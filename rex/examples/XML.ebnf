@@ -1,0 +1,165 @@
+document ::= prolog element Misc* EOF
+prolog   ::= XMLDecl? Misc* ( doctypedecl Misc* )?
+XMLDecl  ::= '<?xml' VersionInfo EncodingDecl? SDDecl? S? '?>'
+VersionInfo
+         ::= S 'version' Eq ( "'" VersionNum "'" | '"' VersionNum '"' )
+Eq       ::= S? '=' S?
+Misc     ::= Comment
+           | PI
+           | S
+doctypedecl
+         ::= '<!DOCTYPE' S Name ( S ExternalID )? S? ( '[' intSubset ']' S? )? '>'
+DeclSep  ::= PEReference
+           | S
+intSubset
+         ::= ( markupdecl | DeclSep )*
+markupdecl
+         ::= elementdecl
+           | AttlistDecl
+           | EntityDecl
+           | NotationDecl
+           | PI
+           | Comment
+SDDecl   ::= S 'standalone' Eq ( "'" ( 'yes' | 'no' ) "'" | '"' ( 'yes' | 'no' ) '"' )
+element  ::= '<' Name ( S Attribute )* S? ( '/>' | '>' content ETag )
+Attribute
+         ::= Name Eq AttValue
+ETag     ::= '</' Name S? '>'
+content  ::= CharData? ( ( element | Reference | CDSect | PI | Comment ) CharData? )*
+elementdecl
+         ::= '<!ELEMENT' S Name S contentspec S? '>'
+contentspec
+         ::= 'EMPTY'
+           | 'ANY'
+           | Mixed
+           | children
+children ::= choiceOrSeq ( '?' | '*' | '+' )?
+cp       ::= ( Name | choiceOrSeq ) ( '?' | '*' | '+' )?
+choiceOrSeq
+         ::= '(' S? cp S? ( ( '|' S? cp S? )+ | ( ',' S? cp S? )* ) ')'
+Mixed    ::= '(' S? '#PCDATA' S? ( ( '|' S? Name S? )* ')*' | ')' )
+AttlistDecl
+         ::= '<!ATTLIST' S Name AttDef* S? '>'
+AttDef   ::= S Name S AttType S DefaultDecl
+AttType  ::= StringType
+           | TokenizedType
+           | EnumeratedType
+StringType
+         ::= 'CDATA'
+TokenizedType
+         ::= 'ID'
+           | 'IDREF'
+           | 'IDREFS'
+           | 'ENTITY'
+           | 'ENTITIES'
+           | 'NMTOKEN'
+           | 'NMTOKENS'
+EnumeratedType
+         ::= NotationType
+           | Enumeration
+NotationType
+         ::= 'NOTATION' S '(' S? Name ( S? '|' S? Name )* S? ')'
+Enumeration
+         ::= '(' S? Nmtoken ( S? '|' S? Nmtoken )* S? ')'
+DefaultDecl
+         ::= '#REQUIRED'
+           | '#IMPLIED'
+           | ( '#FIXED' S )? AttValue
+Reference
+         ::= EntityRef
+           | CharRef
+EntityRef
+         ::= '&' Name ';'
+EntityDecl
+         ::= GEDecl
+           | PEDecl
+GEDecl   ::= '<!ENTITY' S Name S EntityDef S? '>'
+PEDecl   ::= '<!ENTITY' S '%' S Name S PEDef S? '>'
+EntityDef
+         ::= EntityValue
+           | ExternalID NDataDecl?
+PEDef    ::= EntityValue
+           | ExternalID
+ExternalID
+         ::= 'SYSTEM' S SystemLiteral
+           | 'PUBLIC' S PubidLiteral S SystemLiteral
+NDataDecl
+         ::= S 'NDATA' S Name
+EncodingDecl
+         ::= S 'encoding' Eq ( '"' EncName '"' | "'" EncName "'" )
+NotationDecl
+         ::= '<!NOTATION' S Name S ExternalOrPublicID S? '>'
+ExternalOrPublicID
+         ::= 'SYSTEM' S SystemLiteral
+           | 'PUBLIC' S PubidLiteral ( S SystemLiteral )?
+
+<?TOKENS?>
+
+EOF      ::= $
+Char     ::= #x0009
+           | #x000A
+           | #x000D
+           | [#x0020-#xD7FF]
+           | [#xE000-#xFFFD]
+           | [#x10000-#x10FFFF]
+S        ::= ( #x0020 | #x0009 | #x000D | #x000A )+
+NameStartChar
+         ::= ':'
+           | [A-Z]
+           | '_'
+           | [a-z]
+           | [#x00C0-#x00D6]
+           | [#x00D8-#x00F6]
+           | [#x00F8-#x02FF]
+           | [#x0370-#x037D]
+           | [#x037F-#x1FFF]
+           | [#x200C-#x200D]
+           | [#x2070-#x218F]
+           | [#x2C00-#x2FEF]
+           | [#x3001-#xD7FF]
+           | [#xF900-#xFDCF]
+           | [#xFDF0-#xFFFD]
+NameChar ::= NameStartChar
+           | '-'
+           | '.'
+           | [0-9]
+           | #x00B7
+           | [#x0300-#x036F]
+           | [#x203F-#x2040]
+Name     ::= NameStartChar NameChar*
+Nmtoken  ::= NameChar+
+EntityValue
+         ::= '"' ( [^%&"] | PEReference | Reference )* '"'
+           | "'" ( [^%&'] | PEReference | Reference )* "'"
+AttValue ::= '"' ( [^<&"] | Reference )* '"'
+           | "'" ( [^<&'] | Reference )* "'"
+SystemLiteral
+         ::= '"' [^"]* '"'
+           | "'" [^']* "'"
+PubidLiteral
+         ::= '"' PubidChar* '"'
+           | "'" ( PubidChar - "'" )* "'"
+PubidChar
+         ::= #x0020
+           | #x000D
+           | #x000A
+           | [a-zA-Z0-9]
+           | [-'()+,./:=?;!*#@$_%]
+CharData ::= ( [^<&#x005D] | ']' [^<&#x005D] | ']' ']'+ [^<&#x005D>] )+ ']'*
+           | ']'+
+Comment  ::= '<!--' ( Char - '-' | '-' ( Char - '-' ) )* '-->'
+PI       ::= '<?' PITarget ( S ( [^?] | '?'+ [^?>] )* '?'* )? '?>'
+PITarget ::= Name
+CDSect   ::= '<![CDATA[' ( [^#x005D] | ']' [^#x005D] | ']' ']'+ [^#x005D>] )* ']'+ ']>'
+VersionNum
+         ::= '1.' [0-9]+
+CharRef  ::= '&#' [0-9]+ ';'
+           | '&#x' [0-9a-fA-F]+ ';'
+Reference
+         ::= EntityRef
+           | CharRef
+EntityRef
+         ::= '&' Name ';'
+PEReference
+         ::= '%' Name ';'
+EncName  ::= [A-Za-z] ( [A-Za-z0-9._] | '-' )*
