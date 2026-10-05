@@ -1,0 +1,1 @@
+line 7:2 mismatched input 'l_res' expecting {'AND', 'AT', 'BETWEEN', 'DAY', 'IN', 'IS', 'LIKE2', 'LIKE4', 'LIKEC', 'LIKE', 'MEMBER', 'MOD', 'MULTISET', 'NOT', 'ON', 'OR', 'SUBMULTISET', 'YEAR', 'COLLATE', '.', '**', '*', '+', '-', '/', NOT_EQUAL_OP, '^', '!', '>', '<', '|', '=', '['}
