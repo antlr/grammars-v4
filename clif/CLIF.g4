@@ -42,6 +42,8 @@
 
 grammar CLIF;
 
+start_: cltext* EOF; // underscore required for Antlr4 renaming.
+
 //A.2.3.1 Term sequence
 termseq
     : (term | SEQMARK)*
@@ -125,7 +127,7 @@ commentsent
 
 //A.2.3.10 Module
 module
-    : OPEN 'cl-module' interpretablename (OPEN 'cl-excludes' name* CLOSE)? cltext? CLOSE
+    : OPEN 'cl-module' interpretablename (OPEN 'cl-excludes' name* CLOSE)? cltext* CLOSE
     ;
 
 //A.2.3.11 Phrase
@@ -136,18 +138,18 @@ phrase
     | OPEN 'cl-comment' ENCLOSEDNAME cltext? CLOSE
     ;
 
-text
+text_
     : phrase+
     ;
 
 cltext
     : module
     | namedtext
-    | text
+    | text_
     ;
 
 namedtext
-    : OPEN 'cl-text' interpretablename text? CLOSE
+    : OPEN 'cl-text' interpretablename text_? CLOSE
     ;
 
 //A.2.2.2 Delimiters

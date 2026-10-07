@@ -35,6 +35,8 @@ public class Test {
     static int string_instance = 0;
     static String prefix = "";
     static boolean quiet = false;
+    static boolean perf = false;
+    static boolean per_file = false;
     static long total_tokens = 0;
     static double total_parse_seconds = 0;
     static long first_file_tokens = 0;
@@ -101,6 +103,14 @@ public class Test {
             {
                 quiet = true;
             }
+            else if (args[i].equals("--perf"))
+            {
+                perf = true;
+            }
+            else if (args[i].equals("--per-file"))
+            {
+                per_file = true;
+            }
             else if (args[i].equals("-trace"))
             {
                 show_trace = true;
@@ -134,6 +144,10 @@ public class Test {
             long timeElapsed = Duration.between(start, finish).toMillis();
             if (!quiet) {
                 double overall_seconds = (timeElapsed * 1.0) / 1000.0;
+                if (!perf) {
+                    System.err.println(prefix + "TT: " + overall_seconds);
+                }
+                else {
                 long warm_tokens = total_tokens - first_file_tokens;
                 double warm_seconds = total_parse_seconds - first_file_parse_seconds;
                 String warm_tps = (inputs.size() > 1 && warm_seconds > 0)
@@ -146,9 +160,10 @@ public class Test {
                 System.err.println(prefix + "PT: " + total_parse_seconds);
                 System.err.println(prefix + "OT: " + (overall_seconds - total_parse_seconds));
                 System.err.println(prefix + "TT: " + overall_seconds);
-                System.err.println(prefix + "TPS: " + (long)(total_tokens / total_parse_seconds));
-                System.err.println(prefix + "Post-warmup TPS: " + warm_tps);
+                System.err.println(prefix + "PR: " + (long)(total_tokens / total_parse_seconds));
+                System.err.println(prefix + "Post-warmup PR: " + warm_tps);
                 System.err.println(prefix + "Post-warmup speed up: " + speedup);
+                }
             }
         }
         java.lang.System.exit(error_code);
@@ -199,13 +214,16 @@ public class Test {
         <parser_name> parser = new <parser_name>(tokens);
         String out_name = input_name;
         if (output_dir != null) {
-            String absPath = new File(input_name).getAbsolutePath();
-            // Strip drive letter (Windows, e.g. "C:") then leading separators.
-            // Avoid backslash literals to prevent StringTemplate escaping issues.
-            int si = 0;
-            if (absPath.length() >= 2 && absPath.charAt(1) == ':') si = 2;
-            while (si \< absPath.length() && (absPath.charAt(si) == '/' || absPath.charAt(si) == File.separatorChar)) si++;
-            String rootless = absPath.substring(si);
+            File abs = new File(input_name).getAbsoluteFile();
+            File root = new File("../<example_dir_unix>").getAbsoluteFile();
+            String rootless;
+            try {
+                rootless = root.toPath().normalize().relativize(abs.toPath().normalize()).toString();
+                if (rootless.equals("..") || rootless.startsWith(".." + File.separator))
+                    rootless = abs.getName();
+            } catch (IllegalArgumentException ex) {
+                rootless = abs.getName();
+            }
             out_name = new File(output_dir, rootless).getPath();
             new File(out_name).getParentFile().mkdirs();
         }
@@ -272,9 +290,9 @@ public class Test {
                 System.err.println(tree.toStringTree(parser));
             }
         }
-        if (!quiet)
+        if (!quiet && per_file)
         {
-            System.err.println(prefix + "Java " + row_number + " " + input_name + " " + result + " " + parse_seconds + " s " + token_count + " tokens " + (long)(token_count / parse_seconds) + " tps");
+            System.err.println(prefix + "Java " + row_number + " " + input_name + " " + result + " " + parse_seconds + " s " + token_count + " tokens " + (long)(token_count / parse_seconds) + " pr");
         }
         if (tee) output.close();
     }

@@ -1,0 +1,155 @@
+{ ixml grammar serialized 
+  2022-06-23T17:27:05.776042-06:00
+  by serialize-as-ixml.xsl from 
+  file:/home/cmsmcq/2022/github/cmsmcq-ixml/samples/Oberon/misc/tmp.Oberon.1.xml
+}
+
+{* 2022-06-23: whitespace handling added by inject-whitespace.xsl *
+ * start = module
+ * whitespace = s
+ * literal = trailing
+ * tokens = ident+integer+real+CharConstant+string
+ * hide = letter+character+digit+hexDigit
+}
+module = MODULE, ident, SEMI, (ImportList)?, DeclarationSequence, (BEGIN, StatementSequence)?, END, ident, DOT.
+-digit = D-0 | D-1 | D-2 | D-3 | D-4 | D-5 | D-6 | D-7 | D-8 | D-9.
+-hexDigit = -digit | D-A | D-B | D-C | D-D | D-E | D-F.
+ident = -letter, (-letter | -digit)*, s?.
+qualident = (ident, DOT)?, ident.
+identdef = ident, (STAR)?.
+integer = -digit, (-digit)*, s? | -digit, (-hexDigit)*, HEXINT, s?.
+real = -digit, (-digit)*, DOT, (-digit)*, (ScaleFactor)?, s?.
+ScaleFactor = (D-E | D-D), (PLUS | MINUS)?, -digit, (-digit)*.
+number = integer | real.
+string = __39, (-character)*, __39, s? | -digit, (hexdigit)*, HEXCHAR, s?.
+ConstDeclaration = identdef, EQUALS, ConstExpression.
+ConstExpression = expression.
+TypeDeclaration = identdef, EQUALS, StrucType.
+StrucType = ArrayType | RecordType | PointerType | ProcedureType.
+type = qualident | StrucType.
+ArrayType = ARRAY, length, (COMMA, length)*, OF, type.
+length = ConstExpression.
+RecordType = RECORD, (LPAR, BaseType, RPAR)?, (FieldListSequence)?, END.
+BaseType = qualident.
+FieldListSequence = FieldList, (SEMI, FieldList)*.
+FieldList = IdentList, COLON, type.
+IdentList = identdef, (COMMA, identdef)*.
+PointerType = POINTER, TO, type.
+ProcedureType = PROCEDURE, (FormalParameters)?.
+VariableDeclaration = IdentList, COLON, type.
+expression = SimpleExpression, (relation, SimpleExpression)?.
+relation = EQUALS | NEQ | LSS | LEQ | GTR | GEQ | IN | IS.
+SimpleExpression = (PLUS | MINUS)?, term, (AddOperator, term)*.
+AddOperator = PLUS | MINUS | OR.
+term = factor, (MulOperator, factor)*.
+MulOperator = STAR | SLASH | DIV | MOD | AND.
+factor = number | string | NIL | TRUE | FALSE | set | designator, (ActualParameters)? | LPAR, expression, RPAR | NEGATION, factor.
+designator = qualident, (selector)*.
+selector = DOT, ident | LBRKT, ExpList, RBRKT | UP | LPAR, qualident, RPAR.
+set = LBRACE, (element, (COMMA, element)*)?, RBRACE.
+element = expression, (DOTDOT, expression)?.
+ExpList = expression, (COMMA, expression)*.
+ActualParameters = LPAR, (ExpList)?, RPAR.
+statement = (assignment | ProcedureCall | IfStatement | CaseStatement | WhileStatement | RepeatStatement | ForStatement)?.
+assignment = designator, GETS, expression.
+ProcedureCall = designator, (ActualParameters)?.
+StatementSequence = statement, (SEMI, statement)*.
+IfStatement = IF, expression, THEN, StatementSequence, (ELSIF, expression, THEN, StatementSequence)*, (ELSE, StatementSequence)?, END.
+CaseStatement = CASE, expression, OF, case, (VBAR, case)*, END.
+Case = CaseLabelList, COLON, StatementSequence.
+CaseLabelList = LabelRange, (COMMA, LabelRange)*.
+LabelRange = label, (DOTDOT, label)?.
+label = integer | string | ident.
+WhileStatement = WHILE, expression, DO, StatementSequence, (ELSIF, expression, DO, StatementSequence)*, END.
+RepeatStatement = REPEAT, StatementSequence, UNTIL, expression.
+ForStatement = FOR, ident, GETS, expression, TO, expression, (BY, ConstExpression)?, DO, StatementSequence, END.
+ProcedureDeclaration = ProcedureHeading, SEMI, ProcedureBody, ident.
+ProcedureHeading = PROCEDURE, identdef, (FormalParameters)?.
+ProcedureBody = DeclarationSequence, (BEGIN, StatementSequence)?, (RETURN, expression)?, END.
+DeclarationSequence = (CONST, (ConstDeclaration, SEMI)*)?, (TYPE, (TypeDeclaration, SEMI)*)?, (VAR, (VariableDeclaration, SEMI)*)?, (ProcedureDeclaration, SEMI)*.
+FormalParameters = LPAR, (FPSection, (SEMI, FPSection)*)?, RPAR, (COLON, qualident)?.
+FPSection = (CONST | VAR)?, ident, (COMMA, ident)*, COLON, FormalType.
+FormalType = (ARRAY, OF)?, qualident.
+ImportList = IMPORT, import, (COMMA, import)*, SEMI.
+import = ident, (GETS, ident)?.
+
+{*  Rules added by inject-whitespace.xsl *}
+-s = -[Zs; #9; #A; #D].
+-NEQ = -"#", s?.
+-AND = -"&", s?.
+-__39 = -"'", s?.
+-LPAR = -"(", s?.
+-RPAR = -")", s?.
+-STAR = -"*", s?.
+-PLUS = -"+", s?.
+-COMMA = -",", s?.
+-MINUS = -"-", s?.
+-DOT = -".", s?.
+-DOTDOT = -"..", s?.
+-SLASH = -"/", s?.
+-D-0 = -"0", s?.
+-D-1 = -"1", s?.
+-D-2 = -"2", s?.
+-D-3 = -"3", s?.
+-D-4 = -"4", s?.
+-D-5 = -"5", s?.
+-D-6 = -"6", s?.
+-D-7 = -"7", s?.
+-D-8 = -"8", s?.
+-D-9 = -"9", s?.
+-COLON = -":", s?.
+-GETS = -":=", s?.
+-SEMI = -";", s?.
+-LSS = -"<", s?.
+-LEQ = -"<=", s?.
+-EQUALS = -"=", s?.
+-GTR = -">", s?.
+-GEQ = -">=", s?.
+-D-A = -"A", s?.
+-ARRAY = -"ARRAY", s?.
+-D-B = -"B", s?.
+-BEGIN = -"BEGIN", s?.
+-BY = -"BY", s?.
+-D-C = -"C", s?.
+-CASE = -"CASE", s?.
+-CONST = -"CONST", s?.
+-D-D = -"D", s?.
+-DIV = -"DIV", s?.
+-DO = -"DO", s?.
+-D-E = -"E", s?.
+-ELSE = -"ELSE", s?.
+-ELSIF = -"ELSIF", s?.
+-END = -"END", s?.
+-D-F = -"F", s?.
+-FALSE = -"FALSE", s?.
+-FOR = -"FOR", s?.
+-HEXINT = -"H", s?.
+-IF = -"IF", s?.
+-IMPORT = -"IMPORT", s?.
+-IN = -"IN", s?.
+-IS = -"IS", s?.
+-MOD = -"MOD", s?.
+-MODULE = -"MODULE", s?.
+-NIL = -"NIL", s?.
+-OF = -"OF", s?.
+-OR = -"OR", s?.
+-POINTER = -"POINTER", s?.
+-PROCEDURE = -"PROCEDURE", s?.
+-RECORD = -"RECORD", s?.
+-REPEAT = -"REPEAT", s?.
+-RETURN = -"RETURN", s?.
+-THEN = -"THEN", s?.
+-TO = -"TO", s?.
+-TRUE = -"TRUE", s?.
+-TYPE = -"TYPE", s?.
+-UNTIL = -"UNTIL", s?.
+-VAR = -"VAR", s?.
+-WHILE = -"WHILE", s?.
+-HEXCHAR = -"X", s?.
+-LBRKT = -"[", s?.
+-RBRKT = -"]", s?.
+-UP = -"^", s?.
+-LBRACE = -"{", s?.
+-VBAR = -"|", s?.
+-RBRACE = -"}", s?.
+-NEGATION = -"~", s?.

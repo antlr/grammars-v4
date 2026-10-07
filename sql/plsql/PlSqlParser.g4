@@ -3164,8 +3164,8 @@ create_materialized_view_log
     // table_partitioning_clauses TODO
     (
         WITH (','? ( OBJECT ID | PRIMARY KEY | ROWID | SEQUENCE | COMMIT SCN))* (
-            '(' ( ','? regular_id)+ ')' new_values_clause?
-        )? mv_log_purge_clause?
+            '(' ( ','? regular_id)+ ')'
+        )? new_values_clause? mv_log_purge_clause?
     )*
     ;
 
@@ -3477,9 +3477,7 @@ xmltype_storage
     ;
 
 xmlschema_spec
-    : (XMLSCHEMA DELIMITED_ID)? ELEMENT DELIMITED_ID (allow_or_disallow NONSCHEMA)? (
-        allow_or_disallow ANYSCHEMA
-    )?
+    : ((XMLSCHEMA DELIMITED_ID)? ELEMENT id_expression)? (allow_or_disallow (NONSCHEMA | ANYSCHEMA))*
     ;
 
 object_table
@@ -5057,6 +5055,7 @@ alter_table
         | alter_table_partitioning
         //TODO      | alter_external_table
         | move_table_clause
+        | modify_to_partitioned
     ) ((enable_disable_clause | enable_or_disable (TABLE LOCK | ALL TRIGGERS))+)?
     ;
 
@@ -5108,12 +5107,9 @@ merge_table_partition
     ;
 
 modify_table_partition
-    : MODIFY (
-        (PARTITION | SUBPARTITION) partition_name ((ADD | DROP) list_values_clause)? (ADD range_subpartition_desc)? (
-            REBUILD? UNUSABLE LOCAL INDEXES
-        )? shrink_clause?
-        | range_partitions
-    )
+    : MODIFY (PARTITION | SUBPARTITION) partition_name ((ADD | DROP) list_values_clause)? (
+        ADD range_subpartition_desc
+    )? (REBUILD? UNUSABLE LOCAL INDEXES)? shrink_clause?
     ;
 
 split_table_partition
@@ -5273,6 +5269,7 @@ index_attributes
     : (
         physical_attributes_clause
         | logging_clause
+        | ONLINE
         | TABLESPACE (tablespace | DEFAULT)
         | key_compression
         | sort_or_nosort
@@ -5296,6 +5293,10 @@ move_table_clause
         lob_storage_clause
         | varray_col_properties
     )* parallel_clause?
+    ;
+
+modify_to_partitioned
+    : MODIFY (table_partitioning_clauses | NONPARTITIONED) filter_condition? ONLINE? update_index_clauses?
     ;
 
 index_org_table_clause
@@ -5465,7 +5466,7 @@ modify_lob_parameters
 
 lob_parameters
     : (
-        (ENABLE | DISABLE) STORAGE IN ROW
+        (ENABLE | DISABLE) STORAGE IN ROW UNSIGNED_INTEGER?
         | CHUNK UNSIGNED_INTEGER
         | PCTVERSION UNSIGNED_INTEGER
         | FREEPOOLS UNSIGNED_INTEGER
@@ -6155,7 +6156,7 @@ explain_statement
     ;
 
 select_only_statement
-    : with_clause? subquery
+    : subquery
     ;
 
 select_statement
@@ -6174,7 +6175,7 @@ with_factoring_clause
     ;
 
 subquery_factoring_clause
-    : query_name paren_column_list? AS '(' subquery order_by_clause? ')' search_clause? cycle_clause?
+    : query_name paren_column_list? AS '(' subquery_no_with order_by_clause? ')' search_clause? cycle_clause?
     ;
 
 search_clause
@@ -6216,12 +6217,18 @@ add_calc_meas_clause
     ;
 
 subquery
+    : with_clause? subquery_basic_elements subquery_operation_part*
+    ;
+
+// A subquery that must not start with (or contain, parenthesized) a WITH clause.
+// Used where Oracle rejects a CTE: inside another CTE definition and as UNION/INTERSECT/MINUS operands.
+subquery_no_with
     : subquery_basic_elements subquery_operation_part*
     ;
 
 subquery_basic_elements
     : query_block
-    | '(' subquery ')'
+    | '(' subquery_no_with ')'
     ;
 
 subquery_operation_part
@@ -6524,7 +6531,11 @@ insert_into_clause
     ;
 
 values_clause
-    : VALUES (REGULAR_ID | '(' expressions_ ')' | collection_expression)
+    : VALUES (
+        REGULAR_ID
+        | '(' expressions_ ')' (COMMA '(' expressions_ ')')*
+        | collection_expression
+    )
     ;
 
 merge_statement
@@ -6840,6 +6851,7 @@ atom
     | inquiry_directive
     | general_element outer_join_sign?
     | '(' subquery ')' subquery_operation_part*
+    | '(' expression ')' ('.' general_element_part)*
     | '(' expressions_ ')'
     ;
 
@@ -7939,6 +7951,7 @@ regular_id
     | COVAR_
     | DATE_FORMAT
     | CSV
+    | CHARACTERSET
     ;
 
 non_reserved_keywords_in_18c
@@ -8148,6 +8161,7 @@ non_reserved_keywords_in_12c
     | NOCOPY
     | NOKEEP
     | NONEDITIONABLE
+    | NONPARTITIONED
     | NOPARTITION
     | NORELOCATE
     | NOREPLAY

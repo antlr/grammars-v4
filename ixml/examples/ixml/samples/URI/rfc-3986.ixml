@@ -1,0 +1,137 @@
+{ RFC 3986, Uniform Resource Identifier (URI): Generic Syntax
+  January 2005.
+
+  Grammar of appendix A transcribed into ixml 
+
+}
+{
+  2022-06-11 : CMSMcQ : made file
+}
+
+   -URI-reference = URI | relative-ref.
+
+   URI           = scheme, -":", hier-part, (-"?", query)?, (-"#", fragment)?.
+
+   hier-part     = -"//", authority, path-abempty
+                 | path-absolute
+                 | path-rootless
+                 | path-empty.
+
+   absolute-URI  = scheme, -":", hier-part, (-"?", query)?.
+
+   relative-ref  = relative-part, (-"?", query)?, ("#", fragment)?.
+
+   relative-part = -"//", authority, path-abempty
+                 | path-absolute
+                 | path-noscheme
+                 | path-empty.
+
+   scheme        = ALPHA, (ALPHA | DIGIT | ["+-."] )*.
+
+   authority     = (userinfo, -"@")?, host, (-":", port)?.
+   userinfo      = (unreserved | pct-encoded | sub-delims | ":")*.
+   host          = IP-literal | IPv4address | reg-name.
+   port          = DIGIT*.
+
+   IP-literal    = -"[", (IPv6address | IPvFuture), "]".
+
+   IPvFuture     = -"v", HEXDIG+, ".",  (unreserved | sub-delims | ":")+.
+
+{{{
+   IPv6address   =                            6( h16 ":" ) ls32
+                 |                       "::" 5( h16 ":" ) ls32
+                 | (               h16 )? "::" 4( h16 ":" ) ls32
+                 | ( *1( h16 ":" ) h16 )? "::" 3( h16 ":" ) ls32
+                 | ( *2( h16 ":" ) h16 )? "::" 2( h16 ":" ) ls32
+                 | ( *3( h16 ":" ) h16 )? "::"    h16 ":"   ls32
+                 | ( *4( h16 ":" ) h16 )? "::"              ls32
+                 | ( *5( h16 ":" ) h16 )? "::"              h16
+                 | ( *6( h16 ":" ) h16 )? "::"
+}}}
+
+   IPv6address   =                h16x6, ls32
+                 |          "::", h16x5, ls32
+                 | h16x0-1, "::", h16x4, ls32
+                 | h16x0-2, "::", h16x3, ls32
+                 | h16x0-3, "::", h16x2, ls32
+                 | h16x0-4, "::", h16x1, ls32
+                 | h16x0-5, "::",        ls32
+                 | h16x0-6, "::",        h16
+                 | h16x0-7, "::".
+
+   -h16x6        = h16, ":", h16, ":", h16, ":", h16, ":", h16, ":", h16, ":".
+   -h16x5        = h16, ":", h16, ":", h16, ":", h16, ":", h16, ":".
+   -h16x4        = h16, ":", h16, ":", h16, ":", h16, ":".
+   -h16x3        = h16, ":", h16, ":", h16, ":".
+   -h16x2        = h16, ":", h16, ":".
+   -h16x1        = h16, ":".
+
+   -h16x0-7      = h16x0-6 | h16x6, h16.
+   -h16x0-6      = h16x0-5 | h16x5, h16.
+   -h16x0-5      = h16x0-4 | h16x4, h16.
+   -h16x0-4      = h16x0-3 | h16x3, h16.
+   -h16x0-3      = h16x0-2 | h16x2, h16.
+   -h16x0-2      = h16x0-1 | h16x1, h16.
+   -h16x0-1      = h16?.
+   
+   -h16          = HEXDIG, (HEXDIG, (HEXDIG, HEXDIG?)?)?.
+   -ls32         = (h16, ":", h16) | IPv4address.
+   IPv4address   = dec-octet, ".", dec-octet, ".", dec-octet, ".", dec-octet.
+
+   -dec-octet    = DIGIT                 { 0-9 }
+                 | [#31 - #39], DIGIT    { 10-99 }
+                 | "1", DIGIT, DIGIT     { 100-199 }
+                 | "2", [#30-#34], DIGIT { 200-249 }
+                 | "25", [#30-#35]       { 250-255 }
+                 .
+
+   reg-name      = ( unreserved | pct-encoded | sub-delims )*.
+
+   path          = path-abempty    { begins with "/" or is empty }
+                 | path-absolute   { begins with "/" but not "//" }
+                 | path-noscheme   { begins with a non-colon segment }
+                 | path-rootless   { begins with a segment }
+                 | path-empty      { zero characters }
+                 .
+
+   path-abempty  = (-"/", segment)*.
+   path-absolute = "/", (segment-nz, ("/", segment)*)?.
+   path-noscheme = segment-nz-nc, ("/", segment)*.
+   path-rootless = segment-nz, ("/", segment)*.
+   path-empty    = {}.
+
+   segment       = pchar*.
+   segment-nz    = pchar+.
+   segment-nz-nc = ( unreserved | pct-encoded | sub-delims | "@" )+.
+                 { non-zero-length segment without any colon ":" }
+
+   -pchar        = unreserved | pct-encoded | sub-delims | ":" | "@".
+
+   query         = ( pchar | "/" | "?" )*.
+
+   fragment      = ( pchar | "/" | "?" )*.
+
+   pct-encoded   = "%", HEXDIG, HEXDIG.
+
+   -unreserved   = ALPHA | DIGIT | "-" | "." | "_" | "~".
+   reserved      = gen-delims | sub-delims.
+   gen-delims    = ":" | "|" | "?" | "#" | "[" | "]" | "@".
+   sub-delims    = "!" | "$" | "&" | "'" | "(" | ")"
+                 | "*" | "+" | "," | ";" | "=".
+
+{ Rules brought in from RFC 2234 }
+
+-ALPHA         = ["A"-"Z"; "a"-"z"]. { #41-#5A; #61-#7A }
+
+CR            = #0D. { carriage return }
+
+-DIGIT         = ["0"-"9"]. { #30 - #39 }
+
+DQUOTE        = #22. { (Double Quote) }
+
+-HEXDIG       = DIGIT; ["A"-"F"].
+
+LF	      = #0A. { linefeed }
+
+SP            = #20.
+

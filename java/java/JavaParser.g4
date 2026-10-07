@@ -41,7 +41,7 @@ options {
     superClass = JavaParserBase;
 }
 
-compilationUnit
+compilationunit
     : packageDeclaration? (importDeclaration | ';')* (typeDeclaration | ';')* EOF
     | modularCompulationUnit EOF
     ;

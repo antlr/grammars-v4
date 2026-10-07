@@ -31,11 +31,11 @@ fn parse_input(
     let out_name: String = if let Some(ref odir) = flags.output_dir {
         let abs = std::fs::canonicalize(input_name)
             .unwrap_or_else(|_| std::env::current_dir().unwrap_or_default().join(input_name));
-        let rootless: std::path::PathBuf = abs.components()
-            .filter(|c| !matches!(c,
-                std::path::Component::Prefix(_) |
-                std::path::Component::RootDir))
-            .collect();
+        let root = std::fs::canonicalize("../<example_dir_unix>")
+            .unwrap_or_else(|_| std::env::current_dir().unwrap_or_default().join("../<example_dir_unix>"));
+        let rootless = abs.strip_prefix(&root)
+            .map(std::path::PathBuf::from)
+            .unwrap_or_else(|_| abs.file_name().map(std::path::PathBuf::from).unwrap_or_default());
         let p = std::path::Path::new(odir).join(rootless);
         if let Some(parent) = p.parent() {
             std::fs::create_dir_all(parent).ok();
@@ -111,8 +111,8 @@ fn parse_input(
         }
     }
 
-    if !flags.quiet {
-        eprint!("{}Rust {} {} {} {:.3} s {} tokens {:.0} tps\n",
+    if !flags.quiet && flags.per_file {
+        eprint!("{}Rust {} {} {} {:.3} s {} tokens {:.0} pr\n",
             flags.prefix, idx, input_name,
             if error_cnt > 0 { "fail" } else { "success" },
             parse_seconds,
@@ -133,6 +133,8 @@ struct Flags {
     show_trace: bool,
     tee: bool,
     quiet: bool,
+    perf: bool,
+    per_file: bool,
     output_dir: Option\<String>,
 }
 
@@ -146,6 +148,8 @@ fn main() {
         show_trace: false,
         tee: false,
         quiet: false,
+        perf: false,
+        per_file: false,
         output_dir: None,
     };
 
@@ -171,6 +175,8 @@ fn main() {
                 flags.tee = true;
             }
             "-q" => flags.quiet = true,
+            "--perf" => flags.perf = true,
+            "--per-file" => flags.per_file = true,
             "-trace" => flags.show_trace = true,
             "-x" => {
                 let stdin = io::stdin();
@@ -214,6 +220,9 @@ fn main() {
         let elapsed = start_all.elapsed();
         if !flags.quiet {
             let overall_seconds = elapsed.as_secs_f64();
+            if !flags.perf {
+                eprintln!("{}TT: {:.3}", flags.prefix, overall_seconds);
+            } else {
             let warm_tokens = total_tokens - first_file_tokens;
             let warm_seconds = total_parse_seconds - first_file_parse_seconds;
             let warm_tps = if flags.inputs.len() > 1 && warm_seconds > 0.0 {
@@ -230,9 +239,10 @@ fn main() {
             eprintln!("{}PT: {:.3}", flags.prefix, total_parse_seconds);
             eprintln!("{}OT: {:.3}", flags.prefix, overall_seconds - total_parse_seconds);
             eprintln!("{}TT: {:.3}", flags.prefix, overall_seconds);
-            eprintln!("{}TPS: {:.0}", flags.prefix, total_tokens as f64 / total_parse_seconds);
-            eprintln!("{}Post-warmup TPS: {}", flags.prefix, warm_tps);
+            eprintln!("{}PR: {:.0}", flags.prefix, total_tokens as f64 / total_parse_seconds);
+            eprintln!("{}Post-warmup PR: {}", flags.prefix, warm_tps);
             eprintln!("{}Post-warmup speed up: {}", flags.prefix, speedup);
+            }
         }
         process::exit(exit_code as i32);
     }

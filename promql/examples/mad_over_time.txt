@@ -1,0 +1,1 @@
+mad_over_time(demo_cpu_usage_seconds_total[5m])

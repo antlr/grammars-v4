@@ -56,7 +56,7 @@ echo "" >> parse.txt
 # Get a list of test files from the test directory. Do not include any
 # .errors or .tree files. Pay close attention to remove only file names
 # that end with the suffix .errors or .tree.
-files2=`dotnet trash glob '../<example_files_unix>' | grep -v '.errors$' | grep -v '.tree$'`
+files2=`dotnet trash glob <glob_args_unix> | grep -v '.errors$' | grep -v '.tree$'`
 files=()
 for f in $files2
 do
@@ -102,10 +102,10 @@ fi
 if [[ "$type" == "group" ]]
 then
     # Run once and to work past virus scan delay.
-    echo "${files[1]}" | dotnet trash wdog ./bin/Debug/net10.0/<if(os_win)>Test.exe<else>Test<endif> -x -prefix group > /dev/null 2>&1
+    echo "${files[1]}" | dotnet trash wdog ./bin/Debug/net10.0/<if(os_win)>Test.exe<else>Test<endif> -x --perf --per-file -prefix group > /dev/null 2>&1
     for ((i=1; i\<=n; i++))
     do
-        echo "${files[*]}" | dotnet trash wdog ./bin/Debug/net10.0/<if(os_win)>Test.exe<else>Test<endif> -x -prefix group >> parse.txt 2>&1
+        echo "${files[*]}" | dotnet trash wdog ./bin/Debug/net10.0/<if(os_win)>Test.exe<else>Test<endif> -x --perf --per-file -prefix group >> parse.txt 2>&1
         xxx="$?"
         if [ "$xxx" -ne 0 ]
         then

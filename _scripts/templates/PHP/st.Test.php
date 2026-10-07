@@ -74,6 +74,8 @@ $error_code = 0;
 $string_instance = 0;
 $prefix = "";
 $quiet = false;
+$perf = false;
+$per_file = false;
 $total_tokens = 0;
 $total_parse_seconds = 0;
 $first_file_tokens = 0;
@@ -91,6 +93,8 @@ function main($argv) : void {
     global $error_code;
     global $prefix;
     global $quiet;
+    global $perf;
+    global $per_file;
     global $total_tokens;
     global $total_parse_seconds;
     global $first_file_tokens;
@@ -118,6 +122,10 @@ function main($argv) : void {
             }
         } else if ($argv[$i] == "-q") {
             $quiet = true;
+        } else if ($argv[$i] == "--perf") {
+            $perf = true;
+        } else if ($argv[$i] == "--per-file") {
+            $per_file = true;
         } else if ($argv[$i] == "-trace") {
             $show_trace = true;
         } else if ($argv[$i][0] == "-") {
@@ -142,6 +150,9 @@ function main($argv) : void {
         $duration = $timer->stop();
         if (! $quiet) {
             $overall_seconds = $duration->asSeconds();
+            if (! $perf) {
+                fwrite(STDERR, $prefix . "TT: " . $overall_seconds . "\n");
+            } else {
             $warm_tokens = $total_tokens - $first_file_tokens;
             $warm_seconds = $total_parse_seconds - $first_file_parse_seconds;
             $warm_tps = (count($inputs) > 1 && $warm_seconds > 0)
@@ -154,9 +165,10 @@ function main($argv) : void {
             fwrite(STDERR, $prefix . "PT: " . $total_parse_seconds . "\n");
             fwrite(STDERR, $prefix . "OT: " . ($overall_seconds - $total_parse_seconds) . "\n");
             fwrite(STDERR, $prefix . "TT: " . $overall_seconds . "\n");
-            fwrite(STDERR, $prefix . "TPS: " . (int)($total_tokens / $total_parse_seconds) . "\n");
-            fwrite(STDERR, $prefix . "Post-warmup TPS: " . $warm_tps . "\n");
+            fwrite(STDERR, $prefix . "PR: " . (int)($total_tokens / $total_parse_seconds) . "\n");
+            fwrite(STDERR, $prefix . "Post-warmup PR: " . $warm_tps . "\n");
             fwrite(STDERR, $prefix . "Post-warmup speed up: " . $speedup . "\n");
+            }
         }
     }
     exit($error_code);
@@ -195,6 +207,7 @@ function DoParse($str, $input_name, $row_number) {
     global $error_code;
     global $prefix;
     global $quiet;
+    global $per_file;
     global $total_tokens;
     global $total_parse_seconds;
     global $first_file_tokens;
@@ -203,12 +216,12 @@ function DoParse($str, $input_name, $row_number) {
     if ($output_dir != "") {
         $abs_path = realpath($input_name);
         if ($abs_path === false) $abs_path = $input_name;
-        // Strip drive letter then leading separators using ord() to avoid
-        // backslash literals (StringTemplate collapses \\ to \ in output).
-        $rootless = preg_replace('/^[A-Za-z]:/', '', $abs_path);
-        while (strlen($rootless) > 0 && (ord($rootless[0]) == 47 || ord($rootless[0]) == 92)) {
-            $rootless = substr($rootless, 1);
-        }
+        $root = realpath('../<example_dir_unix>');
+        if ($root === false) $root = '../<example_dir_unix>';
+        $root_prefix = rtrim($root, '/'.chr(92)) . DIRECTORY_SEPARATOR;
+        $rootless = strncmp($abs_path, $root_prefix, strlen($root_prefix)) === 0
+            ? substr($abs_path, strlen($root_prefix))
+            : basename($abs_path);
         $out_name = $output_dir . '/' . $rootless;
         $dir = dirname($out_name);
         if (!is_dir($dir)) mkdir($dir, 0755, true);
@@ -272,8 +285,8 @@ function DoParse($str, $input_name, $row_number) {
             fwrite(STDERR, $tree->toStringTree($parser->getRuleNames()));
         }
     }
-    if ( ! $quiet ) {
-        fwrite(STDERR, $prefix . "PHP " . $row_number . " " . $input_name . " " . $result . " " . $parse_seconds . " s " . $token_count . " tokens " . (int)($token_count / $parse_seconds) . " tps\n");
+    if ( ! $quiet && $per_file ) {
+        fwrite(STDERR, $prefix . "PHP " . $row_number . " " . $input_name . " " . $result . " " . $parse_seconds . " s " . $token_count . " tokens " . (int)($token_count / $parse_seconds) . " pr\n");
     }
     if ( $tee ) {
         fclose($output);
