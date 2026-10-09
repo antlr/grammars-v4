@@ -4111,6 +4111,7 @@ non_reserved_words
     | FIRST_NAME
     | FIRST_VALUE
     | FREQUENCY
+    | GEO
     | GLOBAL
     | HIGH
     | HOURS
@@ -4151,6 +4152,7 @@ non_reserved_words
     | ON_SCHEDULE
     | OPTION
     | ORGADMIN
+    | ORIGIN
     | OUTBOUND
     | OUTER
     | OWNER
@@ -4188,6 +4190,7 @@ non_reserved_words
     | RESPECT
     | RESTRICT
     | RESULT
+    | RETURNS
     | ROLE
     | ROUNDING_MODE
     | ROW_NUMBER
@@ -4200,11 +4203,14 @@ non_reserved_words
     | STATE
     | STATS
     | STATUS
+    | SUSPENDED
     | SYSADMIN
+    | SYSTEM
     | TAG
     | TAGS
     | TARGET_LAG
     | TIMEZONE
+    | TRANSACTIONS
     | URL
     | USERADMIN
     | USERNAME
