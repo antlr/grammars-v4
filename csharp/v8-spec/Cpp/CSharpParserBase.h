@@ -28,6 +28,8 @@ public:
     bool IsClassTypeName();
     bool IsClassBaseInterfaceList();
     bool IsClassBaseClassType();
+    bool IsPrimaryConstraintAhead();
+    bool IsSecondaryConstraintAhead();
     bool IsExplicitlyTypedLocalVariable();
     bool IsExplicitlyTypedRefLocalVariable();
     bool IsImplicitlyTypedLocalVariable();

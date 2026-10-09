@@ -200,8 +200,12 @@ export default class CSharpParserBase extends antlr4.Parser {
     }
 
     BeginVariableDeclaration() {
-        const ctx = this._ctx;
+        // After left-factoring (typed_member_declaration), type_ lives in the
+        // parent context; fall back to parent when current context has no children.
+        let ctx = this._ctx;
         if (!ctx) return;
+        if (ctx.getChildCount() === 0 && ctx.parentCtx != null)
+            ctx = ctx.parentCtx;
         this._pendingVarType = ctx.getChild(ctx.getChildCount() - 1).getText() || '?';
     }
 
@@ -295,6 +299,20 @@ export default class CSharpParserBase extends antlr4.Parser {
 
     IsClassBaseInterfaceList() { return this._classBaseTypeCheck(true); }
     IsClassBaseClassType()     { return this._classBaseTypeCheck(false); }
+
+    IsPrimaryConstraintAhead() {
+        const tok = this._input.LT(1);
+        if (!tok) return false;
+        if (tok.type === CSharpLexer.KW_CLASS || tok.type === CSharpLexer.KW_STRUCT ||
+            tok.type === CSharpLexer.KW_NOTNULL || tok.type === CSharpLexer.KW_UNMANAGED ||
+            tok.type === CSharpLexer.KW_OBJECT || tok.type === CSharpLexer.KW_STRING) return true;
+        const sym = this.symTable.currentScope.lookupChain(tok.text);
+        if (!sym) return true;
+        if (sym.kind === CSharpSymbolKind.TypeParameter) return false;
+        if (sym.kind !== CSharpSymbolKind.Type) return true;
+        return sym.typeKind !== CSharpTypeKind.Interface;
+    }
+    IsSecondaryConstraintAhead() { return !this.IsPrimaryConstraintAhead(); }
 
     IsDeclarationPatternAhead() {
         // Heuristic lookahead (avoids stream corruption from Parser constructor

@@ -613,10 +613,17 @@ func (p *CSharpParserBase) OnUsingNamespaceDirective() {
 }
 
 // BeginVariableDeclaration captures the type text for the pending variable declaration.
+// After left-factoring (typed_member_declaration), type_ lives in the parent context;
+// fall back to parent when the current context has no children yet.
 func (p *CSharpParserBase) BeginVariableDeclaration() {
 	ctx := p.GetParserRuleContext()
 	if ctx == nil {
 		return
+	}
+	if ctx.GetChildCount() == 0 {
+		if parent, ok := ctx.GetParent().(antlr.ParserRuleContext); ok {
+			ctx = parent
+		}
 	}
 	n := ctx.GetChildCount()
 	if n == 0 {
@@ -768,6 +775,34 @@ func (p *CSharpParserBase) IsClassBaseInterfaceList() bool { return p.classBaseT
 
 // IsClassBaseClassType returns true if LT(2) is not a known interface type.
 func (p *CSharpParserBase) IsClassBaseClassType() bool { return p.classBaseTypeCheck(false) }
+
+// IsPrimaryConstraintAhead returns true if LT(1) starts a primary type constraint.
+func (p *CSharpParserBase) IsPrimaryConstraintAhead() bool {
+	tok := p.GetTokenStream().LT(1)
+	if tok == nil {
+		return false
+	}
+	switch tok.GetTokenType() {
+	case CSharpLexerKW_CLASS, CSharpLexerKW_STRUCT,
+		CSharpLexerKW_NOTNULL, CSharpLexerKW_UNMANAGED,
+		CSharpLexerKW_OBJECT, CSharpLexerKW_STRING:
+		return true
+	}
+	sym := p.GetSymTable().CurrentScope().LookupChain(tok.GetText())
+	if sym == nil {
+		return true
+	}
+	if sym.Kind == CSharpSymbolKindTypeParameter {
+		return false
+	}
+	if sym.Kind != CSharpSymbolKindType {
+		return true
+	}
+	return sym.TypeKind != CSharpTypeKindInterface
+}
+
+// IsSecondaryConstraintAhead returns true if LT(1) starts a secondary (interface) constraint.
+func (p *CSharpParserBase) IsSecondaryConstraintAhead() bool { return !p.IsPrimaryConstraintAhead() }
 
 // IsDeclarationPatternAhead uses a heuristic token lookahead to check if a declaration pattern follows.
 // (Speculative parsing via NewCSharpParser(ts) is unsafe because BaseParser.SetInputStream calls reset()
