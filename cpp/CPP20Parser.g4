@@ -746,7 +746,7 @@ parametersAndQualifiers
     ;
 
 trailingReturnType
-    : theTypeId
+    : Arrow theTypeId
     ;
 
 pointerOperator
