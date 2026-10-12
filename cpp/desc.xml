@@ -6,13 +6,13 @@
       <name>cpp14</name>
       <grammar-name>CPP14</grammar-name>
       <entry-point>translationUnit</entry-point>
-      <inputs>examples/*.cpp</inputs>
+      <inputs>examples/**/*.cpp</inputs>
    </test>
 
    <test>
       <name>cpp20</name>
       <grammar-name>CPP20</grammar-name>
       <entry-point>start_</entry-point>
-      <inputs>examples/*.cpp;examples/cpp20/**/*.cpp</inputs>
+      <inputs>examples-cpp20/**/*.cpp</inputs>
    </test>
 </desc>
