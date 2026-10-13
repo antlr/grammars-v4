@@ -16,14 +16,6 @@ updates:
     labels:
       - "infrastructure"
       - "dependencies"
-  - package-ecosystem: "nuget"
-    directory: "/_scripts/templates/CSharp"
-    schedule:
-      interval: "daily"
-    labels:
-      - "infrastructure"
-      - "dependencies"
-      - "target:csharp-standard"
   # Go
   - package-ecosystem: "gomod"
     directory: "/_scripts/templates/Go"

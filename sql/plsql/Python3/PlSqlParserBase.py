@@ -6,6 +6,44 @@ class PlSqlParserBase(Parser):
     _isVersion11 = True
     _isVersion12 = True
 
+    def __init__(self, input, output=None):
+        super().__init__(input, output)
+        self._lastUnitWasPlsql = False
+
+    def reset(self):
+        self._lastUnitWasPlsql = False
+        super().reset()
+
+    def setLastUnitPlsql(self):
+        self._lastUnitWasPlsql = True
+
+    def setLastUnitSql(self):
+        self._lastUnitWasPlsql = False
+
+    def isLastUnitSql(self):
+        return not self._lastUnitWasPlsql
+
+    def isLastUnitPlsql(self):
+        return self._lastUnitWasPlsql
+
+    def isSolidusSeparator(self):
+        from PlSqlLexer import PlSqlLexer as _Lexer
+        solidus = self._input.LT(1)
+        if solidus is None or solidus.type != _Lexer.SOLIDUS:
+            return False
+
+        solidusLine = solidus.line
+
+        prev = self._input.LT(-1)
+        if prev is not None and prev.type != Token.EOF and prev.line == solidusLine:
+            return False
+
+        next = self._input.LT(2)
+        if next is not None and next.type != Token.EOF and next.line == solidusLine:
+            return False
+
+        return True
+
     def isVersion10(self):
         return self._isVersion10
 

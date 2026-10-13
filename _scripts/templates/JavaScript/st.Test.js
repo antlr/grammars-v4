@@ -1,6 +1,7 @@
 // Generated from trgen <version>
 
 import antlr4 from 'antlr4';
+import path from 'path';
 <tool_grammar_tuples: {x | import <x.GrammarAutomName> from './<x.GeneratedFileName>';
 } >
 import BinaryCharStream from './BinaryCharStream.js';
@@ -47,12 +48,15 @@ class MyErrorListener extends antlr4.error.ErrorListener {
 }
 
 var tee = false;
+var output_dir = '';
 var show_profile = false;
 var show_tree = false;
 var show_tokens = false;
 var show_trace = false;
 var error_code = 0;
 var quiet = false;
+var perf = false;
+var per_file = false;
 var enc = '<file_encoding>';
 var binary = <binary>;
 var string_instance = 0;
@@ -86,6 +90,10 @@ function main() {
             case '-tee':
                 tee = true;
                 break;
+            case '-o':
+                output_dir = process.argv[++i];
+                tee = true;
+                break;
             case '-encoding':
                 enc = process.argv[++i];
                 break;
@@ -105,6 +113,12 @@ function main() {
                 break;
             case '-q':
                 quiet = true;
+                break;
+            case '--perf':
+                perf = true;
+                break;
+            case '--per-file':
+                per_file = true;
                 break;
             case '-trace':
                 show_trace = true;
@@ -133,6 +147,9 @@ function main() {
         timer.stop();
         var t = timer.time().m * 60 + timer.time().s + timer.time().ms / 1000;
         if (!quiet) {
+            if (!perf) {
+                console.error(prefix + 'TT: ' + t);
+            } else {
             var warm_tokens = total_tokens - first_file_tokens;
             var warm_seconds = total_parse_seconds - first_file_parse_seconds;
             var warm_tps = (inputs.length > 1 && warm_seconds > 0)
@@ -145,9 +162,10 @@ function main() {
             console.error(prefix + 'PT: ' + total_parse_seconds);
             console.error(prefix + 'OT: ' + (t - total_parse_seconds));
             console.error(prefix + 'TT: ' + t);
-            console.error(prefix + 'TPS: ' + Math.round(total_tokens / total_parse_seconds));
-            console.error(prefix + 'Post-warmup TPS: ' + warm_tps);
+            console.error(prefix + 'PR: ' + Math.round(total_tokens / total_parse_seconds));
+            console.error(prefix + 'Post-warmup PR: ' + warm_tps);
             console.error(prefix + 'Post-warmup speed up: ' + speedup);
+            }
         }
     }
     process.exitCode = error_code;
@@ -178,13 +196,23 @@ function ParseFilename(input, row_number) {
 }
 
 function DoParse(str, input_name, row_number) {
+    var out_name = input_name;
+    if (output_dir) {
+        const absPath = path.resolve(input_name);
+        const root = path.resolve('../<example_dir_unix>');
+        let rootless = path.relative(root, absPath);
+        if (rootless === '..' || rootless.startsWith('..' + path.sep) || path.isAbsolute(rootless))
+            rootless = path.basename(absPath);
+        out_name = path.join(output_dir, rootless);
+        fs.mkdirsSync(path.dirname(out_name));
+    }
     if (binary) str = new BinaryCharStream(str);
     const lexer = new <lexer_name>(str);
     const tokens = new antlr4.CommonTokenStream(lexer);
     const parser = new <parser_name>(tokens);
     lexer.removeErrorListeners();
     parser.removeErrorListeners();
-    var output = tee ? fs.openSync(input_name + ".errors", 'w') : 1;
+    var output = tee ? fs.openSync(out_name + ".errors", 'w') : 1;
     var listener_parser = new MyErrorListener(quiet, tee, output);
     var listener_lexer = new MyErrorListener(quiet, tee, output);
     parser.addErrorListener(listener_parser);
@@ -226,13 +254,13 @@ function DoParse(str, input_name, row_number) {
     }
     if (show_tree) {
         if (tee) {
-            fs.writeFileSync(input_name + ".tree", tree.toStringTree(parser.ruleNames));
+            fs.writeFileSync(out_name + ".tree", tree.toStringTree(parser.ruleNames));
         } else {
             console.error(tree.toStringTree(parser.ruleNames));
         }
     }
-    if (! quiet) {
-        console.error(prefix + 'JavaScript ' + row_number + ' ' + input_name + ' ' + result + ' ' + t + ' s ' + token_count + ' tokens ' + Math.round(token_count / t) + ' tps');
+    if (! quiet && per_file) {
+        console.error(prefix + 'JavaScript ' + row_number + ' ' + input_name + ' ' + result + ' ' + t + ' s ' + token_count + ' tokens ' + Math.round(token_count / t) + ' pr');
     }
     if (tee) {
         fs.closeSync(output);

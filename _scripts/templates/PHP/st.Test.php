@@ -63,6 +63,7 @@ class MyErrorListener extends BaseErrorListener /*extends ConsoleErrorListener*/
 }
 
 $tee = false;
+$output_dir = "";
 $show_profile = false;
 $show_tree = false;
 $show_tokens = false;
@@ -73,6 +74,8 @@ $error_code = 0;
 $string_instance = 0;
 $prefix = "";
 $quiet = false;
+$perf = false;
+$per_file = false;
 $total_tokens = 0;
 $total_parse_seconds = 0;
 $first_file_tokens = 0;
@@ -80,6 +83,7 @@ $first_file_parse_seconds = 0;
 
 function main($argv) : void {
     global $tee;
+    global $output_dir;
     global $show_profile;
     global $show_tree;
     global $show_tokens;
@@ -89,6 +93,8 @@ function main($argv) : void {
     global $error_code;
     global $prefix;
     global $quiet;
+    global $perf;
+    global $per_file;
     global $total_tokens;
     global $total_parse_seconds;
     global $first_file_tokens;
@@ -105,6 +111,9 @@ function main($argv) : void {
             array_push($is_fns, false);
         } else if ($argv[$i] == "-tee") {
             $tee = true;
+        } else if ($argv[$i] == "-o") {
+            $output_dir = $argv[++$i];
+            $tee = true;
         } else if ($argv[$i] == "-x") {
             while($f = fgets(STDIN)){
                 $f = trim($f);
@@ -113,6 +122,10 @@ function main($argv) : void {
             }
         } else if ($argv[$i] == "-q") {
             $quiet = true;
+        } else if ($argv[$i] == "--perf") {
+            $perf = true;
+        } else if ($argv[$i] == "--per-file") {
+            $per_file = true;
         } else if ($argv[$i] == "-trace") {
             $show_trace = true;
         } else if ($argv[$i][0] == "-") {
@@ -137,6 +150,9 @@ function main($argv) : void {
         $duration = $timer->stop();
         if (! $quiet) {
             $overall_seconds = $duration->asSeconds();
+            if (! $perf) {
+                fwrite(STDERR, $prefix . "TT: " . $overall_seconds . "\n");
+            } else {
             $warm_tokens = $total_tokens - $first_file_tokens;
             $warm_seconds = $total_parse_seconds - $first_file_parse_seconds;
             $warm_tps = (count($inputs) > 1 && $warm_seconds > 0)
@@ -149,9 +165,10 @@ function main($argv) : void {
             fwrite(STDERR, $prefix . "PT: " . $total_parse_seconds . "\n");
             fwrite(STDERR, $prefix . "OT: " . ($overall_seconds - $total_parse_seconds) . "\n");
             fwrite(STDERR, $prefix . "TT: " . $overall_seconds . "\n");
-            fwrite(STDERR, $prefix . "TPS: " . (int)($total_tokens / $total_parse_seconds) . "\n");
-            fwrite(STDERR, $prefix . "Post-warmup TPS: " . $warm_tps . "\n");
+            fwrite(STDERR, $prefix . "PR: " . (int)($total_tokens / $total_parse_seconds) . "\n");
+            fwrite(STDERR, $prefix . "Post-warmup PR: " . $warm_tps . "\n");
             fwrite(STDERR, $prefix . "Post-warmup speed up: " . $speedup . "\n");
+            }
         }
     }
     exit($error_code);
@@ -181,6 +198,7 @@ function ParseFilename($input, $row_number) {
 
 function DoParse($str, $input_name, $row_number) {
     global $tee;
+    global $output_dir;
     global $show_tree;
     global $show_tokens;
     global $show_trace;
@@ -189,10 +207,25 @@ function DoParse($str, $input_name, $row_number) {
     global $error_code;
     global $prefix;
     global $quiet;
+    global $per_file;
     global $total_tokens;
     global $total_parse_seconds;
     global $first_file_tokens;
     global $first_file_parse_seconds;
+    $out_name = $input_name;
+    if ($output_dir != "") {
+        $abs_path = realpath($input_name);
+        if ($abs_path === false) $abs_path = $input_name;
+        $root = realpath('../<example_dir_unix>');
+        if ($root === false) $root = '../<example_dir_unix>';
+        $root_prefix = rtrim($root, '/'.chr(92)) . DIRECTORY_SEPARATOR;
+        $rootless = strncmp($abs_path, $root_prefix, strlen($root_prefix)) === 0
+            ? substr($abs_path, strlen($root_prefix))
+            : basename($abs_path);
+        $out_name = $output_dir . '/' . $rootless;
+        $dir = dirname($out_name);
+        if (!is_dir($dir)) mkdir($dir, 0755, true);
+    }
     $lexer = new <lexer_name>($str);
     if ($show_tokens) {
         for ($i=0;  ; $i++) {
@@ -207,7 +240,7 @@ function DoParse($str, $input_name, $row_number) {
     }
 
     if ( $tee ) {
-        $output = fopen($input_name . ".errors", "w");
+        $output = fopen($out_name . ".errors", "w");
     } else {
         $output = STDERR;
     }
@@ -245,15 +278,15 @@ function DoParse($str, $input_name, $row_number) {
     }
     if ($show_tree) {
         if ($tee) {
-            $handle = fopen($input_name . ".tree", "w");
+            $handle = fopen($out_name . ".tree", "w");
             fprintf($handle, "%s", $tree->toStringTree($parser->getRuleNames()));
             fclose($handle);
         } else {
             fwrite(STDERR, $tree->toStringTree($parser->getRuleNames()));
         }
     }
-    if ( ! $quiet ) {
-        fwrite(STDERR, $prefix . "PHP " . $row_number . " " . $input_name . " " . $result . " " . $parse_seconds . " s " . $token_count . " tokens " . (int)($token_count / $parse_seconds) . " tps\n");
+    if ( ! $quiet && $per_file ) {
+        fwrite(STDERR, $prefix . "PHP " . $row_number . " " . $input_name . " " . $result . " " . $parse_seconds . " s " . $token_count . " tokens " . (int)($token_count / $parse_seconds) . " pr\n");
     }
     if ( $tee ) {
         fclose($output);

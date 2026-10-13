@@ -35,6 +35,9 @@ public class Program
     static int string_instance = 0;
     static string prefix = "";
     static bool quiet = false;
+    static bool perf = false;
+    static bool per_file = false;
+    static string output_dir = null;
     static long total_tokens = 0;
     static double total_parse_seconds = 0;
     static long first_file_tokens = 0;
@@ -79,6 +82,11 @@ public class Program
             {
                 tee = true;
             }
+            else if (args[i].Equals("-o"))
+            {
+                output_dir = args[++i];
+                tee = true;
+            }
             else if (args[i].Equals("-encoding"))
             {
                 ++i;
@@ -101,6 +109,14 @@ public class Program
             else if (args[i] == "-q")
             {
                 quiet = true;
+            }
+            else if (args[i] == "--perf")
+            {
+                perf = true;
+            }
+            else if (args[i] == "--per-file")
+            {
+                per_file = true;
             }
             else if (args[i] == "-trace")
             {
@@ -130,6 +146,12 @@ public class Program
             if (!quiet)
             {
                 var overall_seconds = (after - before).TotalSeconds;
+                if (!perf)
+                {
+                    System.Console.Error.WriteLine(prefix + "TT: " + overall_seconds);
+                }
+                else
+                {
                 var warm_tokens = total_tokens - first_file_tokens;
                 var warm_seconds = total_parse_seconds - first_file_parse_seconds;
                 var warm_tps = (inputs.Count() > 1 && warm_seconds > 0)
@@ -142,9 +164,10 @@ public class Program
                 System.Console.Error.WriteLine(prefix + "PT: " + total_parse_seconds);
                 System.Console.Error.WriteLine(prefix + "OT: " + (overall_seconds - total_parse_seconds));
                 System.Console.Error.WriteLine(prefix + "TT: " + overall_seconds);
-                System.Console.Error.WriteLine(prefix + "TPS: " + (long)(total_tokens / total_parse_seconds));
-                System.Console.Error.WriteLine(prefix + "Post-warmup TPS: " + warm_tps);
+                System.Console.Error.WriteLine(prefix + "PR: " + (long)(total_tokens / total_parse_seconds));
+                System.Console.Error.WriteLine(prefix + "Post-warmup PR: " + warm_tps);
                 System.Console.Error.WriteLine(prefix + "Post-warmup speed up: " + speedup);
+                }
             }
         }
         Environment.ExitCode = exit_code;
@@ -204,7 +227,19 @@ public class Program
         }
         var tokens = new CommonTokenStream(lexer);
         var parser = new <parser_name>(tokens);
-        var output = tee ? new StreamWriter(input_name + ".errors") : System.Console.Error;
+        string out_name;
+        if (output_dir != null) {
+            var abs = System.IO.Path.GetFullPath(input_name);
+            var root = System.IO.Path.GetFullPath(System.IO.Path.Combine("..", "<example_dir_unix>"));
+            var rootless = System.IO.Path.GetRelativePath(root, abs);
+            if (rootless == ".." || rootless.StartsWith(".." + System.IO.Path.DirectorySeparatorChar))
+                rootless = System.IO.Path.GetFileName(abs);
+            out_name = System.IO.Path.Combine(output_dir, rootless);
+            System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(out_name) ?? output_dir);
+        } else {
+            out_name = input_name;
+        }
+        var output = tee ? new StreamWriter(out_name + ".errors") : System.Console.Error;
         var listener_lexer = new ErrorListener\<int>(quiet, tee, output);
         var listener_parser = new ErrorListener\<IToken>(quiet, tee, output);
         lexer.RemoveErrorListeners();
@@ -242,15 +277,15 @@ public class Program
         {
             if (tee)
             {
-                System.IO.File.WriteAllText(input_name + ".tree", tree.ToStringTree(parser));
+                System.IO.File.WriteAllText(out_name + ".tree", tree.ToStringTree(parser));
             } else
             {
                 System.Console.Error.WriteLine(tree.ToStringTree(parser));
             }
         }
-        if (!quiet)
+        if (!quiet && per_file)
         {
-            System.Console.Error.WriteLine(prefix + "Antlr4cs " + row_number + " " + input_name + " " + result + " " + parse_seconds + " s " + token_count + " tokens " + (long)(token_count / parse_seconds) + " tps");
+            System.Console.Error.WriteLine(prefix + "Antlr4cs " + row_number + " " + input_name + " " + result + " " + parse_seconds + " s " + token_count + " tokens " + (long)(token_count / parse_seconds) + " pr");
         }
         if (tee) output.Close();
     }

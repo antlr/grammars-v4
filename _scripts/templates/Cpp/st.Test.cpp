@@ -5,6 +5,7 @@
 #include \<string>
 #include \<chrono>
 #include \<atomic>
+#include \<filesystem>
 #include \<vector>
 #include "ANTLRInputStream.h"
 #include "ErrorListener.h"
@@ -43,6 +44,7 @@ std::string formatDurationSeconds(uint64_t duration) {
 }
 
 bool tee = false;
+std::string output_dir = "";
 bool show_tree = false;
 bool show_tokens = false;
 bool show_trace = false;
@@ -52,6 +54,8 @@ int error_code = 0;
 int string_instance = 0;
 std::string prefix;
 bool quiet = false;
+bool perf = false;
+bool per_file = false;
 std::string file_encoding = "<file_encoding>";
 long total_tokens = 0;
 double total_parse_seconds = 0;
@@ -60,6 +64,16 @@ double first_file_parse_seconds = 0;
 
 void DoParse(antlr4::CharStream* str, std::string input_name, int row_number)
 {
+    std::string out_name = input_name;
+    if (!output_dir.empty()) {
+        auto abs = std::filesystem::absolute(input_name);
+        auto root = std::filesystem::absolute("../<example_dir_unix>");
+        auto rootless = std::filesystem::relative(abs, root);
+        if (rootless.empty() || *rootless.begin() == "..")
+            rootless = abs.filename();
+        out_name = (std::filesystem::path(output_dir) / rootless).string();
+        std::filesystem::create_directories(std::filesystem::path(out_name).parent_path());
+    }
     antlr4::Lexer* lexer = new <lexer_name>(str);
     if (show_tokens)
     {
@@ -77,7 +91,7 @@ void DoParse(antlr4::CharStream* str, std::string input_name, int row_number)
     auto tokens = new antlr4::CommonTokenStream(lexer);
     auto* parser = new <parser_name>(tokens);
     std::ostream* output = tee
-        ? new std::ofstream(input_name + ".errors")
+        ? new std::ofstream(out_name + ".errors")
         : &std::cerr;
     auto listener_lexer = new ErrorListener(quiet, tee, output);
     auto listener_parser = new ErrorListener(quiet, tee, output);
@@ -117,7 +131,7 @@ void DoParse(antlr4::CharStream* str, std::string input_name, int row_number)
         if (tee)
         {
             try {
-                auto fn = input_name + ".tree";
+                auto fn = out_name + ".tree";
                 auto out = new std::ofstream(fn);
                 (*out) \<\< tree->toStringTree(parser);
                 delete out;
@@ -130,9 +144,9 @@ void DoParse(antlr4::CharStream* str, std::string input_name, int row_number)
             std::cerr \<\< tree->toStringTree(parser) \<\< std::endl;
         }
     }
-    if (!quiet)
+    if (!quiet && per_file)
     {
-        std::cerr \<\< prefix \<\< "Cpp " \<\< row_number \<\< " " \<\< input_name \<\< " " \<\< result \<\< " " \<\< parse_seconds \<\< " s " \<\< token_count \<\< " tokens " \<\< (long)(token_count / parse_seconds) \<\< " tps" \<\< std::endl;
+        std::cerr \<\< prefix \<\< "Cpp " \<\< row_number \<\< " " \<\< input_name \<\< " " \<\< result \<\< " " \<\< parse_seconds \<\< " s " \<\< token_count \<\< " tokens " \<\< (long)(token_count / parse_seconds) \<\< " pr" \<\< std::endl;
     }
     if (tee)
     {
@@ -190,6 +204,11 @@ int TryParse(std::vector\<std::string>& args)
         {
             tee = true;
         }
+        else if (args[i] == "-o")
+        {
+            output_dir = args[++i];
+            tee = true;
+        }
         else if (args[i] == "-x")
         {
             for (; ; )
@@ -209,6 +228,14 @@ int TryParse(std::vector\<std::string>& args)
         else if (args[i] == "-q")
         {
             quiet = true;
+        }
+        else if (args[i] == "--perf")
+        {
+            perf = true;
+        }
+        else if (args[i] == "--per-file")
+        {
+            per_file = true;
         }
         else if (args[i] == "-trace")
         {
@@ -255,6 +282,10 @@ int TryParse(std::vector\<std::string>& args)
         auto duration = std::chrono::duration_cast\<std::chrono::microseconds>(after - before);
         if (!quiet) {
             double overall_seconds = duration.count() / 1000000.0;
+            if (!perf) {
+                std::cerr \<\< prefix \<\< "TT: " \<\< overall_seconds \<\< std::endl;
+            }
+            else {
             long warm_tokens = total_tokens - first_file_tokens;
             double warm_seconds = total_parse_seconds - first_file_parse_seconds;
             std::string warm_tps = (inputs.size() > 1 && warm_seconds > 0)
@@ -269,9 +300,10 @@ int TryParse(std::vector\<std::string>& args)
             std::cerr \<\< prefix \<\< "PT: " \<\< total_parse_seconds \<\< std::endl;
             std::cerr \<\< prefix \<\< "OT: " \<\< (overall_seconds - total_parse_seconds) \<\< std::endl;
             std::cerr \<\< prefix \<\< "TT: " \<\< overall_seconds \<\< std::endl;
-            std::cerr \<\< prefix \<\< "TPS: " \<\< (long)(total_tokens / total_parse_seconds) \<\< std::endl;
-            std::cerr \<\< prefix \<\< "Post-warmup TPS: " \<\< warm_tps \<\< std::endl;
+            std::cerr \<\< prefix \<\< "PR: " \<\< (long)(total_tokens / total_parse_seconds) \<\< std::endl;
+            std::cerr \<\< prefix \<\< "Post-warmup PR: " \<\< warm_tps \<\< std::endl;
             std::cerr \<\< prefix \<\< "Post-warmup speed up: " \<\< speedup_ss.str() \<\< std::endl;
+            }
         }
     }
     return error_code;
@@ -286,4 +318,3 @@ int main(int argc, const char * argv[])
     }   
     return TryParse(args);
 }
-

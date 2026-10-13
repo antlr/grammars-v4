@@ -4075,6 +4075,7 @@ non_reserved_words
     //List here lexer token referenced by rules which is not a keyword (SnowSQL Meaning) and allowed has object name
     // please add in alphabetic order for easy reading
     : ACCOUNTADMIN
+    | ACCOUNTS
     | AES
     | ALLOW_OVERLAPPING_EXECUTION
     | ARRAY_AGG

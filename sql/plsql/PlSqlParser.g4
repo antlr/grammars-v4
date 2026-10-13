@@ -31,12 +31,44 @@ options {
 // Insert here @header for C++ parser.
 
 sql_script
-    : (sql_plus_command  SEMICOLON?)* (
-        (sql_plus_command | unit_statement) (SEMICOLON '/'? (sql_plus_command | unit_statement))* SEMICOLON? '/'?
-    ) EOF
+    : (sql_plus_command SEMICOLON?)* (
+        script_unit (terminator script_unit)* terminator?
+    )? EOF
     ;
 
-unit_statement
+// Actions set a flag for the `terminator` predicate: bare '/' is accepted only
+// after a SQL unit; a PL/SQL unit requires a preceding SEMICOLON.
+script_unit
+    : plsql_unit {this.setLastUnitPlsql();}
+    | sql_unit {this.setLastUnitSql();}
+    | sql_plus_command {this.setLastUnitSql();}
+    ;
+
+// Separator between units (and optional terminator after the last one).
+// SEMICOLON is always valid; bare '/' only after a SQL unit — the predicate
+// rejects '/' after a PL/SQL block, yielding useful diagnostic.
+// isSolidusSeparator() checks that '/' is on its own line (SQL*Plus separator
+// vs division operator).
+terminator
+    : SEMICOLON
+    | SEMICOLON {this.isSolidusSeparator()}? SOLIDUS
+    | {this.isLastUnitSql() && this.isSolidusSeparator()}? SOLIDUS
+    ;
+
+plsql_unit
+    : anonymous_block
+    | create_function_body
+    | create_procedure_body
+    | create_package
+    | create_package_body
+    | create_trigger
+    | create_type_body
+    ;
+
+// SQL/DDL statements. A trailing terminator is optional (the last unit in a
+// script may omit it); when present it is matched by the `terminator` rule,
+// which accepts SEMICOLON, SOLIDUS, or both.
+sql_unit
     : alter_analytic_view
     | alter_attribute_dimension
     | alter_audit_policy
@@ -74,7 +106,6 @@ unit_statement
     | alter_type
     | alter_user
     | alter_view
-    | anonymous_block
     | call_statement
     | create_analytic_view
     | create_attribute_dimension
@@ -90,7 +121,6 @@ unit_statement
     | create_diskgroup
     | create_edition
     | create_flashback_archive
-    | create_function_body
     | create_hierarchy
     | create_index
     | create_inmemory_join_group
@@ -102,10 +132,7 @@ unit_statement
     | create_materialized_zonemap
     | create_operator
     | create_outline
-    | create_package
-    | create_package_body
     | create_pmem_filestore
-    | create_procedure_body
     | create_profile
     | create_restore_point
     | create_role
@@ -116,8 +143,7 @@ unit_statement
     | create_table
     | create_tablespace
     | create_tablespace_set
-    | create_trigger
-    | create_type
+    | create_type_spec
     | create_user
     | create_view
     | drop_analytic_view
@@ -759,10 +785,13 @@ procedure_body
     ;
 
 create_procedure_body
-    : CREATE (OR REPLACE)? PROCEDURE procedure_name ('(' parameter (',' parameter)* ')')? invoker_rights_clause? (PARALLEL_ENABLE | DETERMINISTIC)* (
-        IS
-        | AS
-    ) (DECLARE? seq_of_declare_specs? body | call_spec | EXTERNAL)
+    : CREATE (OR REPLACE)? (EDITIONABLE | NONEDITIONABLE)? PROCEDURE procedure_name (
+        '(' parameter (',' parameter)* ')'
+    )? invoker_rights_clause? (PARALLEL_ENABLE | DETERMINISTIC)* (IS | AS) (
+        DECLARE? seq_of_declare_specs? body
+        | call_spec
+        | EXTERNAL
+    )
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-RESOURCE-COST.html
@@ -840,7 +869,7 @@ alter_trigger
     ;
 
 create_trigger
-    : CREATE (OR REPLACE)? TRIGGER trigger_name (
+    : CREATE (OR REPLACE)? (EDITIONABLE | NONEDITIONABLE)? TRIGGER trigger_name (
         simple_dml_trigger
         | compound_dml_trigger
         | non_dml_trigger
@@ -948,6 +977,7 @@ alter_type
         compile_type_clause
         | replace_type_clause
         | alter_method_spec
+        | alter_attribute_definition
         | alter_collection_clauses
         | modifier_clause
         | overriding_subprogram_spec
@@ -972,6 +1002,11 @@ alter_method_element
     : (ADD | DROP) (map_order_function_spec | subprogram_spec)
     ;
 
+alter_attribute_definition
+    : (ADD | MODIFY) ATTRIBUTE (identifier type_spec? | '(' identifier type_spec (',' identifier type_spec)* ')')
+    | DROP ATTRIBUTE (identifier | '(' identifier (',' identifier)* ')')
+    ;
+
 alter_collection_clauses
     : MODIFY (LIMIT expression | ELEMENT TYPE type_spec)
     ;
@@ -986,7 +1021,17 @@ dependent_exceptions_part
     ;
 
 create_type
-    : CREATE (OR REPLACE)? (EDITIONABLE | NONEDITIONABLE)? TYPE (type_definition | type_body)
+    : create_type_spec | create_type_body
+    ;
+
+// Type spec (SQL, no END) — semicolon optional, solidus valid as terminator
+create_type_spec
+    : CREATE (OR REPLACE)? (EDITIONABLE | NONEDITIONABLE)? TYPE type_definition
+    ;
+
+// Type body (PL/SQL, has END) — requires semicolon, solidus optional after
+create_type_body
+    : CREATE (OR REPLACE)? (EDITIONABLE | NONEDITIONABLE)? TYPE type_body
     ;
 
 // Create Type Specific Clauses
@@ -1610,8 +1655,10 @@ index_expr
     ;
 
 index_properties
-    : (global_partitioned_index | local_partitioned_index | index_attributes)+
-    | INDEXTYPE IS (domain_index_clause | xmlindex_clause)
+    : (
+        (global_partitioned_index | local_partitioned_index | index_attributes)+
+        | INDEXTYPE IS (domain_index_clause | xmlindex_clause)
+    )?
     ;
 
 domain_index_clause
@@ -3117,8 +3164,8 @@ create_materialized_view_log
     // table_partitioning_clauses TODO
     (
         WITH (','? ( OBJECT ID | PRIMARY KEY | ROWID | SEQUENCE | COMMIT SCN))* (
-            '(' ( ','? regular_id)+ ')' new_values_clause?
-        )? mv_log_purge_clause?
+            '(' ( ','? regular_id)+ ')'
+        )? new_values_clause? mv_log_purge_clause?
     )*
     ;
 
@@ -3430,9 +3477,7 @@ xmltype_storage
     ;
 
 xmlschema_spec
-    : (XMLSCHEMA DELIMITED_ID)? ELEMENT DELIMITED_ID (allow_or_disallow NONSCHEMA)? (
-        allow_or_disallow ANYSCHEMA
-    )?
+    : ((XMLSCHEMA DELIMITED_ID)? ELEMENT id_expression)? (allow_or_disallow (NONSCHEMA | ANYSCHEMA))*
     ;
 
 object_table
@@ -5010,6 +5055,7 @@ alter_table
         | alter_table_partitioning
         //TODO      | alter_external_table
         | move_table_clause
+        | modify_to_partitioned
     ) ((enable_disable_clause | enable_or_disable (TABLE LOCK | ALL TRIGGERS))+)?
     ;
 
@@ -5061,12 +5107,9 @@ merge_table_partition
     ;
 
 modify_table_partition
-    : MODIFY (
-        (PARTITION | SUBPARTITION) partition_name ((ADD | DROP) list_values_clause)? (ADD range_subpartition_desc)? (
-            REBUILD? UNUSABLE LOCAL INDEXES
-        )? shrink_clause?
-        | range_partitions
-    )
+    : MODIFY (PARTITION | SUBPARTITION) partition_name ((ADD | DROP) list_values_clause)? (
+        ADD range_subpartition_desc
+    )? (REBUILD? UNUSABLE LOCAL INDEXES)? shrink_clause?
     ;
 
 split_table_partition
@@ -5226,6 +5269,7 @@ index_attributes
     : (
         physical_attributes_clause
         | logging_clause
+        | ONLINE
         | TABLESPACE (tablespace | DEFAULT)
         | key_compression
         | sort_or_nosort
@@ -5249,6 +5293,10 @@ move_table_clause
         lob_storage_clause
         | varray_col_properties
     )* parallel_clause?
+    ;
+
+modify_to_partitioned
+    : MODIFY (table_partitioning_clauses | NONPARTITIONED) filter_condition? ONLINE? update_index_clauses?
     ;
 
 index_org_table_clause
@@ -5324,7 +5372,11 @@ modify_column_clauses
     ;
 
 modify_col_properties
-    : column_name datatype? (DEFAULT (ON NULL_)? expression)? (ENCRYPT encryption_spec | DECRYPT)? inline_constraint* lob_storage_clause? annotations_clause?
+    : column_name datatype? (
+        DEFAULT (ON NULL_)? expression
+        | identity_clause
+        | DROP IDENTITY
+    )? (ENCRYPT encryption_spec | DECRYPT)? inline_constraint* lob_storage_clause? annotations_clause?
     //TODO alter_xmlschema_clause
     ;
 
@@ -5414,7 +5466,7 @@ modify_lob_parameters
 
 lob_parameters
     : (
-        (ENABLE | DISABLE) STORAGE IN ROW
+        (ENABLE | DISABLE) STORAGE IN ROW UNSIGNED_INTEGER?
         | CHUNK UNSIGNED_INTEGER
         | PCTVERSION UNSIGNED_INTEGER
         | FREEPOOLS UNSIGNED_INTEGER
@@ -6104,7 +6156,7 @@ explain_statement
     ;
 
 select_only_statement
-    : with_clause? subquery
+    : subquery
     ;
 
 select_statement
@@ -6123,7 +6175,7 @@ with_factoring_clause
     ;
 
 subquery_factoring_clause
-    : query_name paren_column_list? AS '(' subquery order_by_clause? ')' search_clause? cycle_clause?
+    : query_name paren_column_list? AS '(' subquery_no_with order_by_clause? ')' search_clause? cycle_clause?
     ;
 
 search_clause
@@ -6165,12 +6217,18 @@ add_calc_meas_clause
     ;
 
 subquery
+    : with_clause? subquery_basic_elements subquery_operation_part*
+    ;
+
+// A subquery that must not start with (or contain, parenthesized) a WITH clause.
+// Used where Oracle rejects a CTE: inside another CTE definition and as UNION/INTERSECT/MINUS operands.
+subquery_no_with
     : subquery_basic_elements subquery_operation_part*
     ;
 
 subquery_basic_elements
     : query_block
-    | '(' subquery ')'
+    | '(' subquery_no_with ')'
     ;
 
 subquery_operation_part
@@ -6473,7 +6531,11 @@ insert_into_clause
     ;
 
 values_clause
-    : VALUES (REGULAR_ID | '(' expressions_ ')' | collection_expression)
+    : VALUES (
+        REGULAR_ID
+        | '(' expressions_ ')' (COMMA '(' expressions_ ')')*
+        | collection_expression
+    )
     ;
 
 merge_statement
@@ -6724,6 +6786,14 @@ unary_expression_core
     | standard_function
     | {this.IsNotNumericFunction()}? atom
     | implicit_cursor_expression
+    | selection_directive_expression
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/26/lnpls/conditional-compilation1.html
+selection_directive_expression
+    : DOLLAR_IF condition DOLLAR_THEN expression (
+        DOLLAR_ELSIF condition DOLLAR_THEN expression
+    )* (DOLLAR_ELSE expression)? DOLLAR_END
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/lnpls/plsql-optimization-and-tuning.html#GUID-DAF46F06-EF3F-4B1A-A518-5238B80C69FA
@@ -6789,6 +6859,7 @@ atom
     | inquiry_directive
     | general_element outer_join_sign?
     | '(' subquery ')' subquery_operation_part*
+    | '(' expression ')' ('.' general_element_part)*
     | '(' expressions_ ')'
     ;
 
@@ -7887,6 +7958,8 @@ regular_id
     | VALUE
     | COVAR_
     | DATE_FORMAT
+    | CSV
+    | CHARACTERSET
     ;
 
 non_reserved_keywords_in_18c
@@ -8096,6 +8169,7 @@ non_reserved_keywords_in_12c
     | NOCOPY
     | NOKEEP
     | NONEDITIONABLE
+    | NONPARTITIONED
     | NOPARTITION
     | NORELOCATE
     | NOREPLAY

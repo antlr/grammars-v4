@@ -28,9 +28,25 @@ fn parse_input(
     idx: i32,
     flags: &Flags,
 ) -> (usize, usize, f64) {
+    let out_name: String = if let Some(ref odir) = flags.output_dir {
+        let abs = std::fs::canonicalize(input_name)
+            .unwrap_or_else(|_| std::env::current_dir().unwrap_or_default().join(input_name));
+        let root = std::fs::canonicalize("../<example_dir_unix>")
+            .unwrap_or_else(|_| std::env::current_dir().unwrap_or_default().join("../<example_dir_unix>"));
+        let rootless = abs.strip_prefix(&root)
+            .map(std::path::PathBuf::from)
+            .unwrap_or_else(|_| abs.file_name().map(std::path::PathBuf::from).unwrap_or_default());
+        let p = std::path::Path::new(odir).join(rootless);
+        if let Some(parent) = p.parent() {
+            std::fs::create_dir_all(parent).ok();
+        }
+        p.to_string_lossy().into_owned()
+    } else {
+        input_name.to_string()
+    };
         let writer: Rc\<RefCell\<Box\<dyn Write>>> = Rc::new(RefCell::new(
                 if flags.tee {
-                        Box::new(File::create(format!("{}.errors", input_name)).unwrap()) as Box\<dyn Write>
+                        Box::new(File::create(format!("{}.errors", out_name)).unwrap()) as Box\<dyn Write>
                 } else {
                         Box::new(io::sink()) as Box\<dyn Write>
                 }
@@ -88,15 +104,15 @@ fn parse_input(
     if flags.show_tree {
         let tree_str = tree.to_string_tree(&*parser);
         if flags.tee {
-            let mut f = File::create(format!("{}.tree", input_name)).unwrap();
+            let mut f = File::create(format!("{}.tree", out_name)).unwrap();
             write!(f, "{}", tree_str).ok();
         } else {
             eprintln!("{}", tree_str);
         }
     }
 
-    if !flags.quiet {
-        eprint!("{}Rust {} {} {} {:.3} s {} tokens {:.0} tps\n",
+    if !flags.quiet && flags.per_file {
+        eprint!("{}Rust {} {} {} {:.3} s {} tokens {:.0} pr\n",
             flags.prefix, idx, input_name,
             if error_cnt > 0 { "fail" } else { "success" },
             parse_seconds,
@@ -117,6 +133,9 @@ struct Flags {
     show_trace: bool,
     tee: bool,
     quiet: bool,
+    perf: bool,
+    per_file: bool,
+    output_dir: Option\<String>,
 }
 
 fn main() {
@@ -129,6 +148,9 @@ fn main() {
         show_trace: false,
         tee: false,
         quiet: false,
+        perf: false,
+        per_file: false,
+        output_dir: None,
     };
 
     let args: Vec\<String> = env::args().collect();
@@ -147,7 +169,14 @@ fn main() {
                 flags.is_fns.push(false);
             }
             "-tee" => flags.tee = true,
+            "-o" => {
+                i += 1;
+                flags.output_dir = Some(args[i].clone());
+                flags.tee = true;
+            }
             "-q" => flags.quiet = true,
+            "--perf" => flags.perf = true,
+            "--per-file" => flags.per_file = true,
             "-trace" => flags.show_trace = true,
             "-x" => {
                 let stdin = io::stdin();
@@ -191,6 +220,9 @@ fn main() {
         let elapsed = start_all.elapsed();
         if !flags.quiet {
             let overall_seconds = elapsed.as_secs_f64();
+            if !flags.perf {
+                eprintln!("{}TT: {:.3}", flags.prefix, overall_seconds);
+            } else {
             let warm_tokens = total_tokens - first_file_tokens;
             let warm_seconds = total_parse_seconds - first_file_parse_seconds;
             let warm_tps = if flags.inputs.len() > 1 && warm_seconds > 0.0 {
@@ -207,9 +239,10 @@ fn main() {
             eprintln!("{}PT: {:.3}", flags.prefix, total_parse_seconds);
             eprintln!("{}OT: {:.3}", flags.prefix, overall_seconds - total_parse_seconds);
             eprintln!("{}TT: {:.3}", flags.prefix, overall_seconds);
-            eprintln!("{}TPS: {:.0}", flags.prefix, total_tokens as f64 / total_parse_seconds);
-            eprintln!("{}Post-warmup TPS: {}", flags.prefix, warm_tps);
+            eprintln!("{}PR: {:.0}", flags.prefix, total_tokens as f64 / total_parse_seconds);
+            eprintln!("{}Post-warmup PR: {}", flags.prefix, warm_tps);
             eprintln!("{}Post-warmup speed up: {}", flags.prefix, speedup);
+            }
         }
         process::exit(exit_code as i32);
     }

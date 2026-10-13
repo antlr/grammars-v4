@@ -1,5 +1,6 @@
 # Generated from trgen <version>
 
+import os
 import sys
 from antlr4 import *
 from antlr4.error.ErrorListener import ErrorListener
@@ -31,6 +32,7 @@ class MyErrorListener(ErrorListener):
             print(f"line {line}:{column} {msg}", file=sys.stderr);
 
 tee = False
+output_dir = None
 show_tokens = False
 show_tree = False
 show_trace = False
@@ -39,6 +41,8 @@ error_code = 0
 string_instance = 0
 prefix = ""
 quiet = False
+perf = False
+per_file = False
 noop = False
 total_tokens = 0
 total_parse_seconds = 0
@@ -47,12 +51,15 @@ first_file_parse_seconds = 0
 
 def main(argv):
     global tee
+    global output_dir
     global show_tokens
     global show_tree
     global show_trace
     global encoding
     global prefix
     global quiet
+    global perf
+    global per_file
     global error_code
     global total_parse_seconds
     global first_file_tokens
@@ -80,6 +87,10 @@ def main(argv):
             encoding = argv[i]
         elif arg == "-tee":
             tee = True
+        elif arg == "-o":
+            i = i + 1
+            output_dir = argv[i]
+            tee = True
         elif arg == "-x":
             while f := sys.stdin.readline():
                 f = f.strip()
@@ -87,6 +98,10 @@ def main(argv):
                 is_fns.append(True)
         elif arg == "-q":
             quiet = True
+        elif arg == "--perf":
+            perf = True
+        elif arg == "--per-file":
+            per_file = True
         elif arg == "-trace":
             show_trace = True
         elif arg[0] == "-":
@@ -109,17 +124,20 @@ def main(argv):
         diff = end_time - start_time
         diff_time = diff.total_seconds()
         if (not quiet):
-            warm_tokens = total_tokens - first_file_tokens
-            warm_seconds = total_parse_seconds - first_file_parse_seconds
-            warm_tps = str(int(warm_tokens / warm_seconds)) if (len(inputs) > 1 and warm_seconds > 0) else "n.a."
-            first_tps = first_file_tokens / first_file_parse_seconds if first_file_parse_seconds > 0 else 0
-            speedup = f'{(warm_tokens / warm_seconds) / first_tps:.2f}' if (len(inputs) > 1 and warm_seconds > 0 and first_tps > 0) else "n.a."
-            print(f'{prefix}PT: {total_parse_seconds}', file=sys.stderr)
-            print(f'{prefix}OT: {diff_time - total_parse_seconds}', file=sys.stderr)
-            print(f'{prefix}TT: {diff_time}', file=sys.stderr)
-            print(f'{prefix}TPS: {int(total_tokens / total_parse_seconds) if total_parse_seconds > 0 else 0}', file=sys.stderr)
-            print(f'{prefix}Post-warmup TPS: {warm_tps}', file=sys.stderr)
-            print(f'{prefix}Post-warmup speed up: {speedup}', file=sys.stderr)
+            if not perf:
+                print(f'{prefix}TT: {diff_time}', file=sys.stderr)
+            else:
+                warm_tokens = total_tokens - first_file_tokens
+                warm_seconds = total_parse_seconds - first_file_parse_seconds
+                warm_tps = str(int(warm_tokens / warm_seconds)) if (len(inputs) > 1 and warm_seconds > 0) else "n.a."
+                first_tps = first_file_tokens / first_file_parse_seconds if first_file_parse_seconds > 0 else 0
+                speedup = f'{(warm_tokens / warm_seconds) / first_tps:.2f}' if (len(inputs) > 1 and warm_seconds > 0 and first_tps > 0) else "n.a."
+                print(f'{prefix}PT: {total_parse_seconds}', file=sys.stderr)
+                print(f'{prefix}OT: {diff_time - total_parse_seconds}', file=sys.stderr)
+                print(f'{prefix}TT: {diff_time}', file=sys.stderr)
+                print(f'{prefix}PR: {int(total_tokens / total_parse_seconds) if total_parse_seconds > 0 else 0}', file=sys.stderr)
+                print(f'{prefix}Post-warmup PR: {warm_tps}', file=sys.stderr)
+                print(f'{prefix}Post-warmup speed up: {speedup}', file=sys.stderr)
     sys.exit(error_code)
 
 def ParseStdin():
@@ -148,22 +166,34 @@ def ParseFilename(input, row_number):
 
 def DoParse(str, input_name, row_number):
     global tee
+    global output_dir
     global show_tokens
     global show_tree
     global show_trace
     global encoding
     global prefix
     global quiet
+    global per_file
     global error_code
     global total_tokens
     global total_parse_seconds
     global first_file_tokens
     global first_file_parse_seconds
 
+    if output_dir is not None:
+        abs_name = os.path.abspath(input_name)
+        root = os.path.abspath('../<example_dir_unix>')
+        rootless = os.path.relpath(abs_name, root)
+        if rootless == '..' or rootless.startswith('..' + os.sep) or os.path.isabs(rootless):
+            rootless = os.path.basename(abs_name)
+        out_name = os.path.join(output_dir, rootless)
+        os.makedirs(os.path.dirname(out_name) or '.', exist_ok=True)
+    else:
+        out_name = input_name
     lexer = <lexer_name>(str)
     lexer.removeErrorListeners()
     if (tee):
-        output = open(input_name + ".errors", "w")
+        output = open(out_name + ".errors", "w")
     else:
         output = sys.stderr
     listener_lexer = MyErrorListener(quiet, tee, output)
@@ -208,12 +238,12 @@ def DoParse(str, input_name, row_number):
         result = 'success'
     if (show_tree):
         if (tee):
-            f = open(input_name + '.tree', 'w', encoding='utf-8')
+            f = open(out_name + '.tree', 'w', encoding='utf-8')
             f.write(tree.toStringTree(recog=parser))
             f.close()
         else:
             print(tree.toStringTree(recog=parser), file=sys.stderr)
-    if (not quiet):
+    if (not quiet and per_file):
         sys.stderr.write(prefix)
         sys.stderr.write('Python3 ')
         sys.stderr.write(f'{row_number}')
@@ -227,7 +257,7 @@ def DoParse(str, input_name, row_number):
         sys.stderr.write(f'{token_count}')
         sys.stderr.write(' tokens ')
         sys.stderr.write(f'{int(token_count / diff_time) if diff_time > 0 else 0}')
-        sys.stderr.write(' tps\n')
+        sys.stderr.write(' pr\n')
     if (tee):
         output.close()
 

@@ -21,33 +21,40 @@ options {
 
 ownedExpression
     : IF ownedExpression QUESTION ownedExpression ELSE ownedExpression
-    | ownedExpression QUESTION_QUESTION ownedExpression
-    | ownedExpression IMPLIES ownedExpression
-    | ownedExpression OR ownedExpression
-    | ownedExpression AND ownedExpression
-    | ownedExpression XOR ownedExpression
-    | ownedExpression PIPE ownedExpression
-    | ownedExpression AMP ownedExpression
-    | ownedExpression ( EQ_EQ | BANG_EQ | EQ_EQ_EQ | BANG_EQ_EQ) ownedExpression
-    | ownedExpression ( LT | GT | LE | GE) ownedExpression
-    | ownedExpression DOT_DOT ownedExpression
-    | ownedExpression ( PLUS | MINUS) ownedExpression
-    | ownedExpression ( STAR | SLASH | PERCENT) ownedExpression
-    | <assoc = right> ownedExpression ( STAR_STAR | CARET) ownedExpression
-    | ( PLUS | MINUS | TILDE | NOT) ownedExpression
+    | operatorExpression
+    ;
+
+operatorExpression
+    : unaryExpression
+    | <assoc = right> operatorExpression ( STAR_STAR | CARET) operatorExpression
+    | operatorExpression ( STAR | SLASH | PERCENT) operatorExpression
+    | operatorExpression ( PLUS | MINUS) operatorExpression
+    | operatorExpression DOT_DOT operatorExpression
+    | operatorExpression ( LT | GT | LE | GE) operatorExpression
+    | operatorExpression (ISTYPE | HASTYPE | AT_SIGN | AT_AT | AS | META) typeReference
+    | operatorExpression (EQ_EQ | BANG_EQ | EQ_EQ_EQ | BANG_EQ_EQ) operatorExpression
+    | operatorExpression ( AMP | AND) operatorExpression
+    | operatorExpression XOR operatorExpression
+    | operatorExpression ( PIPE | OR) operatorExpression
+    | operatorExpression IMPLIES operatorExpression
+    | operatorExpression QUESTION_QUESTION operatorExpression
+    ;
+
+unaryExpression
+    : (PLUS | MINUS | TILDE | NOT) unaryExpression
     | ( AT_SIGN | AT_AT) typeReference
-    | ownedExpression ( ISTYPE | HASTYPE | AT_SIGN) typeReference
-    | ownedExpression AS typeReference
-    | ownedExpression AT_AT typeReference
-    | ownedExpression META typeReference
-    | ownedExpression LBRACK sequenceExpressionList? RBRACK
-    | ownedExpression HASH LPAREN sequenceExpressionList? RPAREN
-    | ownedExpression argumentList
-    | ownedExpression DOT qualifiedName
-    | ownedExpression DOT_QUESTION bodyExpression
-    | ownedExpression ARROW qualifiedName ( bodyExpression | argumentList)
     | ALL typeReference
-    | baseExpression
+    | primaryExpression
+    ;
+
+primaryExpression
+    : baseExpression
+    | primaryExpression DOT qualifiedName
+    | primaryExpression DOT_QUESTION bodyExpression
+    | primaryExpression ARROW qualifiedName ( bodyExpression | argumentList)
+    | primaryExpression LBRACK sequenceExpressionList? RBRACK
+    | primaryExpression HASH LPAREN sequenceExpressionList? RPAREN
+    | primaryExpression argumentList
     ;
 
 typeReference
@@ -60,10 +67,12 @@ sequenceExpressionList
 
 baseExpression
     : nullExpression
+    | REGULAR_COMMENT // ignore block comments used as expression placeholders
     | literalExpression
     | qualifiedName (argumentList | DOT METADATA)? // merged featureRef/metadataAccess/invocation
     | constructorExpression
     | bodyExpression
+    | LPAREN AS typeReference RPAREN // metadata cast expression: (as MetadataType)
     | LPAREN sequenceExpressionList? RPAREN
     ;
 
@@ -74,14 +83,6 @@ nullExpression
 
 featureReferenceExpression
     : qualifiedName
-    ;
-
-metadataAccessExpression
-    : qualifiedName DOT METADATA
-    ;
-
-invocationExpression
-    : qualifiedName argumentList
     ;
 
 constructorExpression
@@ -150,6 +151,26 @@ argumentExpressionMember
 name
     : IDENTIFIER
     | STRING
+    | unreservedKeyword
+    ;
+
+// Keywords that appear as names in the official OMG standard library.
+// These are contextually unreserved — valid as identifiers in name positions.
+unreservedKeyword
+    : TYPE
+    | MULTIPLICITY
+    | VAR
+    | LANGUAGE
+    | LOCALE
+    | CROSSES
+    | STEP
+    | FEATURE
+    | BEHAVIOR
+    | FUNCTION
+    | MEMBER
+    | PREDICATE
+    | INTERACTION
+    | METACLASS
     ;
 
 // ===== Parser rules =====
@@ -284,7 +305,6 @@ namespaceImport
 
 filterPackage
     : filterPackageImportDeclaration (filterPackageMember)+
-    | filterPackageImport ( filterPackageMember)+
     ;
 
 filterPackageMember
@@ -478,7 +498,7 @@ ownedSubclassification
 feature
     : (
         featurePrefix ( FEATURE | prefixMetadataMember) featureDeclaration?
-        | ( endFeaturePrefix | basicFeaturePrefix) featureDeclaration
+        | ( endFeaturePrefix | basicFeaturePrefix) ( REF)? featureDeclaration
     ) valuePart? typeBody
     ;
 
@@ -625,19 +645,6 @@ ownedRedefinition
     : qualifiedName (DOT qualifiedName)*
     ;
 
-ownedFeatureChain
-    : featureChain
-    | ownedFeatureChaining ( DOT ownedFeatureChaining)+
-    ;
-
-featureChain
-    : ownedFeatureChaining (DOT ownedFeatureChaining)+
-    ;
-
-ownedFeatureChaining
-    : qualifiedName
-    ;
-
 featureInverting
     : (INVERTING identification?)? INVERSE qualifiedName (DOT qualifiedName)* OF qualifiedName (
         DOT qualifiedName
@@ -747,7 +754,7 @@ functionBody
     ;
 
 functionBodyPart
-    : (typeBodyElement | returnFeatureMember)* (resultExpressionMember)?
+    : (definitionBodyItem | typeBodyElement | returnFeatureMember)* (resultExpressionMember)?
     ;
 
 returnFeatureMember
@@ -774,135 +781,8 @@ invariant
     : featurePrefix INV (TRUE | FALSE)? featureDeclaration valuePart? functionBody
     ;
 
-ownedExpressionMember
-    : ownedExpression
-    ;
-
-metadataReference
-    : elementReferenceMember
-    ;
-
-typeReferenceMember
-    : typeReference
-    ;
-
-typeResultMember
-    : typeReference
-    ;
-
-referenceTyping
-    : qualifiedName
-    ;
-
-emptyResultMember
-    : emptyFeature_
-    ;
-
-sequenceOperatorExpression
-    : ownedExpressionMember COMMA sequenceExpressionListMember
-    ;
-
-sequenceExpressionListMember
-    : sequenceExpressionList
-    ;
-
-bodyArgumentMember
-    : bodyArgument
-    ;
-
-bodyArgument
-    : bodyArgumentValue
-    ;
-
-bodyArgumentValue
-    : bodyExpression
-    ;
-
-functionReferenceArgumentMember
-    : functionReferenceArgument
-    ;
-
-functionReferenceArgument
-    : functionReferenceArgumentValue
-    ;
-
-functionReferenceArgumentValue
-    : functionReferenceExpression
-    ;
-
-functionReferenceExpression
-    : functionReferenceMember
-    ;
-
-functionReferenceMember
-    : functionReference
-    ;
-
-functionReference
-    : referenceTyping
-    ;
-
 featureChainMember
     : qualifiedName (DOT qualifiedName)*
-    ;
-
-ownedFeatureChainMember
-    : featureChain
-    | ownedFeatureChain
-    ;
-
-featureReferenceMember
-    : featureReference
-    ;
-
-featureReference
-    : qualifiedName
-    ;
-
-elementReferenceMember
-    : qualifiedName
-    ;
-
-constructorResultMember
-    : constructorResult
-    ;
-
-constructorResult
-    : argumentList
-    ;
-
-instantiatedTypeMember
-    : qualifiedName (DOT qualifiedName)*
-    ;
-
-instantiatedTypeReference
-    : qualifiedName
-    ;
-
-namedArgumentMember
-    : namedArgument
-    ;
-
-parameterRedefinition
-    : qualifiedName
-    ;
-
-expressionBodyMember
-    : expressionBody
-    ;
-
-expressionBody
-    : LBRACE functionBodyPart RBRACE
-    ;
-
-booleanValue
-    : TRUE
-    | FALSE
-    ;
-
-realValue
-    : INTEGER? DOT (INTEGER | REAL)
-    | REAL
     ;
 
 interaction
@@ -932,10 +812,11 @@ payloadFeatureMember
     ;
 
 payloadFeature
-    : identification? valuePart
-    | identification? payloadFeatureSpecializationPart valuePart?
+    : identification payloadFeatureSpecializationPart valuePart?
+    | identification valuePart
     | ownedFeatureTyping ( ownedMultiplicity)?
-    | ownedMultiplicity ( ownedFeatureTyping)?
+    | ownedMultiplicity ownedFeatureTyping
+    | identification? payloadFeatureSpecializationPart valuePart?
     ;
 
 payloadFeatureSpecializationPart
@@ -949,18 +830,6 @@ flowEndMember
 
 flowEnd
     : qualifiedName (DOT qualifiedName)*
-    ;
-
-flowFeatureMember
-    : flowFeature
-    ;
-
-flowFeature
-    : flowFeatureRedefinition
-    ;
-
-flowFeatureRedefinition
-    : qualifiedName
     ;
 
 valuePart
@@ -1077,7 +946,7 @@ dependencyDeclaration
     ;
 
 annotatingMember
-    : annotatingElement
+    : memberPrefix annotatingElement
     ;
 
 packageBodyElement
@@ -1158,6 +1027,7 @@ definitionBody
 definitionBodyItem
     : importRule
     | memberPrefix definitionBodyItemContent
+    | ( sourceSuccessionMember)? memberPrefix endOccurrenceUsageElement
     | ( sourceSuccessionMember)? memberPrefix occurrenceUsageElement
     ;
 
@@ -1181,10 +1051,6 @@ variantUsageMember
 
 nonOccurrenceUsageMember
     : memberPrefix nonOccurrenceUsageElement
-    ;
-
-occurrenceUsageMember
-    : memberPrefix occurrenceUsageElement
     ;
 
 structureUsageMember
@@ -1265,6 +1131,13 @@ nonOccurrenceUsageElement
     | successionAsUsage
     | extendedUsage
     | defaultReferenceUsage
+    ;
+
+// end [multiplicity] <occurrence-keyword> — e.g. end [1] port p : P;
+// The END keyword marks a feature as a connection/interface/flow endpoint.
+// The optional multiplicity constrains the end feature cardinality.
+endOccurrenceUsageElement
+    : END (name)? (ownedCrossMultiplicityMember)? (NONUNIQUE)? occurrenceUsageElement
     ;
 
 occurrenceUsageElement
@@ -1355,7 +1228,7 @@ enumerationBody
     ;
 
 enumerationUsageMember
-    : memberPrefix enumeratedValue
+    : (prefixMetadataMember)* memberPrefix enumeratedValue
     ;
 
 enumeratedValue
@@ -1530,6 +1403,7 @@ interfaceOccurrenceUsageMember
 
 interfaceOccurrenceUsageElement
     : defaultInterfaceEnd
+    | endOccurrenceUsageElement
     | structureUsageElement
     | behaviorUsageElement
     ;
@@ -1620,15 +1494,6 @@ flowPayloadFeature
     : payloadFeature
     ;
 
-flowEndSubsetting
-    : qualifiedName
-    | featureChainPrefix
-    ;
-
-featureChainPrefix
-    : (ownedFeatureChaining DOT)+ ownedFeatureChaining DOT
-    ;
-
 actionDefinition
     : occurrenceDefinitionPrefix ACTION DEF definitionDeclaration actionBody
     ;
@@ -1655,8 +1520,8 @@ nonBehaviorBodyItem
     ;
 
 actionBehaviorMember
-    : behaviorUsageMember
-    | actionNodeMember
+    : actionNodeMember
+    | behaviorUsageMember
     ;
 
 initialNodeMember
@@ -1774,7 +1639,7 @@ triggerExpression
 sendNode
     : occurrenceUsagePrefix (actionNodeUsageDeclaration | actionUsageDeclaration) SEND (
         nodeParameterMember senderReceiverPart?
-        | emptyParameterMember senderReceiverPart
+        | emptyParameterMember senderReceiverPart?
     ) actionBody
     ;
 
@@ -1860,10 +1725,6 @@ forLoopNode
     ;
 
 forVariableDeclarationMember
-    : usageDeclaration?
-    ;
-
-forVariableDeclaration
     : usageDeclaration?
     ;
 
@@ -2128,8 +1989,8 @@ framedConcernMember
     ;
 
 framedConcernUsage
-    : ownedReferenceSubsetting featureSpecializationPart? calculationBody
-    | (usageExtensionKeyword* CONCERN | usageExtensionKeyword+) calculationUsageDeclaration calculationBody
+    : ownedReferenceSubsetting featureSpecializationPart? requirementBody
+    | (usageExtensionKeyword* CONCERN | usageExtensionKeyword+) constraintUsageDeclaration requirementBody
     ;
 
 actorMember
@@ -2153,7 +2014,7 @@ requirementUsage
     ;
 
 satisfyRequirementUsage
-    : occurrenceUsagePrefix (ASSERT ( NOT)?)? SATISFY (
+    : occurrenceUsagePrefix (ASSERT ( NOT)? | NOT)? SATISFY (
         ownedReferenceSubsetting featureSpecializationPart?
         | REQUIREMENT usageDeclaration?
     ) valuePart? (BY satisfactionSubjectMember)? requirementBody
@@ -2328,16 +2189,6 @@ prefixMetadataUsage
     : ownedFeatureTyping
     ;
 
-metadataUsage
-    : usageExtensionKeyword* (AT_SIGN | METADATA) metadataUsageDeclaration (
-        ABOUT annotation ( COMMA annotation)*
-    )? metadataBody
-    ;
-
-metadataUsageDeclaration
-    : (identification? ( COLON | TYPED BY))? ownedFeatureTyping
-    ;
-
 metadataBodyUsageMember
     : metadataBodyUsage
     ;
@@ -2367,10 +2218,6 @@ namespaceImportDirect
 // These rules are referenced in the spec but not fully defined.
 // They need manual review and completion.
 
-calculationUsageDeclaration
-    : usageDeclaration? valuePart?
-    ;
-
 emptyActionUsage_
     : /* epsilon */
     ;
@@ -2385,10 +2232,6 @@ emptyMultiplicity_
 
 emptyUsage_
     : /* epsilon */
-    ;
-
-filterPackageImport
-    : IDENTIFIER /* TODO: stub for filterPackageImport */
     ;
 
 nonFeatureChainPrimaryExpression

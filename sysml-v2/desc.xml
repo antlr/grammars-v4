@@ -3,4 +3,5 @@
       xsi:noNamespaceSchemaLocation="../../_scripts/desc.xsd">
    <targets>Antlr4ng;CSharp;Cpp;Dart;Go;Java;JavaScript;PHP;Python3;Rust;TypeScript</targets>
    <inputs>examples/**/*.sysml</inputs>
+   <entry-point>rootNamespace</entry-point>
 </desc>

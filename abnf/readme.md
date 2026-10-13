@@ -28,3 +28,4 @@ bidirectional communications protocol.
 ## License
 
 [BSD 3-Clause License](https://opensource.org/license/bsd-3-clause)
+

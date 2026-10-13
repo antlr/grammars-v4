@@ -16,6 +16,8 @@
 .idea/
 *.iml
 /**/gen
+!_scripts/templates/**/gen
+!_scripts/templates/**/gen/**
 *.tokens
 out
 

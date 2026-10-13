@@ -63,7 +63,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.15.0</version>
+					<version>3.16.0</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -96,7 +96,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.6.1</version>
+                <version>3.6.2</version>
                 <executions>
                     <execution>
                         <id>add-source</id>
@@ -234,6 +234,7 @@
 				<module>iso8601</module>
 				<module>istc</module>
 				<module>itn</module>
+                                <module>ixml</module>
 				<module>jam</module>
 				<module>janus</module>
 				<module>java</module>
@@ -326,6 +327,7 @@
 				<module>refal</module>
 				<module>rego</module>
 				<module>restructuredtext</module>
+				<module>rex</module>
 				<module>rexx</module>
 				<module>rfc822</module>
 				<module>rfc1035</module>
@@ -363,6 +365,7 @@
 				<module>suokif</module>
 				<module>swift</module>
 				<module>swift-fin</module>
+				<module>sysml-v2</module>
 				<module>szf</module>
 				<module>tcpheader</module>
 				<module>telephone</module>
@@ -403,13 +406,17 @@
 				<module>wln</module>
 				<module>wren</module>
 				<module>xml</module>
-				<module>xpath</module>
+				<module>xpath/xpath1</module>
+				<module>xpath/xpath20</module>
+				<module>xpath/xpath31</module>
+				<module>xpath/xpath4</module>
 				<module>xsd-regex</module>
 				<module>xyz</module>
 				<module>yara</module>
 				<module>yini</module>
 				<module>z</module>
 				<module>zig</module>
+				<module>xquery/xquery4</module>
 			</modules>
 		</profile>
 		<profile>

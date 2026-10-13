@@ -343,7 +343,7 @@ do
     if [ "$filter" == "agnostic" ]
     then
         # Test whether the grammars have actions.
-        count=`dotnet trash parse -t ANTLRv4 *.g4 2> /dev/null | dotnet trash xgrep ' //(actionBlock | argActionBlock)' | dotnet trash text -c`
+        count=`dotnet trash parse -t ANTLRv4 *.g4 2> /dev/null | dotnet trash xpath ' //(actionBlock | argActionBlock)' | dotnet trash text -c`
         if [ "$count" == "0" ]
         then
             echo "no actions => skipping $testname."

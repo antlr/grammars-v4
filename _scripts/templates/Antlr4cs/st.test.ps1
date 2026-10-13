@@ -3,8 +3,7 @@
 $workingDirectory = Get-Location
 $filePath = "$workingDirectory/tests.txt"
 
-$Tests = "<if(os_win)>../<example_files_win><else>../<example_files_unix><endif>"
-Write-Host "Test cases here: $Tests"
+Write-Host "Test cases: <glob_args_win>"
 
 # Get a list of test files from the test directory. Do not include any
 # .errors or .tree files. Pay close attention to remove only file names
@@ -14,7 +13,7 @@ if (Test-Path -Path "$filePath" -PathType Leaf) {
 }
 
 $files = New-Object System.Collections.Generic.List[string]
-$allFiles = $(& dotnet trash glob "$Tests" ; $last = $LASTEXITCODE )
+$allFiles = $(& dotnet trash glob <glob_args_win> ; $last = $LASTEXITCODE )
 foreach ($file in $allFiles) {
     $ext = $file | Split-Path -Extension
     if (Test-Path $file -PathType Container) {

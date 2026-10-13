@@ -791,3 +791,13 @@ SELECT
      ,@N_latin;
 END
 #end
+
+#begin
+-- Create function with exit handler containing a bare RETURN statement
+-- src: https://mariadb.com/docs/server/reference/sql-statements/programmatic-compound-statements/declare-handler#syntax
+CREATE FUNCTION f() RETURNS INT
+BEGIN
+  DECLARE EXIT HANDLER FOR NOT FOUND RETURN NULL;
+  RETURN 0;
+END
+#end
