@@ -452,8 +452,8 @@ conditionalExpression
     ;
 
 yieldExpression
-	: Co_yeild (assignmentExpression | bracedInitList)
-	;
+    : Co_yield (assignmentExpression | bracedInitList)
+    ;
 
 throwExpression
     : Throw assignmentExpression?

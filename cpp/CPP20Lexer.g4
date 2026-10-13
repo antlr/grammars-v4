@@ -117,7 +117,7 @@ Co_await: 'co_await';
 
 Co_return: 'co_return';
 
-Co_yeild: 'co_yeild';
+Co_yield: 'co_yield';
 
 Decltype: 'decltype';
 
