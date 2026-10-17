@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2025, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -29,20 +29,28 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
-// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
-
-
-// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
-
 grammar supercollider;
 
 file_
-   : func EOF
+   : topLevelStatement* EOF
    ;
 
-func
-   : '{' argdecls? assignment* '}' ('.' invocationchain)? ';'?
+topLevelStatement
+   : compound
+   | statement
+   ;
+   // A top-level ( ... ) group, as commonly used to delimit a single
+   
+   // "chunk" of code evaluated by the sclang interpreter.
+   
+compound
+   : '(' statement* ')' postfix* ';'?
+   ;
+
+statement
+   : argdecls
+   | assignment
+   | expression ';'?
    ;
 
 argdecls
@@ -54,28 +62,53 @@ argdecl
    ;
 
 assignment
-   : (instancename '=')? expression ';'?
+   : instancename '=' expression ';'?
    ;
 
 expression
-   : instanceinvocation
+   : primary postfix* # postfixExpr
+   | '*' expression # splatExpr
+   | '-' expression # negExpr
+   | expression ('*' | '/' | '+' | '-' | '!' | '<>' | '<=' | '>=' | '==' | '!=' | '<' | '>') expression # binaryExpr
+   | expression '..' expression # rangeExpr
+   ;
+
+postfix
+   : '.' methodname arguments? block*
+   | '.' '(' expressionlist? ')' block*
+   | arguments block*
+   | block+
+   | '[' expression ']'
+   ;
+
+primary
+   : block
    | array
    | literal
+   | symbol
    | instancename
+   | classname
    | '(' expression ')'
-   | expression ('*' | '/' | '+' | '-' | '!') expression
    ;
 
-invocationchain
-   : invocation ('.' invocation)*
+block
+   : '{' blockargs? statement* '}'
    ;
 
-instanceinvocation
-   : (classname | instancename) '.' invocationchain
+blockargs
+   : '|' blockarg (',' blockarg)* '|'
    ;
 
-invocation
-   : methodname ('(' expressionlist? ')')?
+blockarg
+   : instancename ('=' expression)?
+   ;
+
+arguments
+   : '(' expressionlist? ')'
+   ;
+
+methodname
+   : VARNAMELITERAL
    ;
 
 classname
@@ -86,31 +119,43 @@ instancename
    : VARNAMELITERAL
    ;
 
-methodname
-   : VARNAMELITERAL
+symbol
+   : SYMBOL
    ;
 
 expressionlist
-   : expression (',' expression)*
+   : callarg (',' callarg)*
+   ;
+
+callarg
+   : keywordarg
+   | expression
+   ;
+
+keywordarg
+   : VARNAMELITERAL ':' expression
    ;
 
 array
-   : '[' literallist ']'
+   : '[' (arrayelement (',' arrayelement)* ','?)? ']'
+   ;
+
+arrayelement
+   : keywordarg
+   | expression
    ;
 
 literal
    : number
    | STRING1
    | STRING2
-   | array
-   ;
-
-literallist
-   : literal (',' literal)*
+   | TRUE
+   | FALSE
+   | NIL
    ;
 
 number
-   : '-'? (DECIMAL | HEX | FLOAT)
+   : (DECIMAL | HEX | FLOAT)
    ;
 
 TRUE
@@ -134,7 +179,7 @@ fragment DECDIGIT
    ;
 
 FLOAT
-   : DECDIGIT+ ('.' DECDIGIT+)? ('e' DECDIGIT+)?
+   : DECDIGIT+ ('.' DECDIGIT+)? ('e' DECDIGIT+)? 'pi'?
    ;
 
 HEX
@@ -142,7 +187,7 @@ HEX
    ;
 
 DECIMAL
-   : DECDIGIT+
+   : DECDIGIT+ 'pi'?
    ;
 
 VARNAMELITERAL
@@ -153,16 +198,24 @@ CLASSNAMELITERAL
    : [A-Z] [a-zA-Z0-9]*
    ;
 
+SYMBOL
+   : '\\' [a-zA-Z_] [a-zA-Z0-9_]*
+   ;
+
 STRING1
-   : '"'* .? '"'
+   : '"' ('\\' . | ~ ["\\])* '"'
    ;
 
 STRING2
-   : '\''* .? '\''
+   : '\'' ('\\' . | ~ ['\\])* '\''
    ;
 
 COMMENT
    : '//' ~ [\r\n]* -> skip
+   ;
+
+BLOCKCOMMENT
+   : '/*' .*? '*/' -> skip
    ;
 
 WS
