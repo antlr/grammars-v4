@@ -255,6 +255,7 @@
                 <module>lazyk</module>
 				<module>lcc</module>
 				<module>less</module>
+                <module>lil</module>
 				<module>limbo</module>
 				<module>lisa</module>
                 <module>lisp</module>
