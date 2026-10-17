@@ -1,0 +1,217 @@
+MODULE $vcgentry;
+/* VCG Entry point definitions
+/*
+/*  Copyright © 1996, Digital Equipment Corporation.
+/*
+/* Modifications:
+/*
+/*	016D	Bevin Brett	12-Jun-1986	(392 SVCG D)
+/*
+/*		Add vcg$init_code_gen
+/*
+/*	015D	Keith Knowles	 8-Dec-1986	(311 SVCG D)
+/*
+/*		Add vcg$get_module_info and vcg$get_routine_info call-backs.
+/*
+/*	014D	Keith Knowles	18-Mar-1986	(201 SVCG D)
+/*
+/*		Changes to SCA support as a result of PL/1 testing.
+/*
+/*	013D	Keith Knowles	 5-Feb-1986	(179 SVCG D)
+/*
+/*		Add entry points for SCA support.
+/*
+/*	012D	Ian Stocks	 1-Jan-1986	(142 SVCG D)
+/*
+/*		Add VCG$FETCH_DEBUG_COUNT, VCG$WRT_DBG_SYM_COUNTED
+/*
+/*	011	Tom Benson	30-Aug-1985	(051 SVCG D)
+/*
+/*		Added VCG$EMIT_WEAK_GSD for Ada.
+/*
+/*	011M	Tom Benson	02-Apr-1986	(197 SVCG M)
+/*
+/*		Added VCG$/CREATE/DELETE/RESET/_FILE_ZONE.
+/*
+/*	010	Caroline Davidson 12-Mar-1985	(184 VCG)
+/*
+/*		Added definition to the callable entry, VCG$OPN_INC_FIL.
+/*
+/*	009	Caroline Davidson 06-Nov-1984	(115 VCG)
+/*
+/*		Added callable entry, VCG$GET_SOURCE_LINE, for the jsb entry
+/*		VCG$GET_SOURCE_LINE_R7.
+/*
+/*	008	Tom Benson	03-Oct-1984	(102 VCG)
+/*
+/*		First parameter to VCG$FREE_MEMORY is ADDRESS, not LONGWORD
+/*
+/*	007	Tom Benson	27-Aug-1984	(084 VCG)
+/*
+/*		Added return status to VCG$RMS_CLOSE, and parameter to
+/*		VCG$EMIT_ENVIRONMENTS.
+/*
+/*	006	Tom Benson	21-Aug-1984	(076 VCG)
+/*
+/*		Add entry point VCG$EMIT_EOM_PARAM, a variant of EMIT_EOM
+/*		which accepts previous transfer addr info as parameters.
+/*
+/*	005	Caroline Davidson 09-Aug-1984	(070 VCG)
+/*
+/*		Defined the new entry VCG$String_Parse.  This will provide 
+/*		access to the subroutine used by VCG$Next_Cmd to process the
+/*		command line qualifier.
+/*
+/*	004	Caroline Davidson 16-Apr-1984	(025 VCG)
+/*
+/*		Defined new entry points VCG$EMIT_SRC_CORREL, VCG$WRITE_PSEREC,
+/*		VCG$START_LINE_REC, and VCG$COM_LINE_REC for the PSE interface.
+/*
+/*	003	Caroline Davidson 30-Mar-1984	(019 VCG)
+/*
+/*		Added an optional fourth parameter to VCG$RMS_OPEN
+/*		for the maximum record size of an output file.
+/*
+/*	002	Caroline Davidson 29-Mar-1984	(018 VCG)
+/*
+/*		Removed parameters from VCG$START_TEXT_CLUSTER.
+/*
+/*	001	Tom Benson	13-Feb-1984	(003 VCG)
+/*
+/*		Added modification history.
+/*
+/*
+
+#linesize = 132;
+ENTRY vcg$add_diag_to_msg PARAMETER(ADDRESS VALUE,ADDRESS VALUE,WORD);
+ENTRY vcg$allocate_memory PARAMETER(LONGWORD VALUE) RETURNS ADDRESS;
+ENTRY vcg$allocate_tspace PARAMETER(LONGWORD VALUE,LONGWORD VALUE) RETURNS ADDRESS;
+ENTRY vcg$allocate_vspace PARAMETER(LONGWORD VALUE,LONGWORD VALUE) RETURNS ADDRESS;
+
+entry vcg$reserve_sca_record parameter(longword value) returns address;	/* M014D
+ENTRY vcg$begin_time PARAMETER(ADDRESS, CHARACTER LENGTH 24 VARYING);
+
+ENTRY vcg$clear_tspace;
+ENTRY vcg$cmd_parse;
+ENTRY vcg$com_line_rec PARAMETER( LONGWORD VALUE ); /* A004
+ENTRY vcg$compute_context PARAMETER(WORD,LONGWORD) RETURNS BYTE;
+ENTRY vcg$compute_size PARAMETER(LONGWORD VALUE,LONGWORD VALUE) RETURNS WORD;
+ENTRY vcg$create_file_zone;	/* Azzz
+ENTRY vcg$create_label RETURNS ADDRESS;
+ENTRY vcg$create_symbol RETURNS ADDRESS;
+
+ENTRY vcg$define_environment_index PARAMETER(ADDRESS VALUE,BOOLEAN VALUE,
+	BOOLEAN VALUE) RETURNS LONGWORD;
+ENTRY vcg$define_psect PARAMETER(ADDRESS VALUE,WORD UNSIGNED,LONGWORD VALUE,
+	BOOLEAN VALUE,BOOLEAN VALUE,BOOLEAN VALUE,BOOLEAN VALUE)
+	RETURNS LONGWORD;
+ENTRY vcg$delete_file_zone;	/* Azzz
+ENTRY vcg$diagnose;
+ENTRY vcg$displayops;
+ENTRY vcg$dt_name PARAMETER(WORD) RETURNS CHARACTER LENGTH 10 VARYING;
+ENTRY vcg$dumpcode;
+
+ENTRY vcg$emit_displaced_lw PARAMETER(LONGWORD VALUE,LONGWORD VALUE,
+		LONGWORD VALUE, LONGWORD VALUE);
+ENTRY vcg$emit_entry;
+ENTRY vcg$emit_environments PARAMETER(LONGWORD VALUE);		/* M007
+ENTRY vcg$emit_eom;
+ENTRY vcg$emit_eom_param PARAMETER(BOOLEAN VALUE,LONGWORD VALUE,LONGWORD VALUE); /* A006
+ENTRY vcg$emit_gsd PARAMETER(ADDRESS VALUE);
+ENTRY vcg$emit_weak_gsd PARAMETER(ADDRESS VALUE);		/* A011
+ENTRY vcg$emit_jump_table PARAMETER(LONGWORD VALUE,LONGWORD VALUE);
+ENTRY vcg$emit_object_commands PARAMETER(ADDRESS VALUE,LONGWORD VALUE);
+ENTRY vcg$emit_object_data PARAMETER(ADDRESS VALUE,LONGWORD VALUE,LONGWORD VALUE,
+			LONGWORD VALUE);
+ENTRY vcg$emit_pidr PARAMETER(LONGWORD VALUE,LONGWORD VALUE,
+		LONGWORD VALUE, LONGWORD VALUE);
+ENTRY vcg$emit_set_base PARAMETER(LONGWORD VALUE,LONGWORD VALUE);
+ENTRY vcg$emit_src_correl PARAMETER( LONGWORD VALUE, LONGWORD VALUE) VARIABLE; /* A004
+ENTRY vcg$emit_store_external_data PARAMETER(ADDRESS VALUE,LONGWORD VALUE,
+			LONGWORD VALUE,LONGWORD VALUE);
+ENTRY vcg$emit_vield PARAMETER(LONGWORD VALUE,LONGWORD VALUE,ADDRESS VALUE,
+			LONGWORD VALUE,LONGWORD VALUE);
+ENTRY vcg$encode_type PARAMETER(WORD,LONGWORD,BOOLEAN,ADDRESS);
+ENTRY vcg$end_cluster ;
+entry vcg$end_sca parameter(longword value,longword value,longword value,
+			    longword value,longword,longword value, /* M014D
+			    longword value,longword value);
+ENTRY vcg$end_time PARAMETER(ADDRESS);
+ENTRY vcg$enlarge_psect PARAMETER(LONGWORD VALUE,LONGWORD VALUE,LONGWORD VALUE)
+      RETURNS LONGWORD;
+ENTRY vcg$enlarge_pst PARAMETER(LONGWORD VALUE,LONGWORD VALUE) 
+      RETURNS LONGWORD;
+ENTRY vcg$error_buffer PARAMETER(LONGWORD VALUE,ADDRESS VALUE);
+ENTRY vcg$error_msg PARAMETER(LONGWORD VALUE,LONGWORD VALUE) VARIABLE;
+ENTRY vcg$error_string PARAMETER(LONGWORD VALUE, CHARACTER LENGTH 32 VARYING) VARIABLE;
+ENTRY vcg$exception;
+
+ENTRY vcg$file_error PARAMETER(LONGWORD,LONGWORD,LONGWORD,LONGWORD);
+ENTRY vcg$find_file_type PARAMETER(ADDRESS VALUE) RETURNS BYTE;
+ENTRY vcg$finish_compile;
+ENTRY vcg$finish_write_tree;
+ENTRY vcg$free_buffer PARAMETER(ADDRESS VALUE);
+ENTRY vcg$free_memory PARAMETER(ADDRESS VALUE,LONGWORD VALUE);
+ENTRY vcg$free_tspace;
+
+ENTRY vcg$gen_phase;
+entry vcg$get_module_info parameter(character length 255 varying, byte); /* A015D
+ENTRY vcg$get_rfa_src PARAMETER(ADDRESS VALUE) RETURNS ADDRESS;
+entry vcg$get_routine_info parameter(address, character length 255 varying); /* A015D
+ENTRY vcg$get_src_pointer PARAMETER(LONGWORD VALUE,ADDRESS) RETURNS ADDRESS;
+ENTRY vcg$get_sym_name PARAMETER(LONGWORD VALUE ) RETURNS CHARACTER LENGTH 32 VARYING;
+ENTRY vcg$get_buffer RETURNS ADDRESS;
+ENTRY vcg$get_src_lin PARAMETER(LONGWORD,ADDRESS,ADDRESS) RETURNS BOOLEAN;
+ENTRY vcg$get_source_line PARAMETER(LONGWORD,ADDRESS,ADDRESS) RETURNS BOOLEAN; {A009
+
+ENTRY vcg$ini_src_str;
+ENTRY vcg$init;
+ENTRY vcg$init_code_gen;
+ENTRY vcg$init_symtab;
+ENTRY vcg$initialize_environments;
+ENTRY vcg$initialize_listing_file ;
+ENTRY vcg$initialize_object_file PARAMETER(CHARACTER LENGTH 32 VARYING,
+	CHARACTER LENGTH 32 VARYING);
+entry vcg$initialize_sca;
+ENTRY vcg$insert_message PARAMETER(LONGWORD VALUE,WORD,BYTE,CHARACTER LENGTH #linesize VARYING);
+ENTRY vcg$is_bad_id PARAMETER(LONGWORD)  RETURNS BOOLEAN;
+
+ENTRY vcg$link_dcl PARAMETER(LONGWORD VALUE, LONGWORD VALUE);
+
+entry vcg$mark_sca_lexical_location parameter(longword reference,
+					      address value,longword value);
+ENTRY vcg$mem_totals;
+
+ENTRY vcg$ok;
+ENTRY vcg$opn_inc_fil PARAMETER(LONGWORD VALUE, ADDRESS VALUE, LONGWORD VALUE,
+                                ADDRESS VALUE, LONGWORD VALUE, ADDRESS VALUE) VARIABLE; /* A010
+ENTRY vcg$optimizer;
+
+ENTRY vcg$reset_file_zone;	/* Azzz
+ENTRY vcg$rms_close PARAMETER(LONGWORD) RETURNS LONGWORD;	/* M007
+ENTRY vcg$rms_open PARAMETER(LONGWORD, CHARACTER LENGTH 255 VARYING, BOOLEAN,
+			LONGWORD VALUE ) VARIABLE RETURNS LONGWORD;
+ENTRY vcg$run_codegen;
+ENTRY vcg$run_optimizer;
+
+ENTRY vcg$start_comp;
+ENTRY vcg$start_line_rec PARAMETER( LONGWORD VALUE, LONGWORD VALUE, LONGWORD VALUE ); /* A004
+ENTRY vcg$start_msg_cluster PARAMETER(LONGWORD VALUE,WORD);
+ENTRY vcg$start_text_cluster ;
+ENTRY vcg$string_parse PARAMETER( ADDRESS VALUE, LONGWORD VALUE ); /* A005
+
+ENTRY vcg$tuple_checker;
+
+ENTRY vcg$write_pserec PARAMETER( ADDRESS VALUE ); /* A004
+entry vcg$write_sca_name parameter(character varying descriptor);
+ENTRY vcg$wrt_dbg_sym PARAMETER(LONGWORD VALUE,LONGWORD VALUE);
+ENTRY vcg$wrt_dbg_sym_counted PARAMETER(LONGWORD VALUE,LONGWORD VALUE, LONGWORD VALUE);	/*A012D
+ENTRY vcg$fetch_debug_count returns LONGWORD;
+ENTRY vcg$wrt_def_hdr PARAMETER(CHARACTER LENGTH #linesize VARYING,
+	CHARACTER LENGTH #linesize VARYING);
+ENTRY vcg$wrt_listing PARAMETER(CHARACTER LENGTH #linesize VARYING, LONGWORD VALUE,
+	BOOLEAN,BOOLEAN);
+ENTRY vcg$wrt_sub_hdr PARAMETER(CHARACTER LENGTH #linesize VARYING,
+	CHARACTER LENGTH #linesize VARYING);
+
+END_MODULE;

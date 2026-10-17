@@ -23,6 +23,10 @@
 					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
+					<arguments>
+						<argument>-package</argument>
+						<argument>io.proleap.cobol</argument>
+					</arguments>
 				</configuration>
 				<executions>
 					<execution>
@@ -41,7 +45,7 @@
 					<showTree>false</showTree>
 					<entryPoint>startRule</entryPoint>
 					<grammarName>Cobol85</grammarName>
-					<packageName></packageName>
+					<packageName>io.proleap.cobol</packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
 				<executions>

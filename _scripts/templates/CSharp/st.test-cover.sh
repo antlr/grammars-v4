@@ -1,42 +1,36 @@
 # Generated from trgen <version>
 
-# People often specify a test file directory, but sometimes no
-# tests are provided. Git won't check in an empty directory.
-# Test if the test file directory does not exist, or it is just
-# an empty directory.
-if [ ! -d ../<example_files_unix> ]
-then
-    echo "No test cases provided."
-    exit 0
-elif [ ! "$(ls -A ../<example_files_unix>)" ]
-then
-    echo "No test cases provided."
-    exit 0
-fi
-
 SAVEIFS=$IFS
 IFS=$(echo -en "\n\b")
 
 # Get a list of test files from the test directory. Do not include any
 # .errors or .tree files. Pay close attention to remove only file names
 # that end with the suffix .errors or .tree.
-files2=`find ../<example_files_unix> -type f | grep -v '.errors$' | grep -v '.tree$'`
+files2=`dotnet trash glob <glob_args_unix> | grep -v '[.]errors$' | grep -v '[.]tree$' | grep -v '[.]trq$'`
 files=()
 for f in $files2
 do
-    dotnet triconv -- -f utf-8 $f > /dev/null 2>&1
-    if [ "$?" = "0" ]
-    then
-        files+=( $f )
-    fi
+    if [ -d "$f" ]; then continue; fi
+    files+=( $f )
 done
+
+old=`pwd`
+
+# People often specify a test file directory, but sometimes no
+# tests are provided. Git won't check in an empty directory.
+# Test if there are no test files.
+if [ ${#files[@]} -eq 0 ]
+then
+    echo "No test cases provided."
+    exit 0
+fi
 
 # Parse all input files.
 <if(individual_parsing)>
 # Individual parsing: NOT SUPPORTED!
 <else>
 # Group parsing.
-echo "${files[*]}" | dotnet trwdog -- dotnet trcover -- -x
+echo "${files[*]}" | dotnet trash wdog dotnet trash cover -x
 status=$?
 <endif>
 

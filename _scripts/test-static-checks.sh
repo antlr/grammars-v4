@@ -212,6 +212,10 @@ then
         directories=`git diff --name-only ${additional[0]} ${additional[1]} . 2> /dev/null | sed 's#\(.*\)[/][^/]*$#\1#' | sort -u | grep -v _scripts`
         for g in $directories
         do
+            if [ ! -d $g ]
+            then
+                continue
+            fi
             pushd $g > /dev/null
             while true
             do
@@ -229,13 +233,7 @@ then
             g=${g##/}
             if [ "$g" == "" ]
             then
-                popd > /dev/null
-                continue
-            fi
-            if [ "$g" == "." ]
-            then
-                popd > /dev/null
-                continue
+                g="."
             fi
             popd > /dev/null
             echo Adding diff $g
@@ -296,7 +294,7 @@ fi
 
 if [ ${#targets[@]} -eq 0 ]
 then
-    targets=( useless-parens format )
+    targets=( useless-parens format ambiguity no-symbolic-links )
 fi
 
 echo grammars = ${grammars[@]}
@@ -345,7 +343,7 @@ do
     if [ "$filter" == "agnostic" ]
     then
         # Test whether the grammars have actions.
-        count=`dotnet trparse -- -t antlr4 *.g4 2> /dev/null | dotnet trxgrep ' //(actionBlock | argActionBlock)' | dotnet trtext -c`
+        count=`dotnet trash parse -t ANTLRv4 *.g4 2> /dev/null | dotnet trash xpath ' //(actionBlock | argActionBlock)' | dotnet trash text -c`
         if [ "$count" == "0" ]
         then
             echo "no actions => skipping $testname."
@@ -357,7 +355,7 @@ do
     if [ "$target" == "useless-parens" ]
     then
         # Find useless parentheses.
-        curl https://raw.githubusercontent.com/kaby76/g4-scripts/9e70a6392783936ddd51cd270f6ac29fecbefef8/find-useless-parentheses.sh 2> /dev/null | bash
+        curl https://raw.githubusercontent.com/kaby76/g4-scripts/7eaf1705a9088dd56820b2aa98d6f8644b0750e2/find-useless-parentheses.sh 2> /dev/null | bash
         if [ $? -ne 0 ]
         then
             echo "::warning file=$testname,line=0,col=0,endColumn=0::grammar contains useless parentheses. Check log for more details."
@@ -374,6 +372,36 @@ do
         then
             echo "::warning file=$testname,line=0,col=0,endColumn=0::one or more grammars do not conform to the Antlr grammar coding standard format for this repo. Reformat using antlr-format."
         fi
+    fi
+
+    if [ "$target" == "ambiguity" ]
+    then
+        dotnet trash gen -t CSharp --template-sources-directory "$full_path_templates" --antlr-tool-path $antlr4jar
+        if [ $? -ne 0 ]
+        then
+            echo "::warning file=$testname,line=0,col=0,endColumn=0::Cannot test ambiguity, non-zero return from trgen."
+        elif [ ! -d Generated-CSharp ]
+        then
+            echo "::warning file=$testname,line=0,col=0,endColumn=0::Cannot test ambiguity, no Generated-CSharp directory."
+        else
+            cd Generated-CSharp
+            bash build.sh
+            bash test-ambiguity.sh
+        fi
+    fi
+
+    if [ "$target" == "no-symbolic-links" ]
+    then
+        # Find if repo contains symbolic file links.
+        for f in `find . -type l | fgrep -v '.git'`
+        do
+            v=`git ls-files --stage $f | awk '{print $1}'`
+            if [ "$v" == "120000" ]
+            then
+                echo $f is a symbolic link file, repo cannot have any.
+                failed=1
+            fi
+        done
     fi
 
     popd > /dev/null

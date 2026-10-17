@@ -1,4 +1,5 @@
-## [Properties File Format](https://docs.oracle.com/cd/E23095_01/Platform.93/ATGProgGuide/html/s0204propertiesfileformat01.html)
+# Java Properties File Grammar
+
 The properties files read by Nucleus must follow a format that is recognized by the class java.util.Properties. The rules for the format are as follows:
 
 + Entries are generally expected to be a single line of the form, one of the following:
@@ -43,3 +44,6 @@ path=c:\\docs\\doc1
 **Note**: It is not necessary to escape backslashes in property values when you use the ATG Control Center Components window; the ATG Control Center handles the escape characters automatically.
 
 + UNICODE characters can be entered as they are in a Java program, using the \u prefix. For example, `\u002c`.
+
+## Reference
+

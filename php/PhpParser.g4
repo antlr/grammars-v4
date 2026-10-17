@@ -499,32 +499,32 @@ expression
     | Empty '(' chain ')'                                         # SpecialWordExpression
     | Eval '(' expression ')'                                     # SpecialWordExpression
     | Exit ( '(' ')' | parentheses)?                              # SpecialWordExpression
-    | (Include | IncludeOnce) expression                          # SpecialWordExpression
-    | (Require | RequireOnce) expression                          # SpecialWordExpression
     | lambdaFunctionExpr                                          # LambdaFunctionExpression
     | matchExpr                                                   # MatchExpression
-    | <assoc = right> expression op = '**' expression             # ArithmeticExpression
+    | <assoc = right> expression op = '**' expression             # ExponentiationExpression
     | expression InstanceOf typeRef                               # InstanceOfExpression
-    | expression op = ('*' | Divide | '%') expression             # ArithmeticExpression
-    | expression op = ('+' | '-' | '.') expression                # ArithmeticExpression
-    | expression op = ('<<' | '>>') expression                    # ComparisonExpression
-    | expression op = (Less | '<=' | Greater | '>=') expression   # ComparisonExpression
-    | expression op = ('===' | '!==' | '==' | IsNotEq) expression # ComparisonExpression
-    | expression op = '&' expression                              # BitwiseExpression
-    | expression op = '^' expression                              # BitwiseExpression
-    | expression op = '|' expression                              # BitwiseExpression
-    | expression op = '&&' expression                             # BitwiseExpression
-    | expression op = '||' expression                             # BitwiseExpression
+    | expression op = ('*' | Divide | '%') expression             # MultiplicativeExpression
+    | expression op = ('+' | '-' | '.') expression                # AdditiveExpression
+    | expression op = ('<<' | '>>') expression                    # ShiftExpression
+    | expression op = (Less | '<=' | Greater | '>=') expression   # RelationalExpression
+    | expression op = ('===' | '!==' | '==' | IsNotEq) expression # EqualityExpression
+    | expression op = '&' expression                              # BitwiseAndExpression
+    | expression op = '^' expression                              # BitwiseExcOrExpression
+    | expression op = '|' expression                              # BitwiseIncOrExpression
+    | expression op = '&&' expression                             # LogicalAndExpression
+    | expression op = '||' expression                             # LogicalIncOrExpression
     | expression op = QuestionMark expression? ':' expression     # ConditionalExpression
-    | expression op = '??' expression                             # NullCoalescingExpression
+    | expression op = '??' expression                             # CoalesceExpression
     | expression op = '<=>' expression                            # SpaceshipExpression
+    | (Include | IncludeOnce) expression                          # IncludeExpression
+    | (Require | RequireOnce) expression                          # RequireExpression
     | Throw expression                                            # SpecialWordExpression
     | arrayDestructuring Eq expression                            # ArrayDestructExpression
     | assignable assignmentOperator attributes? expression        # AssignmentExpression
     | assignable Eq attributes? '&' (chain | newExpr)             # AssignmentExpression
-    | expression op = LogicalAnd expression                       # LogicalExpression
-    | expression op = LogicalXor expression                       # LogicalExpression
-    | expression op = LogicalOr expression                        # LogicalExpression
+    | expression op = LogicalAnd expression                       # LogicalAndExpression
+    | expression op = LogicalXor expression                       # LogicalExcOrExpression
+    | expression op = LogicalOr expression                        # LogicalIncOrExpression
     ;
 
 assignable
@@ -928,25 +928,6 @@ magicConstant
     | Line__
     | File__
     | Dir__
-    ;
-
-magicMethod
-    : Get
-    | Set
-    | Call
-    | CallStatic
-    | Constructor
-    | Destruct
-    | Wakeup
-    | Sleep
-    | Autoload
-    | IsSet__
-    | Unset__
-    | ToString__
-    | Invoke
-    | SetState
-    | Clone__
-    | DebugInfo
     ;
 
 primitiveType

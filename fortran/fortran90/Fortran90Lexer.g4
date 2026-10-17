@@ -456,9 +456,9 @@ ICON: NUM+;
 
 TYPE: 'type' | 'TYPE' | 'Type';
 
-NAME: LETTER ( ALPHANUMERIC_CHARACTER)*;
-
 EXIT: 'EXIT' | 'exit';
+
+NAME: LETTER ( ALPHANUMERIC_CHARACTER)*;
 
 BLANK: 'BLANK' | 'blank';
 

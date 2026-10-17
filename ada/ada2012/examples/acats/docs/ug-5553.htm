@@ -1,0 +1,153 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>Tests for the Distributed Systems Annex</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    DIV.Indented2 {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 4.0em; margin-bottom: 0.6em}
+    DIV.WideAbove {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-top: 0.6em; margin-bottom: 0.6em}
+    DIV.Enumerated-Body {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 2.0em; margin-right: 2.0em; margin-top: 0em; margin-bottom: 0.5em}
+    DIV.Enumerated-Term {float: left; font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 0.5em; margin-top: 0em; margin-bottom: 0em}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-5552.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-5554.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>5.5.5.3 Tests for the Distributed Systems Annex</H1>
+<div class="Normal">The ACATS tests for the Distributed Systems Annex 
+are applicable only to implementations that wish to test this SNA. Not 
+all of these tests apply to all implementations, since the annex includes 
+some implementation permissions that affect the applicability of some 
+tests.</div>
+<div class="Normal" style="margin-bottom: 0.4em">The principal factors 
+affecting test applicability are:&nbsp;</div>
+<div class="Enumerated-Term">1.</div><div class="Enumerated-Body">
+whether the Remote_Call_Interface pragma is supported;</div>
+<div class="Enumerated-Term">2.</div><div class="Enumerated-Body">
+whether a Partition Communication System (PCS) is provided (i.e., whether 
+a body for System.RPC is provided by the implementation);</div>
+<div class="Enumerated-Term">3.</div><div class="Enumerated-Body">
+whether the implementation has taken advantage of the permission to change 
+the specification of System.RPC;</div>
+<div class="Enumerated-Term">4.</div><div class="Enumerated-Body">
+whether the Real-Time Annex is also supported.&nbsp;</div>
+<div class="Normal">An implementation may test for the annex without 
+providing a PCS. In order to test for the Distributed Systems Annex, 
+an implementation must allow a body for System.RPC to be compiled.</div>
+<div class="WideAbove"><SPAN Class="swiss"><SPAN STYLE="font-size: 156%"><B></B></SPAN><SPAN STYLE="font-size: 125%"><B>Remote_Call_Interface 
+pragma</B></SPAN><SPAN STYLE="font-size: 156%"><B></B></SPAN></SPAN></div>
+<div class="Normal" style="margin-bottom: 0.4em">Ada allows explicit 
+message-based communication between active partitions as an alternative 
+to RPC [see Ada <A HREF="http://www.adaic.org/resources/add_content/standards/12rm/html/RM-E-2-3.html#p20">E.2.3(20)</A>]. 
+If an implementation does not support the Remote_Call_Interface pragma 
+then the following tests are not applicable:</div>
+<div class="Indented2"><table width="70%">
+<TR><TD align="left">bxe2009<TD align="left">bxe4001<TD align="left">cxe4002<TD align="left">cxe4006<TD align="left">
+<TR><TD align="left">bxe2010<TD align="left">cxe2001<TD align="left">cxe4003<TD align="left">cxe5002<TD align="left">
+<TR><TD align="left">bxe2011<TD align="left">cxe2002<TD align="left">cxe4004<TD align="left">cxe5003<TD align="left">
+<TR><TD align="left">bxe2013<TD align="left">cxe4001<TD align="left">cxe4005<TD align="left">lxe3001 <TD align="left">
+</table></div>
+<div class="WideAbove"><SPAN Class="swiss"><SPAN STYLE="font-size: 156%"><B></B></SPAN><SPAN STYLE="font-size: 125%"><B>Partition 
+Communication System</B></SPAN><SPAN STYLE="font-size: 156%"><B></B></SPAN></SPAN></div>
+<div class="Normal" style="margin-bottom: 0.4em">An implementation is 
+not required to provide a PCS [see Ada <A HREF="http://www.adaic.org/resources/add_content/standards/12rm/html/RM-E-5.html#p27">E.5(27)</A>] 
+in order to test the Distributed Systems Annex. If no PCS is provided 
+then the following tests are not applicable:</div>
+<div class="Indented2"><table width="70%">
+<TR><TD align="left">cxe1001<TD align="left">cxe4002<TD align="left">cxe4005<TD align="left">&nbsp;<TD align="left">
+<TR><TD align="left">cxe2001<TD align="left">cxe4003<TD align="left">cxe4006<TD align="left">&nbsp;<TD align="left">
+<TR><TD align="left">cxe4001<TD align="left">cxe4004<TD align="left">cxe5001 <TD align="left">&nbsp;<TD align="left">
+</table></div>
+<div class="WideAbove"><SPAN Class="swiss"><SPAN STYLE="font-size: 156%"><B></B></SPAN><SPAN STYLE="font-size: 125%"><B>System.RPC</B></SPAN><SPAN STYLE="font-size: 156%"><B></B></SPAN></SPAN></div>
+<div class="Normal" style="margin-bottom: 0.4em">Two tests provide a 
+body for System.RPC, and a third test checks the specification of System.RPC. 
+An alternative declaration is allowed for package System.RPC [see Ada 
+<A HREF="http://www.adaic.org/resources/add_content/standards/12rm/html/RM-E-5.html#p27.1">E.5(27.1/2)</A>]. 
+If an alternative declaration is used for System.RPC, the following tests 
+are not applicable:</div>
+<div class="Indented2"><table width="70%">
+<TR><TD align="left">cxe5001<TD align="left">cxe5002<TD align="left">cxe5003 <TD align="left">&nbsp;<TD align="left">
+</table></div>
+<div class="WideAbove"><SPAN Class="swiss"><SPAN STYLE="font-size: 156%"><B></B></SPAN><SPAN STYLE="font-size: 125%"><B>Real-Time 
+Annex Support</B></SPAN><SPAN STYLE="font-size: 156%"><B></B></SPAN></SPAN></div>
+<div class="Normal">Many implementations that support the Distributed 
+Systems Annex will also support the Real-Time Annex. Test cxe4003 is 
+designed to take advantage of Real-Time Annex features in order to better 
+test the Distributed Systems Annex.</div>
+<div class="Normal">For implementations that do not support the Real-Time 
+Annex, test cxe4003 must be modified. This modification consists of deleting 
+all lines that end with the comment <TT>--RT</TT>.</div>
+<div class="WideAbove"><SPAN Class="swiss"><SPAN STYLE="font-size: 156%"><B></B></SPAN><SPAN STYLE="font-size: 125%"><B>Configuring 
+Multi-Partition Tests</B></SPAN><SPAN STYLE="font-size: 156%"><B></B></SPAN></SPAN></div>
+<div class="Normal">Some Distributed Systems Annex tests require multiple 
+partitions to run the test, but no more than two partitions are required 
+for running any of them. All multi-partition tests contain a main procedure 
+for each of the two partitions. The two partitions are referred to as 
+&quot;A&quot; and &quot;B&quot; and the main procedures for these partitions 
+are named &lt;test_name&gt;_A and &lt;test_name&gt;_B respectively. Each 
+test contains instructions naming the compilation units to be included 
+in each partition. Most implementations will be primarily concerned with 
+the main procedure and RCI packages that are to be assigned to each partition; 
+the remainder of the partition contents will be determined by the normal 
+dependency rules. The naming convention used in multi-partition tests 
+aid in making the partition assignments. If the name of a compilation 
+unit ends in &quot;_A&lt;optional_digit]&gt;&quot; then it should be 
+assigned to partition A. Compilation units with names ending in &quot;_B&lt;optional_digit&gt;&quot; 
+should be assigned to partition B.</div>
+<div class="Normal" style="margin-bottom: 0.4em">The following tests 
+require that two partitions be available to run the test:</div>
+<div class="Indented2"><table width="70%">
+<TR><TD align="left">cxe1001<TD align="left">cxe4002<TD align="left">cxe4006<TD align="left">lxe3002* <TD align="left">
+<TR><TD align="left">cxe2001*<TD align="left">cxe4003<TD align="left">cxe5002<TD align="left">&nbsp;<TD align="left">
+<TR><TD align="left">cxe2002<TD align="left">cxe4004<TD align="left">cxe5003<TD align="left">&nbsp;<TD align="left">
+<TR><TD align="left">cxe4001<TD align="left">cxe4005<TD align="left">lxe3001<TD align="left">&nbsp;<TD align="left">
+</table></div>
+<div class="Normal">(*) Tests cxe2001 and lxe3002 contain a Shared_Passive 
+package and two active partitions. They may be configured with either 
+two or three partitions. The two-partition configuration must have two 
+active partitions and the Shared_Passive package may be assigned to either 
+one of the active partitions. The three-partition configuration consists 
+of two active partitions and a single passive partition, and the passive 
+partition will contain the single Shared_Passive package.</div>
+<div class="WideAbove"><SPAN Class="swiss"><SPAN STYLE="font-size: 156%"><B></B></SPAN><SPAN STYLE="font-size: 125%"><B>Running 
+Multi-Partition Tests</B></SPAN><SPAN STYLE="font-size: 156%"><B></B></SPAN></SPAN></div>
+<div class="Normal">All of the multi-partition tests include the package 
+Report in both of the active partitions. In order for the test to pass, 
+both partitions must produce a passed message (except for lxe3002 - see 
+special instructions for that test). If either partition produces a failed 
+message, or if one or both partitions do not produce a passed message, 
+the test is graded &quot;failed&quot;.</div>
+<div class="Normal">When running the multi-partition tests it is not 
+important which partition is started first. Generally, partition A acts 
+as a server and partition B is a client, so starting partition A first 
+is usually best.</div>
+<div class="Normal">In the event a test fails due to the exception Communication_Error 
+being raised, it is permissible to rerun the test.</div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-5552.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-5554.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>

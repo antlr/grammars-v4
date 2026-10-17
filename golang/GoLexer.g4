@@ -43,32 +43,31 @@ lexer grammar GoLexer;
 // Keywords
 
 BREAK       : 'break' -> mode(NLSEMI);
-DEFAULT     : 'default';
-FUNC        : 'func';
-INTERFACE   : 'interface';
-SELECT      : 'select';
 CASE        : 'case';
-DEFER       : 'defer';
-GO          : 'go';
-MAP         : 'map';
-STRUCT      : 'struct';
 CHAN        : 'chan';
-ELSE        : 'else';
-GOTO        : 'goto';
-PACKAGE     : 'package';
-SWITCH      : 'switch';
 CONST       : 'const';
-FALLTHROUGH : 'fallthrough' -> mode(NLSEMI);
-IF          : 'if';
-RANGE       : 'range';
-TYPE        : 'type';
 CONTINUE    : 'continue' -> mode(NLSEMI);
+DEFAULT     : 'default';
+DEFER       : 'defer';
+ELSE        : 'else';
+FALLTHROUGH : 'fallthrough' -> mode(NLSEMI);
 FOR         : 'for';
+FUNC        : 'func';
+GO          : 'go';
+GOTO        : 'goto';
+IF          : 'if';
 IMPORT      : 'import';
+INTERFACE   : 'interface';
+MAP         : 'map';
+NIL_LIT     : 'nil' -> mode(NLSEMI);
+PACKAGE     : 'package';
+RANGE       : 'range';
 RETURN      : 'return' -> mode(NLSEMI);
+SELECT      : 'select';
+STRUCT      : 'struct';
+SWITCH      : 'switch';
+TYPE        : 'type';
 VAR         : 'var';
-
-NIL_LIT: 'nil' -> mode(NLSEMI);
 
 IDENTIFIER: LETTER (LETTER | UNICODE_DIGIT)* -> mode(NLSEMI);
 

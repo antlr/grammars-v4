@@ -7,15 +7,26 @@
  * should start with lower case char similar to parser rules.
  */
 class GoParserBase : public antlr4::Parser {
-public:
-    GoParserBase(antlr4::TokenStream* input) : Parser(input) {
-    }
+private:
+    bool debug = false;
+    std::set<std::string> table;
+    static const std::set<std::string> BUILTIN_TYPE_FUNCTIONS;
 
+    static bool hasArg(int argc, char* argv[], const std::string& arg);
+
+public:
+    GoParserBase(antlr4::TokenStream* input) : Parser(input) { }
+    GoParserBase(antlr4::TokenStream* input, int argc, char* argv[]);
     virtual ~GoParserBase() {}
 
 protected:
-    /**
-     * Returns true if the current Token is a closing bracket (")" or "}")
-     */
+    void myreset();
     bool closingBracket();
+    bool isNotReceive();
+    void addImportSpec();
+    bool isOperand();
+    bool isConversion();
+    bool isMethodExpr();
+    bool isTypeArgument();
+    bool isExpressionArgument();
 };

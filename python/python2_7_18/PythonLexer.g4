@@ -28,45 +28,16 @@ THE SOFTWARE.
   */
 
 lexer grammar PythonLexer;
+
 options { superClass=PythonLexerBase; }
-tokens { INDENT, DEDENT } // https://docs.python.org/2.7/reference/lexical_analysis.html#indentation
+
+tokens { 
+  INDENT, DEDENT // https://docs.python.org/2.7/reference/lexical_analysis.html#indentation
+}
 
 /*
  * lexer rules    // https://docs.python.org/2.7/library/tokenize.html
  */
-
-// https://docs.python.org/2.7/reference/lexical_analysis.html#keywords
-AND      : 'and';
-AS       : 'as';
-ASSERT   : 'assert';
-BREAK    : 'break';
-CLASS    : 'class';
-CONTINUE : 'continue';
-DEF      : 'def';
-DEL      : 'del';
-ELIF     : 'elif';
-ELSE     : 'else';
-EXCEPT   : 'except';
-EXEC     : 'exec';
-FINALLY  : 'finally';
-FOR      : 'for';
-FROM     : 'from';
-GLOBAL   : 'global';
-IF       : 'if';
-IMPORT   : 'import';
-IN       : 'in';
-IS       : 'is';
-LAMBDA   : 'lambda';
-NOT      : 'not';
-OR       : 'or';
-PASS     : 'pass';
-PRINT    : 'print';
-RAISE    : 'raise';
-RETURN   : 'return';
-TRY      : 'try';
-WHILE    : 'while';
-WITH     : 'with';
-YIELD    : 'yield';
 
 // https://docs.python.org/2.7/library/token.html#token.OP
 LPAR             : '(';  // OPEN_PAREN
@@ -115,6 +86,38 @@ DOUBLESLASH      : '//';
 DOUBLESLASHEQUAL : '//=';
 AT               : '@';
 
+// https://docs.python.org/2.7/reference/lexical_analysis.html#keywords
+AND      : 'and';
+AS       : 'as';
+ASSERT   : 'assert';
+BREAK    : 'break';
+CLASS    : 'class';
+CONTINUE : 'continue';
+DEF      : 'def';
+DEL      : 'del';
+ELIF     : 'elif';
+ELSE     : 'else';
+EXCEPT   : 'except';
+EXEC     : 'exec';
+FINALLY  : 'finally';
+FOR      : 'for';
+FROM     : 'from';
+GLOBAL   : 'global';
+IF       : 'if';
+IMPORT   : 'import';
+IN       : 'in';
+IS       : 'is';
+LAMBDA   : 'lambda';
+NOT      : 'not';
+OR       : 'or';
+PASS     : 'pass';
+PRINT    : 'print';
+RAISE    : 'raise';
+RETURN   : 'return';
+TRY      : 'try';
+WHILE    : 'while';
+WITH     : 'with';
+YIELD    : 'yield';
 
 // https://docs.python.org/2.7/reference/lexical_analysis.html#identifiers
 NAME : IDENTIFIER;
@@ -131,18 +134,19 @@ NUMBER
 STRING : STRING_LITERAL;
 
 // https://docs.python.org/2.7/reference/lexical_analysis.html#physical-lines
-NEWLINE : OS_INDEPENDENT_NL;
+NEWLINE : '\r'? '\n'; // Unix, Windows
 
 // https://docs.python.org/2.7/reference/lexical_analysis.html#comments
-COMMENT : '#' ~[\r\n]*               -> channel(HIDDEN);
+COMMENT : '#' ~[\r\n]*                    -> channel(HIDDEN);
 
 // https://docs.python.org/2.7/reference/lexical_analysis.html#whitespace-between-tokens
-WS : [ \t\f]+                        -> channel(HIDDEN);
+WS : [ \t\f]+                             -> channel(HIDDEN);
 
 // https://docs.python.org/2.7/reference/lexical_analysis.html#explicit-line-joining
-EXPLICIT_LINE_JOINING : '\\' NEWLINE -> channel(HIDDEN);
+EXPLICIT_LINE_JOINING : BACKSLASH_NEWLINE -> channel(HIDDEN);
 
-ERROR_TOKEN : . ; // catch unrecognized characters and redirect these errors to the parser
+// catch the unrecognized character(s)
+ERRORTOKEN : . ; // PythonLexerBase class will report an error about this (the ERRORTOKEN will also cause an error in the parser)
 
 
 /*
@@ -153,30 +157,35 @@ ERROR_TOKEN : . ; // catch unrecognized characters and redirect these errors to 
 
 // https://docs.python.org/2.7/reference/lexical_analysis.html#string-literals
 fragment STRING_LITERAL : STRING_PREFIX? (SHORT_STRING | LONG_STRING);
-fragment STRING_PREFIX  : 'r' | 'u' | 'ur' | 'R' | 'U' | 'UR' | 'Ur' | 'uR' | 'b' | 'B' | 'br' | 'Br' | 'bR' | 'BR';
+
+// 'r' | 'u' | 'ur' | 'R' | 'U' | 'UR' | 'Ur' | 'uR' | 'b' | 'B' | 'br' | 'Br' | 'bR' | 'BR';
+fragment STRING_PREFIX  options { caseInsensitive=true; } : 'r' | 'u' | 'ur' | 'b' | 'br';
 
 fragment SHORT_STRING
-   : '\'' SHORT_STRING_ITEM_FOR_SINGLE_QUOTE* '\''
-   | '"'  SHORT_STRING_ITEM_FOR_DOUBLE_QUOTE* '"'
-   ;
+    : ['] SHORT_STRING_ITEM_FOR_SINGLE_QUOTE* [']
+    | ["] SHORT_STRING_ITEM_FOR_DOUBLE_QUOTE* ["]
+    ;
 
 fragment LONG_STRING
-   : '\'\'\'' LONG_STRING_ITEM*? '\'\'\''
-   | '"""'    LONG_STRING_ITEM*? '"""'
-   ;
+    : ['][']['] LONG__STRING_ITEM*? ['][']['] // nongreede
+    | ["]["]["] LONG__STRING_ITEM*? ["]["]["] // nongreede
+    ;
 
 fragment SHORT_STRING_ITEM_FOR_SINGLE_QUOTE : SHORT_STRING_CHAR_NO_SINGLE_QUOTE | ESCAPE_SEQ;
 fragment SHORT_STRING_ITEM_FOR_DOUBLE_QUOTE : SHORT_STRING_CHAR_NO_DOUBLE_QUOTE | ESCAPE_SEQ;
 
-fragment LONG_STRING_ITEM : LONG_STRING_CHAR | ESCAPE_SEQ;
+fragment LONG__STRING_ITEM : LONG_STRING_CHAR | ESCAPE_SEQ;
 
-fragment SHORT_STRING_CHAR_NO_SINGLE_QUOTE : ~[\\\r\n'];      // <any source character except "\" or newline or single quote>
-fragment SHORT_STRING_CHAR_NO_DOUBLE_QUOTE : ~[\\\r\n"];      // <any source character except "\" or newline or double quote>
-fragment LONG_STRING_CHAR  : ~'\\';                           // <any source character except "\">
-fragment ESCAPE_SEQ
-   : '\\' OS_INDEPENDENT_NL // \<newline> escape sequence
-   | '\\' [\u0000-\u007F]                                    // "\" <any ASCII character>
-   ; // the \<newline> (not \n) escape sequences will be removed from the string literals by the PythonLexerBase class
+fragment SHORT_STRING_CHAR_NO_SINGLE_QUOTE : ~[\\\r\n'];          // <any source character except "\" or newline or single quote>
+fragment SHORT_STRING_CHAR_NO_DOUBLE_QUOTE : ~[\\\r\n"];          // <any source character except "\" or newline or double quote>
+fragment LONG_STRING_CHAR  : ~'\\';                               // <any source character except "\">
+
+// https://docs.python.org/2.7/reference/lexical_analysis.html#string-literals
+fragment ESCAPE_SEQ : ESCAPE_SEQ_NEWLINE | '\\' [\u0000-\u007F];  // "\" <any ASCII character>
+
+fragment ESCAPE_SEQ_NEWLINE : BACKSLASH_NEWLINE; // it is a kind of line continuation for string literals (backslash and newline will be ignored)
+
+fragment BACKSLASH_NEWLINE : '\\' NEWLINE;
 
 // https://docs.python.org/2.7/reference/lexical_analysis.html#integer-and-long-integer-literals
 fragment LONG_INTEGER    : INTEGER ('l' | 'L');
@@ -200,9 +209,6 @@ fragment EXPONENT       : ('e' | 'E') ('+' | '-')? DIGIT+;
 
 // https://docs.python.org/2.7/reference/lexical_analysis.html#imaginary-literals
 fragment IMAG_NUMBER : (FLOAT_NUMBER | INT_PART) ('j' | 'J');
-
-// https://docs.python.org/2.7/reference/lexical_analysis.html#physical-lines
-fragment OS_INDEPENDENT_NL : '\r'? '\n'; // Unix, Windows
 
 // https://docs.python.org/2.7/reference/lexical_analysis.html#identifiers
 fragment IDENTIFIER : (LETTER | '_') (LETTER | DIGIT | '_')*;

@@ -1,7 +1,7 @@
 \<!-- Generated from trgen <version> -->
 \<Project Sdk="Microsoft.NET.Sdk" >
   \<PropertyGroup>
-    \<TargetFramework>net8.0\</TargetFramework>
+    \<TargetFramework>net10.0\</TargetFramework>
     \<OutputType>Exe\</OutputType>
     \<ProduceReferenceAssembly>false\</ProduceReferenceAssembly>
   \</PropertyGroup>
@@ -9,11 +9,21 @@
 <tool_grammar_files:{x |    \<Antlr4 Include="<x>">
 <if(name_space)>\<Package><name_space>\</Package><endif>\</Antlr4>
 } >  \</ItemGroup>
-  \<Import Project="Other.csproj">\</Import>
+  \<ItemGroup>
+    \<PackageReference Include="UTF.Unknown" Version="2.6.0" />
+<if(antlr_is_dev)>
+    \<Reference Include="Antlr4.Runtime.Standard">
+      \<HintPath>$(ANTLR4_CS_DLL)\</HintPath>
+    \</Reference>
+<else>
+    \<PackageReference Include="Antlr4.Runtime.Standard" Version="<antlr_version>" />
+<endif>
+	  \<!--PackageReference Include="Antlr4BuildTasks" Version="12.10" PrivateAssets="all" -->
+  \</ItemGroup>
   \<PropertyGroup>
     \<RestoreProjectStyle>PackageReference\</RestoreProjectStyle>
   \</PropertyGroup>
-  \<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" >
+  \<PropertyGroup>
     \<NoWarn>1701;1702;3021\</NoWarn>
   \</PropertyGroup>
   \<PropertyGroup>
@@ -31,7 +41,7 @@ do
   if [ "$x1" != "errors" ]
   then
     echo $file
-    cat $file | bin/Debug/net8.0/Test
+    cat $file | bin/Debug/net10.0/Test
     status="$?"
     if [ -f "$file".errors ]
     then
@@ -67,7 +77,7 @@ for %%G in (..\\<example_files_win>\*) do (
   set X3=%%~pG
   if !X1! neq .errors (
     echo !FILE!
-    cat !FILE! | bin\Debug\net8.0\Test.exe
+    cat !FILE! | bin\Debug\net10.0\Test.exe
     if not exist !FILE!.errors (
       if ERRORLEVEL 1 set ERR=1
     ) else (

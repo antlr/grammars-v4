@@ -106,6 +106,12 @@ def index_grammars(root : str) -> Sequence[dict]:
                     bar = p3.stdout.readline()
                     if bar:
                         skip = True
+                    p1 = subprocess.Popen(["dotnet", "trparse", "-t", "ANTLRv4", foo], stdout=subprocess.PIPE)
+                    p2 = subprocess.Popen(["dotnet", "trxgrep", "//delegateGrammar/identifier"], stdin=p1.stdout, stdout=subprocess.PIPE)
+                    p3 = subprocess.Popen(["dotnet", "trtext"], stdin=p2.stdout, stdout=subprocess.PIPE)
+                    imp = p3.stdout.readline()
+                    if imp:
+                        skip = True
             if skip:
                 continue
 

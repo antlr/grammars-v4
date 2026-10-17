@@ -39,7 +39,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>root</entryPoint>
+					<entryPoint>queries</entryPoint>
 					<grammarName>MySQL</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples</exampleFiles>

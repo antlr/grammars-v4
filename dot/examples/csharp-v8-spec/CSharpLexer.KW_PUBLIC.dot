@@ -1,0 +1,20 @@
+digraph ATN {
+rankdir=LR;
+s238[fontsize=11, label="238", shape=doublecircle, fixedsize=true, width=.6];
+s1105[fontsize=11,label="1105", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1106[fontsize=11,label="1106", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1107[fontsize=11,label="1107", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1108[fontsize=11,label="1108", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1109[fontsize=11,label="1109", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1110[fontsize=11,label="1110", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1111[fontsize=11,label="1111", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s237[fontsize=11,label="237", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s237 -> s1105 [fontname="Times-Italic", label="&epsilon;"];
+s1105 -> s1106 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'p'", arrowhead = normal];
+s1106 -> s1107 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'u'", arrowhead = normal];
+s1107 -> s1108 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'b'", arrowhead = normal];
+s1108 -> s1109 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'l'", arrowhead = normal];
+s1109 -> s1110 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'i'", arrowhead = normal];
+s1110 -> s1111 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'c'", arrowhead = normal];
+s1111 -> s238 [fontname="Times-Italic", label="&epsilon;"];
+}

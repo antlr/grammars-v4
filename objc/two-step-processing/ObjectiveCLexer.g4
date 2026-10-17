@@ -99,12 +99,12 @@ SELF            : 'self';
 SUPER           : 'super';
 YES             : 'YES';
 AUTORELEASEPOOL : '@autoreleasepool';
-CATCH           : '@catch';
+CATCH           : 'catch';
 CLASS           : '@class';
 DYNAMIC         : '@dynamic';
 ENCODE          : '@encode';
 END             : '@end';
-FINALLY         : '@finally';
+FINALLY         : 'finally';
 IMPLEMENTATION  : '@implementation';
 INTERFACE       : '@interface';
 IMPORT          : '@import';
@@ -120,14 +120,19 @@ SELECTOR        : '@selector';
 SYNCHRONIZED    : '@synchronized';
 SYNTHESIZE      : '@synthesize';
 THROW           : '@throw';
-TRY             : '@try';
+TRY             : 'try';
 ATOMIC          : 'atomic';
 NONATOMIC       : 'nonatomic';
 RETAIN          : 'retain';
+DIRECT          : 'direct';
 
 // Attributes with `__` prefix
 
+INLINE_ATTR                 : '__inline__';
 ATTRIBUTE                   : '__attribute__';
+EXTENSION                   : '__extension__';
+STATIC_ASSERT               : '_Static_assert';
+ALIGN_OF                    : '_Alignof';
 AUTORELEASING_QUALIFIER     : '__autoreleasing';
 BLOCK                       : '__block';
 BRIDGE                      : '__bridge';
@@ -152,9 +157,19 @@ NULL_RESETTABLE  : 'null_resettable';
 
 // NS prefix
 
-NS_INLINE  : 'NS_INLINE';
-NS_ENUM    : 'NS_ENUM';
-NS_OPTIONS : 'NS_OPTIONS';
+NS_INLINE           : 'NS_INLINE';
+NS_ENUM             : 'NS_ENUM';
+NS_CLOSED_ENUM      : 'NS_CLOSED_ENUM';
+NS_ERROR_ENUM       : 'NS_ERROR_ENUM';
+NS_OPTIONS          : 'NS_OPTIONS';
+NS_SWIFT_NAME       : 'NS_SWIFT_NAME';
+NS_NOESCAPE         : 'NS_NOESCAPE';
+NS_UNAVAILABLE      : 'NS_UNAVAILABLE';
+NS_SWIFT_UNAVAILABLE: 'NS_SWIFT_UNAVAILABLE';
+
+// API availablility macros
+API_AVAILABLE: 'API_AVAILABLE';
+API_UNAVAILABLE: 'API_UNAVAILABLE';
 
 // Property attributes
 
@@ -201,6 +216,7 @@ COMMA        : ',';
 DOT          : '.';
 STRUCTACCESS : '->';
 AT           : '@';
+UNDERSCORE   : '_';
 
 // Operators
 

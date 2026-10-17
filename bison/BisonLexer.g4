@@ -2,9 +2,10 @@
 // Copyright 2020-2022
 // MIT License
 
-// $antlr-format alignTrailingComments true, columnLimit 150, maxEmptyLinesToKeep 1, reflowComments false, useTab false
-// $antlr-format allowShortRulesOnASingleLine true, allowShortBlocksOnASingleLine true, minEmptyLines 0, alignSemicolons ownLine
-// $antlr-format alignColons trailing, singleLineOverrulesHangingColon true, alignLexerCommands true, alignLabels true, alignTrailers true
+
+// $antlr-format alignColons trailing, alignLabels true, alignLexerCommands true, alignSemicolons ownLine, alignTrailers true
+// $antlr-format alignTrailingComments true, allowShortBlocksOnASingleLine true, allowShortRulesOnASingleLine true, columnLimit 150
+// $antlr-format maxEmptyLinesToKeep 1, minEmptyLines 0, reflowComments false, singleLineOverrulesHangingColon true, useTab false
 
 lexer grammar BisonLexer;
 
@@ -141,7 +142,7 @@ PercentPercent: '%%' { this.NextMode(); };
      option name, with a single string argument.  Otherwise, add exceptions
      to ../build-aux/cross-options.pl.  */
 
-NONASSOC: '%binary';
+PERCENT_BINARY: '%binary';
 
 CODE: '%code';
 
