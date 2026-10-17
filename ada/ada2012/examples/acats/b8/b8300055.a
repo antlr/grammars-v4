@@ -1,0 +1,76 @@
+-- B8300055.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      See B8300050.A.
+--
+-- TEST DESCRIPTION:
+--      See B8300050.A.
+--
+-- TEST FILES:
+--      This test consists of the following files:
+--         B8300050.A
+--         B8300051.A
+--         B8300052.A
+--         B8300053.A
+--         B8300054.A
+--      -> B8300055.A
+--         B8300056.A
+--         B8300057.A
+--         B8300058.A
+--
+-- PASS/FAIL CRITERIA:
+--      See B8300050.A.
+--
+-- CHANGE HISTORY:
+--      30 Apr 2021   RLB     Created test from ACVC test B83004D.
+--!
+
+-- CASE B:
+separate (B830005)
+package body Pack2B is
+
+   generic
+      type New_Type is private;
+   function Prot2 (A : New_Type) return Boolean;             -- ERROR: {4;1}
+   
+   -- Completions for declarations in the specification:
+
+   protected body Prot2 is                          -- OPTIONAL ERROR: {4}
+                                     --  Body of an invalid protected unit.
+      procedure Lock (A : Boolean) is
+      begin
+         L := A;
+      end Lock;
+   end Prot2;
+
+   -- Completions for declarations here:
+
+   function Prot2 (A : New_Type) return Boolean is  -- OPTIONAL ERROR: {4}
+   begin                                       -- Body of illegal homograph.
+      return False;
+   end Prot2;
+
+end Pack2B;

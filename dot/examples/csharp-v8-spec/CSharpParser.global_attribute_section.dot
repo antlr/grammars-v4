@@ -1,0 +1,16 @@
+digraph ATN {
+rankdir=LR;
+s735[fontsize=11, label="735", shape=doublecircle, fixedsize=true, width=.6];
+s4054[fontsize=11,label="4054", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s4055[fontsize=11,label="4055", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s4056[fontsize=11,label="4056", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s4057[fontsize=11,label="4057", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s4058[fontsize=11,label="4058", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s734[fontsize=11,label="734", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s734 -> s4054 [fontname="Times-Italic", label="&epsilon;"];
+s4054 -> s4055 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'['", arrowhead = normal];
+s4055 -> s4056 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<global_attribute_target_specifier>", arrowhead = normal];
+s4056 -> s4057 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<attribute_list>", arrowhead = normal];
+s4057 -> s4058 [fontsize=11, fontname="Courier", arrowsize=.7, label = "']'", arrowhead = normal];
+s4058 -> s735 [fontname="Times-Italic", label="&epsilon;"];
+}

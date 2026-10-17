@@ -6,5 +6,5 @@
     <!-- Cpp - many conflicts with Windows builds -->
     <!-- Dart - conflicts with 'depth' rule -->
     <!-- PHP - fails on examples/dml/select/select.sql, idk why -->
-    <targets>CSharp;Go;Java;JavaScript;Python3;TypeScript;Antlr4ng</targets>
+    <targets>CSharp;Go;Java;JavaScript;Python3;TypeScript</targets>
 </desc>

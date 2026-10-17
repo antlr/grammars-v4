@@ -56,16 +56,12 @@ echo "" >> parse.txt
 # Get a list of test files from the test directory. Do not include any
 # .errors or .tree files. Pay close attention to remove only file names
 # that end with the suffix .errors or .tree.
-files2=`dotnet trglob '../<example_files_unix>' | grep -v '.errors$' | grep -v '.tree$'`
+files2=`dotnet trash glob <glob_args_unix> | grep -v '.errors$' | grep -v '.tree$'`
 files=()
 for f in $files2
 do
     if [ -d "$f" ]; then continue; fi
-    dotnet triconv -f utf-8 $f > /dev/null 2>&1
-    if [ "$?" = "0" ]
-    then
-        files+=( $f )
-    fi
+    files+=( $f )
 done
 
 # People often specify a test file directory, but sometimes no
@@ -91,7 +87,7 @@ then
         # Loop from 1 to n and execute the body of the loop each time
         for ((i=1; i\<=n; i++))
         do
-            dotnet trwdog ./bin/Debug/net8.0/<if(os_win)>Test.exe<else>Test<endif> -prefix individual $f >> parse.txt 2>&1
+            dotnet trash wdog ./bin/Debug/net10.0/<if(os_win)>Test.exe<else>Test<endif> -prefix individual $f >> parse.txt 2>&1
             xxx="$?"
             if [ "$xxx" -ne 0 ]
             then
@@ -105,9 +101,11 @@ fi
 # Loop from 1 to n and execute the body of the loop each time
 if [[ "$type" == "group" ]]
 then
+    # Run once and to work past virus scan delay.
+    echo "${files[1]}" | dotnet trash wdog ./bin/Debug/net10.0/<if(os_win)>Test.exe<else>Test<endif> -x --perf --per-file -prefix group > /dev/null 2>&1
     for ((i=1; i\<=n; i++))
     do
-        echo "${files[*]}" | dotnet trwdog ./bin/Debug/net8.0/<if(os_win)>Test.exe<else>Test<endif> -x -prefix group >> parse.txt 2>&1
+        echo "${files[*]}" | dotnet trash wdog ./bin/Debug/net10.0/<if(os_win)>Test.exe<else>Test<endif> -x --perf --per-file -prefix group >> parse.txt 2>&1
         xxx="$?"
         if [ "$xxx" -ne 0 ]
         then

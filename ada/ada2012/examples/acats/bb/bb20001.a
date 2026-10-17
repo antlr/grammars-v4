@@ -1,0 +1,242 @@
+-- BB20001.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that an exception_name of a choice cannot denote an exception 
+--      declared in a generic formal package.                  
+--
+-- TEST DESCRIPTION:
+--      Declare an exception in a library-level generic package.  Declare 
+--      another library-level generic package which declares a formal
+--      package with (<>) as its actual part.  Declare various instances
+--      of the template for the formal package and use that exception as a
+--      choice within an exception handler in the generic body.  Verify that 
+--      an exception declared in a generic formal package is illegal when 
+--      it is used as an exception choice in generic units.
+--
+--
+-- CHANGE HISTORY:
+--      02 May 95   SAIC    Initial prerelease version.
+--      07 Sep 96   SAIC    Modified test description. Changed IPck8.Exception
+--                          to be ok.                  
+--
+--!
+
+package BB20001_0 is                                   
+   Common_Exception : exception;
+end BB20001_0;
+
+     --==================================================================--
+
+with BB20001_0;
+generic                                                
+   type Element_Type is private;                      
+package BB20001_1 is                                   
+   FP_Exception_1        : exception;
+   RN_Common_Exception_1 : exception renames BB20001_0.Common_Exception;
+end BB20001_1;
+
+
+     --==================================================================--
+
+
+with BB20001_1;
+generic                                                
+   with package Formal_Pck2 is new BB20001_1 (<>);  
+package BB20001_2 is                                   
+   Exception_2           : exception;
+   RN_FP_Exception_2     : exception renames Formal_Pck2.FP_Exception_1;
+   RN_Common_Exception_2 : exception renames Formal_Pck2.RN_Common_Exception_1;
+   package RN_FPck2 renames Formal_Pck2;
+   function Do_Something (P : Formal_Pck2.Element_Type) return 
+     Formal_Pck2.Element_Type;
+end BB20001_2;
+
+     --==================================================================--
+
+package body BB20001_2 is                                  
+
+   function Do_Something (P : Formal_Pck2.Element_Type) return 
+     Formal_Pck2.Element_Type is 
+       Res : Formal_Pck2.Element_Type := P;
+   begin
+      return Res;
+   exception
+      when Exception_2           => null;                             -- OK.
+      when RN_Common_Exception_2 => null;                             -- OK.
+
+      when RN_FP_Exception_2     => null;                             -- ERROR:
+                         -- Exception was declared in a generic formal package.
+
+   end Do_Something;  
+
+end BB20001_2;
+
+     --==================================================================--
+
+with BB20001_1;
+generic                                                
+   with package Formal_Pck3 is new BB20001_1 (<>);  
+procedure BB20001_3;
+
+     --==================================================================--
+
+procedure BB20001_3 is                                   
+begin
+   null;
+exception
+   when Formal_Pck3.RN_Common_Exception_1 => null;                       -- OK.
+
+   when Formal_Pck3.FP_Exception_1     => null;                       -- ERROR:
+                         -- Exception was declared in a generic formal package.
+end BB20001_3;      
+
+     --==================================================================--
+
+with BB20001_1;
+generic                                                
+   with package Formal_Pck4 is new BB20001_1 (<>);  
+procedure BB20001_4;
+
+     --==================================================================--
+
+procedure BB20001_4 is
+   RN_FP_Exception_4     : exception renames Formal_Pck4.FP_Exception_1;
+   RN_Common_Exception_4 : exception renames Formal_Pck4.RN_Common_Exception_1;
+begin
+   null;
+exception
+   when RN_Common_Exception_4 => null;                                -- OK.
+
+   when RN_FP_Exception_4     => null;                                -- ERROR:
+                         -- Exception was declared in a generic formal package.
+end BB20001_4;      
+
+     --==================================================================--
+
+with BB20001_1;
+generic                                                
+   with package Formal_Pck5 is new BB20001_1 (<>);  
+package BB20001_5 is 
+   procedure Proc_5;
+   package RN_FPck5 renames Formal_Pck5;
+end BB20001_5;
+
+     --==================================================================--
+
+package body BB20001_5 is 
+   procedure Proc_5 is
+   begin
+      null;
+   
+   -- No exception handlers.
+   end Proc_5;
+
+end BB20001_5;
+
+     --==================================================================--
+
+with BB20001_1;
+with BB20001_5;
+
+procedure BB20001_6 is                                   
+
+   type Enum_Type is (One, Two, Three);
+
+   package IPck   is new BB20001_1 (Enum_Type);
+
+   package IPck6  is new BB20001_5 (IPck);  
+
+begin
+   null;
+
+exception
+   when IPck6.RN_FPck5.RN_Common_Exception_1 => null;                 -- OK.
+
+   when IPck6.RN_FPck5.FP_Exception_1        => null;                 -- OK.
+
+end BB20001_6;
+
+     --==================================================================--
+
+with BB20001_2;
+
+generic                                                
+   with package Formal_Pck7 is new BB20001_2 (<>);  
+package BB20001_7 is 
+   Exception_7 : exception;
+   package RN_FPck7 renames Formal_Pck7;
+   procedure Proc_7;
+end BB20001_7;
+
+     --==================================================================--
+
+package body BB20001_7 is 
+   procedure Proc_7 is
+   begin
+      null;
+   exception
+      when Exception_7                                => null;        -- OK.
+      when Formal_Pck7.RN_FPck2.RN_Common_Exception_1 => null;        -- OK.
+      
+      when Formal_Pck7.RN_FPck2.FP_Exception_1        => null;        -- ERROR:
+                         -- Exception was declared in a generic formal package.
+
+      when Formal_Pck7.Exception_2                    => null;        -- ERROR:
+                         -- Exception was declared in a generic formal package.
+      
+   end Proc_7;
+
+end BB20001_7;
+
+     --==================================================================--
+
+with BB20001_1;
+with BB20001_2;
+with BB20001_7;
+
+procedure BB20001_8 is                                   
+
+   type Enum is (On, Off);
+
+   package IPck1  is new BB20001_1 (Enum);
+
+   package IPck2  is new BB20001_2 (IPck1);  
+
+   package IPck8  is new BB20001_7 (IPck2);  
+
+begin
+   null;
+
+exception
+   when IPck8.RN_FPck7.RN_FPck2.RN_Common_Exception_1 => null;        -- OK.
+
+   when IPck8.Exception_7                             => null;        -- OK.
+
+   when IPck8.RN_FPck7.Exception_2                    => null;        -- OK.
+
+   when IPck8.RN_FPck7.RN_FP_Exception_2              => null;        -- OK.
+
+end BB20001_8;

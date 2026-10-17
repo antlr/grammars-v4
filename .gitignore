@@ -16,6 +16,8 @@
 .idea/
 *.iml
 /**/gen
+!_scripts/templates/**/gen
+!_scripts/templates/**/gen/**
 *.tokens
 out
 
@@ -31,3 +33,9 @@ antlr4-*-complete.jar
 
 node_modules
 package-lock.json
+
+# Ignore C parser preprocessed output files in examples
+c/examples/**/*.p
+
+# Ignore Roslyn clone used for C# v7 grammar testing
+csharp/v7/testing/roslyn/

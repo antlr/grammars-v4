@@ -1,0 +1,27 @@
+digraph ATN {
+rankdir=LR;
+s153[fontsize=11, label="153", shape=doublecircle, fixedsize=true, width=.6];
+s1088[fontsize=11,label="&larr;\n1088", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1089[fontsize=11,label="{1089*\nd=127|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1090[fontsize=11,label="1090", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1091[fontsize=11,label="1091*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1092[fontsize=11,label="1092", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1093[fontsize=11,label="1093", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s152[fontsize=11,label="152", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1084[fontsize=11,label="1084", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1085[fontsize=11,label="1085", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1086[fontsize=11,label="1086", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1087[fontsize=11,label="&rarr;\n1087*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s152 -> s1084 [fontname="Times-Italic", label="&epsilon;"];
+s1084 -> s1089 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<recordComponent>", arrowhead = normal];
+s1089:p0 -> s1087 [fontname="Times-Italic", label="&epsilon;"];
+s1089:p1 -> s1090 [fontname="Times-Italic", label="&epsilon;"];
+s1087 -> s1085 [fontname="Times-Italic", label="&epsilon;"];
+s1090 -> s1092 [fontname="Times-Italic", label="&epsilon;"];
+s1085 -> s1086 [fontsize=11, fontname="Courier", arrowsize=.7, label = "','", arrowhead = normal];
+s1092 -> s1093 [fontsize=11, fontname="Courier", arrowsize=.7, label = "pred_76:1", arrowhead = normal];
+s1086 -> s1088 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<recordComponent>", arrowhead = normal];
+s1093 -> s153 [fontname="Times-Italic", label="&epsilon;"];
+s1088 -> s1091 [fontname="Times-Italic", label="&epsilon;"];
+s1091 -> s1089 [fontname="Times-Italic", label="&epsilon;", style="dashed"];
+}

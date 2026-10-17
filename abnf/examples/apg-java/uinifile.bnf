@@ -1,0 +1,12 @@
+IniFile         = *(e_comment-wsp u_lineend) *Section
+Section         = SectionLine *((e_comment-wsp u_lineend)/ValueLine)
+SectionLine     = GoodSectionLine/BadSectionLine
+GoodSectionLine = "[" e_wsp SectionName e_wsp "]" e_wsp [u_comment] u_lineend
+BadSectionLine  = "[" e_any u_lineend;
+ValueLine       = GoodValueLine/BadValueLine
+GoodValueLine   = ValueName e_wsp "=" e_wsp ValueArray e_wsp [u_comment] u_lineend
+BadValueLine    = (%d33-90/%d92-126) e_any u_lineend
+ValueArray      = Value *(e_wsp "," e_wsp Value)
+SectionName     = u_alphadigitunder
+ValueName       = u_alphadigitunder
+Value           = u_alphadigit/u_dqstring/u_sqstring

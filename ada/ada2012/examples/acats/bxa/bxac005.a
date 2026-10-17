@@ -1,0 +1,148 @@
+-- BXAC005.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that Text_IO.File_Type objects cannot be used in conjunction
+--         with stream-oriented attributes 'Write and 'Read.
+--      Check that Streams.Stream_IO.File_Type objects cannot be used in
+--         Text_IO file data transfer operations.
+--      Check that stream access objects cannot be used as file object
+--         parameters of Text_IO.Put and Text_IO.Get procedures.
+--      Check that Put and Get are not defined as type attributes for use 
+--         with stream files.
+--      Check that the package Stream_Support, which was originally defined
+--         in the 9X Mapping Specification and Ada 9X ILS, but which has been 
+--         changed to package Streams in AARM;3.0, is not included in the
+--         compilation system predefined library. 
+--         (Note: This portion of the objective can be deleted in the future.)
+--      
+-- TEST DESCRIPTION:
+--      This test is designed to ensure that compiler systems identify a
+--      number of potentially typical user errors that could occur when
+--      using Stream_IO capabilities.
+--      This test uses statements that assure that Text_IO.File_Type objects 
+--      cannot be used in conjunction with stream-oriented attributes 'Write 
+--      and 'Read; statements that Streams.Stream_IO.File_Type objects cannot 
+--      be used in Text_IO file data transfer operations; statements
+--      that assure stream access values cannot be used as file object 
+--      parameters of Text_IO.Put and Text_IO.Get procedures; and statements 
+--      that assure that Put and Get are not defined as type attributes for 
+--      use with stream files. 
+--
+--      
+-- CHANGE HISTORY:
+--      06 Dec 94   SAIC    ACVC 2.0
+--
+--!
+
+with Ada.Streams.Stream_IO;
+with Ada.Text_IO;
+
+procedure BXAC005_0 is
+
+   use Ada;
+
+   type Stream_Type is range 1 .. 1024;
+
+   Data_Object   : Stream_Type      := 498;
+   Text_Object   : String (1 .. 20) := "A_Users_Text_Message";
+   Text_Constant : constant String  := "Another_Text_Message";
+   Length        : Text_IO.Field;
+
+   Text_File     : Text_IO.File_Type;
+   Stream_File   : Streams.Stream_IO.File_Type;
+   Str_Access    : Streams.Stream_IO.Stream_Access;
+
+begin
+
+   Streams.Stream_IO.Create (Stream_File, 
+                             Streams.Stream_IO.Out_File, 
+                             "SFile");
+
+   Str_Access := Streams.Stream_IO.Stream (Stream_File);      
+
+
+
+   -- Ensure that Text_IO.File_Type objects cannot be used in conjunction
+   -- with stream-oriented attributes 'Write and 'Read.
+
+   Stream_Type'Write (Text_File, Data_Object);                      -- ERROR:
+                            -- Use of text file object with stream attribute.
+   Stream_Type'Read  (Text_File, Data_Object);                      -- ERROR:
+                            -- Use of text file object with stream attribute.
+
+
+
+
+   -- Ensure that Streams.Stream_IO.File_Type objects cannot be used in
+   -- Text_IO file data transfer operations.
+
+   Text_IO.Put      (Stream_File, Text_Constant);                   -- ERROR:
+                     -- Use of Stream file object with Text_IO Put operation.
+   Text_IO.Put_Line (Stream_File, Text_Constant);                   -- ERROR:
+                -- Use of Stream file object with Text_IO Put_Line operation.
+   Text_IO.Get      (Stream_File, Text_Object, Length);             -- ERROR:
+                     -- Use of Stream file object with Text_IO Get operation.
+
+
+
+
+   -- Ensure that stream access values cannot be used as file object 
+   -- parameters of Text_IO.Put and Text_IO.Get procedures.
+
+   Text_IO.Put      (Str_Access, Text_Constant);                    -- ERROR:
+               -- Use of Stream file access value with Text_IO Put operation.
+   Text_IO.Put_Line (Str_Access, Text_Constant);                    -- ERROR:
+          -- Use of Stream file access value with Text_IO Put_Line operation.
+   Text_IO.Get      (Str_Access, Text_Object, Length);              -- ERROR:
+               -- Use of Stream file access value with Text_IO Get operation.
+
+
+
+
+   -- Ensure that Put and Get are not defined as type attributes for use 
+   -- with stream files.
+
+   Stream_Type'Put      (Stream_File, Data_Object);                 -- ERROR:
+                           -- Put not defined as a stream-oriented attribute.
+   Stream_Type'Put_Line (Stream_File, Data_Object);                 -- ERROR:
+                      -- Put_Line not defined as a stream-oriented attribute.
+   Stream_Type'Get      (Stream_File, Data_Object, Length);         -- ERROR:
+                           -- Get not defined as a stream-oriented attribute.
+
+
+
+end BXAC005_0;
+
+
+
+with Ada.Streams.Stream_IO;                                          -- OK.
+with Ada.Stream_Support;                                             -- ERROR:
+                                         -- Package not in Predefined Library.
+
+procedure BXAC005 is
+begin
+   null;
+end BXAC005;

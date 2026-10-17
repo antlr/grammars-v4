@@ -1,0 +1,30 @@
+digraph ATN {
+rankdir=LR;
+s51[fontsize=11, label="51", shape=doublecircle, fixedsize=true, width=.6];
+s50[fontsize=11,label="50", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s934[fontsize=11,label="934", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s935[fontsize=11,label="935", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s936[fontsize=11,label="936", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s937[fontsize=11,label="937", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s938[fontsize=11,label="938", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s939[fontsize=11,label="939", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s940[fontsize=11,label="940", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s941[fontsize=11,label="{&rarr;\n941\nd=18|{<p0>|<p1>|<p2>|<p3>|<p4>|<p5>|<p6>}}", shape=record, fixedsize=false, peripheries=1];
+s942[fontsize=11,label="&larr;\n942", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s50 -> s941 [fontname="Times-Italic", label="&epsilon;"];
+s941:p0 -> s934 [fontname="Times-Italic", label="&epsilon;"];
+s941:p1 -> s935 [fontname="Times-Italic", label="&epsilon;"];
+s941:p2 -> s936 [fontname="Times-Italic", label="&epsilon;"];
+s941:p3 -> s937 [fontname="Times-Italic", label="&epsilon;"];
+s941:p4 -> s938 [fontname="Times-Italic", label="&epsilon;"];
+s941:p5 -> s939 [fontname="Times-Italic", label="&epsilon;"];
+s941:p6 -> s940 [fontname="Times-Italic", label="&epsilon;"];
+s934 -> s942 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<value_type>", arrowhead = normal];
+s935 -> s942 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<class_type>", arrowhead = normal];
+s936 -> s942 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<interface_type>", arrowhead = normal];
+s937 -> s942 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<delegate_type>", arrowhead = normal];
+s938 -> s942 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'dynamic'", arrowhead = normal];
+s939 -> s942 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<type_parameter>", arrowhead = normal];
+s940 -> s942 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<pointer_type>", arrowhead = normal];
+s942 -> s51 [fontname="Times-Italic", label="&epsilon;"];
+}
