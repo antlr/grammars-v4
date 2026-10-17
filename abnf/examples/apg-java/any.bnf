@@ -1,0 +1,3 @@
+AnyString = *any
+any       = %d32-126 /%d9
+

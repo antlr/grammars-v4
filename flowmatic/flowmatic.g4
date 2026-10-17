@@ -29,140 +29,160 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar flowmatic;
 
 flowmatic
-   : line* END EOF
-   ;
+    : line* END EOF
+    ;
 
 line
-   : label statement (';' statement)* '.'
-   ;
+    : label statement (';' statement)* '.'
+    ;
 
 label
-   : '(' NUM ')'
-   ;
+    : '(' NUM ')'
+    ;
 
 statement
-   : (closeout_statement | test_statement | set_statement | move_statement | compare_statement | otherwise_statement | stop_statement | rewind_statement | transfer_statement | writeitem_statement | jumpto_statement | readitem_statement | input_statement | hsp_statement | output_statement | if_statement)*
-   ;
+    : (
+        closeout_statement
+        | test_statement
+        | set_statement
+        | move_statement
+        | compare_statement
+        | otherwise_statement
+        | stop_statement
+        | rewind_statement
+        | transfer_statement
+        | writeitem_statement
+        | jumpto_statement
+        | readitem_statement
+        | input_statement
+        | hsp_statement
+        | output_statement
+        | if_statement
+    )*
+    ;
 
 hsp_statement
-   : 'HSP' fileletter
-   ;
+    : 'HSP' fileletter
+    ;
 
 output_statement
-   : 'OUTPUT' (filename fileletter)+
-   ;
+    : 'OUTPUT' (filename fileletter)+
+    ;
 
 input_statement
-   : 'INPUT' (filename fileletter)+
-   ;
+    : 'INPUT' (filename fileletter)+
+    ;
 
 jumpto_statement
-   : 'JUMP' 'TO' operation
-   ;
+    : 'JUMP' 'TO' operation
+    ;
 
 readitem_statement
-   : 'READ-ITEM' fileletter
-   ;
+    : 'READ-ITEM' fileletter
+    ;
 
 writeitem_statement
-   : 'WRITE-ITEM' fileletter
-   ;
+    : 'WRITE-ITEM' fileletter
+    ;
 
 transfer_statement
-   : 'TRANSFER' fileletter 'TO' fileletter
-   ;
+    : 'TRANSFER' fileletter 'TO' fileletter
+    ;
 
 if_statement
-   : 'IF' op GOTO operation
-   ;
+    : 'IF' op GOTO operation
+    ;
 
 otherwise_statement
-   : 'OTHERWISE' GOTO operation
-   ;
+    : 'OTHERWISE' GOTO operation
+    ;
 
 rewind_statement
-   : 'REWIND' fileletter
-   ;
+    : 'REWIND' fileletter
+    ;
 
 stop_statement
-   : 'STOP'
-   ;
+    : 'STOP'
+    ;
 
 compare_statement
-   : 'COMPARE' fieldname '(' fileletter ')' 'WITH' fieldname '(' fileletter ')'
-   ;
+    : 'COMPARE' fieldname '(' fileletter ')' 'WITH' fieldname '(' fileletter ')'
+    ;
 
 move_statement
-   : 'MOVE' fieldname '(' fileletter ')' 'TO' fieldname '(' fileletter ')'
-   ;
+    : 'MOVE' fieldname '(' fileletter ')' 'TO' fieldname '(' fileletter ')'
+    ;
 
 set_statement
-   : 'SET' operation 'TO' GOTO operation
-   ;
+    : 'SET' operation 'TO' GOTO operation
+    ;
 
 test_statement
-   : 'TEST' fieldname '(' fileletter ')' 'AGAINST' num
-   ;
+    : 'TEST' fieldname '(' fileletter ')' 'AGAINST' num
+    ;
 
 closeout_statement
-   : 'CLOSE-OUT' 'FILES' fileletter (';' fileletter)*
-   ;
+    : 'CLOSE-OUT' 'FILES' fileletter (';' fileletter)*
+    ;
 
 num
-   : NUM
-   | ZERO
-   ;
+    : NUM
+    | ZERO
+    ;
 
 filename
-   : ID
-   ;
+    : ID
+    ;
 
 fileletter
-   : ID
-   ;
+    : ID
+    ;
 
 fieldname
-   : ID
-   ;
+    : ID
+    ;
 
 operation
-   : 'OPERATION' NUM
-   ;
+    : 'OPERATION' NUM
+    ;
 
 op
-   : 'EQUAL'
-   | 'GREATER'
-   | EOD
-   ;
+    : 'EQUAL'
+    | 'GREATER'
+    | EOD
+    ;
 
 END
-   : '(' 'END' ')'
-   ;
+    : '(' 'END' ')'
+    ;
 
 ZERO
-   : 'Z'+
-   ;
+    : 'Z'+
+    ;
 
 GOTO
-   : 'GO TO'
-   ;
+    : 'GO TO'
+    ;
 
 EOD
-   : 'END OF DATA'
-   ;
+    : 'END OF DATA'
+    ;
 
 ID
-   : [a-zA-Z-]+
-   ;
+    : [a-zA-Z-]+
+    ;
 
 NUM
-   : [0-9]+
-   ;
+    : [0-9]+
+    ;
 
 WS
-   : [ \r\n\t]+ -> skip
-   ;
-
+    : [ \r\n\t]+ -> skip
+    ;

@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>Processing that may be Omitted</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-553.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-555.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>5.5.4 Processing that may be Omitted</H1>
+<div class="Normal">A user may streamline processing of the ACATS tests 
+to the greatest degree possible consistent with complete processing of 
+all tests.</div>
+<div class="Normal">Many modern tests rely on foundation code. A foundation 
+need not be compiled anew each time a different test uses it. In a processing 
+model based on a program library, it is reasonable to compile the code 
+into the library only once and allow the binder to use the processed 
+results for each test that <B>with</B>s the foundation.</div>
+<div class="Normal">A user may determine, with ACAL concurrence, that 
+some tests require support that is impossible for the implementation 
+under test to provide. For example, there are tests that assume the availability 
+of file I/O whereas some (embedded target) implementations do not support 
+file I/O. Those tests need not be processed during witness testing; however, 
+the implementer must demonstrate that they are handled in accordance 
+with the language standard. This demonstration may be performed before 
+witness testing, in which case it need not be repeated.</div>
+<div class="Normal">Annex B tests that require foreign language code 
+(Fortran, C, COBOL) to be compiled and bound with Ada code need not be 
+processed if an implementation does not support a foreign language interface 
+to the respective language.<A NAME="I1038"></A></div>
+<div class="Normal">Tests for the Specialized Needs Annexes of Ada need 
+not be processed except by implementations that wish to have Annex results 
+documented. In that case, only the tests for the annex(es) in question 
+(in addition to all core tests) need be processed. If any tests for a 
+particular Annex are processed, then all tests for that Annex must be 
+processed. If an implementation does not support a feature in a Specialized 
+Needs Annex test, then it must indicate the non-support by rejecting 
+the test at compile time or by raising an appropriate exception at run 
+time.<A NAME="I1039"></A> (See Ada <A HREF="http://www.adaic.org/resources/add_content/standards/12rm/html/RM-1-1-3.html#p17">1.1.3(17)</A>.)</div>
+<div class="Normal">No withdrawn test need be processed. Tests classified 
+as Pending New in the current ACATS Modification List also do not need 
+to be processed. Pending New tests are new tests included with the ACATS 
+for review purposes, and are not yet required for conformity assessment. 
+(Tests classified as New in the current ACATS Modification List <I>do</I> 
+need to be processed; these are required for conformity assessments.)<A NAME="I1040"></A><A NAME="I1041"></A></div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-553.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-555.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>

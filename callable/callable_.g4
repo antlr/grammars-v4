@@ -29,46 +29,49 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar callable_;
 
 program
-   : line (EOL+ line)* EOF
-   ;
+    : line (EOL+ line)* EOF
+    ;
 
 line
-   : ID '(' f_inner? ')'
-   ;
+    : ID '(' f_inner? ')'
+    ;
 
 f_inner
-   : f_arg (',' f_arg)*
-   ;
+    : f_arg (',' f_arg)*
+    ;
 
 f_arg
-   : line
-   | STRING
-   ;
+    : line
+    | STRING
+    ;
 
 ID
-   : (LETTER_UPPER | LETTER_LOWER | '-')+
-   ;
+    : (LETTER_UPPER | LETTER_LOWER | '-')+
+    ;
 
 STRING
-   : '"' ~ '"'* '"'
-   ;
+    : '"' ~ '"'* '"'
+    ;
 
 LETTER_UPPER
-   : [A-Z]
-   ;
+    : [A-Z]
+    ;
 
 LETTER_LOWER
-   : [a-z]
-   ;
+    : [a-z]
+    ;
 
 EOL
-   : [\r\n]
-   ;
+    : [\r\n]
+    ;
 
 WS
-   : [ \t]+ -> skip
-   ;
-
+    : [ \t]+ -> skip
+    ;

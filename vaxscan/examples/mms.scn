@@ -1,0 +1,221 @@
+MODULE build_mms_file;
+
+    !+
+    !   This program creates MMS dependency files for BLISS programs.
+    !   It takes as input a file spec including wildcards.  It looks
+    !   at all the .BLI and .REQ files that match this spec and 
+    !   builds the MMS dependency file needed to build an executable
+    !   image.
+    !-
+    
+    EXTERNAL PROCEDURE lib$find_file ( STRING,
+    				       STRING,
+    				       INTEGER ) OF INTEGER;
+    
+    EXTERNAL PROCEDURE lib$find_file_end ( INTEGER ) OF INTEGER;
+
+    EXTERNAL PROCEDURE bliss_file_check( string, string ) of boolean;
+    EXTERNAL PROCEDURE output_mms_file();
+
+    DECLARE mms_output: COMMON FILE;
+
+    SET non_quote		( NOT( s'eol' OR s'eos' OR '''' ) );
+    SET eol			( s'eol' OR s'eos' );
+    SET non_eol			( NOT eol );
+    SET alpha			( 'a'..'z' OR 'A'..'Z' );
+    SET other			( alpha OR '0'..'9' OR '_' OR '$' );
+    
+    TOKEN require CASELESS 	{ 'require' };
+    TOKEN name			{ alpha [ other... ] };
+    TOKEN semi ALIAS ';'	{ ';' };
+    TOKEN space	IGNORE		{ { ' ' | s'ht' | s'ff' }... };
+    TOKEN comment		{ '!' non_eol... eol };
+    TOKEN spec			{ '''' non_quote... '''' };
+	
+    CONSTANT require_file = 1;
+    CONSTANT compile_file = 2;
+    
+    DECLARE reference: TREE( integer, string, string ) of integer;
+    DECLARE file_name: string;
+    DECLARE file_type: integer;
+    
+    MACRO find_require_reference trigger { require s:spec semi };
+	
+	s = trim( s, '''');
+	reference( file_type, file_name, s ) = 0;
+	
+    END MACRO;
+    
+    PROCEDURE main MAIN (  );
+	
+	DECLARE file_spec,full_file_name: STRING;
+	DECLARE context: INTEGER;
+
+	WRITE 'file spec to process:';
+	READ file_spec;
+
+	context = 0;
+
+	WHILE (lib$find_file ( file_spec, full_file_name, context ) AND 1) = 1;
+
+	    IF bliss_file_check( full_file_name, file_name )
+	    THEN
+	        WRITE 'processing: ', full_file_name;
+	    	START SCAN
+		    INPUT FILE full_file_name
+		    OUTPUT FILE 'nl:';
+	    END IF;
+	    
+	END WHILE;
+
+    !+
+    !    Free the find_file context
+    !-
+
+	IF (lib$find_file_end ( context ) AND 1) <> 1
+	THEN
+	    WRITE 'Error freeing the find_file context.';
+	END IF;
+
+	CALL output_mms_file();
+
+    END PROCEDURE;
+
+    PROCEDURE output_mms_file();
+
+	DECLARE p0: TREEPTR( integer ) TO TREE( string,string ) of integer;
+	DECLARE p1: TREEPTR( string ) TO TREE( string ) of integer;
+	DECLARE p2: TREEPTR( string ) TO integer;
+	DECLARE line,command: string;
+	DECLARE i: integer;
+	
+	OPEN file( mms_output ) AS 'mms.out' FOR OUTPUT;
+
+	IF EXISTS( reference( compile_file ))
+	THEN
+	    p1 = first( reference( compile_file ) );
+	    
+	    WRITE file( mms_output ) 'product.exe :-';
+
+	    WHILE p1 >< NIL;
+	    
+		line =  s'ht' & subscript( p1 );
+		
+		p1 = NEXT( p1 );
+
+		IF p1 <> NIL
+		THEN
+		    line = line & ', -';
+		END IF;
+
+	        WRITE file( mms_output ) line;
+
+	    END WHILE;
+	    
+	    p1 = first( reference( compile_file ) );
+	    
+	    WRITE file( mms_output ) s'ht' & s'ht' & 'link/exe=product -';
+
+	    WHILE p1 >< NIL;
+	    
+		line =  s'ht' & s'ht' & subscript( p1 );
+		
+		p1 = NEXT( p1 );
+
+		IF p1 <> NIL
+		THEN
+		    line = line & ', -';
+		END IF;
+
+	        WRITE file( mms_output ) line;
+
+	    END WHILE;
+
+	END IF;
+
+	p0 = first( reference );
+
+	WHILE p0 >< NIL;
+
+	    p1 = first( p0 );
+
+	    WHILE p1 >< NIL;
+	    
+		CASE subscript( p0 ) FROM 1 TO 2;
+
+		[ compile_file ]:
+		    command = subscript( p1 );
+		    command = command[ 1 .. index( command, '.' ) - 1];
+		    command = s'ht' & s'ht' & 'BLISS ' & command;
+		[ require_file ]:
+		    command = s'ht' & s'ht' & '! no action';
+		END CASE;
+
+		p2 = first( p1 );
+	    
+		WRITE file( mms_output ) '';
+		WRITE file( mms_output ) subscript( p1 ) & ' :-';
+		
+		WHILE p2 >< NIL;
+
+		    line = s'ht' & subscript( p2 );
+		    p2 = NEXT( p2 );
+
+		    IF p2 <> NIL
+		    THEN
+			line = line & ', -';
+		    END IF;
+
+		    WRITE file( mms_output ) line;
+		
+		END WHILE;
+
+		WRITE file( mms_output ) command;
+	
+		p1 = NEXT( p1 );
+
+	    END WHILE;
+
+	    p0 = NEXT( p0 );
+
+	END WHILE;
+
+	CLOSE file( mms_output );
+	
+    END PROCEDURE;
+
+    PROCEDURE bliss_file_check( full_file_name: string, target: string )
+		of boolean;
+
+	DECLARE file_name,extension: string;
+	DECLARE pos: integer;
+
+	file_name = full_file_name[ index( full_file_name, ']' )+1 .. 
+				    index( full_file_name, ';' )-1 ];
+	pos = index( file_name , '.' );
+	extension = file_name[ pos .. ];
+
+	IF (extension = '.BLI') OR
+	   (extension = '.B32') OR
+	   (extension = '.B16')
+	THEN
+	    target = file_name[ 1 .. pos ] & 'OBJ';
+	    reference( compile_file, target, file_name ) = 0;
+	    file_type = compile_file;
+	    RETURN true;
+	END IF;
+
+	IF (extension = '.REQ') OR
+	   (extension = '.R32') OR
+	   (extension = '.R16')
+	THEN
+	    target = file_name;	    
+	    file_type = require_file;
+	    RETURN true;
+	END IF;
+
+	RETURN false;
+
+    END PROCEDURE;
+
+END MODULE;

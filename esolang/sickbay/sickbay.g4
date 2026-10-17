@@ -29,68 +29,71 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar sickbay;
 
 sickbay
-   : line* EOF
-   ;
+    : line* EOF
+    ;
 
 line
-   : intExpr stmt ';'? (':' stmt)* NL
-   ;
+    : intExpr stmt ';'? (':' stmt)* NL
+    ;
 
 stmt
-   : REM
-   | ('LET' intVar '=' intExpr)
-   | ('GOTO' INTCONST)
-   | ('GOSUB' INTCONST)
-   | ('RETURN' | 'END')
-   | ('PRINT' (STRCONST | intExpr | intVar))
-   | ('PROLONG' INTCONST)
-   | ('CUTSHORT')
-   | ('DIM' 'RING' '(' intExpr ')')
-   | ('INPUT' (intVar | 'CHR$' intVar))
-   ;
+    : REM
+    | ('LET' intVar '=' intExpr)
+    | ('GOTO' INTCONST)
+    | ('GOSUB' INTCONST)
+    | ('RETURN' | 'END')
+    | ('PRINT' (STRCONST | intExpr | intVar))
+    | ('PROLONG' INTCONST)
+    | ('CUTSHORT')
+    | ('DIM' 'RING' '(' intExpr ')')
+    | ('INPUT' (intVar | 'CHR$' intVar))
+    ;
 
 intExpr
-   : intVar
-   | INTCONST
-   | 'RND%' '(' intExpr ')'
-   | '(' intExpr INTOP intExpr ')'
-   ;
+    : intVar
+    | INTCONST
+    | 'RND%' '(' intExpr ')'
+    | '(' intExpr INTOP intExpr ')'
+    ;
 
 intVar
-   : IINTID ('(' intExpr ')')?
-   ;
+    : IINTID ('(' intExpr ')')?
+    ;
 
 INTOP
-   : '+'
-   | '-'
-   | '*'
-   | '/'
-   ;
+    : '+'
+    | '-'
+    | '*'
+    | '/'
+    ;
 
 IINTID
-   : [A-Z] [A-Z0-9%]*
-   ;
+    : [A-Z] [A-Z0-9%]*
+    ;
 
 INTCONST
-   : [0-9] [0-9]*
-   ;
+    : [0-9] [0-9]*
+    ;
 
 STRCONST
-   : '"' ~ '"'* '"'
-   ;
+    : '"' ~ '"'* '"'
+    ;
 
 NL
-   : [\r\n]+
-   ;
+    : [\r\n]+
+    ;
 
 WS
-   : [ \t\r\n] -> skip
-   ;
+    : [ \t\r\n] -> skip
+    ;
 
 REM
-   : 'REM' ([ \t]+) ~[\r\n]*
-   ;
-
+    : 'REM' ([ \t]+) ~[\r\n]*
+    ;

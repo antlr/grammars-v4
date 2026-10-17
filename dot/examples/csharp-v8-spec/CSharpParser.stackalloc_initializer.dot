@@ -1,0 +1,19 @@
+digraph ATN {
+rankdir=LR;
+s249[fontsize=11, label="249", shape=doublecircle, fixedsize=true, width=.6];
+s1765[fontsize=11,label="1765", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1766[fontsize=11,label="1766", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1767[fontsize=11,label="{&rarr;\n1767\nd=132|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s248[fontsize=11,label="248", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1768[fontsize=11,label="&larr;\n1768", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1769[fontsize=11,label="1769", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1770[fontsize=11,label="1770", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s248 -> s1765 [fontname="Times-Italic", label="&epsilon;"];
+s1765 -> s1767 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'{'", arrowhead = normal];
+s1767:p0 -> s1766 [fontname="Times-Italic", label="&epsilon;"];
+s1767:p1 -> s1768 [fontname="Times-Italic", label="&epsilon;"];
+s1766 -> s1768 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<stackalloc_initializer_element_list>", arrowhead = normal];
+s1768 -> s1769 [fontname="Times-Italic", label="&epsilon;"];
+s1769 -> s1770 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'}'", arrowhead = normal];
+s1770 -> s249 [fontname="Times-Italic", label="&epsilon;"];
+}

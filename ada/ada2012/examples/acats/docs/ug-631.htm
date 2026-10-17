@@ -1,0 +1,164 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>Test Summary File Reference</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    DIV.Examples {font-family: "Courier New", monospace; font-size: 90%; line-height: 122%; margin-left: 2.2em; margin-bottom: 0.6em}
+    DIV.Indented4WideHanging-Body {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 8.0em; margin-top: 0em; margin-bottom: 0.6em}
+    DIV.Indented4WideHanging-Term {float: left; font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 2.0em; margin-top: 0em; margin-bottom: 0em}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-63.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-632.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>6.3.1 Test Summary File Reference</H1>
+<div class="Normal">A test summary file is a CSV (Comma Separated Value) 
+file of test summary records. See <A HREF="UG-65.HTM">6.5</A>, &ldquo;<A HREF="UG-65.HTM">CSV 
+File Reference</A>&rdquo; for the general rules for constructing a CSV 
+file.</div>
+<div class="Normal" style="margin-bottom: 0.4em">A test summary file 
+record contains the following comma-separated fields on a single line:</div>
+<div class="Indented4WideHanging-Term">Kind</div><div class="Indented4WideHanging-Body">
+KIND (see below), ERROR (Error), PERROR (Possible_Error), OERROR (Optional_Error), 
+NAERR (NA_Error), ACRQMT (Annex_C_Requirement), OK (OK), UPACKSPEC (Package_Specification), 
+UFUNCSPEC (Function_Specification), UPROCSPEC (Procedure_Specification), 
+UGENPACK (Generic_Package), UGENFUNC (Generic_Function), UGENPROC (Generic_Procedure), 
+UPACKBODY (Package_Body), UFUNCBODY (Function_Body), UPROCBODY (Procedure_Body), 
+UPACKINST (Package_Instantiation), UFUNCINST (Function_Instantiation), 
+UPROCINST (Procedure_Instantiation), UPACKREN (Package_Renaming), UFUNCREN 
+(Function_Renaming), UPROCREN (Procedure_Renaming), UGPACKREN (Generic_Package_Renaming), 
+UGFUNCREN (Generic_Function_Renaming), UGPROCREN (Generic_Procedure_Renaming), 
+PACKSUB (Package_Subunit), PROCSUB (Procedure_Subunit), FUNCSUB (Function_Subunit), 
+TASKSUB (Task_Subunit), PROTSUB (Protected_Subunit), PRAGMA (Configuration_Pragma) 
+These values are case-insensitive. &quot;KIND&quot; is treated as specifying 
+a comment; it usually appears in column headers. All of the U kinds are 
+varieties of compilation units; as are the subunits and PRAGMA.</div>
+<div class="Indented4WideHanging-Term">Source_Name</div><div class="Indented4WideHanging-Body">
+The quoted simple name of the source file.</div>
+<div class="Indented4WideHanging-Term">Start_Line</div><div class="Indented4WideHanging-Body">
+For a compilation unit, the starting line of the compilation unit. This 
+may include leading whitespace and comments, but must be no later than 
+the first significant text of the unit, and it may not include part of 
+some preceding unit. For other kinds of records, this represents the 
+first line of the range that indicates a trigger for this record. (For 
+instance, for an ERROR record, this represents the first line in the 
+range in which an error must be reported.)</div>
+<div class="Indented4WideHanging-Term">Start_Position</div><div class="Indented4WideHanging-Body"><br clear="left">
+For a compilation unit, the starting position within the Start_Line for 
+the compilation unit. This may include whitespace or comments (always 
+setting this to 1 would be allowed), but must be no later than the first 
+significant character of the line. (The ACATS never puts multiple compilation 
+units on the same line.)</div>
+<div class="Indented4WideHanging-Term"></div><div class="Indented4WideHanging-Body">
+For other kinds of records, the starting position within Start_Line for 
+the trigger for this record. Whether or not positions are used for grading 
+is selectable by an option to the Grading Tool - see <A HREF="UG-614.HTM">6.1.4</A>. 
+(Use of positions is not required.)</div>
+<div class="Indented4WideHanging-Term">End_Line</div><div class="Indented4WideHanging-Body">
+For a compilation unit, the end line of the compilation unit. This may 
+include trailing whitespace and comments, but must be no earlier than 
+the last significant text of the unit, and it may not include part of 
+some succeeding unit. For other kinds of records, this represents the 
+last line of the range that indicates a trigger for this record.</div>
+<div class="Indented4WideHanging-Term">End_Position</div><div class="Indented4WideHanging-Body">
+For a compilation unit, the end position within the Start_Line for the 
+compilation unit. This may include whitespace or comments, but must be 
+no earlier than the last significant character of the line. For other 
+kinds of records, this is the ending position within End_Line for the 
+trigger for this record.</div>
+<div class="Indented4WideHanging-Term">Name_Label</div><div class="Indented4WideHanging-Body">
+For a compilation unit, the quoted compilation unit name. For a Possible_Error, 
+the quoted set name. For other kinds of records, this value can be omitted 
+other than the separating comma.</div>
+<div class="Indented4WideHanging-Term">Flag</div><div class="Indented4WideHanging-Body">
+Only used for compilation units; for other kinds of records it can be 
+completely omitted (as it is last, there is no trailing comma). For a 
+compilation unit, it can be omitted (meaning a required, non-main subprogram 
+unit), MAIN (a required, main subprogram unit), OPT (an optional, non-main 
+subprogram unit), or OPTMAIN (an optional, main subprogram unit). An 
+optional unit is one that is not required to be processed (this is indicated 
+by comments within the test). As with kinds, this value is case-insensitive.</div>
+<div class="Normal">These fields do not quite match the components used 
+in the associated Ada record; a few were combined to simplify the file 
+format (at a cost of some additional complexity in reading the records).</div>
+<div class="Normal">The order of records within a test summary file is 
+unimportant to the Grading Tool; it will sort the records appropiately 
+before grading.</div>
+<div class="Normal">The compilation unit start and end information is 
+primarily used to determine to which compilation unit (and thus, which 
+compilation) a particular ERROR or other kind of record belongs. The 
+compilation unit records themselves are secondarily used to ensure that 
+all required units have been processed.</div>
+<div class="Normal">The ranges for ERROR, OK, and other non-compilation 
+unit record kinds are used to determine if an appropriate error is (or 
+is not) present for that record. The limits can be determined by a range 
+indicator (see <A HREF="UG-632.HTM">6.3.2</A>) if present. Otherwise, 
+the limits will contain at least all of the significant text of the line 
+that contains the tag. (In some cases, these default limits may be expanded.)</div>
+<div class="Normal">The record types used by the Ada implementation of 
+this file can be found in Tst_Sum.A, along with a routine (Write_Summary_Record) 
+used to write a summary record to a test summary file. Note that Write_Summary_Record 
+writes column headers into a new file, so that headers exist if the file 
+is loaded into a spreadsheet or database. It is recommended to use Tst_Sum.A 
+as part of any tool that creates a test summary file (there being little 
+reason to reinvent this wheel).</div>
+<div class="Normal">Code to read a test summary file into an array can 
+be found in Grd_Data.A.</div>
+<div class="Normal">Here is part of a test summary file for Chapter 5 
+C-Tests:</div>
+<div class="Examples">Kind,Source_Name,Start&nbsp;Line,Start&nbsp;Pos,End&nbsp;Line,End&nbsp;Pos,Name_Label,Flag<BR>
+UPROCBODY,C51004A.ADA,38,1,261,12,C51004A,MAIN<BR>
+UPROCBODY,C52005A.ADA,33,1,177,12,C52005A,MAIN<BR>
+UPROCBODY,C52005B.ADA,33,1,115,12,C52005B,MAIN<BR>
+UPROCBODY,C52005C.ADA,33,1,79,12,C52005C,MAIN<BR>
+UPROCBODY,C52005D.ADA,32,1,182,12,C52005D,MAIN<BR>
+UPROCBODY,C52005E.ADA,32,1,129,12,C52005E,MAIN<BR>
+UPROCBODY,C52005F.ADA,32,1,86,12,C52005F,MAIN<BR>
+UPACKSPEC,C540001.A,50,1,53,14,C540001_0,<BR>
+UPACKSPEC,C540001.A,57,1,73,14,C540001_1,<BR>
+UPACKBODY,C540001.A,77,1,105,14,C540001_1,<BR>
+UGENPACK,C540001.A,109,1,121,14,C540001_2,<BR>
+UPACKBODY,C540001.A,125,1,137,14,C540001_2,<BR>
+UGENFUNC,C540001.A,141,1,149,69,C540001_3,<BR>
+UFUNCBODY,C540001.A,153,1,157,14,C540001_3,<BR>
+UGENPACK,C540001.A,161,1,172,14,C540001_4,<BR>
+UPACKBODY,C540001.A,176,1,187,14,C540001_4,<BR>
+UPACKSPEC,C540001.A,191,1,205,14,C540001_5,<BR>
+UPACKBODY,C540001.A,209,1,222,14,C540001_5,<BR>
+UPROCBODY,C540001.A,226,1,410,12,C540001,MAIN<BR>
+UPROCBODY,C540002.A,66,1,235,12,C540002,MAIN<BR>
+UPACKSPEC,C540003.A,62,1,81,14,C540003_0,<BR>
+UPROCBODY,C540003.A,83,1,240,12,C540003,MAIN<BR>
+NAERR,C55B07A.DEP,45,6,45,26,,<BR>
+UPROCBODY,C55B07A.DEP,41,1,126,14,C55B07A,MAIN<BR>
+NAERR,C55B07B.DEP,45,6,45,27,,<BR>
+UPROCBODY,C55B07B.DEP,41,1,126,14,C55B07B,MAIN</div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-63.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-632.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>

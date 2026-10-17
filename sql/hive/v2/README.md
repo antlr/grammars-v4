@@ -1,4 +1,4 @@
-# HIVE 2.x.x grammar for ANTLR4
+# HIVE 2.x.x Grammar
 
 An ANTLR4 grammar for HIVE 2.3.8. Based on the [Hive grammar for version 3.1.2](https://github.com/antlr/grammars-v4/tree/master/sql/hive).
 
@@ -11,3 +11,7 @@ The resources:
 This implementation is case insensitive.
 
 Also, the starting rule parses multiple statements.
+
+## Reference
+* [pldb](http://pldb.info/concepts/hiveql)
+

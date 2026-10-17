@@ -1,0 +1,2 @@
+line 2:3 mismatched input 'with' expecting {'SELECT', '('}
+line 3:3 mismatched input 'select' expecting {<EOF>, '/', ';'}
