@@ -36,8 +36,7 @@ program
    ;
 
 statement_list
-   : statement
-   | statement_list ';' statement
+   : statement (';' statement)* ';'?
    ;
 
 statement
@@ -150,13 +149,17 @@ procedure_declaration
    | procedure_decl
    ;
 
+procedure_head
+   : 'procedure'
+   ;
+
 procedure_decl
    : 'proedure' id_list 'is' type proc_specifications
    | procedure_decl ',' id_list 'is' type proc_specifications
    ;
 
 proc_specifications
-   : (proc_specifications 'external' constant_expression | proc_specifications linkage | proc_specifications 'stacksize' constant_expression)?
+   : ('external' constant_expression | linkage | 'stacksize' constant_expression)*
    ;
 
 linkage
@@ -247,7 +250,7 @@ end_record
    ;
 
 field_list
-   : (declaration_element | field_list ',' declaration_element)?
+   : (declaration_element (',' declaration_element)*)?
    ;
 
 variant_part
@@ -282,7 +285,7 @@ procedure_type
    ;
 
 parameter_list
-   : (parameter_list parameter_part)?
+   : parameter_part*
    ;
 
 parameter_part
@@ -399,7 +402,7 @@ select_alternatives
    ;
 
 select_alternatives_list
-   : (select_alternatives_list select_alternative)?
+   : select_alternative*
    ;
 
 select_alternative
@@ -460,37 +463,9 @@ direction
 storage_reference
    : identifier
    | '%' identifier
-   | procedure_or_array_reference ')'
-   | storage_reference '(' return_code ')'
+   | storage_reference '(' (expression (',' expression)*)? (('return' 'code' | 'with') storage_reference)? ')'
    | storage_reference '.' identifier
-   | storage_reference '@'
-   ;
-
-procedure_or_array_reference
-   : subscripted_reference
-   | subscripted_reference_head
-   | subscripted_with_return_code
-   ;
-
-subscripted_reference
-   : subscripted_reference_head expression
-   ;
-
-subscripted_reference_head
-   : storage_reference '('
-   | subscripted_reference ','
-   ;
-
-subscripted_with_return_code
-   : with_return_code_head 'return' 'code' storage_reference
-   | with_return_code_head 'with' storage_reference
-   ;
-
-with_return_code_head
-   : subscripted_reference
-   | subscripted_reference_head
-   | subscripted_with_return_code ','
-   | subscripted_with_return_code
+   | storage_reference '@'
    ;
 
 constant_expression
@@ -606,7 +581,11 @@ NUMBER:
 
 
 IDENTIFIER
-   : [a-zA-Z] [a-zA-Z0-9]*
+   : [a-zA-Z] [a-zA-Z0-9_]*
+   ;
+
+COMMENT
+   : '/*' .*? '*/' -> skip
    ;
 
 WS
