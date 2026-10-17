@@ -159,6 +159,8 @@
 				<module>bicep</module>
                 <module>bison</module>
                 <module>bliss</module>
+                <module>blueprint</module>
+                <module>bms</module>
 				<module>bnf</module>
 				<module>c</module>
 				<module>calculator</module>
