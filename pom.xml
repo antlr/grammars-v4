@@ -131,6 +131,7 @@
 				<module>algol60</module>
 				<module>alloy</module>
 				<module>alpaca</module>
+                <module>alpherd</module>
                 <module>amazon-states-language</module>
                 <module>amazon-states-language-intrinsic-functions</module>
 				<module>angelscript</module>
