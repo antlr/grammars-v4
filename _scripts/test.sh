@@ -1,4 +1,5 @@
 #!/usr/bin/bash
+# set -x
 
 myrealpath ()                                                                                                                                                                                   
 {                                                                                                                                                                                             
@@ -35,27 +36,6 @@ then
     echo "This script runs only in a Linux environment. Skipping."
     exit 0
 fi
-
-setupdeps()
-{
-    trgen --version
-    if [ $? != "0" ]
-    then
-        echo "Setting up trgen and antlr jar."
-        dotnet tool install -g trgen --version 0.19.0
-        dotnet tool install -g triconv --version 0.19.0
-        dotnet tool install -g trxml2 --version 0.19.0
-        dotnet tool install -g trwdog --version 0.19.0
-    case "${unameOut}" in
-        Linux*)     curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.11.1-complete.jar' -o $antlr4jar ;;
-        Darwin*)    curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.11.1-complete.jar' -o $antlr4jar ;;
-        CYGWIN*)    curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.11.1-complete.jar' -o $antlr4jar ;;
-        MINGW*)     curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.11.1-complete.jar' -o $antlr4jar ;;
-        *)          echo 'unknown machine'
-    esac
-        echo "Done setting up."
-    fi
-}
 
 thetime()
 {
@@ -113,6 +93,31 @@ prefix=`pwd`
 popd > /dev/null 2>&1
 
 rm -rf `find . -name 'Generated*' -type d`
+
+# Pre-process long options not handled by getopts.
+antlr_version=""
+_args=()
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --antlr-version)
+            if [[ -z "${2:-}" || "$2" == -* ]]; then
+                echo "Error: --antlr-version requires a non-option value." >&2
+                exit 2
+            fi
+            antlr_version="$2"
+            shift 2
+            ;;
+        --antlr-version=*)
+            antlr_version="${1#*=}"
+            shift
+            ;;
+        *)
+            _args+=("$1")
+            shift
+            ;;
+    esac
+done
+set -- "${_args[@]}"
 
 # Parse args, and update computation to perform.
 order="grammars"
@@ -173,9 +178,14 @@ OPTIONS
            "all", or "agnostic". The default is "all".
 
        -t
-           Specifies the targets to test. Possible targets are "Antlr4cs",
-           "CSharp", "Cpp", "Dart", "Go", "Java", "JavaScript", "PHP", "Python3".
+           Specifies the targets to test. Possible targets are
+           "CSharp", "Cpp", "Dart", "Go", "Java", "JavaScript", "Python3".
            All targets are tested by default.
+
+       --antlr-version
+           Specifies the ANTLR4 tool and runtime version to use (e.g. "4.13.1"),
+           or "dev" to clone and build from the ANTLR4 dev branch. Passed
+           directly to trgen. If omitted, trgen's default version is used.
 
 EOF
             exit 0
@@ -195,8 +205,7 @@ then
             directories=`git diff --name-only . 2> /dev/null | sed 's#\(.*\)[/][^/]*$#\1#' | sort -u | grep -v _scripts`
             for g in $directories
             do
-                pushd $g
-                echo here
+                pushd $g > /dev/null
                 while true
                 do
                     if [ -f `pwd`/desc.xml ]
@@ -209,8 +218,13 @@ then
                     cd ..
                 done
                 g=`pwd`
-                g=${g##*$prefix/}
-                popd
+                g=${g##*$prefix}
+                g=${g##/}
+                if [ "$g" == "" ]
+                then
+                    g="."
+                fi
+                popd > /dev/null
                 echo Adding diff $g
                 grammars+=( $g )
             done
@@ -223,8 +237,7 @@ then
         directories=`git diff --name-only ${additional[0]} ${additional[1]} . 2> /dev/null | sed 's#\(.*\)[/][^/]*$#\1#' | sort -u | grep -v _scripts`
         for g in $directories
         do
-            pushd $g
-            echo here
+            pushd $g > /dev/null
             while true
             do
                 if [ -f `pwd`/desc.xml ]
@@ -237,8 +250,13 @@ then
                 cd ..
             done
             g=`pwd`
-            g=${g##*$prefix/}
-            popd
+            g=${g##*$prefix}
+            g=${g##/}
+            if [ "$g" == "" ]
+            then
+                g="."
+            fi
+            popd > /dev/null
             echo Adding diff $g
             grammars+=( $g )
         done
@@ -281,7 +299,7 @@ fi
 
 if [ "$targets" == "" ]
 then
-    targets=( Antlr4cs CSharp Cpp Dart Go Java JavaScript PHP Python3 )
+    targets=( Antlr4ng CSharp Cpp Dart Go Java JavaScript OphiRust Python3 Rust TypeScript )
 fi
 
 echo grammars = ${grammars[@]}
@@ -311,13 +329,23 @@ do
     testname=${all[0]}
     target=${all[1]}
     pushd "$prefix/$testname" > /dev/null
+
+    echo ""
+    echo "$testname,$target:"
+
     if [ ! -f desc.xml ]
     then
         echo No desc.xml for $testname
         popd > /dev/null
         continue
     fi
-    desc_targets=`trxml2 desc.xml | grep '/desc/targets'`
+    desc_targets=`dotnet trash xml2 desc.xml | grep '/desc/targets'`
+    if [ "${PIPESTATUS[0]}" -ne 0 ]
+    then
+        echo "The desc.xml for $testname is malformed. Skipping."
+        popd > /dev/null
+        continue
+    fi
     desc_targets="${desc_targets##*=}"
     desc_targets=`echo "$desc_targets" | tr ',' ' ' | tr ';' ' '`
 
@@ -331,7 +359,7 @@ do
 
     if [ "$yes" == "false" ]
     then
-        echo Skipping $test because target $target does not work for it.
+        echo "Intentionally skipping grammar $testname target $target."
         popd > /dev/null
         continue
     fi
@@ -339,7 +367,7 @@ do
     if [ "$filter" == "agnostic" ]
     then
         # Test whether the grammars have actions.
-        count=`trparse -t antlr4 *.g4 2> /dev/null | trxgrep ' //(actionBlock | argActionBlock)' | trtext -c`
+        count=`dotnet trash parse -t ANTLRv4 *.g4 2> /dev/null | dotnet trash xpath ' //(actionBlock | argActionBlock)' | dotnet trash text -c`
         if [ "$count" == "0" ]
         then
             echo "no actions => skipping $testname."
@@ -349,60 +377,65 @@ do
     fi
 
     # Generate driver source code.
-    echo -n "$testname,$target:"
 
     if [ $quiet != "true" ]; then echo "Generating driver for $testname."; fi
-    bad=`trgen -t "$target" --template-sources-directory "$full_path_templates" --antlr-tool-path $antlr4jar 2> /dev/null`
+    trgen_opts=(-t "$target" --template-sources-directory "$full_path_templates" --antlr-tool-path "$antlr4jar")
+    [[ -n "$antlr_version" ]] && trgen_opts+=(--antlr-version "$antlr_version")
+    bad=$(dotnet trash gen "${trgen_opts[@]}" 2>/dev/null)
     for i in $bad; do failed+=( "$testname/$target" ); done
 
-    if [ ! -f Generated-$target/build.sh ]; then echo " no build.sh"; popd > /dev/null 2>&1; continue; fi
+    for d in `echo Generated-$target-* Generated-$target`
+    do
+        if [ ! -d $d ]; then continue; fi
+        if [ ! -f $d/build.sh ]; then echo " no build.sh"; continue; fi
 
-    # Build driver code.
-    if [ $quiet != "true" ]; then echo "Building."; fi
-    pushd Generated-$target > /dev/null
-    date1=$(date +"%s")
-    bash build.sh > output.txt 2>&1
-    status="$?"
-    date2=$(date +"%s")
-    DIFF=$(($date2-$date1))
-    length=" Build "`thetime $DIFF`
-    if [ "$status" != "0" ]
-    then
-        echo ""
-        echo ========
-        echo "Build of $testname for $target failed."
-        cat output.txt
-        failed+=( "$testname/$target" )
-        echo ========
-        popd > /dev/null
-        popd > /dev/null
-        continue
-    else
-        echo -n " $length"
-    fi
+        # Build driver code.
+        if [ $quiet != "true" ]; then echo "Building."; fi
+        pushd $d > /dev/null
+        date1=$(date +"%s")
+        bash build.sh > output.txt 2>&1
+        status="$?"
+        date2=$(date +"%s")
+        DIFF=$(($date2-$date1))
+        length=" Build "`thetime $DIFF`
+        if [ "$status" != "0" ]
+        then
+            echo ""
+            echo ========
+            echo "Build of $testname for $target failed."
+            cat output.txt
+            failed+=( "$testname/$target" )
+            echo ========
+            popd > /dev/null
+            continue
+        else
+            echo "$length"
+        fi
 
-    # Test generated parser on examples.
-    if [ $quiet != "true" ]; then echo "Parsing."; fi
-    date1=$(date +"%s")
-    bash test.sh > output.txt 2>&1
-    status="$?"
-    date2=$(date +"%s")
-    DIFF=$(($date2-$date1))
-    length=" Test "`thetime $DIFF`
-    echo -n " $length"
-    if [ "$status" != "0" ]
-    then
-        echo ""
-        echo ========
-        echo "Parsing tests of $testname for $target failed."
-        cat output.txt
-        failed+=( "$testname/$target" )
-        echo ========
-    else
-        echo " Succeeded."      
-        succeeded+=( "$testname,$target" )
-    fi
-    popd > /dev/null
+        # Test generated parser on examples.
+        if [ $quiet != "true" ]; then echo "Parsing."; fi
+        date1=$(date +"%s")
+        bash test.sh > output.txt 2>&1
+        status="$?"
+        date2=$(date +"%s")
+        DIFF=$(($date2-$date1))
+        length=" Test "`thetime $DIFF`
+        echo "$length"
+        if [ "$status" != "0" ]
+        then
+            echo ""
+            echo ========
+            echo "Parsing tests of $testname for $target failed."
+            cat output.txt
+            failed+=( "$testname/$target" )
+            echo ========
+            else
+            echo " Succeeded."      
+            succeeded+=( "$testname,$target" )
+        fi
+
+        popd > /dev/null
+    done
     popd > /dev/null
 done
 

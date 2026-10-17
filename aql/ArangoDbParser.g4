@@ -21,9 +21,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar ArangoDbParser;
 
-options { tokenVocab=ArangoDbLexer; }
+options {
+    tokenVocab = ArangoDbLexer;
+}
 
 arangodb_query
     : data_query EOF
@@ -35,35 +40,29 @@ data_query
     ;
 
 data_access_query
-    : with_collection_list? ( for_op* return_expr
-                            | FOR v=id_ (',' e=id_ (',' p=id_)? )?
-                             IN (numeric_literal ('..' numeric_literal)? )?
-                             (OUTBOUND | INBOUND | ANY) expr
-                             (GRAPH expr | collection_list) // collections support direction: ANY
-                             (PRUNE expr)?
-                             filter*
-                             options_?
-                             return_expr? )
+    : with_collection_list? (
+        for_op* return_expr
+        | FOR v = id_ (',' e = id_ (',' p = id_)?)? IN (numeric_literal ('..' numeric_literal)?)? (
+            OUTBOUND
+            | INBOUND
+            | ANY
+        ) expr (GRAPH expr | collection_list) // collections support direction: ANY
+        (PRUNE expr)? filter* options_? return_expr?
+    )
     ;
 
 for_op
-    : for_in
-      collect*
-      filter*
-      sort*
-      limit*
-      window*
+    : for_in collect* filter* sort* limit* window*
     ;
 
 data_modification_query
-    : with_collection_list? for_op*
-        ( INSERT object_literal in_into collection options_?
+    : with_collection_list? for_op* (
+        INSERT object_literal in_into collection options_?
         | UPDATE (expr WITH)? object_literal IN collection options_?
         | REPLACE (expr WITH)? object_literal IN collection options_?
         | (REMOVE expr IN collection options_?)+
         | UPSERT expr INSERT expr (UPDATE | REPLACE) expr IN collection options_?
-        )
-      return_expr?
+    ) return_expr?
     ;
 
 options_
@@ -118,13 +117,13 @@ collection
     ;
 
 collect
-    : COLLECT ( expr (INTO expr)?
-              | expr (INTO id_ KEEP id_)?
-              | expr WITH COUNT INTO id_
-              | expr? aggregate_assign (INTO id_)?
-              | WITH COUNT INTO id_
-              )
-      options_?
+    : COLLECT (
+        expr (INTO expr)?
+        | expr (INTO id_ KEEP id_)?
+        | expr WITH COUNT INTO id_
+        | expr? aggregate_assign (INTO id_)?
+        | WITH COUNT INTO id_
+    ) options_?
     ;
 
 window
@@ -153,7 +152,7 @@ expr
     | '(' (expr | data_access_query) ')'
     | expr '[' (expr | '*') ']'
     | expr ACCESS expr
-    | ('+'|'-') expr
+    | ('+' | '-') expr
     | id_ LRB expr RRB
     | expr ('*' | '/' | '%') expr
     | expr ('+' | '-') expr

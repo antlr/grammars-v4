@@ -47,7 +47,6 @@ public abstract class LexerAdaptor : Lexer
          : base(input, Console.Out, Console.Error)
     {
         CurrentRuleType = TokenConstants.InvalidType;
-        _insideOptionsBlock = false;
         stream = input;
     }
 
@@ -55,7 +54,6 @@ public abstract class LexerAdaptor : Lexer
          : base(input, output, errorOutput)
     {
         CurrentRuleType = TokenConstants.InvalidType;
-        _insideOptionsBlock = false;
         stream = input;
     }
 
@@ -72,8 +70,6 @@ public abstract class LexerAdaptor : Lexer
      * can only occur in lexical rules and arg actions cannot occur.
      */
     private int CurrentRuleType { get; set; } = TokenConstants.InvalidType;
-
-    private bool _insideOptionsBlock;
 
     protected void handleBeginArgument()
     {
@@ -94,17 +90,6 @@ public abstract class LexerAdaptor : Lexer
         if (ModeStack.Count > 0)
         {
             Type = ANTLRv4Lexer.ARGUMENT_CONTENT;
-        }
-    }
-
-    protected void handleEndAction()
-    {
-        var oldMode = CurrentMode;
-        var newMode = PopMode();
-
-        if (ModeStack.Count > 0 && newMode == ANTLRv4Lexer.TargetLanguageAction && oldMode == newMode)
-        {
-            Type = ANTLRv4Lexer.ACTION_CONTENT;
         }
     }
 
@@ -141,9 +126,9 @@ public abstract class LexerAdaptor : Lexer
         else if (Type == ANTLRv4Lexer.SEMI && CurrentRuleType == OPTIONS_CONSTRUCT)
         { // ';' in options { .... }. Don't change anything.
         }
-        else if (Type == ANTLRv4Lexer.END_ACTION && CurrentRuleType == ANTLRv4Lexer.AT)
+        else if (Type == ANTLRv4Lexer.ACTION && CurrentRuleType == ANTLRv4Lexer.AT)
         {
-            // exit action
+            // Exit action
             CurrentRuleType = TokenConstants.InvalidType;
         }
         else if (Type == ANTLRv4Lexer.ID)
@@ -175,7 +160,6 @@ public abstract class LexerAdaptor : Lexer
     public override void Reset()
     {
         CurrentRuleType = TokenConstants.InvalidType;
-        _insideOptionsBlock = false;
         base.Reset();
     }
 }

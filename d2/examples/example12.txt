@@ -1,0 +1,7 @@
+imAShape
+im_a_shape
+im a shape
+i'm a shape
+# notice that one-hyphen is not a connection
+# whereas, `a--shape` would be a connection
+a-shape

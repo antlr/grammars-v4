@@ -1,0 +1,145 @@
+-- BDD2002.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--*
+--
+-- OBJECTIVE:
+--    Check that a limited type extension is illegal if (1) the parent type has
+--    user-defined Read or Write attributes and (2) the extension has a limited
+--    component which does not have a user-defined Read or Write attribute.
+--    (Defect Report 8652/0040,
+--     as reflected in Technical Corrigendum 1, last sentence of 13.13.2(9/1)).
+--
+-- CHANGE HISTORY:
+--    31 JUL 2001   PHL   Initial version.
+--     5 DEC 2001   RLB   Reformatted for ACATS.
+--
+--!
+with Ada.Streams;
+use Ada.Streams;
+package BDD2002_0 is
+
+    type No_Read is limited null record;
+    procedure Write (Stream : access Ada.Streams.Root_Stream_Type'Class;
+                     Item : No_Read);
+    for No_Read'Write use Write;
+
+
+    type No_Write is limited
+        record
+            C : Character;
+        end record;
+    procedure Read (Stream : access Ada.Streams.Root_Stream_Type'Class;
+                    Item : out No_Write);
+    for No_Write'Read use Read;
+
+
+    type No_Read_Write (D : Integer) is tagged limited null record;
+
+
+    type Has_Read is tagged limited
+        record
+            C : Integer;
+        end record;
+    procedure Read (Stream : access Ada.Streams.Root_Stream_Type'Class;
+                    Item : out Has_Read);
+    for Has_Read'Read use Read;
+
+
+    type Has_Write (B : Boolean) is tagged limited
+        record
+            C1 : Duration;
+            case B is
+                when False =>
+                    null;
+                when True =>
+                    C2 : Float;
+            end case;
+        end record;
+    procedure Write (Stream : access Ada.Streams.Root_Stream_Type'Class;
+                     Item : Has_Write);
+    for Has_Write'Write use Write;
+
+    type Has_Inherited_Read is new Has_Read with
+        record
+            S : String (1 .. 4);
+        end record;
+
+
+    type Has_Read_Extension1 is new Has_Read with -- ERROR:
+        record
+            L : No_Read;
+        end record;
+
+    type Has_Read_Extension2 is new Has_Read with -- OK
+        record
+            L : No_Write;
+        end record;
+
+    type Has_Read_Extension3 is new Has_Read with -- ERROR:
+        record
+            L : No_Read_Write (3);
+        end record;
+
+
+    type Has_Inherited_Read_Extension1 is new Has_Inherited_Read with -- ERROR:
+        record
+            L : No_Read;
+        end record;
+
+    type Has_Inherited_Read_Extension2 is new Has_Inherited_Read with -- OK
+        record
+            L : No_Write;
+        end record;
+
+    type Has_Inherited_Read_Extension3 is new Has_Inherited_Read with -- ERROR:
+        record
+            L : No_Read_Write (5);
+        end record;
+
+
+    type Has_Write_Extension1 is new Has_Write with -- ERROR:
+        record
+            L : No_Write;
+        end record;
+
+    type Has_Write_Extension2 is new Has_Write with -- OK
+        record
+            L : No_Read;
+        end record;
+
+    type Has_Write_Extension3 is new Has_Write with -- ERROR:
+        record
+            L : No_Read_Write (7);
+        end record;
+
+
+end BDD2002_0;
+
+with BDD2002_0; -- OPTIONAL ERROR:
+procedure BDD2002 is -- Optional main subprogram. This does not need to be
+                     -- processed.
+begin
+    null;
+end BDD2002;

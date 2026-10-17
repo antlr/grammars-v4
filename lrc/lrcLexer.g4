@@ -29,34 +29,24 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine true, allowShortBlocksOnASingleLine true, minEmptyLines 0, alignSemicolons ownLine
+// $antlr-format alignColons trailing, singleLineOverrulesHangingColon true, alignLexerCommands true, alignLabels true, alignTrailers true
+
 lexer grammar lrcLexer;
 
-LB
-   : '['
-   ;
+LB: '[';
 
-RB
-   : ']' -> pushMode (LINETEXT)
-   ;
+RB: ']' -> pushMode (LINETEXT);
 
-TIMESTAMP
-   : NUM ':' NUM '.' NUM
-   ;
+TIMESTAMP: NUM ':' NUM '.' NUM;
 
-NUM
-   : [0-9]+
-   ;
+NUM: [0-9]+;
 
-WS
-   : [ \r\n\t]+ -> skip
-   ;
+WS: [ \r\n\t]+ -> skip;
 
 mode LINETEXT;
-TEXT
-   : ~ [\r\n]+
-   ;
+TEXT: ~ [\r\n]+;
 
-EOL
-   : [\r\n]+ -> skip , popMode
-   ;
-
+EOL: [\r\n]+ -> skip, popMode;

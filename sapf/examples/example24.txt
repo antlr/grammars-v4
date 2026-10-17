@@ -1,0 +1,12 @@
+(
+	[.4 [8 7.23]]	; LFO freq
+	0 lfsaw			; sawtooth LFO
+	[24 3] *		; modulation depth in semitones
+	+/				; add mono and stereo LFOs
+	81 +			; midi note offset
+	nnhz			; convert note number to Hertz
+	0 sinosc		; sine wave oscillator
+	4c *			; scale amplitude
+	.2 0 4 combn	; comb delay
+	play
+)

@@ -37,34 +37,105 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar DGSParser;
 
-options { tokenVocab=DGSLexer; }
+options {
+    tokenVocab = DGSLexer;
+}
 
-dgs : header ( event | COMMENT | EOL )* EOF ;
-header : MAGIC EOL identifier INT INT EOL;
-event : ( an | cn | dn | ae | ce | de | cg | st | cl ) ( COMMENT | EOL ) ;
+dgs
+    : header (event | COMMENT | EOL)* EOF
+    ;
 
-an : AN identifier attributes;
-cn : CN identifier attributes;
-dn : DN identifier;
-ae : AE identifier identifier direction? identifier attributes;
-ce : CE identifier attributes;
-de : DE identifier;
-cg : CG attributes;
-st : ST REAL;
-cl : CL;
+header
+    : MAGIC EOL identifier INT INT EOL
+    ;
 
+event
+    : (an | cn | dn | ae | ce | de | cg | st | cl) (COMMENT | EOL)
+    ;
 
-attributes : attribute*;
-attribute : (PLUS|MINUS)? identifier ( assign value ( COMMA value )* )? ;
+an
+    : AN identifier attributes
+    ;
 
-value : STRING | INT| REAL | COLOR | array_ | a_map | identifier;
+cn
+    : CN identifier attributes
+    ;
 
-array_ : LBRACE ( value ( COMMA value )* )? RBRACE;
-a_map : LBRACK ( mapping ( COMMA mapping )* )? RBRACK;
-mapping : identifier assign value;
-direction : LANGLE | RANGLE ;
-assign : EQUALS | COLON ;
-identifier : STRING | INT | WORD ( DOT WORD )* ;
+dn
+    : DN identifier
+    ;
 
+ae
+    : AE identifier identifier direction? identifier attributes
+    ;
+
+ce
+    : CE identifier attributes
+    ;
+
+de
+    : DE identifier
+    ;
+
+cg
+    : CG attributes
+    ;
+
+st
+    : ST REAL
+    ;
+
+cl
+    : CL
+    ;
+
+attributes
+    : attribute*
+    ;
+
+attribute
+    : (PLUS | MINUS)? identifier (assign value ( COMMA value)*)?
+    ;
+
+value
+    : STRING
+    | INT
+    | REAL
+    | COLOR
+    | array_
+    | a_map
+    | identifier
+    ;
+
+array_
+    : LBRACE (value ( COMMA value)*)? RBRACE
+    ;
+
+a_map
+    : LBRACK (mapping ( COMMA mapping)*)? RBRACK
+    ;
+
+mapping
+    : identifier assign value
+    ;
+
+direction
+    : LANGLE
+    | RANGLE
+    ;
+
+assign
+    : EQUALS
+    | COLON
+    ;
+
+identifier
+    : STRING
+    | INT
+    | WORD ( DOT WORD)*
+    ;

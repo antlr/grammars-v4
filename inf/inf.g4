@@ -30,54 +30,70 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar inf;
 
 inf
-   : (section | EOL)* EOF
-   ;
+    : (section | EOL)* EOF
+    ;
 
 section
-   : sectionheader line*
-   ;
+    : sectionheader line*
+    ;
 
 sectionheader
-   : '[' string ']' EOL
-   ;
+    : '[' string ']' EOL
+    ;
 
 string
-   : CHARS
-   | STRING
-   ;
+    : CHARS
+    | STRING
+    ;
 
 line
-   : stringlist ('=' stringlist)? EOL
-   ;
+    : stringlist ('=' stringlist)? EOL
+    ;
 
 stringlist
-   : string (',' string?)*
-   ;
-
+    : string (',' string?)*
+    ;
 
 CHARS
-   : ('A' .. 'Z' | '0' .. '9' | 'a' .. 'z' | '.' | '%' | '"' | '\\' | '/' | '*' | '@' | '&' | '_' | '{' | '}' | '<' | '>' | '-') +
-   ;
-
+    : (
+        'A' .. 'Z'
+        | '0' .. '9'
+        | 'a' .. 'z'
+        | '.'
+        | '%'
+        | '"'
+        | '\\'
+        | '/'
+        | '*'
+        | '@'
+        | '&'
+        | '_'
+        | '{'
+        | '}'
+        | '<'
+        | '>'
+        | '-'
+    )+
+    ;
 
 STRING
-   : '"' (~ ('"' | '\n'))* '"'
-   ;
-
+    : '"' (~ ('"' | '\n'))* '"'
+    ;
 
 COMMENT
-   : ';' ~ [\r\n]* EOL -> skip
-   ;
-
+    : ';' ~ [\r\n]* EOL -> skip
+    ;
 
 EOL
-   : [\r\n]+
-   ;
-
+    : [\r\n]+
+    ;
 
 WS
-   : [ \t] + -> skip
-   ;
+    : [ \t]+ -> skip
+    ;

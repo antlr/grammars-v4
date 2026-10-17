@@ -31,11 +31,11 @@ bool TypeScriptParserBase::notLineTerminator()
     return !here(TypeScriptParser::LineTerminator);
 }
 
-bool TypeScriptParserBase::notOpenBraceAndNotFunction()
+bool TypeScriptParserBase::notOpenBraceAndNotFunctionAndNotInterface()
 {
     int nextTokenType = _input->LT(1)->getType();
-    return nextTokenType != TypeScriptParser::OpenBrace && nextTokenType != TypeScriptParser::Function_;
-
+    return nextTokenType != TypeScriptParser::OpenBrace && nextTokenType != TypeScriptParser::Function_
+            && nextTokenType != TypeScriptParser::Interface;
 }
 
 bool TypeScriptParserBase::closeBrace()

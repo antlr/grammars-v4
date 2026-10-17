@@ -1,3 +1,5 @@
+# Swift (Version 2) Grammar
+
 Some notes on issues am finding with the official grammar as I developed the executable grammar.
 
 ## Ambiguities
@@ -144,3 +146,7 @@ optional_binding_continuation_list
  : ',' optional_binding_continuation (',' optional_binding_continuation)*
  ;
 ```
+
+## Reference
+* [pldb](http://pldb.info/concepts/swift)
+

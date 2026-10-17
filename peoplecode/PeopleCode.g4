@@ -22,137 +22,276 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar PeopleCode;
 
 //******************************************************//
 // Parser Rules                                         //
 //******************************************************//
 
-program : stmtList EOF ;
+program
+    : stmtList EOF
+    ;
 
 // Multiple semicolons may be present; the last/only statement may not have a semicolon.
-stmtList: (stmt ';'+)* stmt? ;   
+stmtList
+    : (stmt ';'+)* stmt?
+    ;
 
-stmt  : appClassImport          # StmtAppClassImport
-      | extFuncImport           # StmtExternalFuncImport
-      | classDeclaration        # StmtClassDeclaration
-      | methodImpl              # StmtMethodImpl
-      | getImpl                 # StmtGetImpl
-      | setImpl                 # StmtSetImpl
-      | funcImpl                # StmtFuncImpl
-      | varDeclaration          # StmtVarDeclaration
-      | ifStmt                  # StmtIf
-      | forStmt                 # StmtFor
-      | whileStmt               # StmtWhile
-      | evaluateStmt            # StmtEvaluate
-      | tryCatchStmt            # StmtTryCatch
-      | 'Exit'                  # StmtExit
-      | 'Break'                 # StmtBreak
-      | 'Error' expr            # StmtError
-      | 'Warning' expr          # StmtWarning
-      | 'Return' expr?          # StmtReturn
-      | 'throw' expr            # StmtThrow
-      | expr '=' expr           # StmtAssign  // Must be higher than fn call to properly resolve '=' ambiguity.
-      | expr                    # StmtExpr    // For fn calls; the value of expr is not assigned to anything.
-      ;
+stmt
+    : appClassImport   # StmtAppClassImport
+    | extFuncImport    # StmtExternalFuncImport
+    | classDeclaration # StmtClassDeclaration
+    | methodImpl       # StmtMethodImpl
+    | getImpl          # StmtGetImpl
+    | setImpl          # StmtSetImpl
+    | funcImpl         # StmtFuncImpl
+    | varDeclaration   # StmtVarDeclaration
+    | ifStmt           # StmtIf
+    | forStmt          # StmtFor
+    | whileStmt        # StmtWhile
+    | evaluateStmt     # StmtEvaluate
+    | tryCatchStmt     # StmtTryCatch
+    | 'Exit'           # StmtExit
+    | 'Break'          # StmtBreak
+    | 'Error' expr     # StmtError
+    | 'Warning' expr   # StmtWarning
+    | 'Return' expr?   # StmtReturn
+    | 'throw' expr     # StmtThrow
+    | expr '=' expr    # StmtAssign // Must be higher than fn call to properly resolve '=' ambiguity.
+    | expr             # StmtExpr   // For fn calls; the value of expr is not assigned to anything.
+    ;
 
-expr  : '(' expr ')'                              # ExprParenthesized
-      | '@' expr                                  # ExprDynamicReference
-      | literal                                   # ExprLiteral
-      | id_                                        # ExprId
-      | createInvocation                          # ExprCreate
-      | expr '.' id_                               # ExprDotAccess
-      | expr '[' exprList ']'                     # ExprArrayIndex // &array[&i, &j] is shorthand for &array[&i][&j]
-      | expr '(' exprList? ')'                    # ExprFnOrIdxCall
-      | '-' expr                                  # ExprNegate
-      | 'Not' expr                                # ExprNot
-      | expr (m='*'|d='/') expr                   # ExprMulDiv
-      | expr (a='+'|s='-') expr                   # ExprAddSub
-      | expr (le='<='|ge='>='|l='<'|g='>') expr   # ExprComparison
-      | expr (e='='|i='<>') expr                  # ExprEquality
-      | expr (
-            <assoc=right>op='And'
-          | <assoc=right>op='Or'
-        ) expr                                    # ExprBoolean // order of precedence: Not, And, then Or
-      | expr '|' expr                             # ExprConcat
-      ;
+expr
+    : '(' expr ')'                                                     # ExprParenthesized
+    | '@' expr                                                         # ExprDynamicReference
+    | literal                                                          # ExprLiteral
+    | id_                                                              # ExprId
+    | createInvocation                                                 # ExprCreate
+    | expr '.' id_                                                     # ExprDotAccess
+    | expr '[' exprList ']'                                            # ExprArrayIndex // &array[&i, &j] is shorthand for &array[&i][&j]
+    | expr '(' exprList? ')'                                           # ExprFnOrIdxCall
+    | '-' expr                                                         # ExprNegate
+    | 'Not' expr                                                       # ExprNot
+    | expr (m = '*' | d = '/') expr                                    # ExprMulDiv
+    | expr (a = '+' | s = '-') expr                                    # ExprAddSub
+    | expr (le = '<=' | ge = '>=' | l = '<' | g = '>') expr            # ExprComparison
+    | expr (e = '=' | i = '<>') expr                                   # ExprEquality
+    | expr (<assoc = right>op = 'And' | <assoc = right>op = 'Or') expr # ExprBoolean // order of precedence: Not, And, then Or
+    | expr '|' expr                                                    # ExprConcat
+    ;
 
-exprList: expr (',' expr)* ;
+exprList
+    : expr (',' expr)*
+    ;
 
-varDeclaration  : varScope=GENERIC_ID varType varDeclarator (',' varDeclarator)* ;
-varDeclarator : VAR_ID ('=' expr)? ;
+varDeclaration
+    : varScope = GENERIC_ID varType varDeclarator (',' varDeclarator)*
+    ;
+
+varDeclarator
+    : VAR_ID ('=' expr)?
+    ;
 
 // - The first alt catches primitive types (i.e., "any", "integer"), complex types
 //   (i.e., "Record"), arrays of any dimension (i.e., "array of array of Record"),
 //   and app class names without path prefixes (i.e., "Address" for "EO:CA:Address").
 // - Note: the 'of' clause is only valid after "array" - I'm opting to enforce this
 //   at runtime rather than syntactically.
-varType   : GENERIC_ID ('of' varType)? | appClassPath ;
+varType
+    : GENERIC_ID ('of' varType)?
+    | appClassPath
+    ;
 
-appClassImport  : 'import' (appPkgPath|appClassPath) ;
-appPkgPath      : GENERIC_ID (':' GENERIC_ID)* ':' '*' ;
-appClassPath    : GENERIC_ID (':' GENERIC_ID)+ ;
+appClassImport
+    : 'import' (appPkgPath | appClassPath)
+    ;
 
-extFuncImport   : 'Declare' 'Function' GENERIC_ID 'PeopleCode' recDefnPath event ;
-recDefnPath     : GENERIC_ID '.' GENERIC_ID ;
-event           : 'FieldFormula' | 'FieldChange' ;
+appPkgPath
+    : GENERIC_ID (':' GENERIC_ID)* ':' '*'
+    ;
 
-classDeclaration  : 'class' GENERIC_ID classBlock* 'end-class' ;
-classBlock        : aLvl='private'? (classBlockStmt ';'*)+ ;
-classBlockStmt    : method | constant | property_ | instance ;
-method            : 'method' GENERIC_ID formalParamList returnType? ;
-constant          : 'Constant' VAR_ID '=' expr ;
-property_          : 'property' varType GENERIC_ID g='get'? s='set'? r='readonly'? ;
-instance          : 'instance' varType VAR_ID (',' VAR_ID)* ;
+appClassPath
+    : GENERIC_ID (':' GENERIC_ID)+
+    ;
 
-methodImpl  : 'method' GENERIC_ID stmtList endmethod='end-method' ;
-getImpl     : 'get' GENERIC_ID stmtList endget='end-get' ;
-setImpl     : 'set' GENERIC_ID stmtList endset='end-set' ;
+extFuncImport
+    : 'Declare' 'Function' GENERIC_ID 'PeopleCode' recDefnPath event
+    ;
 
-funcImpl        : funcSignature stmtList endfunction='End-Function' ;
-funcSignature   : 'Function' GENERIC_ID formalParamList? returnType? ';'? ;
-formalParamList : '(' ( param (',' param)* )? ')' ;
-param           : VAR_ID ('As' varType)? ;
-returnType      : 'Returns' varType ;
+recDefnPath
+    : GENERIC_ID '.' GENERIC_ID
+    ;
 
-ifStmt  : 'If' expr 'Then' ';'? stmtList (elsetok='Else' ';'? stmtList)? endif='End-If' ;
+event
+    : 'FieldFormula'
+    | 'FieldChange'
+    ;
 
-forStmt : 'For' VAR_ID '=' expr 'To' expr (';' | ('Step' expr))? stmtList endfor='End-For' ;
+classDeclaration
+    : 'class' GENERIC_ID classBlock* 'end-class'
+    ;
 
-whileStmt : 'While' expr ';'? stmtList 'End-While' ;
+classBlock
+    : aLvl = 'private'? (classBlockStmt ';'*)+
+    ;
 
-evaluateStmt    : 'Evaluate' expr whenBranch+ whenOtherBranch? endevaluate='End-Evaluate' ;
-whenBranch      : 'When' (op='='|op='>')? expr stmtList ;
-whenOtherBranch : 'When-Other' stmtList ;
+classBlockStmt
+    : method
+    | constant
+    | property_
+    | instance
+    ;
 
-tryCatchStmt    : trytok='try' stmtList catchSignature stmtList endtry='end-try' ;
-catchSignature  : 'catch' exClass='Exception' VAR_ID ;
+method
+    : 'method' GENERIC_ID formalParamList returnType?
+    ;
 
-createInvocation : 'create' (appClassPath|GENERIC_ID) '(' exprList? ')' ;
+constant
+    : 'Constant' VAR_ID '=' expr
+    ;
 
-literal : DecimalLiteral
-        | IntegerLiteral
-        | StringLiteral
-        | BoolLiteral
-        ;
+property_
+    : 'property' varType GENERIC_ID g = 'get'? s = 'set'? r = 'readonly'?
+    ;
 
-id_  : SYS_VAR_ID | VAR_ID | GENERIC_ID ;
+instance
+    : 'instance' varType VAR_ID (',' VAR_ID)*
+    ;
+
+methodImpl
+    : 'method' GENERIC_ID stmtList endmethod = 'end-method'
+    ;
+
+getImpl
+    : 'get' GENERIC_ID stmtList endget = 'end-get'
+    ;
+
+setImpl
+    : 'set' GENERIC_ID stmtList endset = 'end-set'
+    ;
+
+funcImpl
+    : funcSignature stmtList endfunction = 'End-Function'
+    ;
+
+funcSignature
+    : 'Function' GENERIC_ID formalParamList? returnType? ';'?
+    ;
+
+formalParamList
+    : '(' (param (',' param)*)? ')'
+    ;
+
+param
+    : VAR_ID ('As' varType)?
+    ;
+
+returnType
+    : 'Returns' varType
+    ;
+
+ifStmt
+    : 'If' expr 'Then' ';'? stmtList (elsetok = 'Else' ';'? stmtList)? endif = 'End-If'
+    ;
+
+forStmt
+    : 'For' VAR_ID '=' expr 'To' expr (';' | ('Step' expr))? stmtList endfor = 'End-For'
+    ;
+
+whileStmt
+    : 'While' expr ';'? stmtList 'End-While'
+    ;
+
+evaluateStmt
+    : 'Evaluate' expr whenBranch+ whenOtherBranch? endevaluate = 'End-Evaluate'
+    ;
+
+whenBranch
+    : 'When' (op = '=' | op = '>')? expr stmtList
+    ;
+
+whenOtherBranch
+    : 'When-Other' stmtList
+    ;
+
+tryCatchStmt
+    : trytok = 'try' stmtList catchSignature stmtList endtry = 'end-try'
+    ;
+
+catchSignature
+    : 'catch' exClass = 'Exception' VAR_ID
+    ;
+
+createInvocation
+    : 'create' (appClassPath | GENERIC_ID) '(' exprList? ')'
+    ;
+
+literal
+    : DecimalLiteral
+    | IntegerLiteral
+    | StringLiteral
+    | BoolLiteral
+    ;
+
+id_
+    : SYS_VAR_ID
+    | VAR_ID
+    | GENERIC_ID
+    ;
 
 //*******************************************************//
 // Lexer Rules                                           //
 //*******************************************************//
 
-DecimalLiteral  : IntegerLiteral '.' [0-9]+ ;
-IntegerLiteral  : '0' | '1'..'9' '0'..'9'* ;
-StringLiteral   : '"' ( ~'"' )* '"' ;
-BoolLiteral     :   'True' | 'False' ;
+DecimalLiteral
+    : IntegerLiteral '.' [0-9]+
+    ;
 
-VAR_ID      : '&' GENERIC_ID ;
-SYS_VAR_ID  : '%' GENERIC_ID ;
-GENERIC_ID  : [a-zA-Z] [0-9a-zA-Z_#]* ;
+IntegerLiteral
+    : '0'
+    | '1' ..'9' '0' ..'9'*
+    ;
 
-REM       : WS? [rR][eE][mM] WS .*? ';' -> skip;
-COMMENT_1 : '/*' .*? '*/' -> skip;
-COMMENT_2 : '<*' .*? '*>' -> skip;
-COMMENT_3 : '/+' .*? '+/' ';'? -> skip;
-WS        : [ \t\r\n]+ -> skip;
+StringLiteral
+    : '"' (~'"')* '"'
+    ;
+
+BoolLiteral
+    : 'True'
+    | 'False'
+    ;
+
+VAR_ID
+    : '&' GENERIC_ID
+    ;
+
+SYS_VAR_ID
+    : '%' GENERIC_ID
+    ;
+
+GENERIC_ID
+    : [a-zA-Z] [0-9a-zA-Z_#]*
+    ;
+
+REM
+    : WS? [rR][eE][mM] WS .*? ';' -> skip
+    ;
+
+COMMENT_1
+    : '/*' .*? '*/' -> skip
+    ;
+
+COMMENT_2
+    : '<*' .*? '*>' -> skip
+    ;
+
+COMMENT_3
+    : '/+' .*? '+/' ';'? -> skip
+    ;
+
+WS
+    : [ \t\r\n]+ -> skip
+    ;
