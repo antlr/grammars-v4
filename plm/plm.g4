@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2018, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -37,6 +37,7 @@ compilation
 
 module
    : (modulename ':')? simpledoblock
+   | (numericconstant ':')? declaration* unit*
    ;
 
 modulename
@@ -49,7 +50,7 @@ declaration
    ;
 
 declarestatement
-   : 'DECLARE'  declareelementlist  ';'
+   : 'DECLARE' declareelementlist ';'
    ;
 
 declareelementlist
@@ -74,13 +75,14 @@ factoredelement
    ;
 
 variableelement
-   : variablenamespecifier arrayspecifier? (variabletype | variableattributes)
+   : variablenamespecifier arrayspecifier? (variabletype variableattributes? | variableattributes)
    ;
 
 variablenamespecifier
    : nonbasedname
    | basedname 'BASED' basespecifier
    | address // 8080 only
+   
    ;
 
 nonbasedname
@@ -114,7 +116,7 @@ arrayspecifier
    ;
 
 explicitdimension
-   : '(' numericconstant ')'
+   : '(' (numericconstant | identifier) ')'
    ;
 
 implicitdimension
@@ -135,7 +137,7 @@ literalelement
    ;
 
 factoredvariableelement
-   : '(' variablenamespecifier (',' variablenamespecifier)* ')' explicitdimension? variabletype variableattributes
+   : '(' variablenamespecifier (',' variablenamespecifier)* ')' explicitdimension? (variabletype variableattributes? | variableattributes)
    ;
 
 factoredlabelelement
@@ -196,7 +198,7 @@ interrupt
    ;
 
 initialization
-   : ('INITIAL' | 'DATA') (initialvalue (',' initialvalue)*)
+   : ('INITIAL' | 'DATA') '(' initialvalue (',' initialvalue)* ')'
    ;
 
 initialvalue
@@ -210,7 +212,7 @@ unit
    | basicstatement
    | labeldefinition unit
    | scopingstatement //???
-
+   
    ;
 
 basicstatement
@@ -219,6 +221,11 @@ basicstatement
    | gotostatement
    | returnstatement
    | microprocessordependentstatement
+   | nullstatement
+   ;
+
+nullstatement
+   : ';'
    ;
 
 scopingstatement
@@ -243,7 +250,7 @@ leftpart
    ;
 
 callstatement
-   : 'CALL' simplevariable '(' parameterlist? ')' ';'
+   : 'CALL' simplevariable ('(' parameterlist? ')')? ';'
    ;
 
 parameterlist
@@ -256,7 +263,7 @@ simplevariable
    ;
 
 gotostatement
-   : ('GOTO' | 'GO TO') identifier
+   : ('GOTO' | 'GO TO') identifier ';'
    ;
 
 returnstatement
@@ -297,6 +304,7 @@ causeinterruptstatement
 
 simpledostatement
    : 'DO' ';'
+   | 'DO' identifier ';'
    ;
 
 docasestatement
@@ -349,7 +357,7 @@ conditionalclause
    ;
 
 ifcondition
-   : 'IF' expression 'THEN' trueunit
+   : 'IF' expression 'THEN'
    ;
 
 trueelement
@@ -407,7 +415,7 @@ datareference
    ;
 
 subscript
-   : expression
+   : '(' expression ')'
    ;
 
 memberspecifier
@@ -419,7 +427,7 @@ functionreference
    ;
 
 actualparameters
-   : expression (',' expression)*
+   : '(' expression (',' expression)* ')'
    ;
 
 membername
@@ -431,8 +439,8 @@ name
    ;
 
 locationreference
-   : '@' constantlist
-   | '@' variablereference
+   : '.' constantlist
+   | '.' variablereference
    ;
 
 constantlist
@@ -463,7 +471,7 @@ logicalsecondary
    ;
 
 logicalprimary
-   : arithmeticexpression (RELATIONALOPERATOR arithmeticexpression)?
+   : arithmeticexpression (relationaloperator arithmeticexpression)?
    ;
 
 arithmeticexpression
@@ -540,7 +548,6 @@ BASICTYPE
    | 'DWORD'
    | 'QWORD'
    | 'CHARINT'
-   | 'OFFSET'
    | 'SHORTINT'
    | 'INTEGER'
    | 'REAL'
@@ -562,7 +569,7 @@ ARITHMETICOPERASTOR
    | 'MOD'
    ;
 
-RELATIONALOPERATOR
+relationaloperator
    : '<'
    | '>'
    | '<='
@@ -626,8 +633,6 @@ fragment OCTALDIGIT
    | '7'
    ;
 
-
-
 fragment DECIMALDIGIT
    : OCTALDIGIT
    | '8'
@@ -645,7 +650,7 @@ fragment HEXADECIMALDIGIT
    ;
 
 STRING
-   : '\'' STRINGBODYELEMENT+ '\''
+   : '\'' ('\'\'' | ~ '\'')* '\''
    ;
 
 STRINGBODYELEMENT
@@ -752,6 +757,10 @@ SPECIALCHARACTER
 
 COMMENT
    : '/' '*' .*? '*' '/' -> skip
+   ;
+
+CONTROLLINE
+   : '$' ~ [\r\n]* -> skip
    ;
 
 WS
