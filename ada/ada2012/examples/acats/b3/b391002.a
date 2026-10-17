@@ -1,0 +1,173 @@
+-- B391002.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making
+--     this public release, the Government intends to confer upon all
+--     recipients unlimited rights  equal to those held by the Government.
+--     These rights include rights to use, duplicate, release or disclose the
+--     released technical data and computer software in whole or in part, in
+--     any manner and for any purpose whatsoever, and to have or permit others
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that a type extension may not be declared in a generic body if
+--      the parent type is a descendant of a formal type declared in the
+--      formal part of the generic unit.
+--
+-- TEST DESCRIPTION:
+--      Type extensions are attempted within a generic body with various
+--      parent types: record and type extensions; type declared within
+--      other library packages, within the corresponding generic specification,
+--      within a formal package; formal types of both the formal package
+--      and the generic itself.
+--
+--
+-- CHANGE HISTORY:
+--      06 Dec 94   SAIC    ACVC 2.0
+--      23 Mar 07   RLB     Updated to reflect new wording of 3.9.1(4/2).
+--
+--!
+
+package B391002_0 is
+   type Root    is tagged null record;
+   type Pri_Der is new Root with private;
+   type Vis_Der is new Root with null record;
+private
+   type Pri_Der is new Root with null record;
+end B391002_0;
+
+
+     --===================================================================--
+
+
+with B391002_0;
+generic                                                     -- Template for
+   type Form_Pri is tagged private;                         -- formal package.
+   type Form_Der is new B391002_0.Root with private;
+package B391002_1 is
+   type Parent  is tagged null record;
+   type Pri_Ext is new Form_Pri with private;
+   type Rec_Ext is new Form_Der with null record;
+private
+   type Pri_Ext is new Form_Pri with null record;
+end B391002_1;
+
+
+     --===================================================================--
+
+
+generic
+   type Form_Pri is tagged private;
+package B391002_2 is
+   type Inst_Ext is new Form_Pri with null record;
+end B391002_2;
+
+
+     --===================================================================--
+
+
+with B391002_0;
+with B391002_1;
+generic
+   type Formal_Private is tagged private;
+   type Formal_Derived is new B391002_0.Root with private;
+   with package Formal_Package is new B391002_1 (<>);
+package B391002 is
+   type Local_Parent  is tagged null record;
+   type Local_Pri_Ext is new Formal_Private with private;
+   type Local_Rec_Ext is new Formal_Derived with null record;
+private
+   type Local_Pri_Ext is new Formal_Private with null record;
+
+   procedure Dummy_Proc;               -- Needed to allow body
+                                       -- for B391002.
+end B391002;
+
+
+     --===================================================================--
+
+
+with B391002_2;
+package body B391002 is
+
+   procedure Dummy_Proc is             -- Needed to allow body
+   begin                               -- for B391002.
+      null;
+   end Dummy_Proc;
+
+
+   type Parent_In_Body    is tagged null record;
+   type Extension_In_Body is new Parent_In_Body with null record;
+
+
+   package Instance01 is new B391002_2 (Parent_In_Body);              -- OK.
+
+   package Instance02 is new B391002_2 (B391002_0.Root);              -- OK.
+
+
+   package Inner is
+      type Inner_Parent  is tagged null record;
+      type Inner_Pri_Ext is new Inner_Parent with private;
+      type Inner_Rec_Ext is new Inner_Parent with null record;
+   private
+      type Inner_Pri_Ext is new Inner_Parent with null record;
+   end Inner;
+
+   type Derived01 is new Inner.Inner_Parent with null record;         -- OK.
+   type Derived02 is new Inner.Inner_Pri_Ext with null record;        -- OK.
+   type Derived03 is new Inner.Inner_Rec_Ext with null record;        -- OK.
+
+
+   type Derived04 is new Parent_In_Body with null record;             -- OK.
+   type Derived05 is new Extension_In_Body with null record;          -- OK.
+
+
+   type Derived06 is new B391002_0.Root with null record;             -- OK.
+
+   type Derived07 is new B391002_0.Pri_Der with null record;          -- OK.
+
+   type Derived08 is new B391002_0.Vis_Der with null record;          -- OK.
+
+   type Derived09 is new Local_Parent with null record;               -- OK.
+
+   type Derived10 is new Local_Pri_Ext with null record;              -- ERROR:
+                            -- Parent type is a descendant of a formal type.
+
+   type Derived11 is new Local_Rec_Ext with null record;              -- ERROR:
+                            -- Parent type is a descendant of a formal type.
+
+   type Derived12 is new Formal_Private with null record;             -- ERROR:
+                            -- Parent type is a descendant of a formal type.
+
+   type Derived13 is new Formal_Derived with null record;             -- ERROR:
+                            -- Parent type is a descendant of a formal type.
+
+   type Derived14 is new Formal_Package.Parent with null record;      -- OK.
+
+   type Derived15 is new Formal_Package.Pri_Ext with null record;     -- ERROR:
+                            -- Parent type is a descendant of a formal type.
+
+   type Derived16 is new Formal_Package.Rec_Ext with null record;     -- ERROR:
+                            -- Parent type is a descendant of a formal type.
+
+   type Derived17 is new Formal_Package.Form_Pri with null record;    -- ERROR:
+                            -- Parent type is a descendant of a formal type.
+
+   type Derived18 is new Formal_Package.Form_Der with null record;    -- ERROR:
+                            -- Parent type is a descendant of a formal type.
+
+end B391002;

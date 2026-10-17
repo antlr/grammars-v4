@@ -1,0 +1,106 @@
+-- BA11002.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that the private declarations of the parent are not visible
+--      for a formal parameter list or result type of a public child.
+--
+-- TEST DESCRIPTION:
+--      The parent package includes integer and record types in both visible
+--      and private parts.  Declare several public child subprograms which 
+--      try (incorrectly) to use its parent's private declarations in the 
+--      formal parameter list.
+--
+--
+-- CHANGE HISTORY:
+--      06 Dec 94   SAIC    ACVC 2.0
+--
+--!
+
+package BA11002_0 is    
+
+   -- Type definitions.
+
+   type Visible_Integer is range 10 .. 19;
+
+   type Color is private;
+
+   type Visible_Record is
+      record
+         X : Visible_Integer;
+         C : Color;
+      end record;
+
+   -- Object definitions.
+
+   Visible_Integer_Num : Visible_Integer := 15;
+
+
+private
+   -- Type definitions.
+
+   type Private_Integer is range 20 .. 200;
+
+   type Color is (White, Black, Red);
+
+   -- Object definitions.
+
+   Private_Integer_Num : Visible_Integer := 11;
+
+   Private_Record_Num  : Visible_Record  := (X => 17, C => White);
+
+end BA11002_0;       
+
+
+-- No body for BA11002_0.
+
+
+     --=================================================================--
+
+-- Public children.
+
+function BA11002_0.BA11002_1 (Int : Visible_Integer)  
+  return Visible_Integer;                              -- OK       
+
+function BA11002_0.BA11002_2 (Int : Visible_Integer)   
+  return Private_Integer;                              -- ERROR:       
+                            -- Private_Integer not visible here
+
+function BA11002_0.BA11002_3 (Int : Private_Integer)   -- ERROR:
+  return Visible_Integer;   -- Private_Integer not visible here            
+
+procedure BA11002_0.BA11002_4                                
+  (Int : Visible_Integer := Visible_Integer_Num);      -- OK     
+
+procedure BA11002_0.BA11002_5                                  
+  (Int : Visible_Integer := Private_Integer_Num);      -- ERROR: 
+                        -- Private_Integer_Num not visible here
+
+procedure BA11002_0.BA11002_8                               
+  (Rec : Visible_Record);                              -- OK   
+
+procedure BA11002_0.BA11002_9                          
+  (Rec : Visible_Record  := Private_Record_Num);       -- ERROR: 
+                         -- Private_Record_Num not visible here

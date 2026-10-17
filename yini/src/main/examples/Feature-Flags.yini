@@ -1,0 +1,10 @@
+/*
+  Feature Flags
+*/
+
+^ FeatureFlags
+debug = true
+experimental_ui = false
+use_cache = true
+cache_expiry = 86400  		// In seconds
+last_purge_date = "2025-05-25"	// YYYY-MM-DD

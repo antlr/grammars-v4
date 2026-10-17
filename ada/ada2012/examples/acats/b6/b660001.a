@@ -1,0 +1,179 @@
+-- B660001.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that the "=" operator may be overloaded for non-limited private
+--      types. Check that explicit overloadings of "/=" may not have a Boolean
+--      result.  Check that the result of an explicitly declared "=" operator 
+--      may be other than Boolean.  Check that an equality operator may rename
+--      a function other than an equality operator.  
+--
+-- TEST DESCRIPTION:
+--      Declare private and limited private types in a package specification.
+--      Define "/=" operations on private and limited private types, returning
+--      Boolean and other type results.  Define tri-state logic with "=" and 
+--      "/=" operators that return values LP_True, LP_False and Unknown.  
+--
+--      In another package, verify that errors are issued for an explicit 
+--      declaration of "/=" that returns a Boolean result.  Also verify
+--      that errors are issued for rename of "/= that returns a Boolean
+--      result.
+--
+--
+-- CHANGE HISTORY:
+--      23 Oct 1995   SAIC    Initial prerelease version.
+--      15 Apr 1996   SAIC    Additional cases for 2.1
+--      30 Apr 2021   RLB     Added error location indicators.
+--!
+
+package B660001_0 is
+
+   type Private_Type is private;
+
+   type Limited_Private is limited private;
+
+   type Enum_Type is (Unknown, LP_True, LP_False);
+
+   type Record_Type is
+     record
+        C : Integer;
+     end record;
+
+   type Access_To_Proc is access procedure;
+
+   function Not_Equal_Boolean_LP (I1, I2 : Limited_Private) return Boolean;
+
+   function Not_Equal_Boolean_PT (I1, I2 : Private_Type)    return Boolean;
+
+   function Not_Equal_Float      (I1, I2 : Private_Type)    return Float;
+
+   function Not_Equal_Enum       (I1, I2 : Limited_Private) return Enum_Type;
+
+   function Equal_Integer        (I1, I2 : Limited_Private) return Integer;
+
+   function Equal_Boolean        (I1, I2 : Private_Type)    return Boolean;
+
+   generic
+     type Enum is (<>);
+     with function "="(Left,Right : Enum) return Enum is <>;
+
+   package Gen_Pak is
+
+     function "/="(Left,Right : Enum) return Enum renames "=";
+
+     type New_Enum is new Enum;
+
+     function "="(Left,Right : New_Enum) return New_Enum;
+
+   end Gen_Pak;
+
+private
+
+   type Private_Type is (Red, Black, White);
+   type Limited_Private is range 1 .. 50;
+
+end B660001_0;
+
+     --==================================================================--
+
+with B660001_0;
+use  B660001_0;
+
+package B660001_1 is
+
+   -- Check explicit overloading of "/=".
+
+   function "/=" (I1, I2 : Private_Type) return Record_Type;  -- OK. {4;1}
+
+   function "/=" (I1, I2 : Private_Type) return Boolean;      -- ERROR: {4;1}
+                                                    -- Result type is Boolean.
+
+   function "/=" (I1, I2 : Limited_Private) return Enum_Type; -- OK. {4;1}
+
+   function "/=" (I1, I2 : Limited_Private) return Boolean;   -- ERROR: {4;1}
+                                                    -- Result type is Boolean.
+
+   function "/=" (I1, I2 : Private_Type)    
+     return Float renames Not_Equal_Float;                    -- OK. {1:4;1}
+
+   function "/=" (I1, I2 : Limited_Private)    
+     return Enum_Type renames Not_Equal_Enum;                 -- OK. {1:4;1}
+
+   function "/=" (I1, I2 : Private_Type)    
+     return Boolean renames Not_Equal_Boolean_PT;             -- ERROR: {1:4;1}
+                                                    -- Result type is Boolean.
+
+   function "/=" (I1, I2 : Limited_Private) 
+     return Boolean renames Not_Equal_Boolean_LP;             -- ERROR: {1:4;1}
+                                                    -- Result type is Boolean.
+
+   --------------------------------------------------------------------------
+   function "=" (I1, I2 : Private_Type) return Boolean;       -- OK. {4;1}
+
+   -- Check that "=" may have a non Boolean result.
+
+   function "=" (I1, I2 : Private_Type) return Record_Type;   -- OK. {4;1}
+
+   function "=" (I1, I2 : Limited_Private) return Access_To_Proc; -- OK. {4;1}
+
+   function "=" (I1 : Limited_Private; I2 : Private_Type)          
+     return Enum_Type;                                        -- OK. {1:4;1}
+
+   -- Check that "=" may rename a function other than an equality operator.
+
+   function "=" (I1, I2 : Limited_Private) 
+     return Integer renames Equal_Integer;                    -- OK. {1:4;1}
+
+   function "=" (I1, I2 : Private_Type)    
+     return Boolean renames Equal_Boolean;                    -- OK. {1:4;1}
+
+   --------------------------------------------------------------------------
+   generic
+
+      -- "/=" may have a result other than Boolean.
+
+      with function "/=" (I1, I2 : Limited_Private) 
+        return Integer;                                       -- OK. {1:7;1}
+
+      -- "/=" may not have a Boolean result.
+
+      with function "/=" (I1, I2 : Limited_Private) 
+        return Boolean;                                       -- ERROR: {1:7;1}
+                                                    -- Result type is Boolean.
+
+      with function "/=" (I1, I2 : Private_Type)    
+        return Boolean;                                       -- ERROR: {1:7;1}
+                                                    -- Result type is Boolean.
+
+   package Gen_Pck is end;
+
+   package New_Pak_1 is new Gen_Pak(Boolean);                 -- ERROR: {4;1}
+                                      -- overloaded "/=" cannot return Boolean
+
+   function Equal(L,R: Enum_Type) return Enum_Type;
+
+   package New_Pak_2 is new Gen_Pak(Enum_Type,Equal);         -- OK. {4;1}
+
+end B660001_1;

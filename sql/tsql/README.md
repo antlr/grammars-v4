@@ -1,4 +1,4 @@
-# An ANTLR4 grammar for T-SQL
+# T-SQL Grammar
 
 This is a community-supported grammar file for t-sql.
 It's not fully complete so far because a grammar reference of T-SQL is hard to clarify.
@@ -7,3 +7,7 @@ but it's not a complete file, so we try hard to stick to the references we could
 and bit by bit make it a more complete grammar.
 
 The reference for the Adaptive Server Enterprise variant of TSql is [online](http://infocenter.sybase.com/help/topic/com.sybase.dc36272_1251/pdf/commands.pdf).
+
+## Reference
+* [pldb](http://pldb.info/concepts/transact-sql)
+

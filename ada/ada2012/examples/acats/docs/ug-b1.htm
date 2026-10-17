@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>Macro Substitution File</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    DIV.Examples {font-family: "Courier New", monospace; font-size: 90%; line-height: 122%; margin-left: 2.2em; margin-bottom: 0.6em}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-B.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-B2.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>B.1 Macro Substitution File</H1>
+<div class="Normal">The support file <TT>MACRO.DFS</TT> provides substitutions 
+for special symbols that appear in certain ACATS 4.2 tests (indicated 
+by the three-letter file type (extension) &quot;.TST&quot; and listed 
+in Section <A HREF="UG-B2.HTM">B.2</A>). The support program <TT>Macrosub</TT> 
+may be used to insert these implementation-specific values in place of 
+the special symbols in the test. The following excerpt from the file 
+describes the file and its use.</div>
+<div class="Examples">--&nbsp;MACRO.DFS<BR>
+--&nbsp;THIS&nbsp;FILE&nbsp;CONTAINS&nbsp;THE&nbsp;MACRO&nbsp;DEFINITIONS&nbsp;USED&nbsp;IN&nbsp;THE&nbsp;ACVC&nbsp;TESTS.<BR>
+--&nbsp;THESE&nbsp;DEFINITIONS&nbsp;ARE&nbsp;USED&nbsp;BY&nbsp;THE&nbsp;ACVC&nbsp;TEST&nbsp;PRE-PROCESSOR,<BR>
+--&nbsp;MACROSUB.&nbsp;MACROSUB&nbsp;WILL&nbsp;CALCULATE&nbsp;VALUES&nbsp;FOR&nbsp;THOSE&nbsp;MACRO&nbsp;SYMBOLS<BR>
+--&nbsp;WHOSE&nbsp;DEFINITIONS&nbsp;DEPEND&nbsp;ON&nbsp;THE&nbsp;VALUE&nbsp;OF&nbsp;MAX_IN_LEN&nbsp;(NAMELY,&nbsp;THE<BR>
+--&nbsp;VALUES&nbsp;OF&nbsp;THE&nbsp;MACRO&nbsp;SYMBOLS&nbsp;BIG_ID1,&nbsp;BIG_ID2,&nbsp;BIG_ID3,&nbsp;BIG_ID4,<BR>
+--&nbsp;BIG_STRING1,&nbsp;BIG_STRING2,&nbsp;MAX_STRING_LITERAL,&nbsp;BIG_INT_LIT,&nbsp;BIG_REAL_LIT,<BR>
+--&nbsp;AND&nbsp;BLANKS).&nbsp;&nbsp;THEREFORE,&nbsp;ANY&nbsp;VALUES&nbsp;GIVEN&nbsp;IN&nbsp;THIS&nbsp;FILE&nbsp;FOR&nbsp;THOSE<BR>
+--&nbsp;MACRO&nbsp;SYMBOLS&nbsp;WILL&nbsp;BE&nbsp;IGNORED&nbsp;BY&nbsp;MACROSUB.</div>
+<div class="Examples">--&nbsp;NOTE:&nbsp;AS&nbsp;REQUIRED&nbsp;BY&nbsp;THE&nbsp;MACROSUB&nbsp;PROGRAM,&nbsp;THE&nbsp;FIRST&nbsp;MACRO&nbsp;DEFINED<BR>
+--&nbsp;IN&nbsp;THIS&nbsp;FILE&nbsp;IS&nbsp;$MAX_IN_LEN.&nbsp;&nbsp;THE&nbsp;NEXT&nbsp;5&nbsp;MACRO&nbsp;DEFINITIONS<BR>
+--&nbsp;ARE&nbsp;FOR&nbsp;THOSE&nbsp;MACRO&nbsp;SYMBOLS&nbsp;THAT&nbsp;DEPEND&nbsp;ON&nbsp;THE&nbsp;VALUE&nbsp;OF<BR>
+--&nbsp;MAX_IN_LEN.&nbsp;&nbsp;THESE&nbsp;ARE&nbsp;IN&nbsp;ALPHABETIC&nbsp;ORDER.&nbsp;&nbsp;FOLLOWING&nbsp;THESE<BR>
+--&nbsp;ARE&nbsp;36&nbsp;MORE&nbsp;DEFINITIONS,&nbsp;ALSO&nbsp;IN&nbsp;ALPHABETIC&nbsp;ORDER.</div>
+<div class="Examples">--&nbsp;EACH&nbsp;DEFINITION&nbsp;IS&nbsp;ACCORDING&nbsp;TO&nbsp;THE&nbsp;FOLLOWING&nbsp;FORMAT:</div>
+<div class="Examples">--&nbsp;A.&nbsp;A&nbsp;NUMBER&nbsp;OF&nbsp;LINES&nbsp;PRECEDED&nbsp;BY&nbsp;THE&nbsp;ADA&nbsp;COMMENT&nbsp;DELIMITER,&nbsp;--.<BR>
+--&nbsp;&nbsp;&nbsp;&nbsp;THE&nbsp;FIRST&nbsp;OF&nbsp;THESE&nbsp;LINES&nbsp;CONTAINS&nbsp;THE&nbsp;MACRO&nbsp;SYMBOL&nbsp;AS&nbsp;IT&nbsp;APPEARS<BR>
+--&nbsp;&nbsp;&nbsp;&nbsp;IN&nbsp;THE&nbsp;TEST&nbsp;FILES&nbsp;(WITH&nbsp;THE&nbsp;DOLLAR&nbsp;SIGN).&nbsp;&nbsp;THE&nbsp;NEXT&nbsp;FEW&nbsp;&quot;COMMENT&quot;<BR>
+--&nbsp;&nbsp;&nbsp;&nbsp;LINES&nbsp;CONTAIN&nbsp;A&nbsp;DESCRIPTION&nbsp;OF&nbsp;THE&nbsp;VALUE&nbsp;TO&nbsp;BE&nbsp;SUBSTITUTED.<BR>
+--&nbsp;&nbsp;&nbsp;&nbsp;THE&nbsp;REMAINING&nbsp;&quot;COMMENT&quot;&nbsp;LINES,&nbsp;THE&nbsp;FIRST&nbsp;OF&nbsp;WHICH&nbsp;BEGINS&nbsp;WITH&nbsp;THE<BR>
+--&nbsp;&nbsp;&nbsp;&nbsp;WORDS&nbsp;&quot;USED&nbsp;IN:&nbsp;&nbsp;&quot;&nbsp;(NO&nbsp;QUOTES),&nbsp;CONTAIN&nbsp;A&nbsp;LIST&nbsp;OF&nbsp;THE&nbsp;TEST&nbsp;FILES<BR>
+--&nbsp;&nbsp;&nbsp;&nbsp;(WITHOUT&nbsp;THE&nbsp;.TST&nbsp;EXTENSION)&nbsp;IN&nbsp;WHICH&nbsp;THE&nbsp;MACRO&nbsp;SYMBOL&nbsp;APPEARS.<BR>
+--&nbsp;&nbsp;&nbsp;&nbsp;EACH&nbsp;TEST&nbsp;FILE&nbsp;NAME&nbsp;IS&nbsp;PRECEDED&nbsp;BY&nbsp;ONE&nbsp;OR&nbsp;MORE&nbsp;BLANKS.<BR>
+--&nbsp;B.&nbsp;A&nbsp;LINE,&nbsp;WITHOUT&nbsp;THE&nbsp;COMMENT&nbsp;DELIMITER,&nbsp;CONSISTING&nbsp;OF&nbsp;THE<BR>
+--&nbsp;&nbsp;&nbsp;&nbsp;IDENTIFIER&nbsp;(WITHOUT&nbsp;THE&nbsp;DOLLAR&nbsp;SIGN)&nbsp;OF&nbsp;THE&nbsp;MACRO&nbsp;SYMBOL,<BR>
+--&nbsp;&nbsp;&nbsp;&nbsp;FOLLOWED&nbsp;BY&nbsp;A&nbsp;SPACE&nbsp;OR&nbsp;TAB,&nbsp;FOLLOWED&nbsp;BY&nbsp;THE&nbsp;VALUE&nbsp;TO&nbsp;BE<BR>
+--&nbsp;&nbsp;&nbsp;&nbsp;SUBSTITUTED.&nbsp;&nbsp;IN&nbsp;THE&nbsp;DISTRIBUTION&nbsp;FILE,&nbsp;A&nbsp;SAMPLE&nbsp;VALUE&nbsp;IS<BR>
+--&nbsp;&nbsp;&nbsp;&nbsp;PROVIDED;&nbsp;THIS&nbsp;VALUE&nbsp;MUST&nbsp;BE&nbsp;REPLACED&nbsp;BY&nbsp;A&nbsp;VALUE&nbsp;APPROPRIATE&nbsp;TO<BR>
+--&nbsp;&nbsp;&nbsp;&nbsp;THE&nbsp;IMPLEMENTATION.</div>
+<div class="Examples">--&nbsp;DEFINITIONS&nbsp;ARE&nbsp;SEPARATED&nbsp;BY&nbsp;ONE&nbsp;OR&nbsp;MORE&nbsp;EMPTY&nbsp;LINES.<BR>
+--&nbsp;THE&nbsp;LIST&nbsp;OF&nbsp;DEFINITIONS&nbsp;BEGINS&nbsp;AFTER&nbsp;THE&nbsp;FOLLOWING&nbsp;EMPTY&nbsp;LINE.</div>
+<div class="Examples">--&nbsp;$MAX_IN_LEN<BR>
+--&nbsp;AN&nbsp;INTEGER&nbsp;LITERAL&nbsp;GIVING&nbsp;THE&nbsp;MAXIMUM&nbsp;LENGTH&nbsp;PERMITTED&nbsp;BY&nbsp;THE<BR>
+--&nbsp;COMPILER&nbsp;FOR&nbsp;A&nbsp;LINE&nbsp;OF&nbsp;ADA&nbsp;SOURCE&nbsp;CODE&nbsp;(NOT&nbsp;INCLUDING&nbsp;AN&nbsp;END-OF-LINE<BR>
+--&nbsp;CHARACTER).<BR>
+--&nbsp;USED&nbsp;IN:&nbsp;&nbsp;A26007A<BR>
+MAX_IN_LEN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;60</div>
+<div class="Examples"><SPAN Class="roman"><I>...</I></SPAN></div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-B.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-B2.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>

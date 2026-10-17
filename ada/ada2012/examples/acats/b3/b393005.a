@@ -1,0 +1,177 @@
+-- B393005.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making
+--     this public release, the Government intends to confer upon all
+--     recipients unlimited rights  equal to those held by the Government.
+--     These rights include rights to use, duplicate, release or disclose the
+--     released technical data and computer software in whole or in part, in
+--     any manner and for any purpose whatsoever, and to have or permit others
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that an abstract type derived from a tagged parent may override
+--      primitive functions with controlling results as abstract.
+--
+--      Check that an abstract type derived from a tagged parent may not
+--      override primitive functions with controlling results as not abstract.
+--
+--      Check that when a non-abstract or untagged type is derived from a
+--      tagged parent with a primitive function returning a controlling
+--      result, the function with the controlling result must be overridden.
+--
+--      Check that an abstract private type may not have a primitive abstract
+--      subprogram if the full view of the type is not abstract.
+--
+-- TEST DESCRIPTION:
+--      This test declares a non-abstract tagged type with a primitive
+--      operation that is a function with a controlling result (e.g. a
+--      result of the tagged type).  It makes legal and illegal
+--      derivations from that type, where the issues of legality are based
+--      on the presence or absence of an override for that function.
+--
+-- PASS/FAIL CRITERIA:
+--     The test contains several lines marked POSSIBLE ERROR: [Setnn].
+--     For each value of n, the implementation must detect one or more of
+--     these possible errors. For instance, an error must be detected on
+--     at least one of the lines labeled POSSIBLE ERROR: [Set01] for an
+--     implementation to pass.
+--
+--
+-- CHANGE HISTORY:
+--      13 Jun 1995  SAIC   Initial version.
+--      27 Mar 1996  SAIC   Modified error format.
+--      17 Apr 1996  SAIC   Documentation, syntax repaired for 2.1.
+--      21 Mar 2007  RLB    Corrected for Amendment 1 change to 3.9.3(4/2).
+--       6 Mar 2014  RLB    Corrected to reflect AI05-0097-1, and add
+--                          additional coverage to ensure that the original
+--                          intent is also checked. Also improved error
+--                          description for type T_3B, using Possible error
+--                          rather than a comment.
+--      26 Apr 2021  RLB    Added error location indicators.
+--!
+
+------------------------------------------------------------------- B393005
+
+package B393005 is
+
+  type Simple is range 0..100;
+  -- define a non-abstract type, and derive abstract types from it.
+
+  type Concrete_Root is tagged record
+    Some_Inconsequential_Stuff : Simple;
+  end record;
+
+  function Dispatch_W_Controlling_Result return Concrete_Root;
+  function Dispatch_WO_Controlling(CR: Concrete_Root) return Simple;
+
+  type Branch_1 is abstract new Concrete_Root with null record; -- OK. {3;1}
+
+  type Branch_2 is abstract new Concrete_Root with null record;
+
+  function Dispatch_W_Controlling_Result return Branch_2
+                           is abstract;                       -- OK. {1:3;1}
+
+  -- define a abstract type, and derive abstract types from it.
+
+  type Abstract_Root is abstract tagged record
+    Some_Inconsequential_Stuff : Simple;
+  end record;
+
+  function Dispatch_W_Controlling_Result return Abstract_Root is abstract;
+  function Dispatch_WO_Controlling(CR: Abstract_Root) 
+                           return Simple;                     -- OK. {1:3;1}
+
+  type Abstract_Branch_1 is
+       abstract new Abstract_Root with null record;           -- OK. {1:3;1}
+
+  type Abstract_Branch_2 is
+       abstract new Abstract_Root with null record;
+
+  function Dispatch_W_Controlling_Result 
+                                   return Abstract_Branch_2;  -- ERROR: {1:3;1}
+                                                 -- function must be abstract
+
+  type Abstract_Branch_3 is
+       abstract new Abstract_Root with null record;
+
+  function Dispatch_W_Controlling_Result
+       return Abstract_Branch_3 is abstract;                  -- OK. {1:3;1}
+
+  -- NOTE: it is an error to have Dispatch_WO_Controlling become abstract
+  --       for any of the above derivations
+
+
+  type Bract_1 is abstract new Branch_1 with null record;     -- OK. {3;1}
+
+  type Bract_2 is abstract new Abstract_Branch_1 with null record; -- OK. {3;1}
+
+  type Bract_3 is abstract new Branch_1 with null record;     -- OK. {3;1}
+  function Dispatch_W_Controlling_Result return Bract_3 is abstract;
+
+  type Bract_4 is abstract new Abstract_Branch_1 with null record; -- OK. {3;1}
+  function Dispatch_W_Controlling_Result return Bract_4 is abstract;
+
+  type Burl_1 is new Concrete_Root with null record;          -- OK. {3;1}
+                 -- null extension does not require overriding of
+                 -- function Dispatch_W_Controlling_Result.
+
+  type Burl_2 is new Concrete_Root with record
+      C : Character := 'B';
+  end record;                                                 -- ERROR: {2:3;1}
+                 -- overriding function Dispatch_W_Controlling_Result required
+
+  type Leaf_1 is new Branch_1 with null record;               -- ERROR: {3;1}
+                 -- overriding function Dispatch_W_Controlling_Result required
+                 -- as it is abstract and the automatic creation of a function
+                 -- is only allowed for concrete functions. (See AI05-0097-1.)
+
+  type Leaf_2 is new Branch_1 with record
+      C : Character := 'R';
+  end record;                                                 -- ERROR: {2:3;1}
+                 -- overriding function Dispatch_W_Controlling_Result required
+
+  type Leaf_3 is new Branch_2 with null record;               -- ERROR: {3;1}
+                 -- overriding function Dispatch_W_Controlling_Result required
+
+  type Stem_1 is new Abstract_Branch_1 with null record;      -- ERROR: {3;1}
+                 -- overriding function Dispatch_W_Controlling_Result required
+
+  type Stem_3 is new Abstract_Branch_3 with null record;      -- ERROR: {3;1}
+                 -- overriding function Dispatch_W_Controlling_Result required
+
+  -- abstract types should not require overriding the dispatching function
+
+  type Leaf_4 is abstract new Branch_2 with null record;      -- OK. {3;1}
+
+  type Stem_4 is abstract new Abstract_Branch_1
+                              with null record;               -- OK. {1:3;1}
+
+  -- the derivation of the untagged type leaves the functions abstract.
+
+  type Untagged is new Simple;                                -- OK. {3;1}
+
+  type T_3B is abstract tagged private;
+  function Foo(X: T_3B) return Boolean 
+                               is abstract; -- POSSIBLE ERROR: [Set01] {1:3;1}
+                                          -- full view of type is not abstract
+
+private
+  type T_3B is tagged null record;          -- POSSIBLE ERROR: [Set01] {3;1}
+                                        -- function Foo is abstract
+
+end B393005;

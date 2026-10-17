@@ -1,0 +1,69 @@
+; compile and link initdir
+;        needs 
+;               diomod.dcl
+;               plibios.dcl
+;               mcd80d.rel
+; assemble plibios3
+device conout=crt
+vax $$as\sd mason.cpm30.sources\ar
+vax plibios3.asm $$stran
+vax plidio.asm $$stran
+vax initdir.pli $$stran
+device conout=crt,lpt
+rmac plibios3
+xref plibios3
+; assemble plidio
+rmac plidio
+xref plidio
+; compile initdir
+rmac mcd80d
+xref mcd80d
+pli initdir $$dl
+link initdir=mcd80d,initdir,plidio,plibios3[a]
+; finished building initdir
+device conout=crt
+vax $$as\sd mason.cpm30.listing\ar
+vax plibios3.xrf $$stran
+vax plidio.xrf $$stran
+vax initdir.prn $$stran
+vax mcd80d.xrf $$stranf
+device conout=crt,lpt
+era initdir.prn
+era initdir.sym
+era initdir.xrf
+era plibios3.prn
+era plibios3.sym
+era plibios3.xrf
+era plidio.prn
+era plidio.sym
+era plidio.xrf
+;
+; submit to assemble, link and gencom DIRLBL
+device conout=crt
+vax $$as\sd mason.cpm30.sources\ar
+vax dirlbl.asm $$stran
+device conout=crt,lpt
+rmac dirlbl
+xref dirlbl
+link dirlbl[op,a]
+era dirlbl.rsx
+ren dirlbl.rsx=dirlbl.prl
+gencom set.com dirlbl.rsx
+device conout=crt
+vax $$as\sd mason.cpm30.listing\ar
+vax dirlbl.xrf $$stran
+device conout=crt,lpt
+era dirlbl.prn
+era dirlbl.sym
+era dirlbl.xrf
+;
+; Finish DIRLBL.RSX
+;
+gencom put.com put.rsx
+gencom submit.com sub.rsx
+gencom get.com get.rsx
+;
+;
+era *.xrf
+<y
+

@@ -1,0 +1,156 @@
+-- CXE5001.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making
+--     this public release, the Government intends to confer upon all
+--     recipients unlimited rights  equal to those held by the Government.
+--     These rights include rights to use, duplicate, release or disclose the
+--     released technical data and computer software in whole or in part, in
+--     any manner and for any purpose whatsoever, and to have or permit others
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that the specifications of the package System.RPC
+--      are available for use.
+--
+-- TEST DESCRIPTION:
+--      This test verifies that the types and subprograms specified for the
+--      interface to the Partition Communication Subsystem are present.
+--
+-- APPLICABILITY CRITERIA:
+--      This test applies only to implementations:
+--         supporting the Distribution Annex, and
+--         providing an implementation of the language-defined System.RPC
+--            rather than an alternative declaration as allowed by E.5(27.1/2).
+--
+--
+-- CHANGE HISTORY:
+--      06 Dec 94   SAIC    ACVC 2.0
+--      31 Oct 95   SAIC    Fixed problems for ACVC 2.0.1
+--      21 Dec 07   RLB     Added Applicability Criteria
+--
+--!
+
+
+--    -- The handler for incoming RPCs
+--    type RPC_Receiver is access procedure(
+--       Params     : access Params_Stream_Type;
+--       Result     : access Params_Stream_Type);
+with System.RPC;
+procedure CXE5001_1 (Param_In  : access System.RPC.Params_Stream_Type;
+                     Param_Out : access System.RPC.Params_Stream_Type) is
+begin
+   null;
+end CXE5001_1;
+
+
+with Report;
+with System.RPC;
+with Ada.Streams;
+with CXE5001_1;
+procedure CXE5001 is
+   package RPC renames System.RPC;
+
+begin
+
+   Report.Test ("CXE5001", "Check the specification of System.RPC");
+
+
+   declare  -- encapsulate the test
+
+      TC_Int    : integer := 1;
+
+      TC_Stream_Element_Array :
+              Ada.Streams.Stream_Element_Array(1..100);
+      TC_Stream_Element_Offset : Ada.Streams.Stream_Element_Offset;
+
+      --  Note:  In the following, the RPC spec. being tested is shown
+      --         as comment lines
+      --
+      --   type Partition_ID is range 0 .. 100;
+      TST_Partition_ID : RPC.Partition_ID := RPC.Partition_ID'First;
+
+      --
+      --    type Params_Stream_Type(
+      --       Initial_Size : Ada.Streams.Stream_Element_Count) is new
+      --       Ada.Streams.Root_Stream_Type with private;
+      TST_Params_Stream_Type :
+                          RPC.Params_Stream_Type (10);
+
+      type acc_Params_Stream_Type is  access RPC.Params_Stream_Type;
+
+      In_Params  :  acc_Params_Stream_Type := null;
+      Out_Params :  acc_Params_Stream_Type;
+
+      TST_RPC_Receiver_1 : RPC.RPC_Receiver := CXE5001_1'Access;
+
+      Some_Partition : RPC.Partition_ID := RPC.Partition_ID'Last;
+
+
+   begin    -- encapsulation
+
+      -- Arrange that the calls to the subprograms are compiled but
+      -- not executed
+      --
+      if not Report.Equal ( TC_Int, TC_Int ) then
+
+         --    procedure Read(
+         --       Stream : in out Params_Stream_Type;
+         --       Item : out Ada.Streams.Stream_Element_Array;
+         --       Last : out Ada.Streams.Stream_Element_Offset);
+         RPC.Read ( TST_Params_Stream_Type,
+                    TC_Stream_Element_Array,
+                    TC_Stream_Element_Offset );
+
+         --    procedure Write(
+         --       Stream : in out Params_Stream_Type;
+         --       Item : in Ada.Streams.Stream_Element_Array);
+         RPC.Write ( TST_Params_Stream_Type, TC_Stream_Element_Array );
+
+         --    -- Synchronous call
+         --    procedure Do_RPC(
+         --       Partition  : in Partition_ID;
+         --       Params     : access Params_Stream_Type;
+         --       Result     : access Params_Stream_Type);
+         RPC.Do_RPC ( TST_Partition_ID, In_Params, Out_Params );
+
+
+         --    -- Asynchronous call
+         --    procedure Do_APC(
+         --       Partition  : in Partition_ID;
+         --       Params     : access Params_Stream_Type);
+         RPC.Do_APC ( TST_Partition_ID, In_Params );
+
+
+         --    procedure Establish_RPC_Receiver(
+         --       Receiver : in RPC_Receiver);
+         RPC.Establish_RPC_Receiver (  Some_Partition, TST_RPC_Receiver_1 );
+
+
+
+         --    Communication_Error : exception;
+         --    NOTE:  this check is out of LRM order to avoid the
+         --    possibility  of compilers complaining about unreachable code
+         raise RPC.Communication_Error;
+
+      end if;
+
+   end;     -- encapsulation
+
+   Report.Result;
+
+end CXE5001;

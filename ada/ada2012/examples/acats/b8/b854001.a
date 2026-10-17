@@ -1,0 +1,91 @@
+-- B854001.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--    Check that a renaming-as-body is illegal if the declaration occurs before
+--    the subprogram it completes is frozen, and the renaming renames the
+--    subprogram itself.  (Defect Report 8652/0027, as reflected in Technical
+--    Corrigendum 1).
+--
+-- CHANGE HISTORY:
+--    29 JAN 2001   PHL   Initial version.
+--     5 DEC 2001   RLB   Reformatted for ACATS.
+--
+--!
+package B854001_0 is
+
+    package P1 is
+
+        function F return Boolean;
+        function G return Boolean renames F;
+        function H return Boolean renames G;
+
+    private
+        function F return Boolean renames H; -- ERROR:
+    end P1;
+
+
+    package P2 is
+
+        function F return Boolean;
+        function G return Boolean;
+        function H return Boolean;
+
+    private
+        function G return Boolean renames F;
+        function H return Boolean renames G;
+        function F return Boolean renames H; -- ERROR:
+    end P2;
+
+
+    package P3 is
+        function F return Boolean;
+        function G return Boolean renames F;
+        function H return Boolean renames G;
+
+    private
+        B : Boolean := F; -- Freezes F, which takes convention Ada.
+        function F return Boolean renames H; -- OK
+    end P3;
+
+
+    package P4 is
+        function F return Boolean;
+        function G return Boolean renames F;
+        function H return Boolean renames G;
+
+    private
+        B : Boolean := G; -- Freezes F, which takes convention Ada.
+        function F return Boolean renames H; -- OK
+    end P4;
+
+end B854001_0;
+
+with B854001_0; -- OPTIONAL ERROR:
+procedure B854001 is -- Optional main subprogram. This does not need to be
+                     -- processed.
+begin
+    null;
+end B854001;
