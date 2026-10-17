@@ -1,0 +1,17 @@
+digraph ATN {
+rankdir=LR;
+s5[fontsize=11, label="5", shape=doublecircle, fixedsize=true, width=.6];
+s800[fontsize=11,label="800", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s801[fontsize=11,label="&rarr;\n801+", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s802[fontsize=11,label="&larr;\n802", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s803[fontsize=11,label="{803+\nd=1|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s4[fontsize=11,label="4", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s804[fontsize=11,label="804", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s4 -> s801 [fontname="Times-Italic", label="&epsilon;"];
+s801 -> s800 [fontname="Times-Italic", label="&epsilon;"];
+s800 -> s802 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<input_section_part>", arrowhead = normal];
+s802 -> s803 [fontname="Times-Italic", label="&epsilon;"];
+s803:p0 -> s801 [fontname="Times-Italic", label="&epsilon;", style="dashed"];
+s803:p1 -> s804 [fontname="Times-Italic", label="&epsilon;"];
+s804 -> s5 [fontname="Times-Italic", label="&epsilon;"];
+}

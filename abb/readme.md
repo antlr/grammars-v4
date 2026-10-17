@@ -1,4 +1,4 @@
-# ABB RAPID grammar
+# ABB RAPID Grammar
 
 ## Authors
 
@@ -11,9 +11,9 @@ The grammar of the industrial robots of ABB. This grammar has been reverse engin
 based on a set of ABB Rapid sys-files and the existing kuka-krl antlr file
 ['../kuka/krl.g4'](https://github.com/antlr/grammars-v4/blob/5e7540fae7588cf1529fc398cb3d8ee691890ded/kuka/krl.g4).
 
-## Links
+## Reference
 
-https://pldb.io/concepts/rapid.html
+* [pldb](http://pldb.info/concepts/rapid)
 
 ## License
 
@@ -22,3 +22,4 @@ https://pldb.io/concepts/rapid.html
 ## Issues
 
 Known ambiguity in dataList.
+

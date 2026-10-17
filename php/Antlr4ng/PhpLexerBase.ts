@@ -65,11 +65,13 @@ export default abstract class PhpLexerBase extends Lexer {
         else if (this.mode === PhpLexer.HereDoc) {
             // Heredoc and Nowdoc syntax support: http://php.net/manual/en/language.types.string.php#language.types.string.syntax.heredoc
             if (token.type === PhpLexer.StartHereDoc || token.type === PhpLexer.StartNowDoc) {
-                this._heredocIdentifier = token.text.slice(3).trim().replace(/\'/, '').replace(/\'/, '');
+                if (token.text != null) {
+                    this._heredocIdentifier = token.text.slice(3).trim().replace(/\'/, '').replace(/\'/, '');
+                }
             }
 
             else if (token.type === PhpLexer.HereDocText) {
-                if (this.CheckHeredocEnd(token.text)) {
+                if (token.text != null && this.CheckHeredocEnd(token.text)) {
                     this.popMode()
                     const heredocIdentifier = this.GetHeredocIdentifier(token.text)
                     if (token.text.trim().endsWith(';')) {

@@ -3,11 +3,12 @@ import { CommonToken, Lexer, CharStream, Token, CommonTokenStream } from "antlr4
 export abstract class LuaLexerBase extends Lexer {
     self : LuaLexerBase;
 
-    start_line: number;
-    start_col: number;
+    start_line: number = 0;
+    start_col: number = 0;
 
     constructor(input: CharStream) {
         super(input);
+        this.self = this;
     }
 
     HandleComment() {

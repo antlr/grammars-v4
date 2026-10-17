@@ -105,7 +105,7 @@ export abstract class PostgreSQLParserBase extends Parser {
 */
     public OnlyAcceptableOps(): boolean {
         const c = (this.inputStream as CommonTokenStream).LT(1);
-        const text = c.text;
+        const text = c?.text;
         return text === '!' || text === '!!' || text === '!=-'; // Code for specific example
     }
 }

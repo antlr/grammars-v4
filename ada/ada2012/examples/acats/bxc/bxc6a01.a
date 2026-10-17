@@ -1,0 +1,276 @@
+-- BXC6A01.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--     Check that if a volatile object is passed as a parameter, then the
+--     type of the formal parameter must not be a non-volatile by-reference
+--     type.
+--    
+-- TEST DESCRIPTION:
+--     A volatile type is one to which a pragma Volatile or Atomic applies.
+--
+--     A volatile object is any of the following:
+--
+--        (1) An object to which a pragma Volatile applies.
+--        (2) A component of an array to which a pragma Volatile_Components
+--            applies.
+--        (3) An object of a volatile type (i.e., a type to which a pragma
+--            Volatile applies).
+--        (4) An object to which a pragma Atomic applies.
+--        (5) A component of an array to which a pragma Atomic_Components
+--            applies.
+--        (6) An object of a atomic type (i.e., a type to which a pragma
+--            Atomic applies).
+--        (7) A subcomponent of a volatile object.
+--
+--     A by-reference type is a descendant of any of the following:
+--
+--        (1) A tagged type.
+--        (2) A task type.
+--        (3) A protected type.
+--        (4) A non-private type with the word "limited" in its declaration.
+--        (5) A composite type with a subcomponent of a by-reference type.
+--        (6) A private type whose full type is a by-reference type.
+--
+--     This test attempts to pass various volatile objects as actuals to
+--     formal parameters of various types, both volatile and non-volatile,
+--     by-reference and otherwise. If the type of the formal is both
+--     non-volatile and by-reference, the case is illegal.
+--
+-- TEST FILES:
+--      This test consists of the following files:
+--
+--         FXC6A00.A
+--      -> BXC6A01.A
+--
+-- APPLICABILITY CRITERIA:
+--      This test is only applicable for implementations validating the
+--      Systems Programming Annex.
+--
+-- PASS/FAIL CRITERIA:
+--      An implementation may reject one or more of the pragmas Atomic and
+--      Atomic_Components in this test if it cannot support indivisible reads
+--      and updates for the specified object or type. If a pragma is rejected,
+--      certain OK cases (as noted in the body of the test) need not be
+--      reported as legal.
+--
+--
+-- CHANGE HISTORY:
+--      23 Jan 96   SAIC    Initial version for ACVC 2.1.
+--      25 Aug 96   SAIC    Added additional cases. Removed task case.
+--                          Corrected commentary. Added pass/fail criteria.
+--
+--!
+
+with FXC6A00;
+package BXC6A01_0 is
+
+   type Scalar is range 1 .. 10;
+
+   type New_Scalar is new Scalar;
+   pragma Volatile (New_Scalar);
+
+   procedure Private_Formal     (X: in     FXC6A00.Private_Type);
+   procedure Vol_Record_Formal  (X: in out FXC6A00.Volatile_Record);
+   procedure Tagged_Formal      (X:    out FXC6A00.Tagged_Type);
+   procedure Array_Formal       (X: in     FXC6A00.Array_Type);
+   procedure Lim_Private_Formal (X: in out FXC6A00.Lim_Private_Type);
+   procedure Record_Formal      (X: in out FXC6A00.Record_Type);
+   procedure Protected_Formal   (X: in     FXC6A00.Protected_Type);
+   procedure Boolean_Formal     (X: in     Boolean);
+   procedure Roman_Formal       (X:    out FXC6A00.Roman);
+   procedure New_Scalar_Formal  (X: in     New_Scalar);
+
+end BXC6A01_0;
+
+
+     --==================================================================--
+
+
+package body BXC6A01_0 is
+
+   procedure Private_Formal (X: in FXC6A00.Private_Type) is
+   begin
+      null;
+   end Private_Formal;
+
+   procedure Vol_Record_Formal (X: in out FXC6A00.Volatile_Record) is
+   begin
+      null;
+   end Vol_Record_Formal;
+
+   procedure Tagged_Formal (X: out FXC6A00.Tagged_Type) is
+   begin
+      null;
+   end Tagged_Formal;
+
+   procedure Array_Formal (X: in FXC6A00.Array_Type) is
+   begin
+      null;
+   end Array_Formal;
+
+   procedure Lim_Private_Formal (X: in out FXC6A00.Lim_Private_Type) is
+   begin
+      null;
+   end Lim_Private_Formal;
+
+   procedure Record_Formal (X: in out FXC6A00.Record_Type) is
+   begin
+      null;
+   end Record_Formal;
+
+   procedure Protected_Formal (X: in FXC6A00.Protected_Type) is
+   begin
+      null;
+   end Protected_Formal;
+
+   procedure Boolean_Formal (X: in Boolean) is
+   begin
+      null;
+   end Boolean_Formal;
+
+   procedure Roman_Formal (X: out FXC6A00.Roman) is
+   begin
+      null;
+   end Roman_Formal;
+
+   procedure New_Scalar_Formal (X: in New_Scalar) is
+   begin
+      null;
+   end New_Scalar_Formal;
+
+end BXC6A01_0;
+
+
+     --==================================================================--
+
+
+with FXC6A00;
+with BXC6A01_0;
+
+procedure BXC6A01 is
+
+   type Byzantine is new FXC6A00.Roman;
+   pragma Atomic (Byzantine);                                  -- N/A => ERROR.
+          -- Implementation must reject this pragma if it does not support
+          -- indivisible read/write for Byzantine objects.  
+
+   procedure Byzantine_Formal (X: Byzantine) is
+   begin
+      null;
+   end Byzantine_Formal;
+
+
+   A01 : FXC6A00.Private_Type;
+   pragma Volatile (A01);
+
+   A02 : FXC6A00.Volatile_Record;
+   pragma Volatile (A02);
+
+   A03 : FXC6A00.Array_Type;
+
+   A04 : FXC6A00.Array_Type;
+   pragma Volatile (A04);
+
+   A05 : array (1 .. 5) of FXC6A00.Lim_Private_Type;
+   pragma Volatile_Components (A05);
+
+   A06 : FXC6A00.Composite_Type;
+   pragma Volatile (A06);
+
+   A07 : Byzantine;
+   pragma Volatile (A07);
+
+   A08 : FXC6A00.Record_Type;
+   pragma Volatile (A08);
+
+   A09 : FXC6A00.Protected_Type;
+   pragma Volatile (A09);
+
+   A10 : Boolean;
+   pragma Atomic (A10);                                        -- N/A => ERROR.
+          -- Implementation must reject this pragma if it does not support
+          -- indivisible read/write for Boolean objects.  
+
+   A11 : FXC6A00.Roman;
+   pragma Atomic (A11);                                        -- N/A => ERROR.
+          -- Implementation must reject this pragma if it does not support
+          -- indivisible read/write for Roman objects.  
+
+   A12 : array (1 .. 7) of FXC6A00.Roman;
+   pragma Atomic_Components (A12);                             -- N/A => ERROR.
+          -- Implementation must reject this pragma if it does not support
+          -- indivisible read/write for Roman objects.  
+
+   A13 : BXC6A01_0.Scalar;
+begin
+
+   BXC6A01_0.Private_Formal (A01);                                    -- ERROR:
+                    -- Formal parameter is of a non-volatile by-reference type.
+   
+   BXC6A01_0.Vol_Record_Formal (A02);                                 -- OK.
+                     -- Formal parameter is of a volatile by-reference type.
+
+   BXC6A01_0.Tagged_Formal (A03(1));                                  -- ERROR:
+                    -- Formal parameter is of a non-volatile by-reference type.
+
+   BXC6A01_0.Array_Formal (A04);                                      -- ERROR:
+                    -- Formal parameter is of a non-volatile by-reference type.
+
+   BXC6A01_0.Lim_Private_Formal (A05(4));                             -- OK.
+                      -- Formal parameter is of a non-volatile by-copy type.
+
+   BXC6A01_0.Tagged_Formal (A06.C);                                   -- ERROR:
+                    -- Formal parameter is of a non-volatile by-reference type.
+
+   Byzantine_Formal (A07);                                            -- OK.
+                      -- Formal parameter is of a non-volatile by-copy type.
+             -- NOTE: if pragma Atomic is rejected for Byzantine, this case
+             --       need NOT be flagged as legal.
+
+   BXC6A01_0.Record_Formal (A08);                                     -- OK.
+     -- Formal parameter is of a non-volatile type that allows pass-by-copy.
+
+   BXC6A01_0.Protected_Formal (A09);                                  -- ERROR:
+                    -- Formal parameter is of a non-volatile by-reference type.
+
+   BXC6A01_0.Boolean_Formal (A10);                                    -- OK.
+                      -- Formal parameter is of a non-volatile by-copy type.
+                   -- NOTE: if pragma Atomic is rejected for A10, this case
+                   --       need NOT be flagged as legal.
+
+   BXC6A01_0.Roman_Formal (A11);                                      -- OK.
+                      -- Formal parameter is of a non-volatile by-copy type.
+                   -- NOTE: if pragma Atomic is rejected for A11, this case
+                   --       need NOT be flagged as legal.
+
+   BXC6A01_0.Roman_Formal (A12(6));                                   -- OK.
+                      -- Formal parameter is of a non-volatile by-copy type.
+        -- NOTE: if pragma Atomic_Components is rejected for A12, this case
+        --       need NOT be flagged as legal.
+
+   BXC6A01_0.New_Scalar_Formal (BXC6A01_0.New_Scalar(A13));           -- OK.
+
+end BXC6A01;
