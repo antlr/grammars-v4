@@ -1,0 +1,81 @@
+;
+;
+;
+;
+;		Title		Binary to BCD conversion
+;		Name:		BN2BCD
+;
+;
+;		Purpose:	Convert one byte of binary data to two
+;				bytes of BCD data
+;
+;		Entry:		Register A = binary data
+;
+;		Exit:		Register H = High byte of BCD data
+;				Register L = Low byte of BCD data
+;
+;		Registers used:	AF,C,HL
+;
+;		Time:		497 cycles maximum
+;
+;		Size:		Program 27 bytes
+;
+;
+
+BN2BCD:
+	;CALCULATE 100'S DIGIT - DIVIDE BY 100
+	; H = QUOTIENT
+	; A = REMAINDER
+	LD	H,0FFH		;START QUOTIENT AT -1
+D100LP:
+	INC	H		;ADD 1 TO QUOTIENT
+	SUB	100		;SUBTRACT 100
+	JR	NC,D100LP	;JUMP IF DIFFERENCE STILL POSITIVE
+	ADD	A,100		;ADD THE LAST 100 BACK
+	
+	;CALCULATE 10'S AND 1'S DIGITS
+	;  DIVIDE REMAINDER OF THE 100'S DIGIT BY 10
+	; L = 10'S DIGIT
+	; A = 1'S DIGIT
+	LD	L,0FFH		;START QUOTIENT AT -1
+D10LP:
+	INC	L		;ADD 1 TO QUOTIENT
+	SUB	10		;SUBTRACT 10
+	JR	NC,D10LP	;JUMP IF DIFFERENCE STILL POSITIVE
+	ADD	A,10		;ADD THE LAST 10 BACK
+	
+	; COMBINE 1'S AND 10'S DIGITS
+	LD	C,A		;SAVE 1'S DIGIT IN C
+	LD	A,L
+	RLCA			;MOVE 10'S TO HIGH NIBBLE OF A
+	RLCA
+	RLCA
+	RLCA
+	OR	C		;OR IN THE 1'S DIGIT
+	
+	; RETURN WITH L = LOW BYTE, H = HIGH BYTE
+	LD	L,A
+	RET
+	
+;
+;
+;	SAMPLE EXECUTION:
+;
+;
+
+SC4A:
+	;CONVERT OA HEXADECIMAL TO 10 BCD
+	LD	A,0AH
+	CALL	BN2BCD		;H = 0, L = 10H
+	
+	;CONVERT FF HEXADECIMAL TO 255 BCD
+	LD	A,0FFH
+	CALL	BN2BCD		;H = 02H, L = 55H
+	
+	;CONVERT 0 HEXADECIMAL TO 0 BCD
+	LD	A,0
+	CALL 	BN2BCD		;H = 0, L = 0
+	
+	JR	SC4A
+	
+	END

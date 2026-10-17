@@ -1,0 +1,23 @@
+digraph ATN {
+rankdir=LR;
+s3[fontsize=11, label="3", shape=doublecircle, fixedsize=true, width=.6];
+s288[fontsize=11,label="288", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2[fontsize=11,label="2", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s281[fontsize=11,label="281", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s282[fontsize=11,label="&rarr;\n282*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s283[fontsize=11,label="&larr;\n283", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s284[fontsize=11,label="{284*\nd=6|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s285[fontsize=11,label="285", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s286[fontsize=11,label="286*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s287[fontsize=11,label="287", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2 -> s284 [fontname="Times-Italic", label="&epsilon;"];
+s284:p0 -> s282 [fontname="Times-Italic", label="&epsilon;"];
+s284:p1 -> s285 [fontname="Times-Italic", label="&epsilon;"];
+s282 -> s281 [fontname="Times-Italic", label="&epsilon;"];
+s285 -> s287 [fontname="Times-Italic", label="&epsilon;"];
+s281 -> s283 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<importDeclaration>", arrowhead = normal];
+s287 -> s288 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<moduleDeclaration>", arrowhead = normal];
+s283 -> s286 [fontname="Times-Italic", label="&epsilon;"];
+s288 -> s3 [fontname="Times-Italic", label="&epsilon;"];
+s286 -> s284 [fontname="Times-Italic", label="&epsilon;", style="dashed"];
+}

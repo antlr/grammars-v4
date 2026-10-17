@@ -1,0 +1,1 @@
+HSCAN test 0 MATCH * COUNT 1

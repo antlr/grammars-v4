@@ -1,0 +1,28 @@
+MODULE $vcgstbdef;
+/*
+/*  Copyright © 1996, Digital Equipment Corporation.
+/*
+/* Modifications:
+/*
+/*	001	Tom Benson	13-Feb-1984	(003 VCG)
+/*
+/*		Added modification history.
+/*
+/*
+
+/* define symbol table node header and types of nodes
+
+AGGREGATE stb STRUCTURE PREFIX "stb_";
+	node_type 	BYTE;	{ Node type code
+	size_field	UNION;
+		node_size 	BYTE;	{ Size of node in long words
+		node_size	WORD;	{ Side of node in long words
+		END;
+	END;
+
+CONSTANT (undefined_node, block_node, symbol_node, label_node) EQUALS 0 INCREMENT 1 PREFIX "stb_";
+/*
+/* Define base for language specific nodes
+CONSTANT language_specific_nodes EQUALS 32 PREFIX "stb_";
+
+END_MODULE;

@@ -23,7 +23,6 @@ alter security integration si set enabled = true;
 -- alter security integration scim ;
 alter sequence seq rename to seq2;
 alter session set autocommit = true;
-alter session policy sp rename to sp2;
 alter share sh unset comment;
 alter stage stg rename to stg2;
 alter storage integration si set enabled = true;
@@ -43,3 +42,9 @@ ALTER TABLE t ADD COLUMN c2 INTEGER NULL DEFAULT NULL COMMENT 'text';
 ALTER TABLE t ADD COLUMN c2 INTEGER NULL NULL COMMENT 'text';
 ALTER TABLE t ADD COLUMN c2 INTEGER NULL NOT NULL COMMENT 'text'; --Seems to not make sense but Snowflake accept it but do nothing
 --ALTER TABLE t ADD COLUMN c2 INTEGER NULL 1 COMMENT 'text'; This fail in Snowflake
+ALTER IMAGE REPOSITORY tutorial_repository SET TAG  T1 = 'v2';
+ALTER IMAGE REPOSITORY if exists tutorial_repository RENAME TO tutorial_repository2;
+ALTER SERVICE echo_service SUSPEND;
+ALTER SERVICE echo_service SET MIN_INSTANCES=3 MAX_INSTANCES=5;
+ALTER SERVICE echo_service FROM SPECIFICATION $$a yaml string$$;
+ALTER SERVICE example_service RESTORE VOLUME "myvolume" INSTANCES 0,2 FROM SNAPSHOT my_snapshot;

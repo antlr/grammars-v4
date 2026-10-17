@@ -8,7 +8,7 @@ options {
     superClass = LuaLexerBase;
 }
 
-// Insert here @header for C++ lexer.
+// Insert here @header for lexer.
 
 SEMI : ';';
 EQ   : '=';
@@ -32,7 +32,6 @@ LOCAL    : 'local';
 LT       : '<';
 GT       : '>';
 RETURN   : 'return';
-CONTINUE : 'continue';
 CC       : '::';
 NIL      : 'nil';
 FALSE    : 'false';

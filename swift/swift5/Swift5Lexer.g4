@@ -151,6 +151,8 @@ HASH_IMAGE_LITERAL : '#imageLiteral';
 GETTER             : 'getter';
 SETTER             : 'setter';
 
+UNDERSCORE : '_';
+
 Identifier:
     Identifier_head Identifier_characters?
     | Implicit_parameter_name
@@ -249,7 +251,6 @@ COLON      : ':';
 SEMI       : ';';
 LT         : '<';
 GT         : '>';
-UNDERSCORE : '_';
 BANG       : '!';
 QUESTION   : '?';
 AT         : '@';
@@ -346,7 +347,7 @@ Single_line_string_open: '"' -> pushMode(SingleLine);
 
 mode SingleLine;
 
-Interpolataion_single_line: '\\(' { parenthesis.push(1);} -> pushMode(DEFAULT_MODE);
+Interpolation_single_line: '\\(' { parenthesis.push(1);} -> pushMode(DEFAULT_MODE);
 
 Single_line_string_close: '"' -> popMode;
 
@@ -354,7 +355,7 @@ Quoted_single_line_text: Quoted_text;
 
 mode MultiLine;
 
-Interpolataion_multi_line: '\\(' {parenthesis.push(1); } -> pushMode(DEFAULT_MODE);
+Interpolation_multi_line: '\\(' {parenthesis.push(1); } -> pushMode(DEFAULT_MODE);
 
 Multi_line_string_close: '"""' -> popMode;
 

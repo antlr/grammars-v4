@@ -1,0 +1,14 @@
+;
+; hostname: Taken from the SIP message standard RFC 3261.
+;           SABNF Modifications:
+;           1) prioritized-choice disambiguation
+;           2) syntactic predicate to differentiate between domainlabel and toplabel
+;           3) the interior hyphen requirement corrected for "greedy" repetitions
+;
+context     = SP hostname SP
+hostname    = *(domainlabel "." &alphanum) toplabel [ "." ]
+domainlabel = 1*alphanum *(1*"-" 1*alphanum)
+toplabel    = ALPHA *alphanum *(1*"-" 1*alphanum)
+ALPHA       = %d65-90 / %d97-122
+alphanum    = %d65-90 / %d97-122 / %d48-57
+SP          = " "

@@ -2,13 +2,13 @@
 <desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../_scripts/desc.xsd">
    <targets>Antlr4ng;Cpp;CSharp;Dart;Go;Java;JavaScript;Python3</targets>
    <test>
-      <name>small</name>
-      <targets>JavaScript;Python3</targets>
-      <inputs>small</inputs>
-   </test>
-   <test>
       <name>large</name>
       <targets>Antlr4ng;Cpp;CSharp;Dart;Go;Java</targets>
       <inputs>examples</inputs>
+   </test>
+   <test>
+      <name>small</name>
+      <targets>JavaScript;Python3</targets>
+      <inputs>small</inputs>
    </test>
 </desc>

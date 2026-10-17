@@ -21,7 +21,7 @@ def transform_grammar(file_path):
     with open(file_path + ".bak",'r', encoding="utf-8") as input_file:
         with open(file_path, 'w', encoding="utf-8") as output_file:
             for line in input_file:
-                line = re.sub(r"(\/\/ Insert here @header for C\+\+ parser\.)",\
+                line = re.sub(r"(\/\/ Insert here @header\.)",\
                     '@header {#include "GoParserBase.h"}', line)
                 line = re.sub(r"(this\.)", 'this->', line)
                 line = re.sub(r"(_input\.)", '_input->', line)

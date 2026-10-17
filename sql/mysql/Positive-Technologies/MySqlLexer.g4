@@ -288,6 +288,7 @@ LONGTEXT   : 'LONGTEXT';
 ENUM       : 'ENUM';
 VARYING    : 'VARYING';
 SERIAL     : 'SERIAL';
+VECTOR     : 'VECTOR';
 
 // Interval type Keywords
 
@@ -436,7 +437,7 @@ COMMIT                      : 'COMMIT';
 COMPACT                     : 'COMPACT';
 COMPLETION                  : 'COMPLETION';
 COMPRESSED                  : 'COMPRESSED';
-COMPRESSION                 : 'COMPRESSION';
+COMPRESSION                 : 'COMPRESSION' | QUOTE_SYMB? 'COMPRESSION' QUOTE_SYMB?;
 CONCURRENT                  : 'CONCURRENT';
 CONNECT                     : 'CONNECT';
 CONNECTION                  : 'CONNECTION';
@@ -767,6 +768,9 @@ WEEK        : 'WEEK';
 SECOND      : 'SECOND';
 MICROSECOND : 'MICROSECOND';
 
+// Azure Database for MySQL Single Server instance:
+FIREWALL_RULES: 'FIREWALL_RULES';
+
 // PRIVILEGES
 
 ADMIN                       : 'ADMIN';
@@ -807,6 +811,7 @@ RESOURCE_GROUP_USER         : 'RESOURCE_GROUP_USER';
 ROLE_ADMIN                  : 'ROLE_ADMIN';
 ROUTINE                     : 'ROUTINE';
 S3                          : 'S3';
+SENSITIVE_VARIABLES_OBSERVER: 'SENSITIVE_VARIABLES_OBSERVER';
 SERVICE_CONNECTION_ADMIN    : 'SERVICE_CONNECTION_ADMIN';
 SESSION_VARIABLES_ADMIN     : QUOTE_SYMB? 'SESSION_VARIABLES_ADMIN' QUOTE_SYMB?;
 SET_USER_ID                 : 'SET_USER_ID';
@@ -958,6 +963,7 @@ DES_DECRYPT                       : 'DES_DECRYPT';
 DES_ENCRYPT                       : 'DES_ENCRYPT';
 DIMENSION                         : 'DIMENSION';
 DISJOINT                          : 'DISJOINT';
+DISTANCE                          : 'DISTANCE';
 ELT                               : 'ELT';
 ENCODE                            : 'ENCODE';
 ENCRYPT                           : 'ENCRYPT';
@@ -1063,6 +1069,7 @@ OCT                               : 'OCT';
 OCTET_LENGTH                      : 'OCTET_LENGTH';
 ORD                               : 'ORD';
 OVERLAPS                          : 'OVERLAPS';
+PERCONA_SEQUENCE_TABLE            : 'PERCONA_SEQUENCE_TABLE';
 PERIOD_ADD                        : 'PERIOD_ADD';
 PERIOD_DIFF                       : 'PERIOD_DIFF';
 PI                                : 'PI';
@@ -1087,7 +1094,9 @@ ROW_COUNT                         : 'ROW_COUNT';
 RPAD                              : 'RPAD';
 RTRIM                             : 'RTRIM';
 SEC_TO_TIME                       : 'SEC_TO_TIME';
+SECONDARY_ENGINE                  : 'SECONDARY_ENGINE';
 SECONDARY_ENGINE_ATTRIBUTE        : 'SECONDARY_ENGINE_ATTRIBUTE';
+SEQUENCE_TABLE                    : 'SEQUENCE_TABLE';
 SESSION_USER                      : 'SESSION_USER';
 SHA                               : 'SHA';
 SHA1                              : 'SHA1';
@@ -1161,11 +1170,13 @@ ST_UNION                          : 'ST_UNION';
 ST_WITHIN                         : 'ST_WITHIN';
 ST_X                              : 'ST_X';
 ST_Y                              : 'ST_Y';
+STRING_TO_VECTOR                  : 'STRING_TO_VECTOR';
 SUBDATE                           : 'SUBDATE';
 SUBSTRING_INDEX                   : 'SUBSTRING_INDEX';
 SUBTIME                           : 'SUBTIME';
 SYSTEM_USER                       : 'SYSTEM_USER';
 TAN                               : 'TAN';
+TELEMETRY_LOG_ADMIN               : 'TELEMETRY_LOG_ADMIN';
 TIMEDIFF                          : 'TIMEDIFF';
 TIMESTAMPADD                      : 'TIMESTAMPADD';
 TIMESTAMPDIFF                     : 'TIMESTAMPDIFF';
@@ -1186,6 +1197,8 @@ UPPER                             : 'UPPER';
 UUID                              : 'UUID';
 UUID_SHORT                        : 'UUID_SHORT';
 VALIDATE_PASSWORD_STRENGTH        : 'VALIDATE_PASSWORD_STRENGTH';
+VECTOR_DIM                        : 'VECTOR_DIM';
+VECTOR_TO_STRING                  : 'VECTOR_TO_STRING';
 VERSION                           : 'VERSION';
 WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS : 'WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS';
 WEEKDAY                           : 'WEEKDAY';
@@ -1267,9 +1280,9 @@ DECIMAL_LITERAL               : DEC_DIGIT+;
 HEXADECIMAL_LITERAL           : 'X' '\'' (HEX_DIGIT HEX_DIGIT)+ '\'' | '0X' HEX_DIGIT+;
 
 REAL_LITERAL:
-    DEC_DIGIT* '.' DEC_DIGIT+
+    (DEC_DIGIT+)? '.' DEC_DIGIT*
     | DEC_DIGIT+ '.' EXPONENT_NUM_PART
-    | DEC_DIGIT* '.' (DEC_DIGIT+ EXPONENT_NUM_PART)
+    | (DEC_DIGIT+)? '.' (DEC_DIGIT+ EXPONENT_NUM_PART)
     | DEC_DIGIT+ EXPONENT_NUM_PART
 ;
 NULL_SPEC_LITERAL   : '\\' 'N';
