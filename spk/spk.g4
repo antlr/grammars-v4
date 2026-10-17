@@ -30,72 +30,190 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// https://en.wikipedia.org/wiki/SP/k
+
+
+// https://dl.acm.org/doi/10.1145/953057.810456
+
+
+//
+
+
+// SP/k is a sequence of structured subsets of PL/I, designed for teaching.
+
+
+// Since it is syntactically just a (small) subset of PL/I, the lexical and
+
+
+// expression layers missing from the original sketch of this grammar are
+
+
+// completed here following standard PL/I conventions.
+
 grammar spk;
 
-prog : identifier ':' 'PROCEDURE' 'OPTIONS(MAIN)'
-declaration*
-definition*
-statement*
-'END'';';
+prog
+   : identifier ':' 'PROCEDURE' 'OPTIONS' '(' identifier ')' ';' declaration* definition* statement* 'END' ';'
+   ;
 
-declaration: 'DECLARE' (variable (',' variable)*) attribute
-(','(variable (',' variable)*) attribute)*;
+declaration
+   : 'DECLARE' variable (',' variable)* attribute (',' variable (',' variable)* attribute)* ';'
+   ;
 
-attribute:
-'FIXED'|
-'FLOAT'|
-'CHARACTER' (maximum length) 'VARYING'|
-'BIT';
+attribute
+   : 'FIXED'
+   | 'FLOAT'
+   | 'CHARACTER' '(' INTEGER ')' 'VARYING'?
+   | 'BIT'
+   ;
 
-definition: identifier ':' 'PROCEDURE'
-((identifier (',' identifier)*))?
-('RETURNS' '('attribute')')?';'
-declaration*
-definition*
-statement*
-'END'';';
+definition
+   : identifier ':' 'PROCEDURE' ('(' identifier (',' identifier)* ')')? ('RETURNS' '(' attribute ')')? ';' declaration* definition* statement* 'END' ';'
+   ;
 
+statement
+   : putstatement
+   | putpagestatement
+   | getstatement
+   | assignstatement
+   | ifstatement
+   | dowhilestatement
+   | do2statement
+   | dostatement
+   | callstatement
+   | returnstatement
+   ;
 
-statement:
-putstatement|
-putpagestatement|
-getstatement|
-assignstatement|
-ifstatement|
-dowhilestatement|
-do2statement|
-dostatement|
-callstatement;
+putstatement
+   : 'PUT' 'SKIP'? 'LIST' '(' expression (',' expression)* ')' ';'
+   ;
 
-putstatement:'PUT' 'SKIP'? 'LIST' '('expression (',' expression)*')'';';
+putpagestatement
+   : 'PUT' 'PAGE' 'LIST' '(' expression (',' expression)* ')' ';'
+   ;
 
+getstatement
+   : 'GET' 'SKIP'? 'LIST' '(' variable (',' variable)* ')' ';'
+   ;
 
-putpagestatement: 'PUT' 'PAGE' 'LIST' '(' expression (',' expression)*')'';' ;
-getstatement: 'GET' 'SKIP'? 'LIST' '(' variable (',' variable)*')'';' ;
-assignstatement: variable '=' expression';' ;
-ifstatement: 'IF' condition 'THEN'
-             statement
-             ('ELSE'
-             statement)* ;
-dowhilestatement:     'DO' 'WHILE' '('condition')'';'
-                      statement*
-                      'END'';' ;
+assignstatement
+   : variable '=' expression ';'
+   ;
 
-do2statement: 'DO' identifier '=' expression 'TO' expression
-              ('BY' expression)?';'
-              statement*
-              'END'';';
-dostatement: 'DO'';'
-             statement*
-             'END' ';';
+ifstatement
+   : 'IF' condition 'THEN' statement ('ELSE' statement)?
+   ;
 
-callstatement: 'CALL' procedure name
-               ('('expression (',' expression)*')')?';'
-               'RETURN' ('('expression')')?';' ;
+dowhilestatement
+   : 'DO' 'WHILE' '(' condition ')' ';' statement* 'END' ';'
+   ;
 
+do2statement
+   : 'DO' identifier '=' expression 'TO' expression ('BY' expression)? ';' statement* 'END' ';'
+   ;
 
+dostatement
+   : 'DO' ';' statement* 'END' ';'
+   ;
 
+callstatement
+   : 'CALL' identifier ('(' (expression (',' expression)*)? ')')? ';'
+   ;
+
+returnstatement
+   : 'RETURN' ('(' expression ')')? ';'
+   ;
+
+condition
+   : orcondition
+   ;
+
+orcondition
+   : andcondition ('|' andcondition)*
+   ;
+
+andcondition
+   : notcondition ('&' notcondition)*
+   ;
+
+notcondition
+   : NOT? relation
+   ;
+
+relation
+   : expression relationaloperator expression
+   | '(' condition ')'
+   ;
+
+relationaloperator
+   : '='
+   | NE
+   | '<'
+   | '<='
+   | '>'
+   | '>='
+   ;
+
+expression
+   : term (('+' | '-' | '||') term)*
+   ;
+
+term
+   : factor (('*' | '/') factor)*
+   ;
+
+factor
+   : ('+' | '-')? primary
+   ;
+
+primary
+   : INTEGER
+   | FLOATLITERAL
+   | STRING
+   | identifier ('(' (expression (',' expression)*)? ')')?
+   | '(' expression ')'
+   ;
+
+variable
+   : identifier
+   ;
+
+identifier
+   : ID
+   ;
+
+NOT
+   : '¬'
+   | '^'
+   ;
+
+NE
+   : '¬='
+   | '^='
+   | '<>'
+   ;
+
+ID
+   : [a-zA-Z] [a-zA-Z0-9_]*
+   ;
+
+INTEGER
+   : [0-9]+
+   ;
+
+FLOATLITERAL
+   : [0-9]+ '.' [0-9]+
+   ;
+
+STRING
+   : '\'' ('\'\'' | ~ ['\r\n])* '\''
+   ;
+
+COMMENT
+   : '/*' .*? '*/' -> skip
+   ;
 
 WS
-   : [ \r\n\t] + -> skip
+   : [ \r\n\t]+ -> skip
    ;
+
