@@ -166,6 +166,8 @@
 				<module>capnproto</module>
 				<module>caql</module>
 				<module>cayenne</module>
+                <module>chip8</module>
+                <module>chip8octo</module>
 				<module>clf</module>
 				<module>clojure</module>
 				<module>clu</module>

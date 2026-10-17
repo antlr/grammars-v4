@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2023, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -48,7 +48,6 @@ instruction_
    | end_
    | load_
    | save_
-   | labelnane_
    | oreq_
    | xoreq_
    | andeq_
@@ -56,6 +55,11 @@ instruction_
    | shreq_
    | while_
    | bcd_
+   | call_
+   ;
+
+call_
+   : IDENTIFIER (atom | STRING)? (atom | STRING)?
    ;
 
 preproc_
@@ -67,14 +71,30 @@ preproc_
    | macro_
    | org_
    | byte_
+   | stringmode_
+   ;
+   // :stringmode name "characters" { ... } binds VALUE to each matched
+   
+   // character's index within the string when the mode is later invoked.
+   
+stringmode_
+   : STRINGMODE IDENTIFIER STRING '{' instruction_* '}'
+   ;
+
+STRINGMODE
+   : ':stringmode'
+   ;
+
+STRING
+   : '"' ~ ["\r\n]* '"'
    ;
 
 org_
-   : ORG '{' IDENTIFIER '}'
+   : ORG atom
    ;
 
 macro_
-   : MACRO macroname_ IDENTIFIER* '{' preproc_ '}'
+   : MACRO macroname_ IDENTIFIER* '{' instruction_* '}'
    ;
 
 macroname_
@@ -82,11 +102,21 @@ macroname_
    ;
 
 expression_
-   : expression_ BINOP expression_
+   : unaryexpression_ (BINOP unaryexpression_)*
+   ;
+   // '-' always lexes as BINOP (it is listed first), never as UNOP, even
+   
+   // though it is also a valid UNOP alternative (unary minus); accept both
+   
+   // token types here so unary minus (and the other UNOP operators) parse.
+   
+unaryexpression_
+   : (UNOP | BINOP)? primaryexpression_
+   ;
+
+primaryexpression_
+   : atom
    | '(' expression_ ')'
-   | atom
-   | UNOP expression_
-   | preproc_
    ;
 
 calc_
@@ -98,7 +128,7 @@ calcname_
    ;
 
 byte_
-   : BYTE '{' expression_ '}'
+   : BYTE ('{' expression_ '}' | atom+)
    ;
 
 const_
@@ -127,6 +157,7 @@ label_
 
 labelnane_
    : IDENTIFIER
+   | UNOP
    ;
 
 unpack_
@@ -134,7 +165,7 @@ unpack_
    ;
 
 save_
-   : 'save' atom
+   : 'save' atom (BINOP atom)?
    ;
 
 clear_
@@ -146,7 +177,7 @@ end_
    ;
 
 assign_
-   : (register_ | IDENTIFIER) ASSIGN 'hex'? atom
+   : (register_ | IDENTIFIER) ASSIGN ('hex' | 'bighex' | 'long')? atom
    ;
 
 loop_
@@ -163,6 +194,7 @@ addeq_
 
 subeq_
    : atom '-=' atom
+   | atom '=-' atom
    ;
 
 oreq_
@@ -206,23 +238,21 @@ condition_
    ;
 
 keycondition_
-   : register_ '-'? KEY
+   : register_ BINOP? KEY
    ;
 
 load_
-   : 'load' register_
+   : 'load' atom (BINOP atom)?
    ;
 
 random_
-   : 'random' num_
+   : 'random' atom
    ;
 
 atom
    : num_
    | register_
-   | aliasname_
-   | labelnane_
-   | constname_
+   | IDENTIFIER
    | random_
    ;
 
@@ -358,7 +388,8 @@ BINARY
    ;
 
 IDENTIFIER
-   : [a-zA-Z] [a-zA-Z0-9-_?]*
+   : [a-zA-Z] [a-zA-Z0-9-_?$\\/]*
+   | '---'
    ;
 
 COMMENT
