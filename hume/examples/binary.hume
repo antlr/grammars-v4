@@ -1,7 +1,5 @@
 -- binary negation, counting executions
 
-program
-
 stream output to "std_out";
 
 type integer = int 64;

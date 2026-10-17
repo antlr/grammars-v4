@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2020, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -87,7 +87,7 @@ vardecl
    ;
 
 vardecls
-   : vardecl+ ';'
+   : vardecl (';' vardecl)*
    ;
 
 foreigndecl
@@ -113,7 +113,7 @@ type
    | '()'
    | ('(' type (',' type)+ ')')
    | ('[' types ']')
-   | (typeid type+)
+   | (typeid type*)
    | type '->' type
    | '(' type ')'
    ;
@@ -141,7 +141,7 @@ expr
    | varid
    | expr op expr
    | (varid expr+)
-   | (conid expr+)
+   | (conid expr*)
    | ('[' exprs ']')
    | '()'
    | ('(' expr (',' expr)+ ')')
@@ -182,7 +182,7 @@ match
    ;
 
 constant
-   : INTCONST
+   : intconst
    | FLOATCONST
    | BOOLCONST
    | CHARCONST
@@ -297,11 +297,11 @@ linkspec
    ;
 
 connection
-   : boxid '.' varid
+   : LOCALID '.' varid
    ;
 
 linkprops
-   : linkprop+
+   : linkprop*
    ;
 
 linkprop
@@ -320,7 +320,7 @@ idlist
    ;
 
 varids
-   : varid+
+   : varid*
    ;
 
 exnidlist
@@ -393,12 +393,14 @@ op
    : OP
    ;
 
-LOCALID
-   : ('_' | LETTER) (LETTER | DIGIT)*
+OP
+   : ('+' | '-' | '*' | '/' | '=' | '!' | '<' | '>' | '^' | '~')+
+   | 'div'
+   | 'mod'
    ;
 
-OP
-   : ('+' | '-' | '*' | '/')+
+LOCALID
+   : ('_' | LETTER) (LETTER | DIGIT)*
    ;
 
 NATCONST
@@ -409,7 +411,7 @@ HEXDIGIT
    : [0-9A-F]
    ;
 
-INTCONST
+intconst
    : NATCONST
    | '(-' NATCONST ')'
    ;
