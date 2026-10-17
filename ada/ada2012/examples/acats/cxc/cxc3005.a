@@ -1,0 +1,297 @@
+-- CXC3005.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--     Check that Program_Error is raised if an actual parameter of type
+--     Ada.Interrupts.Interrupt_ID is passed in a call to any of the
+--     following operations in package Ada.Interrupts, and the specified
+--     interrupt is reserved: Is_Attached, Current_Handler, Attach_Handler,
+--     Exchange_Handler, Detach_Handler.
+--    
+-- TEST DESCRIPTION:
+--     A procedure scans the values of type Ada.Interrupts.Interrupt_ID for
+--     a reserved interrupt (as indicated by the function
+--     Ada.Interrupts.Is_Reserved). If no such interrupt is found, the test
+--     is inapplicable.
+--
+--     If a reserved interrupt is found, the corresponding value of type
+--     Ada.Interrupts.Interrupt_ID is passed as an actual parameter to
+--     each of the following operations in package Ada.Interrupts:
+--     Is_Attached, Current_Handler, Attach_Handler, Exchange_Handler,
+--     Detach_Handler. The test verifies that Program_Error is raised
+--     in each case.
+--
+--     To avoid potential optimizations which would eliminate the raising
+--     of Program_Error, two versions of a procedure Avoid_Optimization
+--     are declared: one for parameters of type Ada.Interrupts.Interrupt_ID
+--     and one for those of type Ada.Interrupts.Parameterless_Handler.
+--     The appropriate procedure is called after the points where the
+--     exception should be raised.
+--
+-- APPLICABILITY CRITERIA:
+--      This test is only applicable for implementations validating the
+--      Systems Programming Annex.
+--
+--      This test must be executed. It will report "not applicable" on
+--      implementations for which no value of the type
+--      Ada.Interrupts.Interrupt_ID designates a reserved interrupt.
+--
+--
+-- CHANGE HISTORY:
+--      18 Jan 96   SAIC    Initial prerelease version.
+--      12 Apr 96   SAIC    Added pragma Elaborate to context clause preceding
+--                          CXC3005_1. Added initialization of ID in body of
+--                          CXC3005_1.Find_Reserved_Interrupt.
+--
+--!
+
+package CXC3005_0 is
+
+   protected Dynamic_Handler is
+      procedure Handle_Interrupt;
+      pragma Interrupt_Handler( Handle_Interrupt );
+   private
+      Was_Handled : Boolean := False;
+   end Dynamic_Handler;
+
+end CXC3005_0;
+
+
+     --==================================================================--
+
+
+package body CXC3005_0 is
+
+   protected body Dynamic_Handler is
+      procedure Handle_Interrupt is
+      begin
+         Was_Handled := True;
+      end Handle_Interrupt;
+   end Dynamic_Handler;
+
+end CXC3005_0;
+
+
+     --==================================================================--
+
+
+with Ada.Interrupts;
+pragma Elaborate (Ada.Interrupts);
+
+package CXC3005_1 is
+
+   Dummy                    : Integer := 0;
+
+   Reserved_Interrupt_Found : Boolean := False;
+   Reserved_Interrupt       : Ada.Interrupts.Interrupt_ID;
+
+   procedure Find_Reserved_Interrupt
+     (Found : out Boolean;
+      ID    : out Ada.Interrupts.Interrupt_ID);
+
+   procedure Avoid_Optimization
+     (ID: in out Ada.Interrupts.Interrupt_ID);
+
+   procedure Avoid_Optimization
+     (ID: in out Ada.Interrupts.Parameterless_Handler);
+
+end CXC3005_1;
+
+
+     --==================================================================--
+
+
+with Report;
+package body CXC3005_1 is
+
+   procedure Find_Reserved_Interrupt                -- Check all values of
+     (Found : out Boolean;                          -- type Interrupt_ID for
+      ID    : out Ada.Interrupts.Interrupt_ID) is   -- a reserved interrupt.
+   begin                                            -- If one is found, exit
+      Found := False;                               -- the loop and return
+      ID    := Ada.Interrupts.Interrupt_ID'First;   -- True for Found.
+      for I in Ada.Interrupts.Interrupt_ID loop     -- Otherwise return False
+         if Ada.Interrupts.Is_Reserved(I) then      -- for Found.
+            ID    := I;
+            Found := True;
+            exit;
+         end if;
+      end loop;
+   end Find_Reserved_Interrupt;
+
+
+   procedure Avoid_Optimization
+     (ID: in out Ada.Interrupts.Interrupt_ID) is
+   begin
+      -- Condition is always false:
+      if not Report.Equal (Report.Ident_Int(Dummy), Dummy) then
+         ID := Ada.Interrupts.Interrupt_ID'Last;         -- Never executed.
+      end if;
+   end Avoid_Optimization;
+
+
+   procedure Avoid_Optimization
+     (ID: in out Ada.Interrupts.Parameterless_Handler) is
+   begin
+      -- Condition is always false:
+      if not Report.Equal (Report.Ident_Int(Dummy), Dummy) then
+         ID := null;                                     -- Never executed.
+      end if;
+   end Avoid_Optimization;
+
+
+begin -- CXC3005_1.
+   Find_Reserved_Interrupt (Reserved_Interrupt_Found, Reserved_Interrupt);
+end CXC3005_1;
+
+
+     --==================================================================--
+
+
+with CXC3005_0;
+with CXC3005_1;
+
+with Ada.Interrupts;
+
+with Report;
+procedure CXC3005 is
+
+begin -- CXC3005.
+
+   Report.Test ("CXC3005", "Check that Program_Error is raised if the " &
+                "interrupt passed to Is_Attached, Current_Handler, "    &
+                "Attach_Handler, Exchange_Handler, or Detach_Handler "  &
+                "is reserved");
+
+
+   if CXC3005_1.Reserved_Interrupt_Found then
+
+      -- ===========
+      -- Is_Attached:
+      -- ===========
+
+      declare
+         use CXC3005_1;
+      begin
+         if Ada.Interrupts.Is_Attached (Reserved_Interrupt) then
+            Avoid_Optimization (Reserved_Interrupt);
+         end if;
+         Report.Failed ("Is_Attached: Program_Error was not raised");
+      exception
+         when Program_Error => -- Expected result.
+            null;
+         when others        =>
+            Report.Failed ("Is_Attached: Unexpected exception raised");
+      end;
+
+
+      -- ===============
+      -- Current_Handler:
+      -- ===============
+
+      declare
+         Handler : Ada.Interrupts.Parameterless_Handler;
+
+         use CXC3005_1;
+      begin
+         Handler := Ada.Interrupts.Current_Handler (Reserved_Interrupt);
+         Avoid_Optimization (Handler);
+         Report.Failed ("Current_Handler: Program_Error was not raised");
+      exception
+         when Program_Error => -- Expected result.
+            null;
+         when others        =>
+            Report.Failed ("Current_Handler: Unexpected exception raised");
+      end;
+
+
+      -- ==============
+      -- Attach_Handler:
+      -- ==============
+
+      declare
+         Handler : Ada.Interrupts.Parameterless_Handler :=
+                   CXC3005_0.Dynamic_Handler.Handle_Interrupt'Access;
+
+         use CXC3005_1;
+      begin
+         Ada.Interrupts.Attach_Handler (Handler, Reserved_Interrupt);
+         Avoid_Optimization (Handler);
+         Report.Failed ("Attach_Handler: Program_Error was not raised");
+      exception
+         when Program_Error => -- Expected result.
+            null;
+         when others        =>
+            Report.Failed ("Attach_Handler: Unexpected exception raised");
+      end;
+
+
+      -- ================
+      -- Exchange_Handler:
+      -- ================
+
+      declare
+         Old     : Ada.Interrupts.Parameterless_Handler;
+         Handler : Ada.Interrupts.Parameterless_Handler :=
+                   CXC3005_0.Dynamic_Handler.Handle_Interrupt'Access;
+
+         use CXC3005_1;
+      begin
+         Ada.Interrupts.Exchange_Handler (Old, Handler, Reserved_Interrupt);
+         Avoid_Optimization (Handler);
+         Report.Failed ("Exchange_Handler: Program_Error was not raised");
+      exception
+         when Program_Error => -- Expected result.
+            null;
+         when others        =>
+            Report.Failed ("Exchange_Handler: Unexpected exception raised");
+      end;
+
+
+      -- ==============
+      -- Detach_Handler:
+      -- ==============
+
+      declare
+         use CXC3005_1;
+      begin
+         Ada.Interrupts.Detach_Handler (Reserved_Interrupt);
+         Avoid_Optimization (Reserved_Interrupt);
+         Report.Failed ("Detach_Handler: Program_Error was not raised");
+      exception
+         when Program_Error => -- Expected result.
+            null;
+         when others        =>
+            Report.Failed ("Detach_Handler: Unexpected exception raised");
+      end;
+
+   else
+      Report.Not_Applicable ("No reserved interrupts found");
+   end if;
+
+
+   Report.Result;
+
+end CXC3005;

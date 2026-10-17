@@ -23,7 +23,7 @@
  */
 
 // $antlr-format alignTrailingComments on, columnLimit 150, maxEmptyLinesToKeep 1, reflowComments off, useTab off
-// $antlr-format allowShortRulesOnASingleLine on, alignSemicolons ownLine
+// $antlr-format allowShortRulesOnASingleLine on, alignSemicolons ownLine, alignColons trailing
 
 lexer grammar SQLiteLexer;
 
@@ -55,6 +55,8 @@ GT_EQ     : '>=';
 EQ        : '==';
 NOT_EQ1   : '!=';
 NOT_EQ2   : '<>';
+JPTR      : '->';
+JPTR2     : '->>';
 
 // http://www.sqlite.org/lang_keywords.html
 ABORT_             : 'ABORT';
@@ -63,6 +65,7 @@ ADD_               : 'ADD';
 AFTER_             : 'AFTER';
 ALL_               : 'ALL';
 ALTER_             : 'ALTER';
+ALWAYS_            : 'ALWAYS';
 ANALYZE_           : 'ANALYZE';
 AND_               : 'AND';
 AS_                : 'AS';
@@ -84,6 +87,7 @@ CONFLICT_          : 'CONFLICT';
 CONSTRAINT_        : 'CONSTRAINT';
 CREATE_            : 'CREATE';
 CROSS_             : 'CROSS';
+CURRENT_           : 'CURRENT';
 CURRENT_DATE_      : 'CURRENT_DATE';
 CURRENT_TIME_      : 'CURRENT_TIME';
 CURRENT_TIMESTAMP_ : 'CURRENT_TIMESTAMP';
@@ -95,22 +99,30 @@ DELETE_            : 'DELETE';
 DESC_              : 'DESC';
 DETACH_            : 'DETACH';
 DISTINCT_          : 'DISTINCT';
+DO_                : 'DO';
 DROP_              : 'DROP';
 EACH_              : 'EACH';
 ELSE_              : 'ELSE';
 END_               : 'END';
 ESCAPE_            : 'ESCAPE';
 EXCEPT_            : 'EXCEPT';
+EXCLUDE_           : 'EXCLUDE';
 EXCLUSIVE_         : 'EXCLUSIVE';
 EXISTS_            : 'EXISTS';
 EXPLAIN_           : 'EXPLAIN';
 FAIL_              : 'FAIL';
+FALSE_             : 'FALSE';
+FILTER_            : 'FILTER';
+FIRST_             : 'FIRST';
+FOLLOWING_         : 'FOLLOWING';
 FOR_               : 'FOR';
 FOREIGN_           : 'FOREIGN';
 FROM_              : 'FROM';
 FULL_              : 'FULL';
+GENERATED_         : 'GENERATED';
 GLOB_              : 'GLOB';
 GROUP_             : 'GROUP';
+GROUPS_            : 'GROUPS';
 HAVING_            : 'HAVING';
 IF_                : 'IF';
 IGNORE_            : 'IGNORE';
@@ -128,26 +140,35 @@ IS_                : 'IS';
 ISNULL_            : 'ISNULL';
 JOIN_              : 'JOIN';
 KEY_               : 'KEY';
+LAST_              : 'LAST';
 LEFT_              : 'LEFT';
 LIKE_              : 'LIKE';
 LIMIT_             : 'LIMIT';
 MATCH_             : 'MATCH';
+MATERIALIZED_      : 'MATERIALIZED';
 NATURAL_           : 'NATURAL';
 NO_                : 'NO';
 NOT_               : 'NOT';
+NOTHING_           : 'NOTHING';
 NOTNULL_           : 'NOTNULL';
 NULL_              : 'NULL';
+NULLS_             : 'NULLS';
 OF_                : 'OF';
 OFFSET_            : 'OFFSET';
 ON_                : 'ON';
 OR_                : 'OR';
 ORDER_             : 'ORDER';
+OTHERS_            : 'OTHERS';
 OUTER_             : 'OUTER';
+OVER_              : 'OVER';
+PARTITION_         : 'PARTITION';
 PLAN_              : 'PLAN';
 PRAGMA_            : 'PRAGMA';
+PRECEDING_         : 'PRECEDING';
 PRIMARY_           : 'PRIMARY';
 QUERY_             : 'QUERY';
 RAISE_             : 'RAISE';
+RANGE_             : 'RANGE';
 RECURSIVE_         : 'RECURSIVE';
 REFERENCES_        : 'REFERENCES';
 REGEXP_            : 'REGEXP';
@@ -160,17 +181,23 @@ RETURNING_         : 'RETURNING';
 RIGHT_             : 'RIGHT';
 ROLLBACK_          : 'ROLLBACK';
 ROW_               : 'ROW';
+ROWID_             : 'ROWID';
 ROWS_              : 'ROWS';
 SAVEPOINT_         : 'SAVEPOINT';
 SELECT_            : 'SELECT';
 SET_               : 'SET';
+STORED_            : 'STORED';
+STRICT_            : 'STRICT';
 TABLE_             : 'TABLE';
 TEMP_              : 'TEMP';
 TEMPORARY_         : 'TEMPORARY';
 THEN_              : 'THEN';
+TIES_              : 'TIES';
 TO_                : 'TO';
 TRANSACTION_       : 'TRANSACTION';
 TRIGGER_           : 'TRIGGER';
+TRUE_              : 'TRUE';
+UNBOUNDED_         : 'UNBOUNDED';
 UNION_             : 'UNION';
 UNIQUE_            : 'UNIQUE';
 UPDATE_            : 'UPDATE';
@@ -181,42 +208,10 @@ VIEW_              : 'VIEW';
 VIRTUAL_           : 'VIRTUAL';
 WHEN_              : 'WHEN';
 WHERE_             : 'WHERE';
-WITH_              : 'WITH';
-WITHOUT_           : 'WITHOUT';
-FIRST_VALUE_       : 'FIRST_VALUE';
-OVER_              : 'OVER';
-PARTITION_         : 'PARTITION';
-RANGE_             : 'RANGE';
-PRECEDING_         : 'PRECEDING';
-UNBOUNDED_         : 'UNBOUNDED';
-CURRENT_           : 'CURRENT';
-FOLLOWING_         : 'FOLLOWING';
-CUME_DIST_         : 'CUME_DIST';
-DENSE_RANK_        : 'DENSE_RANK';
-LAG_               : 'LAG';
-LAST_VALUE_        : 'LAST_VALUE';
-LEAD_              : 'LEAD';
-NTH_VALUE_         : 'NTH_VALUE';
-NTILE_             : 'NTILE';
-PERCENT_RANK_      : 'PERCENT_RANK';
-RANK_              : 'RANK';
-ROW_NUMBER_        : 'ROW_NUMBER';
-GENERATED_         : 'GENERATED';
-ALWAYS_            : 'ALWAYS';
-STORED_            : 'STORED';
-TRUE_              : 'TRUE';
-FALSE_             : 'FALSE';
 WINDOW_            : 'WINDOW';
-NULLS_             : 'NULLS';
-FIRST_             : 'FIRST';
-LAST_              : 'LAST';
-FILTER_            : 'FILTER';
-GROUPS_            : 'GROUPS';
-EXCLUDE_           : 'EXCLUDE';
-TIES_              : 'TIES';
-OTHERS_            : 'OTHERS';
-DO_                : 'DO';
-NOTHING_           : 'NOTHING';
+WITH_              : 'WITH';
+WITHIN_            : 'WITHIN';
+WITHOUT_           : 'WITHOUT';
 
 IDENTIFIER:
     '"' (~'"' | '""')* '"'
@@ -225,7 +220,12 @@ IDENTIFIER:
     | [A-Z_\u007F-\uFFFF] [A-Z_0-9\u007F-\uFFFF]*
 ;
 
-NUMERIC_LITERAL: ((DIGIT+ ('.' DIGIT*)?) | ('.' DIGIT+)) ('E' [-+]? DIGIT+)? | '0x' HEX_DIGIT+;
+NUMERIC_LITERAL:
+    (DIGIT+ ('_' DIGIT+)* ('.' (DIGIT+ ('_' DIGIT+)*)?)? | '.' DIGIT+ ('_' DIGIT+)*) (
+        'E' [-+]? DIGIT+ ('_' DIGIT+)*
+    )?
+    | '0x' HEX_DIGIT+ ('_' HEX_DIGIT+)*
+;
 
 BIND_PARAMETER: '?' DIGIT* | [:@$] IDENTIFIER;
 
@@ -233,7 +233,7 @@ STRING_LITERAL: '\'' ( ~'\'' | '\'\'')* '\'';
 
 BLOB_LITERAL: 'X' STRING_LITERAL;
 
-SINGLE_LINE_COMMENT: '--' ~[\r\n]* (('\r'? '\n') | EOF) -> channel(HIDDEN);
+SINGLE_LINE_COMMENT: '--' ~[\r\n]* ('\r'? '\n' | EOF) -> channel(HIDDEN);
 
 MULTILINE_COMMENT: '/*' .*? '*/' -> channel(HIDDEN);
 

@@ -53,26 +53,36 @@ DO           : 'do';
 DOUBLE       : 'double';
 ELSE         : 'else';
 ENUM         : 'enum';
+EXPORTS    : 'exports';
 EXTENDS      : 'extends';
 FINAL        : 'final';
 FINALLY      : 'finally';
 FLOAT        : 'float';
 FOR          : 'for';
-IF           : 'if';
 GOTO         : 'goto';
+IF           : 'if';
 IMPLEMENTS   : 'implements';
 IMPORT       : 'import';
 INSTANCEOF   : 'instanceof';
 INT          : 'int';
 INTERFACE    : 'interface';
 LONG         : 'long';
+MODULE     : 'module';
 NATIVE       : 'native';
 NEW          : 'new';
+NON_SEALED : 'non-sealed';
+OPEN       : 'open';
+OPENS      : 'opens';
 PACKAGE      : 'package';
+PERMITS    : 'permits';
 PRIVATE      : 'private';
 PROTECTED    : 'protected';
+PROVIDES   : 'provides';
 PUBLIC       : 'public';
+RECORD: 'record';
+REQUIRES   : 'requires';
 RETURN       : 'return';
+SEALED     : 'sealed';
 SHORT        : 'short';
 STATIC       : 'static';
 STRICTFP     : 'strictfp';
@@ -82,37 +92,18 @@ SYNCHRONIZED : 'synchronized';
 THIS         : 'this';
 THROW        : 'throw';
 THROWS       : 'throws';
+TO         : 'to';
 TRANSIENT    : 'transient';
+TRANSITIVE : 'transitive';
 TRY          : 'try';
+USES       : 'uses';
+VAR: 'var'; // reserved type name
 VOID         : 'void';
 VOLATILE     : 'volatile';
+WHEN : 'when';
 WHILE        : 'while';
-
-// Module related keywords
-MODULE     : 'module';
-OPEN       : 'open';
-REQUIRES   : 'requires';
-EXPORTS    : 'exports';
-OPENS      : 'opens';
-TO         : 'to';
-USES       : 'uses';
-PROVIDES   : 'provides';
 WITH       : 'with';
-TRANSITIVE : 'transitive';
-
-// Local Variable Type Inference
-VAR: 'var'; // reserved type name
-
-// Switch Expressions
 YIELD: 'yield'; // reserved type name from Java 14
-
-// Records
-RECORD: 'record';
-
-// Sealed Classes
-SEALED     : 'sealed';
-PERMITS    : 'permits';
-NON_SEALED : 'non-sealed';
 
 // Literals
 
@@ -213,7 +204,7 @@ IDENTIFIER: Letter LetterOrDigit*;
 fragment ExponentPart: [eE] [+-]? Digits;
 
 fragment EscapeSequence:
-    '\\' 'u005c'? [btnfr"'\\]
+    '\\' 'u005c'? [bstnfr"'\\]
     | '\\' 'u005c'? ([0-3]? [0-7])? [0-7]
     | '\\' 'u'+ HexDigit HexDigit HexDigit HexDigit
 ;

@@ -1,8 +1,10 @@
 // Generated from trgen <version>
 
 import antlr4 from 'antlr4';
+import path from 'path';
 <tool_grammar_tuples: {x | import <x.GrammarAutomName> from './<x.GeneratedFileName>';
 } >
+import BinaryCharStream from './BinaryCharStream.js';
 import strops from 'typescript-string-operations';
 import fs from 'fs-extra';
 import pkg from 'timer-node';
@@ -46,15 +48,23 @@ class MyErrorListener extends antlr4.error.ErrorListener {
 }
 
 var tee = false;
+var output_dir = '';
 var show_profile = false;
 var show_tree = false;
 var show_tokens = false;
 var show_trace = false;
 var error_code = 0;
 var quiet = false;
-var encoding = 'utf8';
+var perf = false;
+var per_file = false;
+var enc = '<file_encoding>';
+var binary = <binary>;
 var string_instance = 0;
 var prefix = '';
+var total_tokens = 0;
+var total_parse_seconds = 0;
+var first_file_tokens = 0;
+var first_file_parse_seconds = 0;
 var inputs = [];
 var is_fns = [];
 
@@ -80,8 +90,12 @@ function main() {
             case '-tee':
                 tee = true;
                 break;
+            case '-o':
+                output_dir = process.argv[++i];
+                tee = true;
+                break;
             case '-encoding':
-                encoding = process.argv[++i];
+                enc = process.argv[++i];
                 break;
             case '-x':
                 var sb = new strops.StringBuilder();
@@ -100,12 +114,20 @@ function main() {
             case '-q':
                 quiet = true;
                 break;
+            case '--perf':
+                perf = true;
+                break;
+            case '--per-file':
+                per_file = true;
+                break;
             case '-trace':
                 show_trace = true;
                 break;
             default:
-                inputs.push(process.argv[i]);
-                is_fns.push(true);
+                if (process.argv[i][0] !== '-') {
+                    inputs.push(process.argv[i]);
+                    is_fns.push(true);
+                }
                 break;
         }
     }
@@ -124,7 +146,27 @@ function main() {
         }
         timer.stop();
         var t = timer.time().m * 60 + timer.time().s + timer.time().ms / 1000;
-        if (!quiet) console.error(prefix + 'Total Time: ' + t);
+        if (!quiet) {
+            if (!perf) {
+                console.error(prefix + 'TT: ' + t);
+            } else {
+            var warm_tokens = total_tokens - first_file_tokens;
+            var warm_seconds = total_parse_seconds - first_file_parse_seconds;
+            var warm_tps = (inputs.length > 1 && warm_seconds > 0)
+                ? Math.round(warm_tokens / warm_seconds).toString()
+                : 'n.a.';
+            var first_tps = first_file_parse_seconds > 0 ? (first_file_tokens / first_file_parse_seconds) : 0;
+            var speedup = (inputs.length > 1 && warm_seconds > 0 && first_tps > 0)
+                ? ((warm_tokens / warm_seconds) / first_tps).toFixed(2)
+                : 'n.a.';
+            console.error(prefix + 'PT: ' + total_parse_seconds);
+            console.error(prefix + 'OT: ' + (t - total_parse_seconds));
+            console.error(prefix + 'TT: ' + t);
+            console.error(prefix + 'PR: ' + Math.round(total_tokens / total_parse_seconds));
+            console.error(prefix + 'Post-warmup PR: ' + warm_tps);
+            console.error(prefix + 'Post-warmup speed up: ' + speedup);
+            }
+        }
     }
     process.exitCode = error_code;
 }
@@ -146,17 +188,31 @@ function ParseString(input, row_number) {
 }
 
 function ParseFilename(input, row_number) {
-    var str = antlr4.CharStreams.fromPathSync(input, encoding);
+    if (enc === '') enc = 'utf8';
+    var buffer = fs.readFileSync(input, { encoding: enc });
+    var str = antlr4.CharStreams.fromString(buffer);
+    str.name = input;
     DoParse(str, input, row_number);
 }
 
 function DoParse(str, input_name, row_number) {
+    var out_name = input_name;
+    if (output_dir) {
+        const absPath = path.resolve(input_name);
+        const root = path.resolve('../<example_dir_unix>');
+        let rootless = path.relative(root, absPath);
+        if (rootless === '..' || rootless.startsWith('..' + path.sep) || path.isAbsolute(rootless))
+            rootless = path.basename(absPath);
+        out_name = path.join(output_dir, rootless);
+        fs.mkdirsSync(path.dirname(out_name));
+    }
+    if (binary) str = new BinaryCharStream(str);
     const lexer = new <lexer_name>(str);
     const tokens = new antlr4.CommonTokenStream(lexer);
     const parser = new <parser_name>(tokens);
     lexer.removeErrorListeners();
     parser.removeErrorListeners();
-    var output = tee ? fs.openSync(input_name + ".errors", 'w') : 1;
+    var output = tee ? fs.openSync(out_name + ".errors", 'w') : 1;
     var listener_parser = new MyErrorListener(quiet, tee, output);
     var listener_lexer = new MyErrorListener(quiet, tee, output);
     parser.addErrorListener(listener_parser);
@@ -180,6 +236,8 @@ function DoParse(str, input_name, row_number) {
     timer.start();
     const tree = parser.<start_symbol>();
     timer.stop();
+    var token_count = tokens.size;
+    total_tokens += token_count;
     var result = "";
     if (listener_parser.had_error || listener_lexer.had_error) {
         result = 'fail';
@@ -189,15 +247,20 @@ function DoParse(str, input_name, row_number) {
         result = 'success';
     }
     var t = timer.time().m * 60 + timer.time().s + timer.time().ms / 1000;
+    total_parse_seconds += t;
+    if (row_number == 0) {
+        first_file_tokens = token_count;
+        first_file_parse_seconds = t;
+    }
     if (show_tree) {
         if (tee) {
-            fs.writeFileSync(input_name + ".tree", tree.toStringTree(parser.ruleNames));
+            fs.writeFileSync(out_name + ".tree", tree.toStringTree(parser.ruleNames));
         } else {
             console.error(tree.toStringTree(parser.ruleNames));
         }
     }
-    if (! quiet) {
-        console.error(prefix + 'JavaScript ' + row_number + ' ' + input_name + ' ' + result + ' ' + t);
+    if (! quiet && per_file) {
+        console.error(prefix + 'JavaScript ' + row_number + ' ' + input_name + ' ' + result + ' ' + t + ' s ' + token_count + ' tokens ' + Math.round(token_count / t) + ' pr');
     }
     if (tee) {
         fs.closeSync(output);

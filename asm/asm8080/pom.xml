@@ -41,6 +41,7 @@
 					<entryPoint>prog</entryPoint>
 					<grammarName>asm8080</grammarName>
 					<exampleFiles>examples/</exampleFiles>
+					<testFileExtension>.ASM</testFileExtension>
 				</configuration>
 				<executions>
 					<execution>

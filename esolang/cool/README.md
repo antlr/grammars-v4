@@ -6,10 +6,11 @@ Classroom Object Oriented Language is a widely used language in CS classes.
 
 https://github.com/teverett
 
-Aiken, Alexander. “Cool: a portable project for teaching compiler construction.” ACM SIGPLAN Notices 31 (1996): 19-24.
+Aiken, Alexander. ï¿½Cool: a portable project for teaching compiler construction.ï¿½ ACM SIGPLAN Notices 31 (1996): 19-24.
 
-## Links
+## Reference
 
+* [pldb](http://pldb.info/concepts/cool)
 http://theory.stanford.edu/~aiken/software/cool/cool.html
 
 https://www.semanticscholar.org/paper/Cool%3A-a-portable-project-for-teaching-compiler-Aiken/c31ab5485ca8efb466f4e48cdc596f8def3aafee

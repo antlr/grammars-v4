@@ -1,0 +1,336 @@
+-- CXC3008.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--     Check that the procedures Ada.Interrupts.Attach_Handler and
+--     Ada.Interrupts.Exchange_Handler attach a specified handler to
+--     a specified interrupt, overriding any existing treatment. Check
+--     that, for Exchange_Handler, the value returned in Old_Handler
+--     designates the previous treatment for the interrupt.
+--
+--     Check that the procedure Ada.Interrupts.Current_Handler returns
+--     a value that represents the attached handler of the specified
+--     interrupt.
+--
+--     Check that the procedure Ada.Interrupts.Detach_Handler restores
+--     the default treatment for the specified interrupt.
+--
+--     Check that an attached handler is called once for each delivered
+--     interrupt occurrence.
+--    
+-- TEST DESCRIPTION:
+--     For this test, the determination of whether the default treatment is
+--     restored is based on the value returned by Ada.Interrupts.Is_Attached.
+--     At points where it is expected that the default treatment has been
+--     restored, Attach_Handler should return False.
+--
+-- SPECIAL REQUIREMENTS:
+--      This test requires that interrupts be enabled, and that an
+--      interrupt (identified by ImpDef.Annex_C.Interrupt_To_Generate)
+--      be generated multiple times, at points designated by calls to
+--      ImpDef.Annex_C.Generate_Interrupt.
+--
+-- APPLICABILITY CRITERIA:
+--      This test is only applicable for implementations validating the
+--      Systems Programming Annex.
+--
+--
+-- CHANGE HISTORY:
+--      05 Feb 96   SAIC    Initial version for ACVC 2.1.
+--
+--!
+
+with ImpDef.Annex_C;
+package CXC3008_0 is
+
+   protected type Handler_Type is
+      procedure Handler;
+      pragma Attach_Handler ( Handler, ImpDef.Annex_C.Interrupt_To_Generate );
+
+      function Handle_Count return Natural;
+   private
+      Count : Natural := 0;
+   end Handler_Type;
+
+
+   protected Dynamic1 is
+      procedure Handler;
+      pragma Interrupt_Handler ( Handler );
+
+      function Handle_Count return Natural;
+   private
+      Count : Natural := 0;
+   end Dynamic1;
+
+
+   protected Dynamic2 is
+      procedure Handler;
+      pragma Interrupt_Handler ( Handler );
+
+      function Handle_Count return Natural;
+   private
+      Count : Natural := 0;
+   end Dynamic2;
+
+end CXC3008_0;
+
+
+     --==================================================================--
+
+
+package body CXC3008_0 is
+
+   protected body Handler_Type is
+      procedure Handler is
+      begin
+         Count := Count + 1;
+      end Handler;
+
+      function Handle_Count return Natural is
+      begin
+         return Count;
+      end Handle_Count;
+   end Handler_Type;
+
+
+   protected body Dynamic1 is
+      procedure Handler is
+      begin
+         Count := Count + 1;
+      end Handler;
+
+      function Handle_Count return Natural is
+      begin
+         return Count;
+      end Handle_Count;
+   end Dynamic1;
+
+
+   protected body Dynamic2 is
+      procedure Handler is
+      begin
+         Count := Count + 1;
+      end Handler;
+
+      function Handle_Count return Natural is
+      begin
+         return Count;
+      end Handle_Count;
+   end Dynamic2;
+
+end CXC3008_0;
+
+
+     --==================================================================--
+
+
+with CXC3008_0;
+
+with Ada.Interrupts;
+
+with ImpDef.Annex_C;
+with Report;
+procedure CXC3008 is
+begin
+
+   Report.Test ("CXC3008", "Check Current_Handler, Attach_Handler, and " &
+                "Exchange_Handler when user-specified handlers are "     &
+                "attached. Check Detach_Handler");
+
+   ImpDef.Annex_C.Enable_Interrupts;    -- Enable interrupts, if necessary.
+
+
+   declare
+      package AI renames Ada.Interrupts;
+
+      Old_Handler : AI.Parameterless_Handler;
+   begin
+
+      -- Attach a user handler:
+
+      AI.Attach_Handler (CXC3008_0.Dynamic1.Handler'Access,
+                         ImpDef.Annex_C.Interrupt_To_Generate);
+
+      -- Attach a different user handler:
+
+      AI.Attach_Handler (CXC3008_0.Dynamic2.Handler'Access,
+                         ImpDef.Annex_C.Interrupt_To_Generate);
+
+      ImpDef.Annex_C.Generate_Interrupt;
+      delay ImpDef.Annex_C.Wait_For_Interrupt;
+
+      if CXC3008_0.Dynamic1.Handle_Count /= 0 or
+         CXC3008_0.Dynamic2.Handle_Count /= 1
+      then
+         Report.Failed ("Wrong handler counts after 1st interrupt");
+      end if;
+
+      Report.Comment ("Done with 1st interrupt");
+
+
+      -- Exchange handlers:
+
+      AI.Exchange_Handler (Old_Handler,
+                           CXC3008_0.Dynamic1.Handler'Access,
+                           ImpDef.Annex_C.Interrupt_To_Generate);
+
+                           -- Old_Handler now designates Dynamic2.Handler.
+
+      ImpDef.Annex_C.Generate_Interrupt;
+      delay ImpDef.Annex_C.Wait_For_Interrupt;
+
+      if CXC3008_0.Dynamic1.Handle_Count /= 1 or
+         CXC3008_0.Dynamic2.Handle_Count /= 1
+      then
+         Report.Failed ("Wrong handler counts after 2nd interrupt");
+      end if;
+
+      Report.Comment ("Done with 2nd interrupt");
+
+      -- Current handler is Dynamic1.Handler.
+
+
+      -- Attach a handler with pragma Attach_Handler (via object creation):
+
+      declare
+         Static : CXC3008_0.Handler_Type;
+      begin
+
+         ImpDef.Annex_C.Generate_Interrupt;
+         delay ImpDef.Annex_C.Wait_For_Interrupt;
+
+         if Static.Handle_Count /= 1             or
+            CXC3008_0.Dynamic1.Handle_Count /= 1 or
+            CXC3008_0.Dynamic2.Handle_Count /= 1
+         then
+            Report.Failed ("Wrong handler counts after 3rd interrupt");
+         end if;
+
+         Report.Comment ("Done with 3rd interrupt");
+
+      end;
+
+      -- Protected object Static has been finalized, and previous handler
+      -- (Dynamic1.Handler) should be restored. 
+
+
+      -- Exchange handlers:
+
+      AI.Exchange_Handler (Old_Handler,
+                           Old_Handler,  -- Designates Dynamic2.Handler.
+                           ImpDef.Annex_C.Interrupt_To_Generate);
+
+                           -- Old_Handler now designates Dynamic1.Handler.
+
+      ImpDef.Annex_C.Generate_Interrupt;
+      delay ImpDef.Annex_C.Wait_For_Interrupt;
+
+      if CXC3008_0.Dynamic1.Handle_Count /= 1 or
+         CXC3008_0.Dynamic2.Handle_Count /= 2
+      then
+         Report.Failed ("Wrong handler counts after 4th interrupt");
+      end if;
+
+      Report.Comment ("Done with 4th interrupt");
+
+
+      -- Attach a different handler:
+
+      AI.Attach_Handler (Old_Handler, -- Designates Dynamic1.Handler.
+                         ImpDef.Annex_C.Interrupt_To_Generate);
+
+      -- Attach yet a different user handler:
+
+      -- In practice, calling Current_Handler within Attach_Handler for
+      -- the same interrupt will probably never occur, but calling it for
+      -- a different interrupt will. That's what is simulated below:
+
+      AI.Attach_Handler
+        (AI.Current_Handler(ImpDef.Annex_C.Interrupt_To_Generate),
+         ImpDef.Annex_C.Interrupt_To_Generate);
+
+      ImpDef.Annex_C.Generate_Interrupt;
+      delay ImpDef.Annex_C.Wait_For_Interrupt;
+
+      if CXC3008_0.Dynamic1.Handle_Count /= 2 or
+         CXC3008_0.Dynamic2.Handle_Count /= 2
+      then
+         Report.Failed ("Wrong handler counts after 5th interrupt");
+      end if;
+
+      Report.Comment ("Done with 5th interrupt");
+
+
+      -- Exchange handlers:
+
+      -- In practice, calling Current_Handler within Exchange_Handler for
+      -- the same interrupt will probably never occur, but calling it for
+      -- a different interrupt will. That's what is simulated below:
+
+      AI.Exchange_Handler
+        (Old_Handler,
+         AI.Current_Handler(ImpDef.Annex_C.Interrupt_To_Generate),
+         ImpDef.Annex_C.Interrupt_To_Generate);
+
+                           -- Old_Handler now designates Dynamic1.Handler.
+
+      ImpDef.Annex_C.Generate_Interrupt;
+      delay ImpDef.Annex_C.Wait_For_Interrupt;
+
+      if CXC3008_0.Dynamic1.Handle_Count /= 3 or
+         CXC3008_0.Dynamic2.Handle_Count /= 2
+      then
+         Report.Failed ("Wrong handler counts after 6th interrupt");
+      end if;
+
+      Report.Comment ("Done with 6th interrupt");
+
+
+
+      -- Test Detach_Handler:
+
+      if not AI.Is_Attached (ImpDef.Annex_C.Interrupt_To_Generate) then
+         Report.Failed ("No user-specified handler is attached");
+      else
+
+         -- Detach handler:
+
+         AI.Detach_Handler (ImpDef.Annex_C.Interrupt_To_Generate);
+
+         if AI.Is_Attached (ImpDef.Annex_C.Interrupt_To_Generate) then
+            Report.Failed ("Default treatment not restored by Detach_Handler");
+         end if;
+
+      end if;
+
+   exception
+      when Program_Error =>
+         Report.Failed ("Unexpected Program_Error raised");
+   end;
+
+
+   Report.Result;
+
+end CXC3008;

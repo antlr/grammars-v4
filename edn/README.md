@@ -1,9 +1,6 @@
-edn
-===
+# Extensible Data Notation [eed-n]
 
-extensible data notation [eed-n]
-
-# Rationale
+## Rationale
 
 **edn** is an extensible data notation. A superset of **edn** is used by Clojure to represent
 programs, and it is used by Datomic and other applications as a data transfer format. This spec
@@ -35,9 +32,9 @@ most programming languages. While **edn** specifies how those elements are forma
 does not dictate the representation that results on the consumer side. A well behaved reader
 library should endeavor to map the elements to programming language types with similar semantics.
 
-# Spec
+## Spec
 
-Currently this specification is casual, as we gather feedback from implementors. A more rigorous
+Currently this specification is casual, as we gather feedback from implementers. A more rigorous
 e.g. BNF will follow.
 
 ## General considerations
@@ -296,4 +293,7 @@ equal key is present and mapped to an equal value in the other.
 tagged elements must define their own equality semantics. #uuid elements are equal if their canonic
 representations are equal. #inst elements are equal if their representation strings designate the
 same timestamp per [RFC-3339](http://www.ietf.org/rfc/rfc3339.txt).
+
+## Reference
+* [pldb](http://pldb.info/concepts/edn)
 

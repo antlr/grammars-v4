@@ -1,0 +1,7 @@
+syntax = 'proto3';
+
+// extracted from protobuf sources conformance/conformance.proto
+message FailureSet {
+  repeated TestStatus test = 2;
+  reserved 1;
+}

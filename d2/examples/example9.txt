@@ -1,0 +1,11 @@
+board: {
+
+shape: sql_table
+id: int { constraint: primary_key}
+frame: int { constraint: primary_key}
+diagram: int { constraint: primary_key}
+board_objects: jsonb
+last_updated: timestamp with time zone
+last_thumbgen: timestamp with time zone
+dsl: text
+}

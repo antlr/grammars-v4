@@ -207,7 +207,7 @@ protocol_info
     | spx_protocol
     | nmp_protocol
     | beq_protocol
-    ; // See http://www.toadworld.com/platforms/oracle/w/wiki/5484.defining-tnsname-addresses.aspx
+    ; // See http://web.archive.org/web/20150612014817/http://www.toadworld.com:80/platforms/oracle/w/wiki/5484.defining-tnsname-addresses.aspx
 
 // for examples etc.
 

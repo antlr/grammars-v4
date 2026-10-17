@@ -1,0 +1,348 @@
+-- CXE4001.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that exception propagation between partitions is properly 
+--      handled.  In particular check that:
+--      a predefined exception can be raised in one partition and handled in 
+--      another; 
+--      an exception declared in a remote call interface library unit 
+--      can be raised in one partition and handled in another partition;
+--      an exception declared in partition A and not visible to partition B 
+--      can be raised in partition A and handled in partition B with an others 
+--      clause;
+--      an exception declared in a partition A and not visible to partition B
+--      can be raised in partition A, propagated through partition B, and 
+--      handled back in A.
+--
+-- TEST DESCRIPTION:
+--      This test is composed of the following compilation units:
+--          CXE4001_Decl_Pure - pure package containing declarations 
+--                      shared between partitions A & B
+--          CXE4001_Partition_A - rci package interface for partition A
+--          CXE4001_Partition_B - rci package interface for partition B
+--          CXE4001_A - main procedure for partition A
+--          CXE4001_B - main procedure for partition B
+--
+-- SPECIAL REQUIREMENTS:
+--      Compile the compilation units in this file. 
+--      Create the two partitions (A and B) with the following contents:
+--        Partition A contains:
+--           CXE4001_A  (main procedure)
+--           CXE4001_Partition_A  (RCI package)
+--           and all normal and pure packages with'ed by these units.
+--        Partition B contains:
+--           CXE4001_B  (main procedure)
+--           CXE4001_Partition_B  (RCI package)
+--           and all normal and pure packages with'ed by these units.
+--        Note that package Report is included in both partitions.
+--      Run the program by starting both partitions.  The partitions may be
+--      started in either order.
+--
+-- APPLICABILITY CRITERIA:
+--      This test applies only to implementations that:
+--         support the Distribution Annex,
+--         support the Remote_Call_Interface pragma, and
+--         provide an implementation of System.RPC.
+--
+-- PASS/FAIL CRITERIA:
+--      This test passes if and only if both partition A and
+--      partition B print a message reporting that the test passed.
+--
+--
+-- CHANGE HISTORY:
+--     12 MAR 95   SAIC    Initial version
+--     26 JUN 95   SAIC    Added test per reviewer suggestion.
+--
+--!
+
+package CXE4001_Decl_Pure is
+  pragma Pure;
+  Visible_User_Defined_Exception : exception;
+
+  -- The setting of the following flag affects how much output is 
+  -- produced when the test runs.  This output can be used to help
+  -- debug problems with the test.
+  Verbose : constant Boolean := False;
+end CXE4001_Decl_Pure;
+
+
+package CXE4001_Partition_A is
+  pragma Remote_Call_Interface;
+
+    -- these procedures are the control actions for each test
+  procedure Predefined_Simple;
+  procedure Userdefined_Simple;
+  procedure Invisible_Simple;
+  procedure Invisible_Complex_1;
+  procedure Invisible_Complex_2;
+
+    -- service routine for Invisible_Complex test
+  procedure Raise_Invisible;
+end CXE4001_Partition_A;
+
+
+package CXE4001_Partition_B is
+  pragma Remote_Call_Interface;
+
+  procedure Raise_Program_Error;
+  procedure Raise_Visible_Exception;
+  procedure Raise_Invisible_Exception;
+  procedure Call_A_Raise_Invisible_1;
+  procedure Call_A_Raise_Invisible_2;
+
+  procedure Finished;
+end CXE4001_Partition_B;
+
+-----------------------------------------------------------------------------
+
+with CXE4001_Partition_A;
+with CXE4001_Partition_B;
+with Report;
+with System.RPC;
+procedure CXE4001_A is
+begin
+  Report.Test ("CXE4001_A", "Exception handling across partitions");
+
+  -- make sure partitioning is performed
+  if CXE4001_Partition_A'Partition_ID = CXE4001_Partition_B'Partition_ID then
+    Report.Failed ("Partitioning Error - CXE4001_Partition_A and " &
+                   "CXE4001_Partition_B are in the same partition.");
+  end if;
+
+  -- now do the tests
+  CXE4001_Partition_A.Predefined_Simple;
+  CXE4001_Partition_A.Userdefined_Simple;
+  CXE4001_Partition_A.Invisible_Simple;
+  CXE4001_Partition_A.Invisible_Complex_1;
+  CXE4001_Partition_A.Invisible_Complex_2;
+
+  -- all done
+  CXE4001_Partition_B.Finished;
+  Report.Result;
+end CXE4001_A;
+
+
+with CXE4001_Partition_B;
+with CXE4001_Partition_A;
+with Report;
+with System.RPC; 
+procedure CXE4001_B is
+begin
+  Report.Test ("CXE4001_B", "Server partition of exception handling test");
+  if CXE4001_Partition_A'Partition_ID = CXE4001_Partition_B'Partition_ID then
+    Report.Failed ("Partitioning Error - 1 and Part_B are in the" &
+                   " same partition.");
+  end if;
+  -- Report.Result is called in the body of CXE4001_Partition_B.
+end CXE4001_B;
+
+
+-----------------------------------------------------------------------------
+
+with CXE4001_Decl_Pure;
+with CXE4001_Partition_B;
+with Report;
+with System.RPC;
+package body CXE4001_Partition_A is
+
+  -- the following exception is only defined in partition A
+  Exception_Local_To_A : exception;
+
+
+procedure Predefined_Simple is
+begin
+  if CXE4001_Decl_Pure.Verbose then
+     Report.Comment ("Check that a predefined exception can be raised" &
+                     " in one partition and handled in another");
+  end if;
+
+  CXE4001_Partition_B.Raise_Program_Error;
+  Report.Failed ("Predefined exception was not propagated across partitions");
+exception
+  when Program_Error =>
+     null;  -- passed
+  when System.RPC.Communication_Error =>
+     Report.Failed ("Communication_Error occurred");
+  when others =>
+     Report.Failed ("Wrong exception was propagated across partitions (1)");
+end Predefined_Simple;
+
+
+procedure Userdefined_Simple is
+begin
+  if CXE4001_Decl_Pure.Verbose then
+     Report.Comment ("Check that an exception declared in a shared " &
+                     " package can be raised in one partition and" &
+                     " handled in another");
+  end if;
+  CXE4001_Partition_B.Raise_Visible_Exception;
+  Report.Failed ("Shared exception was not propagated across partitions");
+exception
+  when CXE4001_Decl_Pure.Visible_User_Defined_Exception =>
+     null;  -- passed
+  when System.RPC.Communication_Error =>
+     Report.Failed ("Communication_Error occurred");
+  when others =>
+     Report.Failed ("Wrong exception was propagated across partitions (2)");
+end Userdefined_Simple;
+
+
+procedure Invisible_Simple is
+begin
+  if CXE4001_Decl_Pure.Verbose then
+     Report.Comment ("Check that an exception declared in another" &
+                     " partition can be handled with an 'others'" &
+                     " exception handler");
+  end if;
+  CXE4001_Partition_B.Raise_Invisible_Exception;
+  Report.Failed ("Invisible exception was not propagated across partitions");
+exception
+  when System.RPC.Communication_Error =>
+     Report.Failed ("Communication_Error occurred");
+  when others =>
+     null;  -- passed
+end Invisible_Simple;
+
+
+procedure Invisible_Complex_1 is
+begin
+  if CXE4001_Decl_Pure.Verbose then
+     Report.Comment ("Check that an exception declared in this partition" &
+                     " and not visible to the other partition is properly" &
+                     " handled when it propagates from this partition," &
+                     " through the other partition, and back to this" &
+                     " partition.");
+  end if;
+  CXE4001_Partition_B.Call_A_Raise_Invisible_1;
+  Report.Failed ("Local exception was not propagated across partitions");
+exception
+  when Exception_Local_To_A =>
+     null;  -- passed
+  when System.RPC.Communication_Error =>
+     Report.Failed ("Communication_Error occurred");
+  when others =>
+     Report.Failed ("Wrong exception was propagated across partitions (3)");
+end Invisible_Complex_1;
+
+
+procedure Invisible_Complex_2 is
+begin
+  if CXE4001_Decl_Pure.Verbose then
+     Report.Comment ("Check that an exception declared in this partition" &
+                     " and not visible to the other partition is properly" &
+                     " handled when it propagates from this partition," &
+                     " is handled and then re-raised in the other" &
+                     " partition, and propagated back to this" &
+                     " partition.");
+  end if;
+  CXE4001_Partition_B.Call_A_Raise_Invisible_2;
+  Report.Failed ("Local re-raised exception was not propagated" &
+                 " across partitions");
+exception
+  when Exception_Local_To_A =>
+     null;  -- passed
+  when System.RPC.Communication_Error =>
+     Report.Failed ("Communication_Error occurred");
+  when others =>
+     Report.Failed ("Wrong exception was propagated across partitions (4)");
+end Invisible_Complex_2;
+
+
+    -- service routine for Invisible_Complex test
+procedure Raise_Invisible is
+begin
+  -- Report.Comment ("Round-trip call complete. ");
+  raise Exception_Local_To_A;
+end Raise_Invisible;
+
+end CXE4001_Partition_A;
+
+
+-----------------------------------------------------------------------------
+
+with CXE4001_Decl_Pure;
+with CXE4001_Partition_A;
+with Report;
+package body CXE4001_Partition_B is
+
+procedure Raise_Program_Error is
+begin
+  raise Program_Error;
+end Raise_Program_Error;
+
+
+procedure Raise_Visible_Exception is
+begin
+  raise CXE4001_Decl_Pure.Visible_User_Defined_Exception;
+end Raise_Visible_Exception;
+
+
+procedure Raise_Invisible_Exception is
+  Invisible : exception;
+begin
+  raise Invisible;
+end Raise_Invisible_Exception;
+
+
+procedure Call_A_Raise_Invisible_1 is
+begin
+  CXE4001_Partition_A.Raise_Invisible;
+  Report.Failed ("exception propagation in Call_A_Raise_Invisible_1");
+end Call_A_Raise_Invisible_1;
+
+
+-- Call_A_Raise_Invisible_2 differs from *_1 in that it handles the
+-- invisible exception and then re-raises it.
+procedure Call_A_Raise_Invisible_2 is
+begin
+  CXE4001_Partition_A.Raise_Invisible;
+  Report.Failed ("exception propagation in Call_A_Raise_Invisible_2");
+exception
+  when others =>
+    raise;  -- re-raise the invisible exception
+end Call_A_Raise_Invisible_2;
+
+
+-- the following task is used to keep this partition from
+-- completing until partition A informs it that the test is 
+-- finished.  This is done by calling the Finished procedure
+-- in the specification of this package.
+
+task Coordinate_Completion is
+  entry Finished;
+end Coordinate_Completion;
+
+task body Coordinate_Completion is
+begin
+  accept Finished;
+  Report.Result;
+end Coordinate_Completion;
+
+procedure Finished is
+begin
+  Coordinate_Completion.Finished;
+end Finished;
+end CXE4001_Partition_B;

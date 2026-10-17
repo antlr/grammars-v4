@@ -1,0 +1,4 @@
+(: Check whether x and y are both . :)
+
+assert count(//externalDeclaration//initDeclaratorList//Identifier[text() = "x"]) = 1, "Declaration 'extern int *x;' is not being parsed correctly.";
+assert count(//externalDeclaration//initDeclaratorList//Identifier[text() = "y"]) = 1, "Declaration 'extern int y;' is not being parsed correctly.";

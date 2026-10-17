@@ -1,0 +1,231 @@
+-- BC30001.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that, in the visible part of an instance, legality rules are
+--      enforced at compile time of the generic instantiation, and not
+--      enforced in other parts of the instance. Specifically, check that, for
+--      a tagged actual type passed to a non-tagged formal private type, a
+--      tagged type may not be derived from the actual in the visible part of
+--      an instance, but may be derived in the private part or body. Check that
+--      a non-tagged type derived from a tagged parent type in the private part
+--      of an instance is not treated as tagged outside the instance.
+--
+-- TEST DESCRIPTION:
+--      A tagged actual type may be passed to a non-tagged formal private
+--      type. 
+--
+--      Within the visible part of a generic declaration a non-tagged type may
+--      be derived from the formal private type. However, within the instance,
+--      if the actual type is tagged, the derived type will be illegal because
+--      its parent type is tagged. 
+--
+--      This rule does not apply if the type is derived within the private
+--      part or body of the instance, however, since this rule is not enforced
+--      in the private part or body of the instance. 
+--
+--      Outside the instance, a partial view of the derived type (declared in
+--      the private part) may be visible. If so, this view is not tagged,
+--      and so use of tagged-type-specific attributes with the partial view,
+--      the declaration of type extensions of the partial view, and calls to
+--      dispatching operations of the actual type with operands of the type
+--      of the partial view are illegal.  
+--
+--
+-- CHANGE HISTORY:
+--      06 Dec 94   SAIC    ACVC 2.0
+--      28 Apr 21   RLB     Added error location indicators.
+--!
+
+package BC30001_0 is
+
+   type Tagged_Type is tagged record
+      Bool : Boolean;
+   end record;
+
+   function Func return Tagged_Type;              -- Abstract when inherited.
+
+
+   type Rec_Ext is new Tagged_Type with null record;
+   function Func return Rec_Ext;                  -- Overrides.
+
+
+   type Pri_Ext is new Tagged_Type with private;
+   function Func return Pri_Ext;                  -- Overrides.
+
+private
+
+   type Pri_Ext is new Tagged_Type with null record;
+
+end BC30001_0;
+
+
+     --===================================================================--
+
+
+package body BC30001_0 is
+
+   function Func return Tagged_Type is
+   begin
+      return (Bool => True);
+   end Func;
+
+
+   function Func return Rec_Ext is
+   begin
+      return (Bool => True);
+   end Func;
+
+
+   function Func return Pri_Ext is
+   begin
+      return (Bool => True);
+   end Func;
+
+end BC30001_0;
+
+
+     --===================================================================--
+
+
+with BC30001_0;
+package BC30001_1 is
+
+   generic
+      type Formal_Private is private;
+   package Derived_In_Visible_Part is
+      type Derived_Type is new Formal_Private;
+   end Derived_In_Visible_Part;
+
+
+
+   generic
+      type Formal_Private is private;
+   package Derived_In_Private_Part is
+      type Derived_Type is private;           -- View visible outside instance.
+   private
+      type Derived_Type is new Formal_Private;
+   end Derived_In_Private_Part;
+
+
+
+   generic
+      type Formal_Private is private;
+   package Derived_In_Body is
+
+      procedure Dummy_Proc (P: Formal_Private);       -- Needed to allow body
+                                                      -- for BC30001_1.
+   end Derived_In_Body;
+
+end BC30001_1;
+
+
+     --===================================================================--
+
+
+package body BC30001_1 is
+
+   package body Derived_In_Body is
+
+      type Derived_Type is new Formal_Private;
+
+      procedure Dummy_Proc (P: Formal_Private) is
+      begin
+         null;
+      end Dummy_Proc;
+
+   end Derived_In_Body;
+
+end BC30001_1;
+
+
+     --===================================================================--
+
+
+with Ada.Tags;
+
+with BC30001_0;
+with BC30001_1;
+generic
+   type Formal_Private is tagged private;
+   type Formal_Derived is new BC30001_0.Tagged_Type with private;
+package BC30001 is
+
+-- Check that a tagged actual type may be passed to a non-tagged formal
+-- private type, and that a non-extension type may be derived from the
+-- actual in the private part or body of an instance.
+
+   package Priv_Derivation is new BC30001_1.Derived_In_Private_Part
+      (BC30001_0.Tagged_Type);                                -- OK. {1:4;1}
+
+   package Body_Derivation is new BC30001_1.Derived_In_Body
+      (BC30001_0.Tagged_Type);                                -- OK. {1:4;1}
+
+
+
+-- Check that a tagged actual type may be passed to a non-tagged formal
+-- private type, and that a non-extension type may *not* be derived from the
+-- actual in the visible part of an instance.
+
+   package Visi_Deriv_01 is new BC30001_1.Derived_In_Visible_Part
+     (BC30001_0.Tagged_Type);                                 -- ERROR: {1:4;1}
+                      -- Type derived in instance does not have extension part.
+
+   package Visi_Deriv_02 is new BC30001_1.Derived_In_Visible_Part
+     (BC30001_0.Rec_Ext);                                     -- ERROR: {1:4;1}
+                      -- Type derived in instance does not have extension part.
+
+   package Visi_Deriv_03 is new BC30001_1.Derived_In_Visible_Part
+     (BC30001_0.Pri_Ext);                                     -- ERROR: {1:4;1}
+                      -- Type derived in instance does not have extension part.
+
+   package Visi_Deriv_04 is new BC30001_1.Derived_In_Visible_Part
+     (Formal_Private);                                        -- ERROR: {1:4;1}
+                      -- Type derived in instance does not have extension part.
+
+   package Visi_Deriv_05 is new BC30001_1.Derived_In_Visible_Part
+     (Formal_Derived);                                        -- ERROR: {1:4;1}
+                      -- Type derived in instance does not have extension part.
+
+
+-- Check that a non-tagged type derived from a tagged parent type in the
+-- private part of an instance is not treated as tagged outside the instance.
+
+   Object    : Priv_Derivation.Derived_Type;
+
+   Var       : Priv_Derivation.Derived_Type := BC30001_0.Func;-- ERROR: {4;1}
+                      -- Function not dispatching; function returns wrong type.
+
+   ClassWide : BC30001_0.Tagged_Type'Class := Object;         -- ERROR: {4;1}
+                                         -- Object is not in Tagged_Type'Class.
+
+   Tag_Val   : Ada.Tags.Tag := Priv_Derivation.Derived_Type'Tag;-- ERROR: {4;1}
+                                   -- Attribute not defined for untagged types.
+
+   type Rec_Ext is new Priv_Derivation.Derived_Type
+                                           with null record;  -- ERROR: {1:4;1}
+                                                  -- Parent type is not tagged.
+
+end BC30001;
