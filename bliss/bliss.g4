@@ -1,7 +1,7 @@
 /*
  BSD License
 
- Copyright (c) 2022, Tom Everett All rights reserved.
+ Copyright (c) 2026, Tom Everett All rights reserved.
 
  Redistribution and use in source and binary forms, with or without modification, are permitted
  provided that the following conditions are met:
@@ -22,227 +22,420 @@
  IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 grammar bliss;
 
-module_: 'MODULE' name (parameters) e 'ELUDOM';
+module_
+   : 'MODULE' name '(' parameters? ')' '=' e 'ELUDOM'
+   ;
+
+parameters
+   : parameter
+   | parameter ',' parameters
+   ;
+
+parameter
+   : name
+   | name '=' e
+   ;
+
+block
+   : 'BEGIN' blockbody 'END'
+   | (blockbody)
+   ;
+
+compoundexpression
+   : 'BEGIN' expressionsequence 'END'
+   | '(' expressionsequence ')'
+   ;
+
+blockbody
+   : declarations (';' expressionsequence | ';')?
+   ;
+
+declarations
+   : declaration
+   | declaration ';' declarations
+   ;
+
+expressionsequence
+   : e (';' e)*
+   ;
+
+literal
+   : number
+   | quotedstring
+   ;
+
+number
+   : DECIMAL
+   | OCTAL
+   | FLOATING
+   ;
+
+quotedstring
+   : LEFTADJUSTEDSTRING
+   | RIGHTADJUSTEDSTRING
+   ;
+
+e
+   : simpleexpression
+   | controlexpression
+   ;
+
+simpleexpression
+   : pl1 '=' e
+   | pl1
+   ;
+
+pl1
+   : pl0
+   | pl1 'XOR' pl0
+   | pl1 'EQV' pl0
+   ;
+
+pl0
+   : p9
+   | pl0 'OR' p9
+   ;
+
+p9
+   : p8
+   | p9 'AND' p8
+   ;
+
+p8
+   : p7
+   | 'NOT' p7
+   ;
+
+p7
+   : p6
+   | p6 relation p6
+   ;
+
+p6
+   : p5
+   | '-' p5
+   | p6 '+' p5
+   | p6 '-' p5
+   ;
+
+p5
+   : p4
+   | p5 '*' p4
+   | p5 '/' p4
+   | p5 'MOD' p4
+   ;
+
+p4
+   : p3
+   | p4 't' p3
+   ;
+
+p3
+   : p2
+   | '.' p3
+   | '@' p3
+   | '\\' p3
+   ;
+
+p2
+   : p1
+   | p1 '<' pointerparameters '>'
+   ;
+
+p1
+   : literal
+   | name
+   | name '[' elist ']'
+   | p1 '(' elist ')'
+   | p1 '(' ')'
+   | block
+   | compoundexpression
+   ;
+
+relation
+   : 'EQL'
+   | 'NEQ'
+   | 'LSS'
+   | 'LEQ'
+   | 'GTR'
+   | 'GEQ'
+   ;
+
+pointerparameters
+   : position? ',' size modification?
+   ;
+
+modification
+   : ',' index
+   | ',' index ',' indirect
+   ;
+
+position
+   : e
+   ;
+
+size
+   : e
+   ;
+
+index
+   : e
+   ;
+
+indirect
+   : e
+   ;
+
+controlexpression
+   : conditionalexpression
+   | loopexpression
+   | choiceexpression
+   | escapeexpression
+   | coroutineexpression
+   ;
+
+conditionalexpression
+   : 'IF' e 'THEN' e
+   | 'IF' e 'THEN' e 'ELSE' e
+   ;
+
+loopexpression
+   : 'WHILE' e 'DO' e
+   | 'UNTIL' e 'DO' e
+   | 'DO' e 'WHILE' e
+   | 'DO' e 'UNTIL' e
+   | 'INCR' name 'FROM' e 'TO' e 'BY' e 'DO' e
+   | 'DECR' name 'FROM' e 'TO' e 'BY' e 'DO' e
+   ;
+
+escapeexpression
+   : environment level escapevalue
+   | 'RETURN' escapevalue
+   ;
+
+environment
+   : 'EXIT'
+   | 'EXITBLOCK'
+   | 'EXITCOMPOUND'
+   | 'EXITLOOP'
+   | 'EXITCONDITIONAL' 'EXITCASE'
+   | 'EXITSET'
+   | 'EXITSELECT'
+   ;
+
+level
+   : ('[' e ']')?
+   ;
+
+escapevalue
+   : e?
+   ;
+
+choiceexpression
+   : 'CASE' elist 'OF' 'SET' expressionset 'TES'
+   | 'SELECT' elist 'OF' 'NSET' nexpressionset 'TESN'
+   ;
+
+elist
+   : e
+   | elist ',' e
+   ;
+
+expressionset
+   : e
+   | ';' expressionset
+   | e ';' expressionset
+   ;
+
+nexpressionset
+   : ne
+   | ne ';' nexpressionset
+   ;
+
+ne
+   : e ':' e
+   ;
+
+coroutineexpression
+   : 'CREATE' e '(' elist ')' 'AT' e 'LENGTH' e 'THEN' e
+   | 'EXCHJ' '(' e ',' e ')'
+   ;
+
+declaration
+   : functiondeclaration
+   | structuredeclaration
+   | binddeclaration
+   | macrodeclaration
+   | allocationdeclaration
+   | mapdeclaration
+   | 'MACHOP' mlist
+   | 'ALLMACHOP'
+   | 'SWITCHES' switchlist
+   ;
+
+allocationdeclaration
+   : allocatetype msidlist
+   ;
+
+allocatetype
+   : 'GLOBAL'
+   | 'REGISTER'
+   | 'OWN'
+   | 'LOCAL'
+   | 'EXTERNAL'
+   ;
+
+msidlist
+   : msidelement
+   | msidelement ',' msidlist
+   ;
+
+msidelement
+   : structure sizedchunks
+   ;
+
+structure
+   : name?
+   ;
+
+sizedchunks
+   : sizedchunk
+   | sizedchunk ':' sizedchunks
+   ;
+
+sizedchunk
+   : idchunk
+   | idchunk '[' elist ']'
+   ;
+
+idchunk
+   : name
+   | name ':' idchunk
+   ;
+
+mapdeclaration
+   : 'MAP' msidlist
+   ;
+
+binddeclaration
+   : 'BIND' equivalencelist
+   ;
+
+equivalencelist
+   : equivalence
+   | equivalence ',' equivalencelist
+   ;
+
+equivalence
+   : msidelement '=' e
+   ;
+
+structuredeclaration
+   : 'STRUCTURE' name structureformallist '=' structuresize
+   ;
+
+structureformallist
+   : ('[' namelist ']')?
+   ;
+
+structuresize
+   : ('[' e ']')?
+   ;
+
+functiondeclaration
+   : 'FUNCTION' name '(' namelist ')' '=' e
+   | 'FUNCTION' name '=' e
+   | 'ROUTINE' name '(' namelist ')' '=' e
+   | 'ROUTINE' name '=' e
+   | 'GLOBAL' 'ROUTINE' name '(' namelist ')' '=' e
+   | 'GLOBAL' 'ROUTINE' name '=' e
+   | 'EXTERNAL' 'ROUTINE' namelist
+   | 'FORWARD' 'ROUTINE' namelist
+   ;
+
+namelist
+   : name
+   | namelist ',' name
+   ;
+
+macrodeclaration
+   : 'MACRO' definitionlist
+   ;
+
+definitionlist
+   : definition
+   | definitionlist ',' definition
+   ;
+
+definition
+   : name '(' namelist ')' '=' e
+   | name '=' e
+   ;
+
+mlist
+   : name '=' e
+   | mlist ',' name '=' e
+   ;
+
+switchlist
+   : switch
+   | switch ',' switchlist
+   ;
+
+switch
+   : name
+   | name '=' e
+   ;
+
+name
+   : NAME
+   ;
+
+COMMENT1
+   : '!' ~ [\r\n]* -> skip
+   ;
+
+COMMENT2
+   : '%' ~ '%'* '%' -> skip
+   ;
+
+DECIMAL
+   : DIGIT+
+   ;
+
+OCTAL
+   : '#' [0-7]+
+   ;
+
+FLOATING
+   : DECIMAL '.' DECIMAL EXPONENT?
+   ;
+
+fragment EXPONENT
+   : 'E' DECIMAL
+   | 'E' '+' DECIMAL
+   | 'E' '-' DECIMAL
+   ;
+
+LEFTADJUSTEDSTRING
+   : '\'' ~ ['\r\n]* '\''
+   ;
+
+RIGHTADJUSTEDSTRING
+   : '"' ~ ["\r\n]* '"'
+   ;
+
+NAME
+   : [A-Za-z] [A-Za-z0-9_$]*
+   ;
+
+fragment DIGIT
+   : [0-9]
+   ;
+
+WS
+   : [ \r\n\t]+ -> skip
+   ;
 
-block: 'BEGIN' blockbody 'END' | ( blockbody);
-
-compoundexpression:
-	'BEGIN' expressionsequence 'END'
-	| ( expressionsequence);
-
-blockbody: declarations ';' expressionsequence;
-
-declarations: declaration | declaration ';' declarations;
-
-expressionsequence: e | e expressionsequence;
-
-literal: number | quotedstring;
-
-number: DECIMAL | OCTAL | FLOATING;
-
-quotedstring: LEFTADJUSTEDSTRING | RIGHTADJUSTEDSTRING;
-
-e: simpleexpression | controlexpression;
-
-simpleexpression: pl1 '←' e | pl1;
-
-pl1: pl0 | pl1 'XOR' pl0 | pl1 'EQV' pl0;
-
-pl0: p9 | pl0 'OR' p9;
-
-p9: p8 | p9 'AND' p8;
-
-p8: p7 | 'NOT' p7;
-
-p7: p6 | p6 relation p6;
-
-p6: p5 | '-' p5 | p6 '+' p5 | p6 '-' p5;
-
-p5: p4 | p5 '*' p4 | p5 '/' p4 | p5 'MOD' p4;
-p4: p3 | p4 't' p3;
-
-p3: p2 | '.' p3 | '@' p3 | '\\' p3;
-
-p2: p1 | p1 '<' pointerparameters '>';
-
-p1:
-	literal
-	| name
-	| name '[' elist ']'
-	| p1 '(' elist ')'
-	| p1 '(' ')'
-	| block
-	| compoundexpression;
-
-relation: 'EQL' | 'NEQ' | 'LSS' | 'LEQ' | 'GTR' | 'GEQ';
-
-pointerparameters: position? ',' size modification?;
-
-modification: ',' index | ',' index ',' indirect;
-
-position: e;
-size: e;
-index: e;
-indirect: e;
-controlexpression:
-	conditionalexpression
-	| loopexpression
-	| choiceexpression
-	| escapeexpression
-	| coroutineexpression;
-
-conditionalexpression:
-	'IF' e 'THEN' e
-	| 'IF' e 'THEN' e 'ELSE' e;
-
-loopexpression: 'WHILE' e 'DO' e;
-loopexpression: 'UNTIL' e 'DO' e;
-loopexpression: 'DO' e 'WHILE' e;
-loopexpression: 'DO' e 'UNTIL' e;
-loopexpression: 'INCR' name 'FROM' e 'TO' e 'BY' e 'DO' e;
-loopexpression: 'DECR' name 'FROM' e 'TO' e 'BY' e 'DO' e;
-escapeexpression:
-	environment level escapevalue
-	| 'RETURN' escapevalue;
-environment:
-	'EXIT'
-	| 'EXITBLOCK'
-	| 'EXITCOMPOUND'
-	| 'EXITLOOP'
-	| 'EXITCONDITIONAL' 'EXITCASE'
-	| 'EXITSET'
-	| 'EXITSELECT';
-
-level: ('[' e ']')?;
-
-escapevalue: e?;
-
-choiceexpression: 'CASE' elist 'OF' 'SET' expressionset 'TES';
-
-elist: e | e ',' elist;
-
-expressionset: e | ';' expressionset | e ';' expressionset;
-
-choiceexpression:
-	'SELECT' elist 'OF' 'NSET' nexpressionset 'TESN';
-
-nexpressionset: 'ne' | 'ne' ';' nexpressionset;
-
-ne: e ':' e;
-
-coroutineexpression:
-	'CREATE' e '(' elist ')' 'AT' e 'LENGTH' e 'THEN' e
-	| 'EXCHJ' '(' e ',' e ')';
-
-declaration:
-	functiondeclaration
-	| structuredeclaration
-	| binddeclaration
-	| macrodeclaration
-	| allocationdeclaration
-	| mapdeclaration;
-
-allocationdeclaration: allocatetype msidlist;
-
-allocatetype:
-	'GLOBAL'
-	| 'REGISTER'
-	| 'OWN'
-	| 'LOCAL'
-	| 'EXTERNAL';
-
-msidlist: msidelement | msidelement ',' msidlist;
-
-msidelement: structure sizedchunks;
-
-structure: structurename?;
-
-sizedchunks: sizedchunk | sizedchunk ':' sizedchunks;
-
-sizechunk: idchunk | idchunk '[' elist ']';
-idchunk: name | name ':' idchunk;
-
-mapdeclaration: 'MAP' msidlist;
-
-binddeclaration: 'BIND' equivalencelist;
-
-equivalencelist: equivalence | equivalence ',' equivalencelist;
-
-equivalence: msidelement '=' e;
-
-structuredeclaration:
-	'STRUCTURE' name structureformallist '=' structuresize;
-
-structureformallist: ('[' namelist ']')?;
-
-structuresize: ('[' e ']')?;
-
-functiondeclaration:
-	'FUNCTION' name '(' namelist ')' '=' e
-	| 'FUNCTION' name '=' e
-	| 'ROUTINE' name '(' namelist ')' '=' e
-	| 'ROUTINE' name '=' e;
-
-p1: p1 '(' elist ')' | p1 '(' ')';
-
-elist: e | elist ',' e;
-
-functiondeclaration:
-	'GLOBAL' 'ROUTINE' name '(' namelist ')' '=' e
-	| 'GLOBAL' 'ROUTINE' name '=' e;
-
-functiondeclaration:
-	'EXTERNAL' nameparlist
-	| 'FORWARD' nameparlist;
-
-nameparlist: namepar | nameparlist ',' namepar;
-namepar: name '(' e ')';
-
-macrodeclaration: 'MACRO' definitionlist;
-
-definitionlist: definition | definitionlist ',' definition;
-definition:
-	name '(' namelist ')' '=' stringwithoutdollar '$'
-	| name '=' stringwithoutdollar '$';
-macrocall: name '(' balancecstringlist ')' | name;
-
-balancedstringlist:
-	balancedstrtng· ''
-	| balancedstringlist ',' balancedstring;
-
-declaration: 'MACHOP' mlist | 'ALLMACHOP';
-mlist: name '=' e | mlist ',' name '=' e;
-
-module: 'MODULE' name '(' parameters ')' '=' e 'ELUDOM';
-
-parameters: parameter | parameter ',' parameters;
-
-declaration: 'SWITCHES' switchlist;
-
-switchlist: switch | switch ',' switchlist;
-letter: (NAME | LETTER)*;
-
-COMMENT1: '!' ~[\r\n]* -> skip;
-
-COMMENT2: '%' ~'%'* '%' -> skip;
-
-DECIMAL: DIGIT+;
-
-OCTAL: '#' [0-7]+;
-
-FLOATING: DECIMAL '.' DECIMAL EXPONENT?;
-
-EXPONENT: 'E' DECIMAL | 'E' '+' DECIMAL | 'E' '-' DECIMAL;
-
-LEFTADJUSTEDSTRING: 'string';
-
-RIGHTADJUSTEDSTRING: '"' '"';
-
-OIT: [0-7];
-DIGIT: [0-9];
-LETTER: [A-Za-z];
-
-WS: [ \r\n\t]+ -> skip;

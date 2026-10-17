@@ -155,6 +155,8 @@
 				<module>bencoding</module>
 				<module>bibcode</module>
 				<module>bicep</module>
+                <module>bison</module>
+                <module>bliss</module>
 				<module>bnf</module>
 				<module>c</module>
 				<module>calculator</module>
