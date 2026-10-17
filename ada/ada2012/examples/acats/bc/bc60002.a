@@ -1,0 +1,282 @@
+-- BC60002.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--     The ACAA has created and maintains the Ada Conformity Assessment Test
+--     Suite for the purpose of conformity assessments conducted in accordance
+--     with the International Standard ISO/IEC 18009 - Ada: Conformity
+--     assessment of a language processor. This test suite should not be used
+--     to make claims of conformance unless used in accordance with
+--     ISO/IEC 18009 and any applicable ACAA procedures.
+--
+--*
+--
+-- OBJECTIVE:
+--     Check that a formal_abstract_subprogram_declaration cannot lack a
+--     controlling type.
+--
+--     Check that a formal_abstract_subprogram_declaration cannot have
+--     multiple controlling types.
+--
+--     Check that a formal_abstract_subprogram_declaration cannot have
+--     a controlling type that is incomplete.
+--
+-- TEST DESCRIPTION:
+--     We try formal abstract subprograms whose controlling type is each
+--     of the kinds of types allowed (mentioned in AARM 12.6(8.b/2)):
+--     a formal tagged private type, a formal derived type, a formal
+--     interface type, or a normal tagged type, as well as cases that
+--     are similar (a formal untagged private type; a formal derived type
+--     that is not tagged, and a normal untagged type).
+--
+--     We also try functions that only have a controlling result, as well
+--     as routines with multiple controlling operands of the same type.
+--
+--     The test marks the errors (1), (2), or (3) depending on which of the
+--     three objectives are involved.
+--
+--     The last objective is for Ada 2012; the rest are for the 2007 Amendment
+--     to Ada 95.
+--
+-- CHANGE HISTORY:
+--     18 May 2015   RLB   Created test.
+--     22 Apr 2021   RLB   Added error location indicators.
+
+package BC60002 is
+
+    type Root is tagged null record;
+
+    type Color is (Red, Green, Blue);
+
+    -- First, we try every kind of type:
+
+    generic
+        with procedure P (C : Color) is abstract;          -- ERROR: (1) {9;1}
+    package G1A is
+    end G1A;
+
+    generic
+        with procedure P (R : Root) is abstract;           -- OK. {9;1}
+    package G1B is
+    end G1B;
+
+    generic
+        type UPriv is private;
+        with procedure P (U : UPriv) is abstract;          -- ERROR: (1) {9;1}
+    package G1C is
+    end G1C;
+
+    generic
+        type TPriv is tagged private;
+        with procedure P (T : TPriv) is abstract;          -- OK. {9;1}
+    package G1D is
+    end G1D;
+
+    generic
+        type Disc is (<>);
+        with procedure P (D : Disc) is abstract;           -- ERROR: (1) {9;1}
+    package G1E is
+    end G1E;
+
+    generic
+        type UDer is new Color;
+        with procedure P (U : UDer) is abstract;           -- ERROR: (1) {9;1}
+    package G1F is
+    end G1F;
+
+    generic
+        type TDer is new Root with private;
+        with procedure P (T : TDer) is abstract;           -- OK. {9;1}
+    package G1G is
+    end G1G;
+
+    generic
+        type Intf is limited interface;
+        with procedure P (I : Intf) is abstract;           -- OK. {9;1}
+    package G1H is
+    end G1H;
+
+    generic
+        type Incomp is tagged;
+        with procedure P (I : Incomp) is abstract;         -- ERROR: (3) {9;1}
+    package G1I is
+    end G1I;
+
+    -- Second, we try every kind of subprogram and parameter, with
+    -- the most likely kinds of types:
+
+    generic
+        type TPriv (<>) is abstract tagged limited private;
+        with procedure P (T : in out TPriv; C : Color)
+                                             is abstract;  -- OK. {1:9;1}
+    package G2A is
+    end G2A;
+
+    generic
+        type TPriv (<>) is abstract tagged limited private;
+        with procedure P (T : access TPriv) is abstract;   -- OK. {9;1}
+    package G2B is
+    end G2B;
+
+    generic
+        type TPriv (<>) is abstract tagged limited private;
+        with function F (T : TPriv) return Color
+                                             is abstract;  -- OK. {1:9;1}
+    package G2C is
+    end G2C;
+
+    generic
+        type TPriv (<>) is abstract tagged limited private;
+        with function F (C : Color) return TPriv
+                                             is abstract;  -- OK. {1:9;1}
+    package G2D is
+    end G2D;
+
+    generic
+        type TPriv (<>) is abstract tagged limited private;
+        with function F (C : Color) return access TPriv
+                                             is abstract;  -- OK. {1:9;1}
+    package G2E is
+    end G2E;
+
+    generic
+        type TPriv (<>) is abstract tagged limited private;
+        with procedure P (Target : in out TPriv; Source : in TPriv)
+                                             is abstract;  -- OK. {1:9;1}
+    package G2F is
+    end G2F;
+
+    generic
+        type TPriv (<>) is abstract tagged limited private;
+        with function "=" (Left, Right : in TPriv) return Boolean
+                                             is abstract;  -- OK. {1:9;1}
+    package G2G is
+    end G2G;
+
+    generic
+        type TPriv (<>) is abstract tagged limited private;
+        with function F (Old : in TPriv; C : Color) return TPriv
+                                             is abstract;  -- OK. {1:9;1}
+    package G2H is
+    end G2H;
+
+    generic
+        type TPriv (<>) is abstract tagged limited private;
+        with procedure P (Target : in out TPriv; Source : in Root)
+                                             is abstract;  -- ERROR: (2){1:9;1}
+    package G2I is
+    end G2I;
+
+    generic
+        type TPriv (<>) is abstract tagged limited private;
+        with procedure P (Target : in out TPriv; Source : in Root'Class)
+                                             is abstract;  -- OK. {1:9;1}
+    package G2J is
+    end G2J;
+
+    generic
+        type TPriv (<>) is abstract tagged limited private;
+        type TDer is new Root with private;
+        with function F (Old : in TPriv; C : Color) return TDer
+                                             is abstract;  -- ERROR: (2){1:9;1}
+    package G2K is
+    end G2K;
+
+    generic
+        type TPriv (<>) is abstract tagged limited private;
+        type TDer is new Root with private;
+        with function F (Old : in TPriv'Class; C : Color) return TDer
+                                             is abstract;  -- OK. {1:9;1}
+    package G2L is
+    end G2L;
+
+    generic
+        type TPriv (<>) is abstract tagged limited private;
+        type UDer is new Color;
+        with function F (Old : in TPriv; U : UDer) return TPriv
+                                             is abstract;  -- OK. {1:9;1}
+    package G2M is
+    end G2M;
+
+    generic
+        type TPriv (<>) is abstract tagged limited private;
+        type UDer is new Color;
+        with function F (Old : in TPriv'Class; U : UDer) return Boolean
+                                             is abstract;  -- ERROR: (1){1:9;1}
+    package G2N is
+    end G2N;
+
+    generic
+        type TPriv (<>) is abstract tagged limited private;
+        type UDer is new Color;
+        with function F (Old : access TPriv) return UDer
+                                             is abstract;  -- OK. {1:9;1}
+    package G2O is
+    end G2O;
+
+    generic
+        type TPriv (<>) is abstract tagged limited private;
+        type UDer is new Color;
+        with function F (Old : access TPriv'Class) return UDer
+                                             is abstract;  -- ERROR: (1){1:9;1}
+    package G2P is
+    end G2P;
+
+    generic
+        type UPriv (<>) is limited private;
+        with function F (Old : UPriv; C : Color) return UPriv
+                                             is abstract;  -- ERROR: (1){1:9;1}
+    package G2Q is
+    end G2Q;
+
+    generic
+        type UPriv (<>) is limited private;
+        with function F (C : Color) return UPriv 
+                                             is abstract;  -- ERROR: (1){1:9;1}
+    package G2R is
+    end G2R;
+
+    generic
+        type UPriv (<>) is limited private;
+        with procedure P (Target : in out UPriv; Source : in UPriv)
+                                             is abstract;  -- ERROR: (1){1:9;1}
+    package G2S is
+    end G2S;
+
+    generic
+        type UPriv (<>) is limited private;
+        with function "=" (Left, Right : in UPriv) return Boolean
+                                             is abstract;  -- ERROR: (1){1:9;1}
+    package G2T is
+    end G2T;
+
+    generic
+        type Incomp is tagged;
+        with function "=" (Left, Right : in Incomp) return Boolean
+                                             is abstract;  -- ERROR: (3){1:9;1}
+    package G2U is
+    end G2U;
+
+end BC60002;

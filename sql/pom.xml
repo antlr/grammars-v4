@@ -13,16 +13,25 @@
     </parent>
 
     <modules>
+        <module>athena</module>
+        <module>cockroachdb</module>
+        <module>databricks</module>
+        <module>db2</module>
         <module>derby</module>
+        <module>drill</module>
         <module>hive</module>
         <module>mariadb</module>
-        <module>mysql</module>
+        <module>mysql/Positive-Technologies</module>
         <module>phoenix</module>
         <module>plsql</module>
         <module>postgresql</module>
         <module>snowflake</module>
         <module>sqlite</module>
+        <module>teradata</module>
         <module>trino</module>
         <module>tsql</module>
+        <module>informix-sql</module>
+        <module>starrocks</module>
+        <module>clickhouse</module>
     </modules>
 </project>

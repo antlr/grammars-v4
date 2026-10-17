@@ -29,176 +29,179 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar focal;
 
 prog
-   : statement+ EOF
-   ;
+    : statement+ EOF
+    ;
 
 statement
-   : linenum command
-   ;
+    : linenum command
+    ;
 
 grpnum
-   : INTEGER
-   ;
+    : INTEGER
+    ;
 
 linenum
-   : grpnum '.' INTEGER
-   ;
+    : grpnum '.' INTEGER
+    ;
 
 command
-   : ask
-   | do_
-   | for_
-   | set_
-   | quit
-   | goto_
-   | if_
-   | type_
-   | return_
-   | write_
-   | comment
-   ;
+    : ask
+    | do_
+    | for_
+    | set_
+    | quit
+    | goto_
+    | if_
+    | type_
+    | return_
+    | write_
+    | comment
+    ;
 
 ask
-   : ('ASK' | 'A') askpair (',' askpair)*
-   ;
+    : ('ASK' | 'A') askpair (',' askpair)*
+    ;
 
 askpair
-   : STRING_LITERAL ',' VARIABLE (',' VARIABLE)*
-   ;
+    : STRING_LITERAL ',' VARIABLE (',' VARIABLE)*
+    ;
 
 do_
-   : ('DO' | 'D') ('all' | grpnum | linenum)
-   ;
+    : ('DO' | 'D') ('all' | grpnum | linenum)
+    ;
 
 for_
-   : ('FOR' | 'F') VARIABLE '=' expression ',' expression (',' expression)? ';' command
-   ;
+    : ('FOR' | 'F') VARIABLE '=' expression ',' expression (',' expression)? ';' command
+    ;
 
 quit
-   : 'QUIT'
-   ;
+    : 'QUIT'
+    ;
 
 set_
-   : ('SET' | 'S') VARIABLE '=' expression (';' command)?
-   ;
+    : ('SET' | 'S') VARIABLE '=' expression (';' command)?
+    ;
 
 goto_
-   : ('GOTO' | 'G') linenum?
-   ;
+    : ('GOTO' | 'G') linenum?
+    ;
 
 if_
-   : ('IF') expression linenum (',' linenum) (',' linenum) (';' command)?
-   ;
+    : ('IF') expression linenum (',' linenum) (',' linenum) (';' command)?
+    ;
 
 type_
-   : ('TYPE' | 'T') typeexpression (',' typeexpression)* (';' command)?
-   ;
+    : ('TYPE' | 'T') typeexpression (',' typeexpression)* (';' command)?
+    ;
 
 typeexpression
-   : expression
-   | '!'+
-   | '#'+
-   | STRING_LITERAL
-   | ('%' INTEGER '.' INTEGER)
-   ;
+    : expression
+    | '!'+
+    | '#'+
+    | STRING_LITERAL
+    | ('%' INTEGER '.' INTEGER)
+    ;
 
 return_
-   : 'RETURN'
-   ;
+    : 'RETURN'
+    ;
 
 write_
-   : 'WRITE' (grpnum | linenum)?
-   ;
+    : 'WRITE' (grpnum | linenum)?
+    ;
 
 comment
-   : COMMENT
-   ;
+    : COMMENT
+    ;
 
 expression
-   : primary (PLUSMIN primary)*
-   ;
+    : primary (PLUSMIN primary)*
+    ;
 
 primary
-   : term (MULOP term)*
-   ;
+    : term (MULOP term)*
+    ;
 
 term
-   : ('(' expression ')')
-   | ('[' expression ']')
-   | ('<' expression '>')
-   | number
-   | VARIABLE
-   | (VARIABLE '(' expression ')')
-   | (BUILTIN '(' expression ')')
-   ;
+    : ('(' expression ')')
+    | ('[' expression ']')
+    | ('<' expression '>')
+    | number
+    | VARIABLE
+    | (VARIABLE '(' expression ')')
+    | (BUILTIN '(' expression ')')
+    ;
 
 number
-   : mantissa ('e' signed_)?
-   ;
+    : mantissa ('e' signed_)?
+    ;
 
 mantissa
-   : signed_
-   | (signed_ '.')
-   | ('.' signed_)
-   | (signed_ '.' signed_)
-   ;
+    : signed_
+    | (signed_ '.')
+    | ('.' signed_)
+    | (signed_ '.' signed_)
+    ;
 
 signed_
-   : PLUSMIN? INTEGER
-   ;
+    : PLUSMIN? INTEGER
+    ;
 
 PLUSMIN
-   : '+'
-   | '-'
-   ;
+    : '+'
+    | '-'
+    ;
 
 MULOP
-   : '*'
-   | '/'
-   | '^'
-   ;
+    : '*'
+    | '/'
+    | '^'
+    ;
 
 VARIABLE
-   : ALPHA (ALPHA | DIGIT)*
-   ;
+    : ALPHA (ALPHA | DIGIT)*
+    ;
 
 INTEGER
-   : DIGIT+
-   ;
+    : DIGIT+
+    ;
 
 ALPHA
-   : [A-Za-z]
-   ;
+    : [A-Za-z]
+    ;
 
 DIGIT
-   : [0-9]
-   ;
+    : [0-9]
+    ;
 
 BUILTIN
-   : 'fsin'
-   | 'fcos'
-   | 'fexp'
-   | 'flog'
-   | 'fatn'
-   | 'fsqt'
-   | 'fabs'
-   | 'fsgn'
-   | 'fitr'
-   | 'fran'
-   ;
+    : 'fsin'
+    | 'fcos'
+    | 'fexp'
+    | 'flog'
+    | 'fatn'
+    | 'fsqt'
+    | 'fabs'
+    | 'fsgn'
+    | 'fitr'
+    | 'fran'
+    ;
 
 STRING_LITERAL
-   : '"' .*? '"'
-   ;
+    : '"' .*? '"'
+    ;
 
 COMMENT
-   : 'COMMENT' ~ [\r\n]*
-   ;
+    : 'COMMENT' ~ [\r\n]*
+    ;
 
 WS
-   : [ \r\n\t]+ -> skip
-   ;
-
+    : [ \r\n\t]+ -> skip
+    ;

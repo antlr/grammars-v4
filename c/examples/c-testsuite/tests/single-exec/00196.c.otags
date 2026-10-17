@@ -1,0 +1,4 @@
+org=https://bellard.org/tcc/
+repository=git://repo.or.cz/tinycc.git
+version=61ba9f229955f105af9d7dcdbfcc9c9effbe8af3
+path=tests/tests2/50_logical_second_arg.c

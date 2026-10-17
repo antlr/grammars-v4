@@ -1,0 +1,170 @@
+-- BXE2013.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687 and
+--     F08630-91-C-0015, the U.S. Government obtained unlimited rights in the
+--     software and documentation contained herein.  Unlimited rights are
+--     defined in DFAR 252.227-7013(a)(19).  By making this public release,
+--     the Government intends to confer upon all recipients unlimited rights
+--     equal to those held by the Government.  These rights include rights to
+--     use, duplicate, release or disclose the released technical data and
+--     computer software in whole or in part, in any manner and for any purpose
+--     whatsoever, and to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE
+--     Check the requirements of the revised E.2(4) from Technical
+--     Corrigendum 1 (originally discussed as AI95-00048).
+--     A shared passive or remote types library unit must be a package or
+--     generic package, not a subprogram or generic subprogram.
+--
+-- TEST DESCRIPTION
+--     We test pragmas Shared_Passive and Remote_Types, applied illegally
+--     to procedures and functions, and generic ones.
+--
+-- APPLICABILITY CRITERIA:
+--      This test is only applicable for a compiler attempting validation
+--      for the Distributed Systems Annex.
+--
+-- CHANGE HISTORY:
+--      29 JUN 1999   RAD   Initial Version
+--
+--!
+
+procedure BXE2013_1;
+    pragma Shared_Passive(BXE2013_1); -- ERROR:
+        -- Subprogram cannot be shared passive.
+
+procedure BXE2013_1 is
+begin
+    null;
+end BXE2013_1;
+
+generic
+procedure BXE2013_2(X: Integer);
+    pragma Shared_Passive(BXE2013_2); -- ERROR:
+        -- Generic subprogram cannot be shared passive.
+
+procedure BXE2013_2(X: Integer) is
+begin
+    null;
+end BXE2013_2;
+
+function BXE2013_3(X: Integer) return Boolean;
+    pragma Shared_Passive(BXE2013_3); -- ERROR:
+        -- Subprogram cannot be shared passive.
+
+function BXE2013_3(X: Integer) return Boolean is
+begin
+    return BXE2013_3(X); -- Can't have a missing "return".
+end BXE2013_3;
+
+generic
+function BXE2013_4 return Character;
+    pragma Shared_Passive(BXE2013_4); -- ERROR:
+        -- Generic subprogram cannot be shared passive.
+
+function BXE2013_4 return Character is
+begin
+    return BXE2013_4; -- Can't have a missing "return".
+end BXE2013_4;
+
+procedure BXE2013_5;
+    pragma Remote_Types(BXE2013_5); -- ERROR:
+        -- Subprogram cannot be remote types.
+
+procedure BXE2013_5 is
+begin
+    null;
+end BXE2013_5;
+
+generic
+procedure BXE2013_6(X: Integer);
+    pragma Remote_Types(BXE2013_6); -- ERROR:
+        -- Generic subprogram cannot be remote types.
+
+procedure BXE2013_6(X: Integer) is
+begin
+    null;
+end BXE2013_6;
+
+function BXE2013_7(X: Integer) return Boolean;
+    pragma Remote_Types(BXE2013_7); -- ERROR:
+        -- Subprogram cannot be remote types.
+
+function BXE2013_7(X: Integer) return Boolean is
+begin
+    return BXE2013_7(X); -- Can't have a missing "return".
+end BXE2013_7;
+
+generic
+function BXE2013_8 return Character;
+    pragma Remote_Types(BXE2013_8); -- ERROR:
+        -- Generic subprogram cannot be remote types.
+
+function BXE2013_8 return Character is
+begin
+    return BXE2013_8; -- Can't have a missing "return".
+end BXE2013_8;
+
+procedure BXE2013_9;
+    pragma Remote_Call_Interface(BXE2013_9); -- OK.
+
+procedure BXE2013_9 is
+begin
+    null;
+end BXE2013_9;
+
+generic
+procedure BXE2013_10(X: Integer);
+    pragma Remote_Call_Interface(BXE2013_10); -- OK.
+
+procedure BXE2013_10(X: Integer) is
+begin
+    null;
+end BXE2013_10;
+
+function BXE2013_11(X: Integer) return Boolean;
+    pragma Remote_Call_Interface(BXE2013_11); -- OK.
+
+function BXE2013_11(X: Integer) return Boolean is
+begin
+    return BXE2013_11(X); -- Can't have a missing "return".
+end BXE2013_11;
+
+generic
+function BXE2013_12 return Character;
+    pragma Remote_Call_Interface(BXE2013_12); -- OK.
+
+function BXE2013_12 return Character is
+begin
+    return BXE2013_12; -- Can't have a missing "return".
+end BXE2013_12;
+
+with BXE2013_1;
+with BXE2013_2;
+with BXE2013_3;
+with BXE2013_4;
+with BXE2013_5;
+with BXE2013_6;
+with BXE2013_7;
+with BXE2013_8;
+with BXE2013_9;
+with BXE2013_10;
+with BXE2013_11;
+with BXE2013_12;
+procedure BXE2013 is
+    pragma Remote_Call_Interface(BXE2013); -- OK.
+begin
+    null;
+end BXE2013;

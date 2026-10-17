@@ -1,0 +1,140 @@
+-- B730003.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that if the partial view of a private type is tagged, the full 
+--      view must be tagged. Check that if the partial view of a private type 
+--      is untagged, the full view may be tagged or untagged, but that if the 
+--      partial view is untagged and the full view is tagged, no derivatives
+--      of the partial view are allowed within the immediate scope of the
+--      partial view.  Check that derivatives of the full view are allowed.
+--
+-- TEST DESCRIPTION:
+--      Deriving from a untagged private type within its immediate scope is
+--      only possible in a child package of the one where the private type is
+--      declared. Furthermore, in order to derive from the private type
+--      (as opposed to the full type) in its immediate scope, the derived type
+--      must be declared in the visible part of a public child.
+--
+--      Declare tagged, untagged private types in a package.  Declare 
+--      type extension in a private child.  Verify that compiler generates 
+--      errors for all cases as described in the objective.
+--
+--
+-- CHANGE HISTORY:
+--      06 Dec 94   SAIC    ACVC 2.0
+--
+--!
+
+package B730003_0 is
+
+   type Untag_Partial_01 is private;
+   type Untag_Partial_02 is private;         -- Partial view is untagged.
+
+private
+
+   -- Check that the full view of an untagged private type may be
+   -- tagged or untagged:
+
+   type Untag_Partial_01 is record                                     -- OK.
+      I : Integer;                              -- Full view may be untagged.  
+   end record;
+
+   type Untag_Partial_02 is tagged record                             -- OK.
+      C : Boolean;                               -- Full view may be tagged.
+   end record;
+
+   type Derived_From_Full is new Untag_Partial_02                     -- OK.
+     with null record;        
+
+end B730003_0;
+
+
+     --==================================================================--
+
+
+private package B730003_0.B730003_1 is  -- Private child unit.
+
+   type Der_Type1 is new Untag_Partial_02 with null record;           -- OK.
+                                    -- Legal because derived from full view.
+
+private
+
+   type Der_Type2 is new Untag_Partial_02 with null record;           -- OK.
+
+end B730003_0.B730003_1;
+
+
+     --==================================================================--
+
+
+package B730003_0.B730003 is            -- Public child unit.
+
+   -- Check that if the full view of a private untagged type is tagged,
+   -- no derivatives of the private type are allowed within the immediate
+   -- scope of the private type:
+
+   type Der_Type2 is new Untag_Partial_02;                            -- ERROR:
+               -- Derivation in the immediate scope of an untagged partial view 
+               -- whose full view is tagged.
+
+   type Tag_Priv1 is tagged private;
+   type Tag_Priv2 is tagged private;
+   type Tag_Priv3 is tagged private;
+   type Tag_Priv4 is tagged private;
+
+   type Tagged_Rec is tagged record
+      C : Integer;
+   end record;
+
+   type Untag_Partial_03 is private;
+   type Untag_Partial_04 is private;
+ 
+private
+
+   type Der_Type3 is new Untag_Partial_02 with null record;           -- OK.
+                                    -- Legal because derived from full view.
+
+   -- Check that if the partial view is tagged, the full view must be:
+   
+   type Tag_Priv1 is tagged null record;                              -- OK.
+   type Tag_Priv2 is new Der_Type3 with null record;                  -- OK.
+   type Tag_Priv3 is null record;                                     -- ERROR:
+                                                        -- Type must be tagged.
+
+   type Tag_Priv4 is new Untag_Partial_01;                            -- ERROR:
+                                                        -- Type must be tagged.
+
+   type Untag_Partial_03 is tagged record
+      C : Boolean;
+   end record;
+
+   type Untag_Partial_04 is new Tagged_Rec with null record;
+
+   type Tag_PrivA is new Untag_Partial_03 with null record;           -- OK.
+
+   type Tag_PrivB is new Untag_Partial_04 with null record;           -- OK.
+
+end B730003_0.B730003;

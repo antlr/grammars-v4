@@ -1,0 +1,31 @@
+/* { dg-additional-options "-O2 -fno-analyzer-transitivity" } */
+/* { dg-additional-options "-Wno-analyzer-too-complex" } */
+
+int *wf;
+
+void
+yd (void);
+
+int
+cy (void);
+
+int *
+ee (int hp)
+{
+  if (hp != 0)
+    yd ();
+
+  return 0;
+}
+
+void
+z0 (int co)
+{
+  int l4 = sizeof (int);
+
+ aq:
+  wf = ee (l4);
+  if (l4 < co)
+    l4 = cy () + sizeof (int);
+  goto aq;
+}

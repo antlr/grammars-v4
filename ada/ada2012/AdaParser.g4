@@ -21,63 +21,41 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar AdaParser;
 
-options { tokenVocab = AdaLexer; }
+options {
+    tokenVocab = AdaLexer;
+    superClass = AdaParserBase;
+}
 
-compilation
-    : compilation_unit* EOF
+// Insert here @header for parser.
+
+/*
+2 - Lexical Elements
+*/
+
+identifier
+    : IDENTIFIER_
     ;
 
-compilation_unit
-    : context_item* (library_item | subunit)
+numeric_literal
+    : NUMERIC_LITERAL_
     ;
 
-context_item
-    : with_clause
-    | use_clause
+character_literal
+    : CHARACTER_LITERAL_
     ;
 
-with_clause
-    : limited_with_clause
-    | nonlimited_with_clause
+string_literal
+    : STRING_LITERAL_
     ;
 
-limited_with_clause
-    : LIMITED PRIVATE? WITH name (',' name)* SEMI
-    ;
-
-nonlimited_with_clause
-    : PRIVATE? WITH name (',' name)* SEMI
-    ;
-
-library_item
-    : PRIVATE? library_unit_declaration
-    | library_unit_body
-    | PRIVATE? library_unit_renaming_declaration
-    ;
-
-library_unit_declaration
-    : subprogram_declaration
-    | package_declaration
-    | generic_declaration
-    | generic_instantiation
-    ;
-
-library_unit_renaming_declaration
-    : package_renaming_declaration
-    | generic_renaming_declaration
-    | subprogram_renaming_declaration
-    ;
-
-library_unit_body
-    : subprogram_body
-    | package_body
-    ;
-
-subunit
-    : SEPARATE '(' name ')' proper_body
-    ;
+/*
+3 - Declarations and Types
+*/
 
 basic_declaration
     : type_declaration
@@ -95,6 +73,10 @@ basic_declaration
     | generic_instantiation
     ;
 
+defining_identifier
+    : identifier
+    ;
+
 type_declaration
     : full_type_declaration
     | incomplete_type_declaration
@@ -102,24 +84,8 @@ type_declaration
     | private_extension_declaration
     ;
 
-private_type_declaration
-    : TYPE defining_identifier discriminant_part? IS (ABSTRACT? TAGGED)? LIMITED? PRIVATE
-        aspect_specification? SEMI
-    ;
-
-private_extension_declaration
-    : TYPE defining_identifier discriminant_part? IS
-        ABSTRACT? (LIMITED | SYNCHRONIZED) NEW ancestor_subtype_indication
-        (AND interface_list)? WITH PRIVATE
-        aspect_specification? SEMI
-    ;
-
-ancestor_subtype_indication
-    : subtype_indication
-    ;
-
 full_type_declaration
-    : TYPE defining_identifier known_discriminant_part? IS type_definition aspect_specification? SEMI
+    : TYPE defining_identifier known_discriminant_part? IS type_definition aspect_specification? SEMI {this.EnterDeclaration();}
     | task_type_declaration
     | protected_type_declaration
     ;
@@ -135,92 +101,16 @@ type_definition
     | interface_type_definition
     ;
 
-task_type_declaration
-    : TASK TYPE defining_identifier known_discriminant_part?
-        aspect_specification? (IS  (NEW interface_list WITH)? task_definition)? SEMI
-    ;
-
-single_task_declaration
-    : TASK defining_identifier aspect_specification? (IS (NEW interface_list WITH)? task_definition)? SEMI
-    ;
-
-task_definition
-    : task_item* ( PRIVATE task_item* )? END task_identifier?
-    ;
-
-task_item
-    : entry_declaration
-    | aspect_clause
-    ;
-
-task_body
-    : TASK BODY defining_identifier aspect_specification? IS declarative_part
-        BEGIN handled_sequence_of_statements END task_identifier? SEMI
-    ;
-
-protected_type_declaration
-    : PROTECTED TYPE defining_identifier known_discriminant_part?
-        aspect_specification? IS (NEW interface_list WITH)? protected_definition SEMI
-    ;
-
-single_protected_declaration
-    : PROTECTED defining_identifier aspect_specification? IS (NEW interface_list WITH)? protected_definition SEMI
-    ;
-
-protected_definition
-    : protected_operation_declaration*
-        ( PRIVATE protected_element_declaration* )?
-        END protected_identifier?
-    ;
-
-protected_identifier
-    : id_
-    ;
-
-protected_operation_declaration
-    : subprogram_declaration
-    | entry_declaration
-    | aspect_clause
-    ;
-
-protected_element_declaration
-    : protected_operation_declaration
-    | component_declaration
-    ;
-
-protected_body
-    : PROTECTED BODY defining_identifier aspect_specification? IS protected_operation_item* END protected_identifier? SEMI
-    ;
-
-protected_operation_item
-    : subprogram_declaration
-    | subprogram_body
-    | entry_body
-    | aspect_clause
-    ;
-
-defining_identifier
-    : id_
-    ;
-
-defining_identifier_list
-    : defining_identifier (',' defining_identifier)*
-    ;
-
 subtype_declaration
-    : SUBTYPE defining_identifier IS subtype_indication aspect_specification?
+    : SUBTYPE defining_identifier IS subtype_indication aspect_specification? SEMI {this.EnterDeclaration();}
     ;
 
 subtype_indication
     : null_exclusion? subtype_mark constraint?
     ;
 
-id_
-    : IDENTIFIER
-    ;
-
 subtype_mark
-    : id_
+    : identifier (DOT identifier)*
     ;
 
 constraint
@@ -234,30 +124,33 @@ scalar_constraint
     | delta_constraint
     ;
 
-delta_constraint
-    : DELTA expression range_constraint?
-    ;
-
 composite_constraint
     : index_constraint
     | discriminant_constraint
     ;
 
-digits_constraint
-    : DIGITS expression range_constraint?
+object_declaration
+    : defining_identifier_list COLON ALIASED? CONSTANT? subtype_indication (ASSIGN expression)? aspect_specification? SEMI {this.EnterDeclaration();}
+    | defining_identifier_list COLON ALIASED? CONSTANT? access_definition (ASSIGN expression)? aspect_specification? SEMI {this.EnterDeclaration();}
+    | defining_identifier_list COLON ALIASED? CONSTANT? array_type_definition (ASSIGN expression)? aspect_specification? SEMI {this.EnterDeclaration();}
+    | single_task_declaration
+    | single_protected_declaration
+    ;
+
+defining_identifier_list
+    : defining_identifier (',' defining_identifier)*
+    ;
+
+number_declaration
+    : defining_identifier_list COLON CONSTANT ASSIGN expression SEMI {this.EnterDeclaration();}
+    ;
+
+derived_type_definition
+    : ABSTRACT? LIMITED? NEW subtype_indication ((AND interface_list)? record_extension_part)?
     ;
 
 range_constraint
     : RANGE_ range
-    ;
-
-index_constraint
-    : '(' discrete_range (',' discrete_range)* ')'
-    ;
-
-discrete_range
-    : discrete_subtype_indication
-    | range
     ;
 
 range
@@ -265,184 +158,13 @@ range
     | simple_expression DOTDOT simple_expression
     ;
 
-discriminant_part
-    : unknown_discriminant_part
-    | known_discriminant_part
-    ;
-
-unknown_discriminant_part
-    : '(' BOX ')'
-    ;
-
-known_discriminant_part
-    : '(' discriminant_specification (SEMI discriminant_specification)* ')'
-    ;
-
-discriminant_specification
-    : defining_identifier_list COLON null_exclusion? subtype_mark assign_expression?
-    | defining_identifier_list COLON access_definition assign_expression?
-    ;
-
-default_expression
-    : expression
-    ;
-
-discriminant_constraint
-    : '(' discriminant_association (',' discriminant_association)* ')'
-    ;
-
-discriminant_association
-    : (discriminant_selector_name (VL discriminant_selector_name)* ARROW)? expression
-    ;
-
-discriminant_selector_name
-    : selector_name
-    ;
-
-record_type_definition
-    : (ABSTRACT? TAGGED)? LIMITED? record_definition
-    ;
-
-record_definition
-    : RECORD component_list END RECORD
-    | NULL_ RECORD
-    ;
-
-component_list
-    : component_item+
-    | component_item* variant_part
-    | NULL_ SEMI
-    ;
-
-component_item
-    : component_declaration
-    | aspect_clause
-    ;
-
-component_declaration
-    : defining_identifier_list COLON component_definition (ASSIGN default_expression)? aspect_specification? SEMI
-    ;
-
-variant_part
-    : CASE discriminant_direct_name IS variant+ END CASE SEMI
-    ;
-
-discriminant_direct_name
-    : direct_name
-    ;
-
-variant
-    : WHEN discrete_choice_list ARROW component_list
-    ;
-
-discrete_choice_list
-    : discrete_choice (VL discrete_choice)*
-    ;
-
-discrete_choice
-    : choice_expression
-    | discrete_subtype_indication
-    | range
-    | OTHERS
-    ;
-
-discrete_subtype_indication
-    : subtype_indication
-    ;
-
-record_extension_part
-    : WITH record_definition
-    ;
-
-aspect_specification
-    : WITH aspect_mark (ARROW aspect_definition)? (',' aspect_mark (ARROW aspect_definition)?)*
-    ;
-
-aspect_mark
-    : aspect_identifier (SQ id_)? //TODO Class or id_
-    ;
-
-aspect_identifier
-    : id_
-    ;
-
-aspect_definition
-    : name
-    | expression
-    | id_
-    ;
-
-attribute_definition_clause
-    : FOR local_name SQ attribute_designator USE expression SEMI
-    | FOR local_name SQ attribute_designator USE name SEMI
-    ;
-
-object_declaration
-    : defining_identifier_list COLON ALIASED? CONSTANT? subtype_indication assign_expression? aspect_specification? SEMI
-    | defining_identifier_list COLON ALIASED? CONSTANT? access_definition assign_expression? aspect_specification? SEMI
-    | defining_identifier_list COLON ALIASED? CONSTANT? array_type_definition assign_expression? aspect_specification? SEMI
-    | single_task_declaration
-    | single_protected_declaration
-    ;
-
-task_identifier
-    : id_
-    ;
-
-entry_declaration
-    : overriding_indicator? ENTRY defining_identifier ('('discrete_subtype_definition')')? formal_part? //parameter_profile
-      aspect_specification? SEMI
-    ;
-
-accept_statement
-    : ACCEPT_ entry_direct_name ('('entry_index')')? formal_part? /*parameter_profile*/
-        (DO handled_sequence_of_statements END entry_identifier? )? SEMI
-    ;
-
-entry_direct_name
-    : direct_name
-    ;
-
-entry_index
-    : expression
-    ;
-
-entry_body
-    : ENTRY defining_identifier entry_body_formal_part  entry_barrier IS declarative_part
-        BEGIN handled_sequence_of_statements END entry_identifier? SEMI
-    ;
-
-entry_identifier
-    : id_
-    ;
-
-entry_body_formal_part
-    : ('('entry_index_specification')')? formal_part? //parameter_profile
-    ;
-
-entry_barrier
-    : WHEN condition
-    ;
-
-entry_index_specification
-    : FOR defining_identifier IN discrete_subtype_definition
-    ;
-
-derived_type_definition
-    : ABSTRACT? LIMITED? NEW parent_subtype_indication ( (AND interface_list)? record_extension_part )?
-    ;
-
-parent_subtype_indication
-    : subtype_indication
-    ;
-
 enumeration_type_definition
     : '(' enumeration_literal_specification (',' enumeration_literal_specification)* ')'
     ;
 
 enumeration_literal_specification
-    : defining_identifier
-    | defining_character_literal
+    : defining_identifier {this.EnterDeclaration();}
+    | character_literal
     ;
 
 integer_type_definition
@@ -484,6 +206,10 @@ decimal_fixed_point_definition
     : DELTA expression DIGITS expression real_range_specification?
     ;
 
+digits_constraint
+    : DIGITS expression range_constraint?
+    ;
+
 array_type_definition
     : unconstrained_array_definition
     | constrained_array_definition
@@ -493,16 +219,16 @@ unconstrained_array_definition
     : ARRAY '(' index_subtype_definition (',' index_subtype_definition)* ')' OF component_definition
     ;
 
-constrained_array_definition
-    : ARRAY '(' discrete_subtype_definition (',' discrete_subtype_definition)* ')' OF component_definition
-    ;
-
 index_subtype_definition
     : subtype_mark RANGE_ BOX
     ;
 
+constrained_array_definition
+    : ARRAY '(' discrete_subtype_definition (',' discrete_subtype_definition)* ')' OF component_definition
+    ;
+
 discrete_subtype_definition
-    : discrete_subtype_indication
+    : subtype_indication
     | range
     ;
 
@@ -511,16 +237,268 @@ component_definition
     | ALIASED? access_definition
     ;
 
-defining_character_literal
-    : CHARACTER_LITERAL
+index_constraint
+    : '(' discrete_range (',' discrete_range)* ')'
     ;
 
-assign_expression
-    : ASSIGN expression
+discrete_range
+    : subtype_indication
+    | range
     ;
 
-number_declaration
-    : defining_identifier_list COLON CONSTANT ASSIGN expression
+discriminant_part
+    : unknown_discriminant_part
+    | known_discriminant_part
+    ;
+
+unknown_discriminant_part
+    : '(' BOX ')'
+    ;
+
+known_discriminant_part
+    : '(' {this.EnterScope();} discriminant_specification (SEMI discriminant_specification)* ')' {this.ExitScope();}
+    ;
+
+discriminant_specification
+    : defining_identifier_list COLON null_exclusion? subtype_mark (ASSIGN expression)? {this.EnterDeclaration();}
+    | defining_identifier_list COLON access_definition (ASSIGN expression)? {this.EnterDeclaration();}
+    ;
+
+default_expression
+    : expression
+    ;
+
+discriminant_constraint
+    : '(' discriminant_association (',' discriminant_association)* ')'
+    ;
+
+discriminant_association
+    : (selector_name (VL selector_name)* ARROW)? expression
+    ;
+
+record_type_definition
+    : (ABSTRACT? TAGGED)? LIMITED? record_definition
+    ;
+
+record_definition
+    : RECORD {this.EnterScope();} component_list END RECORD {this.ExitScope();}
+    | NULL_ RECORD
+    ;
+
+component_list
+    : component_item+
+    | component_item* variant_part
+    | NULL_ SEMI
+    ;
+
+component_item
+    : component_declaration
+    | aspect_clause
+    ;
+
+component_declaration
+    : defining_identifier_list COLON component_definition (ASSIGN default_expression)? aspect_specification? SEMI {this.EnterDeclaration();}
+    ;
+
+variant_part
+    : CASE direct_name IS variant+ END CASE SEMI
+    ;
+
+variant
+    : WHEN discrete_choice_list ARROW component_list
+    ;
+
+discrete_choice_list
+    : discrete_choice (VL discrete_choice)*
+    ;
+
+discrete_choice
+    : choice_expression
+    | subtype_indication
+    | range
+    | OTHERS
+    ;
+
+record_extension_part
+    : WITH record_definition
+    ;
+
+abstract_subprogram_declaration
+    : overriding_indicator? subprogram_specification IS ABSTRACT aspect_specification? SEMI
+    ;
+
+interface_type_definition
+    : (LIMITED | TASK | PROTECTED | SYNCHRONIZED)? INTERFACE (AND interface_list)?
+    ;
+
+interface_list
+    : subtype_mark (AND subtype_mark)*
+    ;
+
+access_type_definition
+    : null_exclusion? access_to_object_definition
+    | null_exclusion? access_to_subprogram_definition
+    ;
+
+access_to_object_definition
+    : ACCESS general_access_modifier? subtype_indication
+    ;
+
+general_access_modifier
+    : ALL
+    | CONSTANT
+    ;
+
+access_to_subprogram_definition
+    : ACCESS PROTECTED? PROCEDURE formal_part? //parameter_profile
+    | ACCESS PROTECTED? FUNCTION parameter_and_result_profile
+    ;
+
+null_exclusion
+    : NOT NULL_
+    ;
+
+access_definition
+    : null_exclusion? ACCESS CONSTANT? subtype_mark
+    | null_exclusion? ACCESS PROTECTED? PROCEDURE formal_part? //parameter_profile
+    | null_exclusion? ACCESS PROTECTED? FUNCTION parameter_and_result_profile
+    ;
+
+incomplete_type_declaration
+    : TYPE defining_identifier discriminant_part? (IS TAGGED)? SEMI {this.EnterDeclaration();}
+    ;
+
+declarative_part
+    : declarative_item*
+    ;
+
+declarative_item
+    : basic_declarative_item
+    | body
+    ;
+
+basic_declarative_item
+    : basic_declaration
+    | aspect_clause
+    | use_clause
+    ;
+
+body
+    : proper_body
+    | body_stub
+    ;
+
+proper_body
+    : subprogram_body
+    | package_body
+    | task_body
+    | protected_body
+    ;
+
+/*
+4 - Names and Expressions
+*/
+
+name
+    : direct_name
+    //| explicit_dereference
+    | name DOT ALL
+    | name '(' expression (',' expression)* ')' //indexed_component
+    | name '(' discrete_range ')'               //slice
+    | name DOT selector_name                    //selected_component
+    | name SQ attribute_designator              //attribute_reference
+    | {this.IsTypeName()}? type_conversion
+    | name actual_parameter_part //function_call
+    | character_literal
+    | {this.IsTypeName()}? qualified_expression
+    //| name                       //generalized_reference
+    | name actual_parameter_part //generalized_indexing
+    ;
+
+direct_name
+    : identifier
+    | operator_symbol
+    ;
+
+selector_name
+    : identifier
+    | character_literal
+    | operator_symbol
+    ;
+
+attribute_designator
+    : identifier ('(' expression ')')?
+    | ACCESS__
+    | DELTA__
+    | DIGITS__
+    | MOD__
+    | ACCESS
+    | DELTA
+    | DIGITS
+    | MOD
+    ;
+
+range_attribute_reference
+    //    : prefix '\'' range_attribute_designator
+    : name '\'' range_attribute_designator
+    ;
+
+range_attribute_designator
+    : RANGE_ ('(' expression ')')?
+    ;
+
+aggregate
+    : record_aggregate
+    | extension_aggregate
+    | array_aggregate
+    ;
+
+record_aggregate
+    : '(' record_component_association_list ')'
+    ;
+
+record_component_association_list
+    : record_component_association (',' record_component_association)*
+    | NULL_ RECORD
+    ;
+
+record_component_association
+    : (component_choice_list ARROW)? expression
+    | component_choice_list ARROW BOX
+    ;
+
+component_choice_list
+    : selector_name (VL selector_name)*
+    | OTHERS
+    ;
+
+extension_aggregate
+    : '(' ancestor_part WITH record_component_association_list ')'
+    ;
+
+ancestor_part
+    : expression
+    | subtype_mark
+    ;
+
+array_aggregate
+    : positional_array_aggregate
+    | named_array_aggregate
+    ;
+
+positional_array_aggregate
+    : '(' expression ',' expression (',' expression)* ')'
+    | '(' expression (',' expression)* ',' OTHERS ARROW expression ')'
+    | '(' expression (',' expression)* ',' OTHERS ARROW BOX ')'
+    ;
+
+named_array_aggregate
+    : '(' array_component_association (',' array_component_association)* ')'
+    ;
+
+array_component_association
+    : discrete_choice_list ARROW expression
+    | discrete_choice_list ARROW BOX
     ;
 
 expression
@@ -546,6 +524,7 @@ choice_relation
 relation
     : simple_expression (relational_operator simple_expression)?
     | simple_expression NOT? IN membership_choice_list
+    | raise_expression
     ;
 
 membership_choice_list
@@ -553,13 +532,17 @@ membership_choice_list
     ;
 
 membership_choice
-    : choice_expression
+    : choice_simple_expression
     | range
     | subtype_mark
     ;
 
 simple_expression
-    : (unary_adding_operator)? term (binary_adding_operator term)*
+    : unary_adding_operator? term (binary_adding_operator term)*
+    ;
+
+choice_simple_expression
+    : unary_adding_operator? term (binary_adding_operator term)*
     ;
 
 term
@@ -576,24 +559,12 @@ primary
     : numeric_literal
     | NULL_
     | string_literal
-    | aggregate
+    | {this.IsAggregate()}? aggregate
     | name
     | allocator
     | '(' expression ')'
     | '(' conditional_expression ')'
     | '(' qualified_expression ')'
-    ;
-
-numeric_literal
-    : NUMERIC_LITERAL
-    ;
-
-character_literal
-    : CHARACTER_LITERAL
-    ;
-
-string_literal
-    : STRING_LITERAL
     ;
 
 logical_operator
@@ -605,7 +576,7 @@ logical_operator
 relational_operator
     : EQ
     | NE
-    | LE
+    | LT
     | GT
     | LE
     | GE
@@ -640,34 +611,24 @@ conditional_expression
     | case_expression
     ;
 
+raise_expression
+    : RAISE name (WITH simple_expression)?
+    ;
+
 if_expression
-    : IF condition THEN dependent_expression
-        (ELSIF condition THEN dependent_expression)*
-        (ELSE dependent_expression)?
+    : IF condition THEN expression (ELSIF condition THEN expression)* (ELSE expression)?
     ;
 
 condition
-    : boolean_expression
-    ;
-
-boolean_expression
     : expression
     ;
 
 case_expression
-    : CASE selecting_expression IS case_expression_alternative (',' case_expression_alternative)*
+    : CASE expression IS case_expression_alternative (',' case_expression_alternative)*
     ;
 
 case_expression_alternative
-    : WHEN discrete_choice_list ARROW dependent_expression
-    ;
-
-selecting_expression
-    : expression
-    ;
-
-dependent_expression
-    : expression
+    : WHEN discrete_choice_list ARROW expression
     ;
 
 quantified_expression
@@ -681,11 +642,129 @@ quantifier
     ;
 
 predicate
-    : boolean_expression
+    : expression
     ;
 
+type_conversion
+    : subtype_mark '(' expression ')'
+    | subtype_mark '(' name ')'
+    ;
+
+qualified_expression
+    : subtype_mark SQ '(' expression ')'
+    | subtype_mark SQ aggregate
+    ;
+
+allocator
+    : NEW subpool_specification? subtype_indication
+    | NEW subpool_specification? qualified_expression
+    ;
+
+subpool_specification
+    : '(' name ')'
+    ;
+
+/*
+5 - Statements
+*/
+
+sequence_of_statements
+    : statement+ label*
+    ;
+
+statement
+    : label* simple_statement
+    | label* compound_statement
+    ;
+
+simple_statement
+    : null_statement
+    | assignment_statement
+    | exit_statement
+    | goto_statement
+    | procedure_call_statement
+    | simple_return_statement
+    | entry_call_statement
+    | requeue_statement
+    | delay_statement
+    | abort_statement
+    | raise_statement
+    | qualified_expression //code_statement
+    ;
+
+compound_statement
+    : if_statement
+    | case_statement
+    | loop_statement
+    | block_statement
+    | extended_return_statement
+    | accept_statement
+    | select_statement
+    ;
+
+null_statement
+    : NULL_ SEMI
+    ;
+
+label
+    : LLB direct_name RLB
+    ;
+
+assignment_statement
+    : name ASSIGN expression SEMI
+    ;
+
+if_statement
+    : IF condition THEN sequence_of_statements (ELSIF condition THEN sequence_of_statements)* (
+        ELSE sequence_of_statements
+    )? END IF SEMI
+    ;
+
+case_statement
+    : CASE expression IS case_statement_alternative case_statement_alternative* END CASE SEMI
+    ;
+
+case_statement_alternative
+    : WHEN discrete_choice_list ARROW sequence_of_statements
+    ;
+
+loop_statement
+    : (direct_name COLON)? iteration_scheme? LOOP sequence_of_statements END LOOP identifier? SEMI
+    ;
+
+iteration_scheme
+    : WHILE condition
+    | FOR loop_parameter_specification
+    | FOR iterator_specification
+    ;
+
+loop_parameter_specification
+    : defining_identifier IN REVERSE? discrete_subtype_definition {this.EnterDeclaration();}
+    ;
+
+iterator_specification
+    : defining_identifier IN REVERSE? name {this.EnterDeclaration();}
+    | defining_identifier COLON subtype_indication OF REVERSE? name {this.EnterDeclaration();}
+    ;
+
+block_statement
+    : (direct_name COLON)? {this.EnterScope();} (DECLARE declarative_part)? BEGIN handled_sequence_of_statements END identifier? SEMI {this.ExitScope();}
+    ;
+
+exit_statement
+    : EXIT name? (WHEN condition)? SEMI
+    ;
+
+goto_statement
+    : GOTO name SEMI
+    ;
+
+/*
+6 - Subprograms
+*/
+
 subprogram_declaration
-    : overriding_indicator? subprogram_specification aspect_specification? SEMI
+    : overriding_indicator? subprogram_specification aspect_specification? SEMI {this.EnterDeclaration();}
     ;
 
 subprogram_specification
@@ -702,7 +781,7 @@ function_specification
     ;
 
 designator
-    : (name DOT)? id_
+    : (name DOT)? identifier
     | operator_symbol
     ;
 
@@ -723,22 +802,20 @@ defining_operator_symbol
     : operator_symbol
     ;
 
-//parameter_profile
-//    : formal_part?
-//    ;
-
 parameter_and_result_profile
     : formal_part? RETURN null_exclusion? subtype_mark
     | formal_part? RETURN access_definition
     ;
 
 formal_part
-    : '(' parameter_specification (SEMI parameter_specification)* ')'
+    : '(' {this.EnterScope();} parameter_specification (SEMI parameter_specification)* ')' {this.ExitScope();}
     ;
 
 parameter_specification
-    : defining_identifier_list COLON ALIASED? mode_ null_exclusion? subtype_mark (ASSIGN default_expression)?
-    | defining_identifier_list COLON access_definition (ASSIGN default_expression)?
+    : defining_identifier_list COLON ALIASED? mode_ null_exclusion? subtype_mark (
+        ASSIGN default_expression
+    )? {this.EnterDeclaration();}
+    | defining_identifier_list COLON access_definition (ASSIGN default_expression)? {this.EnterDeclaration();}
     ;
 
 mode_
@@ -746,265 +823,43 @@ mode_
     ;
 
 subprogram_body
-    : overriding_indicator? subprogram_specification aspect_specification? IS declarative_part
-        BEGIN handled_sequence_of_statements END designator? SEMI
+    : overriding_indicator? subprogram_specification aspect_specification? IS {this.EnterDeclaration(); this.EnterScope();} declarative_part BEGIN handled_sequence_of_statements END designator?
+        SEMI {this.ExitScope();}
     ;
 
-handled_sequence_of_statements
-    : sequence_of_statements (EXCEPTION exception_handler+ )?
+procedure_call_statement
+    : name SEMI
+    | name actual_parameter_part SEMI
     ;
 
-exception_handler
-    : WHEN (choice_parameter_specification COLON)? exception_choice (VL exception_choice)* ARROW sequence_of_statements
+actual_parameter_part
+    : '(' parameter_association (',' parameter_association)* ')'
     ;
 
-choice_parameter_specification
-    : defining_identifier
+parameter_association
+    : (selector_name ARROW)? explicit_actual_parameter
     ;
 
-exception_choice
-    : name
-    | OTHERS
-    ;
-
-overriding_indicator
-    : NOT? OVERRIDING
-    ;
-
-raise_statement
-    : RAISE SEMI
-    | RAISE name (WITH string_expression)? SEMI
-    ;
-
-string_expression
+explicit_actual_parameter
     : expression
+    | name
     ;
 
-abstract_subprogram_declaration
-    : overriding_indicator? subprogram_specification IS ABSTRACT aspect_specification?
+simple_return_statement
+    : RETURN expression? SEMI
     ;
 
-interface_type_definition
-    : (LIMITED | TASK | PROTECTED | SYNCHRONIZED)? INTERFACE (AND interface_list)?
+extended_return_object_declaration
+    : defining_identifier COLON ALIASED? CONSTANT? return_subtype_indication (ASSIGN expression)? {this.EnterDeclaration();}
     ;
 
-interface_list
-    : interface_subtype_mark (AND interface_subtype_mark)*
+extended_return_statement
+    : RETURN extended_return_object_declaration (DO handled_sequence_of_statements END RETURN)? SEMI
     ;
 
-interface_subtype_mark
-    : subtype_mark
-    ;
-
-access_type_definition
-    : null_exclusion? access_to_object_definition
-    | null_exclusion? access_to_subprogram_definition
-    ;
-
-access_to_object_definition
-    : ACCESS general_access_modifier? subtype_indication
-    ;
-
-general_access_modifier
-    : ALL
-    | CONSTANT
-    ;
-
-access_to_subprogram_definition
-    : ACCESS PROTECTED? PROCEDURE formal_part? //parameter_profile
-    | ACCESS PROTECTED? FUNCTION parameter_and_result_profile
-    ;
-
-null_exclusion
-    : NOT NULL_
-    ;
-
-access_definition
-    : null_exclusion? ACCESS CONSTANT? subtype_mark
-    | null_exclusion? ACCESS PROTECTED? PROCEDURE formal_part? //parameter_profile
-    | null_exclusion? ACCESS PROTECTED? FUNCTION parameter_and_result_profile
-    ;
-
-incomplete_type_declaration
-    : TYPE defining_identifier discriminant_part? (IS TAGGED)? SEMI
-    ;
-
-declarative_part
-    : declarative_item*
-    ;
-
-declarative_item
-    : basic_declarative_item
-    | body
-    ;
-
-basic_declarative_item
-    : basic_declaration
-    | aspect_clause
-    | use_clause
-    ;
-
-body
-    : proper_body
-    | body_stub
-    ;
-
-proper_body
-    : subprogram_body
-    | package_body
-    | task_body
-    | protected_body
-    ;
-
-name
-    : direct_name
-    //| explicit_dereference
-    | name DOT ALL
-    | name '(' expression (',' expression)* ')' //indexed_component
-    | name '(' discrete_range ')'  //slice
-    | name DOT selector_name       //selected_component
-    | name SQ attribute_designator //attribute_reference
-    | type_conversion
-    | name actual_parameter_part   //function_call
-    | character_literal
-    | qualified_expression
-    //| name                       //generalized_reference
-    | name actual_parameter_part   //generalized_indexing
-    ;
-
-package_body
-    : PACKAGE BODY defining_program_unit_name aspect_specification? IS
-        declarative_part
-        (BEGIN handled_sequence_of_statements)?
-        END ( (name DOT)? id_)? SEMI
-    ;
-
-body_stub
-    : subprogram_body_stub
-    | package_body_stub
-    | task_body_stub
-    | protected_body_stub
-    ;
-
-subprogram_body_stub
-    : overriding_indicator? subprogram_specification IS SEPARATE aspect_specification? SEMI
-    ;
-
-package_body_stub
-    : PACKAGE BODY defining_identifier IS SEPARATE aspect_specification? SEMI
-    ;
-
-task_body_stub
-    : TASK BODY defining_identifier IS SEPARATE aspect_specification? SEMI
-    ;
-
-protected_body_stub
-    : PROTECTED BODY defining_identifier IS SEPARATE aspect_specification? SEMI
-    ;
-
-selector_name
-    : id_
-    | character_literal
-    | operator_symbol
-    ;
-
-direct_name
-    : id_
-    | operator_symbol
-    ;
-
-attribute_designator
-    : id_ ('(' expression ')')?
-    | ACCESS
-    | DELTA
-    | DIGITS
-    | MOD
-    ;
-
-range_attribute_reference
-//    : prefix '\'' range_attribute_designator
-    : name '\'' range_attribute_designator
-    ;
-
-range_attribute_designator
-    : RANGE_ ('(' expression ')')?
-    ;
-
-aggregate
-    : record_aggregate
-    | extension_aggregate
-    | array_aggregate
-    ;
-
-record_aggregate
-    : '(' record_component_association_list ')'
-    ;
-
-record_component_association_list
-    : record_component_association (',' record_component_association)*
-    | NULL_ RECORD
-    ;
-
-record_component_association
-    : (component_choice_list ARROW)? expression
-    | component_choice_list ARROW BOX
-    ;
-
-component_choice_list
-    : component_selector_name (VL component_selector_name)*
-    | OTHERS
-    ;
-
-component_selector_name
-    : selector_name
-    ;
-
-extension_aggregate
-    : '(' ancestor_part WITH record_component_association_list ')'
-    ;
-
-array_aggregate
-    : positional_array_aggregate
-    | named_array_aggregate
-    ;
-
-positional_array_aggregate
-    : '(' expression ',' expression (',' expression)* ')'
-    | '(' expression (',' expression)* ',' OTHERS ARROW expression ')'
-    | '(' expression (',' expression)* ',' OTHERS ARROW BOX ')'
-    ;
-
-named_array_aggregate
-    : '(' array_component_association (',' array_component_association)* ')'
-    ;
-
-array_component_association
-    : discrete_choice_list ARROW expression
-    | discrete_choice_list ARROW BOX
-    ;
-
-ancestor_part
-    : expression
-    | subtype_mark
-    ;
-
-type_conversion
-    : subtype_mark '(' expression ')'
-    | subtype_mark '(' name ')'
-    ;
-
-qualified_expression
-    : subtype_mark SQ '(' expression ')'
-    | subtype_mark SQ '(' aggregate ')'
-    ;
-
-allocator
-    : NEW (subpool_specification)? subtype_indication
-    | NEW (subpool_specification)? qualified_expression
-    ;
-
-subpool_specification
-    : '(' name ')'
+return_subtype_indication
+    : subtype_indication
+    | access_definition
     ;
 
 null_procedure_declaration
@@ -1015,67 +870,42 @@ expression_function_declaration
     : overriding_indicator? function_specification IS '(' expression ')' aspect_specification? SEMI
     ;
 
+/*
+7 - Packages
+*/
+
 package_declaration
-    : package_specification SEMI
-    ;
-
-renaming_declaration
-    : object_renaming_declaration
-    | exception_renaming_declaration
-    | package_renaming_declaration
-    | subprogram_renaming_declaration
-    | generic_renaming_declaration
-    ;
-
-exception_renaming_declaration
-    : defining_identifier COLON EXCEPTION RENAMES name aspect_specification? SEMI
-    ;
-
-package_renaming_declaration
-    : PACKAGE defining_program_unit_name RENAMES name aspect_specification? SEMI
-    ;
-
-subprogram_renaming_declaration
-    : overriding_indicator? subprogram_specification RENAMES name aspect_specification? SEMI
-    ;
-
-generic_renaming_declaration
-    : GENERIC PACKAGE defining_program_unit_name RENAMES name aspect_specification? SEMI
-    | GENERIC PROCEDURE defining_program_unit_name RENAMES name aspect_specification? SEMI
-    | GENERIC FUNCTION defining_program_unit_name RENAMES name aspect_specification? SEMI
-    ;
-
-object_renaming_declaration
-    : defining_identifier COLON null_exclusion? subtype_mark RENAMES name aspect_specification? SEMI
-    | defining_identifier COLON access_definition RENAMES name aspect_specification? SEMI
-    ;
-
-exception_declaration
-    : defining_identifier_list COLON EXCEPTION aspect_specification? SEMI
-    ;
-
-generic_declaration
-    : generic_subprogram_declaration
-    | generic_package_declaration
-    ;
-
-generic_subprogram_declaration
-    : generic_formal_part subprogram_specification aspect_specification? SEMI
-    ;
-
-generic_package_declaration
-    : generic_formal_part package_specification SEMI
+    : package_specification SEMI {this.EnterDeclaration();}
     ;
 
 package_specification
-    : PACKAGE defining_program_unit_name aspect_specification? IS
-        basic_declarative_item*
-        (PRIVATE basic_declarative_item*)?
-        END ( (name DOT)? id_)?
+    : PACKAGE defining_program_unit_name aspect_specification? IS basic_declarative_item* (
+        PRIVATE basic_declarative_item*
+    )? END ((name DOT)? identifier)?
     ;
 
-generic_formal_part
-    : GENERIC (generic_formal_parameter_specification | use_clause)*
+package_body
+    : PACKAGE BODY_ defining_program_unit_name aspect_specification? IS {this.EnterDeclaration(); this.EnterScope();} declarative_part (
+        BEGIN handled_sequence_of_statements
+    )? END ((name DOT)? identifier)? SEMI {this.ExitScope();}
+    ;
+
+private_type_declaration
+    : TYPE defining_identifier discriminant_part? IS (ABSTRACT? TAGGED)? LIMITED? PRIVATE aspect_specification? SEMI {this.EnterDeclaration();}
+    ;
+
+private_extension_declaration
+    : TYPE defining_identifier discriminant_part? IS ABSTRACT? (LIMITED | SYNCHRONIZED) NEW subtype_indication (
+        AND interface_list
+    )? WITH PRIVATE aspect_specification? SEMI {this.EnterDeclaration();}
+    ;
+
+/*
+8 - Visibility Rules
+*/
+
+overriding_indicator
+    : NOT? OVERRIDING
     ;
 
 use_clause
@@ -1091,50 +921,402 @@ use_type_clause
     : USE ALL? TYPE subtype_mark (',' subtype_mark)* SEMI
     ;
 
-generic_formal_parameter_specification
+renaming_declaration
+    : object_renaming_declaration
+    | exception_renaming_declaration
+    | package_renaming_declaration
+    | subprogram_renaming_declaration
+    | generic_renaming_declaration
+    ;
+
+object_renaming_declaration
+    : defining_identifier COLON null_exclusion? subtype_mark RENAMES name aspect_specification? SEMI {this.EnterDeclaration();}
+    | defining_identifier COLON access_definition RENAMES name aspect_specification? SEMI {this.EnterDeclaration();}
+    ;
+
+exception_renaming_declaration
+    : defining_identifier COLON EXCEPTION RENAMES name aspect_specification? SEMI {this.EnterDeclaration();}
+    ;
+
+package_renaming_declaration
+    : PACKAGE defining_program_unit_name RENAMES name aspect_specification? SEMI {this.EnterDeclaration();}
+    ;
+
+subprogram_renaming_declaration
+    : overriding_indicator? subprogram_specification RENAMES name aspect_specification? SEMI
+    ;
+
+generic_renaming_declaration
+    : GENERIC PACKAGE defining_program_unit_name RENAMES name aspect_specification? SEMI
+    | GENERIC PROCEDURE defining_program_unit_name RENAMES name aspect_specification? SEMI
+    | GENERIC FUNCTION defining_program_unit_name RENAMES name aspect_specification? SEMI
+    ;
+
+/*
+9 - Tasks and Synchronization
+*/
+
+task_type_declaration
+    : TASK TYPE defining_identifier known_discriminant_part? aspect_specification? (
+        IS (NEW interface_list WITH)? task_definition
+    )? SEMI {this.EnterDeclaration();}
+    ;
+
+single_task_declaration
+    : TASK defining_identifier aspect_specification? (
+        IS (NEW interface_list WITH)? task_definition
+    )? SEMI {this.EnterDeclaration();}
+    ;
+
+task_definition
+    : task_item* (PRIVATE task_item*)? END identifier?
+    ;
+
+task_item
+    : entry_declaration
+    | aspect_clause
+    ;
+
+task_body
+    : TASK BODY_ defining_identifier aspect_specification? IS {this.EnterDeclaration(); this.EnterScope();} declarative_part BEGIN handled_sequence_of_statements END identifier? SEMI {this.ExitScope();}
+    ;
+
+protected_type_declaration
+    : PROTECTED TYPE defining_identifier known_discriminant_part? aspect_specification? IS (
+        NEW interface_list WITH
+    )? protected_definition SEMI {this.EnterDeclaration();}
+    ;
+
+single_protected_declaration
+    : PROTECTED defining_identifier aspect_specification? IS (NEW interface_list WITH)? protected_definition SEMI {this.EnterDeclaration();}
+    ;
+
+protected_definition
+    : protected_operation_declaration* (PRIVATE protected_element_declaration*)? END identifier?
+    ;
+
+protected_operation_declaration
+    : subprogram_declaration
+    | entry_declaration
+    | aspect_clause
+    ;
+
+protected_element_declaration
+    : protected_operation_declaration
+    | component_declaration
+    ;
+
+protected_body
+    : PROTECTED BODY_ defining_identifier aspect_specification? IS {this.EnterDeclaration(); this.EnterScope();} protected_operation_item* END identifier? SEMI {this.ExitScope();}
+    ;
+
+protected_operation_item
+    : subprogram_declaration
+    | subprogram_body
+    | entry_body
+    | aspect_clause
+    ;
+
+entry_declaration
+    : overriding_indicator? ENTRY defining_identifier ('(' discrete_subtype_definition ')')? formal_part? //parameter_profile
+    aspect_specification? SEMI {this.EnterDeclaration();}
+    ;
+
+accept_statement
+    : ACCEPT_ entry_direct_name ('(' entry_index ')')? formal_part? /*parameter_profile*/ (
+        DO {this.EnterScope();} handled_sequence_of_statements END {this.ExitScope();} entry_identifier?
+    )? SEMI
+    ;
+
+entry_direct_name
+    : direct_name
+    ;
+
+entry_index
+    : expression
+    ;
+
+entry_body
+    : ENTRY defining_identifier entry_body_formal_part entry_barrier IS {this.EnterDeclaration(); this.EnterScope();} declarative_part BEGIN handled_sequence_of_statements END entry_identifier?
+        SEMI {this.ExitScope();}
+    ;
+
+entry_identifier
+    : identifier
+    ;
+
+entry_body_formal_part
+    : ('(' entry_index_specification ')')? formal_part? //parameter_profile
+    ;
+
+entry_barrier
+    : WHEN condition
+    ;
+
+entry_index_specification
+    : FOR defining_identifier IN discrete_subtype_definition {this.EnterDeclaration();}
+    ;
+
+entry_call_statement
+    : name actual_parameter_part? SEMI
+    ;
+
+requeue_statement
+    : REQUEUE name (WITH ABORT)? SEMI
+    ;
+
+delay_statement
+    : delay_until_statement
+    | delay_relative_statement
+    ;
+
+delay_until_statement
+    : DELAY UNTIL delay_expression SEMI
+    ;
+
+delay_relative_statement
+    : DELAY delay_expression SEMI
+    ;
+
+delay_expression
+    : expression
+    ;
+
+select_statement
+    : selective_accept
+    | timed_entry_call
+    | conditional_entry_call
+    | asynchronous_select
+    ;
+
+selective_accept
+    : SELECT guard? select_alternative (OR guard? select_alternative)* (
+        ELSE sequence_of_statements
+    )? END SELECT SEMI
+    ;
+
+guard
+    : WHEN condition ARROW
+    ;
+
+select_alternative
+    : accept_alternative
+    | delay_alternative
+    | terminate_alternative
+    ;
+
+accept_alternative
+    : accept_statement sequence_of_statements?
+    ;
+
+delay_alternative
+    : delay_statement sequence_of_statements?
+    ;
+
+terminate_alternative
+    : TERMINATE SEMI
+    ;
+
+timed_entry_call
+    : SELECT entry_call_alternative OR delay_alternative END SELECT SEMI
+    ;
+
+entry_call_alternative
+    : procedure_or_entry_call sequence_of_statements?
+    ;
+
+procedure_or_entry_call
+    : procedure_call_statement
+    | entry_call_statement
+    ;
+
+conditional_entry_call
+    : SELECT entry_call_alternative ELSE sequence_of_statements END SELECT SEMI
+    ;
+
+asynchronous_select
+    : SELECT triggering_alternative THEN ABORT abortable_part END SELECT SEMI
+    ;
+
+triggering_alternative
+    : triggering_statement sequence_of_statements?
+    ;
+
+triggering_statement
+    : procedure_or_entry_call
+    | delay_statement
+    ;
+
+abortable_part
+    : sequence_of_statements
+    ;
+
+abort_statement
+    : ABORT name (',' name)* SEMI
+    ;
+
+/*
+10 - Program Structure and Compilation Issues
+*/
+
+compilation
+    : compilation_unit* {this.ParsePragmas(); this.OutputSymbolTable();} EOF
+    ;
+
+compilation_unit
+    : context_item* (library_item | subunit)
+    ;
+
+library_item
+    : PRIVATE? library_unit_declaration
+    | library_unit_body
+    | PRIVATE? library_unit_renaming_declaration
+    ;
+
+library_unit_declaration
+    : subprogram_declaration
+    | package_declaration
+    | generic_declaration
+    | generic_instantiation
+    ;
+
+library_unit_renaming_declaration
+    : package_renaming_declaration
+    | generic_renaming_declaration
+    | subprogram_renaming_declaration
+    ;
+
+library_unit_body
+    : subprogram_body
+    | package_body
+    ;
+
+context_item
+    : with_clause
+    | use_clause
+    ;
+
+with_clause
+    : limited_with_clause
+    | nonlimited_with_clause
+    ;
+
+limited_with_clause
+    : LIMITED PRIVATE? WITH name (',' name)* SEMI {this.ImportWithClause();}
+    ;
+
+nonlimited_with_clause
+    : PRIVATE? WITH name (',' name)* SEMI {this.ImportWithClause();}
+    ;
+
+body_stub
+    : subprogram_body_stub
+    | package_body_stub
+    | task_body_stub
+    | protected_body_stub
+    ;
+
+subprogram_body_stub
+    : overriding_indicator? subprogram_specification IS SEPARATE aspect_specification? SEMI
+    ;
+
+package_body_stub
+    : PACKAGE BODY_ defining_identifier IS SEPARATE aspect_specification? SEMI
+    ;
+
+task_body_stub
+    : TASK BODY_ defining_identifier IS SEPARATE aspect_specification? SEMI
+    ;
+
+protected_body_stub
+    : PROTECTED BODY_ defining_identifier IS SEPARATE aspect_specification? SEMI
+    ;
+
+subunit
+    : SEPARATE '(' name ')' proper_body
+    ;
+
+/*
+11 - Exceptions
+*/
+
+exception_declaration
+    : defining_identifier_list COLON EXCEPTION aspect_specification? SEMI {this.EnterDeclaration();}
+    ;
+
+handled_sequence_of_statements
+    : sequence_of_statements (EXCEPTION exception_handler+)?
+    ;
+
+exception_handler
+    : WHEN (choice_parameter_specification COLON)? exception_choice (VL exception_choice)* ARROW sequence_of_statements
+    ;
+
+choice_parameter_specification
+    : defining_identifier {this.EnterDeclaration();}
+    ;
+
+exception_choice
+    : name
+    | OTHERS
+    ;
+
+raise_statement
+    : RAISE SEMI
+    | RAISE name (WITH expression)? SEMI
+    ;
+
+/*
+12 - Generic Units
+*/
+
+generic_declaration
+    : generic_subprogram_declaration
+    | generic_package_declaration
+    ;
+
+generic_subprogram_declaration
+    : generic_formal_part subprogram_specification aspect_specification? SEMI
+    ;
+
+generic_package_declaration
+    : generic_formal_part package_specification SEMI
+    ;
+
+generic_formal_part
+    : GENERIC (generic_formal_parameter_declaration | use_clause)*
+    ;
+
+generic_formal_parameter_declaration
     : formal_object_declaration
     | formal_type_declaration
     | formal_subprogram_declaration
     | formal_package_declaration
     ;
 
-formal_package_declaration
-    : WITH PACKAGE defining_identifier IS NEW name formal_package_actual_part aspect_specification? SEMI
+generic_instantiation
+    : PACKAGE defining_program_unit_name IS NEW name generic_actual_part? aspect_specification? SEMI {this.EnterDeclaration();}
+    | overriding_indicator? PROCEDURE defining_program_unit_name IS NEW name generic_actual_part? aspect_specification? SEMI {this.EnterDeclaration();}
+    | overriding_indicator? FUNCTION defining_designator IS NEW name generic_actual_part? aspect_specification? SEMI {this.EnterDeclaration();}
     ;
 
-formal_package_actual_part
-    : '(' (OTHERS ARROW)? BOX ')'
-    | generic_actual_part?
-    | '(' formal_package_association (',' formal_package_association)* (',' OTHERS ARROW BOX)? ')'
+generic_actual_part
+    : '(' generic_association (',' generic_association)* ')'
     ;
 
-formal_package_association
-    : generic_association
-    | generic_formal_parameter_selector_name ARROW BOX
+generic_association
+    : (selector_name ARROW)? explicit_generic_actual_parameter
     ;
 
-formal_subprogram_declaration
-    : formal_concrete_subprogram_declaration
-    | formal_abstract_subprogram_declaration
-    ;
-
-formal_concrete_subprogram_declaration
-    : WITH subprogram_specification (IS subprogram_default)? aspect_specification? SEMI
-    ;
-
-formal_abstract_subprogram_declaration
-    : WITH subprogram_specification IS ABSTRACT subprogram_default? aspect_specification? SEMI
+explicit_generic_actual_parameter
+    : expression
+    | name
+    | subtype_mark
     ;
 
 formal_object_declaration
-    : defining_identifier_list COLON mode_ null_exclusion? subtype_mark (ASSIGN default_expression)? aspect_specification? SEMI
-    | defining_identifier_list COLON mode_ access_definition (ASSIGN default_expression)? aspect_specification?
-    ;
-
-generic_instantiation
-    : PACKAGE defining_program_unit_name IS NEW name generic_actual_part? aspect_specification?
-    | overriding_indicator? PROCEDURE defining_program_unit_name IS NEW name generic_actual_part? aspect_specification?
-    | overriding_indicator? FUNCTION defining_designator IS NEW name generic_actual_part? aspect_specification?
+    : defining_identifier_list COLON mode_ null_exclusion? subtype_mark (ASSIGN default_expression)? aspect_specification? SEMI {this.EnterDeclaration();}
+    | defining_identifier_list COLON mode_ access_definition (ASSIGN default_expression)? aspect_specification? SEMI {this.EnterDeclaration();}
     ;
 
 formal_type_declaration
@@ -1143,11 +1325,11 @@ formal_type_declaration
     ;
 
 formal_complete_type_declaration
-    : TYPE defining_identifier discriminant_part? IS formal_type_definition aspect_specification? SEMI
+    : TYPE defining_identifier discriminant_part? IS formal_type_definition aspect_specification? SEMI {this.EnterDeclaration();}
     ;
 
 formal_incomplete_type_declaration
-    : TYPE defining_identifier discriminant_part? (IS TAGGED)? SEMI
+    : TYPE defining_identifier discriminant_part? (IS TAGGED)? SEMI {this.EnterDeclaration();}
     ;
 
 formal_type_definition
@@ -1165,11 +1347,11 @@ formal_type_definition
     ;
 
 formal_private_type_definition
-    : ((ABSTRACT)? TAGGED)? LIMITED? PRIVATE
+    : (ABSTRACT? TAGGED)? LIMITED? PRIVATE
     ;
 
 formal_derived_type_definition
-    : ABSTRACT? LIMITED? SYNCHRONIZED NEW subtype_mark ( (AND interface_list)? WITH PRIVATE )?
+    : ABSTRACT? LIMITED? SYNCHRONIZED NEW subtype_mark ((AND interface_list)? WITH PRIVATE)?
     ;
 
 formal_discrete_type_definition
@@ -1177,7 +1359,7 @@ formal_discrete_type_definition
     ;
 
 formal_signed_integer_type_definition
-    : range BOX
+    : RANGE_ BOX
     ;
 
 formal_modular_type_definition
@@ -1208,18 +1390,17 @@ formal_interface_type_definition
     : interface_type_definition
     ;
 
-generic_actual_part
-    : '(' generic_association (',' generic_association)* ')'
+formal_subprogram_declaration
+    : formal_concrete_subprogram_declaration
+    | formal_abstract_subprogram_declaration
     ;
 
-generic_association
-    : (generic_formal_parameter_selector_name ARROW)? explicit_generic_actual_parameter
+formal_concrete_subprogram_declaration
+    : WITH subprogram_specification (IS subprogram_default)? aspect_specification? SEMI
     ;
 
-explicit_generic_actual_parameter
-    : expression
-    | name
-    | subtype_mark
+formal_abstract_subprogram_declaration
+    : WITH subprogram_specification IS ABSTRACT subprogram_default? aspect_specification? SEMI
     ;
 
 subprogram_default
@@ -1228,6 +1409,25 @@ subprogram_default
     | NULL_
     ;
 
+formal_package_declaration
+    : WITH PACKAGE defining_identifier IS NEW name formal_package_actual_part aspect_specification? SEMI {this.EnterDeclaration();}
+    ;
+
+formal_package_actual_part
+    : '(' (OTHERS ARROW)? BOX ')'
+    | generic_actual_part?
+    | '(' formal_package_association (',' formal_package_association)* (',' OTHERS ARROW BOX)? ')'
+    ;
+
+formal_package_association
+    : generic_association
+    | selector_name ARROW BOX
+    ;
+
+/*
+13 - Representation Issues
+*/
+
 aspect_clause
     : attribute_definition_clause
     | enumeration_representation_clause
@@ -1235,20 +1435,37 @@ aspect_clause
     | at_clause
     ;
 
-at_clause
-    : FOR direct_name USE AT expression SEMI
+local_name
+    : direct_name
+    | direct_name SQ attribute_designator
+    | name
     ;
 
-mod_clause
-    : AT MOD expression SEMI
+aspect_specification
+    : WITH aspect_mark (ARROW aspect_definition)? (',' aspect_mark (ARROW aspect_definition)?)*
+    ;
+
+aspect_mark
+    : aspect_identifier (SQ CLASS__)? //TODO Class or id_
+    ;
+
+aspect_identifier
+    : identifier
+    ;
+
+aspect_definition
+    : name
+    | expression
+    | identifier
+    ;
+
+attribute_definition_clause
+    : FOR local_name SQ attribute_designator USE expression SEMI
+    | FOR local_name SQ attribute_designator USE name SEMI
     ;
 
 enumeration_representation_clause
-    : FOR first_subtype_local_name USE enumeration_aggregate SEMI
-    ;
-
-first_subtype_local_name
-    : local_name
+    : FOR local_name USE enumeration_aggregate SEMI
     ;
 
 enumeration_aggregate
@@ -1256,7 +1473,7 @@ enumeration_aggregate
     ;
 
 record_representation_clause
-    : FOR first_subtype_local_name USE RECORD mod_clause? component_clause* END RECORD?
+    : FOR local_name USE RECORD mod_clause? component_clause* END RECORD SEMI
     ;
 
 component_clause
@@ -1279,275 +1496,31 @@ last_bit
     : expression
     ;
 
-code_statement
-    : qualified_expression
+/*
+J.*
+*/
+
+delta_constraint
+    : DELTA simple_expression range_constraint?
     ;
 
-local_name
-    : direct_name
-    | direct_name SQ attribute_designator
+at_clause
+    : FOR direct_name USE AT expression SEMI
+    ;
+
+mod_clause
+    : AT MOD expression SEMI
+    ;
+
+/*
+2.8 - Pragmas
+*/
+
+pragmaRule
+    : PRAGMA identifier (LP pragma_argument_association (COMMA pragma_argument_association)* RP)? SEMI EOF
+    ;
+
+pragma_argument_association
+    : (identifier ARROW)? expression
     | name
-    ;
-
-generic_formal_parameter_selector_name
-    : selector_name
-    ;
-
-sequence_of_statements
-    : statement+ label*
-    ;
-
-statement
-    : label* simple_statement
-    | label* compound_statement
-    ;
-
-simple_statement
-    : null_statement
-    | assignment_statement
-    | exit_statement
-    | goto_statement
-    | procedure_call_statement
-    | simple_return_statement
-    | entry_call_statement
-    | requeue_statement
-    | delay_statement
-    | abort_statement
-    | raise_statement
-    | code_statement
-    ;
-
-requeue_statement
-    : REQUEUE name (WITH ABORT)? SEMI
-    ;
-
-simple_return_statement
-    : RETURN expression? SEMI
-    ;
-
-extended_return_object_declaration
-    : defining_identifier COLON ALIASED? CONSTANT? return_subtype_indication (ASSIGN expression)?
-    ;
-
-extended_return_statement
-    : RETURN extended_return_object_declaration (DO handled_sequence_of_statements END RETURN)? SEMI
-    ;
-
-return_subtype_indication
-    : subtype_indication
-    | access_definition
-    ;
-
-procedure_call_statement
-    : name
-    | procedure_prefix actual_parameter_part SEMI
-    ;
-
-actual_parameter_part
-    : '(' parameter_association (',' parameter_association)* ')'
-    ;
-
-parameter_association
-    : (formal_parameter_selector_name ARROW)? explicit_actual_parameter
-    ;
-
-formal_parameter_selector_name
-    : selector_name
-    ;
-
-explicit_actual_parameter
-    : expression
-    | name
-    ;
-
-procedure_prefix
-    : name
-    ;
-
-abort_statement
-    : ABORT name (',' name)*
-    ;
-
-delay_statement
-    : delay_until_statement
-    | delay_relative_statement
-    ;
-
-delay_until_statement
-    : DELAY UNTIL delay_expression
-    ;
-
-delay_relative_statement
-    : DELAY delay_expression
-    ;
-
-delay_expression
-    : expression
-    ;
-
-compound_statement
-    : if_statement
-    | case_statement
-    | loop_statement
-    | block_statement
-    | extended_return_statement
-    | accept_statement
-    | select_statement
-    ;
-
-select_statement
-    : selective_accept
-    | timed_entry_call
-    | conditional_entry_call
-    | asynchronous_select
-    ;
-
-selective_accept
-    : SELECT guard? select_alternative ( OR guard? select_alternative )*
-        ( ELSE sequence_of_statements )? END SELECT SEMI
-    ;
-
-guard
-    : WHEN condition ARROW
-    ;
-
-select_alternative
-    : accept_alternative
-    | delay_alternative
-    | terminate_alternative
-    ;
-
-asynchronous_select
-    : SELECT triggering_alternative THEN ABORT abortable_part END SELECT SEMI
-    ;
-
-triggering_alternative
-    : triggering_statement sequence_of_statements?
-    ;
-
-triggering_statement
-    : procedure_or_entry_call
-    | delay_statement
-    ;
-
-abortable_part
-    : sequence_of_statements
-    ;
-
-conditional_entry_call
-    : SELECT entry_call_alternative
-        ELSE sequence_of_statements
-        END SELECT SEMI
-    ;
-
-timed_entry_call
-    : SELECT entry_call_alternative OR delay_alternative END SELECT SEMI
-    ;
-
-entry_call_alternative
-    : procedure_or_entry_call sequence_of_statements?
-    ;
-
-procedure_or_entry_call
-    : procedure_call_statement
-    | entry_call_statement
-    ;
-
-entry_call_statement
-    : name actual_parameter_part? SEMI
-    ;
-
-accept_alternative
-    : accept_statement sequence_of_statements?
-    ;
-
-delay_alternative
-    : delay_statement sequence_of_statements?
-    ;
-
-terminate_alternative
-    : TERMINATE SEMI
-    ;
-
-null_statement
-    : NULL_ SEMI
-    ;
-
-label
-    : label_statement_identifier
-    ;
-
-label_statement_identifier
-    : statement_identifier
-    ;
-
-statement_identifier
-    : direct_name
-    ;
-
-assignment_statement
-    : name ASSIGN expression SEMI
-    ;
-
-if_statement
-    : IF condition THEN sequence_of_statements
-        (ELSIF condition THEN sequence_of_statements)*
-        (ELSE sequence_of_statements)?
-        END IF SEMI
-    ;
-
-case_statement
-    : CASE selecting_expression IS case_statement_alternative case_statement_alternative* END CASE SEMI
-    ;
-
-case_statement_alternative
-    : WHEN discrete_choice_list ARROW sequence_of_statements
-    ;
-
-loop_statement
-    : (loop_statement_identifier COLON)? iteration_scheme? LOOP sequence_of_statements END LOOP loop_identifier? SEMI
-    ;
-
-loop_statement_identifier
-    : statement_identifier
-    ;
-
-loop_identifier
-    : id_
-    ;
-
-iteration_scheme
-    : WHILE condition
-    | FOR loop_parameter_specification
-    | FOR iterator_specification
-    ;
-
-loop_parameter_specification
-    : defining_identifier IN REVERSE? discrete_subtype_definition
-    ;
-
-iterator_specification
-    : defining_identifier IN REVERSE? name
-    | defining_identifier (COLON subtype_indication) OF REVERSE? name
-    ;
-
-block_statement
-    : (block_statement_identifier COLON)? (DECLARE declarative_part)?
-        BEGIN handled_sequence_of_statements END (block_identifier)? SEMI
-    ;
-
-block_statement_identifier
-    : statement_identifier
-    ;
-
-block_identifier
-    : id_
-    ;
-
-exit_statement
-    : EXIT name? (WHEN condition)? SEMI
-    ;
-
-goto_statement
-    : GOTO name
     ;

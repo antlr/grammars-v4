@@ -34,3 +34,4 @@ describe view db.sch.obj;
 describe view sch.obj;
 describe view obj;
 describe warehouse obj;
+describe password policy obj;

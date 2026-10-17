@@ -1,0 +1,38 @@
+digraph ATN {
+rankdir=LR;
+s285[fontsize=11, label="285", shape=doublecircle, fixedsize=true, width=.6];
+s1921[fontsize=11,label="1921", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1922[fontsize=11,label="1922", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1923[fontsize=11,label="1923", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1924[fontsize=11,label="1924", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1925[fontsize=11,label="1925", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1926[fontsize=11,label="1926", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1927[fontsize=11,label="1927", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1928[fontsize=11,label="1928", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1929[fontsize=11,label="1929", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1930[fontsize=11,label="1930", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1931[fontsize=11,label="{&rarr;\n1931*\nd=152|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1932[fontsize=11,label="&larr;\n1932", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1933[fontsize=11,label="{1933*\nd=153|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1934[fontsize=11,label="1934", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1935[fontsize=11,label="1935*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s284[fontsize=11,label="284", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s284 -> s1921 [fontname="Times-Italic", label="&epsilon;"];
+s1921 -> s1922 [fontsize=11, fontname="Courier", arrowsize=.7, label = "action_142:-1", arrowhead = normal];
+s1922 -> s1923 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<additive_expression[0]>", arrowhead = normal];
+s1923 -> s1933 [fontname="Times-Italic", label="&epsilon;"];
+s1933:p0 -> s1931 [fontname="Times-Italic", label="&epsilon;"];
+s1933:p1 -> s1934 [fontname="Times-Italic", label="&epsilon;"];
+s1931:p0 -> s1924 [fontname="Times-Italic", label="&epsilon;"];
+s1931:p1 -> s1927 [fontname="Times-Italic", label="&epsilon;"];
+s1934 -> s285 [fontname="Times-Italic", label="&epsilon;"];
+s1924 -> s1925 [fontsize=11, fontname="Courier", arrowsize=.7, label = "2 >= _p", arrowhead = normal];
+s1927 -> s1928 [fontsize=11, fontname="Courier", arrowsize=.7, label = "1 >= _p", arrowhead = normal];
+s1925 -> s1926 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'<<'", arrowhead = normal];
+s1928 -> s1929 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<right_shift>", arrowhead = normal];
+s1926 -> s1932 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<additive_expression[0]>", arrowhead = normal];
+s1929 -> s1930 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<additive_expression[0]>", arrowhead = normal];
+s1932 -> s1935 [fontname="Times-Italic", label="&epsilon;"];
+s1930 -> s1932 [fontname="Times-Italic", label="&epsilon;"];
+s1935 -> s1933 [fontname="Times-Italic", label="&epsilon;", style="dashed"];
+}
