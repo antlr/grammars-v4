@@ -364,7 +364,9 @@
 				<module>solidity</module>
 				<module>sparql</module>
 				<module>spass</module>
-				<module>sql</module>
+                <module>spl</module>
+                <module>squeak</module>
+                <module>sql</module>
                 <module>squirrel</module>
 				<module>stacktrace</module>
 				<module>star</module>
