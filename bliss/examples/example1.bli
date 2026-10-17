@@ -1,0 +1,28 @@
+MODULE E1 (MAIN = CTRL) =
+BEGIN
+FORWARD ROUTINE
+    CTRL,
+    STEP;
+ROUTINE CTRL =
+!+
+! This routine inputs a value, operates on it, and
+! then outputs the result.
+!-
+    BEGIN
+    EXTERNAL ROUTINE
+        GETNUM,     ! Input a number from terminal
+        PUTNUM;     ! Output a number to terminal
+    LOCAL
+        X,          ! Storage for input value
+        Y;          ! Storage for output value
+    GETNUM(X);
+    Y = STEP(.X);
+    PUTNUM(.Y)
+    END;
+ROUTINE STEP(A) =
+!+
+! This routine adds 1 to the given value.
+!-
+    (.A+1);
+END
+ELUDOM

@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>Expected Results for Class L Tests</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    DIV.Indented1 {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 2.0em; margin-bottom: 0.6em}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-562.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-564.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>5.6.3 Expected Results for Class L Tests</H1>
+<div class="Normal">Class L tests are expected to be rejected before 
+execution begins. They must be submitted to the compiler and to the linker/binder. 
+If an executable is generated, then it must be submitted for execution. 
+Unless otherwise documented, the test is graded as &quot;failed&quot; 
+if it begins execution, regardless of whether any output is produced.. 
+(Twenty-eight L tests contain documentation indicating that they may 
+execute. See below.)</div>
+<div class="Normal">In general, an L test is expected to be rejected 
+at link/bind time. Some tests contain <TT>-- ERROR:</TT> indications; 
+an implementation that reports an error associated with one of these 
+lines is judged to have passed the test (provided, of course, that the 
+link attempt fails).</div>
+<div class="Normal" style="margin-bottom: 0.4em">The following tests 
+are exceptions to the general rule that an L test must not execute:</div>
+<div class="Indented1"><SPAN STYLE="font-size: 80%">Test LXE3002, for 
+the Distributed Systems Annex, is a test that has two partitions, each 
+of which may execute. As documented in the source code, this test is 
+graded &quot;failed&quot; if both partitions report &quot;TENTATIVELY 
+PASSED&quot;. Other outcomes are graded as appropriate for Class L tests.</SPAN></div>
+<div class="Indented1"><SPAN STYLE="font-size: 80%">Tests LA14001..27 
+and LA20002 (twenty-seven core language tests), as documented in the 
+source code, may execute if automatic recompilation is supported. These 
+tests are graded as &quot;passed&quot; if they execute and report &quot;PASSED&quot;. 
+Other outcomes are graded as appropriate for Class L tests.</SPAN>&nbsp;</div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-562.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-564.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>

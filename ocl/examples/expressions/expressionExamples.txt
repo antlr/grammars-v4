@@ -1,0 +1,15 @@
+Map{ "1" |-> "a", "2" |-> "b" };
+OrderedSet{ 1, 2, 4 };
+lambda x : double in x*x*x;
+if s->hasMatch("[a-z]+") then s->firstMatch("[a-z]+") else null endif;
+if s->hasMatch("[a-z]+") then s->firstMatch("[a-z]+") else s endif;
+
+/* dot notation can be used instead, if you prefer: */ 
+if s.hasMatch(r) then s.firstMatch(r) else s endif;
+
+s->select( x | x >= 0)->collect( y | y*y )->sum();
+s->iterate( x; acc = Set{} | acc->including(x*x) );
+2*x - 3*y + 4*z;
+
+/* This is now correctly parsed as (2*x - 3*y) + 4*z
+The original version of the grammar gave 2*x - (3*y + 4*z) */ 

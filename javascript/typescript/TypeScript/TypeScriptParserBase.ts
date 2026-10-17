@@ -1,11 +1,11 @@
-import {Parser, Lexer, Token, TokenStream} from 'antlr4ts';
-import {TypeScriptParser} from './TypeScriptParser';
+import {Parser, Lexer, Token, TokenStream} from 'antlr4';
+import TypeScriptParser from './TypeScriptParser';
 
 /**
  * All parser methods that used in grammar (p, prev, notLineTerminator, etc.)
  * should start with lower case char similar to parser rules.
  */
-export abstract class TypeScriptParserBase extends Parser {
+export default abstract class TypeScriptParserBase extends Parser {
 
     constructor(input: TokenStream) {
         super(input);
@@ -43,9 +43,10 @@ export abstract class TypeScriptParserBase extends Parser {
         return !this.here(TypeScriptParser.LineTerminator);
     }
 
-    protected notOpenBraceAndNotFunction():boolean {
+    protected notOpenBraceAndNotFunctionAndNotInterface():boolean {
         const nextTokenType:number = this._input.LT(1).type;
-        return nextTokenType != TypeScriptParser.OpenBrace && nextTokenType != TypeScriptParser.Function_;
+        return nextTokenType != TypeScriptParser.OpenBrace && nextTokenType != TypeScriptParser.Function_
+            && nextTokenType != TypeScriptParser.Interface;
     }
 
     protected closeBrace():boolean {
@@ -68,12 +69,12 @@ export abstract class TypeScriptParserBase extends Parser {
     private here(type:number):boolean {
 
         // Get the token ahead of the current index.
-        const possibleIndexEosToken: number = this.currentToken.tokenIndex - 1;
+        const possibleIndexEosToken: number = this.getCurrentToken().tokenIndex - 1;
         const ahead: Token = this._input.get(possibleIndexEosToken);
 
         // Check if the token resides on the HIDDEN channel and if it's of the
         // provided type.
-        return (ahead.channel == Lexer.HIDDEN) && (ahead.type == type);
+        return (ahead.channel == Token.HIDDEN_CHANNEL) && (ahead.type == type);
     }
 
     /**
@@ -90,10 +91,10 @@ export abstract class TypeScriptParserBase extends Parser {
     protected lineTerminatorAhead():boolean {
 
         // Get the token ahead of the current index.
-        let possibleIndexEosToken: number = this.currentToken.tokenIndex - 1;
+        let possibleIndexEosToken: number = this.getCurrentToken().tokenIndex - 1;
         let ahead: Token  = this._input.get(possibleIndexEosToken);
 
-        if (ahead.channel != Lexer.HIDDEN) {
+        if (ahead.channel != Token.HIDDEN_CHANNEL) {
             // We're only interested in tokens on the HIDDEN channel.
             return false;
         }
@@ -105,7 +106,7 @@ export abstract class TypeScriptParserBase extends Parser {
 
         if (ahead.type == TypeScriptParser.WhiteSpaces) {
             // Get the token ahead of the current whitespaces.
-            possibleIndexEosToken = this.currentToken.tokenIndex - 2;
+            possibleIndexEosToken = this.getCurrentToken().tokenIndex - 2;
             ahead = this._input.get(possibleIndexEosToken);
         }
 

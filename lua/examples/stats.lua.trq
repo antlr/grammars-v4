@@ -1,0 +1,5 @@
+(: Check whether there are a correct number of "stat". :)
+
+if (count(//stat) = 1)
+then ""
+else "Invalid number of 'stat' nodes."

@@ -1,18 +1,17 @@
-# Python base Lexer and Parser for JavaScript
+# JavaScript parser for the Python3 target
 ---
-This is a base lexer and parser for the JavaScript language for Antlr4
+This directory contains the base class code for the JavaScript parser. To use the
+JavaScript grammar for Python3, run:
+```
+python transformGrammar.py
+antlr4 -Dlanguage=Python3 -o gen *.g4
+```
+The [transformGrammar.py](https://github.com/antlr/grammars-v4/blob/master/javascript/javascript/Python3/transformGrammar.py) script modifies the split grammar for Python3.
+The grammar must be modified for Python3.
 
-Baecause the Lexer and Parser use special commands you first need to transform the grammar files:
+The generate parser works with this Python3 driver:
 
-- python transformGrammar.py JavaScriptParser.g4
-- python transformGrammar.py JavaScriptLexer.g4
-
-Then do the antlr thing:
-- antlr4 -Dlanguage=Python3 -o gen *.g4
-
-I have tested with the below code with a sampling of example JavaScript files from the examples directory.
-
-```python
+```
 import sys
 from antlr4 import *
 import JavaScriptLexer
@@ -39,3 +38,5 @@ if __name__ == '__main__':
     print("Running")
     main(sys.argv)
 ```
+
+(Updated 13 July 2022 by Ken Domino.)
