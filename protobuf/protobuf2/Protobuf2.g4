@@ -14,13 +14,13 @@
 grammar Protobuf2;
 
 proto
-    : syntax (importStatement | packageStatement | optionStatement | topLevelDef | emptyStatement_)* EOF
+    : syntax? (importStatement | packageStatement | optionStatement | topLevelDef | emptyStatement_)* EOF
     ;
 
 // Syntax
 
 syntax
-    : SYNTAX EQ (PROTO2_LIT_SINGLE | PROTO2_LIT_DOBULE) SEMI
+    : SYNTAX EQ (PROTO2_LIT_SINGLE | PROTO2_LIT_DOUBLE) SEMI
     ;
 
 // Import Statement
@@ -175,6 +175,7 @@ enumBody
 enumElement
     : optionStatement
     | enumField
+    | reserved
     | emptyStatement_
     ;
 
@@ -266,7 +267,7 @@ constant
 
 // not specified in specification but used in tests
 blockLit
-    : LC (ident COLON constant)* RC
+    : LC (ident COLON constant (COMMA)?)* RC
     ;
 
 emptyStatement_
@@ -335,7 +336,7 @@ intLit
 strLit
     : STR_LIT
     | PROTO2_LIT_SINGLE
-    | PROTO2_LIT_DOBULE
+    | PROTO2_LIT_DOUBLE
     ;
 
 boolLit
@@ -503,7 +504,7 @@ PROTO2_LIT_SINGLE
     : '"proto2"'
     ;
 
-PROTO2_LIT_DOBULE
+PROTO2_LIT_DOUBLE
     : '\'proto2\''
     ;
 

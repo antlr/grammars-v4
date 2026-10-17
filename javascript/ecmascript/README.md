@@ -1,4 +1,4 @@
-# ECMAScript.g4
+# ECMAScript Grammar
 
 An ANTLR4 grammar for ECMAScript based on the
 [Standard ECMA-262 5.1 Edition from June 2011](http://www.ecma-international.org/ecma-262/5.1).
@@ -11,7 +11,7 @@ files.
 
 The parser needs to read certain tokens from the `HIDDEN` channel
 for proper *semi colon insertion*. The following method signatures
-are therefor embedded inside `@parser::members`:
+are therefore embedded inside `@parser::members`:
 
 ```java
 /**
@@ -92,4 +92,7 @@ rules as well.
 
 The grammar including lexer- and parser unit tests, as well as some example 
 code of how to use it, can be found here: [github.com/bkiers/ecmascript-parser](https://github.com/bkiers/ecmascript-parser).
+
+## Reference
+* [pldb](http://pldb.info/concepts/javascript)
 

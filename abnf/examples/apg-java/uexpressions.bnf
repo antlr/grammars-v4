@@ -1,0 +1,11 @@
+;
+; Grammar (4.2) - Modified for SABNF syntax with UDT
+; Aho, Lam, Sethi and Ullman, "Compilers: Principles, Techniques, & Tools",
+; 2nd ed., pp. 193, Addison Wesley, (2007)
+;
+E      = T Eprime               ; expression = sum of terms
+Eprime = "+" T Eprime / ""
+T      = F Tprime               ; term = product of factors
+Tprime = "*" F Tprime / ""
+F      = "(" E ")" / u_id       ; factor = parenthesized expression or identifier
+                                ; u_id = UDT for the identifier

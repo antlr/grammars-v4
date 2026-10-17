@@ -1,0 +1,157 @@
+-- B8300057.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      See B8300050.A.
+--
+-- TEST DESCRIPTION:
+--      See B8300050.A.
+--
+-- TEST FILES:
+--      This test consists of the following files:
+--         B8300050.A
+--         B8300051.A
+--         B8300052.A
+--         B8300053.A
+--         B8300054.A
+--         B8300055.A
+--         B8300056.A
+--      -> B8300057.A
+--         B8300058.A
+--
+-- PASS/FAIL CRITERIA:
+--      See B8300050.A.
+--
+-- CHANGE HISTORY:
+--      30 Apr 2021   RLB     Created test from ACVC test B83004D.
+--!
+
+-- CASE C:
+separate (B830005)
+package body Pack3A is
+
+   -- Local declarations:
+   
+   Var3 : Integer := 2;
+   Con3 : constant String := "HELLO";
+   Exc3 : exception;
+
+   type Int3 is new Integer;
+   subtype Int_Subtype3 is Integer range 3 .. 30;
+
+   package P3 is
+      Z : Integer := 0;
+   end P3;
+
+   task T3;
+
+   protected Prot3 is
+      procedure Lock (A : Boolean);
+   private
+      L : Boolean;
+   end Prot3;
+
+   generic
+   function Fun3 return Integer;
+
+   procedure NP3 (X : in Natural) is null;
+  
+   -- Completions for normal declarations above:
+
+   task body T3 is                                  -- OPTIONAL ERROR: {4}
+   begin                             -- Body for entity with illegal homograph.
+      null;
+   end T3;
+
+   protected body Prot3 is                           -- OPTIONAL ERROR: {4}
+                                     -- Body for entity with illegal homograph.
+      procedure Lock (A : Boolean) is
+      begin
+         null;
+      end Lock;
+   end Prot3;
+
+   function Fun3 return Integer is                  -- OPTIONAL ERROR: {4}
+   begin                            -- Body for entity with illegal homograph.
+      return 1;
+   end Fun3;
+
+   -- Homographs:
+
+   task Var3;                                                -- ERROR: {4;1}
+   
+   function Con3 (A : in Integer) return Boolean;            -- ERROR: {4;1}
+
+   protected Exc3 is                                         -- ERROR: {4}
+      procedure Lock (A : Boolean);
+   private
+      L : Boolean;
+   end Exc3;
+
+   Int3 : constant String := "HELLO";                        -- ERROR: {4;1}
+
+   Int_Subtype3 : Integer := 1;                              -- ERROR: {4;1}
+
+   type P3 is new Integer;                                   -- ERROR: {4;1}
+
+   subtype T3 is Integer range 1 .. 10;                      -- ERROR: {4;1}
+
+   package Prot3 is                                          -- ERROR: {4}
+      Y : Natural := 0;
+   end Prot3;
+
+   Fun3 : exception;                                         -- ERROR: {4;1}
+
+   procedure NP3 (A : in out Positive) is null;              -- ERROR: {4;1}
+
+   
+   -- Completions for declarations in the specification:
+
+   function Funny (A : Funny_Type) return Funny_Type is
+   begin
+       return A;
+   end Funny;
+
+   -- Completions for declarations here:
+
+   task body Var3 is                               -- OPTIONAL ERROR: {4}
+   begin                                       -- Body of illegal homograph.
+      null;
+   end Var3;
+
+   function Con3 (A : in Integer) return Boolean is -- OPTIONAL ERROR: {4}
+   begin                                       -- Body of illegal homograph.
+      return A < 0;
+   end Con3;
+
+   protected body Exc3 is                           -- OPTIONAL ERROR: {4}
+                                               -- Body of illegal homograph.
+      procedure Lock (A : Boolean) is
+      begin
+         null;
+      end Lock;
+   end Exc3;
+
+end Pack3A;

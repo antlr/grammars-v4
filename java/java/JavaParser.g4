@@ -34,12 +34,14 @@
 
 parser grammar JavaParser;
 
+// Insert here @header.
+
 options {
     tokenVocab = JavaLexer;
     superClass = JavaParserBase;
 }
 
-compilationUnit
+compilationunit
     : packageDeclaration? (importDeclaration | ';')* (typeDeclaration | ';')* EOF
     | modularCompulationUnit EOF
     ;
@@ -344,19 +346,36 @@ altAnnotationQualifiedName
     : (identifier DOT)* '@' identifier
     ;
 
-annotation
-    : ('@' qualifiedName | altAnnotationQualifiedName) (
-        '(' ( elementValuePairs | elementValue)? ')'
-    )?
+//annotation
+//    : ('@' qualifiedName /* | altAnnotationQualifiedName */) ( '(' ( elementValuePairs | elementValue)? ')')?
+//    ;
+
+annotation :
+    ('@' qualifiedName /* | altAnnotationQualifiedName */) annotationFieldValues?
     ;
 
-elementValuePairs
-    : elementValuePair (',' elementValuePair)*
-    ;
+annotationFieldValues:
+	'(' ( annotationFieldValue ( ',' annotationFieldValue )* )? ')'
+	;
 
-elementValuePair
-    : identifier '=' elementValue
-    ;
+annotationFieldValue:
+	{ this.IsNotIdentifierAssign() }? annotationValue
+	| identifier '=' annotationValue
+	;
+
+annotationValue:
+	expression //conditionalExpression
+	| annotation
+	| '{' ( annotationValue ( ',' annotationValue )* )? ','? '}'
+	;
+
+//elementValuePairs
+//    : elementValuePair (',' elementValuePair)*
+//    ;
+
+//elementValuePair
+//    : identifier '=' elementValue
+//    ;
 
 elementValue
     : expression

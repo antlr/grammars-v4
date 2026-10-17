@@ -2,12 +2,13 @@
  * Kotlin Grammar for ANTLR v4
  *
  * Based on:
- * http://jetbrains.github.io/kotlin-spec/#_grammars_and_parsing
+ * jetbrains.github.io/kotlin-spec/#_grammars_and_parsing
  * and
- * http://kotlinlang.org/docs/reference/grammar.html
+ * kotlinlang.org/docs/reference/grammar.html
  *
  * Tested on
- * https://github.com/JetBrains/kotlin/tree/master/compiler/testData/psi
+ * github.com/JetBrains/kotlin/tree/master/compiler/testData/psi
+ * (stale link)
  */
 
 // $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
