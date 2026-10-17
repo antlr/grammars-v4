@@ -1,7 +1,7 @@
 /*
  BSD License
 
- Copyright (c) 2020, Tom Everett All rights reserved.
+ Copyright (c) 2026, Tom Everett All rights reserved.
 
  Redistribution and use in source and binary forms, with or without modification, are permitted
  provided that the following conditions are met:
@@ -30,7 +30,9 @@ compilation_unit
    ;
 
 block
-   : exec_decl_list (';' exec_decl_list)* stmt (';' stmt)* '*'
+   : exec_decl_list ';' stmt (';' stmt)*
+   | exec_decl_list
+   | stmt (';' stmt)*
    ;
 
 exec_decl_list
@@ -69,7 +71,7 @@ labeled_stmt
 
 invocation
    : special_literal
-   | simple_invocation actuals*
+   | simple_invocation ('(' actuals ')')?
    | '(' invocation ')'
    ;
 
@@ -161,16 +163,20 @@ assert_stmt
    : 'assert' assertion
    ;
 
+assertion
+   : ASSERTION
+   ;
+
 label_decl
    : 'label' identifier_list
    ;
 
 var_decl
-   : aux 'var' (obj_decl_group init_fin_clause*) (',' (obj_decl_group init_fin_clause*))*
+   : aux 'var' (obj_decl_group init_fin_clause) (',' (obj_decl_group init_fin_clause))*
    ;
 
 const_decl
-   : aux 'const' (obj_decl_group init_fin_clause* | const_assign (',' const_assign)*)
+   : aux 'const' (obj_decl_group init_fin_clause | const_assign (',' const_assign)*)
    ;
 
 aux
@@ -187,8 +193,8 @@ obj_type
    ;
 
 init_fin_clause
-   : expression
-   | ('init' stmt)* ('final' stmt)*
+   : '=' expression
+   | ('init' stmt)? ('final' stmt)?
    ;
 
 const_assign
@@ -196,7 +202,7 @@ const_assign
    ;
 
 type_description
-   : simple_invocation '(' (formal_qual (',' formal_qual)* ')')* update_set*
+   : simple_invocation ('(' (actual (',' actual)*)? ')')? update_set*
    | '?' identifier update_set*
    ;
 
@@ -216,11 +222,11 @@ formals
 
 routine_formal
    : formal_id_list 'proc' parms
-   | formal_id_list (yproc | func | sel) vparms
+   | formal_id_list ('vproc' | 'func' | 'sel') vparms
    ;
 
 binding
-   : ('copy' | alias*) ('const' | 'var')*
+   : ('copy' | 'alias'*) ('const' | 'var')*
    ;
 
 formal_id_list
@@ -259,11 +265,11 @@ routine_id
    ;
 
 parms
-   : formals*
+   : ('(' formals ')')?
    ;
 
 vparms
-   : formals* ':' type_description
+   : ('(' formals ')')? ':' type_description
    ;
 
 pre
@@ -278,18 +284,23 @@ routine_body
    : 'is' stmt
    | 'is' 'as' 'specified'
    | 'is' 'forward'
-   | 'is' 'external' system_specs
+   | 'is' 'external' '(' system_specs ')'
+   ;
+
+system_specs
+   : STRING
    ;
 
 form_decl
    : aux 'form' identifier formals* pre assumes 'is' form_body
+   | aux 'generator' identifier formals* ':' type_description pre assumes 'is' form_body
    ;
 
 form_body
    : specs* impl* 'end' identifier*
    | abbrev_body
    | 'forward'
-   | 'external' system_specs
+   | 'external' '(' system_specs ')'
    | 'as' 'specified'
    ;
 
@@ -333,10 +344,6 @@ enumerated_type
    : 'enumerated' identifier_list
    ;
 
-form_decl
-   : aux 'generator' identifier formals* ':' type_description pre assumes 'is' form_body
-   ;
-
 assumes
    : ('assumes' form_decl)*
    ;
@@ -346,7 +353,7 @@ alphanumeric
    | DIGIT
    ;
    //special_symbol: BASIC_SYMBOL|operator;
-
+   
 identifier
    : IDENTIFIER
    ;
@@ -381,8 +388,7 @@ unsigned_rational
    ;
 
 scale_factor
-   :
-   {'+' | '-'}? unsigned_integer
+   : ('+' | '-')? unsigned_integer
    ;
 
 special_identifier
@@ -421,12 +427,16 @@ binary_operator
    | assign_op
    ;
 
+assign_op
+   : ':='
+   ;
+
 operator
    : unary_operator
    | binary_operator
    ;
    //?
-
+   
 radix
    : alphanumeric+
    ;
@@ -438,6 +448,10 @@ BOOLEAN
 
 STRING
    : '"' .*? '"'
+   ;
+
+ASSERTION
+   : '{' ~ [{}]* '}'
    ;
 
 IDENTIFIER

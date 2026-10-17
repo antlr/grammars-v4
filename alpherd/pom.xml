@@ -38,7 +38,7 @@
 					<enabled>true</enabled>
 					<verbose>false</verbose>
 					<showTree>true</showTree>
-					<entryPoint>program</entryPoint>
+					<entryPoint>compilation_unit</entryPoint>
 					<grammarName>alpherd</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
