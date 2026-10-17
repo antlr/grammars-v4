@@ -33,7 +33,7 @@
 
 grammar croc;
 
-module
+module_
    : moduleDeclaration statement* EOF
    ;
 
