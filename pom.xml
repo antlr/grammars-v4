@@ -252,6 +252,7 @@
 				<module>kquery</module>
 				<module>lambda</module>
 				<module>lark</module>
+                <module>lazyk</module>
 				<module>lcc</module>
 				<module>less</module>
 				<module>limbo</module>

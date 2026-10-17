@@ -37,7 +37,7 @@ program
 
 ccexpr
    : ccexpr expr
-   | epsilon
+   |
    ;
 
 expr
@@ -45,7 +45,7 @@ expr
    | expr1
    ;
 
-oitaexpr
+iotaexpr
    : 'i'
    | expr1
    ;
@@ -54,20 +54,21 @@ expr1
    : 'I'
    | ('K' | 'k')
    | ('S' | 's')
-   | nonemptygotexpr
+   | nonemptyjotexpr
    | '`' expr expr
-   | '*' oitaexpr oitaexpr
+   | '*' iotaexpr iotaexpr
    | '(' ccexpr ')'
    ;
 
-nonemptygotexpr
-   : (jotexpr '0')
-   | (jotexpr '1')
+nonemptyjotexpr
+   : nonemptyjotexpr '0'
+   | nonemptyjotexpr '1'
+   | '0'
+   | '1'
    ;
 
-jotexpr
-   : NonemptyJotExpr
-   | epsilon
+COMMENT
+   : '#' ~[\r\n]* -> skip
    ;
 
 WS
