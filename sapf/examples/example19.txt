@@ -1,0 +1,2 @@
+;;;; moto rev
+.2 0 11 31 lfo [0 3c] .1 lfpulse 1h .1 rlpf .4 clip2 play

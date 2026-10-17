@@ -1,0 +1,56 @@
+MODULE fix_up_mem_files;
+
+    !+
+    !   This program will transform simple .MEM file (Output of DSR)
+    !   which have explicit carriage control into more standard
+    !   text files with implicit carriage control.  It also counts
+    !   the number of lines and pages.
+    !-
+    
+    SET cr            ( s'cr' );
+    SET lf            ( s'lf' );
+    SET nl            ( s'eol' );
+    
+    TOKEN cr_lf_eol     { cr lf nl };
+    TOKEN cr_eol        { cr nl };
+    TOKEN form_feed     { s'ff' };
+    
+    DECLARE numb_pages : INTEGER;
+    DECLARE numb_lines : INTEGER;
+
+    MACRO count_pages TRIGGER { form_feed };
+    
+        ANSWER s'ff';
+        numb_pages = numb_pages + 1;
+        
+    END MACRO;
+
+    MACRO remove_cr_lf_eol TRIGGER { cr_lf_eol };
+
+	ANSWER s'eol';
+        numb_lines = numb_lines + 1;
+	
+    END MACRO;
+	
+    MACRO remove_cr_eol TRIGGER { cr_eol };
+
+	ANSWER s'cr';
+	
+    END MACRO;
+	
+    PROCEDURE main MAIN (  );
+	
+        numb_lines = 0;
+        numb_pages = 0;
+	
+	START SCAN
+	    INPUT FILE 'scn$input'
+            OUTPUT WIDTH 1024
+	    OUTPUT FILE 'scn$output';
+
+        WRITE 'Number of lines: ',numb_lines;
+        WRITE 'Number of pages: ',numb_pages;
+	
+    END PROCEDURE;
+
+END MODULE;

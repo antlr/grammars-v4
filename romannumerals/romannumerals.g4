@@ -33,173 +33,156 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 * Essentials of the grammar from here: https://compilers.iecc.com/comparch/article/07-03-118
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar romannumerals;
 
 expression
-   : thousands EOF
-   ;
+    : thousands EOF
+    ;
 
 thousands
-   : thous_part hundreds
-   | thous_part
-   | hundreds
-   ;
+    : thous_part hundreds
+    | thous_part
+    | hundreds
+    ;
 
 thous_part
-   : thous_part M
-   | M
-   ;
+    : thous_part M
+    | M
+    ;
 
 hundreds
-   : hun_part tens
-   | hun_part
-   | tens
-   ;
+    : hun_part tens
+    | hun_part
+    | tens
+    ;
 
 hun_part
-   : hun_rep
-   | CD
-   | D
-   | D hun_rep
-   | CM
-   ;
+    : hun_rep
+    | CD
+    | D
+    | D hun_rep
+    | CM
+    ;
 
 hun_rep
-   : C
-   | CC
-   | CCC
-   ;
+    : C
+    | CC
+    | CCC
+    ;
 
 tens
-   : tens_part ones
-   | tens_part
-   | ones
-   ;
+    : tens_part ones
+    | tens_part
+    | ones
+    ;
 
 tens_part
-   : tens_rep
-   | XL
-   | L
-   | L tens_rep
-   | XC
-   ;
+    : tens_rep
+    | XL
+    | L
+    | L tens_rep
+    | XC
+    ;
 
 tens_rep
-   : X
-   | XX
-   | XXX
-   ;
+    : X
+    | XX
+    | XXX
+    ;
 
 ones
-   : ones_rep
-   | IV
-   | V
-   | V ones_rep
-   | IX
-   ;
+    : ones_rep
+    | IV
+    | V
+    | V ones_rep
+    | IX
+    ;
 
 ones_rep
-   : I
-   | II
-   | III
-   ;
-
+    : I
+    | II
+    | III
+    ;
 
 M
-   : 'M'
-   ;
-
+    : 'M'
+    ;
 
 CD
-   : 'CD'
-   ;
-
+    : 'CD'
+    ;
 
 D
-   : 'D'
-   ;
-
+    : 'D'
+    ;
 
 CM
-   : 'CM'
-   ;
-
+    : 'CM'
+    ;
 
 C
-   : 'C'
-   ;
-
+    : 'C'
+    ;
 
 CC
-   : 'CC'
-   ;
-
+    : 'CC'
+    ;
 
 CCC
-   : 'CCC'
-   ;
-
+    : 'CCC'
+    ;
 
 XL
-   : 'XL'
-   ;
-
+    : 'XL'
+    ;
 
 L
-   : 'L'
-   ;
-
+    : 'L'
+    ;
 
 XC
-   : 'XC'
-   ;
-
+    : 'XC'
+    ;
 
 X
-   : 'X'
-   ;
-
+    : 'X'
+    ;
 
 XX
-   : 'XX'
-   ;
-
+    : 'XX'
+    ;
 
 XXX
-   : 'XXX'
-   ;
-
+    : 'XXX'
+    ;
 
 IV
-   : 'IV'
-   ;
-
+    : 'IV'
+    ;
 
 V
-   : 'V'
-   ;
-
+    : 'V'
+    ;
 
 IX
-   : 'IX'
-   ;
-
+    : 'IX'
+    ;
 
 I
-   : 'I'
-   ;
-
+    : 'I'
+    ;
 
 II
-   : 'II'
-   ;
-
+    : 'II'
+    ;
 
 III
-   : 'III'
-   ;
-
+    : 'III'
+    ;
 
 WS
-   : [ \r\n\t] + -> skip
-   ;
+    : [ \r\n\t]+ -> skip
+    ;

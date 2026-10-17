@@ -9,14 +9,6 @@
 		<artifactId>grammarsv4</artifactId>
 		<version>1.0-SNAPSHOT</version>
 	</parent>
-    <dependencies>
-        <dependency>
-            <groupId>com.google.truth</groupId>
-            <artifactId>truth</artifactId>
-            <version>1.1.3</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
     <build>
 		<plugins>
 			<plugin>

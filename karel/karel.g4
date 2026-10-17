@@ -22,90 +22,93 @@
  IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar karel;
 
 karel
-   : 'BEGINNING-OF-PROGRAM' definition* 'BEGINNING-OF-EXECUTION' statement* 'END-OF-EXECUTION' 'END-OF-PROGRAM' EOF
-   ;
+    : 'BEGINNING-OF-PROGRAM' definition* 'BEGINNING-OF-EXECUTION' statement* 'END-OF-EXECUTION' 'END-OF-PROGRAM' EOF
+    ;
 
 definition
-   : 'DEFINE' IDENTIFIER 'AS' statement
-   ;
+    : 'DEFINE' IDENTIFIER 'AS' statement
+    ;
 
 statement
-   : block
-   | iteration
-   | loop
-   | conditional
-   | instruction
-   ;
+    : block
+    | iteration
+    | loop
+    | conditional
+    | instruction
+    ;
 
 block
-   : 'BEGIN' statement* 'END'
-   ;
+    : 'BEGIN' statement* 'END'
+    ;
 
 iteration
-   : 'ITERATE' number 'TIMES' statement
-   ;
+    : 'ITERATE' number 'TIMES' statement
+    ;
 
 loop
-   : 'WHILE' condition 'DO' statement
-   ;
+    : 'WHILE' condition 'DO' statement
+    ;
 
 conditional
-   : 'IF' condition 'THEN' statement ('ELSE' statement)?
-   ;
+    : 'IF' condition 'THEN' statement ('ELSE' statement)?
+    ;
 
 instruction
-   : 'MOVE'
-   | 'TURNLEFT'
-   | 'PICKBEEPER'
-   | 'PUTBEEPER'
-   | 'TURNOFF'
-   | IDENTIFIER
-   ;
+    : 'MOVE'
+    | 'TURNLEFT'
+    | 'PICKBEEPER'
+    | 'PUTBEEPER'
+    | 'TURNOFF'
+    | IDENTIFIER
+    ;
 
 condition
-   : 'FRONT-IS-CLEAR'
-   | 'FRONT-IS-BLOCKED'
-   | 'LEFT-IS-CLEAR'
-   | 'LEFT-IS-BLOCKED'
-   | 'RIGHT-IS-CLEAR'
-   | 'RIGHT-IS-BLOCKED'
-   | 'BACK-IS-CLEAR'
-   | 'BACK-IS-BLOCKED'
-   | 'NEXT-TO-A-BEEPER'
-   | 'NOT-NEXT-TO-A-BEEPER'
-   | 'ANY-BEEPERS-IN-BEEPER-BAG'
-   | 'NO-BEEPERS-IN-BEEPER-BAG'
-   | 'FACING-NORTH'
-   | 'NOT-FACING-NORTH'
-   | 'FACING-SOUTH'
-   | 'NOT-FACING-SOUTH'
-   | 'FACING-EAST'
-   | 'NOT-FACING-EAST'
-   | 'FACING-WEST'
-   | 'NOT-FACING-WEST'
-   ;
+    : 'FRONT-IS-CLEAR'
+    | 'FRONT-IS-BLOCKED'
+    | 'LEFT-IS-CLEAR'
+    | 'LEFT-IS-BLOCKED'
+    | 'RIGHT-IS-CLEAR'
+    | 'RIGHT-IS-BLOCKED'
+    | 'BACK-IS-CLEAR'
+    | 'BACK-IS-BLOCKED'
+    | 'NEXT-TO-A-BEEPER'
+    | 'NOT-NEXT-TO-A-BEEPER'
+    | 'ANY-BEEPERS-IN-BEEPER-BAG'
+    | 'NO-BEEPERS-IN-BEEPER-BAG'
+    | 'FACING-NORTH'
+    | 'NOT-FACING-NORTH'
+    | 'FACING-SOUTH'
+    | 'NOT-FACING-SOUTH'
+    | 'FACING-EAST'
+    | 'NOT-FACING-EAST'
+    | 'FACING-WEST'
+    | 'NOT-FACING-WEST'
+    ;
 
 IDENTIFIER
-   : LETTER (LETTER | DIGIT)*
-   ;
+    : LETTER (LETTER | DIGIT)*
+    ;
 
 number
-   : DIGIT+
-   ;
+    : DIGIT+
+    ;
 
 LETTER
-   : [A-Za-z]
-   | '-'
-   ;
+    : [A-Za-z]
+    | '-'
+    ;
 
 DIGIT
-   : [0-9]
-   ;
+    : [0-9]
+    ;
 
 WS
-   : [ \t\r\n] -> skip
-   ;
-
+    : [ \t\r\n] -> skip
+    ;

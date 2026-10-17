@@ -22,20 +22,23 @@
  *
  */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar PROV_N;
 
 document
-   : DOCUMENT (namespaceDeclarations)? (expression)* (bundle (bundle)*)? ENDDOCUMENT EOF
-   ;
+    : DOCUMENT (namespaceDeclarations)? (expression)* (bundle (bundle)*)? ENDDOCUMENT EOF
+    ;
 
 /* parser */
 namespaceDeclarations
-   : (defaultNamespaceDeclaration | namespaceDeclaration) namespaceDeclaration*
-   ;
+    : (defaultNamespaceDeclaration | namespaceDeclaration) namespaceDeclaration*
+    ;
 
 defaultNamespaceDeclaration
-   : 'default' IRI_REF
-   ;
+    : 'default' IRI_REF
+    ;
 
 /* TODO ambiquity with PREFIX token
    prefix ex <http://mynamespace> -- is recognized as 'prefix' token QUALIFIED_NAME token and 'namespace' token
@@ -43,271 +46,308 @@ defaultNamespaceDeclaration
 
 */
 namespaceDeclaration
-   : 'prefix' PREFX namespace_
-   ;
+    : 'prefix' PREFX namespace_
+    ;
 
 namespace_
-   : IRI_REF
-   ;
+    : IRI_REF
+    ;
 
 bundle
-   : BUNDLE identifier (namespaceDeclarations)? (expression)* ENDBUNDLE
-   ;
+    : BUNDLE identifier (namespaceDeclarations)? (expression)* ENDBUNDLE
+    ;
 
 identifier
-   : PREFX | QUALIFIED_NAME
-   ;
+    : PREFX
+    | QUALIFIED_NAME
+    ;
 
 expression
-   : (entityExpression | activityExpression | generationExpression | usageExpression | startExpression | endExpression | invalidationExpression | communicationExpression | agentExpression | associationExpression | attributionExpression | delegationExpression | derivationExpression | influenceExpression | alternateExpression | specializationExpression | membershipExpression | extensibilityExpression)
-   ;
+    : (
+        entityExpression
+        | activityExpression
+        | generationExpression
+        | usageExpression
+        | startExpression
+        | endExpression
+        | invalidationExpression
+        | communicationExpression
+        | agentExpression
+        | associationExpression
+        | attributionExpression
+        | delegationExpression
+        | derivationExpression
+        | influenceExpression
+        | alternateExpression
+        | specializationExpression
+        | membershipExpression
+        | extensibilityExpression
+    )
+    ;
 
 entityExpression
-   : 'entity' '(' identifier optionalAttributeValuePairs ')'
-   ;
+    : 'entity' '(' identifier optionalAttributeValuePairs ')'
+    ;
 
 optionalAttributeValuePairs
-   : (',' '[' attributeValuePairs ']')?
-   ;
+    : (',' '[' attributeValuePairs ']')?
+    ;
 
 attributeValuePairs
-   : (| attributeValuePair (',' attributeValuePair)*)
-   ;
+    : ( | attributeValuePair (',' attributeValuePair)*)
+    ;
 
 attributeValuePair
-   : attribute '=' literal
-   ;
+    : attribute '=' literal
+    ;
 
 attribute
-   : PREFX | QUALIFIED_NAME
-   ;
+    : PREFX
+    | QUALIFIED_NAME
+    ;
 
 literal
-   : typedLiteral
-   | convenienceNotation
-   ;
+    : typedLiteral
+    | convenienceNotation
+    ;
 
 typedLiteral
-   : STRING_LITERAL '%%' datatype
-   ;
+    : STRING_LITERAL '%%' datatype
+    ;
 
 datatype
-   : PREFX | QUALIFIED_NAME
-   ;
+    : PREFX
+    | QUALIFIED_NAME
+    ;
 
 convenienceNotation
-   : STRING_LITERAL (LANGTAG)?
-   | INT_LITERAL
-   | QUALIFIED_NAME_LITERAL
-   ;
+    : STRING_LITERAL (LANGTAG)?
+    | INT_LITERAL
+    | QUALIFIED_NAME_LITERAL
+    ;
 
 activityExpression
-   : 'activity' '(' identifier (',' timeOrMarker ',' timeOrMarker)? optionalAttributeValuePairs ')'
-   ;
+    : 'activity' '(' identifier (',' timeOrMarker ',' timeOrMarker)? optionalAttributeValuePairs ')'
+    ;
 
 timeOrMarker
-   : (time | '-')
-   ;
+    : (time | '-')
+    ;
 
 time
-   : DATETIME
-   ;
+    : DATETIME
+    ;
 
 generationExpression
-   : 'wasGeneratedBy' '(' optionalIdentifier eIdentifier (',' aIdentifierOrMarker ',' timeOrMarker)? optionalAttributeValuePairs ')'
-   ;
+    : 'wasGeneratedBy' '(' optionalIdentifier eIdentifier (
+        ',' aIdentifierOrMarker ',' timeOrMarker
+    )? optionalAttributeValuePairs ')'
+    ;
 
 optionalIdentifier
-   : (identifierOrMarker ';')?
-   ;
+    : (identifierOrMarker ';')?
+    ;
 
 identifierOrMarker
-   : (identifier | '-')
-   ;
+    : (identifier | '-')
+    ;
 
 eIdentifier
-   : identifier
-   ;
+    : identifier
+    ;
 
 eIdentifierOrMarker
-   : (eIdentifier | '-')
-   ;
+    : (eIdentifier | '-')
+    ;
 
 aIdentifierOrMarker
-   : (aIdentifier | '-')
-   ;
+    : (aIdentifier | '-')
+    ;
 
 aIdentifier
-   : identifier
-   ;
+    : identifier
+    ;
 
 agIdentifierOrMarker
-   : (agIdentifier | '-')
-   ;
+    : (agIdentifier | '-')
+    ;
 
 agIdentifier
-   : identifier
-   ;
+    : identifier
+    ;
 
 cIdentifier
-   : identifier
-   ;
+    : identifier
+    ;
 
 gIdentifier
-   : identifier
-   ;
+    : identifier
+    ;
 
 gIdentifierOrMarker
-   : (gIdentifier | '-')
-   ;
+    : (gIdentifier | '-')
+    ;
 
 uIdentifier
-   : identifier
-   ;
+    : identifier
+    ;
 
 uIdentifierOrMarker
-   : (uIdentifier | '-')
-   ;
+    : (uIdentifier | '-')
+    ;
 
 usageExpression
-   : 'used' '(' optionalIdentifier aIdentifier (',' eIdentifierOrMarker ',' timeOrMarker)? optionalAttributeValuePairs ')'
-   ;
+    : 'used' '(' optionalIdentifier aIdentifier (',' eIdentifierOrMarker ',' timeOrMarker)? optionalAttributeValuePairs ')'
+    ;
 
 startExpression
-   : 'wasStartedBy' '(' optionalIdentifier aIdentifier (',' eIdentifierOrMarker ',' aIdentifierOrMarker ',' timeOrMarker)? optionalAttributeValuePairs ')'
-   ;
+    : 'wasStartedBy' '(' optionalIdentifier aIdentifier (
+        ',' eIdentifierOrMarker ',' aIdentifierOrMarker ',' timeOrMarker
+    )? optionalAttributeValuePairs ')'
+    ;
 
 endExpression
-   : 'wasEndedBy' '(' optionalIdentifier aIdentifier (',' eIdentifierOrMarker ',' aIdentifierOrMarker ',' timeOrMarker)? optionalAttributeValuePairs ')'
-   ;
+    : 'wasEndedBy' '(' optionalIdentifier aIdentifier (
+        ',' eIdentifierOrMarker ',' aIdentifierOrMarker ',' timeOrMarker
+    )? optionalAttributeValuePairs ')'
+    ;
 
 invalidationExpression
-   : 'wasInvalidatedBy' '(' optionalIdentifier eIdentifier (',' aIdentifierOrMarker ',' timeOrMarker)? optionalAttributeValuePairs ')'
-   ;
+    : 'wasInvalidatedBy' '(' optionalIdentifier eIdentifier (
+        ',' aIdentifierOrMarker ',' timeOrMarker
+    )? optionalAttributeValuePairs ')'
+    ;
 
 communicationExpression
-   : 'wasInformedBy' '(' optionalIdentifier aIdentifier ',' aIdentifier optionalAttributeValuePairs ')'
-   ;
+    : 'wasInformedBy' '(' optionalIdentifier aIdentifier ',' aIdentifier optionalAttributeValuePairs ')'
+    ;
 
 agentExpression
-   : 'agent' '(' identifier optionalAttributeValuePairs ')'
-   ;
+    : 'agent' '(' identifier optionalAttributeValuePairs ')'
+    ;
 
 associationExpression
-   : 'wasAssociatedWith' '(' optionalIdentifier aIdentifier (',' agIdentifierOrMarker ',' eIdentifierOrMarker)? optionalAttributeValuePairs ')'
-   ;
+    : 'wasAssociatedWith' '(' optionalIdentifier aIdentifier (
+        ',' agIdentifierOrMarker ',' eIdentifierOrMarker
+    )? optionalAttributeValuePairs ')'
+    ;
 
 attributionExpression
-   : 'wasAttributedTo' '(' optionalIdentifier eIdentifier ',' agIdentifier optionalAttributeValuePairs ')'
-   ;
+    : 'wasAttributedTo' '(' optionalIdentifier eIdentifier ',' agIdentifier optionalAttributeValuePairs ')'
+    ;
 
 delegationExpression
-   : 'actedOnBehalfOf' '(' optionalIdentifier agIdentifier ',' agIdentifier (',' aIdentifierOrMarker)? optionalAttributeValuePairs ')'
-   ;
+    : 'actedOnBehalfOf' '(' optionalIdentifier agIdentifier ',' agIdentifier (
+        ',' aIdentifierOrMarker
+    )? optionalAttributeValuePairs ')'
+    ;
 
 derivationExpression
-   : 'wasDerivedFrom' '(' optionalIdentifier eIdentifier ',' eIdentifier (',' aIdentifierOrMarker ',' gIdentifierOrMarker ',' uIdentifierOrMarker)? optionalAttributeValuePairs ')'
-   ;
+    : 'wasDerivedFrom' '(' optionalIdentifier eIdentifier ',' eIdentifier (
+        ',' aIdentifierOrMarker ',' gIdentifierOrMarker ',' uIdentifierOrMarker
+    )? optionalAttributeValuePairs ')'
+    ;
 
 influenceExpression
-   : 'wasInfluencedBy' '(' optionalIdentifier eIdentifier ',' eIdentifier optionalAttributeValuePairs ')'
-   ;
+    : 'wasInfluencedBy' '(' optionalIdentifier eIdentifier ',' eIdentifier optionalAttributeValuePairs ')'
+    ;
 
 alternateExpression
-   : 'alternateOf' '(' eIdentifier ',' eIdentifier ')'
-   ;
+    : 'alternateOf' '(' eIdentifier ',' eIdentifier ')'
+    ;
 
 specializationExpression
-   : 'specializationOf' '(' eIdentifier ',' eIdentifier ')'
-   ;
+    : 'specializationOf' '(' eIdentifier ',' eIdentifier ')'
+    ;
 
 membershipExpression
-   : 'hadMember' '(' cIdentifier ',' eIdentifier ')'
-   ;
+    : 'hadMember' '(' cIdentifier ',' eIdentifier ')'
+    ;
 
 extensibilityExpression
-   : (PREFX|QUALIFIED_NAME) '(' optionalIdentifier extensibilityArgument (',' extensibilityArgument)* optionalAttributeValuePairs ')'
-   ;
+    : (PREFX | QUALIFIED_NAME) '(' optionalIdentifier extensibilityArgument (
+        ',' extensibilityArgument
+    )* optionalAttributeValuePairs ')'
+    ;
 
 extensibilityArgument
-   : (identifierOrMarker | literal | time | extensibilityExpression | extensibilityTuple)
-   ;
+    : (identifierOrMarker | literal | time | extensibilityExpression | extensibilityTuple)
+    ;
 
 extensibilityTuple
-   : '{' extensibilityArgument (',' extensibilityArgument)* '}'
-   | '(' extensibilityArgument (',' extensibilityArgument)* ')'
-   ;
+    : '{' extensibilityArgument (',' extensibilityArgument)* '}'
+    | '(' extensibilityArgument (',' extensibilityArgument)* ')'
+    ;
 
 /* lexer */
 
 DOCUMENT
-   : 'document'
-   ;
-
+    : 'document'
+    ;
 
 ENDDOCUMENT
-   : 'endDocument'
-   ;
-
+    : 'endDocument'
+    ;
 
 BUNDLE
-   : 'bundle'
-   ;
-
+    : 'bundle'
+    ;
 
 ENDBUNDLE
-   : 'endBundle'
-   ;
-
+    : 'endBundle'
+    ;
 
 WS
-   : [ \t\r\n\u000C] + -> channel (HIDDEN)
-   ;
-
+    : [ \t\r\n\u000C]+ -> channel (HIDDEN)
+    ;
 
 COMMENT
-   : '/*' .*? '*/' -> channel (HIDDEN)
-   ;
-
+    : '/*' .*? '*/' -> channel (HIDDEN)
+    ;
 
 LINE_COMMENT
-   : '//' ~ [\r\n]* -> channel (HIDDEN)
-   ;
-
+    : '//' ~ [\r\n]* -> channel (HIDDEN)
+    ;
 
 IRI_REF
-   : LESS ~ ('<' | '>' | '"' | '{' | '}' | '|' | '^' | '\\' | '`' | '\u0000' .. '\u0020')* GREATER
-   ;
-
+    : LESS ~ ('<' | '>' | '"' | '{' | '}' | '|' | '^' | '\\' | '`' | '\u0000' .. '\u0020')* GREATER
+    ;
 
 LESS
-   : '<'
-   ;
-
+    : '<'
+    ;
 
 GREATER
-   : '>'
-   ;
-
+    : '>'
+    ;
 
 DOT
-   : '.'
-   ;
-
+    : '.'
+    ;
 
 MINUS
-   : '-'
-   ;
-
+    : '-'
+    ;
 
 fragment PN_PREFIX
-   : PN_CHARS_BASE ((PN_CHARS | DOT)* PN_CHARS)?
-   ;
-
+    : PN_CHARS_BASE ((PN_CHARS | DOT)* PN_CHARS)?
+    ;
 
 fragment PN_CHARS_BASE
-   : 'A' .. 'Z' | 'a' .. 'z' | '\u00C0' .. '\u00D6' | '\u00D8' .. '\u00F6' | '\u00F8' .. '\u02FF' | '\u0370' .. '\u037D' | '\u037F' .. '\u1FFF' | '\u200C' .. '\u200D' | '\u2070' .. '\u218F' | '\u2C00' .. '\u2FEF' | '\u3001' .. '\uD7FF' | '\uF900' .. '\uFDCF' | '\uFDF0' .. '\uFFFD'
-   ;
+    : 'A' .. 'Z'
+    | 'a' .. 'z'
+    | '\u00C0' .. '\u00D6'
+    | '\u00D8' .. '\u00F6'
+    | '\u00F8' .. '\u02FF'
+    | '\u0370' .. '\u037D'
+    | '\u037F' .. '\u1FFF'
+    | '\u200C' .. '\u200D'
+    | '\u2070' .. '\u218F'
+    | '\u2C00' .. '\u2FEF'
+    | '\u3001' .. '\uD7FF'
+    | '\uF900' .. '\uFDCF'
+    | '\uFDF0' .. '\uFFFD'
+    ;
 
 /* Note PN_CHARS_BASE is same as NCNAMESTARTCHAR (XML Schema)
    http://www.w3.org/TR/rdf-sparql-query/#rPN_CHARS_U
@@ -315,8 +355,9 @@ fragment PN_CHARS_BASE
  */
 
 fragment PN_CHARS_U
-   : PN_CHARS_BASE | '_'
-   ;
+    : PN_CHARS_BASE
+    | '_'
+    ;
 
 /* Note: this is the same as NCNAMECHAR (XML Schema) except for '.'
    http://www.w3.org/TR/rdf-sparql-query/#rPN_CHARS
@@ -325,84 +366,98 @@ fragment PN_CHARS_U
 */
 
 fragment PN_CHARS
-   : PN_CHARS_U | MINUS | DIGIT | '\u00B7' | '\u0300' .. '\u036F' | '\u203F' .. '\u2040'
-   ;
-
+    : PN_CHARS_U
+    | MINUS
+    | DIGIT
+    | '\u00B7'
+    | '\u0300' .. '\u036F'
+    | '\u203F' .. '\u2040'
+    ;
 
 fragment DIGIT
-   : '0' .. '9'
-   ;
-
+    : '0' .. '9'
+    ;
 
 PREFX
-   : PN_PREFIX
-   ;
+    : PN_PREFIX
+    ;
 
 QUALIFIED_NAME
-   : (PN_PREFIX ':')? PN_LOCAL | PN_PREFIX ':'
-   ;
-
+    : (PN_PREFIX ':')? PN_LOCAL
+    | PN_PREFIX ':'
+    ;
 
 fragment PN_LOCAL
-   : (PN_CHARS_U | DIGIT | PN_CHARS_OTHERS) ((PN_CHARS | DOT | PN_CHARS_OTHERS)* (PN_CHARS | PN_CHARS_OTHERS))?
-   ;
-
+    : (PN_CHARS_U | DIGIT | PN_CHARS_OTHERS) (
+        (PN_CHARS | DOT | PN_CHARS_OTHERS)* (PN_CHARS | PN_CHARS_OTHERS)
+    )?
+    ;
 
 fragment PN_CHARS_OTHERS
-   : '/' | '@' | '~' | '&' | '+' | '*' | '?' | '#' | '$' | '!' | PERCENT | PN_CHARS_ESC
-   ;
-
+    : '/'
+    | '@'
+    | '~'
+    | '&'
+    | '+'
+    | '*'
+    | '?'
+    | '#'
+    | '$'
+    | '!'
+    | PERCENT
+    | PN_CHARS_ESC
+    ;
 
 fragment PN_CHARS_ESC
-   : '\\' ('=' | '\'' | '(' | ')' | ',' | '-' | ':' | ';' | '[' | ']' | '.')
-   ;
-
+    : '\\' ('=' | '\'' | '(' | ')' | ',' | '-' | ':' | ';' | '[' | ']' | '.')
+    ;
 
 fragment PERCENT
-   : '%' HEX HEX
-   ;
-
+    : '%' HEX HEX
+    ;
 
 HEX
-   : DIGIT | [A-F] | [a-f]
-   ;
-
+    : DIGIT
+    | [A-F]
+    | [a-f]
+    ;
 
 STRING_LITERAL
-   : STRING_LITERAL2 | STRING_LITERAL_LONG2
-   ;
-
+    : STRING_LITERAL2
+    | STRING_LITERAL_LONG2
+    ;
 
 INT_LITERAL
-   : ('-')? (DIGIT) +
-   ;
-
+    : ('-')? (DIGIT)+
+    ;
 
 QUALIFIED_NAME_LITERAL
-   : '\'' QUALIFIED_NAME '\''
-   ;
-
+    : '\'' QUALIFIED_NAME '\''
+    ;
 
 ECHAR
-   : '\\' [btnfr"'\\]
-   ;
-
+    : '\\' [btnfr"'\\]
+    ;
 
 STRING_LITERAL2
-   : '"' ((~ ["\\\r\n]) | ECHAR)* '"'
-   ;
-
+    : '"' ((~ ["\\\r\n]) | ECHAR)* '"'
+    ;
 
 STRING_LITERAL_LONG2
-   : '"""' (('"' | '""')? (~ ["\\] | ECHAR))* '"""'
-   ;
-
+    : '"""' (('"' | '""')? (~ ["\\] | ECHAR))* '"""'
+    ;
 
 DATETIME
-   : '-'? ([1-9] [0-9] [0-9] [0-9] + | '0' [0-9] [0-9] [0-9]) '-' ('0' [1-9] | '1' [0-2]) '-' ('0' [1-9] | [12] [0-9] | '3' [01]) 'T' ((([01] [0-9]) | ('2' [0-3])) ':' [0-5] [0-9] ':' [0-5] [0-9] ('.' [0-9] +)? | ('24:00:00' ('.' '0' +)?)) ('Z' | ('+' | '-') (('0' [0-9] | '1' [0-3]) ':' [0-5] [0-9] | '14:00'))?
-   ;
-
+    : '-'? ([1-9] [0-9] [0-9] [0-9]+ | '0' [0-9] [0-9] [0-9]) '-' ('0' [1-9] | '1' [0-2]) '-' (
+        '0' [1-9]
+        | [12] [0-9]
+        | '3' [01]
+    ) 'T' (
+        (([01] [0-9]) | ('2' [0-3])) ':' [0-5] [0-9] ':' [0-5] [0-9] ('.' [0-9]+)?
+        | ('24:00:00' ('.' '0'+)?)
+    ) ('Z' | ('+' | '-') (('0' [0-9] | '1' [0-3]) ':' [0-5] [0-9] | '14:00'))?
+    ;
 
 LANGTAG
-   : '@' [a-zA-Z] + ('-' [a-zA-Z0-9] +)*
-   ;
+    : '@' [a-zA-Z]+ ('-' [a-zA-Z0-9]+)*
+    ;
