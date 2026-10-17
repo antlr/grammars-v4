@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2021, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -49,7 +49,7 @@ moduleInterface
    ;
 
 moduleDeclaration
-   : ('datatype' datatypeDeclaration (';' datatypeDeclaration)* '.' )
+   : ('datatype' datatypeDeclaration (';' datatypeDeclaration)* '.')
    | ('func' functionDeclaration (';' functionDeclaration)* '.')
    | ('pred' predicateDeclaration (';' predicateDeclaration)* '.')
    ;
@@ -131,14 +131,16 @@ term
    : NUMBER
    | VARIABLE
    | DOUBLE_QUOTE_STRING
-   | functionterm
+   | funcname '(' termList ')'
+   | funcname
    | '(' term ')'
+   | funcatom term
+   | term funcatom term
+   | term funcatom
    ;
 
 functionterm
-   : (funcname '(' termList ')')
-  //   | (term? funcatom term?)
-   | ('(' functionterm ')')
+   : term
    ;
 
 parameter
@@ -189,7 +191,7 @@ symbolList
    ;
 
 symbol
-   : (funcatom |predatom)  ('/' NUMBER)?
+   : (funcatom | predatom) ('/' NUMBER)?
    ;
 
 precedence

@@ -127,6 +127,7 @@
                 <module>action</module>
 				<module>ada</module>
 				<module>alef</module>
+                <module>alf</module>
 				<module>algol60</module>
 				<module>alloy</module>
 				<module>alpaca</module>
