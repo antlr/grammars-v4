@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2021, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -49,8 +49,7 @@ main
 prcs
    : pid actuals?
    | action '.' prcs
-   | 'wait' '[' exp ']' prcs /* |prcs*/
-   
+   | 'wait' '[' exp ']' prcs ('||' prcs)?
    | 'if' exp 'then' prcs 'else' prcs 'fi'
    | '<' prcslist? '>'
    | '(' prcs ')'
@@ -61,6 +60,7 @@ action
    | ID '!'
    | ID '?' ID
    | ID '!' exp
+   | BRACEEXP '?'
    ;
 
 prcslist
@@ -88,10 +88,13 @@ explist
    ;
 
 exp
-   : ID
+   : ID '(' explist? ')'
+   | ID
    | NUM
+   | '-' exp
    | exp OP exp
    | '(' exp ')'
+   | BRACEEXP
    ;
 
 pid
@@ -110,6 +113,10 @@ OP
    | '<='
    | '>='
    | '!='
+   ;
+
+BRACEEXP
+   : '{' ~ [{}]* '}'
    ;
 
 ID

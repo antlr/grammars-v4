@@ -9,6 +9,6 @@ proc Kbd(s)=K?c.
 
 proc Text(p) =
     < moveTo?p . Text(p)
-    :: typed?s . {drawString(s,p))? . Text (p) >
+    :: typed?s . {drawString(s,p)}? . Text (p) >
 
 type = Mouse & Kbd(emptyString) & Text(nullPt)
