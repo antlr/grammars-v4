@@ -1,0 +1,27 @@
+digraph ATN {
+rankdir=LR;
+s75[fontsize=11, label="75", shape=doublecircle, fixedsize=true, width=.6];
+s992[fontsize=11,label="992", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s993[fontsize=11,label="993", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s994[fontsize=11,label="994", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s985[fontsize=11,label="985", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s74[fontsize=11,label="74", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s986[fontsize=11,label="986", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s987[fontsize=11,label="987", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s988[fontsize=11,label="988", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s989[fontsize=11,label="&rarr;\n989+", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s990[fontsize=11,label="&larr;\n990", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s991[fontsize=11,label="{991+\nd=25|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s74 -> s985 [fontname="Times-Italic", label="&epsilon;"];
+s985 -> s986 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'('", arrowhead = normal];
+s986 -> s989 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<tuple_type_element>", arrowhead = normal];
+s989 -> s987 [fontname="Times-Italic", label="&epsilon;"];
+s987 -> s988 [fontsize=11, fontname="Courier", arrowsize=.7, label = "','", arrowhead = normal];
+s988 -> s990 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<tuple_type_element>", arrowhead = normal];
+s990 -> s991 [fontname="Times-Italic", label="&epsilon;"];
+s991:p0 -> s989 [fontname="Times-Italic", label="&epsilon;", style="dashed"];
+s991:p1 -> s992 [fontname="Times-Italic", label="&epsilon;"];
+s992 -> s993 [fontname="Times-Italic", label="&epsilon;"];
+s993 -> s994 [fontsize=11, fontname="Courier", arrowsize=.7, label = "')'", arrowhead = normal];
+s994 -> s75 [fontname="Times-Italic", label="&epsilon;"];
+}

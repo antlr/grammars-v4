@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>CSV File Reference</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    DIV.Bulleted-NoPrefix {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 2.0em; margin-right: 2.0em; margin-top: 0em; margin-bottom: 0.5em}
+    DIV.Bulleted {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 2.0em; margin-right: 2.0em; margin-top: 0em; margin-bottom: 0.5em; display: list-item; list-style-type: disc}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-64.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-A.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>6.5 CSV File Reference</H1>
+<div class="Normal">Several of the files used by the Grading Tool are 
+.CSV (Comma Separated Value) files. This format was chosen as it:</div>
+<div class="Bulleted">is a pure text format that is easy to write in 
+Ada. Records can be appended to an existing file by opening the file 
+with Text_IO in Append_Mode, Put_Line the line of values for the record, 
+then closing the file. No end markers need to be moved.</div>
+<div class="Bulleted">is reasonably easy to read in Ada using Text_IO. 
+Get_Line and some string operations are sufficient.</div>
+<div class="Bulleted">can be read by most spreadsheet and database programs. 
+Thus, we don't need to provide tools to inspect, check, or edit the contents 
+of these files.&nbsp;</div>
+<div class="Normal">A CSV consists of list of records, one record per 
+line. Each line is a set of values, separated by commas. Each line should 
+have the same number of values, so when loaded in a spreadsheet it becomes 
+a series of columns with each Ada component associated with a column.</div>
+<div class="Normal">There are a number of varieties of CSV files, so 
+we have adopted one of the simplest in order to have the widest applicability.</div>
+<div class="Normal">There are only a few restrictions on the values in 
+our CSV files. Unquoted values must not contain commas, spaces, tabs, 
+or semicolons. A value can be quoted with double quotes, in which case 
+commas, spaces, tabs, and semicolons are allowed, but double quotes are 
+<B>not</B> allowed in quoted strings. Line breaks are not allowed in 
+or outside of values of a single record (they delimit the records).</div>
+<div class="Normal">We require that values are limited to 150 characters 
+(primarily to prevent excessively long messages from making reports hard 
+to read).</div>
+<div class="Normal">There is an example of writing a CSV file (an event 
+trace - see <A HREF="UG-62.HTM">6.2</A>) in the file Report.A, in procedure 
+Put_Event_Trace. Most of the code involves limiting the length of, and 
+removing any double quotes from, the (quoted) message string.&nbsp;</div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-64.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-A.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>

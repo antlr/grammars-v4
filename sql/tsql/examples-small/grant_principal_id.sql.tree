@@ -1,0 +1,1 @@
+(tsql_file (batch (sql_clauses (another_statement (security_statement GRANT (grant_permission SELECT) ON (table_name (id_ bk_tax_form_processing)) to (principal_id (id_ DEV_READ_ONLY_ROLE)) ;)))) <EOF>)

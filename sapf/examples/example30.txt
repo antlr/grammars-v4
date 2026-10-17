@@ -1,0 +1,3 @@
+;;;; rain
+\[2 .2 dust2 .25 decay .05 lfnoise3 8h 13k biexp .18 bpf .08 lfnoise3 pan2 .08 .01 apverb6] 16 X +/ .01 2X pink + .005 2X brown + play
+

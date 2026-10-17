@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>hivev2</artifactId>
     <packaging>jar</packaging>
-    <name>hive 2.3.8 grammar</name>
+    <name>Apache Hive 2.3.8 grammar</name>
     <parent>
         <groupId>org.antlr.grammars</groupId>
         <artifactId>hiveparent</artifactId>
@@ -51,7 +51,7 @@
                 <configuration>
                     <verbose>false</verbose>
                     <showTree>false</showTree>
-                    <entryPoint>statement</entryPoint>
+                    <entryPoint>statements</entryPoint>
                     <grammarName>Hive</grammarName>
                     <packageName></packageName>
                     <exampleFiles>examples/</exampleFiles>

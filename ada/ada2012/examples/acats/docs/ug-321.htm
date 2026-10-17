@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>Coverage Documents</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    DIV.Examples {font-family: "Courier New", monospace; font-size: 90%; line-height: 122%; margin-left: 2.2em; margin-bottom: 0.6em}
+    DIV.Bulleted-NoPrefix {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 2.0em; margin-right: 2.0em; margin-top: 0em; margin-bottom: 0.5em}
+    DIV.Bulleted {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 2.0em; margin-right: 2.0em; margin-top: 0em; margin-bottom: 0.5em; display: list-item; list-style-type: disc}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-32.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-322.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>3.2.1 Coverage Documents</H1>
+<div class="Normal">ACVC 2.0 originated coverage documentation for what 
+is now the ACATS. That coverage document mapped tests to paragraph numbers 
+in the <A HREF="UG-01.HTM#Ada95">[Ada95]</A> Standard. Over time, a number 
+of deficiencies in that approach have been identified:&nbsp;</div>
+<div class="Bulleted">Where a paragraph contains multiple rules, it is 
+not possible to tell if all of the rules are tested. Indeed, a number 
+of instances where important rules were untested have been identified.</div>
+<div class="Bulleted">Since there is not an indication of the type of 
+rule represented by a paragraph, it is not obvious whether the rule is 
+appropriately tested. For instance, a Legality Rule tested only with 
+C-Tests is not appropriately tested (see <A HREF="UG-323.HTM">3.2.3</A> 
+for more on this topic).</div>
+<div class="Bulleted">Rules not modified in <A HREF="UG-01.HTM#Ada95">[Ada95]</A> 
+were not considered. However, sometimes additional test objectives are 
+needed for existing rules because of other changes to the language. Moreover, 
+there is no determination of whether the legacy tests adequately tested 
+the original rule.</div>
+<div class="Bulleted">The plaintext coverage document is not easily processed 
+by tools. In particular, paragraphs that are covered are indicated only 
+by the test name(s) that cover the paragraph; there is no common string 
+for a tool to count. As such, it is difficult to get metrics about coverage 
+from the document, and in particular to quantify progress between versions. 
+</div>
+<div class="Normal">For these reasons, the development of new and much 
+more detailed coverage documentation was initiated for ACATS 3.0. The 
+new documentation considers each sentence of the standard individually 
+if necessary, listing the test objectives for each sentence, and documenting 
+why no objectives are needed if none are provided.</div>
+<div class="Normal">It also lists tests for each objective (including 
+Legacy tests), testing priorities for untested objectives, notes on each 
+objective (including any untested cases), and any additional notes needed.</div>
+<div class="Normal">There is also a summary document that summarizes 
+totals for important metrics for the coverage documents as a whole.</div>
+<div class="Normal">The documents are maintained as spreadsheets (in 
+order to make calculation and extraction of metrics easy). Because spreadsheet 
+programs may be unfamilar to many readers, and compatibility of spreadsheet 
+programs is incomplete, these documents are provided in Adobe Portable 
+Document Format (PDF). (The spreadsheets are available on request from 
+the ACAA Technical Agent, <A HREF="mailto:agent@ada-auth.org">agent@ada-auth.org</A>.)</div>
+<div class="Normal" style="margin-bottom: 0.4em">For ACATS 4.2, the 
+following subclauses of the Ada Standard documents are included in the 
+new coverage documents:&nbsp;</div>
+<div class="Examples">3.2.4<BR>
+3.9.3&nbsp;through&nbsp;3.10.1<BR>
+4.1.3&nbsp;through&nbsp;4.5.2<BR>
+4.5.7&nbsp;through&nbsp;4.5.8<BR>
+5.4&nbsp;through&nbsp;5.5.2<BR>
+6.1.1<BR>
+6.5&nbsp;through&nbsp;6.8<BR>
+7.3.2&nbsp;through&nbsp;7.6.1<BR>
+8.3.1&nbsp;through&nbsp;8.5.5<BR>
+Clause&nbsp;10&nbsp;(10&nbsp;through&nbsp;10.2.1)<BR>
+13.1.1<BR>
+B.3.3</div>
+<div class="Normal">These clauses were selected because of their importance 
+in rule changes in either <A HREF="UG-01.HTM#Ada2012">[Ada2012]</A> or 
+<A HREF="UG-01.HTM#Amend1">[Amend1]</A>.</div>
+<div class="Normal">The original coverage document is also included with 
+the ACATS for those portions of the Ada Standard documents that have 
+not yet had new coverage documents constructed. This document is of primary 
+use for features of <A HREF="UG-01.HTM#Ada95">[Ada95]</A>, as it does 
+not cover Legacy tests nor any features added or modified by either <A HREF="UG-01.HTM#Ada2012">[Ada2012]</A> 
+or <A HREF="UG-01.HTM#Amend1">[Amend1]</A>. As noted above, it is being 
+replaced, so it will disappear completely in a future version of the 
+ACATS.</div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-32.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-322.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>

@@ -1,0 +1,10 @@
+<group>
+ampeg_attack=0.04 ampeg_release=0.45
+
+<region> sample=trumpet_pp_c4.wav key=c4
+<region> sample=trumpet_pp_c#4.wav key=c#4
+<region> sample=trumpet_pp_d4.wav key=d4
+<region> sample=trumpet_pp_d#4.wav key=d#4
+
+<group>
+<region> sample=trumpet_pp_e4.wav key=e4 // previous group parameters reset

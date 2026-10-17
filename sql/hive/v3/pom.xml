@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>hivev3</artifactId>
-    <name>hive grammar</name>
+    <name>Apache Hive 3 grammar</name>
     <packaging>jar</packaging>
     <parent>
         <groupId>org.antlr.grammars</groupId>
@@ -41,7 +41,7 @@
                 <configuration>
                     <verbose>false</verbose>
                     <showTree>false</showTree>
-                    <entryPoint>statement</entryPoint>
+                    <entryPoint>statements</entryPoint>
                     <grammarName>Hive</grammarName>
                     <packageName></packageName>
                     <exampleFiles>examples/</exampleFiles>
