@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2020, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 grammar simula;
 
-LETTER
+fragment LETTER
    : [a-zA-Z]
    ;
 
@@ -39,12 +39,8 @@ DIGIT
    : [0-9]
    ;
 
-SPACE
-   : ' '
-   ;
-
 identifier
-   : LETTER (LETTER | DIGIT | '_')*
+   : IDENTIFIER
    ;
 
 unsigned_number
@@ -64,27 +60,26 @@ decimal_fraction
 exponent_part
    : ('&' | '&&') ('+' | '-')? unsigned_integer
    ;
-
+   // The standard also allows a radix-prefixed integer form ("radix R
+   
+   // radix-digit..."), e.g. "4R123" for base-4 literals. It is omitted here:
+   
+   // in a combined ANTLR grammar, quoted literals used inline in parser rules
+   
+   // (like radix's '2'/'4'/'8') are always given lexer priority over same-length
+   
+   // matches from explicit lexer rules such as DIGIT, regardless of where DIGIT
+   
+   // is declared in the file. That made every plain decimal literal "2", "4",
+   
+   // "8" (and so on) ambiguous with a dead-end radix parse (since a bare radix
+   
+   // value is never actually followed by 'R'), breaking ordinary number
+   
+   // literals throughout the language.
+   
 unsigned_integer
    : DIGIT (DIGIT | '_')*
-   | radix R radix_digit (radix_digit | '_')*
-   ;
-
-radix
-   : '2'
-   | '4'
-   | '8'
-   | '16'
-   ;
-
-radix_digit
-   : DIGIT
-   | 'A'
-   | 'B'
-   | 'C'
-   | 'D'
-   | 'E'
-   | 'F'
    ;
 
 string
@@ -99,25 +94,30 @@ string
    //   ;
    
 simple_string
-   : '"' (ISO_code | NON_QUOTE_CHARACTER | '""')* '"'
+   : STRING
    ;
 
-ISO_code
+fragment ISO_CODE_FRAGMENT
    : '!' DIGIT DIGIT? DIGIT? '!'
    ;
-
-NON_QUOTE_CHARACTER
-   : [a-zA-Z0-9]
+   // The lexer has no notion of "inside a string", so string content must be
+   
+   // matched as a single atomic token: otherwise keyword literals (e.g. 'or',
+   
+   // 'end') occurring as substrings of the string's text would be tokenized
+   
+   // as those keywords instead of as plain characters.
+   
+STRING
+   : '"' (ISO_CODE_FRAGMENT | '""' | ~ ["\r\n])* '"'
    ;
 
 character_constant
-   : '\'' character_designator '\''
+   : CHARACTER_CONSTANT
    ;
 
-character_designator
-   : ISO_code
-   | NON_QUOTE_CHARACTER
-   | '"'
+CHARACTER_CONSTANT
+   : '\'' (ISO_CODE_FRAGMENT | ~ ['\r\n]) '\''
    ;
 
 format_effector
@@ -182,22 +182,45 @@ reference_expression
    : object_expression
    | text_expression
    ;
+   // variable, identifier_1, remote_identifier, subscripted_variable,
+   
+   // array_identifier_1, procedure_identifier_1 and function_designator are
+   
+   // mutually left-recursive in the standard's own grammar (identifiers can be
+   
+   // remote-accessed via '.', subscripted via '(...)', and those expressions
+   
+   // themselves can be identifiers again). ANTLR4 only auto-resolves direct
+   
+   // left recursion within a single rule, so they are flattened here into one
+   
+   // combining rule, with the standard's separate rule names kept as aliases.
+   
+designator
+   : identifier
+   | designator '.' attribute_identifier
+   | designator callsuffix
+   | designator 'qua' class_identifier
+   ;
+
+callsuffix
+   : '(' actual_parameter (',' actual_parameter)* ')'
+   ;
 
 variable
-   : simple_variable_1
-   | subscripted_variable
+   : designator
    ;
 
 simple_variable_1
-   : identifier_1
+   : designator
    ;
 
 subscripted_variable
-   : array_identifier_1 '(' subscript_list ')'
+   : designator
    ;
 
 array_identifier_1
-   : identifier_1
+   : designator
    ;
 
 subscript_list
@@ -209,11 +232,11 @@ subscript_expression
    ;
 
 function_designator
-   : procedure_identifier_1 actual_parameter_part?
+   : designator
    ;
 
 procedure_identifier_1
-   : identifier_1
+   : designator
    ;
 
 actual_parameter_part
@@ -222,19 +245,15 @@ actual_parameter_part
 
 actual_parameter
    : expression
-   | array_identifier_1
-   | switch_identifier
-   | procedure_identifier_1
+   | designator
    ;
 
 identifier_1
-   : identifier
-   | remote_identifier
+   : designator
    ;
 
 remote_identifier
-   : simple_object_expression . attribute_identifier
-   | text_primary . attribute_identifier
+   : designator
    ;
 
 attribute_identifier
@@ -275,12 +294,16 @@ boolean_secondary
    ;
 
 boolean_primary
-   : /*logical_value*/
-   
+   : logical_value
    | variable
    | function_designator
    | relation
    | '(' boolean_expression ')'
+   ;
+
+logical_value
+   : 'true'
+   | 'false'
    ;
 
 relation
@@ -294,7 +317,7 @@ relation
 
 value_relational_operator
    : '<'
-   | ' <='
+   | '<='
    | '='
    | '>='
    | '>'
@@ -379,8 +402,7 @@ simple_text_expression
 text_primary
    : 'notext'
    | string
-   | variable
-   | function_designator
+   | designator
    | '(' text_expression ')'
    ;
 
@@ -391,11 +413,9 @@ object_expression
 
 simple_object_expression
    : 'none'
-   | variable
-   | function_designator
+   | designator
    | object_generator
    | local_object
-   | qualified_object
    | '(' object_expression ')'
    ;
 
@@ -408,7 +428,7 @@ local_object
    ;
 
 qualified_object
-   : simple_object_expression 'qua' class_identifier
+   : designator
    ;
 
 designational_expression
@@ -447,8 +467,8 @@ unconditional_statement
    | procedure_statement
    | object_generator
    | connection_statement
-   | compound_statement
    | block
+   | compound_statement
    | dummy_statement
    | activation_statement
    ;
@@ -517,7 +537,8 @@ simple_variable
    ;
 
 for_right_part
-   : ':=' value_for_list_element (',' value_for_list_element)* '=' ':-' reference_for_list_element (',' reference_for_list_element)*
+   : ':=' value_for_list_element (',' value_for_list_element)*
+   | ':-' reference_for_list_element (',' reference_for_list_element)*
    ;
 
 value_for_list_element
@@ -535,7 +556,7 @@ goto_statement
    ;
 
 procedure_statement
-   : procedure_identifier_1 (actual_parameter_part)?
+   : procedure_identifier_1
    ;
 
 connection_statement
@@ -672,11 +693,11 @@ formal_parameter
    ;
 
 specification_part
-   : specifier identifier_list ';' (specifier identifier_list ';')*
+   : specifier identifier_list (';' specifier identifier_list)*
    ;
 
 specifier
-   : type ('array' | 'procedure')
+   : type ('array' | 'procedure')?
    | 'label'
    | 'switch'
    ;
@@ -831,6 +852,23 @@ timing_clause
 
 simple_timing_clause
    : ('at' | 'delay') arithmetic_expression
+   ;
+   // An identifier must be matched as a single atomic token (not reassembled
+   
+   // in the parser from individual LETTER/DIGIT tokens): otherwise a keyword
+   
+   // occurring as a substring of a longer identifier (e.g. 'text' inside
+   
+   // "outtext", or 'in' inside "outint") would be lexed as that keyword
+   
+   // instead of as part of the identifier. It must also be declared after all
+   
+   // the keyword literals above, so that an exact keyword match (e.g.
+   
+   // 'integer') wins the lexer's same-length tie-break over IDENTIFIER.
+   
+IDENTIFIER
+   : LETTER (LETTER | DIGIT | '_')*
    ;
 
 WS

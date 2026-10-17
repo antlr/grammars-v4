@@ -37,7 +37,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>prog</entryPoint>
+					<entryPoint>simula_source_module</entryPoint>
 					<grammarName>simula</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
