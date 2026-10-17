@@ -11,6 +11,7 @@ export default abstract class CPP14ParserBase extends Parser {
     protected IsPureSpecifierAllowed() : boolean {
         try {
             var x = this.context; // memberDeclarator
+            if (x == null) return false;
             var c = (x.children[0] as ParserRuleContext).children[0] as ParserRuleContext;
             var c2 = c.children[0] as ParserRuleContext;
             var p = c2.children[1] as ParserRuleContext;

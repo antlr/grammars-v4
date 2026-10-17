@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>Output When External Files Are Supported</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    DIV.Examples {font-family: "Courier New", monospace; font-size: 90%; line-height: 122%; margin-left: 2.2em; margin-bottom: 0.6em}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-C4.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-C42.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>C.4.1 Output When External Files Are Supported</H1>
+<div class="Normal">If the implementation under test supports the creation 
+and use of external text files, then test CZ1103A should produce the 
+following report (except for differences in the time stamp). Note that 
+failure messages are expected.</div>
+<div class="Examples">,.,.&nbsp;CZ1103A&nbsp;ACATS&nbsp;4.2A&nbsp;24-05-13&nbsp;09:58:10<BR>
+----&nbsp;CZ1103A&nbsp;CHECK&nbsp;THAT&nbsp;PROCEDURE&nbsp;CHECK_FILE&nbsp;WORKS.<BR>
+&nbsp;&nbsp;&nbsp;-&nbsp;CZ1103A&nbsp;BEGIN&nbsp;TEST&nbsp;WITH&nbsp;AN&nbsp;EMPTY&nbsp;FILE.<BR>
+&nbsp;&nbsp;&nbsp;-&nbsp;CZ1103A&nbsp;BEGIN&nbsp;TEST&nbsp;WITH&nbsp;A&nbsp;FILE&nbsp;WITH&nbsp;BLANK&nbsp;LINES.<BR>
+&nbsp;&nbsp;&nbsp;-&nbsp;CZ1103A&nbsp;BEGIN&nbsp;TEST&nbsp;WITH&nbsp;A&nbsp;FILE&nbsp;WITH&nbsp;BLANK&nbsp;LINES&nbsp;AND&nbsp;PAGES.<BR>
+&nbsp;&nbsp;&nbsp;-&nbsp;CZ1103A&nbsp;BEGIN&nbsp;TEST&nbsp;WITH&nbsp;A&nbsp;FILE&nbsp;WITH&nbsp;TRAILING&nbsp;BLANKS.<BR>
+&nbsp;&nbsp;&nbsp;-&nbsp;CZ1103A&nbsp;FROM&nbsp;CHECK_FILE:&nbsp;THIS&nbsp;IMPLEMENTATION&nbsp;PADS&nbsp;LINES&nbsp;WITH<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BLANKS.<BR>
+&nbsp;&nbsp;&nbsp;-&nbsp;CZ1103A&nbsp;BEGIN&nbsp;TEST&nbsp;WITH&nbsp;A&nbsp;FILE&nbsp;WITHOUT&nbsp;TRAILING&nbsp;BLANKS.<BR>
+&nbsp;&nbsp;&nbsp;-&nbsp;CZ1103A&nbsp;BEGIN&nbsp;TEST&nbsp;WITH&nbsp;A&nbsp;FILE&nbsp;WITH&nbsp;AN&nbsp;END&nbsp;OF&nbsp;LINE&nbsp;ERROR.<BR>
+&nbsp;&nbsp;&nbsp;*&nbsp;CZ1103A&nbsp;FROM&nbsp;CHECK_FILE:&nbsp;END&nbsp;OF&nbsp;LINE&nbsp;EXPECTED&nbsp;-&nbsp;E&nbsp;ENCOUNTERED.<BR>
+&nbsp;&nbsp;&nbsp;-&nbsp;CZ1103A&nbsp;FROM&nbsp;CHECK_FILE:&nbsp;LAST&nbsp;CHARACTER&nbsp;IN&nbsp;FOLLOWING&nbsp;STRING<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;REVEALED&nbsp;ERROR:&nbsp;THIS&nbsp;LINE&nbsp;WILL&nbsp;CONTAIN&nbsp;AN&nbsp;#.<BR>
+&nbsp;&nbsp;&nbsp;-&nbsp;CZ1103A&nbsp;BEGIN&nbsp;TEST&nbsp;WITH&nbsp;FILE&nbsp;WITH&nbsp;END&nbsp;OF&nbsp;PAGE&nbsp;ERROR.<BR>
+&nbsp;&nbsp;&nbsp;*&nbsp;CZ1103A&nbsp;FROM&nbsp;CHECK_FILE:&nbsp;END_OF_PAGE&nbsp;NOT&nbsp;WHERE&nbsp;EXPECTED.<BR>
+&nbsp;&nbsp;&nbsp;-&nbsp;CZ1103A&nbsp;FROM&nbsp;CHECK_FILE:&nbsp;LAST&nbsp;CHARACTER&nbsp;IN&nbsp;FOLLOWING&nbsp;STRING<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;REVEALED&nbsp;ERROR:&nbsp;THIS&nbsp;LINE&nbsp;WILL&nbsp;CONTAIN&nbsp;AN&nbsp;@.<BR>
+&nbsp;&nbsp;&nbsp;-&nbsp;CZ1103A&nbsp;BEGIN&nbsp;TEST&nbsp;WITH&nbsp;FILE&nbsp;WITH&nbsp;END&nbsp;OF&nbsp;FILE&nbsp;ERROR.<BR>
+&nbsp;&nbsp;&nbsp;*&nbsp;CZ1103A&nbsp;FROM&nbsp;CHECK_FILE:&nbsp;END_OF_FILE&nbsp;NOT&nbsp;WHERE&nbsp;EXPECTED.<BR>
+&nbsp;&nbsp;&nbsp;-&nbsp;CZ1103A&nbsp;FROM&nbsp;CHECK_FILE:&nbsp;LAST&nbsp;CHARACTER&nbsp;IN&nbsp;FOLLOWING&nbsp;STRING<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;REVEALED&nbsp;ERROR:&nbsp;THIS&nbsp;LINE&nbsp;WILL&nbsp;CONTAIN&nbsp;AN&nbsp;%.<BR>
+&nbsp;&nbsp;&nbsp;-&nbsp;CZ1103A&nbsp;BEGIN&nbsp;TEST&nbsp;WITH&nbsp;FILE&nbsp;WITH&nbsp;INCORRECT&nbsp;DATA.<BR>
+&nbsp;&nbsp;&nbsp;*&nbsp;CZ1103A&nbsp;FROM&nbsp;CHECK_FILE:&nbsp;FILE&nbsp;DOES&nbsp;NOT&nbsp;CONTAIN&nbsp;CORRECT&nbsp;OUTPUT&nbsp;-<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EXPECTED&nbsp;C&nbsp;-&nbsp;GOT&nbsp;I.<BR>
+&nbsp;&nbsp;&nbsp;-&nbsp;CZ1103A&nbsp;FROM&nbsp;CHECK_FILE:&nbsp;LAST&nbsp;CHARACTER&nbsp;IN&nbsp;FOLLOWING&nbsp;STRING<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;REVEALED&nbsp;ERROR:&nbsp;LINE&nbsp;WITH&nbsp;C.<BR>
+****&nbsp;CZ1103A&nbsp;FAILED&nbsp;****************************.</div>
+<div class="Examples">,.,.&nbsp;CZ1103A&nbsp;ACATS&nbsp;4.2A&nbsp;24-05-13&nbsp;09:58:10<BR>
+----&nbsp;CZ1103A&nbsp;THE&nbsp;LINE&nbsp;ABOVE&nbsp;SHOULD&nbsp;REPORT&nbsp;FAILURE.<BR>
+&nbsp;&nbsp;&nbsp;!&nbsp;CZ1103A&nbsp;COMPARE&nbsp;THIS&nbsp;OUTPUT&nbsp;TO&nbsp;THE&nbsp;EXPECTED&nbsp;RESULT.<BR>
+!!!!&nbsp;CZ1103A&nbsp;TENTATIVELY&nbsp;PASSED&nbsp;!!!!!!!!!!!!!!!!.<BR>
+!!!!&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SEE&nbsp;'!'&nbsp;COMMENTS&nbsp;FOR&nbsp;SPECIAL&nbsp;NOTES!!</div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-C4.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-C42.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>
