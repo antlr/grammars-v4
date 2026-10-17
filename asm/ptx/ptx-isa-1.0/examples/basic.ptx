@@ -1,0 +1,147 @@
+/* */
+.version 1.0
+.target sm_10, sm_11
+        .reg    .b32 r1, r2;
+        .reg    .s32 i;
+        .reg    .v4 .f32 accel;
+        .reg    .pred p, q, r;
+        .reg    .b32 %r<100>;
+        .const  .f32 bias[] = {-1.0, 1.0};
+        .struct  float4 { .f32 v0,v1,v2,v3; }; // typedef
+        .struct  some_struct { .s32 i; .s32 j; .f32 x; .f32 y; };
+        .global .f32  array[N];
+        .global .u32 loc;
+        .global .u8  bg[4] = {0, 0, 0, 0};
+        .global .struct float4 coord;
+        .global .v4 .f32 V;     // a length-4 vector of floats
+        .global .s32 offset[][] = { {-1, 0}, {0, -1}, {1, 0}, {0, 1} };
+        .union   intOrFloat { .s32 i; .f32 f; };
+        //.global  some_struct p; //?
+        .shared .v2 .u16 uv;    // a length-2 vector of unsigned ints
+        .shared .u8  mailbox[128];
+        .local  .u16 kernel[19][19];
+        .global .s32 n = 10;
+        .shared .f16 blur_kernel[][] = {{.05,.1,.05},{.1,.4,.1},{.05,.1,.05}};
+        .global .v3 .u8 rgb[3] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
+        .func (.reg .b32 rval) foo (.reg .b32 arg0, .reg .f64 arg1) {
+            .reg .b32 localVar;
+            mov.b32 rval,result;
+            ret;
+        }
+        .entry filter[16][16] {
+            .reg .b32 a;
+            ret;
+        }
+start:  mov.b32   r1, %tid.x;
+        shl.b32   r1, r1, 2;          // shift thread id by 2 bits
+        ld.global.b32 r2, array[r1];  // thread[tid] gets array[tid]
+        add.f32   r2, r2, 0.5;        // add 1/2
+        @p add.u32 x,y,z;
+        add.sat.s32 c,c,1;
+        add.rz.f32 f1,f2,f3;
+        sub.s32 c,a,b;
+        mul.wide.s16 fa,fxs,fys; // 16*16 bits yields 32 bits
+        mul.lo.s16 fa,fxs,fys; // 16*16 bits, save only the low 16 bits
+        mul.wide.s32 z,x,y; // 32*32 bits, creates 64 bit result
+        mul.f32 circumf,radius,pi; // a single-precision multiply
+        mad.lo.s32 d,a,b,c;
+        mad.lo.s32 r,p,q,r;
+        @p mad.f32 d,a,b,c;
+        mul24.lo.s32 d,a,b; // low 32-bits of 24x24-bit signed multiply.
+        mad24.lo.s32 d,a,b,c; // low 32-bits of 24x24-bit signed multiply.
+        sad.s32 d,a,b,c;
+        sad.u32 d,a,b,d; // running sum
+        sad.f32 w,x,y,z;
+        div.s32 b,n,i;
+        div.wide.s32 d,an_s64_var,b;
+        div.f32 diam,circum,3.14159;
+        rem.s32 x,x,8; // x = x%8;
+        abs.s32 r0,a;
+        abs.f32 x,f0;
+        neg.s32 r0,a;
+        neg.f32 x,f0;
+        min.s32 r0,a,b;
+        @p min.u16 h,i,j;
+        min.f32 z,z,x;
+        max.f32 f0,f1,f2;
+        max.u32 d,a,b;
+        max.s32 q,q,0;
+        set.lt.and.f32.s32 d,a,b,r;
+        set.eq.u32.u32 d,i,n;
+        setp.lt.and.s32 p|q,a,b,r;
+        setp.eq.u32 p,i,n;
+        selp.s32 r0,r,g,p;
+        selp.f32 f0,t,x,xp;
+        slct.u32.s32 x, y, z, val;
+        slct.u64.f32 A, B, C, fval;
+        and.b32 x,q,r;
+        and.b32 sign,fpvalue,0x80000000;
+        or.b32 mask,mask,0x00010001;
+        or.pred p,q,r;
+        xor.b32 d,q,r;
+        xor.b16 d,x,0x0001;
+        not.b32 mask,mask;
+        not.pred p,q;
+        cnot.b32 d,a;
+        shl.b32 q,a,2;
+        shr.u16 c,a,2;
+        shr.s32 i,i,1;
+        shr.b16 k,i,j;
+        mov.f32 d,a;
+        mov.u16 u,v;
+        mov.f32 k,0.1;
+        mov.u32 ptr, A; // move address of A into ptr
+        mov.u32 ptr, A[5]; // move address of A[5] into ptr
+        ld.global.f32 d,[a];
+        ld.shared.b32 d,[p];
+        ld.const.s32 d,[p+4];
+        ld.global.v4.f32 Q,[p];
+        ld.local.b64 x,[240]; // load from location 240 in space local
+        st.global.f32 [d],a;
+        st.local.b32 [q+4],a;
+        st.global.v4.s32 [p],Q;
+        st.shared.s32 [100],r7;
+        cvt.f32.s32 f,i;
+        cvt.sat.s32.f64 j,r;
+        cvt.rni.f32.f32 x,y; // round fp val to nearest int, result is fp
+        tex.3d.v4.s32.f32 {r1,r2,r3,r4},tex_a,{f1,f2,f3};
+        tex.1d.v4.s32.f32 {r1,r2,r3,r4},tex_a,{f1};
+        setp.eq.f32 p,y,0; // is y zero?
+        @!p div.f32 ratio,x,y; // avoid division by zero
+        @q bra L23; // conditional branch
+        bra.uni L_exit;
+        @p bra L321;
+        call init; // call function ‘init’
+        call.uni g, (a); // call function ‘g’ with parameter ‘a’
+        @p call (d), h, (a, b); // return value into register d
+        ret;
+        @p ret;
+        exit;
+        @p exit;
+        bar.sync 0;
+        atom.global.add.s32 d,[a],1;
+        frc.f32 f,g;
+        sin.f32 sa,a;
+        cos.f32 cb,b;
+        @p lg2.f32 q,a;
+        ex2.f32 q,r;
+        rcp.f32 ri,r;
+        sqrt.f32 r,x;
+        rsqrt.f32 isr,x;
+        trap;
+        @p trap;
+        brkpt;
+        @p brkpt;
+        mov.b16 r0,%tid.0; // zero-extends tid.0 to r0
+        cvt.u32.u16 r2,%tid.2; // zero-extends tid.2 to r2
+        mov.b16 r0,%tid.0;
+        mov.b16 h1,%tid.1;
+        mov.u16 h2,%ntid.0;
+        mad.u16 r0,h1,h2,r0; // r0 = unified tid for 2D CTA
+        mov.u32 %r1,%ctaid.1;
+        mov.u32 r1,%nctaid;
+        mov.u32 r1,%gridid;
+        mov.u32 r1,%clock;
+/*
+
+*/

@@ -23,44 +23,79 @@
  OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// http://citeseer.ist.psu.edu/viewdoc/download;jsessionid=F54E0B46B27FC0AEF07271B358CE34E3?doi=10.1.1.47.155&rep=rep1&type=pdf
+// https://dl.acm.org/doi/10.1145/289423.289451
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
 
 grammar cayenne;
 
-expr:
-	'(' varid '::' type_ ')' '->' expr
-	| '\\' '(' varid '::' type_ ')' '->' expr
-	| expr expr
-	| 'data' (conid (type_)* '|')*
-	| conid '@' type_
-	| 'case' varid 'of' arm* '::' type_
-	| 'sig' sign*
-	| 'struct' defn*
-	| expr '.' lblid
-	| id_
-	| '#';
+file_
+    : expr EOF
+    ;
 
-arm: '(' conid varid* ')' '->' expr ';' | varid '->' expr ';';
+expr
+    : '(' varid '::' type_ ')' '->' expr
+    | '\\' '(' varid '::' type_ ')' '->' expr
+    | expr expr
+    | 'data' (conid type_* '|')*
+    | conid '@' type_
+    | 'case' varid 'of' arm* '::' type_
+    | 'sig' sign*
+    | 'struct' defn*
+    | expr '.' lblid
+    | id_
+    | '#'
+    ;
 
-sign: lblid '::' type_ ';' | lblid '::' type_ '=' expr ';';
+arm
+    : '(' conid varid* ')' '->' expr ';'
+    | varid '->' expr ';'
+    ;
 
-defn: vis lblid '::' type_ '=' expr ';';
+sign
+    : lblid '::' type_ ';'
+    | lblid '::' type_ '=' expr ';'
+    ;
 
-vis: 'private' | 'public' abs_;
+defn
+    : vis lblid '::' type_ '=' expr ';'
+    ;
 
-abs_: 'abstract' | 'concrete';
+vis
+    : 'private'
+    | 'public' abs_
+    ;
 
-type_: expr;
+abs_
+    : 'abstract'
+    | 'concrete'
+    ;
 
-varid: id_;
+type_
+    : expr
+    ;
 
-conid: id_;
+varid
+    : id_
+    ;
 
-lblid: id_;
+conid
+    : id_
+    ;
 
-id_: ID;
+lblid
+    : id_
+    ;
 
-ID: [a-zA-Z] [a-zA-Z0-9]*;
+id_
+    : ID
+    ;
 
-WS: [ \r\n\t]+ -> skip;
+ID
+    : [a-zA-Z] [a-zA-Z0-9]*
+    ;
 
+WS
+    : [ \r\n\t]+ -> skip
+    ;

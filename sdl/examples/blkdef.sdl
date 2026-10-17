@@ -1,0 +1,24 @@
+module $vcgblkdef;
+
+/*  Copyright © 1996, Digital Equipment Corporation.
+/*
+/*  VCG block entry definitions.  This module is a jacket for the
+/*  definitions which are actually in the SDL include file
+/*  VCGBLKDEF.SDL.  The include file is supplied for inclusion in
+/*  the definition of each front-end's block table.
+/*
+/*  Modifications:
+/*
+/*	001	Keith Knowles	21-Jan-1988	VCG V4-432
+/*
+/*		Changed obsolete include directory logical "vsrc"
+/*		to "_area".
+/*
+/*	000	Keith Knowles	27-Mar-1987	(357 SVCG M)
+/*
+/*		Original version.
+/*
+
+include "_area:vcgblkdef";
+
+end_module;

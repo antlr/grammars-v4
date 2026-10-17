@@ -1,0 +1,150 @@
+-- BXC6A03.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making
+--     this public release, the Government intends to confer upon all
+--     recipients unlimited rights  equal to those held by the Government.
+--     These rights include rights to use, duplicate, release or disclose the
+--     released technical data and computer software in whole or in part, in
+--     any manner and for any purpose whatsoever, and to have or permit others
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--     Check that if a volatile type is used as an actual for a generic
+--     formal derived type, the ancestor of the formal type must not be a
+--     non-volatile by-reference type.
+--
+-- TEST DESCRIPTION:
+--     A volatile type is one to which a pragma Volatile or Atomic applies.
+--
+--     A volatile object is any of the following:
+--
+--        (1) An object to which a pragma Volatile applies.
+--        (2) A component of an array to which a pragma Volatile_Components
+--            applies.
+--        (3) An object of a volatile type (i.e., a type to which a pragma
+--            Volatile applies).
+--        (4) An object to which a pragma Atomic applies.
+--        (5) A component of an array to which a pragma Atomic_Components
+--            applies.
+--        (6) An object of a atomic type (i.e., a type to which a pragma
+--            Atomic applies).
+--        (7) A subcomponent of a volatile object.
+--
+--     A by-reference type is a descendant of any of the following:
+--
+--        (1) A tagged type.
+--        (2) A task type.
+--        (3) A protected type.
+--        (4) A non-private type with the word "limited" in its declaration.
+--        (5) A composite type with a subcomponent of a by-reference type.
+--        (6) A private type whose full type is a by-reference type.
+--
+--     This test attempts to use various types as actuals for generic formal
+--     derived types, where the ancestor of each formal derived type is a
+--     volatile type. The test verifies that an instantiation is illegal if
+--     the actual type is a non-volatile, by-reference type.
+--
+-- TEST FILES:
+--      This test consists of the following files:
+--
+--         FXC6A00.A
+--      -> BXC6A03.A
+--
+-- APPLICABILITY CRITERIA:
+--      This test is only applicable for implementations validating the
+--      Systems Programming Annex.
+--
+--
+-- CHANGE HISTORY:
+--      01 Feb 96   SAIC    Initial version for ACVC 2.1.
+--      25 Aug 96   SAIC    Added additional cases. Corrected prologue.
+--      02 Dec 97   EDS     Removed application of Pragma Volatile to
+--                          type Volatile_Private.
+--      27 Aug 99   RLB     Repaired test comments.
+--      05 Feb 18   RLB     Commented out test case changed by AI05-0218-1.
+--                          Added error location indicators.
+--      06 Feb 18   RLB     Replaced test case, requiring AI05-0218-1 behavior.
+--
+--!
+
+with FXC6A00;
+package BXC6A03_0 is
+
+   generic
+      type Formal_Derived is new FXC6A00.Tagged_Type with private;
+   package Tagged_Type_Ancestor is end;
+
+   generic
+      type Formal_Derived is new FXC6A00.Volatile_Tagged with private;
+   package Volatile_Tagged_Ancestor is end;
+
+   generic
+      type Formal_Derived is new FXC6A00.Composite_Type;
+   package Composite_Ancestor is end;
+
+   generic
+      type Formal_Derived is new FXC6A00.Private_Type;
+   package Private_Ancestor is end;
+
+   generic
+      type Formal_Derived is new FXC6A00.Array_Type;
+   package Array_Ancestor is end;
+
+   generic
+      type Formal_Derived is new FXC6A00.Record_Type;
+   package Record_Ancestor is end;
+
+end BXC6A03_0;
+
+
+     --==================================================================--
+
+
+with FXC6A00;
+with BXC6A03_0;
+
+package BXC6A03 is
+
+   type Volatile_Record2 is new FXC6A00.Record_Type;    -- Allows pass-by-copy.
+   pragma Volatile (Volatile_Record2);
+
+
+
+   package VolTagAct_NonVolAnc is new BXC6A03_0.Tagged_Type_Ancestor
+     ( FXC6A00.Volatile_Tagged );                       -- ERROR: {6;1}
+                               -- Ancestor is a non-volatile by-reference type.
+
+   package NonVolTagAct_NonVolAnc is new BXC6A03_0.Tagged_Type_Ancestor
+     ( FXC6A00.NonVolatile_Tagged );                    -- OK. {6;1}
+                               -- Actual is a non-volatile type.
+
+   package VolTagAct_VolAnc is new BXC6A03_0.Volatile_Tagged_Ancestor
+     ( FXC6A00.Volatile_Tagged );                       -- OK. {6;1}
+                               -- Ancestor is a volatile type.
+
+   package NonVolTagAct_VolAnc is new BXC6A03_0.Volatile_Tagged_Ancestor
+     ( FXC6A00.NonVolatile_Tagged );                    -- ERROR: {6;1}
+                               -- Actual is a non-volatile type.
+
+   -- AI05-0218-1, a Binding Interpretation, removed the rule that allowed
+   -- the following.
+   package VolAct_NonVolRecAnc is new BXC6A03_0.Record_Ancestor
+     ( Volatile_Record2 );                              -- ERROR: {6;1}
+                -- Ancestor is a non-volatile type that allows pass-by-copy.
+
+end BXC6A03;

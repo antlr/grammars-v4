@@ -1,0 +1,10 @@
+FOR u IN users
+  COLLECT country = u.country, city = u.city INTO groups = {
+    "name" : u.name,
+    "isActive" : u.status == "active"
+  }
+  RETURN {
+    "country" : country,
+    "city" : city,
+    "usersInCity" : groups
+  }

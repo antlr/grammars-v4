@@ -1,0 +1,81 @@
+MODULE find_differences;
+
+    !+
+    !   Compare a set of files in two directories to see if they
+    !   contain any differences
+    !-
+ 
+    EXTERNAL PROCEDURE lib$find_file ( STRING,
+    				       STRING,
+    				       INTEGER ) OF INTEGER;
+    
+    EXTERNAL PROCEDURE lib$find_file_end ( INTEGER ) OF INTEGER;
+
+    FORWARD  PROCEDURE same ( STRING, STRING ) OF BOOLEAN;
+    
+    PROCEDURE main MAIN;
+     
+	DECLARE spec1,dir2,full_file_name: STRING;
+	DECLARE f, f1, f2, state : STRING;
+	DECLARE context: INTEGER;
+
+	READ PROMPT('files to process: ') spec1;
+	READ PROMPT('directory to process: ') dir2;
+
+	context = 0;
+
+	WHILE (lib$find_file ( spec1, full_file_name, context ) AND 1) = 1;
+
+	    f1 = full_file_name[ 1 .. index( full_file_name, ';')-1];
+	    f = f1[ index( f1, ']' )+1 ..];
+	    WRITE 'processing: ', f;
+	    f2 = dir2 & f1[ index( f1, ']' )+1 .. ];
+
+	    IF NOT same( f1, f2 )
+	    THEN
+		WRITE f, ' files are DIFFERENT';
+	    END IF;
+
+	END WHILE;
+
+    !+
+    !    Free the find_file context
+    !-
+
+	IF (lib$find_file_end ( context ) AND 1) <> 1
+	THEN
+	    WRITE 'Error freeing the find_file context.';
+	END IF;
+
+    END PROCEDURE /* main */;
+ 
+     
+    PROCEDURE same( s1 : STRING,
+		    s2 : STRING ) OF BOOLEAN;
+     
+	DECLARE f1, f2 : FILE;
+	DECLARE l1, l2 : STRING;
+	DECLARE res : BOOLEAN;
+
+	OPEN FILE( f1 ) AS s1 FOR INPUT;
+	OPEN FILE( f2 ) AS s2 FOR INPUT;
+
+	WHILE NOT ENDFILE( f1 ) AND NOT ENDFILE( f2 );
+
+	    READ FILE( f1 ) l1;
+	    READ FILE( f2 ) l2;
+
+	    IF l1 <> l2 
+	    THEN
+		GOTO different;
+	    END IF;
+	END WHILE;
+	res = (ENDFILE( f1 ) = ENDFILE( f2 ));
+different:
+	CLOSE FILE( f1 );
+	CLOSE FILE( f2 );
+	RETURN res;
+     
+    END PROCEDURE /* same */;
+ 
+END MODULE /* find_differences */;

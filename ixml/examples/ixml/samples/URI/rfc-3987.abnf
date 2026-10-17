@@ -1,0 +1,110 @@
+;;; ABNF extracted from Sec. 2.2 of RFC 3987.
+;;; Retrieved 11 June 2022 from
+;;; https://datatracker.ietf.org/doc/html/rfc3987#section-2.2
+
+   IRI            = scheme ":" ihier-part [ "?" iquery ]
+                         [ "#" ifragment ]
+
+   ihier-part     = "//" iauthority ipath-abempty
+                  / ipath-absolute
+                  / ipath-rootless
+                  / ipath-empty
+
+   IRI-reference  = IRI / irelative-ref
+
+   absolute-IRI   = scheme ":" ihier-part [ "?" iquery ]
+
+   irelative-ref  = irelative-part [ "?" iquery ] [ "#" ifragment ]
+
+   irelative-part = "//" iauthority ipath-abempty
+                  / ipath-absolute
+                  / ipath-noscheme
+                  / ipath-empty
+
+   iauthority     = [ iuserinfo "@" ] ihost [ ":" port ]
+   iuserinfo      = *( iunreserved / pct-encoded / sub-delims / ":" )
+   ihost          = IP-literal / IPv4address / ireg-name
+
+   ireg-name      = *( iunreserved / pct-encoded / sub-delims )
+
+   ipath          = ipath-abempty   ; begins with "/" or is empty
+                  / ipath-absolute  ; begins with "/" but not "//"
+                  / ipath-noscheme  ; begins with a non-colon segment
+                  / ipath-rootless  ; begins with a segment
+                  / ipath-empty     ; zero characters
+
+   ipath-abempty  = *( "/" isegment )
+   ipath-absolute = "/" [ isegment-nz *( "/" isegment ) ]
+   ipath-noscheme = isegment-nz-nc *( "/" isegment )
+   ipath-rootless = isegment-nz *( "/" isegment )
+   ipath-empty    = 0<ipchar>
+
+   isegment       = *ipchar
+   isegment-nz    = 1*ipchar
+   isegment-nz-nc = 1*( iunreserved / pct-encoded / sub-delims
+                        / "@" )
+                  ; non-zero-length segment without any colon ":"
+
+   ipchar         = iunreserved / pct-encoded / sub-delims / ":"
+                  / "@"
+
+   iquery         = *( ipchar / iprivate / "/" / "?" )
+
+   ifragment      = *( ipchar / "/" / "?" )
+
+   iunreserved    = ALPHA / DIGIT / "-" / "." / "_" / "~" / ucschar
+
+   ucschar        = %xA0-D7FF / %xF900-FDCF / %xFDF0-FFEF
+                  / %x10000-1FFFD / %x20000-2FFFD / %x30000-3FFFD
+                  / %x40000-4FFFD / %x50000-5FFFD / %x60000-6FFFD
+                  / %x70000-7FFFD / %x80000-8FFFD / %x90000-9FFFD
+                  / %xA0000-AFFFD / %xB0000-BFFFD / %xC0000-CFFFD
+                  / %xD0000-DFFFD / %xE1000-EFFFD
+
+   iprivate       = %xE000-F8FF / %xF0000-FFFFD / %x100000-10FFFD
+
+;
+;   Some productions are ambiguous.  The "first-match-wins" (a.k.a.
+;   "greedy") algorithm applies.  For details, see [RFC3986].
+;
+
+;
+;   The following rules are the same as those in [RFC3986]:
+;
+
+   scheme         = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
+
+   port           = *DIGIT
+
+   IP-literal     = "[" ( IPv6address / IPvFuture  ) "]"
+
+   IPvFuture      = "v" 1*HEXDIG "." 1*( unreserved / sub-delims / ":" )
+
+   IPv6address    =                            6( h16 ":" ) ls32
+                  /                       "::" 5( h16 ":" ) ls32
+                  / [               h16 ] "::" 4( h16 ":" ) ls32
+                  / [ *1( h16 ":" ) h16 ] "::" 3( h16 ":" ) ls32
+                  / [ *2( h16 ":" ) h16 ] "::" 2( h16 ":" ) ls32
+                  / [ *3( h16 ":" ) h16 ] "::"    h16 ":"   ls32
+                  / [ *4( h16 ":" ) h16 ] "::"              ls32
+                  / [ *5( h16 ":" ) h16 ] "::"              h16
+                  / [ *6( h16 ":" ) h16 ] "::"
+
+   h16            = 1*4HEXDIG
+   ls32           = ( h16 ":" h16 ) / IPv4address
+
+   IPv4address    = dec-octet "." dec-octet "." dec-octet "." dec-octet
+
+   dec-octet      = DIGIT                 ; 0-9
+                  / %x31-39 DIGIT         ; 10-99
+                  / "1" 2DIGIT            ; 100-199
+                  / "2" %x30-34 DIGIT     ; 200-249
+                  / "25" %x30-35          ; 250-255
+
+   pct-encoded    = "%" HEXDIG HEXDIG
+
+   unreserved     = ALPHA / DIGIT / "-" / "." / "_" / "~"
+   reserved       = gen-delims / sub-delims
+   gen-delims     = ":" / "/" / "?" / "#" / "[" / "]" / "@"
+   sub-delims     = "!" / "$" / "&" / "'" / "(" / ")"
+                  / "*" / "+" / "," / ";" / "="

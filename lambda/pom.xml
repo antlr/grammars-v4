@@ -38,7 +38,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>expression</entryPoint>
+					<entryPoint>file_</entryPoint>
 					<grammarName>lambda</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>

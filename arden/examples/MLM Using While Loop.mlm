@@ -1,0 +1,64 @@
+maintenance:
+title: Allergy_test_with_while_loop;;
+filename: test_for_allergies_while_loop;;
+Arden: version 3;;
+version: 0.00;;
+institution: ;;
+author: ;;
+specialist: ;;
+date: 1997-11-06;;
+validation: testing;;
+library:
+purpose:
+Illustrates the use of a WHILE-LOOP that processes an entire list
+;;
+explanation:
+;;
+keywords:
+;;
+knowledge:
+type: data-driven;;
+data: /* Receives four arguments from the calling MLM: */
+(med_orders,
+med_allergens,
+patient_allergies,
+patient_reactions) := ARGUMENT;
+;;
+evoke:
+;;
+logic: /* Initializes variables */
+a_list:= ();
+m_list:= ();
+r_list:= ();
+num:= 1;
+/* Checks each allergen in the medications to determine */
+/* if the patient is allergic to it */
+while num <= (count med_allergen) do
+allergen:= last(first num from med_allergens);
+allergy_found:= (patient_allergies = allergen);
+reaction:= patient_reactions where allergy_found;
+medication:= med_orders where (med_allergens = allergen);
+/* Adds the allergen, medication, and reaction to */
+/* variables that will be returned to the calling MLM */
+If any allergy_found then
+a_list:= a_list, allergen;
+m_list:= m_list, medication;
+r_list:= r_list, reaction;
+endif;
+/* Increments the counter that is used to stop the while-loop */
+num:= num + 1;
+enddo;
+/* Concludes true if the patient is allergic to one of */
+/* the medications */
+If exist m_list then
+conclude true;
+endif;
+;;
+action:
+/* Returns three lists to the calling MLM */
+return m_list, a_list, r_list;
+;;
+resources: 
+default: en;;
+language: en;;
+end:
