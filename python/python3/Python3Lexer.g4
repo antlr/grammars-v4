@@ -28,187 +28,159 @@
  *                https://github.com/bkiers/python3-parser
  * Developed by : Bart Kiers, bart@big-o.nl
  */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine true, allowShortBlocksOnASingleLine true, minEmptyLines 0, alignSemicolons ownLine
+// $antlr-format alignColons trailing, singleLineOverrulesHangingColon true, alignLexerCommands true, alignLabels true, alignTrailers true
+
 lexer grammar Python3Lexer;
 
 // All comments that start with "///" are copy-pasted from
 // The Python Language Reference
 
-tokens { INDENT, DEDENT }
+tokens {
+    INDENT,
+    DEDENT
+}
 
 options {
-    superClass=Python3LexerBase;
+    superClass = Python3LexerBase;
 }
+
+// Insert here @header for C++ lexer.
 
 /*
  * lexer rules
  */
 
-STRING
- : STRING_LITERAL
- | BYTES_LITERAL
- ;
+STRING: STRING_LITERAL | BYTES_LITERAL;
 
-NUMBER
- : INTEGER
- | FLOAT_NUMBER
- | IMAG_NUMBER
- ;
+NUMBER: INTEGER | FLOAT_NUMBER | IMAG_NUMBER;
 
-INTEGER
- : DECIMAL_INTEGER
- | OCT_INTEGER
- | HEX_INTEGER
- | BIN_INTEGER
- ;
+INTEGER: DECIMAL_INTEGER | OCT_INTEGER | HEX_INTEGER | BIN_INTEGER;
 
-DEF : 'def';
-RETURN : 'return';
-RAISE : 'raise';
-FROM : 'from';
-IMPORT : 'import';
-AS : 'as';
-GLOBAL : 'global';
-NONLOCAL : 'nonlocal';
-ASSERT : 'assert';
-IF : 'if';
-ELIF : 'elif';
-ELSE : 'else';
-WHILE : 'while';
-FOR : 'for';
-IN : 'in';
-TRY : 'try';
-FINALLY : 'finally';
-WITH : 'with';
-EXCEPT : 'except';
-LAMBDA : 'lambda';
-OR : 'or';
-AND : 'and';
-NOT : 'not';
-IS : 'is';
-NONE : 'None';
-TRUE : 'True';
-FALSE : 'False';
-CLASS : 'class';
-YIELD : 'yield';
-DEL : 'del';
-PASS : 'pass';
-CONTINUE : 'continue';
-BREAK : 'break';
-ASYNC : 'async';
-AWAIT : 'await';
+AND        : 'and';
+AS         : 'as';
+ASSERT     : 'assert';
+ASYNC      : 'async';
+AWAIT      : 'await';
+BREAK      : 'break';
+CASE       : 'case';
+CLASS      : 'class';
+CONTINUE   : 'continue';
+DEF        : 'def';
+DEL        : 'del';
+ELIF       : 'elif';
+ELSE       : 'else';
+EXCEPT     : 'except';
+FALSE      : 'False';
+FINALLY    : 'finally';
+FOR        : 'for';
+FROM       : 'from';
+GLOBAL     : 'global';
+IF         : 'if';
+IMPORT     : 'import';
+IN         : 'in';
+IS         : 'is';
+LAMBDA     : 'lambda';
+MATCH      : 'match';
+NONE       : 'None';
+NONLOCAL   : 'nonlocal';
+NOT        : 'not';
+OR         : 'or';
+PASS       : 'pass';
+RAISE      : 'raise';
+RETURN     : 'return';
+TRUE       : 'True';
+TRY        : 'try';
+UNDERSCORE : '_';
+WHILE      : 'while';
+WITH       : 'with';
+YIELD      : 'yield';
 
-NEWLINE
- : ( {atStartOfInput()}?   SPACES
-   | ( '\r'? '\n' | '\r' | '\f' ) SPACES?
-   )
-   {onNewLine();}
- ;
+NEWLINE: ({this.atStartOfInput()}? SPACES | ( '\r'? '\n' | '\r' | '\f') SPACES?) {this.onNewLine();};
 
 /// identifier   ::=  id_start id_continue*
-NAME
- : ID_START ID_CONTINUE*
- ;
+NAME: ID_START ID_CONTINUE*;
 
 /// stringliteral   ::=  [stringprefix](shortstring | longstring)
 /// stringprefix    ::=  "r" | "u" | "R" | "U" | "f" | "F"
 ///                      | "fr" | "Fr" | "fR" | "FR" | "rf" | "rF" | "Rf" | "RF"
-STRING_LITERAL
- : ( [rR] | [uU] | [fF] | ( [fF] [rR] ) | ( [rR] [fF] ) )? ( SHORT_STRING | LONG_STRING )
- ;
+STRING_LITERAL: ( [rR] | [uU] | [fF] | ( [fF] [rR]) | ( [rR] [fF]))? ( SHORT_STRING | LONG_STRING);
 
 /// bytesliteral   ::=  bytesprefix(shortbytes | longbytes)
 /// bytesprefix    ::=  "b" | "B" | "br" | "Br" | "bR" | "BR" | "rb" | "rB" | "Rb" | "RB"
-BYTES_LITERAL
- : ( [bB] | ( [bB] [rR] ) | ( [rR] [bB] ) ) ( SHORT_BYTES | LONG_BYTES )
- ;
+BYTES_LITERAL: ( [bB] | ( [bB] [rR]) | ( [rR] [bB])) ( SHORT_BYTES | LONG_BYTES);
 
 /// decimalinteger ::=  nonzerodigit digit* | "0"+
-DECIMAL_INTEGER
- : NON_ZERO_DIGIT DIGIT*
- | '0'+
- ;
+DECIMAL_INTEGER: NON_ZERO_DIGIT DIGIT* | '0'+;
 
 /// octinteger     ::=  "0" ("o" | "O") octdigit+
-OCT_INTEGER
- : '0' [oO] OCT_DIGIT+
- ;
+OCT_INTEGER: '0' [oO] OCT_DIGIT+;
 
 /// hexinteger     ::=  "0" ("x" | "X") hexdigit+
-HEX_INTEGER
- : '0' [xX] HEX_DIGIT+
- ;
+HEX_INTEGER: '0' [xX] HEX_DIGIT+;
 
 /// bininteger     ::=  "0" ("b" | "B") bindigit+
-BIN_INTEGER
- : '0' [bB] BIN_DIGIT+
- ;
+BIN_INTEGER: '0' [bB] BIN_DIGIT+;
 
 /// floatnumber   ::=  pointfloat | exponentfloat
-FLOAT_NUMBER
- : POINT_FLOAT
- | EXPONENT_FLOAT
- ;
+FLOAT_NUMBER: POINT_FLOAT | EXPONENT_FLOAT;
 
 /// imagnumber ::=  (floatnumber | intpart) ("j" | "J")
-IMAG_NUMBER
- : ( FLOAT_NUMBER | INT_PART ) [jJ]
- ;
+IMAG_NUMBER: ( FLOAT_NUMBER | INT_PART) [jJ];
 
-DOT : '.';
-ELLIPSIS : '...';
-STAR : '*';
-OPEN_PAREN : '(' {openBrace();};
-CLOSE_PAREN : ')' {closeBrace();};
-COMMA : ',';
-COLON : ':';
-SEMI_COLON : ';';
-POWER : '**';
-ASSIGN : '=';
-OPEN_BRACK : '[' {openBrace();};
-CLOSE_BRACK : ']' {closeBrace();};
-OR_OP : '|';
-XOR : '^';
-AND_OP : '&';
-LEFT_SHIFT : '<<';
-RIGHT_SHIFT : '>>';
-ADD : '+';
-MINUS : '-';
-DIV : '/';
-MOD : '%';
-IDIV : '//';
-NOT_OP : '~';
-OPEN_BRACE : '{' {openBrace();};
-CLOSE_BRACE : '}' {closeBrace();};
-LESS_THAN : '<';
-GREATER_THAN : '>';
-EQUALS : '==';
-GT_EQ : '>=';
-LT_EQ : '<=';
-NOT_EQ_1 : '<>';
-NOT_EQ_2 : '!=';
-AT : '@';
-ARROW : '->';
-ADD_ASSIGN : '+=';
-SUB_ASSIGN : '-=';
-MULT_ASSIGN : '*=';
-AT_ASSIGN : '@=';
-DIV_ASSIGN : '/=';
-MOD_ASSIGN : '%=';
-AND_ASSIGN : '&=';
-OR_ASSIGN : '|=';
-XOR_ASSIGN : '^=';
-LEFT_SHIFT_ASSIGN : '<<=';
+DOT                : '.';
+ELLIPSIS           : '...';
+STAR               : '*';
+OPEN_PAREN         : '(' {this.openBrace();};
+CLOSE_PAREN        : ')' {this.closeBrace();};
+COMMA              : ',';
+COLON              : ':';
+SEMI_COLON         : ';';
+POWER              : '**';
+ASSIGN             : '=';
+OPEN_BRACK         : '[' {this.openBrace();};
+CLOSE_BRACK        : ']' {this.closeBrace();};
+OR_OP              : '|';
+XOR                : '^';
+AND_OP             : '&';
+LEFT_SHIFT         : '<<';
+RIGHT_SHIFT        : '>>';
+ADD                : '+';
+MINUS              : '-';
+DIV                : '/';
+MOD                : '%';
+IDIV               : '//';
+NOT_OP             : '~';
+OPEN_BRACE         : '{' {this.openBrace();};
+CLOSE_BRACE        : '}' {this.closeBrace();};
+LESS_THAN          : '<';
+GREATER_THAN       : '>';
+EQUALS             : '==';
+GT_EQ              : '>=';
+LT_EQ              : '<=';
+NOT_EQ_1           : '<>';
+NOT_EQ_2           : '!=';
+AT                 : '@';
+ARROW              : '->';
+ADD_ASSIGN         : '+=';
+SUB_ASSIGN         : '-=';
+MULT_ASSIGN        : '*=';
+AT_ASSIGN          : '@=';
+DIV_ASSIGN         : '/=';
+MOD_ASSIGN         : '%=';
+AND_ASSIGN         : '&=';
+OR_ASSIGN          : '|=';
+XOR_ASSIGN         : '^=';
+LEFT_SHIFT_ASSIGN  : '<<=';
 RIGHT_SHIFT_ASSIGN : '>>=';
-POWER_ASSIGN : '**=';
-IDIV_ASSIGN : '//=';
+POWER_ASSIGN       : '**=';
+IDIV_ASSIGN        : '//=';
 
-SKIP_
- : ( SPACES | COMMENT | LINE_JOINING ) -> skip
- ;
+SKIP_: ( SPACES | COMMENT | LINE_JOINING) -> skip;
 
-UNKNOWN_CHAR
- : .
- ;
+UNKNOWN_CHAR: .;
 
 /*
  * fragments
@@ -217,143 +189,93 @@ UNKNOWN_CHAR
 /// shortstring     ::=  "'" shortstringitem* "'" | '"' shortstringitem* '"'
 /// shortstringitem ::=  shortstringchar | stringescapeseq
 /// shortstringchar ::=  <any source character except "\" or newline or the quote>
-fragment SHORT_STRING
- : '\'' ( STRING_ESCAPE_SEQ | ~[\\\r\n\f'] )* '\''
- | '"' ( STRING_ESCAPE_SEQ | ~[\\\r\n\f"] )* '"'
- ;
+fragment SHORT_STRING:
+    '\'' (STRING_ESCAPE_SEQ | ~[\\\r\n\f'])* '\''
+    | '"' ( STRING_ESCAPE_SEQ | ~[\\\r\n\f"])* '"'
+;
 /// longstring      ::=  "'''" longstringitem* "'''" | '"""' longstringitem* '"""'
-fragment LONG_STRING
- : '\'\'\'' LONG_STRING_ITEM*? '\'\'\''
- | '"""' LONG_STRING_ITEM*? '"""'
- ;
+fragment LONG_STRING: '\'\'\'' LONG_STRING_ITEM*? '\'\'\'' | '"""' LONG_STRING_ITEM*? '"""';
 
 /// longstringitem  ::=  longstringchar | stringescapeseq
-fragment LONG_STRING_ITEM
- : LONG_STRING_CHAR
- | STRING_ESCAPE_SEQ
- ;
+fragment LONG_STRING_ITEM: LONG_STRING_CHAR | STRING_ESCAPE_SEQ;
 
 /// longstringchar  ::=  <any source character except "\">
-fragment LONG_STRING_CHAR
- : ~'\\'
- ;
+fragment LONG_STRING_CHAR: ~'\\';
 
 /// stringescapeseq ::=  "\" <any source character>
-fragment STRING_ESCAPE_SEQ
- : '\\' .
- | '\\' NEWLINE
- ;
+fragment STRING_ESCAPE_SEQ: '\\' . | '\\' NEWLINE;
 
 /// nonzerodigit   ::=  "1"..."9"
-fragment NON_ZERO_DIGIT
- : [1-9]
- ;
+fragment NON_ZERO_DIGIT: [1-9];
 
 /// digit          ::=  "0"..."9"
-fragment DIGIT
- : [0-9]
- ;
+fragment DIGIT: [0-9];
 
 /// octdigit       ::=  "0"..."7"
-fragment OCT_DIGIT
- : [0-7]
- ;
+fragment OCT_DIGIT: [0-7];
 
 /// hexdigit       ::=  digit | "a"..."f" | "A"..."F"
-fragment HEX_DIGIT
- : [0-9a-fA-F]
- ;
+fragment HEX_DIGIT: [0-9a-fA-F];
 
 /// bindigit       ::=  "0" | "1"
-fragment BIN_DIGIT
- : [01]
- ;
+fragment BIN_DIGIT: [01];
 
 /// pointfloat    ::=  [intpart] fraction | intpart "."
-fragment POINT_FLOAT
- : INT_PART? FRACTION
- | INT_PART '.'
- ;
+fragment POINT_FLOAT: INT_PART? FRACTION | INT_PART '.';
 
 /// exponentfloat ::=  (intpart | pointfloat) exponent
-fragment EXPONENT_FLOAT
- : ( INT_PART | POINT_FLOAT ) EXPONENT
- ;
+fragment EXPONENT_FLOAT: ( INT_PART | POINT_FLOAT) EXPONENT;
 
 /// intpart       ::=  digit+
-fragment INT_PART
- : DIGIT+
- ;
+fragment INT_PART: DIGIT+;
 
 /// fraction      ::=  "." digit+
-fragment FRACTION
- : '.' DIGIT+
- ;
+fragment FRACTION: '.' DIGIT+;
 
 /// exponent      ::=  ("e" | "E") ["+" | "-"] digit+
-fragment EXPONENT
- : [eE] [+-]? DIGIT+
- ;
+fragment EXPONENT: [eE] [+-]? DIGIT+;
 
 /// shortbytes     ::=  "'" shortbytesitem* "'" | '"' shortbytesitem* '"'
 /// shortbytesitem ::=  shortbyteschar | bytesescapeseq
-fragment SHORT_BYTES
- : '\'' ( SHORT_BYTES_CHAR_NO_SINGLE_QUOTE | BYTES_ESCAPE_SEQ )* '\''
- | '"' ( SHORT_BYTES_CHAR_NO_DOUBLE_QUOTE | BYTES_ESCAPE_SEQ )* '"'
- ;
+fragment SHORT_BYTES:
+    '\'' (SHORT_BYTES_CHAR_NO_SINGLE_QUOTE | BYTES_ESCAPE_SEQ)* '\''
+    | '"' ( SHORT_BYTES_CHAR_NO_DOUBLE_QUOTE | BYTES_ESCAPE_SEQ)* '"'
+;
 
 /// longbytes      ::=  "'''" longbytesitem* "'''" | '"""' longbytesitem* '"""'
-fragment LONG_BYTES
- : '\'\'\'' LONG_BYTES_ITEM*? '\'\'\''
- | '"""' LONG_BYTES_ITEM*? '"""'
- ;
+fragment LONG_BYTES: '\'\'\'' LONG_BYTES_ITEM*? '\'\'\'' | '"""' LONG_BYTES_ITEM*? '"""';
 
 /// longbytesitem  ::=  longbyteschar | bytesescapeseq
-fragment LONG_BYTES_ITEM
- : LONG_BYTES_CHAR
- | BYTES_ESCAPE_SEQ
- ;
+fragment LONG_BYTES_ITEM: LONG_BYTES_CHAR | BYTES_ESCAPE_SEQ;
 
 /// shortbyteschar ::=  <any ASCII character except "\" or newline or the quote>
-fragment SHORT_BYTES_CHAR_NO_SINGLE_QUOTE
- : [\u0000-\u0009]
- | [\u000B-\u000C]
- | [\u000E-\u0026]
- | [\u0028-\u005B]
- | [\u005D-\u007F]
- ;
+fragment SHORT_BYTES_CHAR_NO_SINGLE_QUOTE:
+    [\u0000-\u0009]
+    | [\u000B-\u000C]
+    | [\u000E-\u0026]
+    | [\u0028-\u005B]
+    | [\u005D-\u007F]
+;
 
-fragment SHORT_BYTES_CHAR_NO_DOUBLE_QUOTE
- : [\u0000-\u0009]
- | [\u000B-\u000C]
- | [\u000E-\u0021]
- | [\u0023-\u005B]
- | [\u005D-\u007F]
- ;
+fragment SHORT_BYTES_CHAR_NO_DOUBLE_QUOTE:
+    [\u0000-\u0009]
+    | [\u000B-\u000C]
+    | [\u000E-\u0021]
+    | [\u0023-\u005B]
+    | [\u005D-\u007F]
+;
 
 /// longbyteschar  ::=  <any ASCII character except "\">
-fragment LONG_BYTES_CHAR
- : [\u0000-\u005B]
- | [\u005D-\u007F]
- ;
+fragment LONG_BYTES_CHAR: [\u0000-\u005B] | [\u005D-\u007F];
 
 /// bytesescapeseq ::=  "\" <any ASCII character>
-fragment BYTES_ESCAPE_SEQ
- : '\\' [\u0000-\u007F]
- ;
+fragment BYTES_ESCAPE_SEQ: '\\' [\u0000-\u007F];
 
-fragment SPACES
- : [ \t]+
- ;
+fragment SPACES: [ \t]+;
 
-fragment COMMENT
- : '#' ~[\r\n\f]*
- ;
+fragment COMMENT: '#' ~[\r\n\f]*;
 
-fragment LINE_JOINING
- : '\\' SPACES? ( '\r'? '\n' | '\r' | '\f')
- ;
-
+fragment LINE_JOINING: '\\' SPACES? ( '\r'? '\n' | '\r' | '\f');
 
 // TODO: ANTLR seems lack of some Unicode property support...
 //$ curl https://www.unicode.org/Public/13.0.0/ucd/PropList.txt | grep Other_ID_
@@ -366,36 +288,26 @@ fragment LINE_JOINING
 //1369..1371    ; Other_ID_Continue # No   [9] ETHIOPIC DIGIT ONE..ETHIOPIC DIGIT NINE
 //19DA          ; Other_ID_Continue # No       NEW TAI LUE THAM DIGIT ONE
 
-fragment UNICODE_OIDS
- : '\u1885'..'\u1886'
- | '\u2118'
- | '\u212e'
- | '\u309b'..'\u309c'
- ;
+fragment UNICODE_OIDS: '\u1885' ..'\u1886' | '\u2118' | '\u212e' | '\u309b' ..'\u309c';
 
-fragment UNICODE_OIDC
- : '\u00b7'
- | '\u0387'
- | '\u1369'..'\u1371'
- | '\u19da'
- ;
+fragment UNICODE_OIDC: '\u00b7' | '\u0387' | '\u1369' ..'\u1371' | '\u19da';
 
 /// id_start     ::=  <all characters in general categories Lu, Ll, Lt, Lm, Lo, Nl, the underscore, and characters with the Other_ID_Start property>
-fragment ID_START
- : '_'
- | [\p{L}]
- | [\p{Nl}]
- //| [\p{Other_ID_Start}]
- | UNICODE_OIDS
- ;
+fragment ID_START:
+    '_'
+    | [\p{L}]
+    | [\p{Nl}]
+    //| [\p{Other_ID_Start}]
+    | UNICODE_OIDS
+;
 
 /// id_continue  ::=  <all characters in id_start, plus characters in the categories Mn, Mc, Nd, Pc and others with the Other_ID_Continue property>
-fragment ID_CONTINUE
- : ID_START
- | [\p{Mn}]
- | [\p{Mc}]
- | [\p{Nd}]
- | [\p{Pc}]
- //| [\p{Other_ID_Continue}]
- | UNICODE_OIDC
- ;
+fragment ID_CONTINUE:
+    ID_START
+    | [\p{Mn}]
+    | [\p{Mc}]
+    | [\p{Nd}]
+    | [\p{Pc}]
+    //| [\p{Other_ID_Continue}]
+    | UNICODE_OIDC
+;

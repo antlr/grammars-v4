@@ -1,0 +1,32 @@
+digraph ATN {
+rankdir=LR;
+s149[fontsize=11, label="149", shape=doublecircle, fixedsize=true, width=.6];
+s1066[fontsize=11,label="1066", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1067[fontsize=11,label="1067", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1068[fontsize=11,label="1068", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1069[fontsize=11,label="{&rarr;\n1069\nd=124|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1070[fontsize=11,label="&larr;\n1070", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1071[fontsize=11,label="1071", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1072[fontsize=11,label="1072", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1073[fontsize=11,label="1073", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1074[fontsize=11,label="{&rarr;\n1074\nd=125|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1075[fontsize=11,label="&larr;\n1075", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s148[fontsize=11,label="148", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1076[fontsize=11,label="1076", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1077[fontsize=11,label="1077", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s148 -> s1066 [fontname="Times-Italic", label="&epsilon;"];
+s1066 -> s1067 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'record'", arrowhead = normal];
+s1067 -> s1069 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<identifier>", arrowhead = normal];
+s1069:p0 -> s1068 [fontname="Times-Italic", label="&epsilon;"];
+s1069:p1 -> s1070 [fontname="Times-Italic", label="&epsilon;"];
+s1068 -> s1070 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<typeParameters>", arrowhead = normal];
+s1070 -> s1071 [fontname="Times-Italic", label="&epsilon;"];
+s1071 -> s1074 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<recordHeader>", arrowhead = normal];
+s1074:p0 -> s1072 [fontname="Times-Italic", label="&epsilon;"];
+s1074:p1 -> s1075 [fontname="Times-Italic", label="&epsilon;"];
+s1072 -> s1073 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'implements'", arrowhead = normal];
+s1075 -> s1076 [fontname="Times-Italic", label="&epsilon;"];
+s1073 -> s1075 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<typeList>", arrowhead = normal];
+s1076 -> s1077 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<recordBody>", arrowhead = normal];
+s1077 -> s149 [fontname="Times-Italic", label="&epsilon;"];
+}

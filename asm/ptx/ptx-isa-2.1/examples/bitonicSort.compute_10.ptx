@@ -1,0 +1,574 @@
+	.version 1.4
+	.target sm_10, map_f64_to_f32
+	// compiled with C:\CUDA\bin/../open64/lib//be.exe
+	// nvopencc 3.1 built on 2010-06-08
+
+	//-----------------------------------------------------------
+	// Compiling bitonicSort.compute_10.cpp3.i (C:/Users/Ken/AppData/Local/Temp/ccBI#.a04504)
+	//-----------------------------------------------------------
+
+	//-----------------------------------------------------------
+	// Options:
+	//-----------------------------------------------------------
+	//  Target:ptx, ISA:sm_10, Endian:little, Pointer Size:32
+	//  -O3	(Optimization level)
+	//  -g0	(Debug level)
+	//  -m2	(Report advisories)
+	//-----------------------------------------------------------
+
+	.file	1	"bitonicSort.compute_10.cudafe2.gpu"
+	.file	2	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\crtdefs.h"
+	.file	3	"C:\CUDA\include\crt/device_runtime.h"
+	.file	4	"C:\CUDA\include\host_defines.h"
+	.file	5	"C:\CUDA\include\builtin_types.h"
+	.file	6	"c:\cuda\include\device_types.h"
+	.file	7	"c:\cuda\include\driver_types.h"
+	.file	8	"c:\cuda\include\surface_types.h"
+	.file	9	"c:\cuda\include\texture_types.h"
+	.file	10	"c:\cuda\include\vector_types.h"
+	.file	11	"c:\cuda\include\builtin_types.h"
+	.file	12	"c:\cuda\include\host_defines.h"
+	.file	13	"C:\CUDA\include\device_launch_parameters.h"
+	.file	14	"c:\cuda\include\crt\storage_class.h"
+	.file	15	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\time.h"
+	.file	16	"c:\programdata\nvidia corporation\nvidia gpu computing sdk\c\src\sortingnetworks\sortingNetworks_common.h"
+	.file	17	"c:\cuda\include\texture_fetch_functions.h"
+	.file	18	"c:/ProgramData/NVIDIA Corporation/NVIDIA GPU Computing SDK/C/src/sortingNetworks/bitonicSort.cu"
+	.file	19	"C:\CUDA\include\common_functions.h"
+	.file	20	"c:\cuda\include\math_functions.h"
+	.file	21	"c:\cuda\include\math_constants.h"
+	.file	22	"c:\cuda\include\device_functions.h"
+	.file	23	"c:\cuda\include\sm_11_atomic_functions.h"
+	.file	24	"c:\cuda\include\sm_12_atomic_functions.h"
+	.file	25	"c:\cuda\include\sm_13_double_functions.h"
+	.file	26	"c:\cuda\include\sm_20_atomic_functions.h"
+	.file	27	"c:\cuda\include\sm_20_intrinsics.h"
+	.file	28	"c:\cuda\include\surface_functions.h"
+	.file	29	"c:\cuda\include\math_functions_dbl_ptx1.h"
+
+
+	.entry _Z17bitonicSortSharedPjS_S_S_jj (
+		.param .u32 __cudaparm__Z17bitonicSortSharedPjS_S_S_jj___val_paramd_DstKey,
+		.param .u32 __cudaparm__Z17bitonicSortSharedPjS_S_S_jj___val_paramd_DstVal,
+		.param .u32 __cudaparm__Z17bitonicSortSharedPjS_S_S_jj___val_paramd_SrcKey,
+		.param .u32 __cudaparm__Z17bitonicSortSharedPjS_S_S_jj___val_paramd_SrcVal,
+		.param .u32 __cudaparm__Z17bitonicSortSharedPjS_S_S_jj_arrayLength,
+		.param .u32 __cudaparm__Z17bitonicSortSharedPjS_S_S_jj_dir)
+	{
+	.reg .u16 %rh<3>;
+	.reg .u32 %r<76>;
+	.reg .pred %p<11>;
+	.shared .align 4 .b8 __cuda___cuda_local_var_279307_33_s_val24[4096];
+	.shared .align 4 .b8 __cuda___cuda_local_var_279306_33_s_key4120[4096];
+	.loc	18	38	0
+$LDWbegin__Z17bitonicSortSharedPjS_S_S_jj:
+	mov.u32 	%r1, __cuda___cuda_local_var_279307_33_s_val24;
+	mov.u32 	%r2, __cuda___cuda_local_var_279306_33_s_key4120;
+	.loc	18	49	0
+	mov.u16 	%rh1, %ctaid.x;
+	mul.wide.u16 	%r3, %rh1, 1024;
+	cvt.u32.u16 	%r4, %tid.x;
+	mul24.lo.u32 	%r5, %r4, 4;
+	add.u32 	%r6, %r3, %r4;
+	add.u32 	%r7, %r5, %r2;
+	mul.lo.u32 	%r8, %r6, 4;
+	ld.param.u32 	%r9, [__cudaparm__Z17bitonicSortSharedPjS_S_S_jj___val_paramd_SrcKey];
+	add.u32 	%r10, %r9, %r8;
+	ld.global.u32 	%r11, [%r10+0];
+	st.shared.u32 	[%r7+0], %r11;
+	.loc	18	50	0
+	add.u32 	%r12, %r5, %r1;
+	ld.param.u32 	%r13, [__cudaparm__Z17bitonicSortSharedPjS_S_S_jj___val_paramd_SrcVal];
+	add.u32 	%r14, %r13, %r8;
+	ld.global.u32 	%r15, [%r14+0];
+	st.shared.u32 	[%r12+0], %r15;
+	.loc	18	51	0
+	ld.global.u32 	%r16, [%r10+2048];
+	st.shared.u32 	[%r7+2048], %r16;
+	.loc	18	52	0
+	ld.global.u32 	%r17, [%r14+2048];
+	st.shared.u32 	[%r12+2048], %r17;
+	ld.param.u32 	%r18, [__cudaparm__Z17bitonicSortSharedPjS_S_S_jj_arrayLength];
+	mov.u32 	%r19, 2;
+	setp.le.u32 	%p1, %r18, %r19;
+	@%p1 bra 	$Lt_0_5634;
+	mov.u32 	%r20, 2;
+$Lt_0_6146:
+ //<loop> Loop body line 52, nesting depth: 1, estimated iterations: unknown
+	.loc	18	57	0
+	shr.u32 	%r21, %r20, 1;
+	mov.s32 	%r22, %r21;
+	mov.u32 	%r23, 0;
+	setp.eq.u32 	%p2, %r21, %r23;
+	@%p2 bra 	$Lt_0_6402;
+ //<loop> Part of loop body line 52, head labeled $Lt_0_6146
+	mul24.lo.u32 	%r24, %r4, 2;
+	ld.param.u32 	%r25, [__cudaparm__Z17bitonicSortSharedPjS_S_S_jj_dir];
+	xor.b32 	%r26, %r25, 1;
+	and.b32 	%r27, %r21, %r4;
+	mov.u32 	%r28, 0;
+	setp.ne.u32 	%p3, %r27, %r28;
+	selp.u32 	%r29, %r26, %r25, %p3;
+$Lt_0_6914:
+ //<loop> Loop body line 58
+	.loc	18	58	0
+	bar.sync 	0;
+	sub.u32 	%r30, %r22, 1;
+	and.b32 	%r31, %r30, %r4;
+	sub.u32 	%r32, %r24, %r31;
+	mul.lo.u32 	%r33, %r32, 4;
+	add.u32 	%r34, %r32, %r22;
+	add.u32 	%r35, %r33, %r2;
+	mul.lo.u32 	%r36, %r34, 4;
+	ld.shared.u32 	%r37, [%r35+0];
+	add.u32 	%r38, %r36, %r2;
+	ld.shared.u32 	%r39, [%r38+0];
+	set.lt.u32.u32 	%r40, %r39, %r37;
+	neg.s32 	%r41, %r40;
+	setp.ne.u32 	%p4, %r29, %r41;
+	@%p4 bra 	$Lt_0_7170;
+ //<loop> Part of loop body line 58, head labeled $Lt_0_6914
+	.loc	18	60	0
+	st.shared.u32 	[%r35+0], %r39;
+	st.shared.u32 	[%r38+0], %r37;
+	add.u32 	%r42, %r33, %r1;
+	ld.shared.u32 	%r43, [%r42+0];
+	add.u32 	%r44, %r36, %r1;
+	ld.shared.u32 	%r45, [%r44+0];
+	st.shared.u32 	[%r42+0], %r45;
+	st.shared.u32 	[%r44+0], %r43;
+$Lt_0_7170:
+ //<loop> Part of loop body line 58, head labeled $Lt_0_6914
+	.loc	18	57	0
+	shr.u32 	%r22, %r22, 1;
+	mov.u32 	%r46, 0;
+	setp.ne.u32 	%p5, %r22, %r46;
+	@%p5 bra 	$Lt_0_6914;
+$Lt_0_6402:
+ //<loop> Part of loop body line 52, head labeled $Lt_0_6146
+	.loc	18	54	0
+	shl.b32 	%r20, %r20, 1;
+	setp.gt.u32 	%p6, %r18, %r20;
+	@%p6 bra 	$Lt_0_6146;
+$Lt_0_5634:
+	.loc	18	70	0
+	shr.u32 	%r47, %r18, 1;
+	mov.s32 	%r48, %r47;
+	mov.u32 	%r49, 0;
+	setp.eq.u32 	%p7, %r47, %r49;
+	@%p7 bra 	$Lt_0_8194;
+	mul24.lo.u32 	%r24, %r4, 2;
+	ld.param.u32 	%r25, [__cudaparm__Z17bitonicSortSharedPjS_S_S_jj_dir];
+$Lt_0_8706:
+ //<loop> Loop body line 71
+	.loc	18	71	0
+	bar.sync 	0;
+	sub.u32 	%r50, %r48, 1;
+	and.b32 	%r51, %r50, %r4;
+	sub.u32 	%r52, %r24, %r51;
+	mul.lo.u32 	%r53, %r52, 4;
+	add.u32 	%r54, %r52, %r48;
+	add.u32 	%r55, %r53, %r2;
+	mul.lo.u32 	%r56, %r54, 4;
+	ld.shared.u32 	%r57, [%r55+0];
+	add.u32 	%r58, %r56, %r2;
+	ld.shared.u32 	%r59, [%r58+0];
+	set.lt.u32.u32 	%r60, %r59, %r57;
+	neg.s32 	%r61, %r60;
+	setp.ne.u32 	%p8, %r25, %r61;
+	@%p8 bra 	$Lt_0_8962;
+ //<loop> Part of loop body line 71, head labeled $Lt_0_8706
+	.loc	18	73	0
+	st.shared.u32 	[%r55+0], %r59;
+	st.shared.u32 	[%r58+0], %r57;
+	add.u32 	%r62, %r53, %r1;
+	ld.shared.u32 	%r63, [%r62+0];
+	add.u32 	%r64, %r56, %r1;
+	ld.shared.u32 	%r65, [%r64+0];
+	st.shared.u32 	[%r62+0], %r65;
+	st.shared.u32 	[%r64+0], %r63;
+$Lt_0_8962:
+ //<loop> Part of loop body line 71, head labeled $Lt_0_8706
+	.loc	18	70	0
+	shr.u32 	%r48, %r48, 1;
+	mov.u32 	%r66, 0;
+	setp.ne.u32 	%p9, %r48, %r66;
+	@%p9 bra 	$Lt_0_8706;
+$Lt_0_8194:
+	.loc	18	81	0
+	bar.sync 	0;
+	.loc	18	82	0
+	ld.param.u32 	%r67, [__cudaparm__Z17bitonicSortSharedPjS_S_S_jj___val_paramd_DstKey];
+	add.u32 	%r68, %r67, %r8;
+	ld.shared.u32 	%r69, [%r7+0];
+	st.global.u32 	[%r68+0], %r69;
+	.loc	18	83	0
+	ld.param.u32 	%r70, [__cudaparm__Z17bitonicSortSharedPjS_S_S_jj___val_paramd_DstVal];
+	add.u32 	%r71, %r70, %r8;
+	ld.shared.u32 	%r72, [%r12+0];
+	st.global.u32 	[%r71+0], %r72;
+	.loc	18	84	0
+	ld.shared.u32 	%r73, [%r7+2048];
+	st.global.u32 	[%r68+2048], %r73;
+	.loc	18	85	0
+	ld.shared.u32 	%r74, [%r12+2048];
+	st.global.u32 	[%r71+2048], %r74;
+	.loc	18	86	0
+	exit;
+$LDWend__Z17bitonicSortSharedPjS_S_S_jj:
+	} // _Z17bitonicSortSharedPjS_S_S_jj
+
+	.entry _Z18bitonicSortShared1PjS_S_S_ (
+		.param .u32 __cudaparm__Z18bitonicSortShared1PjS_S_S____val_paramd_DstKey,
+		.param .u32 __cudaparm__Z18bitonicSortShared1PjS_S_S____val_paramd_DstVal,
+		.param .u32 __cudaparm__Z18bitonicSortShared1PjS_S_S____val_paramd_SrcKey,
+		.param .u32 __cudaparm__Z18bitonicSortShared1PjS_S_S____val_paramd_SrcVal)
+	{
+	.reg .u32 %r<70>;
+	.reg .pred %p<10>;
+	.shared .align 4 .b8 __cuda___cuda_local_var_279371_33_s_val8232[4096];
+	.shared .align 4 .b8 __cuda___cuda_local_var_279370_33_s_key12328[4096];
+	.loc	18	102	0
+$LDWbegin__Z18bitonicSortShared1PjS_S_S_:
+	mov.u32 	%r1, __cuda___cuda_local_var_279371_33_s_val8232;
+	mov.u32 	%r2, __cuda___cuda_local_var_279370_33_s_key12328;
+	.loc	18	113	0
+	cvt.u32.u16 	%r3, %ctaid.x;
+	mul.lo.u32 	%r4, %r3, 1024;
+	cvt.u32.u16 	%r5, %tid.x;
+	mul24.lo.u32 	%r6, %r5, 4;
+	add.u32 	%r7, %r4, %r5;
+	add.u32 	%r8, %r6, %r2;
+	mul.lo.u32 	%r9, %r7, 4;
+	ld.param.u32 	%r10, [__cudaparm__Z18bitonicSortShared1PjS_S_S____val_paramd_SrcKey];
+	add.u32 	%r11, %r10, %r9;
+	ld.global.u32 	%r12, [%r11+0];
+	st.shared.u32 	[%r8+0], %r12;
+	.loc	18	114	0
+	add.u32 	%r13, %r6, %r1;
+	ld.param.u32 	%r14, [__cudaparm__Z18bitonicSortShared1PjS_S_S____val_paramd_SrcVal];
+	add.u32 	%r15, %r14, %r9;
+	ld.global.u32 	%r16, [%r15+0];
+	st.shared.u32 	[%r13+0], %r16;
+	.loc	18	115	0
+	ld.global.u32 	%r17, [%r11+2048];
+	st.shared.u32 	[%r8+2048], %r17;
+	.loc	18	116	0
+	ld.global.u32 	%r18, [%r15+2048];
+	st.shared.u32 	[%r13+2048], %r18;
+	mul24.lo.u32 	%r19, %r5, 2;
+	mov.u32 	%r20, 2;
+$Lt_1_5378:
+ //<loop> Loop body line 116, nesting depth: 1, estimated iterations: unknown
+	.loc	18	121	0
+	shr.u32 	%r21, %r20, 1;
+	mov.s32 	%r22, %r21;
+	mov.u32 	%r23, 0;
+	setp.eq.u32 	%p1, %r21, %r23;
+	@%p1 bra 	$Lt_1_5634;
+ //<loop> Part of loop body line 116, head labeled $Lt_1_5378
+	and.b32 	%r24, %r21, %r5;
+	mov.u32 	%r25, 0;
+	setp.ne.u32 	%p2, %r24, %r25;
+$Lt_1_6146:
+ //<loop> Loop body line 122
+	.loc	18	122	0
+	bar.sync 	0;
+	sub.u32 	%r26, %r22, 1;
+	and.b32 	%r27, %r26, %r5;
+	sub.u32 	%r28, %r19, %r27;
+	mul.lo.u32 	%r29, %r28, 4;
+	add.u32 	%r30, %r28, %r22;
+	add.u32 	%r31, %r29, %r2;
+	mul.lo.u32 	%r32, %r30, 4;
+	ld.shared.u32 	%r33, [%r31+0];
+	add.u32 	%r34, %r32, %r2;
+	ld.shared.u32 	%r35, [%r34+0];
+	setp.lt.u32 	%p3, %r35, %r33;
+	xor.pred 	%p4, %p2, %p3;
+	@%p4 bra 	$Lt_1_6402;
+ //<loop> Part of loop body line 122, head labeled $Lt_1_6146
+	.loc	18	124	0
+	st.shared.u32 	[%r31+0], %r35;
+	st.shared.u32 	[%r34+0], %r33;
+	add.u32 	%r36, %r29, %r1;
+	ld.shared.u32 	%r37, [%r36+0];
+	add.u32 	%r38, %r32, %r1;
+	ld.shared.u32 	%r39, [%r38+0];
+	st.shared.u32 	[%r36+0], %r39;
+	st.shared.u32 	[%r38+0], %r37;
+$Lt_1_6402:
+ //<loop> Part of loop body line 122, head labeled $Lt_1_6146
+	.loc	18	121	0
+	shr.u32 	%r22, %r22, 1;
+	mov.u32 	%r40, 0;
+	setp.ne.u32 	%p5, %r22, %r40;
+	@%p5 bra 	$Lt_1_6146;
+$Lt_1_5634:
+ //<loop> Part of loop body line 116, head labeled $Lt_1_5378
+	.loc	18	118	0
+	shl.b32 	%r20, %r20, 1;
+	mov.u32 	%r41, 1023;
+	setp.le.u32 	%p6, %r20, %r41;
+	@%p6 bra 	$Lt_1_5378;
+	and.b32 	%r42, %r3, 1;
+	mov.u32 	%r43, 512;
+$Lt_1_7938:
+ //<loop> Loop body line 118, nesting depth: 1, estimated iterations: unknown
+	.loc	18	137	0
+	bar.sync 	0;
+	sub.u32 	%r44, %r43, 1;
+	and.b32 	%r45, %r44, %r5;
+	sub.u32 	%r46, %r19, %r45;
+	mul.lo.u32 	%r47, %r46, 4;
+	add.u32 	%r48, %r46, %r43;
+	add.u32 	%r49, %r47, %r2;
+	mul.lo.u32 	%r50, %r48, 4;
+	ld.shared.u32 	%r51, [%r49+0];
+	add.u32 	%r52, %r50, %r2;
+	ld.shared.u32 	%r53, [%r52+0];
+	set.lt.u32.u32 	%r54, %r53, %r51;
+	neg.s32 	%r55, %r54;
+	setp.ne.u32 	%p7, %r42, %r55;
+	@%p7 bra 	$Lt_1_8194;
+ //<loop> Part of loop body line 118, head labeled $Lt_1_7938
+	.loc	18	139	0
+	st.shared.u32 	[%r49+0], %r53;
+	st.shared.u32 	[%r52+0], %r51;
+	add.u32 	%r56, %r47, %r1;
+	ld.shared.u32 	%r57, [%r56+0];
+	add.u32 	%r58, %r50, %r1;
+	ld.shared.u32 	%r59, [%r58+0];
+	st.shared.u32 	[%r56+0], %r59;
+	st.shared.u32 	[%r58+0], %r57;
+$Lt_1_8194:
+ //<loop> Part of loop body line 118, head labeled $Lt_1_7938
+	.loc	18	136	0
+	shr.u32 	%r43, %r43, 1;
+	mov.u32 	%r60, 0;
+	setp.ne.u32 	%p8, %r43, %r60;
+	@%p8 bra 	$Lt_1_7938;
+	.loc	18	148	0
+	bar.sync 	0;
+	.loc	18	149	0
+	ld.param.u32 	%r61, [__cudaparm__Z18bitonicSortShared1PjS_S_S____val_paramd_DstKey];
+	add.u32 	%r62, %r61, %r9;
+	ld.shared.u32 	%r63, [%r8+0];
+	st.global.u32 	[%r62+0], %r63;
+	.loc	18	150	0
+	ld.param.u32 	%r64, [__cudaparm__Z18bitonicSortShared1PjS_S_S____val_paramd_DstVal];
+	add.u32 	%r65, %r64, %r9;
+	ld.shared.u32 	%r66, [%r13+0];
+	st.global.u32 	[%r65+0], %r66;
+	.loc	18	151	0
+	ld.shared.u32 	%r67, [%r8+2048];
+	st.global.u32 	[%r62+2048], %r67;
+	.loc	18	152	0
+	ld.shared.u32 	%r68, [%r13+2048];
+	st.global.u32 	[%r65+2048], %r68;
+	.loc	18	153	0
+	exit;
+$LDWend__Z18bitonicSortShared1PjS_S_S_:
+	} // _Z18bitonicSortShared1PjS_S_S_
+
+	.entry _Z18bitonicMergeGlobalPjS_S_S_jjjj (
+		.param .u32 __cudaparm__Z18bitonicMergeGlobalPjS_S_S_jjjj_d_DstKey,
+		.param .u32 __cudaparm__Z18bitonicMergeGlobalPjS_S_S_jjjj_d_DstVal,
+		.param .u32 __cudaparm__Z18bitonicMergeGlobalPjS_S_S_jjjj_d_SrcKey,
+		.param .u32 __cudaparm__Z18bitonicMergeGlobalPjS_S_S_jjjj_d_SrcVal,
+		.param .u32 __cudaparm__Z18bitonicMergeGlobalPjS_S_S_jjjj_arrayLength,
+		.param .u32 __cudaparm__Z18bitonicMergeGlobalPjS_S_S_jjjj_size,
+		.param .u32 __cudaparm__Z18bitonicMergeGlobalPjS_S_S_jjjj_stride,
+		.param .u32 __cudaparm__Z18bitonicMergeGlobalPjS_S_S_jjjj_dir)
+	{
+	.reg .u16 %rh<4>;
+	.reg .u32 %r<44>;
+	.reg .pred %p<4>;
+	.loc	18	164	0
+$LDWbegin__Z18bitonicMergeGlobalPjS_S_S_jjjj:
+	.loc	18	173	0
+	mov.u16 	%rh1, %ctaid.x;
+	mov.u16 	%rh2, %ntid.x;
+	mul.wide.u16 	%r1, %rh1, %rh2;
+	ld.param.u32 	%r2, [__cudaparm__Z18bitonicMergeGlobalPjS_S_S_jjjj_stride];
+	sub.u32 	%r3, %r2, 1;
+	cvt.u32.u16 	%r4, %tid.x;
+	add.u32 	%r5, %r4, %r1;
+	mul.lo.u32 	%r6, %r5, 2;
+	and.b32 	%r7, %r3, %r5;
+	sub.u32 	%r8, %r6, %r7;
+	mul.lo.u32 	%r9, %r8, 4;
+	ld.param.u32 	%r10, [__cudaparm__Z18bitonicMergeGlobalPjS_S_S_jjjj_d_SrcKey];
+	add.u32 	%r11, %r9, %r10;
+	ld.global.u32 	%r12, [%r11+0];
+	mov.s32 	%r13, %r12;
+	.loc	18	174	0
+	ld.param.u32 	%r14, [__cudaparm__Z18bitonicMergeGlobalPjS_S_S_jjjj_d_SrcVal];
+	add.u32 	%r15, %r9, %r14;
+	ld.global.u32 	%r16, [%r15+0];
+	mov.s32 	%r17, %r16;
+	.loc	18	175	0
+	add.u32 	%r18, %r8, %r2;
+	mul.lo.u32 	%r19, %r18, 4;
+	add.u32 	%r20, %r19, %r10;
+	ld.global.u32 	%r21, [%r20+0];
+	.loc	18	176	0
+	add.u32 	%r22, %r19, %r14;
+	ld.global.u32 	%r23, [%r22+0];
+	ld.param.u32 	%r24, [__cudaparm__Z18bitonicMergeGlobalPjS_S_S_jjjj_dir];
+	xor.b32 	%r25, %r24, 1;
+	ld.param.u32 	%r26, [__cudaparm__Z18bitonicMergeGlobalPjS_S_S_jjjj_arrayLength];
+	shr.u32 	%r27, %r26, 1;
+	sub.u32 	%r28, %r27, 1;
+	and.b32 	%r29, %r5, %r28;
+	ld.param.u32 	%r30, [__cudaparm__Z18bitonicMergeGlobalPjS_S_S_jjjj_size];
+	shr.u32 	%r31, %r30, 1;
+	and.b32 	%r32, %r29, %r31;
+	mov.u32 	%r33, 0;
+	setp.ne.u32 	%p1, %r32, %r33;
+	selp.u32 	%r34, %r25, %r24, %p1;
+	set.gt.u32.u32 	%r35, %r12, %r21;
+	neg.s32 	%r36, %r35;
+	setp.ne.u32 	%p2, %r34, %r36;
+	@%p2 bra 	$Lt_2_1794;
+	.loc	18	178	0
+	mov.s32 	%r13, %r21;
+	mov.s32 	%r21, %r12;
+	mov.s32 	%r17, %r23;
+	mov.s32 	%r23, %r16;
+$Lt_2_1794:
+	.loc	18	184	0
+	ld.param.u32 	%r37, [__cudaparm__Z18bitonicMergeGlobalPjS_S_S_jjjj_d_DstKey];
+	add.u32 	%r38, %r9, %r37;
+	st.global.u32 	[%r38+0], %r13;
+	.loc	18	185	0
+	ld.param.u32 	%r39, [__cudaparm__Z18bitonicMergeGlobalPjS_S_S_jjjj_d_DstVal];
+	add.u32 	%r40, %r9, %r39;
+	st.global.u32 	[%r40+0], %r17;
+	.loc	18	186	0
+	add.u32 	%r41, %r19, %r37;
+	st.global.u32 	[%r41+0], %r21;
+	.loc	18	187	0
+	add.u32 	%r42, %r19, %r39;
+	st.global.u32 	[%r42+0], %r23;
+	.loc	18	188	0
+	exit;
+$LDWend__Z18bitonicMergeGlobalPjS_S_S_jjjj:
+	} // _Z18bitonicMergeGlobalPjS_S_S_jjjj
+
+	.entry _Z18bitonicMergeSharedPjS_S_S_jjj (
+		.param .u32 __cudaparm__Z18bitonicMergeSharedPjS_S_S_jjj___val_paramd_DstKey,
+		.param .u32 __cudaparm__Z18bitonicMergeSharedPjS_S_S_jjj___val_paramd_DstVal,
+		.param .u32 __cudaparm__Z18bitonicMergeSharedPjS_S_S_jjj___val_paramd_SrcKey,
+		.param .u32 __cudaparm__Z18bitonicMergeSharedPjS_S_S_jjj___val_paramd_SrcVal,
+		.param .u32 __cudaparm__Z18bitonicMergeSharedPjS_S_S_jjj_arrayLength,
+		.param .u32 __cudaparm__Z18bitonicMergeSharedPjS_S_S_jjj_size,
+		.param .u32 __cudaparm__Z18bitonicMergeSharedPjS_S_S_jjj_dir)
+	{
+	.reg .u32 %r<61>;
+	.reg .pred %p<5>;
+	.shared .align 4 .b8 __cuda___cuda_local_var_279467_33_s_key16484[4096];
+	.shared .align 4 .b8 __cuda___cuda_local_var_279468_33_s_val20580[4096];
+	.loc	18	199	0
+$LDWbegin__Z18bitonicMergeSharedPjS_S_S_jjj:
+	mov.u32 	%r1, __cuda___cuda_local_var_279467_33_s_key16484;
+	mov.u32 	%r2, __cuda___cuda_local_var_279468_33_s_val20580;
+	.loc	18	209	0
+	cvt.u32.u16 	%r3, %ctaid.x;
+	mul.lo.u32 	%r4, %r3, 1024;
+	cvt.u32.u16 	%r5, %tid.x;
+	mul24.lo.u32 	%r6, %r5, 4;
+	add.u32 	%r7, %r4, %r5;
+	add.u32 	%r8, %r6, %r1;
+	mul.lo.u32 	%r9, %r7, 4;
+	ld.param.u32 	%r10, [__cudaparm__Z18bitonicMergeSharedPjS_S_S_jjj___val_paramd_SrcKey];
+	add.u32 	%r11, %r10, %r9;
+	ld.global.u32 	%r12, [%r11+0];
+	st.shared.u32 	[%r8+0], %r12;
+	.loc	18	210	0
+	add.u32 	%r13, %r6, %r2;
+	ld.param.u32 	%r14, [__cudaparm__Z18bitonicMergeSharedPjS_S_S_jjj___val_paramd_SrcVal];
+	add.u32 	%r15, %r14, %r9;
+	ld.global.u32 	%r16, [%r15+0];
+	st.shared.u32 	[%r13+0], %r16;
+	.loc	18	211	0
+	ld.global.u32 	%r17, [%r11+2048];
+	st.shared.u32 	[%r8+2048], %r17;
+	.loc	18	212	0
+	ld.global.u32 	%r18, [%r15+2048];
+	st.shared.u32 	[%r13+2048], %r18;
+	mul24.lo.u32 	%r19, %r5, 2;
+	cvt.u32.u16 	%r20, %ntid.x;
+	mul24.lo.u32 	%r21, %r3, %r20;
+	ld.param.u32 	%r22, [__cudaparm__Z18bitonicMergeSharedPjS_S_S_jjj_arrayLength];
+	shr.u32 	%r23, %r22, 1;
+	ld.param.u32 	%r24, [__cudaparm__Z18bitonicMergeSharedPjS_S_S_jjj_size];
+	shr.u32 	%r25, %r24, 1;
+	ld.param.u32 	%r26, [__cudaparm__Z18bitonicMergeSharedPjS_S_S_jjj_dir];
+	xor.b32 	%r27, %r26, 1;
+	add.u32 	%r28, %r21, %r5;
+	sub.u32 	%r29, %r23, 1;
+	and.b32 	%r30, %r28, %r29;
+	and.b32 	%r31, %r25, %r30;
+	mov.u32 	%r32, 0;
+	setp.ne.u32 	%p1, %r31, %r32;
+	selp.u32 	%r33, %r27, %r26, %p1;
+	mov.u32 	%r34, 512;
+$Lt_3_3330:
+ //<loop> Loop body line 212, nesting depth: 1, estimated iterations: unknown
+	.loc	18	218	0
+	bar.sync 	0;
+	sub.u32 	%r35, %r34, 1;
+	and.b32 	%r36, %r35, %r5;
+	sub.u32 	%r37, %r19, %r36;
+	mul.lo.u32 	%r38, %r37, 4;
+	add.u32 	%r39, %r37, %r34;
+	add.u32 	%r40, %r38, %r1;
+	mul.lo.u32 	%r41, %r39, 4;
+	ld.shared.u32 	%r42, [%r40+0];
+	add.u32 	%r43, %r41, %r1;
+	ld.shared.u32 	%r44, [%r43+0];
+	set.lt.u32.u32 	%r45, %r44, %r42;
+	neg.s32 	%r46, %r45;
+	setp.ne.u32 	%p2, %r33, %r46;
+	@%p2 bra 	$Lt_3_3586;
+ //<loop> Part of loop body line 212, head labeled $Lt_3_3330
+	.loc	18	220	0
+	st.shared.u32 	[%r40+0], %r44;
+	st.shared.u32 	[%r43+0], %r42;
+	add.u32 	%r47, %r38, %r2;
+	ld.shared.u32 	%r48, [%r47+0];
+	add.u32 	%r49, %r41, %r2;
+	ld.shared.u32 	%r50, [%r49+0];
+	st.shared.u32 	[%r47+0], %r50;
+	st.shared.u32 	[%r49+0], %r48;
+$Lt_3_3586:
+ //<loop> Part of loop body line 212, head labeled $Lt_3_3330
+	.loc	18	217	0
+	shr.u32 	%r34, %r34, 1;
+	mov.u32 	%r51, 0;
+	setp.ne.u32 	%p3, %r34, %r51;
+	@%p3 bra 	$Lt_3_3330;
+	.loc	18	227	0
+	bar.sync 	0;
+	.loc	18	228	0
+	ld.param.u32 	%r52, [__cudaparm__Z18bitonicMergeSharedPjS_S_S_jjj___val_paramd_DstKey];
+	add.u32 	%r53, %r52, %r9;
+	ld.shared.u32 	%r54, [%r8+0];
+	st.global.u32 	[%r53+0], %r54;
+	.loc	18	229	0
+	ld.param.u32 	%r55, [__cudaparm__Z18bitonicMergeSharedPjS_S_S_jjj___val_paramd_DstVal];
+	add.u32 	%r56, %r55, %r9;
+	ld.shared.u32 	%r57, [%r13+0];
+	st.global.u32 	[%r56+0], %r57;
+	.loc	18	230	0
+	ld.shared.u32 	%r58, [%r8+2048];
+	st.global.u32 	[%r53+2048], %r58;
+	.loc	18	231	0
+	ld.shared.u32 	%r59, [%r13+2048];
+	st.global.u32 	[%r56+2048], %r59;
+	.loc	18	232	0
+	exit;
+$LDWend__Z18bitonicMergeSharedPjS_S_S_jjj:
+	} // _Z18bitonicMergeSharedPjS_S_S_jjj
+

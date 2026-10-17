@@ -1,0 +1,1 @@
+last_over_time(container_cpu_usage_seconds_total[1m])

@@ -1,0 +1,1 @@
+MATCH (p) WHERE {foo: p}.foo:Person:Teacher RETURN p

@@ -1,0 +1,20 @@
+/* Add edges from input graph to argument graph
+ * Does not add nodes.
+ */
+BEGIN{
+  graph_t g = readG(ARGV[0]);
+  node_t h, t;
+  edge_t e;
+}
+E {
+  if ((h = isNode(g,head.name)) && (t = isNode(g,tail.name))) {
+    if (!isEdge(t,h,"")) {
+      e = copy(g,$);
+    }
+  }
+}
+END {
+  write(g);
+}
+
+

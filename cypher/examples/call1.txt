@@ -1,0 +1,1 @@
+CALL test.proc(  a  ,  b  ,  c  ) RETURN *

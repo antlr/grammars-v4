@@ -29,41 +29,44 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar itn;
 
 itinerary
-   : line* EOF
-   ;
+    : line* EOF
+    ;
 
 line
-   : longitude '|' latitude '|' descr '|' flag '|'
-   ;
+    : longitude '|' latitude '|' descr '|' flag '|'
+    ;
 
 longitude
-   : NUM
-   ;
+    : NUM
+    ;
 
 latitude
-   : NUM
-   ;
+    : NUM
+    ;
 
 descr
-   : TEXT
-   ;
+    : TEXT
+    ;
 
 flag
-   : NUM
-   ;
+    : NUM
+    ;
 
 NUM
-   : [0-9]+
-   ;
+    : [0-9]+
+    ;
 
 TEXT
-   : [ a-zA-Z0-9]+
-   ;
+    : [ a-zA-Z0-9]+
+    ;
 
 WS
-   : [\r\n\t]+ -> skip
-   ;
-
+    : [\r\n\t]+ -> skip
+    ;

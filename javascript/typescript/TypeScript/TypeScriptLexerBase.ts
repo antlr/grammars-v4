@@ -1,33 +1,33 @@
-import {Lexer, Token, CharStream} from "antlr4ts";
-import {TypeScriptLexer} from './TypeScriptLexer';
+import {Lexer, Token, CharStream} from "antlr4";
+import TypeScriptLexer from './TypeScriptLexer';
 
 /**
  * All lexer methods that used in grammar (IsStrictMode)
  * should start with Upper Case Char similar to Lexer rules.
  */
-export abstract class TypeScriptLexerBase extends Lexer {
+export default abstract class TypeScriptLexerBase extends Lexer {
     /**
      * Stores values of nested modes. By default mode is strict or
      * defined externally (useStrictDefault)
      */
     private readonly scopeStrictModes: boolean[] = [];
 
-    private lastToken: Token;
+    private lastToken: Token | null = null;
 
     /**
      * Default value of strict mode
      * Can be defined externally by setUseStrictDefault
      */
-    private useStrictDefault: boolean;
+    private useStrictDefault: boolean = false;
 
     /**
      * Current value of strict mode
      * Can be defined during parsing, see StringFunctions.js and StringGlobal.js samples
      */
-    private useStrictCurrent: boolean;
+    private useStrictCurrent: boolean = false;
 
     /**
-     * Keeps track of the the current depth of nested template string backticks.
+     * Keeps track of the current depth of nested template string backticks.
      * E.g. after the X in:
      *
      * `${a ? `${X
@@ -36,6 +36,16 @@ export abstract class TypeScriptLexerBase extends Lexer {
      * plain CloseBrace, or one that closes an expression inside a template string.
      */
     private templateDepth = 0;
+
+    /**
+     * Keeps track of the depth of open- and close-braces. Used for expressions like:
+     *
+     * `${[1, 2, 3].map(x => { return x * 2;}).join("")}`
+     *
+     * where the '}' from `return x * 2;}` should not become a `TemplateCloseBrace`
+     * token but rather a `CloseBrace` token.
+     */
+    private bracesDepth = 0;
 
     constructor(input: CharStream) {
         super(input);
@@ -58,8 +68,12 @@ export abstract class TypeScriptLexerBase extends Lexer {
         return this.useStrictCurrent;
     }
 
+    public StartTemplateString() {
+        this.bracesDepth = 0;
+    }
+
     public IsInTemplateString(): boolean {
-        return this.templateDepth > 0;
+        return this.templateDepth > 0 && this.bracesDepth == 0;
     }
 
     /**
@@ -84,12 +98,14 @@ export abstract class TypeScriptLexerBase extends Lexer {
     }
 
     protected ProcessOpenBrace() {
+        this.bracesDepth++;
         this.useStrictCurrent = (this.scopeStrictModes.length > 0 && this.scopeStrictModes[this.scopeStrictModes.length - 1]) || this.UseStrictDefault;
         this.scopeStrictModes.push(this.useStrictCurrent);
     }
 
     protected ProcessCloseBrace() {
-        this.useStrictCurrent = this.scopeStrictModes.length > 0 ? this.scopeStrictModes.pop() : this.UseStrictDefault;
+        this.bracesDepth--;
+        this.useStrictCurrent = this.scopeStrictModes.length > 0 ? this.scopeStrictModes.pop()! : this.UseStrictDefault;
     }
 
     protected ProcessStringLiteral() {
