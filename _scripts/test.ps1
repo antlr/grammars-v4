@@ -21,7 +21,7 @@ function Get-GrammarSkip {
         Write-Host "Intentionally skipping grammar $Grammar target $Target."
         return $True
     }
-    $desc_targets = dotnet trxml2 "$Grammar/desc.xml" | Select-String '/desc/targets'
+    $desc_targets = dotnet trash xml2 "$Grammar/desc.xml" | Select-String '/desc/targets'
     if ($LASTEXITCODE -ne 0) {
         Write-Host "The desc.xml for $testname is malformed. Skipping."
         return $True
@@ -70,8 +70,8 @@ function Test-Grammar {
 
     Write-Host "Building"
     # codegen
-    Write-Host "dotnet trgen -t $Target --template-sources-directory $templates"
-    $(& dotnet trgen -t $Target --template-sources-directory $templates; $status = $LASTEXITCODE) | Write-Host
+    Write-Host "dotnet trash gen -t $Target --template-sources-directory $templates"
+    $(& dotnet trash gen -t $Target --template-sources-directory $templates; $status = $LASTEXITCODE) | Write-Host
     if ($status -ne 0) {
         $failStage = [FailStage]::CodeGeneration
         Write-Host "trgen failed" -ForegroundColor Red

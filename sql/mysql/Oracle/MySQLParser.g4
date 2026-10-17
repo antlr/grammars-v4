@@ -163,7 +163,7 @@ alterDatabaseOption
 alterEvent
     : definerClause? EVENT_SYMBOL eventRef (ON_SYMBOL SCHEDULE_SYMBOL schedule)? (
         ON_SYMBOL COMPLETION_SYMBOL NOT_SYMBOL? PRESERVE_SYMBOL
-    )? (RENAME_SYMBOL TO_SYMBOL identifier)? (
+    )? (RENAME_SYMBOL TO_SYMBOL qualifiedIdentifier)? (
         ENABLE_SYMBOL
         | DISABLE_SYMBOL (ON_SYMBOL replica)?
     )? (COMMENT_SYMBOL textLiteral)? (DO_SYMBOL compoundStatement)?
@@ -2244,7 +2244,7 @@ tableAdministrationStatement
         QUICK_SYMBOL
         | EXTENDED_SYMBOL
     )?
-    | type = OPTIMIZE_SYMBOL noWriteToBinLog? TABLE_SYMBOL tableRefList
+    | type = OPTIMIZE_SYMBOL noWriteToBinLog? (TABLE_SYMBOL | TABLES_SYMBOL) tableRefList
     | type = REPAIR_SYMBOL noWriteToBinLog? TABLE_SYMBOL tableRefList repairType*
     ;
 
@@ -2355,7 +2355,7 @@ optionValueListContinued
 
 optionValueNoOptionType
     : lvalueVariable equal setExprOrDefault
-    | charsetClause
+    | charset (charsetName | DEFAULT_SYMBOL)
     | userVariable equal expr
     | AT_AT_SIGN_SYMBOL setVarIdentType? lvalueVariable equal setExprOrDefault
     | NAMES_SYMBOL (
@@ -3056,7 +3056,7 @@ runtimeFunctionCall
     | HOUR_SYMBOL exprWithParentheses
     | INSERT_SYMBOL OPEN_PAR_SYMBOL expr COMMA_SYMBOL expr COMMA_SYMBOL expr COMMA_SYMBOL expr CLOSE_PAR_SYMBOL
     | INTERVAL_SYMBOL OPEN_PAR_SYMBOL expr (COMMA_SYMBOL expr)+ CLOSE_PAR_SYMBOL
-    | JSON_VALUE_SYMBOL OPEN_PAR_SYMBOL simpleExpr COMMA_SYMBOL textLiteral returningType? onEmptyOrError CLOSE_PAR_SYMBOL
+    | JSON_VALUE_SYMBOL OPEN_PAR_SYMBOL simpleExpr COMMA_SYMBOL textLiteral returningType? onEmptyOrError? CLOSE_PAR_SYMBOL
     | LEFT_SYMBOL OPEN_PAR_SYMBOL expr COMMA_SYMBOL expr CLOSE_PAR_SYMBOL
     | MINUTE_SYMBOL exprWithParentheses
     | MONTH_SYMBOL exprWithParentheses
@@ -3839,12 +3839,10 @@ functionDatetimePrecision
 charsetName
     : textOrIdentifier
     | BINARY_SYMBOL
-    | {this.isServerVersionLt80011()}? DEFAULT_SYMBOL
     ;
 
 collationName
     : textOrIdentifier
-    | {this.isServerVersionLt80011()}? DEFAULT_SYMBOL
     | {this.isServerVersionGe80018()}? BINARY_SYMBOL
     ;
 

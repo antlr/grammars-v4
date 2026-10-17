@@ -11,9 +11,9 @@ export abstract class LuaParserBase extends Parser {
     IsFunctionCall(): boolean
     {
         var la = this.inputStream.LT(1);
-        if (la.type !== LuaParser.NAME) return false;
+        if (la === null || la.type !== LuaParser.NAME) return false;
 	la = this.inputStream.LT(2);
-        if (la.type === LuaParser.OP) return false;
+        if (la === null || la.type === LuaParser.OP) return false;
         return true;
     }
 }

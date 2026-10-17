@@ -1,0 +1,20 @@
+digraph ATN {
+rankdir=LR;
+s507[fontsize=11, label="507", shape=doublecircle, fixedsize=true, width=.6];
+s2817[fontsize=11,label="2817", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2818[fontsize=11,label="2818", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2819[fontsize=11,label="2819", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2820[fontsize=11,label="2820", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2821[fontsize=11,label="2821", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2822[fontsize=11,label="2822", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2823[fontsize=11,label="2823", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s506[fontsize=11,label="506", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s506 -> s2817 [fontname="Times-Italic", label="&epsilon;"];
+s2817 -> s2818 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'using'", arrowhead = normal];
+s2818 -> s2819 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<identifier>", arrowhead = normal];
+s2819 -> s2820 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'='", arrowhead = normal];
+s2820 -> s2821 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<namespace_or_type_name>", arrowhead = normal];
+s2821 -> s2822 [fontsize=11, fontname="Courier", arrowsize=.7, label = "';'", arrowhead = normal];
+s2822 -> s2823 [fontsize=11, fontname="Courier", arrowsize=.7, label = "action_253:-1", arrowhead = normal];
+s2823 -> s507 [fontname="Times-Italic", label="&epsilon;"];
+}

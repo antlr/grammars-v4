@@ -10,11 +10,23 @@ import java.util.Set;
  */
 public abstract class GoParserBase extends Parser
 {
-    private static final boolean debug = false;
+    private static boolean debug = false;
     private Set<String> table = new HashSet<>();
 
     protected GoParserBase(TokenStream input) {
         super(input);
+	String cmdLine = System.getProperty("sun.java.command");
+	String[] args = cmdLine != null ? cmdLine.split("\\s+") : new String[0];
+	debug = hasArg(args, "--debug");
+    }
+
+    private static boolean hasArg(String[] args, String arg) {
+	for (String a : args) {
+	    if (a.toLowerCase().contains(arg.toLowerCase())) {
+		return true;
+	    }
+	}
+	return false;
     }
 
     protected void myreset()
@@ -53,16 +65,45 @@ public abstract class GoParserBase extends Parser
             String name = packageName.getText();
             if (debug) System.out.println("Entering " + name);
             table.add(name);
-        } else {
-            String name = importSpec.importPath().getText();
-            name = name.replace("\"", "");
-            name = name.replace("\\", "/");
-            String[] pathArr = name.split("/");
-            String[] fileArr = pathArr[pathArr.length - 1].split("\\.");
-            String fileName = fileArr[fileArr.length - 1];
-            if (debug) System.out.println("Entering " + fileName);
-            table.add(fileName);
+            return;
         }
+        GoParser.ImportPathContext importPath = importSpec.importPath();
+        if (importPath == null) {
+            return;
+        }
+        String name = importPath.getText();
+        if (debug) System.out.println("import path " + name);
+        name = name.replace("\"", "");
+        if (name.isEmpty()) {
+            return;
+        }
+        name = name.replace("\\", "/");
+        String[] pathArr = name.split("/");
+        if (pathArr.length == 0) {
+            return;
+        }
+        String lastComponent = pathArr[pathArr.length - 1];
+        if (lastComponent.isEmpty()) {
+            return;
+        }
+        // Handle special cases like "." and ".."
+        if (lastComponent.equals(".") || lastComponent.equals("..")) {
+            return;
+        }
+        String[] fileArr = lastComponent.split("\\.");
+        // Guard against empty array (can happen if lastComponent is all dots)
+        if (fileArr.length == 0) {
+            table.add(lastComponent);
+            if (debug) System.out.println("Entering " + lastComponent);
+            return;
+        }
+        String fileName = fileArr[fileArr.length - 1];
+        if (fileName.isEmpty()) {
+            // Fall back to lastComponent if split resulted in empty string
+            fileName = lastComponent;
+        }
+        if (debug) System.out.println("Entering " + fileName);
+        table.add(fileName);
     }
 
     public boolean isOperand() {
@@ -123,6 +164,32 @@ public abstract class GoParserBase extends Parser
         var la = stream.LT(1);
         var result = la.getType() != GoLexer.IDENTIFIER;
         if (debug) System.out.println("isConversion Returning " + result + " for " + la);
+        return result;
+    }
+
+    // Built-in functions that take a type as first argument
+    private static final Set<String> BUILTIN_TYPE_FUNCTIONS = Set.of("make", "new");
+
+    // Check if we're in a call to a built-in function that takes a type as first argument.
+    // Called after L_PAREN has been matched in the arguments rule.
+    public boolean isTypeArgument() {
+        BufferedTokenStream stream = (BufferedTokenStream)_input;
+        // After matching L_PAREN, LT(-1) is '(' and LT(-2) is the token before it
+        Token funcToken = stream.LT(-2);
+        if (funcToken == null || funcToken.getType() != GoParser.IDENTIFIER) {
+            if (debug) System.out.println("isTypeArgument Returning false - no identifier before (");
+            return false;
+        }
+        boolean result = BUILTIN_TYPE_FUNCTIONS.contains(funcToken.getText());
+        if (debug) System.out.println("isTypeArgument Returning " + result + " for " + funcToken.getText());
+        return result;
+    }
+
+    // Check if we're NOT in a call to a built-in function that takes a type.
+    // This is the inverse of isTypeArgument for the expressionList alternative.
+    public boolean isExpressionArgument() {
+        boolean result = !isTypeArgument();
+        if (debug) System.out.println("isExpressionArgument Returning " + result);
         return result;
     }
 }

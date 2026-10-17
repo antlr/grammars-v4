@@ -1,0 +1,138 @@
+-- BXE2010.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that a public child library unit of a remote call 
+--      interface library unit must itself have a Remote_Call_Interface
+--      pragma.
+--      Check that a private child library unit of a remote call
+--      interface library unit are not subjected to the restrictions
+--      of an RCI unit unless the private child unit contains a 
+--      Remote_Call_Interface pragma.
+--      Check the parameterized form of the pragma to see that a library 
+--      unit name can be specified and if it is specified, it must
+--      correspond to the library unit in which it is contained.
+--      Check that a public child library unit of a normal package
+--      cannot be a remote call interface unit.
+--      Check that a public child library unit of a pure package
+--      can be a remote call interface unit.
+--
+-- TEST DESCRIPTION:
+--      This test declares a remote call interface unit, a normal package,
+--      and a pure package and a selection of child units to go with 
+--      these different parents.  The units that should compile without
+--      error are so noted.
+--
+-- APPLICABILITY CRITERIA:
+--      This test applies only to implementations supporting the
+--      Distribution Annex and the Remote_Call_Interface pragma.
+--
+--
+-- CHANGE HISTORY:
+--     11 MAR 95   SAIC    Initial version
+--     23 OCT 95   SAIC    Incorporate Reviewer comments.
+--                         Added pragma Remote_Call_Interface to Bad_Child_1
+--     26 FEB 97   PWB.CTA Added pragma Pure to BXE2010_Pure
+--
+--!
+
+package BXE2010 is
+  -- this package should compile without error.
+  pragma Remote_Call_Interface;
+  procedure Simple_Remote_Call (X, Y : in Integer); 
+end BXE2010;
+
+
+package BXE2010.BXE2010_Ok_Child_1 is
+  -- this package should compile without error.
+  pragma Remote_Call_Interface (BXE2010.BXE2010_Ok_Child_1);
+  procedure A_Remote_Proc;
+end BXE2010.BXE2010_Ok_Child_1;
+
+
+private package BXE2010.BXE2010_Ok_Child_2 is
+  -- no restrictions on what can be in this unit
+  task Some_Task_Object;                                           -- OK.
+  X : Integer;                                                     -- OK.
+end BXE2010.BXE2010_Ok_Child_2;
+
+
+private package BXE2010.BXE2010_Ok_Child_3 is
+  pragma Remote_Call_Interface (BXE2010.BXE2010_Ok_Child_3);       -- OK.
+        -- private child can be a RCI unit but can only be called from
+        -- units within its own partition since those are the only
+        -- units that can see it.
+  procedure A_Remote_Proc;
+end BXE2010.BXE2010_Ok_Child_3;
+
+
+package BXE2010.BXE2010_Bad_Child_1 is   
+  pragma Remote_Call_Interface (BXE2010);                          -- ERROR:
+                      -- The name specified in the pragma does not match the 
+                      -- library unit name    
+  pragma All_Calls_Remote (BXE2010);                               -- ERROR:
+                      -- The name specified in the pragma does not match the 
+                      -- library unit name    
+  pragma Remote_Call_Interface;
+  procedure A_Remote_Proc;
+end BXE2010.BXE2010_Bad_Child_1;
+
+
+package BXE2010.BXE2010_Bad_Child_2 is                             -- ERROR:
+             -- this package does not contain a Remote_Call_Interface pragma
+             -- but since it is a public child of a Remote_Call_Interface
+             -- unit it is required to have one.
+  procedure A_Normal_Proc;
+end BXE2010.BXE2010_Bad_Child_2;
+
+--------------------------------------------------------------------------
+
+package BXE2010_Normal is
+  -- this package should compile without error.
+  An_Object : Integer;
+end BXE2010_Normal;
+
+
+package BXE2010_Normal.BXE2010_Illegal_RCI is
+  pragma Remote_Call_Interface;                                    -- ERROR:
+               -- This package depends upon a normal package so it cannot be
+               -- an RCI unit.
+  procedure Bletch (X : Integer);
+end BXE2010_Normal.BXE2010_Illegal_RCI;
+
+--------------------------------------------------------------------------
+
+package BXE2010_Pure is
+pragma Pure;
+  -- this package should compile without error.
+  type PT is range 0 .. 5;
+end BXE2010_Pure;
+
+
+package BXE2010_Pure.BXE2010_Legal_RCI is
+  -- this package should compile without error.
+  pragma Remote_Call_Interface;
+  procedure Uses_PT (X : BXE2010_Pure.PT);
+end BXE2010_Pure.BXE2010_Legal_RCI;

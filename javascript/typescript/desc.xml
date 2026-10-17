@@ -3,4 +3,5 @@
    <antlr-version>^4.7</antlr-version>
    <targets>CSharp;Java;TypeScript</targets>
    <inputs>examples/*.ts</inputs>
+   <entry-point>program</entry-point>
 </desc>

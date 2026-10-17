@@ -43,17 +43,21 @@ options {
 }
 
 prog
-    : EOL* ((line EOL)* line EOL*)? EOF
+    : EOL* ((line EOL+)* line EOL*)? EOF
     ;
 
 line
-    : lbl? (instruction | directive) comment?
+    : lbl? (instruction | directive | macrocall) ('!' (instruction | directive | macrocall)?)* comment?
     | lbl comment?
     | comment
     ;
 
 instruction
     : opcode expressionlist?
+    ;
+
+macrocall
+    : name expressionlist?
     ;
 
 opcode
@@ -65,7 +69,7 @@ register_
     ;
 
 directive
-    : argument? assemblerdirective expressionlist
+    : argument? assemblerdirective expressionlist?
     ;
 
 assemblerdirective
@@ -82,18 +86,54 @@ expressionlist
 
 label
     : name
+    | register_
+    | assemblerdirective
     ;
 
 expression
-    : multiplyingExpression (('+' | '-') multiplyingExpression)*
+    : orExpression (('=' | '<>' | '<' | '>' | '<=' | '>=' | OP_GT | OP_LT | OP_GE | OP_LE | OP_NE | OP_EQ) orExpression)?
+    ;
+
+orExpression
+    : xorExpression (OP_OR xorExpression)*
+    ;
+
+xorExpression
+    : andExpression (OP_XOR andExpression)*
+    ;
+
+andExpression
+    : addExpression (OP_AND addExpression)*
+    ;
+
+addExpression
+    : shiftExpression (('+' | '-') shiftExpression)*
+    ;
+
+shiftExpression
+    : modExpression ((OP_SHL | OP_SHR) modExpression)*
+    ;
+
+modExpression
+    : multiplyingExpression (OP_MOD multiplyingExpression)*
     ;
 
 multiplyingExpression
-    : argument (('*' | '/') argument)*
+    : unaryExpression (('*' | '/') unaryExpression)*
+    ;
+
+unaryExpression
+    : OP_NOT unaryExpression
+    | OP_HIGH unaryExpression
+    | OP_LOW unaryExpression
+    | '-' unaryExpression
+    | '+' unaryExpression
+    | argument
     ;
 
 argument
     : number
+    | opcode
     | register_
     | dollar
     | name
@@ -129,9 +169,42 @@ ASSEMBLER_DIRECTIVE
     | 'DW'
     | 'DS'
     | 'IF'
+    | 'ELSE'
     | 'ENDIF'
     | 'SET'
+    | 'TITLE'
+    | '$TITLE'
+    | 'NAME'
+    | 'CSEG'
+    | 'DSEG'
+    | 'ASEG'
+    | 'PUBLIC'
+    | 'EXTRN'
+    | 'MACRO'
+    | 'ENDM'
+    | 'EXITM'
+    | 'REPT'
+    | 'MACLIB'
     ;
+
+// Expression operators — defined before NAME so keywords take precedence over identifiers.
+// Longest-match still ensures e.g. SHLD, ORI, ANA are lexed as OPCODE, not SHL+D, OR+I, etc.
+
+OP_NOT : 'NOT' ;
+OP_HIGH: 'HIGH';
+OP_LOW : 'LOW' ;
+OP_AND : 'AND' ;
+OP_OR  : 'OR'  ;
+OP_XOR : 'XOR' ;
+OP_SHL : 'SHL' ;
+OP_SHR : 'SHR' ;
+OP_MOD : 'MOD' ;
+OP_GT  : 'GT'  ;
+OP_LT  : 'LT'  ;
+OP_GE  : 'GE'  ;
+OP_LE  : 'LE'  ;
+OP_NE  : 'NE'  ;
+OP_EQ  : 'EQ'  ;
 
 REGISTER
     : 'A'
@@ -226,20 +299,25 @@ OPCODE
     | 'RM'
     ;
 
+// Names may start with a letter or '?' (for PL/I-style external symbols like ?bdos).
+// '$' is allowed internally (e.g. sta$ret, rsx$chain) but not as the first character,
+// which keeps standalone '$' (current-address) unambiguous.
+
 NAME
-    : [A-Z] [A-Z0-9."]*
+    : [A-Z?@] [A-Z0-9.$?@"]*
     ;
 
 NUMBER
-    : '$'? [0-9A-F]+ 'H'?
+    : '$'? [0-9A-F] [0-9A-F$]* 'H'?
     ;
 
 COMMENT
     : ';' ~ [\r\n]*
+    | '*' '*'+ ~ [\r\n]*
     ;
 
 STRING
-    : '\u0027' ~'\u0027'* '\u0027'
+    : '\u0027' ('\u0027\u0027' | ~'\u0027')* '\u0027'
     ;
 
 EOL
@@ -248,4 +326,8 @@ EOL
 
 WS
     : [ \t] -> skip
+    ;
+
+ARTIFACT
+    : [\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\uffff] -> skip
     ;

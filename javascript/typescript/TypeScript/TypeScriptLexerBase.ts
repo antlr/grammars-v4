@@ -12,19 +12,19 @@ export default abstract class TypeScriptLexerBase extends Lexer {
      */
     private readonly scopeStrictModes: boolean[] = [];
 
-    private lastToken: Token;
+    private lastToken: Token | null = null;
 
     /**
      * Default value of strict mode
      * Can be defined externally by setUseStrictDefault
      */
-    private useStrictDefault: boolean;
+    private useStrictDefault: boolean = false;
 
     /**
      * Current value of strict mode
      * Can be defined during parsing, see StringFunctions.js and StringGlobal.js samples
      */
-    private useStrictCurrent: boolean;
+    private useStrictCurrent: boolean = false;
 
     /**
      * Keeps track of the current depth of nested template string backticks.
@@ -105,7 +105,7 @@ export default abstract class TypeScriptLexerBase extends Lexer {
 
     protected ProcessCloseBrace() {
         this.bracesDepth--;
-        this.useStrictCurrent = this.scopeStrictModes.length > 0 ? this.scopeStrictModes.pop() : this.UseStrictDefault;
+        this.useStrictCurrent = this.scopeStrictModes.length > 0 ? this.scopeStrictModes.pop()! : this.UseStrictDefault;
     }
 
     protected ProcessStringLiteral() {
