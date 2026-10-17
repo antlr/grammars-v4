@@ -394,7 +394,8 @@
 				<module>turtle</module>
 				<module>turtle-doc</module>
 				<module>unicode</module>
-				<module>unreal_angelscript</module>
+                <module>unlambda</module>
+                <module>unreal_angelscript</module>
 				<module>upnp</module>
 				<module>url</module>
 				<module>useragent</module>

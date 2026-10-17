@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2020, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -40,19 +40,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar unlambda;
 
 prog
-   : function+
+   : function+ EOF
    ;
-
+   // In Unlambda, every multi-argument primitive (k, s, d, c, ...) is a single,
+   
+   // atomic term; application is always explicit via the backtick operator,
+   
+   // which applies its first function argument to its second.
+   
 function
    : apply
-   | constant_function
-   | substitution_first_partial
-   | substituted_application
    | identity
    | void_
    | call
    | delay
-   | promise
+   | constant
+   | substitution
    | print
    | carriage_return
    | exit
@@ -60,19 +63,15 @@ function
    ;
 
 apply
-   : '`' function
+   : '`' function function
    ;
 
-constant_function
-   : 'k' function
+constant
+   : CONSTANT
    ;
 
-substitution_first_partial
-   : 's' function
-   ;
-
-substituted_application
-   : 's' function function
+substitution
+   : SUBSTITUTION
    ;
 
 identity
@@ -91,12 +90,8 @@ delay
    : DELAY
    ;
 
-promise
-   : 'd' function
-   ;
-
 print
-   : '.' CHAR
+   : PRINTCHAR
    ;
 
 carriage_return
@@ -127,6 +122,14 @@ DELAY
    : 'd'
    ;
 
+CONSTANT
+   : 'k'
+   ;
+
+SUBSTITUTION
+   : 's'
+   ;
+
 CARRIAGE_RETURN
    : 'r'
    ;
@@ -139,8 +142,8 @@ READ
    : '@'
    ;
 
-CHAR
-   : [0-9a-zA-Z ]
+PRINTCHAR
+   : '.' .
    ;
 
 WS
