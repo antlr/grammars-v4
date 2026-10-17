@@ -9,3 +9,7 @@ McKeeman Form is a notation for expressing grammars. It was proposed by Bill McK
 Document: https://www.crockford.com/mckeeman.html
 
 `McKeemanForm.g4` is ported from original McKeeman Form format (`examples/mckeeman.txt`) with some modification (use `?`, remove some recursion) to reduce parse tree depth.
+
+## Reference
+* [pldb](http://pldb.info/concepts/mckeeman-form)
+

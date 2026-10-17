@@ -21,3 +21,5 @@ INSERT INTO "students"("id", "address", "name", "[age]", "age", "colu'mn1", "col
     (740, 'hongkong','alice',null,32,'','',172);
 
 INSERT INTO test(a,b,c,d) values(1,['listtext1','listtext2'],{'settext1','settext2'},{'mapkey1':'mapvale2','mapkey2':'mapvalue2'});
+
+INSERT INTO PERSON (id, name) VALUES (uuid(), 'fullname');

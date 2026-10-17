@@ -38,7 +38,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>statement</entryPoint>
+					<entryPoint>file_</entryPoint>
 					<grammarName>matlab</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>

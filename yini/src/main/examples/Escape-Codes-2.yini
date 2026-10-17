@@ -1,0 +1,16 @@
+// Escape Sequences: Hex, Unicode, Octal
+
+// Hexadecimal escape: \xNN (2-digit hex)
+hexChars = C"\x48\x65\x6C\x6C\x6F"  // "Hello"
+
+// Unicode escape (4-digit): \uNNNN
+unicodeChars = C"\u2603"            // Unicode snowman ☃
+
+// Unicode escape (8-digit): \UNNNNNNNN
+unicodeLongs = C"\U0001F984"        // Unicode unicorn 🦄
+
+// Octal escape: \oOOO (3-digit octal)
+octalChars = C"\o110\o145\o154\o154\o157" // "Hello"
+
+// \0 inserts a null byte (ASCII 0) into the string
+strWithNullByte = C"This string contains a null byte \0 in the middle."
