@@ -48,14 +48,14 @@ main
 
 prcs
    : pid actuals?
-   | action '.' prcs
+   | action_ '.' prcs
    | 'wait' '[' exp ']' prcs ('||' prcs)?
    | 'if' exp 'then' prcs 'else' prcs 'fi'
    | '<' prcslist? '>'
    | '(' prcs ')'
    ;
 
-action
+action_
    : ID '?'
    | ID '!'
    | ID '?' ID
