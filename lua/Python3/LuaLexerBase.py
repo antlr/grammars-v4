@@ -23,11 +23,11 @@ class LuaLexerBase(Lexer):
                 return
 
         while cs.LA(1) != 10 and cs.LA(1) != -1:  # '\n'
-            cs.consume()
+            self._interp.consume(cs)
 
     def read_long_string(self, cs:InputStream, sep:int):
         done = False
-        cs.consume()
+        self._interp.consume(cs)
 
         while not done:
             c = cs.LA(1)
@@ -35,21 +35,21 @@ class LuaLexerBase(Lexer):
                 done = True
             elif c == 93:  # ']'
                 if self.skip_sep(cs) == sep:
-                    cs.consume()
+                    self._interp.consume(cs)
                     done = True
             else:
                 if cs.LA(1) == -1:
                     done = True
                 else:
-                    cs.consume()
+                    self._interp.consume(cs)
 
     def skip_sep(self, cs:InputStream):
         count = 0
         s = cs.LA(1)
-        cs.consume()
+        self._interp.consume(cs)
 
         while cs.LA(1) == 61:  # '='
-            cs.consume()
+            self._interp.consume(cs)
             count += 1
 
         if cs.LA(1) == s:

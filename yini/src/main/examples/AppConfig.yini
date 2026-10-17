@@ -1,0 +1,59 @@
+/*
+    Example includes:
+    - Top-level and nested sections via `^`, `^^`, and `^^^`.
+    - Booleans via `YES` / `NO`.
+    - Strings with quotes.
+    - Lists via `:` and comma-separated values.
+    - `/END` line with a comment.
+*/
+
+^ AppConfig
+
+^ General
+AppName = "YINI Editor"
+Version = 1.0
+IsPortable = YES
+DefaultPaths: "C:\Program Files", "D:\Apps", "E:\Tools"
+MaxRecentFiles = 15
+
+^ UI
+Theme = "Dark"
+FontSize = 14
+Languages: "en-US", "fr-FR", "de-DE"
+
+    ^^ Toolbar
+    Visible = YES
+    Position = "Top"
+
+        ^^^ ToolButton
+        Id = "btnNew"
+        Label = "New"
+        Icon = "icons/new.png"
+        OnClick = "NewFile()"
+
+        ^^^ ToolButton
+        Id = "btnOpen"
+        Label = "Open"
+        Icon = "icons/open.png"
+        OnClick = "OpenFile()"
+
+        ^^^ ToolButton
+        Id = "btnSave"
+        Label = "Save"
+        Icon = "icons/save.png"
+        OnClick = "SaveFile()"
+
+    ^^ Sidebar
+    Visible = NO
+    Tabs: "Explorer", "Search", "Extensions"
+
+^ Network
+UseProxy = YES
+ProxyAddress = "192.168.0.100"
+ProxyPort = 8080
+TimeoutSeconds = 30
+
+^ Advanced
+EnableLogs = YES
+LogLevel = "DEBUG"
+IgnoredWarnings: 1001, 1002, 1050, 1100

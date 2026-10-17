@@ -1,0 +1,62 @@
+;
+; RESBDOS3 GENERATION
+;
+device conout=crt
+vax $$as\sd mason.cpm30.sources\ar
+vax resbdos.asm $$stran
+device conout=crt,lpt
+rmac resbdos
+xref resbdos
+link resbdos3=resbdos[os,$$sz]
+device conout=crt
+vax $$as\sd mason.cpm30.listing\ar
+vax resbdos.xrf $$stran
+device conout=crt,lpt
+era *.prn
+<y
+era resbdos.rel
+era *.sym
+<y
+era *.xrf
+<y
+;
+; SID Generation
+;
+device conout=crt
+vax $$as\sd mason.cpm30.sources\ar
+vax prs0mov.asm $$stran
+vax prs1asm.asm $$stran
+vax prs2mon.asm $$stran 
+device conout=crt,lpt
+mac prs1asm
+mac prs2mon
+xref prs1asm
+xref prs2mon
+ren prs1asm0.hex = prs1asm.hex
+ren prs2mon0.hex = prs2mon.hex
+mac prs1asm  $$pz-s+r
+mac prs2mon  $$pz-s+r
+ren prs1asm1.hex = prs1asm.hex
+ren prs2mon1.hex = prs2mon.hex
+mac prs0mov
+xref prs0mov
+copy relprsid.hex = prs1asm0.hex[i],prs2mon0.hex,prs1asm1.hex[i],prs2mon1.hex
+genmod relprsid.hex relprsid.com
+sid relprsid.com
+<rprs0mov.hex
+<wsid.com,100,1fff
+<g0
+device conout=crt
+vax $$as\sd mason.cpm30.listing\ar
+vax prs0mov.xrf $$stran
+vax prs1asm.xrf $$starn
+vax prs2mon.xrf $$Stran
+device counout=crt,lpt
+era *.prn
+<y
+era *.hex
+<y
+era *.sym
+<y
+cpm3pli1
+

@@ -23,16 +23,24 @@ import org.antlr.v4.runtime.tree.*;
 public class Test {
 
     static boolean tee = false;
+    static String output_dir = null;
     static boolean show_profile = false;
     static boolean show_tree = false;
     static boolean show_tokens = false;
     static boolean show_trace = false;
     static boolean show_diagnostic = false;
     static int error_code = 0;
-    static java.nio.charset.Charset charset = null;
+    static String file_encoding = "<file_encoding>";
+    static boolean binary = <binary>;
     static int string_instance = 0;
     static String prefix = "";
     static boolean quiet = false;
+    static boolean perf = false;
+    static boolean per_file = false;
+    static long total_tokens = 0;
+    static double total_parse_seconds = 0;
+    static long first_file_tokens = 0;
+    static double first_file_parse_seconds = 0;
 
     public static void main(String[] args) throws  FileNotFoundException, IOException
     {
@@ -68,9 +76,14 @@ public class Test {
             {
                 tee = true;
             }
+            else if (args[i].equals("-o"))
+            {
+                output_dir = args[++i];
+                tee = true;
+            }
             else if (args[i].equals("-encoding"))
             {
-                charset = java.nio.charset.Charset.forName(args[++i]);
+                file_encoding = args[++i];
             }
             else if (args[i].equals("-x"))
             {
@@ -90,10 +103,22 @@ public class Test {
             {
                 quiet = true;
             }
+            else if (args[i].equals("--perf"))
+            {
+                perf = true;
+            }
+            else if (args[i].equals("--per-file"))
+            {
+                per_file = true;
+            }
             else if (args[i].equals("-trace"))
             {
                 show_trace = true;
                 continue;
+            }
+            else if (args[i].charAt(0) == '-')
+            {
+                // Ignore unknown option.
             }
             else {
                 inputs.add(args[i]);
@@ -117,7 +142,29 @@ public class Test {
             }
             Instant finish = Instant.now();
             long timeElapsed = Duration.between(start, finish).toMillis();
-            if (!quiet) System.err.println(prefix + "Total Time: " + (timeElapsed * 1.0) / 1000.0);
+            if (!quiet) {
+                double overall_seconds = (timeElapsed * 1.0) / 1000.0;
+                if (!perf) {
+                    System.err.println(prefix + "TT: " + overall_seconds);
+                }
+                else {
+                long warm_tokens = total_tokens - first_file_tokens;
+                double warm_seconds = total_parse_seconds - first_file_parse_seconds;
+                String warm_tps = (inputs.size() > 1 && warm_seconds > 0)
+                    ? Long.toString((long)(warm_tokens / warm_seconds))
+                    : "n.a.";
+                double first_tps = first_file_parse_seconds > 0 ? (first_file_tokens / first_file_parse_seconds) : 0;
+                String speedup = (inputs.size() > 1 && warm_seconds > 0 && first_tps > 0)
+                    ? String.format("%.2f", (warm_tokens / warm_seconds) / first_tps)
+                    : "n.a.";
+                System.err.println(prefix + "PT: " + total_parse_seconds);
+                System.err.println(prefix + "OT: " + (overall_seconds - total_parse_seconds));
+                System.err.println(prefix + "TT: " + overall_seconds);
+                System.err.println(prefix + "PR: " + (long)(total_tokens / total_parse_seconds));
+                System.err.println(prefix + "Post-warmup PR: " + warm_tps);
+                System.err.println(prefix + "Post-warmup speed up: " + speedup);
+                }
+            }
         }
         java.lang.System.exit(error_code);
     }
@@ -135,14 +182,17 @@ public class Test {
     static void ParseFilename(String input, int row_number) throws IOException
     {
         CharStream str = null;
-        if (charset == null)
+        if (file_encoding == null || file_encoding == "")
             str = CharStreams.fromFileName(input);
-        else
+        else {
+            var charset = java.nio.charset.Charset.forName(file_encoding);
             str = CharStreams.fromFileName(input, charset);
+        }
         DoParse(str, input, row_number);
     }
 
     static void DoParse(CharStream str, String input_name, int row_number) {
+        if (binary) str = new BinaryCharStream(str);
         <lexer_name> lexer = new <lexer_name>(str);
         if (show_tokens)
         {
@@ -162,9 +212,24 @@ public class Test {
         }
         var tokens = new CommonTokenStream(lexer);
         <parser_name> parser = new <parser_name>(tokens);
+        String out_name = input_name;
+        if (output_dir != null) {
+            File abs = new File(input_name).getAbsoluteFile();
+            File root = new File("../<example_dir_unix>").getAbsoluteFile();
+            String rootless;
+            try {
+                rootless = root.toPath().normalize().relativize(abs.toPath().normalize()).toString();
+                if (rootless.equals("..") || rootless.startsWith(".." + File.separator))
+                    rootless = abs.getName();
+            } catch (IllegalArgumentException ex) {
+                rootless = abs.getName();
+            }
+            out_name = new File(output_dir, rootless).getPath();
+            new File(out_name).getParentFile().mkdirs();
+        }
         PrintStream output = null;
         try {
-            output = tee ? new PrintStream(new File(input_name + ".errors")) : System.out;
+            output = tee ? new PrintStream(new File(out_name + ".errors")) : System.out;
         } catch (NullPointerException e) {
             output = System.err;
         } catch (FileNotFoundException e2) {
@@ -189,6 +254,14 @@ public class Test {
         ParseTree tree = parser.<start_symbol>();
         Instant finish = Instant.now();
         long timeElapsed = Duration.between(start, finish).toMillis();
+        double parse_seconds = (timeElapsed * 1.0) / 1000.0;
+        total_parse_seconds += parse_seconds;
+        long token_count = tokens.size();
+        total_tokens += token_count;
+        if (row_number == 0) {
+            first_file_tokens = token_count;
+            first_file_parse_seconds = parse_seconds;
+        }
         String result = "";
         if (listener_parser.had_error || listener_lexer.had_error)
         {
@@ -203,7 +276,7 @@ public class Test {
             {
                 PrintWriter treef = null;
                 try {
-                    treef = new PrintWriter(new OutputStreamWriter(new FileOutputStream(new File(input_name + ".tree")), StandardCharsets.UTF_8), true);
+                    treef = new PrintWriter(new OutputStreamWriter(new FileOutputStream(new File(out_name + ".tree")), StandardCharsets.UTF_8), true);
                     //treef = new PrintStream(new File(input_name + ".tree"));
                 } catch (NullPointerException e) {
                     treef = new PrintWriter(new OutputStreamWriter(System.out, StandardCharsets.UTF_8), true);;
@@ -217,70 +290,70 @@ public class Test {
                 System.err.println(tree.toStringTree(parser));
             }
         }
-        if (!quiet)
+        if (!quiet && per_file)
         {
-            System.err.println(prefix + "Java " + row_number + " " + input_name + " " + result + " " + (timeElapsed * 1.0) / 1000.0);
+            System.err.println(prefix + "Java " + row_number + " " + input_name + " " + result + " " + parse_seconds + " s " + token_count + " tokens " + (long)(token_count / parse_seconds) + " pr");
         }
         if (tee) output.close();
     }
 
     public static String toStringTree(Tree tree, Parser recog) {
-	StringBuilder sb = new StringBuilder();
-	String[] ruleNames = recog != null ? recog.getRuleNames() : null;
-	List\<String> ruleNamesList = ruleNames != null ? List.of(ruleNames) : null;
-	toStringTree(sb, tree, 0, ruleNamesList);
-	return sb.toString();
+        StringBuilder sb = new StringBuilder();
+        String[] ruleNames = recog != null ? recog.getRuleNames() : null;
+        List\<String> ruleNamesList = ruleNames != null ? List.of(ruleNames) : null;
+        toStringTree(sb, tree, 0, ruleNamesList);
+        return sb.toString();
     }
 
     public static void toStringTree(StringBuilder sb, Tree t, int indent, List\<String> ruleNames) {
-	String s = org.antlr.v4.runtime.misc.Utils.escapeWhitespace(getNodeText(t, ruleNames), false);
-	if (t.getChildCount() == 0) {
-	    for (int i = 0; i \< indent; ++i) sb.append(" ");
-	    sb.append(s).append(System.lineSeparator());
-	    return;
-	}
-	s = org.antlr.v4.runtime.misc.Utils.escapeWhitespace(getNodeText(t, ruleNames), false);
-	for (int i = 0; i \< indent; ++i) sb.append(' ');
-	sb.append(s).append(System.lineSeparator());
-	for (int i = 0; i \< t.getChildCount(); i++) {
-	    toStringTree(sb, t.getChild(i), indent + 1, ruleNames);
-	}
+        String s = org.antlr.v4.runtime.misc.Utils.escapeWhitespace(getNodeText(t, ruleNames), false);
+        if (t.getChildCount() == 0) {
+            for (int i = 0; i \< indent; ++i) sb.append(" ");
+            sb.append(s).append(System.lineSeparator());
+            return;
+        }
+        s = org.antlr.v4.runtime.misc.Utils.escapeWhitespace(getNodeText(t, ruleNames), false);
+        for (int i = 0; i \< indent; ++i) sb.append(' ');
+        sb.append(s).append(System.lineSeparator());
+        for (int i = 0; i \< t.getChildCount(); i++) {
+            toStringTree(sb, t.getChild(i), indent + 1, ruleNames);
+        }
     }
 
     public static String getNodeText(Tree t, Parser recog) {
-	String[] ruleNames = recog != null ? recog.getRuleNames() : null;
-	List\<String> ruleNamesList = ruleNames != null ? java.util.Arrays.asList(ruleNames) : null;
-	return getNodeText(t, ruleNamesList);
+        String[] ruleNames = recog != null ? recog.getRuleNames() : null;
+        List\<String> ruleNamesList = ruleNames != null ? java.util.Arrays.asList(ruleNames) : null;
+        return getNodeText(t, ruleNamesList);
     }
     
     public static String getNodeText(Tree t, List\<String> ruleNames) {
-	if ( ruleNames!=null ) {
-	    if ( t instanceof RuleContext ) {
-		int ruleIndex = ((RuleContext)t).getRuleContext().getRuleIndex();
-		String ruleName = ruleNames.get(ruleIndex);
-		int altNumber = ((RuleContext) t).getAltNumber();
-		if ( altNumber!=ATN.INVALID_ALT_NUMBER ) {
-		    return ruleName+":"+altNumber;
-		}
-		return ruleName;
-	    }
-	    else if ( t instanceof ErrorNode) {
-		return t.toString();
-	    }
-	    else if ( t instanceof TerminalNode) {
-		Token symbol = ((TerminalNode)t).getSymbol();
-		if (symbol != null) {
-		    String s = symbol.getText();
-		    return s;
-		}
-	    }
-	}
-		// no recog for rule names
-	Object payload = t.getPayload();
-	if ( payload instanceof Token ) {
-	    return ((Token)payload).getText();
-	}
-	return t.getPayload().toString();
+        if ( ruleNames!=null ) {
+            if ( t instanceof RuleContext ) {
+                int ruleIndex = ((RuleContext)t).getRuleContext().getRuleIndex();
+                String ruleName = ruleNames.get(ruleIndex);
+                int altNumber = ((RuleContext) t).getAltNumber();
+                if ( altNumber!=ATN.INVALID_ALT_NUMBER ) {
+                    return ruleName+":"+altNumber;
+                }
+                return ruleName;
+            }
+            else if ( t instanceof ErrorNode) {
+                return t.toString();
+            }
+            else if ( t instanceof TerminalNode) {
+                Token symbol = ((TerminalNode)t).getSymbol();
+                if (symbol != null) {
+                    String s = symbol.getText();
+                    return s;
+                }
+            }
+        }
+                // no recog for rule names
+        Object payload = t.getPayload();
+        if ( payload instanceof Token ) {
+            return ((Token)payload).getText();
+        }
+        return t.getPayload().toString();
     }
 
 }

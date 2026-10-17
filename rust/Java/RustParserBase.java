@@ -5,7 +5,11 @@ public abstract class RustParserBase extends Parser {
         super(input);
     }
 
-    public boolean next(char expect){
-        return _input.LA(1) == expect;
+    public boolean NextGT() {
+        return _input.LA(1) == RustParser.GT;
+    }
+
+    public boolean NextLT() {
+        return _input.LA(1) == RustParser.LT;
     }
 }

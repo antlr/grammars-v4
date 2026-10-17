@@ -1,0 +1,32 @@
+digraph ATN {
+rankdir=LR;
+s209[fontsize=11, label="209", shape=doublecircle, fixedsize=true, width=.6];
+s208[fontsize=11,label="208", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1584[fontsize=11,label="1584", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1585[fontsize=11,label="1585", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1586[fontsize=11,label="{&rarr;\n1586\nd=112|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1587[fontsize=11,label="&larr;\n1587", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1588[fontsize=11,label="1588", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1589[fontsize=11,label="1589", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1590[fontsize=11,label="1590", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1591[fontsize=11,label="1591", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1592[fontsize=11,label="1592", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1593[fontsize=11,label="1593", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1594[fontsize=11,label="{&rarr;\n1594\nd=113|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1595[fontsize=11,label="&larr;\n1595", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s208 -> s1594 [fontname="Times-Italic", label="&epsilon;"];
+s1594:p0 -> s1584 [fontname="Times-Italic", label="&epsilon;"];
+s1594:p1 -> s1589 [fontname="Times-Italic", label="&epsilon;"];
+s1584 -> s1586 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'{'", arrowhead = normal];
+s1589 -> s1590 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'{'", arrowhead = normal];
+s1586:p0 -> s1585 [fontname="Times-Italic", label="&epsilon;"];
+s1586:p1 -> s1587 [fontname="Times-Italic", label="&epsilon;"];
+s1590 -> s1591 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<member_declarator_list>", arrowhead = normal];
+s1585 -> s1587 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<member_declarator_list>", arrowhead = normal];
+s1587 -> s1588 [fontname="Times-Italic", label="&epsilon;"];
+s1591 -> s1592 [fontsize=11, fontname="Courier", arrowsize=.7, label = "','", arrowhead = normal];
+s1588 -> s1595 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'}'", arrowhead = normal];
+s1592 -> s1593 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'}'", arrowhead = normal];
+s1595 -> s209 [fontname="Times-Italic", label="&epsilon;"];
+s1593 -> s1595 [fontname="Times-Italic", label="&epsilon;"];
+}

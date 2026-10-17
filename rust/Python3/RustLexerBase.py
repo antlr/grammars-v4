@@ -51,13 +51,7 @@ class RustLexerBase(Lexer):
     def SOF(self):
         return self._input.LA(-1) <= 0
 
-    def next(self, expect) -> bool:
-        if isinstance(expect, str):
-            return chr(self._input.LA(1)) == expect
-        else:
-            return self._input.LA(1) == expect
-
-    def floatDotPossible(self):
+    def FloatDotPossible(self):
         next = chr(self._input.LA(1))
         # print(f'INFO: floatpossible ? {next} = {chr(next)}')
         # if isinstance(next, int):
@@ -79,7 +73,7 @@ class RustLexerBase(Lexer):
             return False
         return True
 
-    def floatLiteralPossible(self):
+    def FloatLiteralPossible(self):
         prev, current = self.token_lookbehind
         
         if prev == None or current == None:

@@ -1,0 +1,14 @@
+^ StringExample
+
+RawString = 'This is a raw string without escape sequences.'
+
+HyperString = h"This is a multi-line
+    Hyper string that trims leading and trailing spaces, 
+    and normalizes multiple spaces in between."
+
+ClassicString = c"This is a string with a newline character \n and a tab \t."
+
+TripleQuotedString = """This is a triple-quoted
+string that can span across multiple lines."""
+
+ConcatenatedString = "Hello, " + "world!"

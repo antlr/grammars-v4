@@ -34,7 +34,9 @@ SELECT SPLIT(C1,';') FROM T1;
 SELECT SPLIT_PART(C1,';',1) FROM T1;
 SELECT C1 FROM T1 WHERE NOT C2;
 SELECT C1, LAG(C1) OVER (PARTITION BY C2);
+SELECT C1, LAG(C1, 3) OVER (PARTITION BY C2);
 SELECT C1, LEAD(C1,1,2) OVER (PARTITION BY C2);
+SELECT C1, LEAD(C1, 2) OVER (PARTITION BY C2);
 SELECT NVL2(C1, 1, 2);
 SELECT * FROM monthly_sales PIVOT(SUM(amount) FOR MONTH IN ('JAN', 'FEB', 'MAR', 'APR')) AS p (EMP_ID_renamed, JAN, FEB, MAR, APR) ORDER BY EMP_ID_renamed;
 SELECT * FROM monthly_sales PIVOT(SUM(amount) FOR MONTH IN ('JAN', 'FEB', 'MAR', 'APR')) AS p ORDER BY EMP_ID_renamed;
@@ -132,3 +134,44 @@ select count(t.*) as ca from t9 as t;
 SELECT a.* EXCLUDE (col1, col2), b.* EXCLUDE col3
 FROM t1 as a
 JOIN t2 as b USING (col5, col6);
+
+select * from t1
+union all by name
+select * from t2;
+
+select * from t1
+union by name
+select * from t2;
+
+select *
+from t
+where c1 is distinct from c2;
+
+select *
+from t
+where c1 is not distinct from c2;
+
+show warehouses
+->> select * from $1;
+
+SELECT 0 as c
+->> SELECT c FROM $1
+->> SELECT c FROM $2
+->> SELECT c FROM $3;
+
+SELECT * FROM t PIVOT(SUM(amount) FOR quarter IN (ANY ORDER BY c1 desc)) ORDER BY empid;
+SELECT * FROM t PIVOT(SUM(amount) FOR quarter IN (ANY));
+SELECT * FROM t PIVOT(SUM(amount) FOR quarter IN (
+      SELECT DISTINCT quarter
+        FROM t2
+        WHERE television = TRUE
+        ORDER BY quarter))
+  ORDER BY empid;
+  SELECT * FROM t PIVOT(SUM(amount) FOR quarter IN (ANY) DEFAULT ON NULL (IFF(c3 % 2 = 0 ,1,-1)));
+
+WITH LOCATION as ( SELECT 1 as LOCATION)
+SELECT LOCATION.LOCATION as LOCATION
+FROM LOCATION;
+
+SELECT COUNT(accounts.account_id) FROM accounts;
+SELECT accounts.name FROM db1.public.accounts AS accounts WHERE accounts.id > 0;

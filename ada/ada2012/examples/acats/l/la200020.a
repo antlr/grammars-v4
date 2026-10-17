@@ -1,0 +1,149 @@
+-- LA200020.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--     The ACAA has created and maintains the Ada Conformity Assessment Test
+--     Suite for the purpose of conformity assessments conducted in accordance
+--     with the International Standard ISO/IEC 18009 - Ada: Conformity
+--     assessment of a language processor. This test suite should not be used
+--     to make claims of conformance unless used in accordance with
+--     ISO/IEC 18009 and any applicable ACAA procedures.
+--
+--*
+--
+-- OBJECTIVE:
+--      Check that an inconsistent partition cannot be created.
+--      Case L1: A partition cannot depend on two versions of a unit
+--      referenced only through a limited with on a library subprogram.
+--
+-- TEST DESCRIPTION:
+--
+--      This test is intended to emulate the following development steps:
+--
+--      A reusable subsystem LA20002_L is developed, including a type
+--      Extra_Info and an operation Display for it. A library subprogram
+--      LA20002_0 is created which takes an access to Extra_Info and
+--      passes into to another routine (unnamed for this test) which calls
+--      Display. Since this is just passing an access, LA20002_0 just uses
+--      a limited with on LA20002_L. A main program LA200023 is compiled that
+--      tests LA20002_0 and the main subsystem that it uses LA20002_1.
+--
+--      Later during development, the operation Display is deleted from
+--      LA20002_L, and the call to the unnamed routine is deleted from
+--      LA20002_0. The partition is recompiled and is retested. This is the
+--      initial state of this test.
+--
+--      Now, a code review on LA20002_L finds the now unused type Extra_Info;
+--      the type is removed from LA20002_L and the subsystem recompiled.
+--      The test program LA200023 is recompiled and an attempt to recreate the
+--      test partition LA200023 is made. Either this should fail or a previous
+--      version of the subsystem should be used.
+--
+--      In order to determine which versions of of the various units have been
+--      we also compile a unit LA20002_TC.
+--
+--      In this example, the subsystem accessed by limited with is used
+--      only peripherally in the subsystem being tested. We expect this
+--      situation to be fairly common in unit tests.
+--
+--      Note that units referenced only by a limited with are nevertheless
+--      "needed" by a partition, as explained in 10.2(6.1/2), and thus are
+--      included in the partition. Thus, not including the limited withed
+--      units at all is not allowed. And like all needed units, they must be
+--      consistent. This rule requires care in checking, as consistent
+--      partitions (possibly using an older version of the limited withed unit)
+--      and automatic recompilation must be allowed.
+--
+-- SPECIAL REQUIREMENTS:
+--      To build this test:
+--         1) Compile the file LA200020 (and include the results in the
+--            environment). This is the initial reusable subsystem.
+--            Any additional steps needed to add the limited view of the
+--            reusable subsystem to the environment also must be performed
+--            at this time.
+--         2) Compile the file LA200021 (and include the results in the
+--            environment). This is the subprogram and test code.
+--         3) Compile the file LA200022 (and include the results in the
+--            environment). This is the revised reusable subsystem.
+--            Any additional steps needed to add the limited view of the
+--            revised reusable subsystem to the environment also must be
+--            performed at this time.
+--         4) Compile the file LA200023 (and include the results in the
+--            environment). This is a recompile of the test code.
+--         5) Attempt to build an executable image.
+--         6) If an executable image results, run it.
+--
+-- TEST FILES:
+--      This test consists of the following files:
+--      -> LA200020.A
+--         LA200021.A
+--         LA200022.A
+--         LA200023.AM
+--
+-- PASS/FAIL CRITERIA:
+--      The test passes if the compilation of LA200023 is rejected, a
+--      link-time error message reports an inconsistency, or the
+--      test program reports Passed.
+--
+-- CHANGE HISTORY:
+--     09 Apr 07   RLB     Initial test.
+--!
+
+package LA20002_TC is
+   -- Test state for this test.
+   INITIAL : constant Natural := 2;
+   FIRST_VERSION : constant Natural := 3;
+   SECOND_VERSION : constant Natural := 5;
+   BAD_VERSION : constant Natural := 13;
+
+   TC_Limited_Package : Natural := INITIAL;
+
+   TC_Subprogram : Natural := INITIAL;
+
+end LA20002_TC;
+
+package LA20002_L is
+   type Some_Info is record
+      A : Character := 'A';
+   end record;
+
+   procedure Do_a_Little (A : in out Some_Info);
+
+   type Extra_Info is null record; -- No info now.
+end LA20002_L;
+
+with LA20002_TC;
+package body LA20002_L is
+
+   procedure Do_a_Little (A : in out Some_Info) is
+   begin
+      A.A := 'B';
+      LA20002_TC.TC_Limited_Package := LA20002_TC.BAD_VERSION;
+   end Do_a_Little;
+
+begin
+   LA20002_TC.TC_Limited_Package := LA20002_TC.FIRST_VERSION;
+end LA20002_L;
+
