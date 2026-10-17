@@ -36,14 +36,14 @@ public abstract class LuaLexerBase : Lexer
         }
         while (cs.LA(1) != '\n' && cs.LA(1) != -1)
         {
-            cs.Consume();
+            this.Interpreter.Consume(cs);
         }
     }
 
     private void read_long_string(ICharStream cs, int sep)
     {
         bool done = false;
-        cs.Consume();
+        this.Interpreter.Consume(cs);
         for (; ; )
         {
             var c = cs.LA(1);
@@ -58,7 +58,7 @@ public abstract class LuaLexerBase : Lexer
                 case ']':
                     if (skip_sep(cs) == sep)
                     {
-                        cs.Consume();
+                        this.Interpreter.Consume(cs);
                         done = true;
                     }
                     break;
@@ -68,7 +68,7 @@ public abstract class LuaLexerBase : Lexer
                         done = true;
                         break;
                     }
-                    cs.Consume();
+                    this.Interpreter.Consume(cs);
                     break;
             }
             if (done) break;
@@ -80,10 +80,10 @@ public abstract class LuaLexerBase : Lexer
         int count = 0;
         int s = cs.LA(1);
         char ss = (char)s;
-        cs.Consume();
+        this.Interpreter.Consume(cs);
         while (cs.LA(1) == '=')
         {
-            cs.Consume();
+            this.Interpreter.Consume(cs);
             count++;
         }
         if (cs.LA(1) == s) count += 2;

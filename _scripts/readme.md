@@ -13,7 +13,7 @@ you want to test. You will also need to set the Antlr4 tool.
 
 Both scripts use trgen to generate a program from the pom.xml file
 in the grammar source. The tool generates a parser program for one of the target
-langauges, currently CSharp, Java, Cpp, Dart, Go, and Python. The generated
+languages, currently CSharp, Java, Cpp, Dart, Go, and Python. The generated
 code contains makefiles and Powershell files to present an idealized interface
 to build and run the parse with the examples, so you do not need to memorize how
 to build and run the parser for the given target.

@@ -105,7 +105,7 @@ typeDef
     ;
 
 typeParameters
-    : L_BRACKET typeParameterDecl (COMMA typeParameterDecl)* R_BRACKET
+    : L_BRACKET typeParameterDecl (COMMA typeParameterDecl)* COMMA? R_BRACKET
     ;
 
 typeParameterDecl
@@ -451,6 +451,7 @@ integer
 
 operandName
     : IDENTIFIER
+    | qualifiedIdent
     ;
 
 qualifiedIdent
@@ -526,7 +527,7 @@ typeAssertion
     ;
 
 arguments
-    : L_PAREN ((expressionList | type_ (COMMA expressionList)?) ELLIPSIS? COMMA?)? R_PAREN
+    : L_PAREN (({this.isTypeArgument()}? type_ (COMMA expressionList)? | {this.isExpressionArgument()}? expressionList) ELLIPSIS? COMMA?)? R_PAREN
     ;
 
 methodExpr

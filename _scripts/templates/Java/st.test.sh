@@ -1,24 +1,33 @@
 # Generated from trgen <version>
 
+# Uncomment for debugging.
+#set -x
+
 # glob patterns
 shopt -s globstar
 
 SAVEIFS=$IFS
 IFS=$(echo -en "\n\b")
 
+# Get environment.
+unameOut="$(uname -s)"
+case "${unameOut}" in
+    Linux*)     machine=Linux;;
+    Darwin*)    machine=Mac;;
+    CYGWIN*)    machine=Cygwin;;
+    MINGW*)     machine=MinGw;;
+    *)          machine="UNKNOWN:${unameOut}"
+esac
+
 # Get a list of test files from the test directory. Do not include any
 # .errors or .tree files. Pay close attention to remove only file names
 # that end with the suffix .errors or .tree.
-files2=`dotnet trglob '../<example_files_unix>' | grep -v '.errors$' | grep -v '.tree$'`
+files2=`dotnet trash glob <glob_args_unix> | tr -d '\r' | grep -v '[.]errors$' | grep -v '[.]tree$' | grep -v '[.]trq$'`
 files=()
 for f in $files2
 do
     if [ -d "$f" ]; then continue; fi
-    dotnet triconv -f utf-8 $f > /dev/null 2>&1
-    if [ "$?" = "0" ]
-    then
         files+=( $f )
-    fi
 done
 
 # People often specify a test file directory, but sometimes no
@@ -30,16 +39,25 @@ then
     exit 0
 fi
 
+# Before anything, clean out the testsuite directory of any previous
+# run.
+git clean -f ../<example_dir_unix>
+
 # Parse all input files.
-version=`grep "version=" build.sh | awk -F= '{print $2}'`
+<if(antlr_is_dev)>
+ANTLR4_DEV_DIR=<antlr_dev_dir>/antlr4
+JAR=$(ls "$ANTLR4_DEV_DIR"/tool/target/antlr4-*-complete.jar | tail -1)
+<else>
+version=<antlr_version>
 JAR=`python -c "import os; from pathlib import Path; print(os.path.join(Path.home() , '.m2',  'repository', 'org', 'antlr', 'antlr4', '$version', 'antlr4-$version-complete.jar'))"`
+<endif>
 CLASSPATH="$JAR<if(path_sep_semi)>\;<else>:<endif>."
 <if(individual_parsing)>
 # Individual parsing.
 rm -f parse.txt
 for f in ${files[*]}
 do
-    dotnet trwdog java -classpath "$CLASSPATH" Test -q -tee -tree $f >> parse.txt 2>&1
+    dotnet trash wdog java -classpath "$CLASSPATH" Test -q -tee -tree $f >> parse.txt 2>&1
     xxx="$?"
     if [ "$xxx" -ne 0 ]
     then
@@ -48,7 +66,7 @@ do
 done
 <else>
 # Group parsing.
-echo "${files[*]}" | dotnet trwdog java -classpath "$CLASSPATH" Test -q -x -tee -tree > parse.txt 2>&1
+echo "${files[*]}" | dotnet trash wdog java -classpath "$CLASSPATH" Test -q -x -tee -tree > parse.txt 2>&1
 status=$?
 <endif>
 
@@ -71,21 +89,11 @@ then
     exit 1
 fi
 
-# rm -rf `find ../<example_files_unix> -type f -name '*.errors' -o -name '*.tree' -size 0`
-
 # For Unix environments, convert the newline in the .errors and .trees
 # to Unix style.
-unameOut="$(uname -s)"
-case "${unameOut}" in
-    Linux*)     machine=Linux;;
-    Darwin*)    machine=Mac;;
-    CYGWIN*)    machine=Cygwin;;
-    MINGW*)     machine=MinGw;;
-    *)          machine="UNKNOWN:${unameOut}"
-esac
 if [[ "$machine" == "MinGw" || "$machine" == "Msys" || "$machine" == "Cygwin" || "#machine" == "Linux" ]]
 then
-    gen=`find ../<example_files_unix> -type f -name '*.errors' -o -name '*.tree'`
+    gen=`find ../<example_dir_unix> -type f -name '*.errors' -o -name '*.tree'`
     if [ "$gen" != "" ]
     then
         dos2unix -f $gen
@@ -146,7 +154,7 @@ done
 if [ "$updated" = "129" ]
 then
     echo "Grammar outside a git repository. Assuming parse exit code."
-    if [ "$status" = 0 ]
+    if [ "$status" -eq 0 ]
     then
         echo "Test succeeded."
     else

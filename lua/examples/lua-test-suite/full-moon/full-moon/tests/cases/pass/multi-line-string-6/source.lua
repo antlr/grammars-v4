@@ -1,0 +1,2 @@
+local foo = "bar\
+baz"

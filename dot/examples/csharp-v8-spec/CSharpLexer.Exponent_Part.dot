@@ -1,0 +1,30 @@
+digraph ATN {
+rankdir=LR;
+s394[fontsize=11, label="394", shape=doublecircle, fixedsize=true, width=.6];
+s1696[fontsize=11,label="&rarr;\n1696*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1697[fontsize=11,label="&larr;\n1697", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1698[fontsize=11,label="{1698*\nd=49|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1699[fontsize=11,label="1699", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1700[fontsize=11,label="1700*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s393[fontsize=11,label="393", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1690[fontsize=11,label="1690", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1691[fontsize=11,label="1691", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1692[fontsize=11,label="{&rarr;\n1692\nd=48|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1693[fontsize=11,label="&larr;\n1693", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1694[fontsize=11,label="1694", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1695[fontsize=11,label="1695", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s393 -> s1690 [fontname="Times-Italic", label="&epsilon;"];
+s1690 -> s1692 [fontsize=11, fontname="Courier", arrowsize=.7, label = "{'E', 'e'}", arrowhead = normal];
+s1692:p0 -> s1691 [fontname="Times-Italic", label="&epsilon;"];
+s1692:p1 -> s1693 [fontname="Times-Italic", label="&epsilon;"];
+s1691 -> s1693 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<Sign>", arrowhead = normal];
+s1693 -> s1694 [fontname="Times-Italic", label="&epsilon;"];
+s1694 -> s1698 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<Decimal_Digit>", arrowhead = normal];
+s1698:p0 -> s1696 [fontname="Times-Italic", label="&epsilon;"];
+s1698:p1 -> s1699 [fontname="Times-Italic", label="&epsilon;"];
+s1696 -> s1695 [fontname="Times-Italic", label="&epsilon;"];
+s1699 -> s394 [fontname="Times-Italic", label="&epsilon;"];
+s1695 -> s1697 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<Decorated_Decimal_Digit>", arrowhead = normal];
+s1697 -> s1700 [fontname="Times-Italic", label="&epsilon;"];
+s1700 -> s1698 [fontname="Times-Italic", label="&epsilon;", style="dashed"];
+}

@@ -1,13 +1,43 @@
 import 'package:antlr4/antlr4.dart';
 import 'GoParser.dart';
 import 'dart:collection';
+import 'dart:io';
 
 abstract class GoParserBase extends Parser
 {
-    final bool debug = false;
+    static bool _debugInitialized = false;
+    static bool _debug = false;
     HashSet<String> table = new HashSet<String>();
 
-    GoParserBase(TokenStream input) : super(input);
+    static bool _hasArg(List<String> args, String arg) {
+        for (var a in args) {
+            if (a.toLowerCase().contains(arg.toLowerCase())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    static void _initDebug() {
+        if (!_debugInitialized) {
+            try {
+                _debug = _hasArg(Platform.executableArguments, '--debug');
+                if (_debug) {
+                    print('debug = $_debug');
+                }
+            } catch (e) {
+                // Platform may not be available in all environments
+                _debug = false;
+            }
+            _debugInitialized = true;
+        }
+    }
+
+    bool get debug => _debug;
+
+    GoParserBase(TokenStream input) : super(input) {
+        _initDebug();
+    }
 
     void myreset()
     {
@@ -29,29 +59,54 @@ abstract class GoParserBase extends Parser
     void addImportSpec()
     {
         final ctx = context;
-        if (ctx == null) return; // Null check for safety
+        if (ctx == null) return;
+        if (ctx is! ImportSpecContext) return;
         final importSpec = ctx as ImportSpecContext;
-        if (importSpec == null) return;
         final packageName = importSpec.packageName();
         if (packageName != null) {
             final name = packageName.text;
             if (debug) {
                 print('Entering $name');
             }
-            table.add(name);
-        } else {
-            var name = importSpec.importPath()?.text;
-            name = name?.replaceAll('"', '');
-            name = name?.replaceAll('\\', '/');
-            final pathArr = name?.split('/');
-            final fileArr = pathArr?.last.split('.');
-            final fileName = fileArr?.last;
-            if (fileName == null) return;
-            if (debug) {
-                print('Entering $fileName');
+            if (name != null) {
+                table.add(name);
             }
-            table.add(fileName);
+            return;
         }
+        final importPath = importSpec.importPath();
+        if (importPath == null) return;
+        var name = importPath.text;
+        if (name == null) return;
+        if (debug) {
+            print('import path $name');
+        }
+        name = name.replaceAll('"', '');
+        if (name.isEmpty) return;
+        name = name.replaceAll('\\', '/');
+        final pathArr = name.split('/');
+        if (pathArr.isEmpty) return;
+        final lastComponent = pathArr.last;
+        if (lastComponent.isEmpty) return;
+        // Handle special cases like "." and ".."
+        if (lastComponent == '.' || lastComponent == '..') return;
+        final fileArr = lastComponent.split('.');
+        // Guard against empty array (can happen if lastComponent is all dots)
+        if (fileArr.isEmpty) {
+            table.add(lastComponent);
+            if (debug) {
+                print('Entering $lastComponent');
+            }
+            return;
+        }
+        var fileName = fileArr.last;
+        if (fileName.isEmpty) {
+            // Fall back to lastComponent if split resulted in empty string
+            fileName = lastComponent;
+        }
+        if (debug) {
+            print('Entering $fileName');
+        }
+        table.add(fileName);
     }
 
     bool isOperand()
@@ -116,6 +171,39 @@ abstract class GoParserBase extends Parser
         result = !table.contains(la?.text);
         if (debug) {
             print('isMethodExpr Returning $result for ${la?.text}');
+        }
+        return result;
+    }
+
+    // Built-in functions that take a type as first argument
+    static final Set<String> BUILTIN_TYPE_FUNCTIONS = {'make', 'new'};
+
+    // Check if we're in a call to a built-in function that takes a type as first argument.
+    // Called after L_PAREN has been matched in the arguments rule.
+    bool isTypeArgument()
+    {
+        // After matching L_PAREN, LT(-1) is '(' and LT(-2) is the token before it
+        final funcToken = this.tokenStream.LT(-2);
+        if (funcToken == null || funcToken.type != GoParser.TOKEN_IDENTIFIER) {
+            if (debug) {
+                print('isTypeArgument Returning false - no identifier before (');
+            }
+            return false;
+        }
+        final result = BUILTIN_TYPE_FUNCTIONS.contains(funcToken.text);
+        if (debug) {
+            print('isTypeArgument Returning $result for ${funcToken.text}');
+        }
+        return result;
+    }
+
+    // Check if we're NOT in a call to a built-in function that takes a type.
+    // This is the inverse of isTypeArgument for the expressionList alternative.
+    bool isExpressionArgument()
+    {
+        final result = !isTypeArgument();
+        if (debug) {
+            print('isExpressionArgument Returning $result');
         }
         return result;
     }

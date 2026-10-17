@@ -27,10 +27,10 @@
  *
  * This combined grammar implements the "muparser" mathematical expression
  * language described here:
- * http://beltoforion.de/article.php?a=muparser
+ * https://beltoforion.de/en/muparser/index.php
  *
  * I also referenced this file for information on the predefined constants:
- * https://github.com/shouze/muparser/blob/master/doc/custom/features.txt
+ *  github.com/shouze/muparser/blob/master/doc/custom/features.txt
  ******************************************************************************/
 
 /*
