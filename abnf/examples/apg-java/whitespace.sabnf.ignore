@@ -1,0 +1,12 @@
+FWSP-COMMENT = 1*(SP / comment / F-SP) ; white space includes comments and folding white space
+WSP-COMMENT  = 1*(SP / comment)        ; white space includes comments
+FWSP         = 1*(SP / F-SP)           ; white space includes folding white space
+OWSP         = *SP                     ; optional white space
+WSP          = 1*SP                    ; white space (at least one space required)
+F-SP         = (LF / CRLF / CR) SP     ; folding white space - line end followed by a single space
+comment      = ";" *any                ; comment - semicolon to end of line
+any          = %d32-126                ; any printing character
+SP           = %d32 / %d9              ; space - space or horizontal tab
+LF           = %d10                    ; line feed
+CR           = %d13                    ; carriage return
+CRLF         = %d13.10                 ; carriage return / line feed pair

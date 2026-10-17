@@ -40,20 +40,7 @@
 				<groupId>com.khubla.antlr</groupId>
 				<artifactId>antlr4test-maven-plugin</artifactId>
 				<version>${antlr4test-maven-plugin.version}</version>
-				<configuration>
-					<verbose>false</verbose>
-					<showTree>false</showTree>
-					<entryPoint>sql_script</entryPoint>
-					<grammarName>PlSql</grammarName>
-					<packageName>${packageName}</packageName>
-					<exampleFiles>examples/</exampleFiles>
-				</configuration>
 				<executions>
-					<execution>
-						<goals>
-							<goal>test</goal>
-						</goals>
-					</execution>
 					<execution>
 						<id>test-examples-sql-script</id>
 						<goals>
@@ -65,7 +52,22 @@
 							<entryPoint>sql_script</entryPoint>
 							<grammarName>PlSql</grammarName>
 							<packageName>${packageName}</packageName>
-							<exampleFiles>examples-sql-script/</exampleFiles>
+							<exampleFiles>examples/</exampleFiles>
+						</configuration>
+					</execution>
+					<execution>
+						<id>test-more-sql-script</id>
+						<goals>
+							<goal>test</goal>
+						</goals>
+						<configuration>
+							<verbose>false</verbose>
+							<showTree>false</showTree>
+							<entryPoint>sql_script</entryPoint>
+							<grammarName>PlSql</grammarName>
+							<packageName>${packageName}</packageName>
+							<exampleFiles>more/</exampleFiles>
+							<testFileExtension>.sql</testFileExtension>
 						</configuration>
 					</execution>
 				</executions>

@@ -34,12 +34,14 @@
 
 parser grammar JavaParser;
 
+// Insert here @header.
+
 options {
     tokenVocab = JavaLexer;
     superClass = JavaParserBase;
 }
 
-compilationUnit
+compilationunit
     : packageDeclaration? (importDeclaration | ';')* (typeDeclaration | ';')* EOF
     | modularCompulationUnit EOF
     ;
@@ -267,8 +269,14 @@ arrayInitializer
     : '{' (variableInitializer (',' variableInitializer)* ','?)? '}'
     ;
 
-classOrInterfaceType
-    : (identifier typeArguments? '.')* typeIdentifier typeArguments?
+classType:
+    (
+      ( packageName '.' annotation* )? typeIdentifier typeArguments?
+    )+ ( '.' annotation* typeIdentifier typeArguments? )*
+    ;
+
+packageName:
+    identifier ('.' identifier)*
     ;
 
 typeArgument
@@ -282,10 +290,8 @@ qualifiedNameList
 
 formalParameters
     : '(' (
-        receiverParameter?
-        | receiverParameter (',' formalParameterList)?
-        | formalParameterList?
-    ) ')'
+       ( receiverParameter | formalParameter ) (',' formalParameterList)*
+    )? ')'
     ;
 
 receiverParameter
@@ -293,16 +299,11 @@ receiverParameter
     ;
 
 formalParameterList
-    : formalParameter (',' formalParameter)* (',' lastFormalParameter)?
-    | lastFormalParameter
+    : formalParameter (',' formalParameter)*
     ;
 
 formalParameter
-    : variableModifier* typeType variableDeclaratorId
-    ;
-
-lastFormalParameter
-    : variableModifier* typeType annotation* '...' variableDeclaratorId
+    : variableModifier* typeType (annotation* '...')? variableDeclaratorId
     ;
 
 // local variable type inference
@@ -345,19 +346,36 @@ altAnnotationQualifiedName
     : (identifier DOT)* '@' identifier
     ;
 
-annotation
-    : ('@' qualifiedName | altAnnotationQualifiedName) (
-        '(' ( elementValuePairs | elementValue)? ')'
-    )?
+//annotation
+//    : ('@' qualifiedName /* | altAnnotationQualifiedName */) ( '(' ( elementValuePairs | elementValue)? ')')?
+//    ;
+
+annotation :
+    ('@' qualifiedName /* | altAnnotationQualifiedName */) annotationFieldValues?
     ;
 
-elementValuePairs
-    : elementValuePair (',' elementValuePair)*
-    ;
+annotationFieldValues:
+	'(' ( annotationFieldValue ( ',' annotationFieldValue )* )? ')'
+	;
 
-elementValuePair
-    : identifier '=' elementValue
-    ;
+annotationFieldValue:
+	{ this.IsNotIdentifierAssign() }? annotationValue
+	| identifier '=' annotationValue
+	;
+
+annotationValue:
+	expression //conditionalExpression
+	| annotation
+	| '{' ( annotationValue ( ',' annotationValue )* )? ','? '}'
+	;
+
+//elementValuePairs
+//    : elementValuePair (',' elementValuePair)*
+//    ;
+
+//elementValuePair
+//    : identifier '=' elementValue
+//    ;
 
 elementValue
     : expression
@@ -494,8 +512,6 @@ typeIdentifier // Identifiers that are not restricted for type declarations
     | WITH
     | TRANSITIVE
     | SEALED
-    | PERMITS
-    | RECORD
     ;
 
 localTypeDeclaration
@@ -729,8 +745,8 @@ switchRuleOutcome
     | blockStatement* // is *-operator correct??? I don't think so. https://docs.oracle.com/javase/specs/jls/se24/html/jls-14.html#jls-BlockStatements
     ;
 
-classType
-    : (classOrInterfaceType '.')? annotation* identifier typeArguments?
+classOrInterfaceType
+    : classType // classType, interfaceType are all essentially identical to classOrInterfaceType because of no symbol table.
     ;
 
 creator

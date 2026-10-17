@@ -1,0 +1,103 @@
+-- CXE2002.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687 and
+--     F08630-91-C-0015, the U.S. Government obtained unlimited rights in the
+--     software and documentation contained herein.  Unlimited rights are
+--     defined in DFAR 252.227-7013(a)(19).  By making this public release,
+--     the Government intends to confer upon all recipients unlimited rights
+--     equal to those held by the Government.  These rights include rights to
+--     use, duplicate, release or disclose the released technical data and
+--     computer software in whole or in part, in any manner and for any purpose
+--     whatsoever, and to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE
+--     Check the requirements of the revised E.2(4) and E.2.3(7) from Technical
+--     Corrigendum 1 (originally discussed as AI95-00048).
+--     Check that a remote call interface library unit may be a subprogram
+--     or generic subprogram.
+--
+-- TEST DESCRIPTION
+--     Apply pragma Remote_Call_Interface to a subprogram, and to a
+--     generic subprogram and its instance.
+--
+-- SPECIAL REQUIREMENTS
+--     The implementation should partition the program so that all of
+--     the RCI units are in partition B, with no main subprogram, and
+--     the main procedure CXE2002_A is in partition A.
+--
+-- APPLICABILITY CRITERIA:
+--      This test is only applicable for a compiler attempting validation
+--      for the Distributed Systems Annex.
+--
+-- CHANGE HISTORY:
+--      29 JUN 1999   RAD   Initial Version
+--      23 SEP 1999   RLB   Improved comments, renamed, issued.
+--      24 SEP 1999   RLB   Repaired for error noticed in testing.
+--
+--!
+
+procedure CXE2002_1(X: Integer);
+    pragma Remote_Call_Interface(CXE2002_1);
+
+with Report; use Report;
+procedure CXE2002_1(X: Integer) is
+    -- Note: The separate specification is necessary, as Report is not an
+    -- RCI unit.
+begin
+    if X /= 1 then
+        Failed("Bad value passed to CXE2002_1:"
+               & Integer'Image(X));
+    end if;
+end CXE2002_1;
+
+package CXE2002_2 is
+    pragma Pure;
+    -- Empty.
+end CXE2002_2;
+
+generic
+    type Int is new Integer;
+procedure CXE2002_2.Gen(Y: out Int);
+    pragma Remote_Call_Interface(CXE2002_2.Gen);
+
+procedure CXE2002_2.Gen(Y: out Int) is
+begin
+    Y := 2;
+end CXE2002_2.Gen;
+
+with CXE2002_2.Gen;
+procedure CXE2002_2.Inst is new CXE2002_2.Gen(Int => Integer);
+    pragma Remote_Call_Interface(CXE2002_2.Inst);
+
+with Report; use Report;
+with CXE2002_1;
+with CXE2002_2.Inst;
+procedure CXE2002_A is
+    Y: Integer := 17;
+begin
+    Test("CXE2002",
+         "a remote call interface library unit may be a subprogram,"
+         & " or generic subprogram");
+
+    CXE2002_1(1);
+
+    CXE2002_2.Inst(Y);
+    if Y /= 2 then
+        Failed("Bad value returned from CXE2002_2.Gen:"
+               & Integer'Image(Y));
+    end if;
+
+    Result;
+end CXE2002_A;

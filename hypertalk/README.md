@@ -41,3 +41,7 @@ end mouseDown
 ## Contributors
 
 * Matt DeFano
+
+## Reference
+* [pldb](http://pldb.info/concepts/hypertalk)
+
