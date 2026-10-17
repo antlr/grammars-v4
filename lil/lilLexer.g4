@@ -44,6 +44,10 @@ SET
    : 'set'
    ;
 
+GLOBAL
+   : 'global'
+   ;
+
 FUNC
    : 'func'
    ;
@@ -82,7 +86,7 @@ WS
 
 mode PRINT_MODE;
 PRINTSTR
-   : ~ [}\r\n\t]+
+   : ( ~ [$}\r\n\t] | '$' '{' ~ [}]* '}' | '$' )+
    ;
 
 RBRACE2

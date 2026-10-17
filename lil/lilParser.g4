@@ -37,6 +37,7 @@ line
    | printcmd
    | foreachcmd
    | localcmd
+   | funccall
    ;
 
 watchcmd
@@ -52,7 +53,7 @@ foreachcmd
    ;
 
 setcmd
-   : SET arg arg
+   : SET GLOBAL? arg arg (arg arg)*
    ;
 
 localcmd
@@ -61,6 +62,10 @@ localcmd
 
 func
    : FUNC identifier identifierlist block
+   ;
+
+funccall
+   : identifier+
    ;
 
 identifierlist
