@@ -43,6 +43,7 @@
 					<grammarName>Lua</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
+					<testFileExtension>.lua</testFileExtension>
 				</configuration>
 				<executions>
 					<execution>

@@ -1171,6 +1171,10 @@ GEOMETRYCOLLECTION_SYMBOL
     : G E O M E T R Y C O L L E C T I O N
     ;                                                                                     // MYSQL
 
+GEOMCOLLECTION_SYMBOL
+    : G E O M C O L L E C T I O N -> type(GEOMETRYCOLLECTION_SYMBOL)
+    ;                                                                                     // Synonym
+
 GEOMETRY_SYMBOL
     : G E O M E T R Y
     ;
@@ -3318,6 +3322,11 @@ SOURCE_COMPRESSION_ALGORITHM_SYMBOL
     : S O U R C E '_' C O M P R E S S I O N '_' A L G O R I T H M                         {this.isServerVersionGe80023()}?
     ;                                                                                     // MYSQL
 
+SOURCE_COMPRESSION_ALGORITHMS_SYMBOL
+    : S O U R C E '_' C O M P R E S S I O N '_' A L G O R I T H M S                       {this.isServerVersionGe80023()}?
+      -> type(SOURCE_COMPRESSION_ALGORITHM_SYMBOL)
+    ;                                                                                     // MYSQL
+
 SOURCE_CONNECT_RETRY_SYMBOL
     : S O U R C E '_' C O N N E C T '_' R E T R Y                                         {this.isServerVersionGe80023()}?
     ;                                                                                     // MYSQL
@@ -3587,7 +3596,7 @@ INVALID_INPUT
 // The underscore charset token is used to defined the repertoire of a string, though it conflicts
 // with normal identifiers, which also can start with an underscore.
 UNDERSCORE_CHARSET
-    : UNDERLINE_SYMBOL [a-z0-9]+ { this.doUnderscoreCharset(); }
+    : UNDERLINE_SYMBOL [a-zA-Z0-9]+ { this.doUnderscoreCharset(); }
     ;
 
 // TODO: check in the semantic phase that starting and ending tags are the same.
@@ -3624,7 +3633,7 @@ fragment DOUBLE_QUOTE
     ;
 
 BACK_TICK_QUOTED_ID
-    : BACK_TICK (({this.isBackTickQuotedId()}? '\\')? .)*? BACK_TICK
+    : BACK_TICK ( BACK_TICK BACK_TICK | ~[`] )* BACK_TICK
     ;
 
 DOUBLE_QUOTED_TEXT
