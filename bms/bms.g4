@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2022, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -29,44 +29,59 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// https://bm98.yaneu.com/bm98/bmsformat.html
+
 grammar bms;
 
+
+options { caseInsensitive = true; }
 file_
-   : header_ EOF?
+   : line_* EOF
+   ;
+   // A BMS file is a sequence of lines. A line beginning with '#' is either a
+   
+   // channel/object ("data") line of the form #AAABB:CCCC..., or a header /
+   
+   // control directive of the form #KEY VALUE (#TITLE, #BPM, #WAVxx, #RANDOM,
+   
+   // #IF, #ENDIF, etc). Any other line (including '*'-prefixed section
+   
+   // separators and '//' comments) is ignored, per the spec.
+   
+line_
+   : dataline_
+   | headerline_
    ;
 
-header_
-   : headerstart_ headerline_+
-   ;
-
-headerstart_
-   : '*' .*?
+dataline_
+   : DATALINE
    ;
 
 headerline_
-   : '#' key_ value_
+   : HEADERLINE
+   ;
+   // aaa (measure/track 000-999) and bb (channel 00-FF) are fixed-width, so
+   
+   // they are matched directly in the data-line token; they are immediately
+   
+   // distinguishable from a header line because header keys always start with
+   
+   // a letter, never a digit.
+   
+DATALINE
+   : '#' [0-9] [0-9] [0-9] [0-9A-F] [0-9A-F] ':' [0-9A-F]*
    ;
 
-key_
-   : ID
+HEADERLINE
+   : '#' [A-Z] [A-Z0-9]* ([ \t]+ ~ [\r\n]*)?
    ;
-
-value_
-   : ID | data
-   ;
-
-data: measure_number channel_number ':' message;
-
-measure_number: DIGIT DIGIT DIGIT;
-
-channel_number: DIGIT DIGIT;
-
-message: DIGIT+;
-
-DIGIT: [0-9];
-
-ID
-   : [a-zA-Z0-9._-]+
+   // Any line not starting with '#' (comments, '*' section separators,
+   
+   // '//' comments, blank lines) is simply ignored.
+   
+OTHERLINE
+   : ~ [\r\n#]+ -> skip
    ;
 
 WS
