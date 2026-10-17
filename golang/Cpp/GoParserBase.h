@@ -8,11 +8,15 @@
  */
 class GoParserBase : public antlr4::Parser {
 private:
-    const bool debug = false;
+    bool debug = false;
     std::set<std::string> table;
+    static const std::set<std::string> BUILTIN_TYPE_FUNCTIONS;
+
+    static bool hasArg(int argc, char* argv[], const std::string& arg);
 
 public:
     GoParserBase(antlr4::TokenStream* input) : Parser(input) { }
+    GoParserBase(antlr4::TokenStream* input, int argc, char* argv[]);
     virtual ~GoParserBase() {}
 
 protected:
@@ -23,4 +27,6 @@ protected:
     bool isOperand();
     bool isConversion();
     bool isMethodExpr();
+    bool isTypeArgument();
+    bool isExpressionArgument();
 };

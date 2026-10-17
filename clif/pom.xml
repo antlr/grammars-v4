@@ -31,14 +31,14 @@
 					</execution>
 				</executions>
 			</plugin>
-<!--			<plugin>
+			<plugin>
 				<groupId>com.khubla.antlr</groupId>
 				<artifactId>antlr4test-maven-plugin</artifactId>
 				<version>${antlr4test-maven-plugin.version}</version>
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>termseq</entryPoint>
+					<entryPoint>start_</entryPoint>
 					<grammarName>CLIF</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
@@ -50,7 +50,7 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin> -->
+			</plugin>
 		</plugins>
 	</build>
 </project>

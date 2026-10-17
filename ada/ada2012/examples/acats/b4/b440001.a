@@ -1,0 +1,104 @@
+-- B440001.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--     The ACAA has created and maintains the Ada Conformity Assessment Test
+--     Suite for the purpose of conformity assessments conducted in accordance
+--     with the International Standard ISO/IEC 18009 - Ada: Conformity
+--     assessment of a language processor. This test suite should not be used
+--     to make claims of conformance unless used in accordance with
+--     ISO/IEC 18009 and any applicable ACAA procedures.
+--*
+-- OBJECTIVES:
+--     Check that the operands of a membership test are simple_expressions, not
+--     choice_expressions.
+--
+-- TEST DESCRIPTION:
+--     This test checks that the syntax changes of AI12-0039-1 have been
+--     applied. To do so, we try various expressions as well as their
+--     parenthesized cousins.
+--
+--     We generally do not test syntax, but we do in this case as the change
+--     is incompatible with the syntax in the original Ada 2012 Standard.
+--     It is important for portability that compilers do not accept ambiguous
+--     expressions that could be interpreted differently by different
+--     implementations.
+--
+-- CHANGE HISTORY:
+--     30 Dec 2021  RLB  Created new test.
+
+procedure B440001 is
+
+    A, B, C, D, E : Boolean := True;
+    
+begin
+
+    -- Expressions that cannot be parsed with the new grammar:
+    
+    -- From AI12-0039-1:
+    if A in B in C | D then                                 -- ERROR: {8;5}
+       null;
+    elsif A in (B in C) | D then                            -- OK. {11;5}
+       null;
+    elsif A in (B in C | D) then                            -- OK. {11;5}
+       null;
+    end if;
+   
+    if A in B and C | D then                                -- ERROR: {8;5}
+       null;
+    elsif A in (B and C) | D then                           -- OK. {11;5}
+       null;
+    end if;
+
+    if A in B and C | D and E then                          -- ERROR: {8;5}
+       null;
+    elsif (A in (B and C) | D) and E then                   -- OK. {11;5}
+       null;
+    elsif A in (B and C) | (D and E) then                   -- OK. {11;5}
+       null;
+    end if;
+
+    -- Other previously ambiguous expressions from AI12-0039-1:
+    
+    if A in B and C then                                    -- OK. {8;5}
+       -- Now always means (A in B) and C
+       null;
+    elsif (A in B) and C then                               -- OK. {11;5}
+       null;
+    elsif A in (B and C) then                               -- OK. {11;5}
+       null;
+    end if;
+    
+    if A in B | C and D then                                -- OK. {8;5}
+       -- Now always means (A in B | C) and D
+       null;
+    elsif (A in B | C) and D then                           -- OK. {11;5}
+       null;
+    elsif A in B | (C and D) then                           -- OK. {11;5}
+       null;
+    end if;
+
+end B440001;
+   

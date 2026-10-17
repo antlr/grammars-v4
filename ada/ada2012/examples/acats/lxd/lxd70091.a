@@ -1,0 +1,93 @@
+-- LXD70091.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making
+--     this public release, the Government intends to confer upon all
+--     recipients unlimited rights  equal to those held by the Government.
+--     These rights include rights to use, duplicate, release or disclose the
+--     released technical data and computer software in whole or in part, in
+--     any manner and for any purpose whatsoever, and to have or permit others
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      See LXD70092.AM.
+--
+-- TEST FILES:
+--      This test consists of the following files:
+--          LXD70090.A     A text file with the Restrictions pragma.
+--       => LXD70091.A     A package which violates the restrictions
+--          LXD70092.AM    The main program.
+--
+-- CHANGE HISTORY:
+--      28 SEP 95   SAIC    ACVC 2.1
+--      30 Sep 96   SAIC    Multi-file prolog convention fix.
+--      02 Feb 17   RLB     Added location indicators.
+--
+--!
+
+package  LXD7009_1 is
+  procedure Violations_Abound;
+end  LXD7009_1;
+
+
+with Report;
+package body  LXD7009_1 is
+
+  task Too_Many_Entries is
+    entry One_Is_Too_Many;               -- OPTIONAL ERROR: {1:3}
+                 -- maximum number of task entries exceeded
+  end Too_Many_Entries;
+
+  protected Has_Entries is
+    entry Too_Much;                      -- OPTIONAL ERROR: {1:3}
+            -- maximum number of protected entries exceeded
+  end Has_Entries;
+
+  Global_Var : Integer := 0;
+  procedure Do_Something_Important is
+  begin
+    Global_Var := 1;
+  end Do_Something_Important;
+
+
+  protected body Has_Entries is
+    entry Too_Much when True is
+    begin
+       Do_Something_Important;
+    end Too_Much;
+  end Has_Entries;
+
+  task body Too_Many_Entries is
+  begin
+    select
+      accept One_Is_Too_Many do             -- OPTIONAL ERROR: {1:5}
+                 -- max number of select alternatives exceeded
+        Do_Something_Important;
+      end One_Is_Too_Many;
+    or
+      terminate;
+    end select;
+  end Too_Many_Entries;
+
+  procedure Violations_Abound is
+  begin
+    Too_Many_Entries.One_Is_Too_Many;
+    Has_Entries.Too_Much;
+    Report.Failed ("pragma restrictions violations not detected");
+  end Violations_Abound;
+
+end LXD7009_1;

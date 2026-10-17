@@ -1,0 +1,37 @@
+digraph ATN {
+rankdir=LR;
+s386[fontsize=11, label="386", shape=doublecircle, fixedsize=true, width=.6];
+s385[fontsize=11,label="385", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1609[fontsize=11,label="1609", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1610[fontsize=11,label="1610", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1611[fontsize=11,label="1611", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1612[fontsize=11,label="1612", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1613[fontsize=11,label="{&rarr;\n1613\nd=33|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1614[fontsize=11,label="&larr;\n1614", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1615[fontsize=11,label="1615", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1616[fontsize=11,label="&rarr;\n1616+", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1617[fontsize=11,label="&larr;\n1617", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1618[fontsize=11,label="{1618+\nd=34|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1619[fontsize=11,label="1619", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1620[fontsize=11,label="1620", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1621[fontsize=11,label="{&rarr;\n1621\nd=35|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1622[fontsize=11,label="&larr;\n1622", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s385 -> s1613 [fontname="Times-Italic", label="&epsilon;"];
+s1613:p0 -> s1609 [fontname="Times-Italic", label="&epsilon;"];
+s1613:p1 -> s1611 [fontname="Times-Italic", label="&epsilon;"];
+s1609 -> s1610 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'0'", arrowhead = normal];
+s1611 -> s1612 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'0'", arrowhead = normal];
+s1610 -> s1614 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'b'", arrowhead = normal];
+s1612 -> s1614 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'B'", arrowhead = normal];
+s1614 -> s1616 [fontname="Times-Italic", label="&epsilon;"];
+s1616 -> s1615 [fontname="Times-Italic", label="&epsilon;"];
+s1615 -> s1617 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<Decorated_Binary_Digit>", arrowhead = normal];
+s1617 -> s1618 [fontname="Times-Italic", label="&epsilon;"];
+s1618:p0 -> s1616 [fontname="Times-Italic", label="&epsilon;", style="dashed"];
+s1618:p1 -> s1619 [fontname="Times-Italic", label="&epsilon;"];
+s1619 -> s1621 [fontname="Times-Italic", label="&epsilon;"];
+s1621:p0 -> s1620 [fontname="Times-Italic", label="&epsilon;"];
+s1621:p1 -> s1622 [fontname="Times-Italic", label="&epsilon;"];
+s1620 -> s1622 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<Integer_Type_Suffix>", arrowhead = normal];
+s1622 -> s386 [fontname="Times-Italic", label="&epsilon;"];
+}
