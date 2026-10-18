@@ -1,3 +1,5 @@
 # Orc Grammar
 
-A simple ANTLR4 grammar for [orc](http://orc.csres.utexas.edu/documentation/html/refmanual/ref.syntax.EBNF.html).  
+An ANTLR4 grammar for [orc](https://en.wikipedia.org/wiki/Orc_(programming_language)).
+
+[Reference](https://www.cs.utexas.edu/~misra/orc.dir/2-Language.pdf)

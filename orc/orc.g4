@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2023, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -31,111 +31,49 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 grammar orc;
 
+program
+   : expression EOF
+   ;
+
 expression
-   : literal
-   | variable
-   | stop
-   | tuple
-   | list
-   | record
-   | call
-   | dotAccess
-   | prefixOperation
-   | infixOperation
-   | postfixOperation
-   | parallel
-   | sequence
-   | prune
-   | otherwise
-   | conditional
-   | lambda
-   | withDeclaration
-   | withTypeInformation
-   | typeOverride
-   | '(' expression ')'
-   ;
-
-stop
-   : 'stop'
-   ;
-
-tuple
-   : expression ',' expression (',' expression)*
-   ;
-
-list
-   : '[' expression (',' expression)* ']'
-   ;
-
-record
-   : '{' '.' (key '=' expression) (',' key '=' expression)* '.' '}'
-   ;
-
-call
-   : expression typeArguments? arguments
-   ;
-
-dotAccess
-   : expression '.' key
-   ;
-
-prefixOperation
-   : PREFIXOPERATOR expression
-   ;
-
-infixOperation
-   : expression INFIXOPERATOR expression
-   ;
-
-postfixOperation
-   : expression POSTFIXOPERATOR
-   ;
-
-parallel
-   : expression '|' expression
-   ;
-
-sequence
-   : expression '>' pattern? '>' expression
-   ;
-
-prune
-   : expression '<' pattern? '<' expression
-   ;
-
-otherwise
-   : expression ';' expression
-   ;
-
-conditional
-   : 'if' expression 'then' expression 'else' expression
-   ;
-
-lambda
-   : 'lambda' typeParameters? parameters returnType? '=' expression
-   ;
-
-withDeclaration
-   : declaration expression
-   ;
-
-withTypeInformation
-   : expression '::' type
-   ;
-
-typeOverride
-   : expression ':!:' type
+   : literal # literalExpr
+   | variable # variableExpr
+   | 'stop' # stopExpr
+   | '[' (expression (',' expression)*)? ']' # listExpr
+   | '{' '.' key '=' expression (',' key '=' expression)* '.' '}' # recordExpr
+   | '(' expression ')' # parenExpr
+   | '(' expression (',' expression)+ ')' # tupleExpr
+   | 'lambda' typeParameters? parameters returnType? '=' expression # lambdaExpr
+   | declaration expression # withDeclarationExpr
+   | 'if' expression 'then' expression 'else' expression # conditionalExpr
+   | expression '.' key # dotAccessExpr
+   | expression typeArguments? arguments # callExpr
+   | expression '?' # derefExpr
+   | '-' expression # negateExpr
+   | expression op = ('*' | '/') expression # mulDivExpr
+   | expression op = ('+' | '-') expression # addSubExpr
+   | expression ':' expression # consExpr
+   | expression op = ('<:' | ':>' | '=') expression # compareExpr
+   | expression ':=' expression # assignExpr
+   | expression '&&' expression # andExpr
+   | expression '||' expression # orExpr
+   | expression '::' type # withTypeExpr
+   | expression ':!:' type # typeOverrideExpr
+   | expression '>' pattern? '>' expression # sequenceExpr
+   | expression '<' pattern? '<' expression # pruneExpr
+   | expression '|' expression # parallelExpr
+   | expression ';' expression # otherwiseExpr
    ;
 
 declaration
-   : declareVal '#?'
-   | declareDefinition '#?'
-   | declareDefclass '#?'
-   | declareSignature '#?'
-   | declareSite '#?'
-   | declareClass '#?'
-   | declareInclude '#?'
-   | declareType '#?'
+   : declareVal
+   | declareDefinition
+   | declareDefclass
+   | declareSignature
+   | declareSite
+   | declareClass
+   | declareInclude
+   | declareType
    ;
 
 declareVal
@@ -185,11 +123,11 @@ declareTypeImport
    ;
 
 declareDatatype
-   : 'type' typeVariable typeParameters? '=' constructor+
+   : 'type' typeVariable typeParameters? '=' constructor ('|' constructor)*
    ;
 
 constructor
-   : variable '(' slot (',' slot)* ')'
+   : variable '(' (slot (',' slot)*)? ')'
    ;
 
 slot
@@ -198,82 +136,26 @@ slot
    ;
 
 pattern
-   : wildcardPattern
-   | literalPattern
-   | variablePattern
-   | tuplePattern
-   | listPattern
-   | recordPattern
-   | consPattern
-   | callPattern
-   | asPattern
-   | patternWithTypeInformation
-   | '(' Pattern ')'
-   ;
-
-wildcardPattern
-   : '_'
-   ;
-
-literalPattern
-   : Literal
-   ;
-
-variablePattern
-   : Variable
-   ;
-
-tuplePattern
-   : '(' pattern (',' pattern)* ')'
-   ;
-
-listPattern
-   : '[' pattern (',' pattern)* ']'
-   ;
-
-recordPattern
-   : '{' '.' key '=' pattern (',' key '=' pattern)* '.' '}'
-   ;
-
-consPattern
-   : pattern ':' pattern
-   ;
-
-callPattern
-   : variable '(' pattern (',' pattern)* ')'
-   ;
-
-asPattern
-   : pattern 'as' variable
-   ;
-
-patternWithTypeInformation
-   : pattern '::' type
+   : '_' # wildcardPattern
+   | literal # literalPattern
+   | variable '(' (pattern (',' pattern)*)? ')' # callPattern
+   | variable # variablePattern
+   | '(' pattern ')' # parenPattern
+   | '(' pattern (',' pattern)+ ')' # tuplePattern
+   | '[' (pattern (',' pattern)*)? ']' # listPattern
+   | '{' '.' key '=' pattern (',' key '=' pattern)* '.' '}' # recordPattern
+   | pattern ':' pattern # consPattern
+   | pattern 'as' variable # asPattern
+   | pattern '::' type # typedPattern
    ;
 
 type
-   : typeVariable
-   | tupleType
-   | recordType
-   | functionType
-   | typeApplication
-   | '(' type ')'
-   ;
-
-tupleType
-   : '(' type (',' type)* ')'
-   ;
-
-recordType
-   : '{' '.' key '=' type (',' key '=' type)* '.' '}'
-   ;
-
-functionType
-   : 'lambda' typeParameters? argumentTypes returnType
-   ;
-
-typeApplication
-   : type typeArguments
+   : typeVariable # typeVariableType
+   | '(' type ')' # parenType
+   | '(' type (',' type)+ ')' # tupleType
+   | '{' '.' key '=' type (',' key '=' type)* '.' '}' # recordType
+   | 'lambda' typeParameters? argumentTypes returnType # functionType
+   | type typeArguments # typeApplicationType
    ;
 
 literal
@@ -281,7 +163,6 @@ literal
    | BOOLEANLITERAL
    | NUMBERLITERAL
    | CHARACTERSTRINGLITERAL
-   | 'null'
    ;
 
 variable
@@ -305,7 +186,7 @@ fileName
    ;
 
 parameters
-   : '(' pattern (',' pattern)* ')'
+   : '(' (pattern (',' pattern)*)? ')'
    ;
 
 typeParameters
@@ -313,7 +194,7 @@ typeParameters
    ;
 
 argumentTypes
-   : '(' type (',' type)* ')'
+   : '(' (type (',' type)*)? ')'
    ;
 
 returnType
@@ -321,7 +202,7 @@ returnType
    ;
 
 arguments
-   : '(' expression (',' expression)* ')'
+   : '(' (expression (',' expression)*)? ')'
    ;
 
 typeArguments
@@ -338,32 +219,35 @@ SIGNALLITERAL
    ;
 
 NUMBERLITERAL
-   : INTEGERLITERAL DECIMALPART? EXPONENTPART?
+   : INTEGERLITERAL ('.' INTEGERLITERAL)? EXPONENTPART?
    ;
 
-EXPONENTPART
-   : 'E' INTEGERLITERAL
-   | 'E+' INTEGERLITERAL
-   | 'E-' INTEGERLITERAL
-   | 'e' INTEGERLITERAL
-   | 'e+' INTEGERLITERAL
-   | 'e-' INTEGERLITERAL
+fragment EXPONENTPART
+   : [eE] [+-]? INTEGERLITERAL
    ;
 
-DECIMALPART
-   : '.' INTEGERLITERAL
-   ;
-
-INTEGERLITERAL
+fragment INTEGERLITERAL
    : DECIMALDIGIT+
    ;
 
-DECIMALDIGIT
+fragment DECIMALDIGIT
    : [0-9]
    ;
 
 CHARACTERSTRINGLITERAL
-   : '"' ~ '"'* '"'
+   : '"' (~ ["\r\n])* '"'
+   ;
+
+IDENTIFIER
+   : [a-zA-Z_] [a-zA-Z_0-9]*
+   ;
+
+LINE_COMMENT
+   : '--' ~ [\r\n]* -> skip
+   ;
+
+BLOCK_COMMENT
+   : '{-' .*? '-}' -> skip
    ;
 
 WS
