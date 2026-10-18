@@ -23,7 +23,7 @@ THE SOFTWARE.
 
 COOL grammar derived from:
 
-http://sist.shanghaitech.edu.cn/faculty/songfu/course/spring2017/cs131/COOL/COOLAid.pdf
+sist.shanghaitech.edu.cn/faculty/songfu/course/spring2017/cs131/COOL/COOLAid.pdf
 
 */
 

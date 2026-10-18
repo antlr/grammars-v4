@@ -1,0 +1,1479 @@
+$title('CP/M 3 System Generation')
+gencpm:
+do;
+
+/*
+  Copyright (C) 1982
+  Digital Research
+  P.O. Box 579
+  Pacific Grove, CA 93950
+*/
+
+/*
+    Revised:
+      02 Dec 82  by Bruce Skidmore
+*/
+
+  declare true literally '0FFH';
+  declare false literally '0';
+  declare forever literally 'while true';
+  declare boolean literally 'byte';
+  declare cr literally '0dh';
+  declare lf literally '0ah';
+
+  mon1:
+    procedure (func,info) external;
+      declare func byte;
+      declare info address;
+    end mon1;
+
+  mon2:
+    procedure (func,info) byte external;
+      declare func byte;
+      declare info address;
+    end mon2;
+
+  relfix:
+    procedure byte external;
+    end relfix;
+
+  setbuf:
+    procedure external;
+    end setbuf;
+
+  getdef:
+    procedure external;
+    end getdef;
+
+  crtdef:
+   procedure external;
+   end crtdef;
+
+  declare reset label external;
+
+  declare fcb (1) byte external;
+  declare fcb16 (1) byte external;
+  declare tbuff (1) byte external;
+  declare maxb address external;
+  declare bitmap (128) byte external;
+
+  declare FCBin address public;
+
+  declare bios$fcb (36) byte initial (
+    0,'BNKBIOS3','SPR',0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
+
+  declare res$fcb (36) byte initial (
+    0,'RESBDOS3','SPR',0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
+
+  declare bnk$fcb (36) byte initial (
+    0,'BNKBDOS3','SPR',0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
+
+  declare FCBout (36) byte initial (
+    0,'CPM3    ','SYS',0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
+
+  declare data$fcb (36) byte public initial (
+    0,'GENCPM  ','DAT',0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
+
+  declare offset byte public;
+  declare prgsiz address public;
+  declare bufsiz address public;
+  declare codsiz address public;
+  declare bios$pg byte public;
+  declare scb$pg byte public;
+  declare res$pg byte public;
+  declare bnk$pg byte public;
+  declare bnk$off byte public;
+  declare res$len byte public;
+  declare non$bnk byte public;
+  declare dma address public;
+
+  declare hexASCII (16) byte public data (
+    '0123456789ABCDEF');
+
+  declare lnbfr (14) byte public initial (12);
+
+  declare sctbfr (1) structure (
+    record (128) byte) public at (.memory);
+
+  declare fcb$msg (13) byte initial ('        .   $');
+
+  declare query boolean public;
+
+/*
+     B D O S    P r o c e d u r e   &   F u n c t i o n    C a l l s
+*/
+
+  system$reset:
+    procedure public;
+      call mon1 (0,0);
+    end system$reset;
+
+  write$console:
+    procedure (char) public;
+      declare char byte;
+      if display then
+        call mon1 (2,char);
+    end write$console;
+
+  print$console$buffer:
+    procedure (buffer$address) public;
+      declare buffer$address address;
+      if display then
+        call mon1 (9,buffer$address);
+    end print$console$buffer;
+
+  read$console$buffer:
+    procedure (buffer$address) public;
+      declare buffer$address address;
+      declare buf based buffer$address (1) byte;
+      buf(1) = 0;
+      if automatic then 
+        do;
+          if not query then
+            return;
+        end;
+      call mon1 (10,buffer$address);
+      buf(buf(1)+2) = 0;
+    end read$console$buffer;
+
+  crlf:
+    procedure public;
+      call write$console (cr);
+      call write$console (lf);
+    end crlf;
+
+  error:
+    procedure(term$code,err$type,err$msg$adr) public;
+      declare (term$code,err$type) byte;
+      declare err$msg$adr address;
+      display = true;
+      call print$console$buffer (.(cr,lf,
+          'ERROR:  $'));
+      call print$console$buffer (err$msg$adr);
+      if err$type = 1 then
+        call print$console$buffer(.fcb$msg);
+      call crlf;
+      if term$code then
+        call system$reset;
+      if automatic and not query then
+        do;
+          fcb(1),
+          fcb16(1) = ' ';
+          goto reset;
+        end;
+   end error;
+
+  open$file:
+    procedure (fcb$address) byte public;
+      declare fcb$address address;
+      declare fcb based fcb$address (1) byte;
+      fcb(12),      /* ex = 0 */
+      fcb(32) = 0;  /* cr = 0 */
+      return mon2 (15,fcb$address);
+    end open$file;
+
+  close$file:
+    procedure (fcb$address) public;
+      declare fcb$address address;
+      call mon1 (16,fcb$address);
+    end close$file;
+
+  delete$file:
+    procedure (fcb$address) public;
+      declare fcb$address address;
+      call mon1 (19,fcb$address);
+    end delete$file;
+
+  read$record:
+    procedure (fcb$address) public;
+      declare fcb$address address;
+      if mon2 (20,fcb$address) <> 0 then
+      do;
+        call error(true,1,.(
+          'Reading file:  $'));
+      end;
+    end read$record;
+
+  write$record:
+    procedure (fcb$address) public;
+      declare fcb$address address;
+      if mon2 (21,fcb$address) <> 0 then
+      do;
+        call error(true,1,.(
+          'Writing file:  ','$'));
+      end;
+    end write$record;
+
+  create$file:
+    procedure (fcb$address) public;
+      declare fcb$address address;
+      declare fcb based fcb$address (1) byte;
+      if mon2 (22,fcb$address) = 255 then
+      do;
+        call error(true,0,.(
+          'Directory full','$'));
+      end;
+      fcb(32) = 0;  /* set cr = 0 */
+    end create$file;
+
+  set$DMA$address:
+    procedure (DMA$address) public;
+      declare DMA$address address;
+      call mon1 (26,DMA$address);
+    end set$DMA$address;
+
+  read$random$record:
+    procedure (fcb$address) public;
+      declare fcb$address address;
+      if mon2 (33,fcb$address) <> 0 then
+      do;
+        call error(true,1,.(
+          'Reading file: ','$'));
+      end;
+    end read$random$record;
+
+  write$random$record:
+    procedure (fcb$address) public;
+      declare fcb$address address;
+      if mon2 (34,fcb$address) <> 0 then
+      do;
+        call error(true,1,.(
+          'Writing file:  ','$'));
+      end;
+    end write$random$record;
+
+  set$random$record:
+    procedure (fcb$address) public;
+      declare fcb$address address;
+      call mon1 (36,fcb$address);
+    end set$random$record;
+
+
+/*
+    D a t a    S t r u c t u r e s
+*/
+  
+
+  declare automatic boolean;
+  declare display boolean public;
+
+  declare nmb$sect address;
+
+  declare link address at (.memory);
+
+  declare bios$atts(3) address public;
+  declare res$atts(3) address public;
+  declare bnk$atts(3) address public;
+
+  declare res$bios$len byte public;
+  declare res$base byte public;
+  declare pg$dif byte public;
+  declare xmove$implemented boolean public;
+  declare os$top address;
+
+  declare system$data (256) byte;
+
+  declare common$len byte public at (.system$data(1));
+  declare banked$len byte public at (.system$data(3));
+  declare sys$entry address public at (.system$data(4));
+
+  declare prt$msg$ptr byte;
+
+  declare dont$hash boolean;
+
+  declare wordadr address;
+  declare word based wordadr address;
+
+  declare len byte;
+  declare off address;
+  declare res$flg byte;
+  declare save$mem$top byte;
+
+  declare drvtbl$adr address public;
+  declare drvtbl based drvtbl$adr (16) address;
+
+  declare dph$adr address public;
+  declare dph based dph$adr structure (
+    xlt         address,
+    scratch1(4) address,
+    scratch2    byte,
+    mf          byte,
+    dpb         address,
+    csv         address,
+    alv         address,
+    dirbcb      address,
+    dtabcb      address,
+    hash        address,
+    hbank       byte);
+
+  declare dpb$adr address public;
+  declare dpb based dpb$adr structure (
+    spt         address,
+    bsh         byte,
+    blm         byte,
+    exm         byte,
+    dsm         address,
+    drm         address,
+    al0         byte,
+    al1         byte,
+    cks         address,
+    off         address,
+    psh         byte,
+    phm         byte);
+
+  declare bnk$swt boolean external;
+  declare dbl$alv boolean external;
+  declare mem$top byte external;
+  declare bnk$top byte external;
+  declare lerror boolean external;
+  declare bdrive byte external;
+  declare con$wid byte external;
+  declare con$pag byte external;
+  declare bck$spc boolean external;
+  declare rubout boolean external;
+  declare prt$msg boolean external;
+  declare hash(16) boolean external;
+  declare num$seg byte external;
+  declare crdatf boolean external;
+
+  declare mem$tbl (17) structure(
+    base        byte,
+    len         byte,
+    bank        byte,
+    attr        address) external;
+ 
+  declare record(16) structure(
+    size        address,
+    attr        byte,
+    altbnks     byte,
+    no$dirrecs  byte,
+    no$dtarecs  byte,
+    ovlydir$dr  byte,
+    ovlydta$dr  byte,
+    dir$resp    byte,
+    dta$resp    byte) external;
+
+  declare quest(157) boolean external;
+
+  declare hash$data(16) address public;
+  declare hash$space address public;
+  declare alloc(16) address public;
+  declare alloc$space address public;
+  declare chk(16) address public;
+  declare chk$space address public;
+
+/*
+      L o c a l    P r o c e d u r e s
+*/
+
+  movef:
+    procedure (count,source$adr,dest$adr) public;
+      declare count byte;
+      declare (source$adr,dest$adr) address;
+
+      if count = 0
+      then return;
+      else call move (count,source$adr,dest$adr);
+
+    end movef;
+
+  shift$left:
+    procedure (pattern, count) address public;
+      declare count byte;
+      declare pattern address;
+
+      if count = 0
+      then return pattern;
+      else return shl(pattern,count);
+
+   end shift$left;
+
+  upper:
+    procedure(b) byte public;
+      declare b byte;
+  
+      if b < ' ' then return cr; /* all non-graphics */
+      /* translate alpha to upper case */
+      if b >= 'a' and b <= 'z' then
+        b = b and 101$1111b; /* upper case */
+      return b;
+    end upper;
+
+  valid$drive:
+    procedure(drv) boolean public;
+      declare drv byte;
+      if (drv >= 0) and (drv <= 15) then
+        return true;
+      call error(false,0,.('Invalid drive.$'));
+      return false;
+    end valid$drive;
+
+  get$response:
+    procedure (val$adr) public;
+      declare val$adr address;
+      declare val based val$adr byte;
+      call write$console ('(');
+      if val = 0ffh
+        then call write$console ('Y');
+        else call write$console ('N');
+      call print$console$buffer (.(') ? ','$'));
+      call read$console$buffer (.lnbfr);
+      if lnbfr(1) = 0 
+        then return;  /* accept default */
+      val = (upper(lnbfr(2)) = 'Y');
+    end get$response;
+
+  dsply$hex:
+    procedure (val) public;
+      declare val byte;
+      call write$console (hexASCII(shr (val,4)));
+      call write$console (hexASCII(val and 0fh));
+    end dsply$hex;
+
+  dsply$hex$adr:
+    procedure (val) public;
+      declare val address;
+      call write$console (' ');
+      call dsply$hex (high (val));
+      call dsply$hex (low (val));
+      call write$console ('H');
+    end dsply$hex$adr;
+
+  dsply$hex$high$adr:
+    procedure (val) public;
+      declare val byte;
+      call dsply$hex$adr (double (val)*256);
+    end dsply$hex$high$adr;
+
+  dsply$dec$adr:
+    procedure (val) public;
+      declare val address;
+      declare big address;
+      declare (digit,i) byte;
+      declare pdigit boolean;
+
+      pdigit = false;
+      digit = '0';
+      big = 10000;
+      if val = 0 then
+        call write$console(digit);
+      else
+        do;
+          do i = 0 to 4;
+            do while val >= big;
+              pdigit = true;
+              digit = digit + 1;
+              val = val - big;
+            end;
+            if pdigit then
+              do;
+                call write$console(digit);
+                digit = '0';
+              end;
+            big = big / 10;
+          end;
+        end;
+    end dsply$dec$adr;
+    
+  dsply$param:
+    procedure (val,base) public;
+      declare (val,base) byte;
+      call write$console ('(');
+      if base = 10 then
+      do;
+        call write$console ('#');
+        call dsply$dec$adr(double(val));
+      end;
+      else
+      do;
+        call dsply$hex (val);
+      end;
+      call print$console$buffer (.(') ? ','$'));
+    end dsply$param;
+
+  get$param:
+    procedure (string$adr,val$adr,pbase) public;
+      declare (string$adr,val$adr) address;
+      declare pbase byte;
+      declare base byte;
+      declare val based val$adr byte;
+      declare string based string$adr (1) byte;
+      declare char byte;
+      declare lbindx byte;
+
+      prompt$read:
+        procedure;
+          call print$console$buffer (string$adr);
+          if string(0) = ' ' then
+          do;
+            call write$console ('(');
+            call dsply$hex (val);
+            do lbindx = 1 to 2;
+              val$adr = val$adr + 1;
+              if (lbindx=2) and (not bnk$swt) then
+              do;
+                val = 0;
+              end;
+              else
+              do;
+                call write$console (',');
+                call dsply$hex (val);
+              end;
+            end;
+            val$adr = val$adr - 2;
+            call print$console$buffer (.(') ? ','$'));
+          end;
+          else
+          do;
+            call dsply$param (val,pbase);
+          end;
+          base = 16;
+          lbindx = 1;
+          call read$console$buffer (.lnbfr);
+        end prompt$read;
+
+      call prompt$read;
+      if lnbfr(1) = 0 then
+      do;
+        /* accept default value */
+        call crlf;
+        return;
+      end;
+      val = 0;
+      do while (char := upper(lnbfr(lbindx:=lbindx+1))) <> cr;
+        if char = ',' then
+        do;
+          val$adr = val$adr + 1;
+          val = 0;
+          base = 16;
+        end;
+        else
+        do;
+          if char = '#' then
+          do;
+            base = 10;
+          end;
+          else
+          do;
+            char = char - '0';
+            if (base = 16) and (char > 9) then
+            do;
+              if char > 16
+                then char = char - 7;
+                else char = 255;
+            end;
+            if char < base then
+            do;
+              val = val*base + char;
+            end;
+            else
+            do;
+              char,
+              val = 0;
+              call error (false,0,.(
+                'Bad character, re-enter $'));
+              call prompt$read;
+              val = 0;
+            end;
+          end;
+        end;
+      end;
+      call crlf;
+    end get$param;
+
+  get$seg:
+    procedure(type,record$size) byte public;
+
+      declare (type,k,seg$no) byte;
+      declare (record$size,max$attr) address;
+  
+      if not bnk$swt then
+        return 0;
+
+      seg$no = 0ffh;
+      max$attr = 0ffffh;
+      do k = 1 to num$seg;
+        if mem$tbl(k).attr >= record$size then
+          if type = 1 then
+            do;
+              if (mem$tbl(k).bank = 0) and
+                   (mem$tbl(k).attr < max$attr) then
+                do;
+                  seg$no = k;
+                  max$attr = mem$tbl(k).attr;
+                end;
+            end;
+          else
+            do;
+              if (mem$tbl(k).bank <> 0) and
+                   (mem$tbl(k).attr < max$attr) then
+                do;
+                  seg$no = k;
+                  max$attr = mem$tbl(k).attr;
+                end;
+            end;
+      end;
+      if (seg$no = 0ffh) and (type = 2) then
+        do k = 1 to num$seg;
+          if (mem$tbl(k).attr >= record$size) and
+             (mem$tbl(k).bank = 0)            and
+             (mem$tbl(k).attr < max$attr)     then
+            do;
+               seg$no = k;
+               max$attr = mem$tbl(k).attr;
+             end;
+        end;
+      return seg$no;
+
+    end get$seg;
+     
+plm: 
+  procedure public;
+
+  st$ascii$hex:
+    procedure(string$adr,val);
+     declare string$adr address;
+     declare string based string$adr (6) byte;
+     declare val address;
+     declare i byte;
+     string(0) = ' ';
+     string(1) = ' ';
+     string(2) = hexASCII(shr(high(val),4));
+     string(3) = hexASCII(high(val) and 0fh);
+     string(4) = hexASCII(shr(low(val),4));
+     string(5) = hexASCII(low(val) and 0fh);
+   end st$ascii$hex;
+
+  setup$scb:
+    procedure;
+      declare scb$adr address;
+      declare scb$dat based scb$adr (100) byte;
+
+      scb$adr = .memory + shl(double(scb$pg-res$pg),8) + 09ch;
+
+      scb$dat(13h) = bdrive;
+      scb$dat(1ah) = con$wid;
+      scb$dat(1ch) = con$pag;
+      scb$dat(2eh) = bck$spc;
+      scb$dat(2fh) = rubout;
+      call movef(5,.(012h,07h,0,0,0),.scb$dat(58h)); /* December 15, 1982 */
+      if not lerror then
+        scb$dat(57h) = scb$dat(57h) and 7fh;
+      if not dbl$alv and not bnk$swt then
+        scb$dat(57h) = scb$dat(57h) or 0100$0000B;
+      else
+        scb$dat(57h) = scb$dat(57h) and 1011$1111B;
+      scb$dat(5eh) = bnk$top;
+      
+    end setup$scb;
+
+  get$drvtbl$adr:
+    procedure address;
+      declare temp$adr address;
+      declare temp2 based temp$adr address;
+      declare temp3 address;
+
+      temp$adr = .memory(43h);
+      temp3 = temp2 + 1 + .memory;
+      temp$adr = temp3;
+      if temp2 = 0fffeh
+      then res$flg = 2;
+      else res$flg = 0;
+      if temp2 < 0fffeh
+      then return temp2 + .memory;
+      else return 0ffffh;
+    end get$drvtbl$adr;
+
+  page$chop:
+    procedure;
+      declare i byte;
+
+      drvtbl$adr = get$drvtbl$adr;
+
+      dont$hash = true;
+      if (drvtbl$adr <> 0ffffh) then
+        do;
+          do i = 0 to 15;
+            if drvtbl(i) <> 0 then
+              do;
+                dph$adr = drvtbl(i) + .memory;
+                if dph.hash <> 0ffffh then
+                  dont$hash = false;
+              end;
+          end;
+          if dont$hash and not bnk$swt then
+            res$flg = 2;
+          else
+            res$flg = 0;
+        end;
+
+    end page$chop;
+
+  get$xmove:
+    procedure boolean;
+      declare xmove$adr address;
+      declare xmove$val based xmove$adr byte;
+
+      call movef(2,.memory(58h),.xmove$adr);
+      xmove$adr = xmove$adr + .memory;
+      if xmove$val = 0c9h /* ret instr. */ then
+        return false;
+      else
+        return true;
+    end get$xmove;
+
+  display$layout:
+    procedure(string$adr,base,length);
+      declare string$adr address;
+      declare base address;
+      declare length byte;
+
+      call print$console$buffer (.(cr,lf,' ','$'));
+      call print$console$buffer (string$adr);
+      call write$console(' ');
+      call dsply$hex$adr (base);
+      call write$console(' ');
+      call dsply$hex$high$adr (length);
+      if prt$msg then
+       do;
+         call movef(12,string$adr,.system$data(prt$msg$ptr));
+         prt$msg$ptr = prt$msg$ptr + 12;
+         call st$ascii$hex(.system$data(prt$msg$ptr),base);
+         prt$msg$ptr = prt$msg$ptr + 6;
+         call st$ascii$hex(.system$data(prt$msg$ptr),
+                            double(length)*256);
+         prt$msg$ptr = prt$msg$ptr + 6;
+         call movef(3,.(cr,lf,' '),.system$data(prt$msg$ptr));
+         prt$msg$ptr = prt$msg$ptr + 3;
+       end;
+   end display$layout;
+
+  reloc$module:
+    procedure (fcb$adr);
+      declare fcb$adr address;
+      FCBin = fcb$adr;
+      if relfix <> 0 then
+      do;
+        call error(true,1,.('Disk read error:  $'));
+      end;
+      call close$file(fcb$adr);
+    end reloc$module;
+
+  load:
+    procedure (fcb$adr,atts$adr);
+      declare fcb$adr address;
+      declare atts$adr address;
+      declare atts based atts$adr (3) address;
+      declare (i,rdcnt) byte;
+
+      prgsiz = atts(0);
+      bufsiz = atts(1);
+      codsiz = atts(2);
+      call movef(8,fcb$adr+1,.fcb$msg);
+      call movef(3,fcb$adr+9,.fcb$msg+9);
+      if shr(prgsiz+255,7) > nmb$sect then
+      do;
+        call error(true,1,.('File cannot fit into GENCPM buffer:  ','$'));
+      end;
+      rdcnt = low(shr(prgsiz-1,7)) + 1;
+      i = 0;
+      do while (i < rdcnt);
+        call set$dma$address(dma:=.sctbfr(i));
+        call read$record(fcb$adr);
+        i = i + 1;
+      end;
+      call movef(128,dma,.bitmap);  /* copy the last sector read, into */
+                                    /* the bitmap buffer, relocation   */
+                                    /* info might be that last sector  */
+      dma = prgsiz + .memory;
+  end load;
+
+  wrtbuf:
+    procedure (wrtlen,wrtoff$adr);
+      declare (i,wrtlen,wrtcnt) byte;
+      declare wrtoff$adr address;
+      declare wrtoff based wrtoff$adr address;
+      if wrtlen <> 0 then
+        do;
+           call movef(8,.FCBout+1,.fcb$msg);
+           call movef(3,.FCBout+9,.fcb$msg+9);
+           FCBout(33) = low(wrtoff);
+           FCBout(34) = high(wrtoff);
+           call write$random$record(.FCBout);
+           dma = dma + low(256 - low(dma - .memory));
+           wrtcnt = wrtlen * 2 - 1;
+           do i = 0 to wrtcnt;
+             call set$dma$address(dma:=dma-80h);
+             call write$record(.FCBout);
+           end;
+           call set$random$record(.FCBout);
+           call movef(2,.FCBout(33),wrtoff$adr);
+        end;
+    end wrtbuf;
+
+  get$file$info:
+    procedure;
+      declare fcb$adr address;
+      declare atts$adr address; 
+      declare file$atts based atts$adr(3) address;
+      declare header$record structure (
+        fill1 byte,  
+        psize address,
+        fill2 byte,
+        dsize address,
+        fill3 (4) byte,
+        csize address,
+        fill4 (116) byte) at (.memory);
+
+
+    get$atts:
+      procedure;
+        call movef(8,fcb$adr+1,.fcb$msg);
+        call movef(3,fcb$adr+9,.fcb$msg+9);
+        if open$file(fcb$adr) = 0ffh
+        then call error(true,1,.('Unable to open:  $'));
+        call set$dma$address(.header$record);
+        call read$record(fcb$adr);
+        file$atts(0) = header$record.psize;
+        file$atts(1) = header$record.dsize;
+        file$atts(2) = header$record.csize;
+        call read$record(fcb$adr);
+      end get$atts;
+
+    if not bnk$swt then
+      do;
+        call movef(8,.('BDOS3   '),.res$fcb+1);
+        call movef(8,.('BIOS3   '),.bios$fcb+1);
+      end;
+    else 
+      do;
+         fcb$adr = .bnk$fcb;
+         atts$adr = .bnk$atts;
+         call get$atts;
+      end;
+    fcb$adr = .bios$fcb;
+    atts$adr = .bios$atts;
+    call get$atts;
+    fcb$adr = .res$fcb;
+    atts$adr = .res$atts;
+    call get$atts;
+  end get$file$info;
+
+  need$tbl:
+    procedure byte;
+     declare (all$some,i) byte;
+
+     all$some = false;
+
+     if drvtbl$adr = 0ffffh
+     then return false;
+     else 
+       do i = 0 to 15;
+         if drvtbl(i) <> 0 then
+           do;
+              dph$adr = drvtbl(i) + .memory;
+              /* zero the reserved bytes in the DPH */
+              call movef(9,.(0,0,0,0,0,0,0,0,0),dph$adr+2);
+              if (dph.dirbcb = 0fffeh) or (dph.dtabcb = 0fffeh) or
+                 (dph.hash = 0fffeh) or (dph.alv = 0fffeh) or
+                 (dph.csv = 0fffeh)
+              then all$some = true;
+           end;
+       end;
+     return all$some;
+
+  end need$tbl;
+
+  setup$hash:
+    procedure;
+      declare (i,j,printed,seg$no,seg0$no,h$bank,hohash) byte;
+      declare (size,h$attr,max$attr,max0$attr) address;
+      declare nohash boolean;
+
+      printed = false;
+      nohash = true;
+
+      do i = 0 to 15;
+        dph$adr = drvtbl(i) + .memory;
+        if drvtbl(i) <> 0 then
+          do;
+            if dph.hash < 0fffeh then
+              nohash = false;
+            if dph.hash = 0fffeh then
+              do;
+                if not printed then
+                  do;
+                    printed = true;
+                    call print$console$buffer(.
+                       (lf,cr,'Setting up directory hash tables:',
+                        lf,cr,'$'));
+                  end;
+                query = quest(27 + i);
+                dpb$adr = dph.dpb + .memory;
+                size = shl(dpb.drm+1,2);
+                call print$console$buffer(.
+                     (' Enable hashing for drive $'));
+                call write$console('A'+i);
+                call print$console$buffer(.(': $'));
+                call get$response(.hash(i));
+                call crlf;
+                if not hash(i) then
+                  do;
+                    dph.hash = 0ffffh;
+                  end;
+                else
+                  if not bnk$swt then
+                    do;
+                      nohash = false;
+                      hash$data(i) = size;
+                      hash$space = hash$space + size;
+                    end;
+                  else
+                    do;
+                      if (seg$no := get$seg(2,size)) = 0ffh then
+                        call error(false,0,.(
+                              'Unable to allocate space for hash table.$'));
+                      else
+                        do;
+                          dph.hbank = mem$tbl(seg$no).bank;
+                          dph.hash = shl(double(mem$tbl(seg$no).base),8) +
+                                     (shl(double(mem$tbl(seg$no).len),8) -
+                                      mem$tbl(seg$no).attr);
+                          mem$tbl(seg$no).attr = mem$tbl(seg$no).attr - size;
+                        end;
+                    end; 
+              end;
+          end;
+      end;
+      if (not bnk$swt) and (nohash) then
+       do;
+         res$flg = 2;
+         scb$pg = scb$pg + 2;
+         res$pg = res$pg + 2;
+       end;
+    end setup$hash;
+
+  get$alloc$chk:
+    procedure;
+      declare (i,dbl$alloc) byte;
+      declare printed boolean;
+
+      do i = 0 to 15;
+        alloc(i) = 0;
+        chk(i) = 0;
+      end;
+
+      if not dbl$alv and not bnk$swt then
+        dbl$alloc = 1;
+      else
+        dbl$alloc = 2;
+
+      alloc$space = 0;
+      chk$space = 0;
+      printed = false;
+      do i = 0 to 15;
+        if drvtbl(i) <> 0 then
+          do;
+            dph$adr = drvtbl(i) + .memory;
+            dpb$adr = dph.dpb + .memory;
+            if dph.alv = 0fffeh then
+              do;
+                call print$console$buffer(.(cr,lf,
+                     'Setting up Allocation vector for drive $'));
+                call write$console('A'+i);
+                call write$console(':');
+                printed = true;
+                alloc(i) = (dpb.dsm/8 + 1) * dbl$alloc;
+                alloc$space = alloc$space + alloc(i);
+              end;
+            if dph.csv = 0fffeh then
+              do;
+                call print$console$buffer(.(cr,lf,
+                     'Setting up Checksum vector for drive $'));
+                call write$console('A'+i);
+                call write$console(':');
+                printed = true;
+                chk(i) = (dpb.drm + 4)/4;
+                chk$space = chk$space + chk(i);
+                dpb.cks = (dpb.cks and 8000h) or chk(i);
+              end;
+          end;
+      end;
+      if printed then
+        call crlf;
+    end get$alloc$chk;
+
+  setup$mem$seg$tbl:
+    procedure;
+      declare (i,j,ok,accept,mlow,mhigh,tlow,thigh) byte;
+      declare mem$temp address;
+
+      /* Create first memory segment table entry */
+      mem$tbl(0).base = bnk$pg;
+      mem$tbl(0).len = bnk$top - bnk$pg;
+      mem$tbl(0).attr = 0;
+      mem$tbl(0).bank = 0;
+
+      accept = false;
+
+      call print$console$buffer(
+                 .(lf,cr,
+                  '*** Bank 1 and Common are not included ***',
+                   lf,cr,
+                  '*** in the memory segment table.       ***',
+                   lf,cr,lf,cr,'$'));
+      query = quest(10);
+      call get$param (.('Number of memory segments $'),
+                      .num$seg,10);
+      call print$console$buffer(.(cr,lf,
+              'CP/M 3 Base,size,bank ($'));
+      call dsply$hex(mem$tbl(0).base);
+      call write$console(',');
+      call dsply$hex(mem$tbl(0).len);
+      call write$console(',');
+      call dsply$hex(mem$tbl(0).bank);
+      call print$console$buffer(.(')',lf,cr,'$'));
+
+      do while not accept;  
+        /* Bank switched memory segment table input */
+        call print$console$buffer (.(cr,lf,
+              'Enter memory segment table:',lf,cr,'$'));
+        do j = 1 to num$seg;
+          ok = false;
+          do while not ok;
+            query = quest(11 + j - 1);
+            call get$param (.(' Base,size,bank ','$'),
+                            .mem$tbl(j),16);
+            mem$tbl(j).attr = shl(double(mem$tbl(j).len),8);
+            if mem$tbl(j).len = 0 then
+              do;
+                 call error(false,0,.(
+                      'Zero length segment not allowed.$'));
+              end;
+            else
+              if mem$tbl(j).bank = 1 then
+                do;
+                  call error(false,0,.(
+                       'Bank one not allowed.$'));
+                end;
+              else
+                do;
+                  tlow = mem$tbl(j).base;
+                  mem$temp = double(tlow) + double(mem$tbl(j).len);
+                  if (high(mem$temp) <> 0) or (low(mem$temp) > bnk$top) then
+                    do;
+                       call print$console$buffer(.(cr,lf,'ERROR:  ',
+                               'Memory conflict - segment trimmed.',
+                                cr,lf,'$'));
+                       mem$tbl(j).len = bnk$top - tlow;
+                       mem$tbl(j).attr = shl(double(bnk$top - tlow),8);
+                    end;
+                  else
+                    do;
+                      thigh = low(mem$temp);
+                      i = 0;
+                      ok = true;
+                      do while ((i < j) and ok);
+                        mlow = mem$tbl(i).base;
+                        mhigh = mlow + mem$tbl(i).len;
+                        if mem$tbl(i).bank = mem$tbl(j).bank then
+                          do;
+                            if (mhigh >= thigh) and (tlow >= mlow) then
+                              do;
+                                call error(false,0,.(
+                                     'Memory conflict - cannot trim segment.$'));
+                                ok = false;
+                              end;
+                            else
+                              if ((thigh > mhigh) and (mhigh > tlow)) then
+                                do;
+                                  call print$console$buffer(.(cr,lf,'ERROR:  ',
+                                       'Memory conflict - segment trimmed.',
+                                        cr,lf,'$'));
+                                  mem$tbl(j).base = mhigh;
+                                  ok = false;
+                                end;
+                              else
+                                if ((thigh > mlow) and (mlow > tlow)) then
+                                  do;
+                                     call print$console$buffer(.(cr,lf,'ERROR:  ',
+                                         'Memory conflict - segment trimmed.',
+                                          cr,lf,'$'));
+                                     mem$tbl(j).len = mlow - tlow;
+                                     mem$tbl(j).attr = shl(double(mlow-tlow),8);
+                                     ok = false;
+                                  end;
+                          end;
+                          i = i + 1;
+                      end;
+                    end;
+                end;
+          end;
+        end;
+        call crlf;
+        do j = 0 to num$seg;
+          if j = 0 then
+            call print$console$buffer   (.(' CP/M 3 Sys   ','$'));
+          else
+            do;
+              call print$console$buffer (.(' Memseg No. ','$'));
+              call dsply$hex(j-1);
+            end;
+          call dsply$hex$high$adr (mem$tbl(j).base);
+          call dsply$hex$high$adr (mem$tbl(j).len);
+          if bnk$swt then
+            do;
+              call print$console$buffer (.('  Bank ','$'));
+              call dsply$hex (mem$tbl(j).bank);
+            end;
+          call crlf;
+        end;
+        query = false;
+        accept = true;
+        call print$console$buffer (.(cr,lf,
+          'Accept new memory segment table entries ','$'));
+        call get$response (.accept);
+      end; /* do while not accept */
+      call crlf;
+    end setup$mem$seg$tbl;
+
+  get$default$file:
+    procedure;
+      declare ret byte;
+
+      call print$console$buffer(.(
+        'Default entries are shown in (parens).',cr,lf,
+        'Default base is Hex, precede entry with # for decimal',
+        cr,lf,'$'));
+      if (ret:=open$file(.data$fcb)) <> 255 then
+        do;
+          call movef(8,.data$fcb+1,.fcb$msg);
+          call movef(3,.data$fcb+9,.fcb$msg+9);
+          call print$console$buffer(.(
+            cr,lf,'Use GENCPM.DAT for defaults $'));
+          ret = 0ffh;
+          call get$response(.ret);
+          call crlf;
+          if ret then
+            call getdef;
+          call close$file(.data$fcb);
+        end;
+      else
+        do;
+          display = true;
+          automatic = false;
+        end;
+
+    end get$default$file;
+
+  setup$system$dat:
+    procedure;
+      declare (i,j,ok,temp) byte;
+      ok = false;
+      call get$default$file;
+      do while not ok;
+        query = quest(155);
+        call crlf;
+        call print$console$buffer(.('Create a new GENCPM.DAT file $'));
+        call get$response(.crdatf);
+        query = quest(0);
+        call crlf;
+        call crlf;
+        call print$console$buffer(.('Display Load Map at Cold Boot $'));
+        call get$response(.prt$msg);
+        call crlf;
+        call crlf;
+        query = quest(1);
+        con$wid = con$wid + 1;
+        call get$param (.('Number of console columns $'),
+                        .con$wid,10);
+        con$wid = con$wid - 1;
+        query = quest(2);
+        con$pag = con$pag + 1;
+        call get$param (.('Number of lines in console page $'),
+                        .con$pag,10);
+        con$pag = con$pag - 1;
+        query = quest(3);
+        call print$console$buffer(.
+                   ('Backspace echoes erased character $'));
+        call get$response (.bck$spc);
+        call crlf;
+        query = quest(4);
+        call print$console$buffer(.
+                   ('Rubout echoes erased character $'));
+        call get$response (.rubout);
+        call crlf;
+        call crlf;
+        query = quest(5);
+   err1:
+        call print$console$buffer(.('Initial default drive ($'));
+        call write$console('A'+bdrive);
+        call print$console$buffer(.(':) ? $'));
+        call read$console$buffer(.lnbfr);
+        if lnbfr(1) <> 0 then
+          do;
+            temp = upper(lnbfr(2))-'A';
+            if not valid$drive(temp) then
+              goto err1;
+            bdrive = temp;
+          end;
+        call crlf;
+        call crlf;
+        query = quest(6);
+        call get$param (.('Top page of memory $'),
+                        .mem$top,16);
+        os$top = shl(double(mem$top),8) + 100h;
+        query = quest(7);
+        call print$console$buffer(.('Bank switched memory $'));
+        call get$response (.bnk$swt);
+        call crlf;
+        non$bnk = not bnk$swt;
+        if bnk$swt then
+          do;
+            query = quest(8);
+            call get$param (.('Common memory base page $'),
+                            .bnk$top,16);
+            call crlf;
+            query = quest(9);
+            call print$console$buffer(.('Long error messages $'));
+            call get$response(.lerror);
+            call crlf;
+          end;            
+        else
+          do;
+            query = quest(156);
+            call crlf;
+            call print$console$buffer(.('Double allocation vectors $'));
+            call get$response(.dbl$alv);
+            call crlf;
+            bnk$top = 0;
+          end;
+        query = false;
+        ok = true;
+        call crlf;
+        call print$console$buffer(.('Accept new system definition $'));
+        call get$response(.ok);
+        call crlf;
+      end;
+      save$mem$top = mem$top;
+      mem$top = mem$top + 1;
+      rubout = not rubout;
+    end setup$system$dat;
+
+  setup$CPM80$sys:
+    procedure;
+    declare i byte;
+      call print$console$buffer (.(  cr,lf,lf,
+        'CP/M 3.0 System Generation',cr,lf,
+        'Copyright (C) 1982, Digital Research',
+        cr,lf,cr,lf,'$'));
+      call delete$file (.fcbout);
+      call create$file (.fcbout);
+      FCBout(32) = 0;
+      do i = 0 to 127;
+        system$data(i) = 0;
+      end;
+      do i = 128 to 255;
+        system$data(i) = '$';
+      end;
+      prt$msg$ptr = 128;
+      call movef(3,.(cr,lf,' '),.system$data(prt$msg$ptr));
+      prt$msg$ptr = 131;
+      call movef(8,.FCBout+1,.fcb$msg);
+      call movef(3,.FCBout+9,.fcb$msg+9);
+      call set$DMA$address (.sctbfr);
+      call write$record (.FCBout);
+      call write$record (.FCBout);
+    end setup$CPM80$sys;
+
+  initialization:
+    procedure;
+      declare i byte;
+
+      nmb$sect = shr ((maxb-.sctbfr+1),7);
+
+      do i = 0 to 15;
+        hash$data(i) = 0;
+      end;
+      hash$space = 0;
+
+      if fcb(1) = 'A' then
+        do;
+          automatic = true;
+          display = false;
+          do i = 0 to 154;
+            quest(i) = false;
+          end;
+        end;
+      else
+        do;
+         automatic = false;
+         display = true;
+        end;
+      if fcb16(1) = 'D' then
+        do;
+          display = true;
+        end;
+      query = false;
+
+    end initialization;
+
+
+/*
+     G E N C P M    M a i n    P r o g r a m
+*/
+
+  res$flg = 0;
+  display = true;
+  call setup$CPM80$sys;
+  call initialization;
+  call setup$system$dat;
+
+  call get$file$info;
+
+  if bios$atts(2) <> 0
+  then res$bios$len = high(bios$atts(2) + 255);
+  else res$bios$len = high(bios$atts(0) + 255);
+  bios$pg = mem$top - res$bios$len;
+  bnk$off = bnk$top - (high(bios$atts(0) + 255) - res$bios$len);
+  bnk$pg = bnk$off - high(bnk$atts(0) + 255);
+
+  call load(.bios$fcb,.bios$atts);
+
+  call page$chop;
+
+
+  if not bnk$swt then
+    do;
+      scb$pg = bios$pg - (3 - res$flg);
+      res$pg = bios$pg - high(res$atts(0) + 255) + res$flg;
+    end;
+  else
+    do;
+      scb$pg = bios$pg - 1;
+      res$pg = bios$pg - high(res$atts(0) + 255);
+    end;
+
+  if need$tbl then
+    do;
+      call get$alloc$chk;
+      if bnk$swt then
+        do;
+          bnk$off = bnk$top - (high(bios$atts(0) + alloc$space +
+                               chk$space + 255) - res$bios$len);
+          bnk$pg = bnk$off - high(bnk$atts(0) + 255);
+          xmove$implemented = get$xmove;
+          call setup$mem$seg$tbl;
+          if (not xmove$implemented) then
+            do len = 0 to 15;
+              record(len).altbnks = false;
+            end;
+        end;
+      else
+         xmove$implemented = false;
+      if not dont$hash then
+        call setup$hash;
+      call setbuf;
+    end;
+
+  res$len = res$bios$len;
+
+  offset = bios$pg;
+  call reloc$module(.bios$fcb);
+
+  if bnk$swt
+  then call display$layout(.('BNKBIOS3 SPR$'),
+                           double(bios$pg)*256,res$bios$len);
+  else call display$layout(.('BIOS3    SPR$'),
+                           double(bios$pg)*256,res$bios$len);
+  if not bnk$swt then
+    do;
+       len = res$bios$len;
+       off = 2;
+       call wrtbuf(len,.off);
+       common$len = len;
+       banked$len = 0;
+    end;
+  else
+    do;
+       len = high(bios$atts(0) + 255) - res$bios$len;
+       off = (high(res$atts(0) + 255) + res$bios$len) * 2 + 2;
+       call display$layout(.('BNKBIOS3 SPR$'),double(bnk$off)*256,len);
+       call wrtbuf(len,.off);
+       banked$len = len;
+       len = res$bios$len;
+       off = 2;
+       dma = dma - 80h;
+       call wrtbuf(len,.off);
+       common$len = len;
+    end;
+
+  res$len = high(res$atts(0) + 255) - res$flg;
+  offset = res$pg;
+  call load(.res$fcb,.res$atts);
+  call reloc$module(.res$fcb);
+  call setup$scb;
+  dma = dma - (res$flg * 256);
+  len = high(res$atts(0) + 255) - res$flg;
+  if not bnk$swt
+  then call display$layout(.('BDOS3    SPR$'),double(res$pg)*256,len);
+  else call display$layout(.('RESBDOS3 SPR$'),double(res$pg)*256,len);
+  call wrtbuf(len,.off);
+  common$len = common$len + len;
+
+  if bnk$swt then
+  do;
+     res$len = 0ffh;
+     offset = bnk$pg;
+     call load(.bnk$fcb,.bnk$atts);
+     call reloc$module(.bnk$fcb);
+     len = high(bnk$atts(0) + 255);
+     off = off + (high(bios$atts(0) + 255) - res$bios$len) * 2;
+     call display$layout(.('BNKBDOS3 SPR$'),double(bnk$pg)*256,len);
+     call wrtbuf(len,.off);
+     banked$len = banked$len + len;
+  end;
+  if not prt$msg then prt$msg$ptr = prt$msg$ptr - 3;
+  call movef(12,.(lf,cr,' 64K TPA',lf,cr),.system$data(prt$msg$ptr));
+  res$pg = shr(res$pg,2);
+  system$data(prt$msg$ptr+3) = res$pg/10 + '0';
+  system$data(prt$msg$ptr+4) = res$pg mod 10 + '0';
+  prt$msg$ptr = prt$msg$ptr + 12;
+  sys$entry = bios$pg * 256;
+  call movef(36,.('Copyright (C) 1982, Digital Research'),.system$data(10h));
+  call movef(6,.memory,.system$data(35h));  /* Copy Serial No. into header */
+  FCBout(33) = 0; FCBout(34) = 0; FCBout(35) = 0;
+  system$data(0) = mem$top;
+  system$data(2) = bnk$top;
+  call movef(8,.FCBout+1,.fcb$msg);
+  call movef(3,.FCBout+9,.fcb$msg+9);
+  call set$DMA$address(.system$data);
+  call write$random$record(.FCBout);
+  FCBout(33) = 1;
+  call set$DMA$address(.system$data(128));
+  call write$random$record(.FCBout);
+  call close$file(.fcbout);
+
+  if crdatf then
+    do;                        /* create a new data file for GENCPM */
+      crdatf = false;
+      mem$top = save$mem$top;
+      rubout = not rubout;
+      call movef(8,.data$fcb+1,.fcb$msg);
+      call movef(3,.data$fcb+9,.fcb$msg+9);
+      call crtdef;
+    end;
+
+  display = true;
+  call print$console$buffer (.(cr,lf,lf,
+    '*** CP/M 3.0 SYSTEM GENERATION DONE ***','$'));
+  return;
+  
+ end plm;
+end gencpm;
+

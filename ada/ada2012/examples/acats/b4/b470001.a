@@ -1,0 +1,223 @@
+-- B470001.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--     The ACAA has created and maintains the Ada Conformity Assessment Test
+--     Suite for the purpose of conformity assessments conducted in accordance
+--     with the International Standard ISO/IEC 18009 - Ada: Conformity
+--     assessment of a language processor. This test suite should not be used
+--     to make claims of conformance unless used in accordance with
+--     ISO/IEC 18009 and any applicable ACAA procedures.
+--*
+-- OBJECTIVES:
+--     Check that a qualified expression is a constant view of the expression,
+--     even if the expression is a variable object.
+--
+-- TEST DESCRIPTION:
+--     We use an enhanced version of the document management package from
+--     test C470001 to provide types and subprograms for testing.
+--
+--     We try as many of the contexts where variables are required as we can.
+--     We won't try the prefix of a protected entry (it's similar to prefixed
+--     views) or a Storage_Pool.
+
+-- CHANGE HISTORY:
+--     27 Mar 17   RLB     Created test.
+--
+--!
+package B470001_0 is -- Document_Manager
+
+   subtype Paragraph_Number is Natural range 0 .. 19;
+   type Paragraph_Text is access all String;
+   type Paragraph_Info is tagged record
+      Text : Paragraph_Text;
+      Length : Natural := 0;
+      Indent : aliased Natural := 0;
+      -- ... other information here.
+   end record;
+
+   procedure Set_Paragraph (Num : in Paragraph_Number;
+                            Text : in String;
+                            Indent : in Natural := 0);
+      -- Insert paragraph number Num with the given Text and Indent.
+
+   procedure Change_Paragraph_Indent (Num : in Paragraph_Number;
+                                      Offset : in Integer;
+                                      New_Indent : out Natural);
+      -- Change the paragraph indent.
+
+   function Paragraph (Num : in Paragraph_Number) return Paragraph_Info;
+      -- Get the paragraph information for paragraph Num.
+
+   function Paragraph (Num : in Paragraph_Number) return Paragraph_Text;
+      -- Get the paragraph text for paragraph Num. Note that modifying
+      -- the returned text will modify the original text as well.
+
+   function Total_Width (P : in Paragraph_Info) return Natural;
+      -- Returns the total width for the paragraph P.
+
+   procedure Calc_Width (P : in out Paragraph_Info);
+      -- Calculates the total width for the paragraph P.
+
+end B470001_0;
+
+package body B470001_0 is -- Document_Manager
+
+   Document : array (Paragraph_Number) of Paragraph_Info;
+
+   procedure Set_Paragraph (Num : in Paragraph_Number;
+                            Text : in String;
+                            Indent : in Natural := 0) is
+      -- Insert paragraph number Num with the given Text and Indent.
+   begin
+      Document(Num) := (Text => new String'(Text),
+                        Indent => Indent,
+                        Length => Text'Length);
+   end Set_Paragraph;
+
+
+   procedure Change_Paragraph_Indent (Num : in Paragraph_Number;
+                                      Offset : in Integer;
+                                      New_Indent : out Natural) is
+      -- Change the paragraph indent.
+   begin
+      Document(Num).Indent := Document(Num).Indent + Offset;
+      New_Indent := Document(Num).Indent;
+   end Change_Paragraph_Indent;
+
+
+   function Paragraph (Num : in Paragraph_Number) return Paragraph_Info is
+      -- Get the paragraph information for paragraph Num.
+      -- We presume the real application would do more than just return
+      -- the information passed in.
+   begin
+      return Document(Num);
+   end Paragraph;
+
+
+   function Paragraph (Num : in Paragraph_Number) return Paragraph_Text is
+      -- Get the paragraph text for paragraph Num.
+      -- We presume the real application would do more than just return
+      -- the information passed in.
+   begin
+      return Document(Num).Text;
+   end Paragraph;
+
+
+   function Total_Width (P : in Paragraph_Info) return Natural is
+      -- Returns the total width for the paragraph P.
+   begin
+      return P.Length + P.Indent;
+   end Total_Width;
+
+
+   procedure Calc_Width (P : in out Paragraph_Info) is
+      -- Calculates the total width for the paragraph P.
+   begin
+      null;
+   end Calc_Width;
+
+end B470001_0;
+
+
+with B470001_0; use B470001_0;
+procedure B470001 is
+   PI : Paragraph_Info := Paragraph(1);
+   type Acc_Nat is access all Natural;
+   type Acc_CNat is access constant Natural;
+begin
+   -- A variable is required as the actual for an "out" parameter:
+   Change_Paragraph_Indent (1, +1, PI.Indent);                -- OK. {4;1}
+
+   Change_Paragraph_Indent (1, -1, Natural'(PI.Indent));      -- ERROR: {4;1}
+
+   Change_Paragraph_Indent (1, -1, Natural(PI.Indent));       -- OK. {4;1}
+
+   -- A variable is required as the target of an assignment:
+   PI.Indent := 8;                                            -- OK. {4;1}
+
+   Natural'(PI.Indent) := 8;                                  -- ERROR: {4;1}
+
+   Natural(PI.Indent) := 8;                                   -- ERROR: {4;1}
+
+   -- A variable is required as the prefix of 'Access for
+   -- an access-to-variable type:
+   declare
+      Bare_Indent : Natural renames PI.Indent;                -- OK. {7;1}
+
+      QE_Indent   : Natural renames Natural'(PI.Indent);      -- OK. {7;1}
+
+      Ptr  : Acc_Nat;
+      CPtr : Acc_CNat;
+   begin
+      Change_Paragraph_Indent (1, +1, Bare_Indent);           -- OK. {7;1}
+
+      Change_Paragraph_Indent (1, -1, QE_Indent);             -- ERROR: {7;1}
+
+      Ptr := PI.Indent'Access;                                -- OK. {14;1}
+
+      Ptr := Paragraph_Info'(PI).Indent'Access;               -- ERROR: {14;1}
+
+      CPtr := PI.Indent'Access;                               -- OK. {14;1}
+
+      CPtr := Paragraph_Info'(PI).Indent'Access;              -- OK. {14;1}
+
+   end;
+
+   -- A variable is required as the actual of a formal "in out" parameter:
+   declare
+      generic
+         Tst : in out Natural;
+      procedure Try;
+
+      procedure Try is
+      begin
+         null;
+      end Try;
+
+      procedure Inst1 is new Try (PI.Indent);                 -- OK. {7;1}
+
+      procedure Inst2 is new Try (Natural'(PI.Indent));       -- ERROR: {7;1}
+
+      procedure Inst3 is new Try (Natural(PI.Indent));        -- ERROR: {7;1}
+
+   begin
+      null;
+   end;
+
+   -- A variable is required as the prefix of a prefixed view if the
+   -- corresponding parameter is "in out":
+
+   PI.Calc_Width;                                             -- OK. {4;1}
+
+   Paragraph_Info'(PI).Calc_Width;                            -- ERROR: {4;1}
+
+   if PI.Total_Width > 10 then                                -- OK. {7;5}
+      null;
+   elsif Paragraph_Info'(PI).Total_Width > 10 then            -- OK. {7;5}
+      null;
+   end if;
+
+end B470001;

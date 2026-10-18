@@ -1,0 +1,18 @@
+digraph ATN {
+rankdir=LR;
+s375[fontsize=11, label="375", shape=doublecircle, fixedsize=true, width=.6];
+s374[fontsize=11,label="374", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2264[fontsize=11,label="2264", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2265[fontsize=11,label="2265", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2266[fontsize=11,label="2266", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2267[fontsize=11,label="{&rarr;\n2267\nd=191|{<p0>|<p1>|<p2>}}", shape=record, fixedsize=false, peripheries=1];
+s2268[fontsize=11,label="&larr;\n2268", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s374 -> s2267 [fontname="Times-Italic", label="&epsilon;"];
+s2267:p0 -> s2264 [fontname="Times-Italic", label="&epsilon;"];
+s2267:p1 -> s2265 [fontname="Times-Italic", label="&epsilon;"];
+s2267:p2 -> s2266 [fontname="Times-Italic", label="&epsilon;"];
+s2264 -> s2268 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<labeled_statement>", arrowhead = normal];
+s2265 -> s2268 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<declaration_statement>", arrowhead = normal];
+s2266 -> s2268 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<embedded_statement>", arrowhead = normal];
+s2268 -> s375 [fontname="Times-Italic", label="&epsilon;"];
+}

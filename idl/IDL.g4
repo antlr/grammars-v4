@@ -27,7 +27,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /** CORBA IDL v3.5 grammar built from the OMG IDL language spec 'ptc-13-02-02'
-    http://www.omg.org/spec/IDL35/Beta1/PDF/
+    https://www.omg.org/spec/IDL/3.5/
 
     Initial IDL spec implementation in ANTLR v3 by Dong Nguyen.
     Migrated to ANTLR v4 by Steve Osselton.
