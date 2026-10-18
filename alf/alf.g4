@@ -155,11 +155,11 @@ name
 
 modulename
    : IDENT
-   | ('\'' PATHNAME? '/' IDENT '\'')
+   | QUOTED_MODULE_NAME
    ;
 
-PATHNAME
-   : CHARACTER+
+QUOTED_MODULE_NAME
+   : ('\'' CHARACTER* '/' IDENT '\'')
    ;
 
 predname
