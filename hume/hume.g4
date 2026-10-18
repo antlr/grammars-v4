@@ -174,10 +174,10 @@ exprs
    ;
 
 matches
-   : match ('|' match)*
+   : match_ ('|' match_)*
    ;
 
-match
+match_
    : patt '->' expr
    ;
 
