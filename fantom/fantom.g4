@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2024, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -32,180 +32,737 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar fantom;
 
 file_
-   : program? EOF
+   : compilationUnit EOF
    ;
 
-compilationUnit :  using* typeDef* doc?;
-using           :  usingPod | usingType | usingAs;
-usingPod        :  'using' podSpec EOS;
-usingType       :  'using' podSpec '::' ID EOS;
-usingAs         :  'using' podSpec '::' ID 'as' ID EOS;
-podSpec         :  ID | str | ffiPodSpec;
-ffiPodSpec      : '[' ID ']' ID ('.' ID)*;
+compilationUnit
+   : using* typeDef*
+   ;
 
-typeDef        :  classDef | mixinDef | facetDef | enumDef;
+using
+   : usingPod
+   | usingType
+   | usingAs
+   ;
 
-classDef       :  typeHeader 'class' ID inheritance? '{' slotDefs '}';
-mixinDef       :  typeHeader 'mixin' ID inheritance? '{' slotDefs '}';
-facetDef       :  typeHeader 'facet' 'class' ID inheritance? '{' slotDefs '}';
-enumDef        :  typeHeader 'enum' 'class' ID inheritance? '{' enumValDefs slotDefs '}';
+usingPod
+   : 'using' podSpec EOS
+   ;
 
-typeHeader     :  doc? facets typeFlags;
-typeFlags      :  typeFlag*;
-typeFlag       :  protection | 'abstract' | 'final' | 'const' | 'native';
-protection     :  'public' | 'protected' | 'private' | 'internal';
-inheritance    :  ':' typeList;
+usingType
+   : 'using' podSpec '::' ID EOS
+   ;
 
-enumValDefs    :  enumValDef (',' enumValDef)* EOS;
-enumValDef     :  facets ID ('(' args ')')?;
+usingAs
+   : 'using' podSpec '::' ID 'as' ID EOS
+   ;
 
-slotDefs       :  slotDef*;
-slotDef        :  fieldDef | methodDef | ctorDef | staticInit;
+podSpec
+   : ID
+   | str
+   | ffiPodSpec
+   ;
 
-fieldDef       :  facets fieldFlags type ID (':' expr)?
-                     ( '{' fieldGetter? fieldSetter? '}' )? EOS;
-fieldFlags     :  fieldFlag*;
-fieldFlag      :  protection | 'abstract' | 'const' | 'final' | 'native' |
-                     'override' | 'readonly' | 'static' | 'virtual';
-fieldGetter    :  'get' (EOS | block);
-fieldSetter    :  protection 'set' (EOS | block);
+ffiPodSpec
+   : '[' ID ']' ID ('.' ID)*
+   ;
 
-methodDef      :  facets methodFlags type ID '(' params ')' methodBody;
-methodFlags    :  methodFlag*;
-methodFlag     :  protection | 'abstract' | 'native' | 'once' |
-                     'override' | 'static' | 'virtual' | 'final';
-params         :  (param (',' param)*)?;
-param          :  type ID (':' expr)?;
-methodBody     :  EOS | ( '{' stmts '}' );
+typeDef
+   : classDef
+   | mixinDef
+   | facetDef
+   | enumDef
+   ;
 
-ctorDef        :  facets ctorFlags 'new' ID '(' params ')' ctorChain? methodBody;
-ctorFlags      :  protection?;
-ctorChain      :  ':' ctorChainThis | ctorChainSuper;
-ctorChainThis  :  'this' '.' ID '(' args ')';
-ctorChainSuper :  'super' ('.' ID)? '(' args ')';
+classDef
+   : typeHeader 'class' ID inheritance? '{' slotDefs '}'
+   ;
 
-staticInit     :  'static' '{' stmts '}';
+mixinDef
+   : typeHeader 'mixin' ID inheritance? '{' slotDefs '}'
+   ;
 
+facetDef
+   : typeHeader 'facet' 'class' ID inheritance? '{' slotDefs '}'
+   ;
 
-facets        : facet*;
-facet         : '@' simpleType [facetVals];
-facetVals     : '{' facetVal (EOS facetVal)* '}';
-facetVal      : ID '=' expr;
+enumDef
+   : typeHeader 'enum' 'class' ID inheritance? '{' enumValDefs slotDefs '}'
+   ;
 
-block          :  stmt | ( '{' stmts '}' );
-stmts          :  stmt*;
-stmt           :  break | continue | for | if | return | switch |
-                     throw | while | try | exprStmt | localDef | itAdd;
-break          :  'break' EOS;
-continue       :  'continue' EOS;
-for            :  'for' '(' forInit? ';' expr? ';' expr? ')' block;
-forInit        :  expr | localDef;
-if             :  'if' '(' expr ')' block ( 'else' block )?;
-return         :  'return' expr? EOS;
-throw          :  'throw' expr EOS;
-while          :  'while' '(' expr ')' block;
-exprStmt       :  expr EOS;
-localDef       :  type? ID (':' expr)? EOS;
-itAdd          :  expr (',' expr)* ','? EOS;
+typeHeader
+   : facets typeFlags
+   ;
 
-try            :  'try' block catch_* finally_?;
-catch_          :  'catch' catchDef? block;
-catchDef       :  '(' type ID ')';
-finally_        :  'finally' block;
+typeFlags
+   : typeFlag*
+   ;
 
-switch         :  'switch' '(' expr ')' '{' case* default? '}';
-case           :  'case' expr ':' stmts;
-default        :  'default' ':' stmts;
+typeFlag
+   : protection
+   | 'abstract'
+   | 'final'
+   | 'const'
+   | 'native'
+   ;
 
-expr           :  assignExpr;
-assignExpr     :  ifExpr [assignOp assignExpr];
-assignOp       :  '=' | '*=' | '/=' | '%=' | '+=' | '-=';
+protection
+   : 'public'
+   | 'protected'
+   | 'private'
+   | 'internal'
+   ;
 
-ifExpr         :  ternaryExpr | elvisExpr;
-ternaryExpr    :  condOrExpr ['?' ifExprBody ':' ifExprBody];
-elvisExpr      :  condOrExpr '?:' ifExprBody;
-ifExprBody     :  condOrExpr | ifExprThrow;
-ifExprThrow    :  'throw' expr;
+inheritance
+   : ':' typeList
+   ;
 
-condOrExpr     :  condAndExpr  ('||' condAndExpr)*;
-condAndExpr    :  equalityExpr ('&&' equalityExpr)*;
-equalityExpr   :  relationalExpr [('==' | '!=' | '===' | '!==') relationalExpr];
-relationalExpr :  typeCheckExpr | compareExpr;
-typeCheckExpr  :  rangeExpr [('is' | 'as' | 'isnot') type];
-compareExpr    :  rangeExpr [('<' | '<=' | '>' | '>=' | '<=>') rangeExpr];
-rangeExpr      :  addExpr (('..' | '..<') addExpr)*;
-addExpr        :  multExpr (('+' | '-') multExpr)*;
-multExpr       :  parenExpr (('*' | '/' | '%') parenExpr)*;
-parenExpr      :  unaryExpr | castExpr | groupedExpr;
-castExpr       :  '(' type ')' parenExpr;
-groupedExpr    :  '(' expr ')' termChain*;
-unaryExpr      :  prefixExpr | termExpr | postfixExpr;
-prefixExpr     :  ('!' | '+' | '-' | '++' | '--') parenExpr;
-postfixExpr    :  termExpr ('++' | '--');
+enumValDefs
+   : enumValDef (',' enumValDef)* EOS
+   ;
 
-termExpr       :  termBase termChain*;
-termBase       :  literal | idExpr | typeBase;
-typeBase       :  typeLiteral | slotLiteral | namedSuper | staticCall |
-                     dsl | closure | simple | ctorBlock;
-typeLiteral    :  type '#';
-slotLiteral    :  type? '#' ID;
-namedSuper     :  type '.' 'super';
-staticCall     :  type '.' slotExpr;
-dsl            :  type '<|' anyChar* '|>';
-simple         :  type '(' expr ')';
-ctorBlock      :  type itBlock;
-termChain      :  dotCall | dynCall | safeDotCall | safeDynCall |
-                     indexExpr | callOp | itBlock;
-itBlock        :  '{' stmts '}';
-dotCall        :  '.' slotExpr;
-dynCall        :  '->' slotExpr;
-safeDotCall    :  '?.' slotExpr;
-safeDynCall    :  '?->' slotExpr;
-IDExpr         :  local | slotExpr;
-slotExpr       :  field | call;
-local          :  ID;
-field          :  '&'? ID;
-call           :  ID ('(' args ')')? closure?;
-args           :  (expr (',' expr)*)?;
-indexExpr      :  '[' expr ']';
-callOp         :  '(' args ')' closure?;
+enumValDef
+   : facets ID ('(' args ')')?
+   ;
 
-literal        :  'null' | 'this' | 'super' | 'it' |
-                     bool | int | float | decimal | str |
-                     duration | uri | list | map | uri;
-list           :  type? '[' listItems ']';
-listItems      :  ',' | (expr (',' expr)*) ','?;
-map            :  mapType? '[' mapItems [','] ']';
-mapItems       :  ':' | (mapPair (',' mapPair)*);
-mapPair        :  expr ':' expr;
+slotDefs
+   : slotDef*
+   ;
 
-closure        :  closureSig '{' stmts '}';
-closureSig     :  '|' closureParams ['-' type] '|';
-closureParams  :  (closureParam (',' closureParam)*)?;
-closureParam   :  formal | ID;
+slotDef
+   : fieldDef
+   | methodDef
+   | ctorDef
+   | staticInit
+   ;
 
-type           :  nullType | nonNullType;
-nullType       :  nonNullType '?';
-nonNullType    :  simpleType | listType | mapType | funcType;
-typeList       :  type (',' type)*;
-simpleType     :  ID ('::' ID)?;
-listType       :  type '[]';
-mapType        :  '['? type ':' type ']'?;
-funcType       :  '|' formals? ('-' type)? '|';
-formals        :  (formal (',' formal)*)?;
-formal         :  formalFull | formalInferred | formalTypeOnly;
-formalFull     :  type ID;
-formalInferred :  ID;
-formalTypeOnly :  type;
+fieldDef
+   : facets fieldFlags type ID (':=' expr)? ('{' fieldGetter? fieldSetter? '}')? EOS
+   ;
 
-ID            : IDSTART (IDCHAR)*;
-IDSTART        : [A-Z] | [a-z] | '_';
-IDCHAR         : [A-Z] | [a-z] | '_' | [0-9];
-EOS            : ';' | '\n' | '}';
+fieldFlags
+   : fieldFlag*
+   ;
 
+fieldFlag
+   : protection
+   | 'abstract'
+   | 'const'
+   | 'final'
+   | 'native'
+   | 'override'
+   | 'readonly'
+   | 'static'
+   | 'virtual'
+   ;
 
-COMMENT
-   : ';' ~ ('\r' | '\n')* -> skip
+fieldGetter
+   : 'get' (EOS | block)
+   ;
+
+fieldSetter
+   : protection? 'set' (EOS | block)
+   ;
+
+methodDef
+   : facets methodFlags type ID '(' params ')' methodBody
+   ;
+
+methodFlags
+   : methodFlag*
+   ;
+
+methodFlag
+   : protection
+   | 'abstract'
+   | 'native'
+   | 'once'
+   | 'override'
+   | 'static'
+   | 'virtual'
+   | 'final'
+   ;
+
+params
+   : (param (',' param)*)?
+   ;
+
+param
+   : type ID (':=' expr)?
+   ;
+
+methodBody
+   : EOS
+   | ('{' stmts '}')
+   ;
+
+ctorDef
+   : facets ctorFlags 'new' ID '(' params ')' ctorChain? methodBody
+   ;
+
+ctorFlags
+   : protection?
+   ;
+
+ctorChain
+   : ':' (ctorChainThis | ctorChainSuper)
+   ;
+
+ctorChainThis
+   : 'this' '.' ID '(' args ')'
+   ;
+
+ctorChainSuper
+   : 'super' ('.' ID)? '(' args ')'
+   ;
+
+staticInit
+   : 'static' '{' stmts '}'
+   ;
+
+facets
+   : facet*
+   ;
+
+facet
+   : '@' simpleType facetVals?
+   ;
+
+facetVals
+   : '{' facetVal (EOS facetVal)* '}'
+   ;
+
+facetVal
+   : ID '=' expr
+   ;
+
+block
+   : stmt
+   | ('{' stmts '}')
+   ;
+
+stmts
+   : stmt*
+   ;
+
+stmt
+   : break_
+   | continue_
+   | for_
+   | if_
+   | return_
+   | switch_
+   | throw_
+   | while_
+   | try_
+   | exprStmt
+   | localDef
+   | itAdd
+   ;
+
+break_
+   : 'break' EOS
+   ;
+
+continue_
+   : 'continue' EOS
+   ;
+
+for_
+   : 'for' '(' forInit? ';' expr? ';' expr? ')' block
+   ;
+
+forInit
+   : expr
+   | forLocalDef
+   ;
+
+forLocalDef
+   : type? ID (':=' expr)?
+   ;
+
+if_
+   : 'if' '(' expr ')' block ('else' block)?
+   ;
+
+return_
+   : 'return' expr? EOS
+   ;
+
+throw_
+   : 'throw' expr EOS
+   ;
+
+while_
+   : 'while' '(' expr ')' block
+   ;
+
+exprStmt
+   : expr EOS
+   ;
+
+localDef
+   : type? ID (':=' expr)? EOS
+   ;
+
+itAdd
+   : expr (',' expr)* ','? EOS
+   ;
+
+try_
+   : 'try' block catch_* finally_?
+   ;
+
+catch_
+   : 'catch' catchDef? block
+   ;
+
+catchDef
+   : '(' type ID ')'
+   ;
+
+finally_
+   : 'finally' block
+   ;
+
+switch_
+   : 'switch' '(' expr ')' '{' case_* default_? '}'
+   ;
+
+case_
+   : 'case' expr ':' stmts
+   ;
+
+default_
+   : 'default' ':' stmts
+   ;
+
+expr
+   : assignExpr
+   ;
+
+assignExpr
+   : ifExpr (assignOp assignExpr)?
+   ;
+
+assignOp
+   : '='
+   | '*='
+   | '/='
+   | '%='
+   | '+='
+   | '-='
+   ;
+
+ifExpr
+   : condOrExpr (ternarySuffix | elvisSuffix)?
+   ;
+
+ternarySuffix
+   : '?' ifExprBody ':' ifExprBody
+   ;
+
+elvisSuffix
+   : '?:' ifExprBody
+   ;
+
+ifExprBody
+   : condOrExpr
+   | ifExprThrow
+   ;
+
+ifExprThrow
+   : 'throw' expr
+   ;
+
+condOrExpr
+   : condAndExpr ('||' condAndExpr)*
+   ;
+
+condAndExpr
+   : equalityExpr ('&&' equalityExpr)*
+   ;
+
+equalityExpr
+   : relationalExpr (('==' | '!=' | '===' | '!==') relationalExpr)?
+   ;
+
+relationalExpr
+   : rangeExpr (typeCheckSuffix | compareSuffix)?
+   ;
+
+typeCheckSuffix
+   : ('is' | 'as' | 'isnot') type
+   ;
+
+compareSuffix
+   : ('<' | '<=' | '>' | '>=' | '<=>') rangeExpr
+   ;
+
+rangeExpr
+   : addExpr (('..' | '..<') addExpr)*
+   ;
+
+addExpr
+   : multExpr (('+' | '-') multExpr)*
+   ;
+
+multExpr
+   : parenExpr (('*' | '/' | '%') parenExpr)*
+   ;
+
+parenExpr
+   : castExpr
+   | unaryExpr
+   | groupedExpr
+   ;
+
+castExpr
+   : '(' type ')' parenExpr
+   ;
+
+groupedExpr
+   : '(' expr ')' termChain*
+   ;
+
+unaryExpr
+   : prefixExpr
+   | postfixExpr
+   | termExpr
+   ;
+
+prefixExpr
+   : ('!' | '+' | '-' | '++' | '--') parenExpr
+   ;
+
+postfixExpr
+   : termExpr ('++' | '--')
+   ;
+
+termExpr
+   : termBase termChain*
+   ;
+
+termBase
+   : literal
+   | idExpr
+   | typeBase
+   ;
+
+typeBase
+   : typeLiteral
+   | slotLiteral
+   | namedSuper
+   | staticCall
+   | dsl
+   | simple
+   | ctorBlock
+   | closure
+   ;
+
+typeLiteral
+   : type '#'
+   ;
+
+slotLiteral
+   : type? '#' ID
+   ;
+
+namedSuper
+   : type '.' 'super'
+   ;
+
+staticCall
+   : type '.' slotExpr
+   ;
+
+dsl
+   : type DSL_BODY
+   ;
+
+simple
+   : type '(' expr ')'
+   ;
+
+ctorBlock
+   : type itBlock
+   ;
+
+termChain
+   : dotCall
+   | dynCall
+   | safeDotCall
+   | safeDynCall
+   | indexExpr
+   | callOp
+   | itBlock
+   ;
+
+itBlock
+   : '{' stmts '}'
+   ;
+
+dotCall
+   : '.' slotExpr
+   ;
+
+dynCall
+   : '->' slotExpr
+   ;
+
+safeDotCall
+   : '?.' slotExpr
+   ;
+
+safeDynCall
+   : '?->' slotExpr
+   ;
+
+idExpr
+   : local
+   | slotExpr
+   ;
+
+slotExpr
+   : field
+   | call
+   ;
+
+local
+   : ID
+   ;
+
+field
+   : '&' ID
+   ;
+
+call
+   : ID ('(' args ')')? closure?
+   ;
+
+args
+   : (expr (',' expr)*)?
+   ;
+
+indexExpr
+   : '[' expr ']'
+   ;
+
+callOp
+   : '(' args ')' closure?
+   ;
+
+literal
+   : 'null'
+   | 'this'
+   | 'super'
+   | 'it'
+   | bool
+   | int
+   | float
+   | decimal
+   | str
+   | duration
+   | uri
+   | list
+   | map
+   ;
+
+bool
+   : 'true'
+   | 'false'
+   ;
+
+int
+   : INT
+   | CHAR
+   ;
+
+float
+   : FLOAT
+   ;
+
+decimal
+   : DECIMAL
+   ;
+
+str
+   : STR
+   ;
+
+duration
+   : DURATION
+   ;
+
+uri
+   : URI
+   ;
+
+list
+   : type? '[' listItems ']'
+   ;
+
+listItems
+   : ','
+   | (expr (',' expr)*) ','?
+   ;
+
+map
+   : mapType? '[' mapItems ','? ']'
+   ;
+
+mapItems
+   : ':'
+   | (mapPair (',' mapPair)*)
+   ;
+
+mapPair
+   : expr ':' expr
+   ;
+
+closure
+   : closureSig '{' stmts '}'
+   ;
+
+closureSig
+   : '|' closureParams ('->' type)? '|'
+   ;
+
+closureParams
+   : (closureParam (',' closureParam)*)?
+   ;
+
+closureParam
+   : formal
+   ;
+
+type
+   : simpleType # simpleTypeRef
+   | mapType # mapTypeRef
+   | funcType # funcTypeRef
+   | type '[]' # listTypeRef
+   | type '?' # nullableTypeRef
+   ;
+
+typeList
+   : type (',' type)*
+   ;
+
+simpleType
+   : ID ('::' ID)?
+   ;
+
+mapType
+   : '[' type ':' type ']'
+   ;
+
+funcType
+   : '|' formals ('->' type)? '|'
+   ;
+
+formals
+   : (formal (',' formal)*)?
+   ;
+
+formal
+   : formalFull
+   | formalInferred
+   | formalTypeOnly
+   ;
+
+formalFull
+   : type ID
+   ;
+
+formalInferred
+   : ID
+   ;
+
+formalTypeOnly
+   : type
+   ;
+
+ID
+   : IDSTART (IDCHAR)*
+   ;
+
+fragment IDSTART
+   : [A-Za-z_]
+   ;
+
+fragment IDCHAR
+   : [A-Za-z_0-9]
+   ;
+
+fragment DIGIT
+   : [0-9]
+   ;
+
+fragment HEXDIGIT
+   : [0-9a-fA-F]
+   ;
+
+fragment DIGITS
+   : DIGIT ('_'? DIGIT)*
+   ;
+
+fragment EXPONENT
+   : [eE] [+-]? DIGITS
+   ;
+
+fragment ESC
+   : '\\' (["'\\$`bfnrt] | 'u' HEXDIGIT HEXDIGIT HEXDIGIT HEXDIGIT | 'u{' HEXDIGIT+ '}')
+   ;
+
+INT
+   : '0x' HEXDIGIT ('_'? HEXDIGIT)*
+   | '0b' [01] ('_'? [01])*
+   | DIGITS
+   ;
+
+CHAR
+   : '\'' (ESC | ~ ['\\\r\n]) '\''
+   ;
+
+FLOAT
+   : DIGITS ('.' DIGITS)? EXPONENT? [fF]
+   ;
+
+DECIMAL
+   : DIGITS ('.' DIGITS)? EXPONENT? [dD]
+   ;
+
+DURATION
+   : DIGITS ('.' DIGITS)? ('ns' | 'ms' | 'sec' | 'min' | 'hr' | 'day')
+   ;
+
+STR
+   : '"""' .*? '"""'
+   | '"' (ESC | ~ ["\\\r\n])* '"'
+   ;
+
+URI
+   : '`' (ESC | ~ [`\\\r\n])* '`'
+   ;
+
+DSL_BODY
+   : '<|' .*? '|>'
+   ;
+
+EOS
+   : ';'
+   ;
+
+DOC_COMMENT
+   : '**' ~ [\r\n]* -> skip
+   ;
+
+LINE_COMMENT
+   : '//' ~ [\r\n]* -> skip
+   ;
+
+BLOCK_COMMENT
+   : '/*' (BLOCK_COMMENT | .)*? '*/' -> skip
    ;
 
 WS
