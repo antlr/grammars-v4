@@ -1,0 +1,1 @@
+assert(StringToHex(HexToString("05 e0 81 91 24 cb b2 2c 49 e2 0f 2e 8b 9a" .. " 47 56 9f fb fe ec d2 ff 1f")) == "05 e0 81 91 24 cb b2 2c 49 e2 0f 2e 8b 9a 47 56 9f fb fe ec d2 ff 1f")

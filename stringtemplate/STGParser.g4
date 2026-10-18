@@ -34,72 +34,69 @@
  *	-- updated to use imported standard fragments
  */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar STGParser;
 
 options {
-	language=Java;
-	tokenVocab=STGLexer;
+    language = Java;
+    tokenVocab = STGLexer;
 }
 
 group
-	: delimiters? imports?
-	( template_ | dict_ )+
-	EOF
-	;
+    : delimiters? imports? (template_ | dict_)+ EOF
+    ;
 
 delimiters
-	: DELIMITERS STRING COMMA STRING
-	;
+    : DELIMITERS STRING COMMA STRING
+    ;
 
 imports
-	: ( IMPORT STRING )+
-	;
+    : (IMPORT STRING)+
+    ;
 
 template_
-	: ( AT ID DOT ID LPAREN RPAREN
-	  | ID LPAREN formalArgs? RPAREN
-	  )
-		TMPL_ASSIGN
-			( STRING			// "..."
-			| BIGSTRING			// <<...>>
-			| BIGSTRING_NO_NL	// <%...%>
-			)
-	| ID TMPL_ASSIGN ID			// alias one template to another
-	;
+    : (AT ID DOT ID LPAREN RPAREN | ID LPAREN formalArgs? RPAREN) TMPL_ASSIGN (
+        STRING            // "..."
+        | BIGSTRING       // <<...>>
+        | BIGSTRING_NO_NL // <%...%>
+    )
+    | ID TMPL_ASSIGN ID // alias one template to another
+    ;
 
 formalArgs
-	: formalArg ( COMMA formalArg )*
-	;
+    : formalArg (COMMA formalArg)*
+    ;
 
 formalArg
-	: ID 	( ASSIGN STRING
-			| ASSIGN ANON_TEMPLATE
-			| ASSIGN TRUE
-			| ASSIGN FALSE
-			| ASSIGN LBRACK RBRACK
-			)?
-	;
+    : ID (ASSIGN STRING | ASSIGN ANON_TEMPLATE | ASSIGN TRUE | ASSIGN FALSE | ASSIGN LBRACK RBRACK)?
+    ;
 
 dict_
-	: ID TMPL_ASSIGN LBRACK dictPairs RBRACK
-	;
+    : ID TMPL_ASSIGN LBRACK dictPairs RBRACK
+    ;
 
 dictPairs
-	: keyValuePair ( COMMA keyValuePair )* ( COMMA defaultValuePair )?
-	| defaultValuePair
-	;
+    : keyValuePair (COMMA keyValuePair)* (COMMA defaultValuePair)?
+    | defaultValuePair
+    ;
 
-keyValuePair		: STRING  COLON keyValue ;
-defaultValuePair	: DEFAULT COLON keyValue ;
+keyValuePair
+    : STRING COLON keyValue
+    ;
+
+defaultValuePair
+    : DEFAULT COLON keyValue
+    ;
 
 keyValue
-	: BIGSTRING
-	| BIGSTRING_NO_NL
-	| ANON_TEMPLATE
-	| STRING
-	| TRUE
-	| FALSE
-	| LBRACK RBRACK
-	| KEY
-	;
-
+    : BIGSTRING
+    | BIGSTRING_NO_NL
+    | ANON_TEMPLATE
+    | STRING
+    | TRUE
+    | FALSE
+    | LBRACK RBRACK
+    | KEY
+    ;

@@ -3,32 +3,37 @@
 	Based on the C++ grammar made by Camilo Sanchez (Camiloasc1) and Martin Mirchev (Marti2203). See the parser file.
  */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine true, allowShortBlocksOnASingleLine true, minEmptyLines 0, alignSemicolons ownLine
+// $antlr-format alignColons trailing, singleLineOverrulesHangingColon true, alignLexerCommands true, alignLabels true, alignTrailers true
+
 lexer grammar UnrealAngelscriptLexer;
 
 IntegerLiteral:
-	DecimalLiteral Integersuffix?
-	| OctalLiteral Integersuffix?
-	| HexadecimalLiteral Integersuffix?
-	| BinaryLiteral Integersuffix?;
+    DecimalLiteral Integersuffix?
+    | OctalLiteral Integersuffix?
+    | HexadecimalLiteral Integersuffix?
+    | BinaryLiteral Integersuffix?
+;
 
 CharacterLiteral: ('u' | 'U' | 'L')? '\'' Cchar+ '\'';
 
 FloatingLiteral:
-	Fractionalconstant Exponentpart? Floatingsuffix?
-	| Digitsequence Exponentpart Floatingsuffix?;
+    Fractionalconstant Exponentpart? Floatingsuffix?
+    | Digitsequence Exponentpart Floatingsuffix?
+;
 
 StringLiteral:
-	'"""' .*? '"""'
-	| ('n' | 'f')? '"' (
-		~["\\\u0085\u2028\u2029]
-		| Escapesequence
-	)* '"';
+    '"""' .*? '"""'
+    | ('n' | 'f')? '"' ( ~["\\\u0085\u2028\u2029] | Escapesequence)* '"'
+;
 
 UserDefinedLiteral:
-	UserDefinedIntegerLiteral
-	| UserDefinedFloatingLiteral
-	| UserDefinedStringLiteral
-	| UserDefinedCharacterLiteral;
+    UserDefinedIntegerLiteral
+    | UserDefinedFloatingLiteral
+    | UserDefinedStringLiteral
+    | UserDefinedCharacterLiteral
+;
 
 /*Angelscript*/
 
@@ -58,19 +63,19 @@ Check: 'check';
 
 Mixin: 'mixin';
 
-Int: 'int';
-Int8: 'int8';
-Int16: 'int16';
-Int32: 'int32';
-Int64: 'int64';
-UInt: 'uint';
-UInt8: 'uint8';
-UInt16: 'uint16';
-UInt32: 'uint32';
-UInt64: 'uint64';
-Float: 'float';
-Double: 'double';
-Bool: 'bool';
+Int    : 'int';
+Int8   : 'int8';
+Int16  : 'int16';
+Int32  : 'int32';
+Int64  : 'int64';
+UInt   : 'uint';
+UInt8  : 'uint8';
+UInt16 : 'uint16';
+UInt32 : 'uint32';
+UInt64 : 'uint64';
+Float  : 'float';
+Double : 'double';
+Bool   : 'bool';
 
 /*Keywords*/
 
@@ -231,10 +236,10 @@ Semi: ';';
 Dot: '.';
 
 Identifier:
-	/*
+    /*
 	 Identifiernondigit | Identifier Identifiernondigit | Identifier DIGIT
-	 */
-	Identifiernondigit (Identifiernondigit | DIGIT)*;
+	 */ Identifiernondigit (Identifiernondigit | DIGIT)*
+;
 
 fragment Identifiernondigit: NONDIGIT;
 
@@ -246,9 +251,7 @@ DecimalLiteral: NONZERODIGIT ('\''? DIGIT)*;
 
 OctalLiteral: '0' ('\''? OCTALDIGIT)*;
 
-HexadecimalLiteral: ('0x' | '0X') HEXADECIMALDIGIT (
-		'\''? HEXADECIMALDIGIT
-	)*;
+HexadecimalLiteral: ('0x' | '0X') HEXADECIMALDIGIT ( '\''? HEXADECIMALDIGIT)*;
 
 BinaryLiteral: ('0b' | '0B') BINARYDIGIT ('\''? BINARYDIGIT)*;
 
@@ -261,10 +264,11 @@ fragment HEXADECIMALDIGIT: [0-9a-fA-F];
 fragment BINARYDIGIT: [01];
 
 Integersuffix:
-	Unsignedsuffix Longsuffix?
-	| Unsignedsuffix Longlongsuffix?
-	| Longsuffix Unsignedsuffix?
-	| Longlongsuffix Unsignedsuffix?;
+    Unsignedsuffix Longsuffix?
+    | Unsignedsuffix Longlongsuffix?
+    | Longsuffix Unsignedsuffix?
+    | Longlongsuffix Unsignedsuffix?
+;
 
 fragment Unsignedsuffix: [uU];
 
@@ -274,39 +278,34 @@ fragment Longlongsuffix: 'll' | 'LL';
 
 fragment Cchar: ~ ['\\\r\n] | Escapesequence;
 
-fragment Escapesequence:
-	Simpleescapesequence
-	| Octalescapesequence
-	| Hexadecimalescapesequence;
+fragment Escapesequence: Simpleescapesequence | Octalescapesequence | Hexadecimalescapesequence;
 
 fragment Simpleescapesequence:
-	'\\\''
-	| '\\"'
-	| '\\?'
-	| '\\\\'
-	| '\\a'
-	| '\\b'
-	| '\\f'
-	| '\\n'
-	| '\\r'
-	| ('\\' ('\r' '\n'? | '\n'))
-	| '\\t'
-	| '\\v';
+    '\\\''
+    | '\\"'
+    | '\\?'
+    | '\\\\'
+    | '\\a'
+    | '\\b'
+    | '\\f'
+    | '\\n'
+    | '\\r'
+    | ('\\' ('\r' '\n'? | '\n'))
+    | '\\t'
+    | '\\v'
+;
 
 fragment Octalescapesequence:
-	'\\' OCTALDIGIT
-	| '\\' OCTALDIGIT OCTALDIGIT
-	| '\\' OCTALDIGIT OCTALDIGIT OCTALDIGIT;
+    '\\' OCTALDIGIT
+    | '\\' OCTALDIGIT OCTALDIGIT
+    | '\\' OCTALDIGIT OCTALDIGIT OCTALDIGIT
+;
 
 fragment Hexadecimalescapesequence: '\\x' HEXADECIMALDIGIT+;
 
-fragment Fractionalconstant:
-	Digitsequence? '.' Digitsequence
-	| Digitsequence '.';
+fragment Fractionalconstant: Digitsequence? '.' Digitsequence | Digitsequence '.';
 
-fragment Exponentpart:
-	'e' SIGN? Digitsequence
-	| 'E' SIGN? Digitsequence;
+fragment Exponentpart: 'e' SIGN? Digitsequence | 'E' SIGN? Digitsequence;
 
 fragment SIGN: [+-];
 
@@ -317,14 +316,16 @@ fragment Floatingsuffix: [flFL];
 fragment Encodingprefix: 'u8' | 'u' | 'U' | 'L';
 
 UserDefinedIntegerLiteral:
-	DecimalLiteral Udsuffix
-	| OctalLiteral Udsuffix
-	| HexadecimalLiteral Udsuffix
-	| BinaryLiteral Udsuffix;
+    DecimalLiteral Udsuffix
+    | OctalLiteral Udsuffix
+    | HexadecimalLiteral Udsuffix
+    | BinaryLiteral Udsuffix
+;
 
 UserDefinedFloatingLiteral:
-	Fractionalconstant Exponentpart? Udsuffix
-	| Digitsequence Exponentpart Udsuffix;
+    Fractionalconstant Exponentpart? Udsuffix
+    | Digitsequence Exponentpart Udsuffix
+;
 
 UserDefinedStringLiteral: StringLiteral Udsuffix;
 
@@ -334,8 +335,8 @@ fragment Udsuffix: Identifier;
 
 Whitespace: [ \t]+ -> skip;
 
-Newline: ('\r' '\n'? | '\n') -> skip;
-BlockComment: '/*' .*? '*/' -> skip;
-LineComment: '//' ~ [\r\n]* -> skip;
-PreprocessorBranchRemoval: '#else' .*? '#endif' -> skip;
-Preprocessor: ('#if' | '#ifdef' | '#else' | '#endif') ~ [\r\n]* -> skip;
+Newline                   : ('\r' '\n'? | '\n')                               -> skip;
+BlockComment              : '/*' .*? '*/'                                     -> skip;
+LineComment               : '//' ~ [\r\n]*                                    -> skip;
+PreprocessorBranchRemoval : '#else' .*? '#endif'                              -> skip;
+Preprocessor              : ('#if' | '#ifdef' | '#else' | '#endif') ~ [\r\n]* -> skip;

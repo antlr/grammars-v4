@@ -1,0 +1,379 @@
+-- CXD1008.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that task scheduling, floating point operations,
+--      and exceptions work properly together.
+--
+-- TEST DESCRIPTION:
+--      The first package in this test is a generic cyclic task package.
+--      This package is instantiated in the main procedure multiple times
+--      to produce a number of tasks, all at different priorities.
+--      The second package in this test declares the operations that are
+--      carried out by the tasks.  Since the main purpose of the test is
+--      to check out the interaction of features when preemption occurs,
+--      the operations each inform the other operations as to when they
+--      have been preempted.  Each operation is performed until it has
+--      been preempted a desired number of times.
+-- 
+-- APPLICABILITY CRITERIA:
+--      This test applies only to implementations supporting the
+--      Real-Time Systems Annex.
+--
+--
+-- CHANGE HISTORY:
+--      04 JAN 96   SAIC    Initial release for 2.1
+--      04 MAY 96   SAIC    Commentary update
+--      01 DEC 97   EDS     Remove incorrect check (previously at 
+--                          lines 228-232).
+--!
+
+----------------------------------------------------------
+--
+-- Cyclic Scheduler
+--
+with System;
+generic
+    with procedure Periodic_Activity (Id : Integer);
+    Task_Period   : in Duration;
+    Task_Priority : in System.Priority;
+    Task_Id       : in Integer;
+package CXD1008_0 is
+    procedure Start;
+    procedure Stop;
+end CXD1008_0;
+
+----------------------------------------------------------
+
+with ImpDef;
+with Report;
+package body CXD1008_0 is
+    Verbose : constant Boolean := False;
+
+    task Cyclic is
+       pragma Priority (Task_Priority);
+       entry Start;
+       entry Stop;
+    end Cyclic;
+
+    task body Cyclic is
+       -- allow drift in the periodic tasks - works better for this test
+    begin
+        accept Start;
+        -- sit quietly until all the tasks have gotten started
+        delay ImpDef.Clear_Ready_Queue;
+
+        loop
+            select
+                accept Stop;
+                exit;  -- out of task loop
+            or
+                delay Task_Period;
+                -- if we get here then it is not time to stop
+                Periodic_Activity (Task_Id);
+            end select;
+        end loop;
+    end Cyclic;
+
+
+    procedure Start is
+    begin
+        Cyclic.Start;
+    end Start;
+
+    procedure Stop is
+    begin
+        -- if the task is waiting then allow it to die gracefully.
+        -- otherwise, kill it.
+        select
+            Cyclic.Stop;
+            if Verbose then
+                Report.Comment ("stop issued for" &
+                                Integer'Image (Task_Id));
+            end if;
+        else
+            abort Cyclic;
+            if Verbose then
+                Report.Comment ("abort issued for" &
+                                Integer'Image (Task_Id));
+            end if;
+        end select;
+    end Stop;
+end CXD1008_0;
+
+----------------------------------------------------------
+
+package CXD1008_1 is
+    procedure Do_Float (Id : Integer);
+    procedure Do_Exceptions (Id : Integer);
+    procedure Preemption (Id : Integer);
+    procedure Wait_Till_Done;
+end CXD1008_1;
+
+----------------------------------------------------------
+
+with Report;
+package body CXD1008_1 is
+    Verbose : constant Boolean := False;
+
+    -- how many times must a computation be preempted before we
+    -- will allow it to complete
+    Desired_Preemptions : constant := 10;
+
+    -- The purpose of the manager is to keep track of how many times
+    -- a particular computation has been preempted.  This is done by
+    -- having each computation register that it is starting.  Whenever
+    -- a computation starts, it preempts anything running at a lower
+    -- priority (or lower id).
+    -- The condition for the termination of a computation depends upon
+    -- the preemption count.
+    -- The count of the number of tests started at each priority level
+    -- is kept and used for determining when to terminate the test
+
+    subtype Valid_Id is Integer range 1..7;
+    type Counters is array (Valid_Id) of Natural;
+    Test_Counts : Counters := (Valid_Id => 0);
+
+    protected Manager is
+        procedure Start (Id : Valid_Id);
+        function Preemption_Count (Id : Valid_Id) return Natural;
+        entry Test_Done;
+    private
+        Preemptions : Counters := (Valid_Id => 0); 
+        Starts : Natural := 0;
+    end Manager;
+
+    protected body Manager is
+       procedure Start (Id : Valid_Id) is
+       begin
+           for I in Valid_Id'First .. Id - 1 loop
+               Preemptions (I) := Preemptions (I) + 1;
+           end loop;
+           Preemptions (Id) := 0;
+           Test_Counts (Id) := Test_Counts (Id) + 1;
+           -- only count the tests of each type that are below
+           -- the highest priority for that type
+           if Id <= Valid_Id'Last - 3 then
+               Starts := Starts + 1;
+           end if;
+       end Start;
+
+       function Preemption_Count (Id : Valid_Id) return Natural is
+       begin
+           return Preemptions (Id);
+       end Preemption_Count;
+
+       entry Test_Done when Starts > 50 is
+       begin
+           null;  -- just finish
+       end Test_Done;
+    end Manager;
+
+
+    procedure Do_Float (Id : Integer) is
+       -- hopefully, some of these variables will be allocated
+       -- to registers.
+       A, B, C, D, E, F : Float;
+       -- two values that are the same as Id but not obvious to the compiler
+       Id2 : Integer := Report.Ident_Int (Id);
+       Id1 : Integer := Report.Ident_Int (Id);
+    begin
+       Manager.Start (Id);
+       F := 1.0;
+       while Manager.Preemption_Count (Id) < Desired_Preemptions loop
+          A := Float (Id1) + F;
+          B := Float (Id1 + 1);
+          C := A ** Id1;
+          D := B ** (- Id1) + F;
+          E := F ** (Id1 + 3);
+
+          if A /= Float (Id2) + F then
+             Report.Failed ("Do_Float A = " & Float'Image (A) &
+                            " for Id = " & Integer'Image (Id) &
+                            " and F = " & Float'Image (F));
+          end if;
+
+          if B /= Float (Id2 + 1) then
+             Report.Failed ("Do_Float B = " & Float'Image (B) &
+                            " for Id = " & Integer'Image (Id) &
+                            " and F = " & Float'Image (F));
+          end if;
+
+          if C /= A ** Id2 then
+             Report.Failed ("Do_Float C = " & Float'Image (C) &
+                            " for Id = " & Integer'Image (Id) &
+                            " and F = " & Float'Image (F));
+          end if;
+
+
+          if E /= F ** (Id2 + 3)  then
+             Report.Failed ("Do_Float E = " & Float'Image (E) &
+                            " for Id = " & Integer'Image (Id) &
+                            " and F = " & Float'Image (F));
+          end if;
+
+          -- optimization thwarting - make it look like the values
+          -- computed in the loop might change.
+          if Report.Ident_Bool (False) then
+             F := F * 10.0;
+             Id1 := Id1 + 2;
+          end if;
+       end loop;
+
+    end Do_Float;
+
+
+    procedure Do_Exceptions (Id : Integer) is
+        Count : Integer := 0;
+        My_Exception : exception;
+        procedure Recurse (Levels : Integer) is
+        begin
+            if Levels > Report.Ident_Int (1) then
+                Recurse (Levels - 1);
+            else
+                if Id < 4 then
+                     -- note that constraint_error will be raised in
+                     -- the following line (divide by 0)
+                     Report.Comment ("shouldn't print" &
+                                     Integer'Image (5 / Report.Ident_Int(0)));
+                else
+                     raise My_Exception;
+                end if;
+            end if;
+        exception
+           when others => 
+               Count := Count + 1;
+               raise;
+        end Recurse;
+    begin
+        Manager.Start (Id);
+        Recurse (Id);
+        Report.Failed ("No exception for Id=" & Integer'Image (Id));
+    exception
+        when Constraint_Error | My_Exception =>
+            if Id /= Count then
+                Report.Failed ("Exception test  Id =" & Integer'Image (Id) &
+                               " Count =" & Integer'Image (Count));
+            end if;
+        when others =>
+            Report.Failed ("unexpected exception for Id=" & 
+                           Integer'Image (Id));
+    end Do_Exceptions;
+
+
+    procedure Preemption (Id : Integer) is
+    begin
+       -- just note that everything running has been preempted.
+       Manager.Start (Id); 
+    end Preemption;
+
+
+    procedure Wait_Till_Done is
+    begin
+        Manager.Test_Done;
+        if Verbose then
+            Report.Comment ("Id   Tests");
+            for I in Valid_Id loop
+                Report.Comment (Integer'Image (I) & "  " &
+                                Integer'Image (Test_Counts (I)));
+            end loop;
+        end if;
+    end Wait_Till_Done;
+end CXD1008_1;
+
+----------------------------------------------------------
+
+with System;
+with Report;
+with ImpDef;
+with CXD1008_0;
+with CXD1008_1;
+procedure CXD1008 is
+
+    generic package Cyclic renames CXD1008_0;
+    package Test_Cases renames CXD1008_1;
+
+    Min_Period : constant Duration := ImpDef.Switch_To_New_Task;
+    Base_Priority : constant System.Priority := System.Priority'First;
+
+    package T1 is new Cyclic (Test_Cases.Do_Float, 
+                              1.8*Min_Period,
+                              Base_Priority + 0,
+                              1);
+    package T2 is new Cyclic (Test_Cases.Do_Exceptions,
+                              1.7*Min_Period,
+                              Base_Priority + 1,
+                              2);
+    package T3 is new Cyclic (Test_Cases.Do_Float, 
+                              1.6*Min_Period,
+                              Base_Priority + 2,
+                              3);
+    package T4 is new Cyclic (Test_Cases.Do_Exceptions,
+                              1.5*Min_Period,
+                              Base_Priority + 3,
+                              4);
+    package T5 is new Cyclic (Test_Cases.Do_Float, 
+                              1.4*Min_Period,
+                              Base_Priority + 4,
+                              5);
+    package T6 is new Cyclic (Test_Cases.Do_Exceptions,
+                              1.3*Min_Period,
+                              Base_Priority + 5,
+                              6);
+---
+
+    package Ticker is new Cyclic (Test_Cases.Preemption,
+                              Min_Period,
+                              Base_Priority + 6,
+                              7);
+
+----------------------------------------------------------
+  
+
+begin
+    Report.Test ("CXD1008",
+                 "Check that preemptive scheduling, floating point, and" &
+                 " exceptions all work together");
+
+    T1.Start;
+    T2.Start;
+    T3.Start;
+    T4.Start;
+    T5.Start;
+    T6.Start;
+    Ticker.Start;
+
+    Test_Cases.Wait_Till_Done;
+
+    T1.Stop;
+    T2.Stop;
+    T3.Stop;
+    T4.Stop;
+    T5.Stop;
+    T6.Stop;
+    Ticker.Stop;
+  
+    Report.Result;
+end CXD1008;

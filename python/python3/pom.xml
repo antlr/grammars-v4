@@ -9,12 +9,7 @@
 		<artifactId>pythonparent</artifactId>
 		<version>1.0-SNAPSHOT</version>
 	</parent>
-	<properties>
-		<!-- location of java sources -->
-		<src.dir>Java</src.dir>
-	</properties>
 	<build>
-		<sourceDirectory>${src.dir}</sourceDirectory>
 		<plugins>
 			<plugin>
 				<groupId>org.antlr</groupId>
@@ -47,7 +42,7 @@
 					<entryPoint>file_input</entryPoint>
 					<grammarName>Python3</grammarName>
 					<packageName></packageName>
-					<exampleFiles>examples/</exampleFiles>
+					<exampleFiles>large/</exampleFiles>
 				</configuration>
 				<executions>
 					<execution>

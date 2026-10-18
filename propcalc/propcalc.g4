@@ -30,95 +30,88 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar propcalc;
 
 proposition
-   : expression THEREFORE expression EOF
-   ;
+    : expression THEREFORE expression EOF
+    ;
 
 expression
-   : relExpression ((AND | OR) relExpression)*
-   ;
+    : relExpression ((AND | OR) relExpression)*
+    ;
 
 relExpression
-   : atom
-   | equiv
-   | implies
-   ;
+    : atom
+    | equiv
+    | implies
+    ;
 
 atoms
-   : atom (',' atom)*
-   ;
+    : atom (',' atom)*
+    ;
 
 atom
-   : variable
-   | NOT atom
-   | LPAREN expression RPAREN
-   ;
+    : variable
+    | NOT atom
+    | LPAREN expression RPAREN
+    ;
 
 equiv
-   : atom EQUIV atom
-   ;
+    : atom EQUIV atom
+    ;
 
 implies
-   : atom IMPLIES atom
-   ;
+    : atom IMPLIES atom
+    ;
 
 variable
-   : LETTER*
-   ;
-
+    : LETTER*
+    ;
 
 AND
-   : '^'
-   ;
-
+    : '^'
+    ;
 
 OR
-   : 'v'
-   ;
-
+    : 'v'
+    ;
 
 NOT
-   : '!'
-   ;
-
+    : '!'
+    ;
 
 EQ
-   : '='
-   ;
-
+    : '='
+    ;
 
 IMPLIES
-   : '->'
-   ;
-
+    : '->'
+    ;
 
 THEREFORE
-   : '|-'
-   ;
-
+    : '|-'
+    ;
 
 EQUIV
-   : '<->'
-   ;
-
+    : '<->'
+    ;
 
 LPAREN
-   : '('
-   ;
-
+    : '('
+    ;
 
 RPAREN
-   : ')'
-   ;
-
+    : ')'
+    ;
 
 LETTER
-   : ('a' .. 'z') | ('A' .. 'Z')
-   ;
-
+    : ('a' .. 'z')
+    | ('A' .. 'Z')
+    ;
 
 WS
-   : [ \r\n\t] + -> channel (HIDDEN)
-   ;
+    : [ \r\n\t]+ -> channel (HIDDEN)
+    ;
