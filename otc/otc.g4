@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2020, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -32,16 +32,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar otc;
 
 prog
-   : decl*
+   : decl* EOF
    ;
 
 decl
-   : vardecl fundecl
+   : vardecl
+   | fundecl
    ;
 
 vardecl
-   : (type NAME)
-   | (type NAME '[' INT ']')
+   : (type NAME ';')
+   | (type NAME '[' INT ']' ';')
    ;
 
 fundecl
@@ -49,7 +50,7 @@ fundecl
    ;
 
 args
-   : (arg ',')* arg
+   : ((arg ',')* arg)?
    ;
 
 arg
@@ -66,7 +67,8 @@ stmt
    | dowhilestmt
    | ('return' expr ';')
    | (expr ';')
-   | ('{' stmt* '}') ';'
+   | ('{' stmt* '}')
+   | ';'
    ;
 
 ifstmt
@@ -83,19 +85,19 @@ dowhilestmt
    ;
 
 expr
-   : (unop expr)
-   | ('(' expr ')')
+   : unop expr
+   | '(' expr ')'
    | NAME
    | INT
    | CHAR
    | STRING
-   | (expr '(' exprs ')')
-   | (expr '[' expr ']')
-   | (expr binop expr)
+   | expr '(' exprs ')'
+   | expr '[' expr ']'
+   | expr binop expr
    ;
 
 exprs
-   : (expr ',')* expr
+   : ((expr ',')* expr)?
    ;
 
 binop
@@ -126,11 +128,15 @@ stars
    ;
 
 CHAR
-   : [a-zA-Z0-9]
+   : '\'' (ESC | ~ ['\\\r\n]) '\''
+   ;
+
+fragment ESC
+   : '\\' .
    ;
 
 STRING
-   : '"' ~ '"'* '"'
+   : '"' (ESC | ~ ["\\\r\n])* '"'
    ;
 
 INT
@@ -138,7 +144,15 @@ INT
    ;
 
 NAME
-   : [a-zA-Z]+
+   : [a-zA-Z_] [a-zA-Z_0-9]*
+   ;
+
+LINE_COMMENT
+   : '//' ~ [\r\n]* -> skip
+   ;
+
+BLOCK_COMMENT
+   : '/*' .*? '*/' -> skip
    ;
 
 WS
