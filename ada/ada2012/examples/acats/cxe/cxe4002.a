@@ -1,0 +1,507 @@
+-- CXE4002.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making
+--     this public release, the Government intends to confer upon all
+--     recipients unlimited rights  equal to those held by the Government.
+--     These rights include rights to use, duplicate, release or disclose the
+--     released technical data and computer software in whole or in part, in
+--     any manner and for any purpose whatsoever, and to have or permit others
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that parameter passing to remote procedures is handled
+--      properly when the size of the parameters can be determined at
+--      compile time.   Check that the following types can be passed
+--      as parameters:  integer, float, static sized arrays, and simple
+--      records.  Check the parameter passing using all three modes
+--      and check that function results of the various types are handled
+--      properly.  Check that both direct subprogram calls and indirect
+--      calls through a value of a remote access to subprogram can be
+--      used for the call.
+--
+-- TEST DESCRIPTION:
+--      This test is composed of the following compilation units:
+--          CXE4002_Common  - pure package containing declarations
+--              shared between partitions A & B
+--          CXE4002_Part_A1 - rci package interface for partition A
+--          CXE4002_Part_A2 - rci package interface for partition A
+--          CXE4002_A  - main procedure for partition A
+--          CXE4002_B  - main procedure for partition B - main driver
+--              for the test
+--
+-- SPECIAL REQUIREMENTS:
+--      Compile the compilation units in this file.
+--      Create the two partitions (A and B) with the following contents:
+--        Partition A contains:
+--           CXE4002_A  (main procedure)
+--           CXE4002_Part_A1  (RCI package)
+--           CXE4002_Part_A2  (RCI package)
+--           and all normal and pure packages with'ed by these units.
+--        Partition B contains:
+--           CXE4002_B  (main procedure)
+--           and all normal and pure packages with'ed by these units.
+--        Note that package Report is included in both partitions.
+--      Run the program by starting both partitions.  The partitions may be
+--      started in either order.
+--
+-- APPLICABILITY CRITERIA:
+--      This test applies only to implementations:
+--         supporting the Distribution Annex,
+--         supporting the Remote_Call_Interface pragma, and
+--         providing an implementation of System.RPC.
+--
+-- PASS/FAIL CRITERIA:
+--      This test passes if and only if both partition A and
+--      partition B print a message reporting that the test passed.
+--
+--
+-- CHANGE HISTORY:
+--     17 APR 95   SAIC    Initial version
+--     05 JUN 95   SAIC    Made floating point values friendly to
+--                         heterogeneous systems.
+--     19 DEC 95   SAIC    Fixed operator visibility problem.
+--     25 APR 96   SAIC    Incorporated Reviewer comments.
+--     25 JAN 01   RLB     Repaired startup race condition.
+--
+--!
+
+package CXE4002_Common is
+  pragma Pure;
+
+  -- types for parameters passed between partitions
+
+  type Little_Number is range 0..7;
+
+  type Integer_Vector is array (2..11) of Integer;
+
+  subtype Description is String (1..10);
+  type Record_Data is
+    record
+      Part_No : Integer;
+      Cost    : Float;
+      Name    : Description;
+    end record;
+end CXE4002_Common;
+
+-----------------------------------------------------------------------------
+
+with CXE4002_Common;
+package CXE4002_Part_A1 is
+  pragma Remote_Call_Interface;
+
+  -- for convenience, rename the imported types used for parameters
+  subtype Little_Number  is CXE4002_Common.Little_Number;
+  subtype Integer_Vector is CXE4002_Common.Integer_Vector;
+  subtype Description    is CXE4002_Common.Description;
+  subtype Record_Data    is CXE4002_Common.Record_Data;
+
+  -- simple integer and float tests
+  procedure Check_In (Little : in Little_Number;
+                      Real   : in Float;
+                      Int    : in Integer);
+  procedure Set_Out  (Little : out Little_Number;
+                      Real   : out Float;
+                      Int    : out Integer);
+  procedure Decr     (Little : in out Little_Number;
+                      Real   : in out Float;
+                      Int    : in out Integer);
+
+  -- record tests
+  function Current_Record (Name : Description) return Record_Data;
+  procedure Update_Record (Old_Data : in Record_Data;
+                           New_Data : out Record_Data);
+
+  -- array tests
+  function "+"(A, B : in Integer_Vector) return Integer_Vector;
+  procedure Incr_Vector (X : in out Integer_Vector);
+
+  -- access test support
+  procedure Call_With_4 (T : Integer);
+
+  -- coordination of test termination across partitions
+  procedure Can_Quit;
+  procedure Quit;
+end CXE4002_Part_A1;
+
+-----------------------------------------------------------------------------
+
+package CXE4002_Part_A2 is
+  -- This package supports the remote access tests
+  pragma Remote_Call_Interface;
+
+  procedure Call_With_2 (T : Integer);
+  procedure Call_With_3 (T : Integer);
+
+  procedure Mixed_1 (X : in Integer;  Y : out Integer; Z : in out Integer);
+  procedure Mixed_2 (X : in Integer;  Y : out Integer; Z : in out Integer);
+
+  type Remote_Proc is access procedure (X : Integer);
+  type Remote_Proc_Mixed is access
+        procedure (A : in Integer;  B : out Integer;  C : in out Integer);
+
+end CXE4002_Part_A2;
+
+-----------------------------------------------------------------------------
+
+with CXE4002_Common;
+with CXE4002_Part_A1;
+with CXE4002_Part_A2;
+with Report;
+procedure CXE4002_A is
+begin
+  -- this partition is a server that deals with calls
+  -- from CXE4002_B.
+  Report.Test ("CXE4002_A",
+               "Parameter passing across partitions (server)");
+  CXE4002_Part_A1.Can_Quit; -- OK to quit now.
+
+  -- Report.Result is called in the body of CXE4002_Part_A1.
+end CXE4002_A;
+
+-----------------------------------------------------------------------------
+
+with CXE4002_Common;
+with CXE4002_Part_A1;
+with CXE4002_Part_A2;
+with Report;
+procedure CXE4002_B is
+  function "="(L,R : CXE4002_Common.Integer_Vector) return Boolean
+      renames CXE4002_Common."=";
+  function "+"(L,R : CXE4002_Common.Integer_Vector)
+      return CXE4002_Common.Integer_Vector
+      renames CXE4002_Part_A1."+";
+  function "="(L,R : CXE4002_Common.Little_Number) return Boolean
+      renames CXE4002_Common."=";
+
+  use type CXE4002_Common.Record_Data;
+begin
+  Report.Test ("CXE4002_B", "Parameter passing across partitions");
+
+  -- make sure partitioning is performed
+  if CXE4002_Part_A1'Partition_ID = CXE4002_B'Partition_ID then
+    Report.Failed ("Partitioning Error - CXE4002_Part_A1 and CXE4002_B" &
+                   " are in the same partition.");
+  end if;
+
+  -- do the tests
+
+  -- simple IN parameter test
+  CXE4002_Part_A1.Check_In (1, 2.0, 3);
+
+  -- simple OUT and IN OUT parameter test
+  declare
+    A : CXE4002_Common.Little_Number;
+    B : Float;
+    C : Integer;
+  begin
+    CXE4002_Part_A1.Set_Out (A, B, C);
+    if A /= 4 or B /= -123.0 or C /= -789 then
+      Report.Failed ("OUT parameters not set properly");
+    end if;
+
+    A := 6;
+    B := 2.0;
+    C := -1;
+    CXE4002_Part_A1.Decr (A, B, C);
+    if A = 5 and B = 1.0 and C = -2 then
+      null;
+      -- Report.Comment ("finished simple parameter passing");
+    else
+      Report.Failed ("IN OUT parameters not returned properly");
+    end if;
+  end;
+
+
+  -- do the record type tests now
+  declare
+    I_Data : CXE4002_Common.Record_Data;
+  begin
+    I_Data := CXE4002_Part_A1.Current_Record ("1234567890");
+    if I_Data /= (1, 198.0, "1234567890") then
+      Report.Failed ("composite function result not the expected value");
+    end if;
+
+    CXE4002_Part_A1.Update_Record ((22, 33.0, "abcdefghij"), I_Data);
+    if I_Data.Part_No /= 24 then
+      Report.Failed ("OUT parameter Part_No component has wrong value");
+    end if;
+    if I_Data.Cost /= 66.0 then
+      Report.Failed ("OUT parameter Cost component has wrong value");
+    end if;
+    if I_Data.Name /= "ABCDEFGHIJ" then
+      Report.Failed ("OUT parameter Name component has wrong value");
+    else
+      null;
+      -- Report.Comment ("OUT parameter tests");
+    end if;
+  end;
+
+  -- do the array type tests now
+  declare
+    Ones  : constant CXE4002_Common.Integer_Vector := (others => 1);
+    Twos  : constant CXE4002_Common.Integer_Vector := (others => 2);
+    Fives : constant CXE4002_Common.Integer_Vector := (others => 5);
+    Result : CXE4002_Common.Integer_Vector := (others => 0);
+  begin
+    Result :=  (Twos + Ones) + Twos;
+    if Result = Fives then
+      null;
+      -- Report.Comment ("array parameter and function result");
+    else
+      Report.Failed ("incorrect array parameters and/or" &
+                     " array function results");
+    end if;
+
+    Result := Ones;
+    CXE4002_Part_A1.Incr_Vector (Result);
+    if Result /= Twos then
+      Report.Failed ("incorrect array IN OUT parameter");
+    end if;
+  end;
+
+  -- access to remote subprogram tests
+  -- here we make sure the correct procedure is called by having
+  -- several procedures with the same parameter profile but each
+  -- procedure expects a different value to be passed to it as is
+  -- indicated by the procedure name.
+  declare
+    P2, P3, P4 : CXE4002_Part_A2.Remote_Proc;
+  begin
+    P2 := CXE4002_Part_A2.Call_With_2'Access;
+    P3 := CXE4002_Part_A2.Call_With_3'Access;
+    P4 := CXE4002_Part_A1.Call_With_4'Access;
+    -- try two different procedures from the same RCI package
+    P2(2);
+    P3(3);
+    -- try a procedure that is in a different RCI package
+    P4(4);
+  end;
+
+  -- access to remote subprogram tests with mixed parameters.
+  -- make sure the pointer is used.
+  declare
+    M1 : CXE4002_Part_A2.Remote_Proc_Mixed;
+    M2 : CXE4002_Part_A2.Remote_Proc_Mixed;
+    T  : CXE4002_Part_A2.Remote_Proc_Mixed;
+
+    D, E : Integer := 33;
+
+  begin
+    T := CXE4002_Part_A2.Mixed_1'Access;
+    if Report.Ident_Int (1) = 1 then
+      M1 := T;
+      M2 := CXE4002_Part_A2.Mixed_2'Access;
+    else -- not executed
+      M2 := T;
+      M1 := CXE4002_Part_A2.Mixed_2'Access;
+    end if;
+    E := 30;
+    M1(20, D, E);
+    if D /= 25   or
+       E /= 35   then
+      Report.Failed ("OUT parameters from Mixed 1 are not the" &
+                     " expected values");
+    end if;
+
+    E := 300;
+    D := 100;
+    M2 (200, D, E);
+    if D /= 250   or
+       E /= 350   then
+      Report.Failed ("OUT parameters from Mixed 2 are not the" &
+                     " expected values");
+    end if;
+  end;
+
+  -- finish up
+  CXE4002_Part_A1.Quit;
+  Report.Result;
+end CXE4002_B;
+
+-----------------------------------------------------------------------------
+
+with Report;
+with CXE4002_Common;
+package body CXE4002_Part_A1 is
+  function "+"(X,Y : Little_Number) return Little_Number renames
+      CXE4002_Common."+";
+  function "-"(X,Y : Little_Number) return Little_Number renames
+      CXE4002_Common."-";
+  function "="(X,Y : Little_Number) return Boolean renames
+      CXE4002_Common."=";
+
+
+  -- simple integer and float tests
+  procedure Check_In (Little : in Little_Number;
+                      Real   : in Float;
+                      Int    : in Integer) is
+  begin
+    if Little /= 1 or
+       Real   /= 2.0 or
+       Int    /= 3 then
+      Report.Failed ("incorrect value in mode IN integer and float test");
+    else
+      null;
+      -- Report.Comment ("mode in integer and float test");
+    end if;
+  end Check_In;
+
+
+  procedure Set_Out  (Little : out Little_Number;
+                      Real   : out Float;
+                      Int    : out Integer) is
+  begin
+    Little := 4;
+    Real := -123.0;
+    Int := -789;
+  end Set_Out;
+
+
+  procedure Decr     (Little : in out Little_Number;
+                      Real   : in out Float;
+                      Int    : in out Integer) is
+  begin
+    if Little /= 6   or
+       Real   /= 2.0 or
+       Int    /= -1  then
+      Report.Failed ("mode IN OUT parameters did not have the " &
+                     " correct value upon entry");
+    end if;
+    Little := Little - 1;
+    Real := Real - 1.0;
+    Int := Int - 1;
+  end Decr;
+
+  -- Record tests
+  function Current_Record (Name : Description) return Record_Data is
+  begin
+    if Name /= "1234567890" then
+      Report.Failed ("string parameter did not have the correct value" &
+                     " upon entry");
+    end if;
+    return (1, 198.0, Name);
+  end Current_Record;
+
+
+  procedure Update_Record (Old_Data : in Record_Data;
+                           New_Data : out Record_Data) is
+  begin
+    New_Data.Part_No := Old_Data.Part_No + 2;
+    New_Data.Cost := Old_Data.Cost * 2.0;
+    New_Data.Name := "ABCDEFGHIJ";
+  end Update_Record;
+
+
+  -- vector operation tests
+  function "+" (A, B : in Integer_Vector) return Integer_Vector is
+    Result : Integer_Vector;
+  begin
+    for I in Integer_Vector'Range loop
+      Result (I) := A(I) + B(I);
+    end loop;
+    return Result;
+  end "+";
+
+
+  procedure Incr_Vector (X : in out Integer_Vector) is
+  begin
+    for I in Integer_Vector'Range loop
+      X (I) := X (I) + 1;
+    end loop;
+  end Incr_Vector;
+
+
+  -- remote call test
+  procedure Call_With_4 (T : Integer) is
+  begin
+    if T /= 4 then
+      Report.Failed ("expected 4 but received" & Integer'Image (T));
+    end if;
+  end;
+
+
+  ---------  partition termination coordination ----------
+  -- use a task to prevent the partition from completing its execution
+  -- until the main procedure in partition B tells it to quit.
+
+  task Wait_For_Quit is
+    entry Can_Quit;
+    entry Quit;
+  end Wait_For_Quit;
+
+  task body Wait_For_Quit is
+  begin
+    accept Can_Quit; -- Called once we've called Report.Test. (Else we might
+                     -- call Report.Result before Report.Test.)
+    accept Quit;
+    Report.Result;
+  end Wait_For_Quit;
+
+  procedure Can_Quit is
+  begin
+    Wait_For_Quit.Can_Quit;
+  end Can_Quit;
+
+  procedure Quit is
+  begin
+    Wait_For_Quit.Quit;
+  end Quit;
+
+
+end CXE4002_Part_A1;
+
+-----------------------------------------------------------------------------
+
+with Report;
+package body CXE4002_Part_A2 is
+
+  procedure Call_With_2 (T : Integer) is
+  begin
+    if T /= 2 then
+      Report.Failed ("expected 2 but received" & Integer'Image (T));
+    end if;
+  end;
+
+  procedure Call_With_3 (T : Integer) is
+  begin
+    if T /= 3 then
+      Report.Failed ("expected 3 but received" & Integer'Image (T));
+    end if;
+  end;
+
+  procedure Mixed_1 (X : in Integer;  Y : out Integer; Z : in out Integer) is
+  begin
+    if X /= 20    or
+       Z /= 30    then
+      Report.Failed ("Mixed_1 IN parameters are not the expected value");
+    end if;
+    Y := 25;
+    Z := 35;
+  end Mixed_1;
+
+  procedure Mixed_2 (X : in Integer;  Y : out Integer; Z : in out Integer) is
+  begin
+    if X /= 200    or
+       Z /= 300    then
+      Report.Failed ("Mixed_2 IN parameters are not the expected value");
+    end if;
+    Y := 250;
+    Z := 350;
+  end Mixed_2;
+
+end CXE4002_Part_A2;

@@ -70,58 +70,64 @@ VEHICLES WITH DISTRICT NO. 78 PERMITS EXEMPTED
 DISTRICT NO.34 PERMITS EXEMPT
 
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar parkingsign;
+
 /*
 There can be multiple parking signs on the same pole that together determine
 the parking rules for the location.  Assume we have at least one sign in the image
 we are analyzing.
 */
 
-
 parkingSigns
-   : parkingSign* EOF
-   ;
+    : parkingSign* EOF
+    ;
 
 parkingSign
-   : streetSweepingSign
-   | noParkingSign
-   | noStoppingSign
-   | passengerLoadingSign
-   | singleTimeLimitSign
-   | doubleTimeLimitSign
-   | temporaryNoParkingSign
-   | permitSign
-   ;
+    : streetSweepingSign
+    | noParkingSign
+    | noStoppingSign
+    | passengerLoadingSign
+    | singleTimeLimitSign
+    | doubleTimeLimitSign
+    | temporaryNoParkingSign
+    | permitSign
+    ;
+
 /*
 Sometimes there are the words NO PARKING and sometimes there is a graphic P
 with a circle and line through it.  We don't include the graphic in the grammar
 */
-   
-   
+
 streetSweepingSign
-   : noParking? timeRange day streetSweeping
-   ;
-   // Sometimes the exception is on a different sign below the no parking sign
-   
+    : noParking? timeRange day streetSweeping
+    ;
+
+// Sometimes the exception is on a different sign below the no parking sign
+
 noParkingSign
-   : noParking? (anyTime | timeRange) EXCEPT? dayRange?
-   ;
+    : noParking? (anyTime | timeRange) EXCEPT? dayRange?
+    ;
 
 noStoppingSign
-   : towAway? (noStopping | valetOnly) timeRange+ EXCEPT? dayRange?
-   ;
+    : towAway? (noStopping | valetOnly) timeRange+ EXCEPT? dayRange?
+    ;
 
 passengerLoadingSign
-   : towAway? loadingOnly timeRange+ EXCEPT? dayRange?
-   ;
+    : towAway? loadingOnly timeRange+ EXCEPT? dayRange?
+    ;
 
 temporaryNoParkingSign
-   : towAway TEMPORARY noParking (anyTime | timeRange) EXCEPT? dayRange?
-   ;
+    : towAway TEMPORARY noParking (anyTime | timeRange) EXCEPT? dayRange?
+    ;
 
 singleTimeLimitSign
-   : ((INT HOUR) | (INT minute)) PARKING timeRange EXCEPT? dayRange?
-   ;
+    : ((INT HOUR) | (INT minute)) PARKING timeRange EXCEPT? dayRange?
+    ;
+
 /*
 The double time limit sign is a challenge in that the order of the tokens
 is not ideal.  If there is 2 hour parking Mon-Sat from 8am to 8pm and on
@@ -129,332 +135,332 @@ Sun from 11am to 8pm, the order of the tokens will be
 2 HOUR PARKING MON TO SAT SUN 8 AM 11 AM TO TO 11 AM 8 PM
 because of the vertical arrangement of the day/time ranges
 */
-   
-   
+
 doubleTimeLimitSign
-   : INT HOUR PARKING dayRange dayRange time time TO TO time time (EXCEPT HOLIDAYS)?
-   ;
+    : INT HOUR PARKING dayRange dayRange time time TO TO time time (EXCEPT HOLIDAYS)?
+    ;
 
 permitSign
-   : (VEHICLES WITH)? DISTRICT NO INT PERMITS exempt
-   ;
-   // Phrases
-   
+    : (VEHICLES WITH)? DISTRICT NO INT PERMITS exempt
+    ;
+
+// Phrases
+
 streetSweeping
-   : STREET (SWEEPING | CLEANING)
-   ;
+    : STREET (SWEEPING | CLEANING)
+    ;
 
 noParking
-   : NO PARKING
-   ;
+    : NO PARKING
+    ;
 
 noStopping
-   : NO STOPPING
-   ;
+    : NO STOPPING
+    ;
 
 valetOnly
-   : VALET PARKING ONLY
-   ;
+    : VALET PARKING ONLY
+    ;
 
 loadingOnly
-   : PASSENGER LOADING ONLY
-   ;
+    : PASSENGER LOADING ONLY
+    ;
 
 schoolDays
-   : SCHOOL DAYS
-   ;
+    : SCHOOL DAYS
+    ;
 
 timeRange
-   : (time to time)
-   | (INT to time)
-   ;
+    : (time to time)
+    | (INT to time)
+    ;
 
 everyDay
-   : DAILY
-   | NIGHTLY
-   ;
+    : DAILY
+    | NIGHTLY
+    ;
 
 dayToDay
-   : day to day
-   ;
+    : day to day
+    ;
 
 dayAndDay
-   : day and_ day
-   ;
+    : day and_ day
+    ;
 
 dayRange
-   : everyDay
-   | schoolDays
-   | HOLIDAYS
-   | dayAndDay
-   | dayToDay
-   | day ONLY
-   | day
-   ;
+    : everyDay
+    | schoolDays
+    | HOLIDAYS
+    | dayAndDay
+    | dayToDay
+    | day ONLY
+    | day
+    ;
 
 dayRangePlus
-   : dayRange
-   ;
+    : dayRange
+    ;
 
 to
-   : TO
-   | DASH
-   | THRU
-   ;
+    : TO
+    | DASH
+    | THRU
+    ;
 
 and_
-   : AND
-   | AMPERSAND
-   ;
+    : AND
+    | AMPERSAND
+    ;
 
 towAway
-   : TOW DASH? AWAY
-   ;
+    : TOW DASH? AWAY
+    ;
 
 minute
-   : MIN
-   | MINUTE
-   ;
+    : MIN
+    | MINUTE
+    ;
 
 exempt
-   : EXEMPT
-   | EXEMPTED
-   ;
+    : EXEMPT
+    | EXEMPTED
+    ;
 
 anyTime
-   : ANYTIME
-   | (ANY TIME)
-   ;
+    : ANYTIME
+    | (ANY TIME)
+    ;
 
 NO
-   : 'NO'
-   ; // two meanings : negative (no) and abbreviation for number (No.)
-   
+    : 'NO'
+    ; // two meanings : negative (no) and abbreviation for number (No.)
+
 PARKING
-   : 'PARKING'
-   ;
+    : 'PARKING'
+    ;
 
 TO
-   : 'TO'
-   ;
+    : 'TO'
+    ;
 
 THRU
-   : 'THRU'
-   ;
+    : 'THRU'
+    ;
 
 DASH
-   : '-'
-   ;
+    : '-'
+    ;
 
 ANYTIME
-   : 'ANYTIME'
-   ;
+    : 'ANYTIME'
+    ;
 
 ANY
-   : 'ANY'
-   ;
+    : 'ANY'
+    ;
 
 TIME
-   : 'TIME'
-   ;
+    : 'TIME'
+    ;
 
 EXCEPT
-   : 'EXCEPT'
-   ;
+    : 'EXCEPT'
+    ;
 
 DAILY
-   : 'DAILY'
-   ;
+    : 'DAILY'
+    ;
 
 NIGHTLY
-   : 'NIGHTLY'
-   ;
+    : 'NIGHTLY'
+    ;
 
 SCHOOL
-   : 'SCHOOL'
-   ;
+    : 'SCHOOL'
+    ;
 
 DAYS
-   : 'DAYS'
-   ;
+    : 'DAYS'
+    ;
 
 HOLIDAYS
-   : 'HOLIDAYS'
-   ;
+    : 'HOLIDAYS'
+    ;
 
 AND
-   : 'AND'
-   ;
+    : 'AND'
+    ;
 
 AMPERSAND
-   : '&'
-   ;
+    : '&'
+    ;
 
 TOW
-   : 'TOW'
-   ;
+    : 'TOW'
+    ;
 
 AWAY
-   : 'AWAY'
-   ;
+    : 'AWAY'
+    ;
 
 STOPPING
-   : 'STOPPING'
-   ;
+    : 'STOPPING'
+    ;
 
 VALET
-   : 'VALET'
-   ;
+    : 'VALET'
+    ;
 
 ONLY
-   : 'ONLY'
-   ;
+    : 'ONLY'
+    ;
 
 VEHICLES
-   : 'VEHICLES'
-   ;
+    : 'VEHICLES'
+    ;
 
 WITH
-   : 'WITH'
-   ;
+    : 'WITH'
+    ;
 
 DISTRICT
-   : 'DISTRICT'
-   ;
+    : 'DISTRICT'
+    ;
 
 PERMITS
-   : 'PERMITS'
-   ;
+    : 'PERMITS'
+    ;
 
 EXEMPTED
-   : 'EXEMPTED'
-   ;
+    : 'EXEMPTED'
+    ;
 
 EXEMPT
-   : 'EXEMPT'
-   ;
+    : 'EXEMPT'
+    ;
 
 HOUR
-   : 'HOUR'
-   ;
+    : 'HOUR'
+    ;
 
 MINUTE
-   : 'MINUTE'
-   ;
+    : 'MINUTE'
+    ;
 
 MIN
-   : 'MIN'
-   ;
+    : 'MIN'
+    ;
 
 TEMPORARY
-   : 'TEMPORARY'
-   ;
+    : 'TEMPORARY'
+    ;
 
 PASSENGER
-   : 'PASSENGER'
-   ;
+    : 'PASSENGER'
+    ;
 
 LOADING
-   : 'LOADING'
-   ;
+    : 'LOADING'
+    ;
 
 day
-   : MON
-   | TUE
-   | WED
-   | THU
-   | FRI
-   | SAT
-   | SUN
-   ;
+    : MON
+    | TUE
+    | WED
+    | THU
+    | FRI
+    | SAT
+    | SUN
+    ;
 
 MON
-   : 'MONDAY'
-   | 'MON'
-   ;
+    : 'MONDAY'
+    | 'MON'
+    ;
 
 TUE
-   : 'TUESDAY'
-   | 'TUE'
-   ;
+    : 'TUESDAY'
+    | 'TUE'
+    ;
 
 WED
-   : 'WEDNESDAY'
-   | 'WED'
-   ;
+    : 'WEDNESDAY'
+    | 'WED'
+    ;
 
 THU
-   : 'THURSDAY'
-   | 'THU'
-   ;
+    : 'THURSDAY'
+    | 'THU'
+    ;
 
 FRI
-   : 'FRIDAY'
-   | 'FRI'
-   ;
+    : 'FRIDAY'
+    | 'FRI'
+    ;
 
 SAT
-   : 'SATURDAY'
-   | 'SAT'
-   ;
+    : 'SATURDAY'
+    | 'SAT'
+    ;
 
 SUN
-   : 'SUNDAY'
-   | 'SUN'
-   ;
+    : 'SUNDAY'
+    | 'SUN'
+    ;
 
 STREET
-   : 'STREET'
-   ;
+    : 'STREET'
+    ;
 
 SWEEPING
-   : 'SWEEPING'
-   ;
+    : 'SWEEPING'
+    ;
 
 CLEANING
-   : 'CLEANING'
-   ;
+    : 'CLEANING'
+    ;
 
 time
-   : INT (':' INT)? (am | pm)?
-   | twelveNoon
-   | twelveMidnight
-   ;
+    : INT (':' INT)? (am | pm)?
+    | twelveNoon
+    | twelveMidnight
+    ;
 
 twelveNoon
-   : NOON
-   | ('12' NOON)
-   ;
+    : NOON
+    | ('12' NOON)
+    ;
 
 twelveMidnight
-   : MIDNIGHT
-   | ('12' MIDNIGHT)
-   ;
+    : MIDNIGHT
+    | ('12' MIDNIGHT)
+    ;
 
 am
-   : 'AM'
-   | ('A.M.')
-   ;
+    : 'AM'
+    | ('A.M.')
+    ;
 
 pm
-   : 'PM'
-   | ('P.M.')
-   ;
+    : 'PM'
+    | ('P.M.')
+    ;
 
 NOON
-   : 'NOON'
-   ;
+    : 'NOON'
+    ;
 
 MIDNIGHT
-   : 'MIDNIGHT'
-   ;
+    : 'MIDNIGHT'
+    ;
 
 INT
-   : [0-9]+
-   ;
-   // skip whitespace and periods (e.g., 7a.m.)
-   
-WS
-   : [ \t\r\n.]+ -> skip
-   ;
+    : [0-9]+
+    ;
 
+// skip whitespace and periods (e.g., 7a.m.)
+
+WS
+    : [ \t\r\n.]+ -> skip
+    ;

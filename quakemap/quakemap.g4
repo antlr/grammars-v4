@@ -30,60 +30,59 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar quakemap;
 
 map_
-   : entity* EOF
-   ;
+    : entity* EOF
+    ;
 
 entity
-   : '{' keyvalue* brush* '}'
-   ;
+    : '{' keyvalue* brush* '}'
+    ;
 
 keyvalue
-   : string string
-   ;
+    : string string
+    ;
 
 brush
-   : '{' brushline + '}'
-   ;
+    : '{' brushline+ '}'
+    ;
 
 brushline
-   : coord* text num*
-   ;
+    : coord* text num*
+    ;
 
 coord
-   : '(' num* ')'
-   ;
+    : '(' num* ')'
+    ;
 
 num
-   : NUMBER
-   ;
+    : NUMBER
+    ;
 
 string
-   : STRING
-   ;
+    : STRING
+    ;
 
 text
-   : TEXT
-   ;
-
+    : TEXT
+    ;
 
 TEXT
-   : [a-zA-Z] [a-zA-Z0-9_] +
-   ;
-
+    : [a-zA-Z] [a-zA-Z0-9_]+
+    ;
 
 NUMBER
-   : ('+' | '-')? ('0' .. '9') + ('.' ('0' .. '9') +)?
-   ;
-
+    : ('+' | '-')? ('0' .. '9')+ ('.' ('0' .. '9')+)?
+    ;
 
 STRING
-   : '"' ('""' | ~ '"')* '"'
-   ;
-
+    : '"' ('""' | ~ '"')* '"'
+    ;
 
 WS
-   : [ \r\n\t] + -> skip
-   ;
+    : [ \r\n\t]+ -> skip
+    ;

@@ -1,0 +1,54 @@
+MODULE $vcgsrcrec;
+/*
+/*  Copyright © 1996, Digital Equipment Corporation.
+/*
+/* Modifications:
+/*
+/*	002D	Keith Knowles	04-Apr-1987	(362 SVCG D)
+/*
+/*		"list" is now a reserved word in SDL.
+/*
+/*	001	Tom Benson	13-Feb-1984	(003 VCG)
+/*
+/*		Added modification history.
+/*
+/*
+/*
+/* file type definitions
+/*
+CONSTANT ( not_rnd , random , deleted ) EQUALS -1 INCREMENT 1 PREFIX file_typ_;
+/*
+/* definition of a source record
+/*
+AGGREGATE src_record STRUCTURE PREFIX src_ ;
+	listing_line 		LONGWORD;
+	record_nbr		LONGWORD;
+	file_id 		WORD UNSIGNED;
+	flags	STRUCTURE ;
+	    message		BITFIELD MASK ;
+	    page		BITFIELD MASK ;
+	    "list"		BITFIELD MASK ;	/* M002D
+	    nolist		BITFIELD MASK ;
+	    list_required	BITFIELD MASK ;
+	    machine		BITFIELD MASK ;
+	    weird_char		BITFIELD MASK ;
+	    src_bspare		BITFIELD ;
+	    src_byspare		BYTE;
+	    END;
+	"prefix"		CHARACTER LENGTH 8;
+#const_size = .;
+	src_line	UNION;
+		rfa	QUADWORD;
+		text	CHARACTER LENGTH ( 255 ) varying ;
+		END;
+	END;
+/*
+/* sizes of the source record
+/*
+CONSTANT src_record_rfa_size_byte EQUALS #const_size+8 ;
+CONSTANT src_record_rfa_size_long EQUALS ( #const_size+11)/4 ;
+/*
+CONSTANT src_record_text_size_byte EQUALS #const_size+2 ;
+CONSTANT src_record_text_size_long EQUALS ( #const_size+5 )/4 ;
+
+END_MODULE;

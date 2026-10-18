@@ -1,30 +1,30 @@
-import {Lexer, Token, CharStream} from "antlr4ts";
-import {TypeScriptLexer} from './TypeScriptLexer';
+import {Lexer, Token, CharStream} from "antlr4";
+import TypeScriptLexer from './TypeScriptLexer';
 
 /**
  * All lexer methods that used in grammar (IsStrictMode)
  * should start with Upper Case Char similar to Lexer rules.
  */
-export abstract class TypeScriptLexerBase extends Lexer {
+export default abstract class TypeScriptLexerBase extends Lexer {
     /**
      * Stores values of nested modes. By default mode is strict or
      * defined externally (useStrictDefault)
      */
     private readonly scopeStrictModes: boolean[] = [];
 
-    private lastToken: Token;
+    private lastToken: Token | null = null;
 
     /**
      * Default value of strict mode
      * Can be defined externally by setUseStrictDefault
      */
-    private useStrictDefault: boolean;
+    private useStrictDefault: boolean = false;
 
     /**
      * Current value of strict mode
      * Can be defined during parsing, see StringFunctions.js and StringGlobal.js samples
      */
-    private useStrictCurrent: boolean;
+    private useStrictCurrent: boolean = false;
 
     /**
      * Keeps track of the current depth of nested template string backticks.
@@ -105,7 +105,7 @@ export abstract class TypeScriptLexerBase extends Lexer {
 
     protected ProcessCloseBrace() {
         this.bracesDepth--;
-        this.useStrictCurrent = this.scopeStrictModes.length > 0 ? this.scopeStrictModes.pop() : this.UseStrictDefault;
+        this.useStrictCurrent = this.scopeStrictModes.length > 0 ? this.scopeStrictModes.pop()! : this.UseStrictDefault;
     }
 
     protected ProcessStringLiteral() {

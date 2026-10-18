@@ -1,147 +1,228 @@
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
 
 grammar CapnProto;
 
 // parser rules
 
-document :
-	file_identifier using_import* namespace_? document_content* EOF	;
+document
+    : file_identifier using_import* namespace_? document_content* EOF
+    ;
 
-file_identifier :
-	FILE_ID ';' ;
-	
-using_import :
-	'using' ( NAME '=' )? 'import' TEXT ( '.' NAME )? ';' ;
-	
-namespace_ :
-	'$' NAME '.namespace' '(' TEXT ')' ';' ;
+file_identifier
+    : FILE_ID ';'
+    ;
 
-document_content :
-	struct_def | interface_def | function_def | annotation_def | const_def | enum_def ;
+using_import
+    : 'using' (NAME '=')? 'import' TEXT ('.' NAME)? ';'
+    ;
 
-struct_def :
-	'struct' type_ annotation_reference? '{' struct_content* '}' ;
+namespace_
+    : '$' NAME '.namespace' '(' TEXT ')' ';'
+    ;
 
-struct_content : 
-	field_def | enum_def | named_union_def 
-	| unnamed_union_def | interface_def | annotation_def
-	| struct_def | group_def | const_def | inner_using ;
+document_content
+    : struct_def
+    | interface_def
+    | function_def
+    | annotation_def
+    | const_def
+    | enum_def
+    ;
 
-interface_def :
-	'interface' type_ ( 'extends' '(' type_ ')' )? '{' interface_content* '}' ;
+struct_def
+    : 'struct' type_ annotation_reference? '{' struct_content* '}'
+    ;
 
-interface_content : 
-	field_def | enum_def | named_union_def 
-	| unnamed_union_def | interface_def 
-	| struct_def | function_def ;
+struct_content
+    : field_def
+    | enum_def
+    | named_union_def
+    | unnamed_union_def
+    | interface_def
+    | annotation_def
+    | struct_def
+    | group_def
+    | const_def
+    | inner_using
+    ;
 
-field_def :	
-	NAME LOCATOR ':' type_ ( '=' const_value )? ';' ;
+interface_def
+    : 'interface' type_ ('extends' '(' type_ ')')? '{' interface_content* '}'
+    ;
 
-type_ :
-	NAME 
-	inner_type?
-	( '.' type_ )? ;
+interface_content
+    : field_def
+    | enum_def
+    | named_union_def
+    | unnamed_union_def
+    | interface_def
+    | struct_def
+    | function_def
+    ;
 
-inner_type :
-	'(' type_ inner_type? ( ',' type_ inner_type? )* ')' ;
-	
-enum_def :
-	'enum' NAME annotation_reference? '{' enum_content* '}' ;
+field_def
+    : NAME LOCATOR ':' type_ ('=' const_value)? ';'
+    ;
 
-annotation_reference :
-	'$' type_ '.ann'? '(' TEXT ')' ;
-	
-enum_content :
-	NAME LOCATOR annotation_reference? ';' ;
+type_
+    : NAME inner_type? ('.' type_)?
+    ;
 
-named_union_def :
-	NAME LOCATOR? ':union' '{' union_content* '}' ;
+inner_type
+    : '(' type_ inner_type? (',' type_ inner_type?)* ')'
+    ;
 
-unnamed_union_def :
-	'union' '{' union_content* '}' ;
+enum_def
+    : 'enum' NAME annotation_reference? '{' enum_content* '}'
+    ;
 
-union_content :
-	field_def | group_def | unnamed_union_def | named_union_def ;
-	
-group_def :
-	NAME ':group' '{' group_content* '}' ;
+annotation_reference
+    : '$' type_ '.ann'? '(' TEXT ')'
+    ;
 
-group_content :
-	field_def | unnamed_union_def | named_union_def ;
-	
-function_def :
-	NAME LOCATOR? generic_type_parameters? ( function_parameters | type_ )
-	( '->' ( function_parameters | type_ ) )?
-	';' ;
+enum_content
+    : NAME LOCATOR annotation_reference? ';'
+    ;
 
-generic_type_parameters :
-	'[' 
-		NAME ( ',' NAME )*
-	']' ;
-	
-function_parameters :
-	'(' 
-		( NAME ':' type_ ( '=' const_value )?
-			( ',' NAME ':' type_ ( '=' const_value )? )*
-		)?
-	')' ;
-	
-annotation_def :
-	'annotation' type_ annotation_parameters? ':' type_ ';' ;
+named_union_def
+    : NAME LOCATOR? ':union' '{' union_content* '}'
+    ;
 
-annotation_parameters :
-	'(' 'struct' ')' ;
-	
-const_def :
-	'const' NAME ':' type_ '=' const_value ';' ;
-	
-const_value :
-	'-'? '.'? NAME ( '.' NAME )? | INTEGER | FLOAT 
-	| TEXT | BOOLEAN | HEXADECIMAL | VOID 
-	| literal_list | literal_union | literal_bytes ;
-	
-literal_union :
-	'(' NAME '=' union_mapping ( ',' NAME '=' union_mapping )* ')' ;
+unnamed_union_def
+    : 'union' '{' union_content* '}'
+    ;
 
-literal_list :
-	'[' const_value ( ',' const_value )* ']' ;
+union_content
+    : field_def
+    | group_def
+    | unnamed_union_def
+    | named_union_def
+    ;
 
-literal_bytes :
-	'0x' TEXT ;
-	
-union_mapping :
-	'(' NAME '=' const_value ')' | const_value ;
+group_def
+    : NAME ':group' '{' group_content* '}'
+    ;
 
-inner_using :
-	'using' NAME ( '.' NAME )*
-	( '=' type_ )?
-	';' ;
-	
-	
+group_content
+    : field_def
+    | unnamed_union_def
+    | named_union_def
+    ;
+
+function_def
+    : NAME LOCATOR? generic_type_parameters? (function_parameters | type_) (
+        '->' ( function_parameters | type_)
+    )? ';'
+    ;
+
+generic_type_parameters
+    : '[' NAME (',' NAME)* ']'
+    ;
+
+function_parameters
+    : '(' (NAME ':' type_ ( '=' const_value)? ( ',' NAME ':' type_ ( '=' const_value)?)*)? ')'
+    ;
+
+annotation_def
+    : 'annotation' type_ annotation_parameters? ':' type_ ';'
+    ;
+
+annotation_parameters
+    : '(' 'struct' ')'
+    ;
+
+const_def
+    : 'const' NAME ':' type_ '=' const_value ';'
+    ;
+
+const_value
+    : '-'? '.'? NAME ('.' NAME)?
+    | INTEGER
+    | FLOAT
+    | TEXT
+    | BOOLEAN
+    | HEXADECIMAL
+    | VOID
+    | literal_list
+    | literal_union
+    | literal_bytes
+    ;
+
+literal_union
+    : '(' NAME '=' union_mapping (',' NAME '=' union_mapping)* ')'
+    ;
+
+literal_list
+    : '[' const_value (',' const_value)* ']'
+    ;
+
+literal_bytes
+    : '0x' TEXT
+    ;
+
+union_mapping
+    : '(' NAME '=' const_value ')'
+    | const_value
+    ;
+
+inner_using
+    : 'using' NAME ('.' NAME)* ('=' type_)? ';'
+    ;
+
 // lexer rules
 
-fragment DIGIT : [0-9] ;
+fragment DIGIT
+    : [0-9]
+    ;
 
-fragment HEX_DIGIT : DIGIT | 'A'..'F' | 'a'..'f' ;
+fragment HEX_DIGIT
+    : DIGIT
+    | 'A' ..'F'
+    | 'a' ..'f'
+    ;
 
-LOCATOR : '@' DIGIT+ '!'? ;
+LOCATOR
+    : '@' DIGIT+ '!'?
+    ;
 
-TEXT : '"' ~["]*? '"' ;
+TEXT
+    : '"' ~["]*? '"'
+    ;
 
-INTEGER : '-'? DIGIT+ ;
+INTEGER
+    : '-'? DIGIT+
+    ;
 
-FLOAT : '-'? DIGIT+ ( '.' DIGIT+ )? ( 'e' '-'? DIGIT+ )? ;
+FLOAT
+    : '-'? DIGIT+ ('.' DIGIT+)? ('e' '-'? DIGIT+)?
+    ;
 
-HEXADECIMAL : '-'? '0x' HEX_DIGIT+ ;
+HEXADECIMAL
+    : '-'? '0x' HEX_DIGIT+
+    ;
 
-FILE_ID : '@' HEXADECIMAL ;
+FILE_ID
+    : '@' HEXADECIMAL
+    ;
 
-BOOLEAN : 'true' | 'false' ;
+BOOLEAN
+    : 'true'
+    | 'false'
+    ;
 
-VOID : 'void' ;
+VOID
+    : 'void'
+    ;
 
-NAME : [a-zA-Z] [a-zA-Z0-9]* ;
+NAME
+    : [a-zA-Z] [a-zA-Z0-9]*
+    ;
 
-COMMENT : '#' ~[\n]* -> channel(HIDDEN) ;
+COMMENT
+    : '#' ~[\n]* -> channel(HIDDEN)
+    ;
 
-WHITESPACE : [ \t\r\n] -> skip ;
+WHITESPACE
+    : [ \t\r\n] -> skip
+    ;

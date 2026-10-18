@@ -1,0 +1,20 @@
+digraph {
+    layers = "a:b";
+    layerselect = "";
+
+    subgraph cluster_alpha {
+        label = "Alpha";
+        a, b, c [layer = "a"];
+    }
+
+    subgraph cluster_beta {
+        label = "Beta";
+        d, e, f [layer = "b"];
+    }
+
+    g [layer = "a"];
+    h [layer = "b"];
+
+    g -> a [layer = "a"];
+    h -> e [layer = "b"]
+}

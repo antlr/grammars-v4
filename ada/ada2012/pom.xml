@@ -18,8 +18,8 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
-					   <include>AdaParser.g4</include>
-					   <include>AdaLexer.g4</include>
+						<include>AdaParser.g4</include>
+						<include>AdaLexer.g4</include>
 					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
@@ -42,7 +42,8 @@
 					<entryPoint>compilation</entryPoint>
 					<grammarName>Ada</grammarName>
 					<packageName></packageName>
-					<exampleFiles>examples/</exampleFiles>
+					<exampleFiles>examples/semtest/</exampleFiles>
+					<testFileExtension>.adb</testFileExtension>
 				</configuration>
 				<executions>
 					<execution>

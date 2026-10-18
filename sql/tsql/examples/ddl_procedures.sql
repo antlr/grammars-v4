@@ -54,9 +54,3 @@ CREATE PROCEDURE [DBO].[EXECUTEOLAP] @MY_PARAM NVARCHAR(MAX)
 WITH EXECUTE AS OWNER
 AS EXTERNAL NAME [MY_ASSEMBLY_NAME].[MY_NAMESPACE.MY_CLASS].[MY_METHOD]
 go
-
-create or replace procedure dbo.a_procedure
-as
-select * from a_table t
-go
-

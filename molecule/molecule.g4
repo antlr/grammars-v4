@@ -30,26 +30,29 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar molecule;
 
 molecule
-   : part_ ('·' part_)* EOF
-   ;
+    : part_ ('·' part_)* EOF
+    ;
 
 part_
-    : (count? structure)+;
+    : (count? structure)+
+    ;
 
 structure
-    :  symbol count?
-    ; 
+    : symbol count?
+    ;
 
 symbol
-   : 
-   element 
-   | group
-   | ion
-   ;
-     
+    : element
+    | group
+    | ion
+    ;
+
 group
     : '(' structure+ ')'
     ;
@@ -59,21 +62,138 @@ ion
     ;
 
 element
-   : ELEMENT
-   ;
+    : ELEMENT
+    ;
 
 ELEMENT
-   : 'H' | 'He' | 'Li' | 'Be' | 'B' | 'C' | 'N' | 'O' | 'F' | 'Ne' | 'Na' | 'Mg' | 'Al' | 'Si' | 'P' | 'S' | 'Cl' | 'Ar' | 'K' | 'Ca' | 'Sc' | 'Ti' | 'V' | 'Cr' | 'Mn' | 'Fe' | 'Co' | 'Ni' | 'Cu' | 'Zn' | 'Ga' | 'Ge' | 'As' | 'Se' | 'Br' | 'Kr' | 'Rb' | 'Sr' | 'Y' | 'Zr' | 'Nb' | 'Mo' | 'Tc' | 'Ru' | 'Rh' | 'Pd' | 'Ag' | 'Cd' | 'In' | 'Sn' | 'Sb' | 'Te' | 'I' | 'Xe' | 'Cs' | 'Ba' | 'La' | 'Ce' | 'Pr' | 'Nd' | 'Pm' | 'Sm' | 'Eu' | 'Gd' | 'Tb' | 'Dy' | 'Ho' | 'Er' | 'Tm' | 'Yb' | 'Lu' | 'Hf' | 'Ta' | 'W' | 'Re' | 'Os' | 'Ir' | 'Pt' | 'Au' | 'Hg' | 'Tl' | 'Pb' | 'Bi' | 'Po' | 'At' | 'Rn' | 'Fr' | 'Ra' | 'Ac' | 'Th' | 'Pa' | 'U' | 'Np' | 'Pu' | 'Am' | 'Cm' | 'Bk' | 'Cf' | 'Es' | 'Fm' | 'Md' | 'No' | 'Lr' | 'Rf' | 'Db' | 'Sg' | 'Bh' | 'Hs' | 'Mt' | 'Ds' | 'Rg' | 'Cn' | 'Nh' | 'Fl' | 'Mc' | 'Lv' | 'Ts' | 'Og'
-   ;
+    : 'H'
+    | 'He'
+    | 'Li'
+    | 'Be'
+    | 'B'
+    | 'C'
+    | 'N'
+    | 'O'
+    | 'F'
+    | 'Ne'
+    | 'Na'
+    | 'Mg'
+    | 'Al'
+    | 'Si'
+    | 'P'
+    | 'S'
+    | 'Cl'
+    | 'Ar'
+    | 'K'
+    | 'Ca'
+    | 'Sc'
+    | 'Ti'
+    | 'V'
+    | 'Cr'
+    | 'Mn'
+    | 'Fe'
+    | 'Co'
+    | 'Ni'
+    | 'Cu'
+    | 'Zn'
+    | 'Ga'
+    | 'Ge'
+    | 'As'
+    | 'Se'
+    | 'Br'
+    | 'Kr'
+    | 'Rb'
+    | 'Sr'
+    | 'Y'
+    | 'Zr'
+    | 'Nb'
+    | 'Mo'
+    | 'Tc'
+    | 'Ru'
+    | 'Rh'
+    | 'Pd'
+    | 'Ag'
+    | 'Cd'
+    | 'In'
+    | 'Sn'
+    | 'Sb'
+    | 'Te'
+    | 'I'
+    | 'Xe'
+    | 'Cs'
+    | 'Ba'
+    | 'La'
+    | 'Ce'
+    | 'Pr'
+    | 'Nd'
+    | 'Pm'
+    | 'Sm'
+    | 'Eu'
+    | 'Gd'
+    | 'Tb'
+    | 'Dy'
+    | 'Ho'
+    | 'Er'
+    | 'Tm'
+    | 'Yb'
+    | 'Lu'
+    | 'Hf'
+    | 'Ta'
+    | 'W'
+    | 'Re'
+    | 'Os'
+    | 'Ir'
+    | 'Pt'
+    | 'Au'
+    | 'Hg'
+    | 'Tl'
+    | 'Pb'
+    | 'Bi'
+    | 'Po'
+    | 'At'
+    | 'Rn'
+    | 'Fr'
+    | 'Ra'
+    | 'Ac'
+    | 'Th'
+    | 'Pa'
+    | 'U'
+    | 'Np'
+    | 'Pu'
+    | 'Am'
+    | 'Cm'
+    | 'Bk'
+    | 'Cf'
+    | 'Es'
+    | 'Fm'
+    | 'Md'
+    | 'No'
+    | 'Lr'
+    | 'Rf'
+    | 'Db'
+    | 'Sg'
+    | 'Bh'
+    | 'Hs'
+    | 'Mt'
+    | 'Ds'
+    | 'Rg'
+    | 'Cn'
+    | 'Nh'
+    | 'Fl'
+    | 'Mc'
+    | 'Lv'
+    | 'Ts'
+    | 'Og'
+    ;
 
 count
-   : NUMBER
-   ;
+    : NUMBER
+    ;
 
 NUMBER
-   : ('0' .. '9') +
-   ;
+    : ('0' .. '9')+
+    ;
 
 WS
-   : [ \t\r\n] + -> skip
-   ;
+    : [ \t\r\n]+ -> skip
+    ;
