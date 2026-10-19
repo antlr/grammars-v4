@@ -33,7 +33,7 @@ cloneroot=`pwd`
 
 ```sh
 cd csharp/v8-spec
-dotnet trgen -t CSharp
+dotnet trash gen -t CSharp
 ```
 
 `trgen` reads `desc.xml` in the current directory for grammar and test configuration,
@@ -42,9 +42,9 @@ application into `Generated-CSharp/`.
 
 > **trgen rules:**
 > - Only ever use `-t <target>` — no other options (no `--template-sources-directory`, etc.).
-> - Always run `dotnet trgen` from the directory that contains `desc.xml` (the grammar dir).
+> - Always run `dotnet trash gen` from the directory that contains `desc.xml` (the grammar dir).
 > - Never run it from the repo root or any other directory.
-> - For Java: `dotnet trgen -t Java` → generates `Generated-Java/`.
+> - For Java: `dotnet trash gen -t Java` → generates `Generated-Java/`.
 
 **3. Build the driver:**
 
@@ -160,5 +160,5 @@ line, prefixed with `d=<decision>.a=<alt>` (e.g. `d=195.a=1`, `d=195.a=2`).
 **Using trparse/trtree to show ambiguities:**
 
 ```sh
-dotnet trparse --ambig <file> | dotnet trtree
+dotnet trash parse --ambig <file> | dotnet trash tree
 ```

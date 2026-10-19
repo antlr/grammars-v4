@@ -1,4 +1,4 @@
-Ada 2012 ANTLR Grammar
+# Ada 95 Grammar
 
 http://www.ada-auth.org/standards/12rm/html/RM-TOC.html
 

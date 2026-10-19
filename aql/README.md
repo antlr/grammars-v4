@@ -1,4 +1,4 @@
-# ANTLR4 grammar for ArangoDB Query Language (AQL)
+# ArangoDB Query Language (AQL) Grammar
 
 https://www.arangodb.com/docs/stable/aql/index.html
 

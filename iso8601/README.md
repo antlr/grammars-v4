@@ -1,4 +1,4 @@
-# ISO 8601 Grammar for ANTLR 4
+# ISO 8601 Grammar
 
 ISO 8601 grammar with date, time, duration, recurring support.
 

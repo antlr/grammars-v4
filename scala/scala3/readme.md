@@ -1,4 +1,4 @@
-# Scala 3
+# Scala 3 Grammar
 
 ## Source
 EBNF adapted from https://docs.scala-lang.org/scala3/reference/syntax.html (read May 6, 2026).
@@ -32,7 +32,7 @@ To regenerate coverage after adding or modifying example files:
 
 ```sh
 cd Generated-CSharp
-dotnet trcover ../examples/*.scala
+dotnet trash cover ../examples/*.scala
 ```
 
 This writes `cover.html`, an annotated copy of the grammar where covered call sites are

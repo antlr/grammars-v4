@@ -24,7 +24,7 @@ jobs:
       with:
         fetch-depth: 0
     - name: Set up JDK 17
-      uses: actions/setup-java@v5
+      uses: actions/setup-java@v6.0.1
       with:
         java-version: '17'
         distribution: 'zulu'
@@ -35,7 +35,7 @@ jobs:
         javac --version
         mvn --version
     - name: Install Python
-      uses: actions/setup-python@v6.2.0
+      uses: actions/setup-python@v7.0.0
       with:
         python-version: '3.10'
     - name: Install antlr4-tools
@@ -50,7 +50,7 @@ jobs:
     - name: Test Trash install
       shell: bash
       run: |
-        dotnet trgen --help
+        dotnet trash gen --help
     - name: Clone and build ANTLR4 dev branch
       shell: bash
       run: |
@@ -62,12 +62,8 @@ jobs:
         JAR=$(ls "$ANTLR4_DEV_DIR"/tool/target/antlr4-*-complete.jar | tail -1)
         echo "ANTLR4_DEV_JAR=$JAR" >> "$GITHUB_ENV"
         dotnet build -c Release "$ANTLR4_DEV_DIR/runtime/CSharp/src"
-        CS_BIN=$(ls -d "$ANTLR4_DEV_DIR"/runtime/CSharp/src/bin/Release/*)
+        CS_BIN="$ANTLR4_DEV_DIR/runtime/CSharp/src/bin/Release/netstandard2.0"
         echo "ANTLR4_CS_BIN=$CS_BIN" >> "$GITHUB_ENV"
-    - name: Test all grammars with dev ANTLR4 (Java target)
-      shell: bash
-      run: |
-        bash _scripts/test.sh -t Java --antlr-version dev
     - name: Upload dev ANTLR4 JAR
       uses: actions/upload-artifact@v7
       with:
@@ -80,3 +76,7 @@ jobs:
         name: antlr4-dev-csharp-runtime-bin
         path: ${{ env.ANTLR4_CS_BIN }}
         retention-days: 90
+    - name: Test all grammars with dev ANTLR4 (Java target)
+      shell: bash
+      run: |
+        bash _scripts/test.sh -t Java --antlr-version dev

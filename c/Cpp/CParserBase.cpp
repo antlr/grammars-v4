@@ -172,6 +172,20 @@ bool CParserBase::IsDeclaration() {
 bool CParserBase::IsDeclarationSpecifier() {
     if (noSemantics_.count("IsDeclarationSpecifier")) return true;
     if (debug_) std::cerr << "IsDeclarationSpecifier" << std::endl;
+    auto *ts_check = dynamic_cast<antlr4::CommonTokenStream*>(getTokenStream());
+    auto *lt1 = ts_check->LT(1);
+    if (lt1->getType() == CLexer::Identifier) {
+        if (auto *dsCtx = dynamic_cast<CParser::DeclarationSpecifiersContext*>(getContext())) {
+            auto resolvedId = resolveWithOutput(lt1);
+            if (resolvedId && !resolvedId->isPredefined()
+                && !resolvedId->getClassification().count(TypeClassification::Variable_)
+                && !resolvedId->getClassification().count(TypeClassification::Function_)) {
+                for (auto *spec : dsCtx->declarationSpecifier()) {
+                    if (spec->typeSpecifier() != nullptr) return false;
+                }
+            }
+        }
+    }
     bool result = IsStorageClassSpecifier()
                   || IsTypeSpecifier()
                   || IsTypeQualifier()
@@ -366,7 +380,18 @@ bool CParserBase::IsInitDeclaratorList() {
     if (!resolved) {
         result = true;
     } else if (resolved->getClassification().count(TypeClassification::TypeQualifier_) || resolved->getClassification().count(TypeClassification::TypeSpecifier_)) {
-        result = false;
+        if (lt1->getType() == CLexer::Identifier
+            && resolved->getClassification().count(TypeClassification::TypeSpecifier_)) {
+            if (auto *declCtx = dynamic_cast<CParser::DeclarationContext*>(getContext())) {
+                auto *dsCtx = declCtx->declarationSpecifiers();
+                if (dsCtx != nullptr) {
+                    for (auto *spec : dsCtx->declarationSpecifier()) {
+                        if (spec->typeSpecifier() != nullptr) { result = true; break; }
+                    }
+                }
+            }
+        }
+        if (!result) result = false;
     } else {
         result = true;
     }

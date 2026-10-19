@@ -124,4 +124,15 @@ public class MyDiagnosticErrorListener : DiagnosticErrorListener
     }
 }
 
+public class AmbigCountListener : Antlr4.Runtime.BaseErrorListener
+{
+    public int ambiguity_count = 0;
+
+    public override void ReportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex,
+        bool exact, BitSet ambigAlts, ATNConfigSet configs)
+    {
+        ambiguity_count++;
+    }
+}
+
 <if(has_name_space)>}<endif>

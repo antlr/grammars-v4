@@ -1,3 +1,5 @@
+# VAX SCAN Grammar
+
 This is the grammar for VAX SCAN. The following description is lifted from the
 Guide to VAX SCAN (Copyright ©1985, 1986, 1989 by Digital Equipment 
 Corporation).

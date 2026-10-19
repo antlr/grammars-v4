@@ -1,4 +1,4 @@
-# Graphstream Dgs
+# GraphStream DGS Grammar
 
 ## Reference
 

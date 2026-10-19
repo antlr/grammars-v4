@@ -1,4 +1,4 @@
-import { Parser, TokenStream, CommonTokenStream, Recognizer } from 'antlr4ng';
+import { Parser, TokenStream, CommonTokenStream, Token } from 'antlr4ng';
 import { PlSqlLexer } from './PlSqlLexer.js';
 
 export abstract class PlSqlParserBase extends Parser {
@@ -6,12 +6,43 @@ export abstract class PlSqlParserBase extends Parser {
   _isVersion10: boolean;
   _isVersion11: boolean;
   _isVersion12: boolean;
+  _lastUnitWasPlsql: boolean;
 
   constructor(input: TokenStream) {
     super(input);
     this._isVersion10 = true;
     this._isVersion11 = true;
     this._isVersion12 = true;
+    this._lastUnitWasPlsql = false;
+  }
+
+  reset(): void {
+    this._lastUnitWasPlsql = false;
+    super.reset();
+  }
+
+  setLastUnitPlsql(): void { this._lastUnitWasPlsql = true; }
+  setLastUnitSql(): void   { this._lastUnitWasPlsql = false; }
+  isLastUnitSql(): boolean { return !this._lastUnitWasPlsql; }
+  isLastUnitPlsql(): boolean { return this._lastUnitWasPlsql; }
+
+  isSolidusSeparator(): boolean {
+    const stream = this.tokenStream as CommonTokenStream;
+    const solidus = stream.LT(1);
+    if (solidus == null || solidus!.type !== PlSqlLexer.SOLIDUS)
+      return false;
+
+    const solidusLine = solidus!.line;
+
+    const prev = stream.LT(-1);
+    if (prev != null && prev!.type !== Token.EOF && prev!.line === solidusLine)
+      return false;
+
+    const next = stream.LT(2);
+    if (next != null && next!.type !== Token.EOF && next!.line === solidusLine)
+      return false;
+
+    return true;
   }
 
   isVersion10(): boolean {

@@ -1,4 +1,4 @@
-# Trino grammar for ANTLR4
+# Trino Grammar
 
 An ANTLR4 grammar for Trino, formerly known as PrestoSQL.
 This grammar is based on the actively maintained [Trino repository](https://github.com/trinodb/trino).

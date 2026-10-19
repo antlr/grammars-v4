@@ -1,4 +1,4 @@
-## Summary
+# PHP Grammar
 
 Parser grammar based on [Phalanger](https://github.com/DEVSENSE/Phalanger) grammar
 by Jakub Míšek (jakubmisek).

@@ -49,6 +49,7 @@ class NamedCharStream extends CharStream {
 
 
 var tee = false;
+var output_dir = "";
 var show_tree = false;
 var show_tokens = false;
 var show_trace = false;
@@ -60,6 +61,12 @@ var error_code = 0;
 var string_instance = 0;
 var prefix = "";
 var quiet = false;
+var perf = false;
+var per_file = false;
+var total_tokens = 0;
+var total_parse_seconds = 0.0;
+var first_file_tokens = 0;
+var first_file_parse_seconds = 0.0;
 
 void main(List\<String> args) async {
     // Set command-line args before anything else.
@@ -87,6 +94,11 @@ void main(List\<String> args) async {
         {
             tee = true;
         }
+        else if (args[i] == "-o")
+        {
+            output_dir = args[++i];
+            tee = true;
+        }
         else if (args[i] == "-x")
         {
             for (; ; )
@@ -104,6 +116,14 @@ void main(List\<String> args) async {
         else if (args[i] == "-q")
         {
             quiet = true;
+        }
+        else if (args[i] == "--perf")
+        {
+            perf = true;
+        }
+        else if (args[i] == "--per-file")
+        {
+            per_file = true;
         }
         else if (args[i] == "-trace")
         {
@@ -136,7 +156,27 @@ void main(List\<String> args) async {
         }
         s.stop();
         var et = s.elapsedMilliseconds / 1000.0;
-        if (!quiet) stderr.writeln(prefix + "Total Time: " + et.toString());
+        if (!quiet) {
+            if (!perf) {
+                stderr.writeln(prefix + "TT: " + et.toString());
+            } else {
+            var warm_tokens = total_tokens - first_file_tokens;
+            var warm_seconds = total_parse_seconds - first_file_parse_seconds;
+            var warm_tps = (inputs.length > 1 && warm_seconds > 0)
+                ? (warm_tokens / warm_seconds).round().toString()
+                : "n.a.";
+            var first_tps = first_file_parse_seconds > 0 ? (first_file_tokens / first_file_parse_seconds) : 0.0;
+            var speedup = (inputs.length > 1 && warm_seconds > 0 && first_tps > 0)
+                ? ((warm_tokens / warm_seconds) / first_tps).toStringAsFixed(2)
+                : "n.a.";
+            stderr.writeln(prefix + "PT: " + total_parse_seconds.toString());
+            stderr.writeln(prefix + "OT: " + (et - total_parse_seconds).toString());
+            stderr.writeln(prefix + "TT: " + et.toString());
+            stderr.writeln(prefix + "PR: " + (total_parse_seconds > 0 ? (total_tokens / total_parse_seconds).round().toString() : "0"));
+            stderr.writeln(prefix + "Post-warmup PR: " + warm_tps);
+            stderr.writeln(prefix + "Post-warmup speed up: " + speedup);
+            }
+        }
     }
     exit(error_code);
 }
@@ -177,6 +217,18 @@ Future\<void> ParseFilename(String input, int row_number) async
 
 Future\<void> DoParse(CharStream str, String input_name, int row_number) async
 {
+    String out_name = input_name;
+    if (output_dir != "") {
+        String absPath = File(input_name).absolute.path;
+        String root = Directory('../<example_dir_unix>').absolute.path;
+        String rootPrefix = root.endsWith(Platform.pathSeparator)
+            ? root : root + Platform.pathSeparator;
+        String rootless = absPath.startsWith(rootPrefix)
+            ? absPath.substring(rootPrefix.length)
+            : absPath.split(Platform.pathSeparator).last;
+        out_name = output_dir + '/' + rootless;
+        await Directory(File(out_name).parent.path).create(recursive: true);
+    }
     if (binary) str = new BinaryCharStream(str);
     <tool_grammar_tuples:{x|<x.GrammarAutomName>.checkVersion();
     }>
@@ -199,7 +251,7 @@ Future\<void> DoParse(CharStream str, String input_name, int row_number) async
     IOSink output;
     if (tee)
     {
-        output =  File(input_name + ".errors").openWrite();
+        output =  File(out_name + ".errors").openWrite();
     }
     else
     {
@@ -220,7 +272,14 @@ Future\<void> DoParse(CharStream str, String input_name, int row_number) async
     s.start();
     var tree = parser.<start_symbol>();
     s.stop();
+    var token_count = tokens.size;
+    total_tokens += token_count;
     var et = s.elapsedMilliseconds / 1000.0;
+    total_parse_seconds += et;
+    if (row_number == 0) {
+        first_file_tokens = token_count;
+        first_file_parse_seconds = et;
+    }
     var result = "";
     if (parser.numberOfSyntaxErrors > 0)
     {
@@ -236,7 +295,7 @@ Future\<void> DoParse(CharStream str, String input_name, int row_number) async
         if (tee)
         {
             try {
-                final fn = input_name + ".tree";
+                final fn = out_name + ".tree";
                 final File file = File(fn);
                 await file.writeAsString(tree.toStringTree(parser: parser));
             } catch (e) {
@@ -247,9 +306,9 @@ Future\<void> DoParse(CharStream str, String input_name, int row_number) async
             stderr.writeln(tree.toStringTree(parser: parser));
         }
     }
-    if (!quiet)
+    if (!quiet && per_file)
     {
-        stderr.writeln(prefix + "Dart " + row_number.toString() + " " + input_name + " " + result + " " + et.toString());
+        stderr.writeln(prefix + "Dart " + row_number.toString() + " " + input_name + " " + result + " " + et.toString() + " s " + token_count.toString() + " tokens " + (et > 0 ? (token_count / et).round().toString() : "0") + " pr");
     }
     if (tee)
     {

@@ -3,15 +3,16 @@ import { SymbolTable } from "./SymbolTable.js";
 import { Symbol } from "./Symbol.js";
 import { TypeClassification } from "./TypeClassification.js";
 import CLexer from "./CLexer.js";
-import CParser, { DeclarationContext, FunctionDefinitionContext, DeclaratorContext } from "./CParser.js";
+// Note: CParser import removed to break circular dependency (CParser extends CParserBase).
+// RULE_declaration = 27, RULE_declarationSpecifiers = 28, RULE_functionDefinition = 92 (from CParser.js static fields).
 
-function isDeclarationContext(x: any): x is DeclarationContext {
-  return x?.ruleIndex === CParser.RULE_declaration;
+function isDeclarationContext(x: any): boolean {
+  return x?.ruleIndex === 27;
 }
 
 
-function isFunctionDefinitionContext(x: any): x is FunctionDefinitionContext {
-  return x?.ruleIndex === CParser.RULE_functionDefinition;
+function isFunctionDefinitionContext(x: any): boolean {
+  return x?.ruleIndex === 92;
 }
 
 // List of all semantic function names
@@ -141,6 +142,20 @@ export default abstract class CParserBase extends Parser {
         const lt1 = (this._input as CommonTokenStream).LT(1);
         const text = lt1!.text!;
         if (this.debug) console.log("IsDeclarationSpecifier " + lt1);
+        if (lt1!.type === CLexer.Identifier && (this._ctx as any)?.ruleIndex === 28) {
+            const dsCtx = this._ctx as any;
+            const resolvedId = this.resolveWithOutput(lt1);
+            if (resolvedId !== null && !resolvedId.predefined
+                    && !resolvedId.classification.has(TypeClassification.Variable_)
+                    && !resolvedId.classification.has(TypeClassification.Function_)) {
+                const specList = dsCtx.declarationSpecifier_list() ?? null;
+                if (specList) {
+                    for (const spec of specList) {
+                        if (spec.typeSpecifier() != null) return false;
+                    }
+                }
+            }
+        }
         const result = this.IsStorageClassSpecifier()
             || this.IsTypeSpecifier()
             || this.IsTypeQualifier()
@@ -334,12 +349,12 @@ export default abstract class CParserBase extends Parser {
         return result;
     }
 
-    private myGetDeclarationId(y: DeclaratorContext | null): string | null {
+    private myGetDeclarationId(y: any): string | null {
         const token = this.myGetDeclarationToken(y);
         return token !== null ? token.text : null;
     }
 
-    private myGetDeclarationToken(y: DeclaratorContext | null): any | null {
+    private myGetDeclarationToken(y: any): any | null {
         // Go down the tree and find a declarator with Identifier.
         if (y === null) return null;
 
@@ -362,11 +377,8 @@ export default abstract class CParserBase extends Parser {
         if (this.debug) console.log("EnterDeclaration");
         let context: ParserRuleContext | null | undefined = this._ctx;
         for (; context != null; context = context.parentCtx) {
-            if (context instanceof DeclarationContext) {
-                if ( ! isDeclarationContext(context)) {
-                    continue;
-                }
-                const declaration_context = context as DeclarationContext;
+            if (isDeclarationContext(context)) {
+                const declaration_context = context as any;
                 const declaration_specifiers = declaration_context.declarationSpecifiers();
                 const declaration_specifier = declaration_specifiers?.declarationSpecifier_list() ?? null;
 
@@ -425,11 +437,8 @@ export default abstract class CParserBase extends Parser {
                     }
                 }
             }
-            if (context instanceof FunctionDefinitionContext) {
-                const fd = context as FunctionDefinitionContext;
-                if ( ! isFunctionDefinitionContext(context)) {
-                    continue;
-                }
+            if (isFunctionDefinitionContext(context)) {
+                const fd = context as any;
                 const de = fd.declarator();
                 if (de === null || de === undefined) continue;
                 const dd = de?.directDeclarator();
@@ -552,7 +561,19 @@ export default abstract class CParserBase extends Parser {
         if (resolved === null) {
             result = true;
         } else if (resolved.classification.has(TypeClassification.TypeQualifier_) || resolved.classification.has(TypeClassification.TypeSpecifier_)) {
-            result = false;
+            if (lt1!.type === CLexer.Identifier && resolved.classification.has(TypeClassification.TypeSpecifier_)) {
+                if ((this._ctx as any)?.ruleIndex === 27) {
+                    const declCtx = this._ctx as any;
+                    const dsCtx = declCtx.declarationSpecifiers();
+                    const specList = dsCtx?.declarationSpecifier_list() ?? null;
+                    if (specList) {
+                        for (const spec of specList) {
+                            if (spec.typeSpecifier() != null) { result = true; break; }
+                        }
+                    }
+                }
+            }
+            if (!result) result = false;
         } else {
             result = true;
         }

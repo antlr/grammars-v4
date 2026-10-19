@@ -42,7 +42,7 @@
                     <verbose>false</verbose>
                     <showTree>false</showTree>
                     <entryPoint>rootNamespace</entryPoint>
-                    <grammarName>SysMLv2Parser</grammarName>
+                    <grammarName>SysMLv2</grammarName>
                     <packageName></packageName>
                     <exampleFiles>examples/</exampleFiles>
                 </configuration>

@@ -131,6 +131,20 @@ abstract class CParserBase extends Parser {
     if (_noSemantics.contains("IsDeclarationSpecifier")) return true;
     var lt1 = (inputStream as CommonTokenStream).LT(1);
     if (_debug) print("IsDeclarationSpecifier $lt1");
+    if (lt1?.type == CLexer.TOKEN_Identifier && context is DeclarationSpecifiersContext) {
+      var dsCtx = context as DeclarationSpecifiersContext;
+      var resolvedId = _resolveWithOutput(lt1);
+      if (resolvedId != null && !resolvedId.predefined
+          && !resolvedId.classification.contains(TypeClassification.variable)
+          && !resolvedId.classification.contains(TypeClassification.function_)) {
+        var specList = dsCtx.declarationSpecifiers();
+        if (specList != null) {
+          for (var spec in specList) {
+            if (spec.typeSpecifier() != null) return false;
+          }
+        }
+      }
+    }
     var result = IsStorageClassSpecifier() ||
         IsTypeSpecifier() ||
         IsTypeQualifier() ||
@@ -521,7 +535,20 @@ abstract class CParserBase extends Parser {
     if (resolved == null) {
       result = true;
     } else if (resolved.classification.contains(TypeClassification.typeQualifier) || resolved.classification.contains(TypeClassification.typeSpecifier)) {
-      result = false;
+      if (lt1?.type == CLexer.TOKEN_Identifier
+          && resolved.classification.contains(TypeClassification.typeSpecifier)) {
+        if (context is DeclarationContext) {
+          var declCtx = context as DeclarationContext;
+          var dsCtx = declCtx.declarationSpecifiers();
+          var specList = dsCtx?.declarationSpecifiers();
+          if (specList != null) {
+            for (var spec in specList) {
+              if (spec.typeSpecifier() != null) { result = true; break; }
+            }
+          }
+        }
+      }
+      if (!result) result = false;
     } else {
       result = true;
     }

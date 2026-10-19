@@ -7,7 +7,7 @@ format).
 ## Source
 
 - **Specification**: [Systems-Modeling/SysML-v2-Release](https://github.com/Systems-Modeling/SysML-v2-Release)
-- **Release tag**: `2026-01`
+- **Release tag**: `2026-05`
 - **Generator**: [daltskin/sysml-v2-grammar](https://github.com/daltskin/sysml-v2-grammar)
 
 ## Grammar Structure

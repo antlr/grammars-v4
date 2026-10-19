@@ -36,6 +36,7 @@ export class SymbolTable {
         this.define(this.createSymbol("float", TypeClassification.TypeSpecifier_));
         this.define(this.createSymbol("double", TypeClassification.TypeSpecifier_));
         this.define(this.createSymbol("signed", TypeClassification.TypeSpecifier_));
+        this.define(this.createSymbol("__signed__", TypeClassification.TypeSpecifier_));
         this.define(this.createSymbol("unsigned", TypeClassification.TypeSpecifier_));
         this.define(this.createSymbol("_BitInt", TypeClassification.TypeSpecifier_));
         this.define(this.createSymbol("bool", TypeClassification.TypeSpecifier_));
@@ -100,6 +101,10 @@ export class SymbolTable {
         this.define(this.createSymbol("_Float32", TypeClassification.TypeSpecifier_)); // gcc
         this.define(this.createSymbol("_Float64", TypeClassification.TypeSpecifier_)); // gcc
         this.define(this.createSymbol("_Float128", TypeClassification.TypeSpecifier_)); // gcc
+        this.define(this.createSymbol("_Float16x", TypeClassification.TypeSpecifier_)); // gcc
+        this.define(this.createSymbol("_Float32x", TypeClassification.TypeSpecifier_)); // gcc
+        this.define(this.createSymbol("_Float64x", TypeClassification.TypeSpecifier_)); // gcc
+        this.define(this.createSymbol("_Float128x", TypeClassification.TypeSpecifier_)); // gcc
         this.define(this.createSymbol("__v8hf", TypeClassification.TypeSpecifier_)); // gcc
         this.define(this.createSymbol("__bf16", TypeClassification.TypeSpecifier_)); // gcc
         this.define(this.createSymbol("__v16bf", TypeClassification.TypeSpecifier_)); // gcc

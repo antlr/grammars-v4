@@ -1,0 +1,22 @@
+digraph ATN {
+rankdir=LR;
+s234[fontsize=11, label="234", shape=doublecircle, fixedsize=true, width=.6];
+s1088[fontsize=11,label="1088", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1089[fontsize=11,label="1089", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1090[fontsize=11,label="1090", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1091[fontsize=11,label="1091", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1092[fontsize=11,label="1092", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1093[fontsize=11,label="1093", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1094[fontsize=11,label="1094", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s233[fontsize=11,label="233", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1087[fontsize=11,label="1087", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s233 -> s1087 [fontname="Times-Italic", label="&epsilon;"];
+s1087 -> s1088 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'p'", arrowhead = normal];
+s1088 -> s1089 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'r'", arrowhead = normal];
+s1089 -> s1090 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'i'", arrowhead = normal];
+s1090 -> s1091 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'v'", arrowhead = normal];
+s1091 -> s1092 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'a'", arrowhead = normal];
+s1092 -> s1093 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'t'", arrowhead = normal];
+s1093 -> s1094 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'e'", arrowhead = normal];
+s1094 -> s234 [fontname="Times-Italic", label="&epsilon;"];
+}
