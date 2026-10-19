@@ -7282,7 +7282,7 @@ start_command
 sql_plus_filepath
     : (id_expression COLON)? (SOLIDUS | RSOLIDUS)? (
         id_expression (SOLIDUS | RSOLIDUS)
-    )* id_expression PERIOD (SQL | FILE_EXT)
+    )* id_expression PERIOD regular_id
     ;
 
 whenever_command
@@ -7886,7 +7886,6 @@ regular_id
     | EXIT
     | EXTEND
     | FIELDS
-    | FILE_EXT
     | FILESTORE
     | FLOAT
     | FORALL

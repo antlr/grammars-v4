@@ -1754,7 +1754,6 @@ SQLDATA                        : 'SQLDATA';
 SQLERROR                       : 'SQLERROR';
 SQLLDR                         : 'SQLLDR';
 SQL                            : 'SQL';
-FILE_EXT                       : 'FNC' | 'PKB' | 'PKS' | 'PRC' | 'TRG' | 'VW';
 SQL_MACRO                      : 'SQL_MACRO';
 SQL_TRACE                      : 'SQL_TRACE';
 SQL_TRANSLATION_PROFILE        : 'SQL_TRANSLATION_PROFILE';
