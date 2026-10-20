@@ -301,6 +301,7 @@
                 <module>orc</module>
 				<!-- <module>objc</module> -->
 				<module>oncrpc</module>
+                <module>otc</module>
 				<module>orwell</module>
 				<module>p</module>
 				<module>parkingsign</module>
