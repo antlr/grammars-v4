@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../_scripts/desc.xsd">
-    <targets>CSharp;Cpp;Dart;Go;Java;JavaScript;Python3;TypeScript;Antlr4ng</targets>
+    <targets>CSharp;Dart;Java;JavaScript;TypeScript</targets>
+    <!-- Other targets in C grammar with transformGrammar.py do not
+    work because of a collision in transformGrammar.py from this
+    grammar. We need both. -->
     <imports>../c</imports>
     <grammar-name>TrapCParser</grammar-name>
+    <inputs>examples/*.tc</inputs>
     <entry-point>compilationUnit</entry-point>
 </desc>

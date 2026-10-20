@@ -6,3 +6,7 @@ Format data from [here](https://www.iucr.org/__data/iucr/cif/standard/cifstd5.ht
  and [here](https://www.iucr.org/__data/assets/file/0013/11416/star.5.html)
 
 Examples from [here](https://www.balisage.net/Proceedings/vol26/html/Gryk01/BalisageVol26-Gryk01.html)
+
+## Reference
+* [pldb](http://pldb.info/concepts/star)
+

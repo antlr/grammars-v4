@@ -1,0 +1,60 @@
+
+
+: update-player
+	v2 := 3
+	v1 := va
+	v0 := 7
+	if v0 key then va -= v2
+	v0 := 9
+	if v0 key then va += v2
+	v0 := 8
+	if v0 key then bomb-fire
+	if v1 == va then return
+	i := boat
+	sprite v1 vb 5
+	sprite va vb 5
+;
+
+: bomb-explode
+	ve := 2
+	i  := boom
+	sprite vc vd 7
+;
+
+: bomb-falling
+	i  := bomb
+	sprite vc vd 6
+	vd += 1
+	if vd == 25 then jump bomb-explode
+	v0 := 8
+	if v0 -key then  jump bomb-explode
+	sprite vc vd 6
+;
+
+: bomb-exploding
+	ve += 1
+	if ve != 4 then return
+	ve := 0
+	i  := boom
+	sprite vc vd 7
+;
+
+: update-bomb
+	if ve == 1 then jump bomb-falling
+	if ve != 0 then jump bomb-exploding
+;
+
+###########################################
+#
+#  Main Loop
+#
+###########################################
+
+: main
+	title
+	init-game
+	loop
+		update-player
+		update-bomb
+		update-enemies
+	again

@@ -228,7 +228,7 @@ TemplateStringAtom            : ~[`];
 
 // Lexer mode for JSX opening elements.
 // See https://github.com/facebook/jsx?tab=readme-ov-file
-// and https://facebook.github.io/jsx/ for more information
+// and https://react.github.io/jsx/ for more information
 //
 // e.g. <DropDownMenu...>
 //      <DropDownMenu.../>

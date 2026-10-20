@@ -345,6 +345,7 @@ sourceElement
 
 statement
     : block
+    | namespaceDeclaration //ADDED
     | variableStatement
     | importStatement
     | exportStatement
@@ -352,9 +353,7 @@ statement
     | abstractDeclaration //ADDED
     | classDeclaration
     | functionDeclaration
-    | expressionStatement
     | interfaceDeclaration //ADDED
-    | namespaceDeclaration //ADDED
     | ifStatement
     | iterationStatement
     | continueStatement
@@ -372,6 +371,7 @@ statement
     | typeAliasDeclaration //ADDED
     | enumDeclaration      //ADDED
     | Export statement
+    | expressionStatement
     ;
 
 block

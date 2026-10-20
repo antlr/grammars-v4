@@ -1,0 +1,72 @@
+-- LA200010.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687 and
+--     F08630-91-C-0015, the U.S. Government obtained unlimited rights in the
+--     software and documentation contained herein.  Unlimited rights are
+--     defined in DFAR 252.227-7013(a)(19).  By making this public release,
+--     the Government intends to confer upon all recipients unlimited rights
+--     equal to those held by the Government.  These rights include rights to
+--     use, duplicate, release or disclose the released technical data and
+--     computer software in whole or in part, in any manner and for any purpose
+--     whatsoever, and to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that two units or subunits with the same expanded name cannot
+--      be included in the same partition. Check that a partition can be
+--      created even if the environment contains two units with the same
+--      name. (This is rule 10.2(19)).
+--
+-- TEST DESCRIPTION:
+--      Declare the a parent package (LA20001_0). Declare a child package
+--      (LA20001_0.LA20001_1). Declare a subunit in the parent package body
+--      (LA20001_1). Declare a main subprogram that includes the child.
+--      An attempt to create this partition must fail.
+--
+-- SPECIAL REQUIREMENTS:
+--      To build this test:
+--         1) Compile the file LA200010 (and include the results in the
+--            program library).
+--         2) Compile the file LA200011 (and include the results in the
+--            program library).
+--         3) Compile the file LA200012 (and include the results in the
+--            program library).
+--         4) Attempt to build an executable image.
+--         5) If an executable image results, run it.
+--
+-- TEST FILES:
+--      This test consists of the following files:
+--      -> LA200010.A
+--         LA200011.A
+--         LA200012.AM
+--
+-- PASS/FAIL CRITERIA:
+--      The test passes if a link time error message reports that
+--      LA200012 violates 10.2(19), or the compilation of LA200012 is rejected
+--      because it must violate 10.2(19).
+--
+-- CHANGE HISTORY:
+--     25 Jan 99   RLB     Initial test, removed from B830001.
+--     27 JAN 99   RLB     Revised for reviewer comments.
+--!
+
+package LA20001_0 is
+   procedure Do_a_Little (A : out Integer);
+
+end LA20001_0;
+
+package LA20001_0.LA20001_1 is
+   My_Global : Integer;
+end LA20001_0.LA20001_1;
+

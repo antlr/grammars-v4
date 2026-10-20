@@ -1,4 +1,4 @@
-# YINI ANTLR 4 grammar
+# YINI Grammar
 
 This grammar is based on official language specification hosted at [YINI-spec on GitHub](https://github.com/YINI-lang/YINI-spec).
 
@@ -56,6 +56,9 @@ Open-source **YINI parser for Node.js & TypeScript** is available:
 - **npm:** [yini-parser](https://www.npmjs.com/package/yini-parser)
 
 ---
+
+## Reference
+
 
 ## License
 

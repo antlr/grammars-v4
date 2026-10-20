@@ -67,6 +67,7 @@ export abstract class Protobuf3ParserBase extends Parser {
         }
         if (!ctx) throw new Error();
         const newScope = this.symbolTable.resolve(ctx);
+        if (!newScope) throw new Error();
         if (this.debug) console.log(this.prefix + "EnterBlock " + newScope?.toString());
         this.symbolTable.enterScope(newScope);
     }
@@ -84,18 +85,19 @@ export abstract class Protobuf3ParserBase extends Parser {
 
         while (true) {
             const la = this.tokenStream.LT(i);
+            if (!la) break;
             const id = la.text;
-            if (this.debug) process.stderr.write(id);
+            if (this.debug && id !== undefined) process.stderr.write(id);
 
             if (la.type === Protobuf3Parser.DOT) {
                 if (first) first = false;
-                if (this.tokenStream.LT(i + 1).type !== Protobuf3Parser.IDENTIFIER) break;
+                if ((this.tokenStream.LT(i + 1)?.type ?? -1) !== Protobuf3Parser.IDENTIFIER) break;
             } else if (la.type === Protobuf3Parser.IDENTIFIER) {
-                symbol = this.symbolTable.resolve(id, scope ?? undefined);
+                symbol = this.symbolTable.resolve(id ?? '', scope ?? undefined);
                 if (symbol) {
                     scope = symbol;
                 } else break;
-                if (this.tokenStream.LT(i + 1).type !== Protobuf3Parser.DOT) break;
+                if ((this.tokenStream.LT(i + 1)?.type ?? -1) !== Protobuf3Parser.DOT) break;
             } else break;
 
             i++;
@@ -114,18 +116,19 @@ export abstract class Protobuf3ParserBase extends Parser {
 
         while (true) {
             const la = this.tokenStream.LT(i);
+            if (!la) break;
             const id = la.text;
-            if (this.debug) process.stderr.write(id);
+            if (this.debug && id !== undefined) process.stderr.write(id);
 
             if (la.type === Protobuf3Parser.DOT) {
                 if (first) first = false;
-                if (this.tokenStream.LT(i + 1).type !== Protobuf3Parser.IDENTIFIER) break;
+                if ((this.tokenStream.LT(i + 1)?.type ?? -1) !== Protobuf3Parser.IDENTIFIER) break;
             } else if (la.type === Protobuf3Parser.IDENTIFIER) {
-                symbol = this.symbolTable.resolve(id, scope ?? undefined);
+                symbol = this.symbolTable.resolve(id ?? '', scope ?? undefined);
                 if (symbol) {
                     scope = symbol;
                 } else break;
-                if (this.tokenStream.LT(i + 1).type !== Protobuf3Parser.DOT) break;
+                if ((this.tokenStream.LT(i + 1)?.type ?? -1) !== Protobuf3Parser.DOT) break;
             } else break;
 
             i++;
@@ -141,7 +144,7 @@ export abstract class Protobuf3ParserBase extends Parser {
         const _ctx = parser.context;
         parser.proto();
         parser.reset();
-        _ctx.removeLastChild();  // Warning: assumes removeLastChild() exists
+        _ctx?.removeLastChild();  // Warning: assumes removeLastChild() exists
         parser.context = _ctx;
     }
 
@@ -182,6 +185,7 @@ export abstract class Protobuf3ParserBase extends Parser {
 
     IsNotKeyword(): boolean {
         const la = this.tokenStream.LT(1);
+        if (!la) return true;
         switch (la.type) {
             case Protobuf3Parser.DOUBLE:
             case Protobuf3Parser.FLOAT:

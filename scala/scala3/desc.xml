@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../_scripts/desc.xsd">
+    <targets>CSharp;Java</targets>
+    <test>
+       <inputs>examples/*.scala</inputs>
+    </test>
+    <test>
+       <inputs>examples/lila/app/*.scala</inputs>
+    </test>
+</desc>

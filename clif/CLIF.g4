@@ -31,16 +31,18 @@
    http://standards.iso.org/ittf/PubliclyAvailableStandards/c039175_ISO_IEC_24707_2007%28E%29.zip
    
    with bug fixes from
-   http://metadata-standards.org/Document-library/Documents-by-number/WG2-N1701-N1750/WG2N1703_24707-defect-report.pdf
+   metadata-standards.org/Document-library/Documents-by-number/WG2-N1701-N1750/WG2N1703_24707-defect-report.pdf
     
    example clif ontologies available from COLORE
-   http://stl.mie.utoronto.ca/colore/
+   http://web.archive.org/web/20150422010624/http://stl.mie.utoronto.ca:80/colore/
  */
 
 // $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
 // $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
 
 grammar CLIF;
+
+start_: cltext* EOF; // underscore required for Antlr4 renaming.
 
 //A.2.3.1 Term sequence
 termseq
@@ -125,7 +127,7 @@ commentsent
 
 //A.2.3.10 Module
 module
-    : OPEN 'cl-module' interpretablename (OPEN 'cl-excludes' name* CLOSE)? cltext? CLOSE
+    : OPEN 'cl-module' interpretablename (OPEN 'cl-excludes' name* CLOSE)? cltext* CLOSE
     ;
 
 //A.2.3.11 Phrase
@@ -136,18 +138,18 @@ phrase
     | OPEN 'cl-comment' ENCLOSEDNAME cltext? CLOSE
     ;
 
-text
+text_
     : phrase+
     ;
 
 cltext
     : module
     | namedtext
-    | text
+    | text_
     ;
 
 namedtext
-    : OPEN 'cl-text' interpretablename text? CLOSE
+    : OPEN 'cl-text' interpretablename text_? CLOSE
     ;
 
 //A.2.2.2 Delimiters
