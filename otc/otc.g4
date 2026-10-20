@@ -91,12 +91,12 @@ expr
    | INT
    | CHAR
    | STRING
-   | expr '(' exprs ')'
+   | expr '(' exprList ')'
    | expr '[' expr ']'
    | expr binop expr
    ;
 
-exprs
+exprList
    : ((expr ',')* expr)?
    ;
 
