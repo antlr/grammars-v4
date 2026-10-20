@@ -137,6 +137,7 @@
 				<module>angelscript</module>
 				<module>antlr</module>
 				<module>apex</module>
+                <module>apl</module>
 				<module>apt</module>
 				<module>aql</module>
                 <module>arden</module>
