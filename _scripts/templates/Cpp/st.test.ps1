@@ -131,7 +131,6 @@ foreach ($s in $new_errors3_txt) {
     if ( [String]::IsNullOrWhiteSpace($s) ) {
         continue
     }
-    $ext = $item.Extension
     if (! $s.EndsWith(".errors")) {
         continue
     }
@@ -139,8 +138,8 @@ foreach ($s in $new_errors3_txt) {
     $size = (Get-Item -Path $file).Length
     if ( $size -eq 0 ) {
     } else {
-        $new_errors_txt.Add($item)
-        Add-Content -Path "$old/new_errors.txt" -Value "$item"
+        $new_errors_txt.Add($file)
+        Add-Content -Path "$old/new_errors.txt" -Value "$file"
         ((Get-Content $file) -join "`n") + "`n" | Add-Content -Path "$old/new_errors.txt"
     }
 }

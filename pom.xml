@@ -159,6 +159,8 @@
 				<module>bicep</module>
                 <module>bison</module>
                 <module>bliss</module>
+                <module>blueprint</module>
+                <module>bms</module>
 				<module>bnf</module>
 				<module>c</module>
 				<module>calculator</module>
@@ -166,6 +168,8 @@
 				<module>capnproto</module>
 				<module>caql</module>
 				<module>cayenne</module>
+                <module>chip8</module>
+                <module>chip8octo</module>
 				<module>clf</module>
 				<module>clojure</module>
 				<module>clu</module>
@@ -178,6 +182,7 @@
 				<module>cql</module>
 				<module>cql3</module>
 				<module>creole</module>
+                <module>croc</module>
 				<module>csharp/v6</module>
 				<module>csharp/v7</module>
 				<module>css3</module>
@@ -201,6 +206,7 @@
 				<module>erlang</module>
 				<module>esolang</module>
 				<module>evm-bytecode</module>
+                <module>fantom</module>
 				<module>fasta</module>
 				<module>fdo91</module>
 				<module>fen</module>
@@ -292,8 +298,10 @@
 				<module>newick</module>
 				<module>oberon</module>
                 <module>odin</module>
+                <module>orc</module>
 				<!-- <module>objc</module> -->
 				<module>oncrpc</module>
+                <module>otc</module>
 				<module>orwell</module>
 				<module>p</module>
 				<module>parkingsign</module>
@@ -310,6 +318,7 @@
 				<module>pii</module>
 				<!-- <module>pike</module> -->
 				<module>plantUML</module>
+                <module>plm</module>
 				<module>pl0</module>
 				<module>plucid</module>
                 <module>plus</module>
@@ -357,6 +366,7 @@
 				<module>sharc</module>
 				<module>sici</module>
 				<module>sieve</module>
+                <module>simula</module>
 				<module>smalltalk</module>
 				<module>smiles</module>
 				<module>smtlibv2</module>
@@ -364,7 +374,10 @@
 				<module>solidity</module>
 				<module>sparql</module>
 				<module>spass</module>
-				<module>sql</module>
+                <module>spk</module>
+                <module>spl</module>
+                <module>squeak</module>
+                <module>sql</module>
                 <module>squirrel</module>
 				<module>stacktrace</module>
 				<module>star</module>
@@ -394,7 +407,8 @@
 				<module>turtle</module>
 				<module>turtle-doc</module>
 				<module>unicode</module>
-				<module>unreal_angelscript</module>
+                <module>unlambda</module>
+                <module>unreal_angelscript</module>
 				<module>upnp</module>
 				<module>url</module>
 				<module>useragent</module>
