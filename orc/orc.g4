@@ -123,10 +123,10 @@ declareTypeImport
    ;
 
 declareDatatype
-   : 'type' typeVariable typeParameters? '=' constructor ('|' constructor)*
+   : 'type' typeVariable typeParameters? '=' dataConstructor ('|' dataConstructor)*
    ;
 
-constructor
+dataConstructor
    : variable '(' (slot (',' slot)*)? ')'
    ;
 
