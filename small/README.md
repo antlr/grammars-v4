@@ -1,4 +1,5 @@
 # SMALL Grammar
 
-An ANTLR4 grammar for [SMALL](http://www.csci.csusb.edu/dick/samples/small.html).
+An ANTLR4 grammar for [SMALL](https://en.wikipedia.org/wiki/SMALL).
+
   
