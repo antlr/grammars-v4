@@ -68,11 +68,11 @@ datatypeDeclaration
    ;
 
 constructorDeclaration
-   : funcatom ('(' sortList ')')? (opType precedence)?
+   : funcatom ('(' sortList ')')? (opType precedence_)?
    ;
 
 functionDeclaration
-   : funcatom ':' (sortList '->')? sort (opType precedence)? ('partial')?
+   : funcatom ':' (sortList '->')? sort (opType precedence_)? ('partial')?
    ;
 
 predicateDeclaration
@@ -155,11 +155,11 @@ name
 
 modulename
    : IDENT
-   | ('\'' pathname '/' IDENT '\'')
+   | QUOTED_MODULE_NAME
    ;
 
-pathname
-   : CHARACTER*
+QUOTED_MODULE_NAME
+   : ('\'' CHARACTER* '/' IDENT '\'')
    ;
 
 predname
@@ -194,7 +194,7 @@ symbol
    : (funcatom | predatom) ('/' NUMBER)?
    ;
 
-precedence
+precedence_
    : NUMBER
    ;
 

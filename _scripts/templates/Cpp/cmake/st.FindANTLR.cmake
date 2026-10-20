@@ -82,12 +82,12 @@ find_package(Java QUIET COMPONENTS Runtime)
         OUTPUT ${ANTLR_${Name}_OUTPUTS}
 <if(antlrng_tool)>
 <if(os_win)>
-        COMMAND pwsh -c tsx ${HOME}/antlr-ng/cli/runner.ts
+        COMMAND pwsh -c tsx ${HOME}/antlr-ng/cli/runner.ts --encoding utf-8
 <else>
-        COMMAND pwsh -c tsx $ENV{HOME}/antlr-ng/cli/runner.ts
+        COMMAND pwsh -c tsx $ENV{HOME}/antlr-ng/cli/runner.ts --encoding utf-8
 <endif>
 <else>
-        COMMAND antlr4<if(os_win)>.exe<else><endif> -v ${ANTLR4_TAG}
+        COMMAND antlr4<if(os_win)>.exe<else><endif> -v ${ANTLR4_TAG} -encoding utf-8
 <endif>
                 -o ${ANTLR_${Name}_OUTPUT_DIR}
                 -Dlanguage=Cpp
