@@ -557,8 +557,8 @@ literal
    | 'this'
    | 'super'
    | 'it'
-   | bool
-   | int
+   | bool_
+   | int_
    | float
    | decimal
    | str
@@ -568,12 +568,12 @@ literal
    | map
    ;
 
-bool
+bool_
    : 'true'
    | 'false'
    ;
 
-int
+int_
    : INT
    | CHAR
    ;
