@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2025, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -35,65 +35,74 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
 
-grammar autocode;
+lexer grammar autocodeLexer;
 
-file_
-   : statement* EOF
+TEXT
+   : 'TEXT' -> pushMode (TEXT_LEAD_MODE)
    ;
 
-statement
-   : label? (assignment | text | feed | arraydecl)
+TAPE
+   : 'TAPE'
    ;
 
-arraydecl: value '->' NUMBER;
-
-function
-   : tape
+PRINT
+   : 'PRINT'
    ;
 
-text
-   : 'TEXT'
+STOP
+   : 'STOP'
    ;
 
-tape
-   : 'TAPE' value?
+ARROW
+   : '->'
    ;
 
-assignment
-   : value '=' expression
+APPROX_EQ
+   : '=*'
    ;
 
-feed
-   : 'FEED' 'COMPOSITION'
+GE
+   : '>='
    ;
 
-expression
-   : atom
-   | (atom OPERATOR expression)
+LE
+   : '<='
    ;
 
-atom
-   : value
-   | function
-   | NUMBER
+GT
+   : '>'
    ;
 
-value
-   : variable
-   | index
+LT
+   : '<'
    ;
 
-variable
-   : ('v' NUMBER)
-   | ('v' '(' expression ')')
+EQ
+   : '='
    ;
 
-index
-   : INDEX
+HASH
+   : '#'
    ;
 
-label
-   : NUMBER ')'
+LPAREN
+   : '('
+   ;
+
+RPAREN
+   : ')'
+   ;
+
+COMMA
+   : ','
+   ;
+
+V
+   : 'v'
+   ;
+
+J
+   : 'J'
    ;
 
 NUMBER
@@ -101,10 +110,7 @@ NUMBER
    ;
 
 OPERATOR
-   : '+'
-   | '-'
-   | 'x'
-   | '/'
+   : [+\-xX/]
    ;
 
 INDEX
@@ -113,5 +119,19 @@ INDEX
 
 WS
    : [ \r\n\t]+ -> skip
+   ;
+
+mode TEXT_LEAD_MODE;
+TEXT_LEAD_NL
+   : '\r'? '\n' -> mode (TEXT_CONTENT_MODE) , skip
+   ;
+
+mode TEXT_CONTENT_MODE;
+TEXT_CONTENT
+   : ~ [\r\n]+
+   ;
+
+TEXT_TRAIL_NL
+   : '\r'? '\n' -> popMode , skip
    ;
 

@@ -149,6 +149,7 @@
 				<!-- <module>aspectj</module> -->
                 <module>aterm</module>
 				<module>atl</module>
+                <module>autocode</module>
 				<module>b</module>
 				<module>basic</module>
 				<module>bcl</module>
