@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2022, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -30,54 +30,244 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// Grammar for the SMALL programming language, as specified at
+
+
+// http://www.csci.csusb.edu/dick/samples/small.html
+
 grammar small;
 
-prog : equation* EOF;
+prog
+   : (statement | command)* EOF
+   ;
 
-program::=#(statement | comment | command | separator). See Examples below.
-outcome::= termination | nontermination.outcome::= termination | nontermination.
-termination::=success | failure.
-comment::= "//" #(char~end_of_line).
-separator::= end_of_line whitespace.separator::= end_of_line whitespace.
-whitespace::= #(end_of_line | ws)
-ws::= #( horizontal_tab | space).
-command::="edit" program_name | "exit"
-statement::= structured_statement | expression_statement.
-expression_statement::= expression O(assignment) O(disposition ).
-assignment::= arrow variable.
-disposition::= ignored | output | returned | testeddisposition::= ignored | output | returned | tested
-arrow::="->"
-expression::= O(prefix) ws simple_expression ws #(operator ws O(prefix) ws simple_expression ws).
-E::expression->constant, E(e) is the value of expression e.
-V::simple_expression->constant,
-prefix::= "+" | "-" | "~".
-operator::= arithmetic | relational | boolean | string_op.
-arithmetic::="+" | "-" | "*" | "/" | "%".
-relational::= "<" | "<=" | "<>" | "=" | ">=" | ">". "<", "<=", ">" and ">="
-boolean::="&" | "|". "&" and "|" a
-string_op::= ":" | default. The colon(":")
-default::=""
-simple_expression::= constant | variable | input | program_call.
-input::="$".
-program_call::= name_of_program.
-variable::=letter.
-constant::=string | integer | float.
-string::= double_quotes #(char ~ double_quotes) double_quotes.
-double_quotes::= "\"".
-integer::= decimal_digit #(decimal_digit).
-decimal_digit::= "0".."9".
-float::= integer "." integer.
-structured_statement::=iteration | selection
-iteration::= "{" alternatives "}".
-selection::= "[" alternatives "]".
+command
+   : EDIT NAME
+   | EXIT
+   ;
 
-alternatives::= alternative #( or_else alternative) .
-or_else::= "||"
-alternative::= program, -- as defined above.
+statement
+   : structuredStatement
+   | expressionStatement
+   ;
 
+expressionStatement
+   : expression assignment? disposition?
+   ;
 
+assignment
+   : ARROW variable
+   ;
 
+disposition
+   : IGNORED
+   | OUTPUT
+   | RETURNED
+   | TESTED
+   ;
+
+expression
+   : prefix? simpleExpression (operator prefix? simpleExpression)*
+   ;
+
+operator
+   : PLUS
+   | MINUS
+   | STAR
+   | SLASH
+   | PERCENT
+   | LE
+   | NE
+   | GE
+   | LT
+   | GT
+   | EQ
+   | AMP
+   | PIPE
+   | COLON
+   |
+   ;
+
+prefix
+   : PLUS
+   | MINUS
+   | TILDE
+   ;
+
+simpleExpression
+   : constant
+   | variable
+   | input
+   ;
+
+input
+   : DOLLAR
+   ;
+
+variable
+   : NAME
+   ;
+
+constant
+   : STRING
+   | FLOAT
+   | INT
+   ;
+
+structuredStatement
+   : iteration
+   | selection
+   ;
+
+iteration
+   : LBRACE alternatives RBRACE
+   ;
+
+selection
+   : LBRACKET alternatives RBRACKET
+   ;
+
+alternatives
+   : alternative (ORELSE alternative)*
+   ;
+
+alternative
+   : (statement | command)*
+   ;
+
+EDIT
+   : 'edit'
+   ;
+
+EXIT
+   : 'exit'
+   ;
+
+ARROW
+   : '->'
+   ;
+
+ORELSE
+   : '||'
+   ;
+
+IGNORED
+   : ';'
+   ;
+
+OUTPUT
+   : '!'
+   ;
+
+RETURNED
+   : '^'
+   ;
+
+TESTED
+   : '?'
+   ;
+
+LE
+   : '<='
+   ;
+
+NE
+   : '<>'
+   ;
+
+GE
+   : '>='
+   ;
+
+LT
+   : '<'
+   ;
+
+GT
+   : '>'
+   ;
+
+EQ
+   : '='
+   ;
+
+PLUS
+   : '+'
+   ;
+
+MINUS
+   : '-'
+   ;
+
+STAR
+   : '*'
+   ;
+
+SLASH
+   : '/'
+   ;
+
+PERCENT
+   : '%'
+   ;
+
+AMP
+   : '&'
+   ;
+
+PIPE
+   : '|'
+   ;
+
+COLON
+   : ':'
+   ;
+
+TILDE
+   : '~'
+   ;
+
+DOLLAR
+   : '$'
+   ;
+
+LBRACE
+   : '{'
+   ;
+
+RBRACE
+   : '}'
+   ;
+
+LBRACKET
+   : '['
+   ;
+
+RBRACKET
+   : ']'
+   ;
+
+NAME
+   : [a-zA-Z]+
+   ;
+
+FLOAT
+   : [0-9]+ '.' [0-9]+
+   ;
+
+INT
+   : [0-9]+
+   ;
+
+STRING
+   : '"' ~ ["\r\n]* '"'
+   ;
 
 WS
-   : [ \r\n\t] + -> skip
+   : [ \t\r\n]+ -> skip
    ;
+
+COMMENT
+   : '//' ~ [\r\n]* -> skip
+   ;
+
