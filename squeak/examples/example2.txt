@@ -1,0 +1,5 @@
+proc p = < c!0 . <> :: a!3 . p :: b?x . p >
+
+proc q = < c?z . <> :: a?y . b!y+1 . q >
+
+example = p & q

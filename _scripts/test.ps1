@@ -75,8 +75,24 @@ function Test-Grammar {
     if ($status -ne 0) {
         $failStage = [FailStage]::CodeGeneration
         Write-Host "trgen failed" -ForegroundColor Red
+        Set-Location $cwd
+        return @{
+            Success     = $false
+            Stage       = $failStage
+            FailedCases = @()
+        }
     }
-    $dirs = Get-ChildItem -Path "Generated-$Target*"
+    $dirs = @(Get-ChildItem -Path "Generated-$Target*")
+    if ($dirs.Count -eq 0) {
+        $failStage = [FailStage]::CodeGeneration
+        Write-Host "No code generated" -ForegroundColor Red
+        Set-Location $cwd
+        return @{
+            Success     = $false
+            Stage       = $failStage
+            FailedCases = @()
+        }
+    }
     foreach ($m in $dirs) {
         $targetgenerated = $m.Name
         Write-Host "targetgenerated is $targetgenerated"
