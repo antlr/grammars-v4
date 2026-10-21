@@ -370,6 +370,7 @@
 				<module>sici</module>
 				<module>sieve</module>
                 <module>simula</module>
+                <module>small</module>
 				<module>smalltalk</module>
 				<module>smiles</module>
 				<module>smtlibv2</module>
