@@ -15,4 +15,12 @@
       <entry-point>start_</entry-point>
       <inputs>examples-cpp20/**/*.cpp</inputs>
    </test>
+
+   <test>
+      <name>cpp23</name>
+      <grammar-name>CPP23</grammar-name>
+      <entry-point>start_</entry-point>
+      <inputs>examples-cpp23/**/*.cpp</inputs>
+   </test>
+
 </desc>
