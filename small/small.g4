@@ -32,9 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Grammar for the SMALL programming language, as specified at
 
-
-// http://www.csci.csusb.edu/dick/samples/small.html
-
 grammar small;
 
 prog
