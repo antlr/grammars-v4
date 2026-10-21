@@ -112,13 +112,13 @@ type
    | ('vector' NATCONST 'of' type)
    | '()'
    | ('(' type (',' type)+ ')')
-   | ('[' types ']')
+   | ('[' types_ ']')
    | (typeid type*)
    | type '->' type
    | '(' type ')'
    ;
 
-types
+types_
    : type (',' type)+
    ;
 
@@ -142,10 +142,10 @@ expr
    | expr op expr
    | (varid expr+)
    | (conid expr*)
-   | ('[' exprs ']')
+   | ('[' exprs_ ']')
    | '()'
    | ('(' expr (',' expr)+ ')')
-   | ('<<' exprs '>>')
+   | ('<<' exprs_ '>>')
    | ('case' expr 'of' matches)
    | ('if' expr 'then' expr 'else' expr)
    | ('let' vardecls 'in' expr)
@@ -169,15 +169,15 @@ cexpr
    : expr
    ;
 
-exprs
+exprs_
    : expr (',' expr)*
    ;
 
 matches
-   : match ('|' match)*
+   : match_ ('|' match_)*
    ;
 
-match
+match_
    : patt '->' expr
    ;
 
@@ -194,8 +194,8 @@ patt
    : constant
    | varid
    | '_'
-   | '[' patts ']'
-   | '<<' patts '>>'
+   | '[' patts_ ']'
+   | '<<' patts_ '>>'
    | '()'
    | ('(' patt (',' patt)* ')')
    | conid
@@ -206,7 +206,7 @@ patt
    | varid '@' patt
    ;
 
-patts
+patts_
    : patt (',' patt)*
    ;
 

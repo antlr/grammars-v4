@@ -36,8 +36,7 @@ program
    ;
 
 ccexpr
-   : ccexpr expr
-   |
+   : expr*
    ;
 
 expr
@@ -61,10 +60,7 @@ expr1
    ;
 
 nonemptyjotexpr
-   : nonemptyjotexpr '0'
-   | nonemptyjotexpr '1'
-   | '0'
-   | '1'
+   : ('0' | '1')+
    ;
 
 COMMENT

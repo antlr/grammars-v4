@@ -122,6 +122,7 @@
 			<id>grammarv4</id>
 			<modules>
 				<module>abb</module>
+                <module>abc</module>
 				<module>abnf</module>
 				<module>acme</module>
                 <module>action</module>
@@ -137,6 +138,7 @@
 				<module>angelscript</module>
 				<module>antlr</module>
 				<module>apex</module>
+                <module>apl</module>
 				<module>apt</module>
 				<module>aql</module>
                 <module>arden</module>
@@ -206,6 +208,7 @@
 				<module>erlang</module>
 				<module>esolang</module>
 				<module>evm-bytecode</module>
+                <module>fantom</module>
 				<module>fasta</module>
 				<module>fdo91</module>
 				<module>fen</module>
@@ -297,8 +300,10 @@
 				<module>newick</module>
 				<module>oberon</module>
                 <module>odin</module>
+                <module>orc</module>
 				<!-- <module>objc</module> -->
 				<module>oncrpc</module>
+                <module>otc</module>
 				<module>orwell</module>
 				<module>p</module>
 				<module>parkingsign</module>
