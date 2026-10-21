@@ -38,7 +38,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>program</entryPoint>
+					<entryPoint>file_</entryPoint>
 					<grammarName>refal</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>

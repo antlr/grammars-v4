@@ -1,0 +1,28 @@
+digraph ATN {
+rankdir=LR;
+s335[fontsize=11, label="335", shape=doublecircle, fixedsize=true, width=.6];
+s2144[fontsize=11,label="&larr;\n2144", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2145[fontsize=11,label="{2145*\nd=179|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s2146[fontsize=11,label="2146", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2147[fontsize=11,label="2147*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2148[fontsize=11,label="2148", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2149[fontsize=11,label="2149", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2150[fontsize=11,label="{&rarr;\n2150\nd=180|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s2151[fontsize=11,label="&larr;\n2151", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s334[fontsize=11,label="334", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2142[fontsize=11,label="2142", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2143[fontsize=11,label="&rarr;\n2143*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s334 -> s2145 [fontname="Times-Italic", label="&epsilon;"];
+s2145:p0 -> s2143 [fontname="Times-Italic", label="&epsilon;"];
+s2145:p1 -> s2146 [fontname="Times-Italic", label="&epsilon;"];
+s2143 -> s2142 [fontname="Times-Italic", label="&epsilon;"];
+s2146 -> s2148 [fontname="Times-Italic", label="&epsilon;"];
+s2142 -> s2144 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<query_body_clause>", arrowhead = normal];
+s2148 -> s2150 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<select_or_group_clause>", arrowhead = normal];
+s2144 -> s2147 [fontname="Times-Italic", label="&epsilon;"];
+s2150:p0 -> s2149 [fontname="Times-Italic", label="&epsilon;"];
+s2150:p1 -> s2151 [fontname="Times-Italic", label="&epsilon;"];
+s2147 -> s2145 [fontname="Times-Italic", label="&epsilon;", style="dashed"];
+s2149 -> s2151 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<query_continuation>", arrowhead = normal];
+s2151 -> s335 [fontname="Times-Italic", label="&epsilon;"];
+}

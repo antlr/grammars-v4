@@ -1,0 +1,3 @@
+ALTER TABLE foo.bar.baz
+ALTER COLUMN col1
+SET DATA TYPE bigint;

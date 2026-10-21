@@ -29,61 +29,64 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar ttm;
 
 program
-   : function_* EOF?
-   ;
+    : function_* EOF?
+    ;
 
 function_
-   : active
-   | neutral
-   ;
+    : active
+    | neutral
+    ;
 
 active
-   : ACTIVE functionname (';' arglist)? '>'
-   ;
+    : ACTIVE functionname (';' arglist)? '>'
+    ;
 
 neutral
-   : NEUTRAL functionname (';' arglist)? '>'
-   ;
+    : NEUTRAL functionname (';' arglist)? '>'
+    ;
 
 arglist
-   : arg (';' arg)*
-   ;
+    : arg (';' arg)*
+    ;
 
 arg
-   : function_
-   | ('<' function_ '>')
-   | string
-   ;
+    : function_
+    | ('<' function_ '>')
+    | string
+    ;
 
 functionname
-   : string
-   ;
+    : string
+    ;
 
 string
-   : STRING
-   | ESCSTRING
-   ;
+    : STRING
+    | ESCSTRING
+    ;
 
 ACTIVE
-   : '#<'
-   ;
+    : '#<'
+    ;
 
 NEUTRAL
-   : '##<'
-   ;
+    : '##<'
+    ;
 
 ESCSTRING
-   : '<' [a-zA-Z]+ '>'
-   ;
+    : '<' [a-zA-Z]+ '>'
+    ;
 
 STRING
-   : [a-zA-Z0-9@!#+\-*&$%'?=".|_ ]+
-   ;
+    : [a-zA-Z0-9@!#+\-*&$%'?=".|_ ]+
+    ;
 
 WS
-   : [ \r\n\t]+ -> skip
-   ;
-
+    : [ \r\n\t]+ -> skip
+    ;

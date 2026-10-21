@@ -1,0 +1,406 @@
+-- B416001.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--     The ACAA has created and maintains the Ada Conformity Assessment Test
+--     Suite for the purpose of conformity assessments conducted in accordance
+--     with the International Standard ISO/IEC 18009 - Ada: Conformity
+--     assessment of a language processor. This test suite should not be used
+--     to make claims of conformance unless used in accordance with
+--     ISO/IEC 18009 and any applicable ACAA procedures.
+--*
+--  OBJECTIVE:
+--     Check that incorrect definitions of the Constant_Indexing or
+--     Variable_Indexing aspects are detected.
+--
+-- TEST DESCRIPTION:
+--
+--     This test checks the following static semantics and legality rules:
+--
+--     (A) A Constant_Indexing or Variable_Indexing aspect can only be
+--         specified on a tagged type declaration.
+--
+--     (B) A Constant_Indexing or Variable_Indexing aspect cannot be specified
+--         on a full type declaration that has a tagged partial view.
+--
+--     (C) The name of a Constant_Indexing or Variable_Indexing aspect
+--         cannot denote an entity other than a function declared in the same
+--         declaration list as the type declaration.
+--
+--     (D) The name of a Constant_Indexing or Variable_Indexing aspect
+--         cannot denote a function with zero or one parameters.
+--
+--     (E) The name of a Constant_Indexing or Variable_Indexing aspect
+--         can denote a function with more than two parameters, and
+--         can refer to a set of overloaded functions.
+--
+--     (F) The Constant_Indexing or Variable_Indexing aspect cannot
+--         be specified on a derived type if the type would inherit the aspect
+--         from its parent type.
+--
+--     (G) The name of a Constant_Indexing or Variable_Indexing aspect
+--         specified for a type T cannot denote a function whose first
+--         parameter has a type other than T or T'Class or an
+--         access-to-constant (resp., access-to-variable) type designating T or
+--         T'Class.
+--
+--     (H) The name specified by a Variable_Indexing attribute cannot
+--         denote a function that returns a type other than a reference type
+--         for an access-to-variable type.
+--
+-- CHANGE HISTORY:
+--     27 Sep 2013 GJD Created test.
+--     19 May 2014 RLB Updates for issuance as part of ACATS 4.0:
+--                       Updated name of test; simplified objective;
+--                       corrected format of error indications; added
+--                       indications of which rule each error is testing.
+--     15 Jun 2021 RLB Commented out dubious OK pending approval of
+--                       AI12-0428-1. Fixed overlong lines.
+--!
+
+procedure B416001 is
+
+    type Ref (Int_Ref : access Integer) is null record
+      with Implicit_Dereference => Int_Ref;
+
+    Null_Ref : constant Ref := (Int_Ref => null);
+
+    type Ref_C (Int_Ref_C : access constant Integer) is null record
+      with Implicit_Dereference => Int_Ref_C;
+
+    Null_Ref_C : constant Ref_C := (Int_Ref_C => null);
+
+    package Invalid_Indexing_Types is
+
+        type Int is new Integer
+          with Variable_Indexing => Int_Func;        -- ERROR: (A)
+
+        function Int_Func (I : Int; Index : Positive) return Ref is (Null_Ref);
+
+        type Real is new Float
+          with Constant_Indexing => Real_Func;       -- ERROR: (A)
+
+        function Real_Func
+          (R : Real; Index : Positive) return Ref_C is (Null_Ref_C);
+
+        type Acc is access Integer
+          with Variable_Indexing => Acc_Func;        -- ERROR: (A)
+
+        function Acc_Func (A : Acc; Index : Positive) return Ref is (Null_Ref);
+
+        type Arr is array (Natural range <>) of Integer
+          with Constant_Indexing => Arr_Func;        -- ERROR: (A)
+
+        function Arr_Func
+          (A : Arr; Index : Positive) return Ref_C is (Null_Ref_C);
+
+        type Untagged_Record_Type is null record
+          with Variable_Indexing => Untagged_Func;   -- ERROR: (A)
+
+        function Untagged_Func
+          (X : Untagged_Record_Type; Index : Positive)
+           return Ref is (Null_Ref);
+
+        type Tagged_Type is tagged null record
+          with Variable_Indexing => Tagged_Func;     -- OK.
+
+        function Tagged_Func
+          (X : Tagged_Type; Index : Positive) return Ref is (Null_Ref);
+
+        type Priv_Tagged is tagged private
+          with Variable_Indexing => Priv_Tagged_Func;-- OK.
+
+        function Priv_Tagged_Func
+          (X : Priv_Tagged; Index : Positive) return Ref is (Null_Ref);
+
+        type Priv is private
+          with Variable_Indexing => Priv_Func;       -- ERROR: (A)
+
+        function Priv_Func
+          (P : Priv; Index : Positive) return Ref is (Null_Ref);
+
+        --See below for why this is commented out.
+        --type Priv_2 is private;
+        --
+        --function Priv_2_Func
+        --  (P : Priv_2; Index : Positive) return Ref is (Null_Ref);
+
+        type Priv_3 is tagged private
+          with Variable_Indexing => Priv_3_Func;     -- OK.
+
+        function Priv_3_Func
+          (P : Priv_3; Index : Positive) return Ref is (Null_Ref);
+
+        type Priv_4 is tagged private;
+
+        function Priv_4_Func
+          (P : Priv_4; Index : Positive) return Ref is (Null_Ref);
+
+        type Priv_5 is tagged private;
+
+        function Priv_5_Func
+          (P : Priv_5; Index : Positive) return Ref_C is (Null_Ref_C);
+
+    private
+
+        type TT is tagged null record;
+
+        type Priv_Tagged is tagged null record;
+
+        type Priv is tagged null record;
+
+        --This case is unclear as it is not obvious if the declaration list
+        --to check for (C) is this one or the previous one. AI12-0428-1
+        --clarifies this by allowing either, but testing that has to wait
+        --for Ada 202x.
+        --type Priv_2 is tagged null record
+        --  with Variable_Indexing => Priv_2_Func;     -- OK.
+
+        type Priv_3 is tagged null record;
+
+        type Priv_4 is tagged null record
+          with Variable_Indexing => Priv_4_Func;     -- ERROR: (B)
+
+        type Priv_5 is tagged null record
+          with Constant_Indexing => Priv_5_Func;     -- ERROR: (B)
+
+    end Invalid_Indexing_Types;
+
+    function Get_1 return Ref is
+    begin
+        return Null_Ref;
+    end Get_1;
+
+    function Get_1_C return Ref_C is
+    begin
+        return Null_Ref_C;
+    end Get_1_C;
+
+    package Invalid_Indexing_Operations is
+
+       type Type_1 is tagged null record
+         with Variable_Indexing => Get_1;            -- ERROR: (C) (D)
+                                                     -- Denotes outside Get_1,
+                                                     -- with no parameters.
+
+       type Type_1C is tagged null record
+         with Constant_Indexing => Get_1_C;          -- ERROR: (C) (D)
+                                                     -- Denotes outside
+                                                     -- Get_1_C, with no 
+                                                     -- parameters.
+
+       type Type_2 is tagged null record
+         with Variable_Indexing => Get_2;            -- ERROR: (D)
+                                                     -- Function with no params
+
+       function Get_2 return Ref is (Null_Ref);
+
+       type Type_2C is tagged null record
+         with Constant_Indexing => Get_2C;           -- ERROR: (D)
+                                                     -- Function with no params
+
+       function Get_2C return Ref_C is (Null_Ref_C);
+
+       type Type_3 is tagged null record
+         with Variable_Indexing => Get_3;            -- ERROR: (D)
+                                                     -- Function with one param
+
+       function Get_3 (X : Type_3) return Ref is (Null_Ref);
+
+       type Type_3_C is tagged null record
+         with Constant_Indexing => Get_3_C;          -- ERROR: (D)
+                                                     -- Function with one param
+
+       function Get_3_C (X : Type_3_C) return Integer is (123);
+
+       type Type_4 is tagged null record
+         with Variable_Indexing => Get_4;            -- OK. (E)
+                                                     -- Overloaded, 
+                                                     -- >= two params
+
+       function Get_4 (X : in out Type_4; Index : Positive)
+         return Ref is (Null_Ref);
+
+       function Get_4
+         (X : in out Type_4; Index : Positive; Extra : Boolean)
+         return Ref is (Null_Ref);
+
+       type Type_4_C is tagged null record
+         with Constant_Indexing => Get_4_C;          -- OK. (E)
+                                                     -- Overloaded,
+                                                     -- >= two params
+
+       function Get_4_C
+         (X : Type_4_C; Index : Positive) return Ref_C is (Null_Ref_C);
+
+       function Get_4_C
+         (X : Type_4_C; Index : Positive; Extra : Boolean)
+       return Ref_C is (Null_Ref_C);
+
+       type Type_5 is new Type_4 with null record
+         with Variable_Indexing => Get_5;            -- ERROR: (F)
+
+       function Get_5 (X : Type_5; Index : Positive) return Ref is (Null_Ref);
+
+       type Type_5_C is new Type_4_C with null record
+         with Constant_Indexing => Get_5_C;          -- ERROR: (F)
+
+       function Get_5_C
+         (X : Type_5_C; Index : Positive) return Ref_C is (Null_Ref_C);
+
+       type Type_6 is tagged null record
+         with Variable_Indexing => Get_6;            -- ERROR: (H)
+
+       function Get_6 (X : Type_6; Index : Positive) return Integer is (0);
+
+       type Type_7 is tagged null record
+         with Constant_Indexing => Get_7;            -- OK. (H) only applies
+                                                     -- to Variable_Indexing.
+
+       function Get_7 (X : Type_7; Index : Positive) return Integer is (0);
+
+       type Type_8 is tagged null record
+         with Variable_Indexing => Get_8;            -- ERROR: (G)  Wrong kind
+                                                     -- of first parameter.
+
+       function Get_8 (Index : Positive; X : Type_8) return Ref is (Null_Ref);
+
+       type Type_9 is tagged null record
+         with Variable_Indexing => Get_9;            -- ERROR: (H)  Reference
+                                                     -- type discriminant not
+                                                     -- access-to-variable.
+
+       function Get_9
+         (X : Type_9; Index : Positive) return Ref_C is (Null_Ref_C);
+
+       type Type_10 is tagged null record
+         with Constant_Indexing => Get_10;           -- OK. Parameter is
+                                                     -- access constant.
+
+       function Get_10
+         (X : access constant Type_10; Index : Positive)
+          return Ref_C is (Null_Ref_C);
+
+       type Type_11 is tagged null record
+         with Constant_Indexing => Get_11;           -- ERROR: (G)  Parameter
+                                                     -- not access constant.
+
+       function Get_11
+         (X : access Type_11; Index : Positive) return Ref_C is (Null_Ref_C);
+
+       type Type_12 is tagged null record
+         with Variable_Indexing => Get_12;           -- OK. (G)  Parameter is
+                                                     -- T'Class.
+
+       function Get_12 (X : Type_12'Class; Index : Positive) return Ref
+         is (Null_Ref);
+
+       type Type_13 is tagged null record
+         with Constant_Indexing => Get_13;           -- OK. (G)  Parameter is
+                                                     -- T'Class.
+
+       function Get_13 (X : Type_13'Class; Index : Positive) return Ref_C
+         is (Null_Ref_C);
+
+       type Type_14 is tagged null record;
+
+       function Get_14 (X : Type_14'Class; Index : Positive) return Ref
+         is (Null_Ref);
+
+       type Type_15 is new Type_14 with null record
+         with Variable_Indexing => Get_14;           -- ERROR: (G)  Parameter
+                                                     -- is not T'Class.
+
+       type Type_16 is tagged null record
+         with Variable_Indexing => Inner.Get_16;     -- ERROR: (C)
+
+       type Type_16_C is tagged null record
+         with Constant_Indexing => Inner.Get_16_C;   -- ERROR: (C)
+
+       package Inner is
+           function Get_16 (X : in out Type_16; Index : Positive)
+             return Ref is (Null_Ref);
+
+           function Get_16_C
+             (X : Type_16_C; Index : Positive) return Ref_C is (Null_Ref_C);
+       end Inner;
+
+       type Type_17 is tagged null record
+         with Variable_Indexing => Get_17;           -- ERROR: (D)
+                                                     -- Function with one param
+                                                     -- overloaded with OK
+                                                     -- case.
+
+       function Get_17 (X : Type_17) return Ref is (Null_Ref);
+
+       function Get_17 (X : in out Type_17; Index : Positive)
+         return Ref is (Null_Ref);
+
+       type Type_17_C is tagged null record
+         with Constant_Indexing => Get_17_C;         -- ERROR: (D)
+                                                     -- Function with one param
+                                                     -- overloaded with OK
+                                                     -- case.
+
+       function Get_17_C (X : Type_17_C) return Integer is (1217);
+
+       function Get_17_C
+         (X : Type_17_C; Index : Positive) return Integer is (2345);
+
+       type Type_18 is tagged null record
+         with Variable_Indexing => Get_18;           -- ERROR: (G)  Wrong kind
+                                                     -- of first parameter,
+                                                     -- overloaded with correct
+                                                     -- routine.
+
+       function Get_18 (Index : Positive; X : Type_18) 
+         return Ref is (Null_Ref);
+
+       function Get_18 (X : in out Type_18; Index : Positive)
+         return Ref is (Null_Ref);
+
+       type Type_19 is tagged null record
+         with Constant_Indexing => Get_19;           -- ERROR: (G)  Wrong kind
+                                                     -- of first parameter,
+                                                     -- overloaded with correct
+                                                     -- routine.
+
+       function Get_19 (Id : String; X : Type_19) return Integer is (12);
+
+       function Get_19 (X : Type_19; Index : Positive)
+         return Integer is (4);
+
+       type Type_20 is tagged null record
+         with Variable_Indexing => Get_20;           -- ERROR: (H)  Not
+                                                     -- reference type.
+
+       function Get_20
+         (X : Type_20; Index : Positive) return access Integer is (null);
+
+    end Invalid_Indexing_Operations;
+
+begin
+    null;
+end B416001;

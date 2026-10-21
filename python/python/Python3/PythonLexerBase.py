@@ -141,7 +141,7 @@ class PythonLexerBase(Lexer):
             token_type,
             channel,
             char_index - len(text),
-            char_index)
+            char_index - 1)
         token.line = self.line
         token.column = self.column
         token.text = text

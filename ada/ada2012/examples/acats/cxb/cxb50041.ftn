@@ -1,0 +1,105 @@
+C CXB50041.FTN
+C
+C                         Grant of Unlimited Rights
+C
+C Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+C F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+C unlimited rights in the software and documentation contained herein.
+C Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+C this public release, the Government intends to confer upon all 
+C recipients unlimited rights  equal to those held by the Government.  
+C These rights include rights to use, duplicate, release or disclose the 
+C released technical data and computer software in whole or in part, in 
+C any manner and for any purpose whatsoever, and to have or permit others 
+C to do so.
+C
+C                                DISCLAIMER
+C
+C ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+C DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+C WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+C SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+C OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+C PARTICULAR PURPOSE OF SAID MATERIAL.
+C
+C----------------------------------------------------------------------
+C TEST OBJECTIVE
+C      See CXB50042.AM
+C
+C TEST DESCRIPTION
+C      This Fortran function computes sales tax.  A real value argument
+C      is used to determine the appropriate tax, and the computed tax
+C      is returned through the function name.
+C
+C      Inputs:
+C        There is one argument to this Fortran function:
+C          AMT - a real value.
+C
+C      Processing:
+C        The function converts the real value argument to an integer
+C        corresponding to the number of cents represented by the argument.
+C        A tax table is used to determine the tax due for amounts under 
+C        $1.08, while a tax value of six percent of the total is computed 
+C        for amounts over $1.08.
+C
+C      Outputs:
+C        The computed sales tax is returned through the function name.
+C
+C SPECIAL REQUIREMENTS:
+C      See CXB50042.AM
+C     
+C TEST FILES:
+C      The following files comprise this test:
+C
+C         CXB50040.FTN
+C      => CXB50041.FTN
+C         CXB50042.AM
+C
+C APPLICABILITY CRITERIA: 
+C      See CXB50042.AM
+C
+C
+C CHANGE HISTORY:
+C    21 Mar 1996     SAIC     Initial release for ACVC 2.1.
+C    27 Oct 1996     SAIC     Modified commentary.
+C 
+C----------------------------------------------------------------------
+C
+      REAL FUNCTION TAX (AMT)
+C
+      REAL     AMT
+      INTEGER  CENTS, TBL(7), T
+C
+      TBL(1) = 10
+      TBL(2) = 22
+      TBL(3) = 39
+      TBL(4) = 56
+      TBL(5) = 73
+      TBL(6) = 90
+      TBL(7) = 108
+C
+C     Convert AMT to cents.
+C
+      CENTS = NINT(100.00*AMT)
+C
+      IF (CENTS .GT. 108) THEN
+C
+C        Compute 6 per cent sales tax.
+C
+         TAX = NINT(0.06*AMT)
+C
+      ELSE
+C
+C        Use tax table for amounts under $1.08
+C        Tax amounts will vary from 0-6 cents.
+C
+         T = 0
+ 210     IF (CENTS .LE. TBL(T+1))  GO TO 250
+            T = T + 1
+            GO TO 210
+ 250     TAX = T / 100.00
+C
+      ENDIF
+C
+      RETURN
+      END
