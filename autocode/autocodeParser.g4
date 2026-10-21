@@ -48,7 +48,7 @@ jobheader
    ;
 
 statement
-   : label? (assignment | text | print_ | stop_ | goto_)
+   : label? (assignment | text_ | print_ | stop_ | goto_)
    ;
 
 label
@@ -59,7 +59,7 @@ assignment
    : value EQ expression
    ;
 
-text
+text_
    : TEXT TEXT_CONTENT?
    ;
 
