@@ -48,7 +48,7 @@ jobheader
    ;
 
 statement
-   : label? (assignment | text | print_ | stop | goto_)
+   : label? (assignment | text | print_ | stop_ | goto_)
    ;
 
 label
@@ -67,7 +67,7 @@ print_
    : PRINT value COMMA NUMBER
    ;
 
-stop
+stop_
    : STOP
    ;
 
