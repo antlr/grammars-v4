@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../_scripts/desc.xsd">
+   <targets>Antlr4ng;CSharp;Dart;Java;JavaScript;Python3</targets>
+
+   <test>
+      <name>cpp14</name>
+      <grammar-name>CPP14</grammar-name>
+      <entry-point>translationUnit</entry-point>
+      <inputs>examples/**/*.cpp</inputs>
+   </test>
+
+   <test>
+      <name>cpp20</name>
+      <grammar-name>CPP20</grammar-name>
+      <entry-point>start_</entry-point>
+      <inputs>examples-cpp20/**/*.cpp</inputs>
+   </test>
+</desc>

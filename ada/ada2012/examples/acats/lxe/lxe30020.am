@@ -1,0 +1,172 @@
+-- LXE30020.AM
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that an inconsistent distributed program 
+--      is properly detected.  
+--
+-- TEST DESCRIPTION:
+--      In this test the inconsistency is
+--      introduced by attempting to produce two partitions, each
+--      containing a different version of the specification of the
+--      Shared_Passive package than that contained in the 
+--      other partition.
+--      This test is constructed such that a consistent program 
+--      cannot be produced and execution of the inconsistent 
+--      program will produce a failed message if the inconsistency 
+--      is not detected by the implementation.
+--       
+--      The first file of this test (LXE30020.AM) contains all the 
+--      compilation units required for constructing partition A.
+--      The second file of this test (LXE30021.AM) contains all the
+--      compilation units required for constructing partition B.
+--      Both files contain the specification of a Shared_Passive 
+--      unit that is used by both partitions of the program. 
+--      The specifications are different in each of the two files.
+--      
+--      The compilation units contained in LXE30020.AM are as
+--      follows:
+--          LXE3002_A       -- partition main procedure
+--          LXE3002_Shared  -- specification of a shared passive unit
+--      
+--      The compilation units contained in LXE30021.AM are as
+--      follows:
+--          LXE3002_B       -- partition main procedure
+--          LXE3002_Shared  -- specification of a shared passive unit
+--      
+-- SPECIAL REQUIREMENTS:
+--      Compile the compilation units in this file (LXE30020.AM)
+--      If the implementation allows one partition of a program to
+--      be created before the other partition is compiled then
+--      partition A is to be created once the units in this file have
+--      been compiled.  Partition A is to contain the following units:
+--           LXE3002_A       (main procedure)
+--           Report
+--         and any other non-RCI units required by those compilation
+--             units.
+--      Compile all the compilation units in LXE30021.AM. 
+--      Note that LXE30021.AM contains an (intentionally) altered
+--      version of LXE3002_Shared.  This version must be compiled
+--      after the compilation of the units contained in LXE30020.AM.
+--      If the implementation requires that all partitions of the
+--      program be created at the same time then attempt to create  
+--      both partitions at this time. This should result in an error
+--      since the program library will not contain a complete set of
+--      up-to-date units.  If such an error is reported then the test
+--      passes.
+--      If the implementation does not require that all partitions
+--      be created at one time then partition A has already been
+--      created so create partition B at this time.
+--      Partition B is to contain the following units:
+--           LXE3002_B       (main procedure)
+--           LXE3002_Shared  (Shared_Passive package)
+--           Report
+--         and any other non-RCI units required by those compilation
+--             units.
+--      Alternatively, LXE3002_Shared may be placed in a separate
+--      passive partition resulting in a 3 partition program.
+--      If the two or three partitions were successfully created then
+--      run the program by starting both active partitions.  
+--      The partitions may be started in either order.
+--
+-- APPLICABILITY CRITERIA:
+--      This test applies only to implementations:
+--         supporting the Distribution Annex, and
+--         providing an implementation of System.RPC.
+--
+-- PASS/FAIL CRITERIA:
+--      This test passes if:
+--        1.  The tool that creates the partitions reports that the 
+--            program is inconsistent (a unit is obsolete), or
+--        2.  Program_Error is raised in either or both partitions 
+--            during elaboration. 
+--      This test fails if either or both partition reports that the 
+--      test fails or if BOTH PARTITIONS REPORT THE TEST TENTATIVELY  
+--      PASSED.  If both partitions report the test tentatively 
+--      passed then it is likely that a separate copy of the state 
+--      of the shared passive package was present for each active 
+--      partition. 
+--      Whatever the reason, the test fails if the inconsistency is
+--      not detected and this detection must occur no later than
+--      elaboration time of the last partition to elaborate. 
+--
+-- SPECIAL NOTE
+--      The is no real communication between the two partitions of this
+--      test.  Only the data in the shared passive package is in common
+--      between the two partitions.  However, this program must be
+--      built as a distributed program and not as two separate programs.
+--        
+--
+-- CHANGE HISTORY:
+--     26 JUN 95   SAIC    Initial version
+--     28 APR 96   SAIC    Fixed comments.
+--
+--!
+
+-----------------------------------------------------------------------------
+
+package LXE3002_Shared is
+  pragma Shared_Passive;
+  Counter : Integer := 1;
+
+  Id : Character := 'A';   -- initial value changes between specs 
+  -- the following declaration is different in the two versions of
+  -- this package.  This will prevent automatic recompilation from
+  -- being able to make the program consistent.
+  Only_In_A : Boolean;     -- name changes between specs. 
+end LXE3002_Shared;
+
+-----------------------------------------------------------------------------
+
+with LXE3002_Shared;
+with Report;
+procedure LXE3002_A is
+begin
+  -- this partition attempts to use the data in the Shared_Passive
+  -- package.
+  Report.Test ("LXE3002_A", 
+               "Checking that an inconsistent program is detected when" &
+                " the inconsistency is due to a change in a" &
+                " shared_passive package");
+
+  if LXE3002_Shared.Counter = 1 then
+    Report.Comment ("Partition A is the first partition to run");
+  else
+    Report.Failed ("Partition B has already altered the shared data");
+  end if;
+
+  LXE3002_Shared.Counter := 10;
+  LXE3002_Shared.Only_In_A := True;
+
+  if LXE3002_Shared.Id = 'A' then
+    Report.Comment ("'A' version of LXE3002_Shared is present");
+    Report.Special_Action ("If partition B reports that the test" &
+                           " passed then the test failed");
+  else
+    Report.Failed ("'B' version of LXE3002_Shared is present");
+  end if;
+
+ Report.Result;
+end LXE3002_A;

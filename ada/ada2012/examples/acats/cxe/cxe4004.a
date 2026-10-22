@@ -1,0 +1,743 @@
+-- CXE4004.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making
+--     this public release, the Government intends to confer upon all
+--     recipients unlimited rights  equal to those held by the Government.
+--     These rights include rights to use, duplicate, release or disclose the
+--     released technical data and computer software in whole or in part, in
+--     any manner and for any purpose whatsoever, and to have or permit others
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that parameter passing to remote procedures is handled
+--      properly when the parameters are of a dynamic size or have
+--      discriminants.
+--      Check that the following types can be passed as parameters:
+--      dynamic sized arrays, constrained discriminated records,
+--      unconstrained discriminated records, and tagged records.
+--      Check the parameter passing using all three modes and check
+--      that function results of the various types are handled properly.
+--      Check that both direct subprogram calls and indirect calls
+--      through a value of a remote access to subprogram can be used
+--      for the call.
+--
+-- TEST DESCRIPTION:
+--      This test is composed of the following compilation units:
+--          CXE4004_Common  - pure package containing declarations
+--              shared between partitions A & B
+--          CXE4004_Shared  - normal package of support routines
+--              included in both partitions A & B
+--          CXE4004_Part_A1 - rci package interface for partition A
+--          CXE4004_Part_A2 - rci package interface for partition A
+--          CXE4004_Part_B  - rci package interface for partition B
+--          CXE4004_A  - main procedure for partition A
+--          CXE4004_B  - main procedure for partition B - main driver
+--              for the test.
+--       The types that are declared in CXE4004_Common are used
+--       for parameter passing across partitions.
+--
+-- SPECIAL REQUIREMENTS:
+--      Compile the compilation units in this file.
+--      Create the two partitions (A and B) with the following contents:
+--        Partition A contains:
+--           CXE4004_A  (main procedure)
+--           CXE4004_Part_A1  (RCI package body)
+--           CXE4004_Part_A2  (RCI package body)
+--           CXE4004_Shared
+--           CXE4004_Common
+--           Report
+--           and all normal and pure packages with'ed by these units.
+--        Partition B contains:
+--           CXE4004_B  (main procedure)
+--           CXE4004_Part_B  (RCI package body)
+--           CXE4004_Shared
+--           CXE4004_Common
+--           Report
+--           and all normal and pure packages with'ed by these units.
+--        Note that package Report is included in both partitions and
+--        prints messages from both partitions.
+--      Run the program by starting both partitions.  The partitions may be
+--      started in either order.
+--
+-- APPLICABILITY CRITERIA:
+--      This test applies only to implementations:
+--         supporting the Distribution Annex,
+--         supporting the Remote_Call_Interface pragma, and
+--         providing an implementation of System.RPC.
+--
+-- PASS/FAIL CRITERIA:
+--      This test passes if and only if both partition A and
+--      partition B print a message reporting that the test passed.
+--
+--
+-- CHANGE HISTORY:
+--     15 MAY 95   SAIC    Initial version for ACVC 2.1
+--      1 MAY 96   SAIC    Fixed problems noted by reviewers.
+--     25 JAN 01   RLB     Repaired startup race condition.
+--
+--!
+
+package CXE4004_Common is
+  pragma Pure;
+
+  -- types for parameters passed between partitions
+
+  type Integer_Vector is array (Integer range <>) of Integer;
+  subtype Three_Ints is Integer_Vector (4..6);
+
+  type Discriminated_Record (Disc : Boolean := True) is
+    record
+      Common_Component : Integer;
+      case Disc is
+        when True =>
+           A_Char : Character;
+        when False =>
+           Ints_3 : Three_Ints;
+           Another_Int : Integer;
+      end case;
+    end record;
+
+  type Another_Discriminated_Record (Disc : Boolean;
+                                     Disc_Low : Integer;
+                                     Disc_High : Integer) is
+    record
+      Common_Component : Integer := 18;
+      case Disc is
+        when True =>
+           A_Char : Character := 'X';
+        when False =>
+           Some_Ints : Integer_Vector (Disc_Low .. Disc_High);
+           A_Bool : Boolean := True;
+           Some_More_Ints : Integer_Vector (1.. Disc_High);
+           Even_More_Ints : Integer_Vector (Disc_Low .. 20);
+      end case;
+    end record;
+
+  type Root_Tagged_Record is tagged
+    record
+      In_Root : Integer := 22;
+    end record;
+
+  type Extended_1 is new Root_Tagged_Record with
+    record
+      In_Extension : Integer := 445;
+    end record;
+
+  type Extended_2 is new Root_Tagged_Record with
+    record
+      Ext_2_Component : Integer := 135;
+    end record;
+
+end CXE4004_Common;
+
+-----------------------------------------------------------------------------
+
+package CXE4004_Shared is
+  -- Support routines that are used in both of the partitions.
+  -- Since this is a normal package, a copy of this package is present
+  -- on each partition.
+  -- The Chk routines are used to verify that a value is equal to
+  -- the expected value.  If not, Report.Failed is called with Note as
+  -- the failure message.
+  generic
+     type The_Type is (<>);
+  procedure Gen_Chk (Note     : String;
+                     Actual,
+                     Expected : The_Type);
+
+  procedure Start_Test_Section (Name : String);
+end CXE4004_Shared;
+
+
+with Report;
+package body CXE4004_Shared is
+  -- The following constant controls whether or not comment
+  -- messages are generated to show progress during the test.
+  -- The setting of Verbose does not affect the result of the
+  -- test.
+  Verbose : constant Boolean := False;
+
+  procedure Gen_Chk (Note     : String;
+                     Actual,
+                     Expected : The_Type) is
+  begin
+    if Actual /= Expected then
+      Report.Failed (Note & "  Expected:" &
+                     The_Type'Image (Expected) &
+                     " Actual:" &
+                     The_Type'Image (Actual));
+    elsif Verbose then
+      Report.Comment (Note);
+    end if;
+  end Gen_Chk;
+
+
+  procedure Start_Test_Section (Name : String) is
+  begin
+    if Verbose then
+      Report.Comment (Name);
+    end if;
+  end Start_Test_Section;
+end CXE4004_Shared;
+
+-----------------------------------------------------------------------------
+
+with CXE4004_Common;  use CXE4004_Common;
+package CXE4004_Part_A1 is
+  pragma Remote_Call_Interface;
+
+  procedure Check_In (Test_No: in Integer;
+                      Vec    : in Integer_Vector;
+                      Dr1    : in Discriminated_Record;
+                      Dr2    : in Another_Discriminated_Record;
+                      Tr     : in Extended_2);
+  procedure Set_Out  (Test_No: in Integer;
+                      Vec    : out Integer_Vector;
+                      Dr1    : out Discriminated_Record;
+                      Dr2    : out Another_Discriminated_Record;
+                      Tr     : out Extended_2);
+  procedure Modify   (Test_No: in Integer;
+                      Vec    : in out Integer_Vector;
+                      Dr1    : in out Discriminated_Record;
+                      Dr2    : in out Another_Discriminated_Record;
+                      Tr     : in out Extended_2);
+
+  -- big parameter array tests
+  function "+"(A, B : in Integer_Vector) return Integer_Vector;
+
+  -- coordination of test termination across partitions
+  procedure Can_Quit;
+  procedure Quit;
+end CXE4004_Part_A1;
+
+-----------------------------------------------------------------------------
+
+with CXE4004_Common;  use CXE4004_Common;
+package CXE4004_Part_A2 is
+  -- This package supports the remote access tests
+  pragma Remote_Call_Interface;
+
+  procedure Call_With_2 (T : Integer_Vector);
+  procedure Call_With_3 (T : Integer_Vector);
+
+  type Remote_Proc is access procedure (X : Integer_Vector);
+
+end CXE4004_Part_A2;
+
+-----------------------------------------------------------------------------
+
+with CXE4004_Common;  use CXE4004_Common;
+package CXE4004_Part_B is
+  -- This package supports the remote access tests
+  pragma Remote_Call_Interface;
+
+  -- access test support
+  procedure Call_With_4 (T : Integer_Vector);
+
+end CXE4004_Part_B;
+
+-----------------------------------------------------------------------------
+
+with CXE4004_Common;
+with CXE4004_Part_A1;
+with CXE4004_Part_A2;
+with Report;
+procedure CXE4004_A is
+begin
+  -- this partition is a server that deals with calls
+  -- from CXE4004_B.
+  Report.Test ("CXE4004_A",
+               "Parameter passing across partitions (server)");
+  CXE4004_Part_A1.Can_Quit; -- OK to quit now.
+
+  -- Report.Result is called in the body of CXE4004_Part_A1.
+end CXE4004_A;
+
+-----------------------------------------------------------------------------
+
+with CXE4004_Common;  use CXE4004_Common;
+with CXE4004_Shared;  use CXE4004_Shared;
+with CXE4004_Part_A1;
+with CXE4004_Part_A2;
+with CXE4004_Part_B;
+with Report;
+procedure CXE4004_B is
+  function "+"(L,R : CXE4004_Common.Integer_Vector)
+      return CXE4004_Common.Integer_Vector
+      renames CXE4004_Part_A1."+";
+
+  procedure Chk is new CXE4004_Shared.Gen_Chk (Integer);
+  procedure Chk is new CXE4004_Shared.Gen_Chk (Boolean);
+  procedure Chk is new CXE4004_Shared.Gen_Chk (Character);
+
+--------------------------------------------
+
+procedure In_Tests is
+    V : Integer_Vector (7..9) := (77, 88, 99);
+    Not_Constrained : Discriminated_Record := (False, 7, (5,4,3), 2);
+    Simple_DR2 : Another_Discriminated_Record(True, 0 , 0) :=
+           (True, 0, 0, 98, A_Char => 'p');
+    Tagged_Rec : Extended_2;
+begin
+    Tagged_Rec.In_Root := 56;
+    Tagged_Rec.Ext_2_Component := 57;
+
+    -- Test #1
+    --    check that the bounds for V are 7 and 9
+    --    check the discriminant and component values for everything else
+    CXE4004_Part_A1.Check_In (1, V, Not_Constrained, Simple_DR2, Tagged_Rec);
+
+    -- Test #2
+    --    check that the bounds of the array components of
+    --    Another_Discriminated_Record are correct and the values in the
+    --    arrays are correct
+    CXE4004_Part_A1.Check_In(2, V, Not_Constrained,
+                             Another_Discriminated_Record'(False,
+                                  Disc_Low  =>3,
+                                  Disc_High => 5,
+                                  Common_Component => 18,
+                                  A_Bool => False,
+                                  Some_Ints => (3 => 30, 4 => 40, 5=> 50),
+                                  Some_More_Ints => (1,2,3,4,5),
+                                  Even_More_Ints => (3..19 => 319,
+                                                     20 => 200)
+                                ),
+                             Tagged_Rec);
+end In_Tests;
+
+--------------------------------------------
+
+procedure Out_Tests is
+
+begin
+  -- Test #1
+  --    check the Constrained attribute on the other side.
+  --       Both records are constrained.
+  --    check a few of the values returned
+  declare
+    Vec : Integer_Vector (18..19);
+    Dr1 : Discriminated_Record(True);
+    Dr2 : Another_Discriminated_Record(False, 2, 3);
+    Tr  : Extended_2;
+  begin
+    CXE4004_Part_A1.Set_Out (1, Vec, Dr1, Dr2, Tr);
+
+    Chk("Out_Tests.Vec(18)",    Vec(18),    1800);
+    Chk("Out_Tests.Dr1.A_Char",  Dr1.A_Char, 'Z');
+    Chk("Out_Tests.Dr2.Some_More_Ints(2)", Dr2.Some_More_Ints(2), 2222);
+    Chk("Out_Tests.Tr.In_Root", Tr.In_Root, 3333);
+  end;
+
+
+  -- Test #2
+  --    check the Constrained attribute on the other side.
+  --       Dr1 is not constrained.  Dr2 is constrained.
+  --    check a few of the values returned
+  declare
+    Vec : Integer_Vector (-5..-3);
+    Dr1 : Discriminated_Record;  -- use default disc.
+    Dr2 : Another_Discriminated_Record(False, 2, 5);
+    Tr  : Extended_2;
+  begin
+    CXE4004_Part_A1.Set_Out (2, Vec, Dr1, Dr2, Tr);
+
+    Chk("Out_Tests.Vec(-5)",    Vec(-5),    -5);
+    Chk("Out_Tests.Vec(-3)",    Vec(-3),    -3);
+    Chk("Out_Tests.Dr2.Some_Ints(5)", Dr2.Some_Ints(5), 255);
+  end;
+
+end Out_Tests;
+
+--------------------------------------------
+
+procedure InOut_Tests is
+    V : Integer_Vector (12..15) := (177, 188, 199, 166);
+    Big_V : Integer_Vector (1000..2500);
+    Not_Constrained : Discriminated_Record :=
+           (False, 17, (15,24,33), 42);
+    Is_Constrained  : Discriminated_Record(False) :=
+           (False, 18, (115,124,133), 142);
+    Another_DR : Another_Discriminated_Record(True, 9 , 10) :=
+           (True, 9, 10,
+            998, A_Char => 'q');
+    A_Big_DR : Another_Discriminated_Record(False, 19, 419) :=
+           (False, 19, 419,
+            Common_Component => 400,
+            Some_Ints        => (19..419 => 10101),
+            A_Bool           => True,
+            Some_More_Ints   => (1..419 => 10202),
+            Even_More_Ints   => (19..20 => 10303) );
+    Tagged_Rec : Extended_2;
+begin
+  Tagged_Rec.In_Root := 678;
+  Tagged_Rec.Ext_2_Component := 901;
+
+  -- Test #1
+  --    check that the Constrained attribute is passed correctly
+  --    check some of the modified values that are returned
+  --    check some of the unmodified values too.
+  CXE4004_Part_A1.Modify (1, V, Not_Constrained, Another_DR, Tagged_Rec);
+
+    -- not modified by call
+  Chk("InOut_Tests.V(14)",                 V(14),                  199);
+  Chk("InOut_Tests.Tagged_Rec.In_Root",    Tagged_Rec.In_Root,     678);
+  Chk("InOut_Tests.Not_Constrained.Common_Component",
+      Not_Constrained.Common_Component,    17);
+  Chk("InOut_Tests.Another_DR.Common_Component",
+      Another_DR.Common_Component,         998);
+
+    -- modified by call
+  Chk("InOut_Tests.V(13)",                 V(13),                  881);
+  Chk("InOut_Tests.Not_Constrained.Disc",  Not_Constrained.Disc,   True);
+  Chk("InOut_Tests.Another_DR.A_Char",     Another_DR.A_Char,      's');
+  Chk("InOut_Tests.Tagged_Rec.Ext_2_Component",
+      Tagged_Rec.Ext_2_Component,          109);
+
+  -- Test #2
+  --    make the parameters bigger
+  Tagged_Rec.In_Root := 1022;
+  Tagged_Rec.Ext_2_Component := 1124;
+  for I in Big_V'Range loop
+    Big_V (I) := I;
+  end loop;
+  for I in A_Big_DR.Even_More_Ints'Range loop
+    A_Big_DR.Even_More_Ints(I) := -I;
+  end loop;
+
+  CXE4004_Part_A1.Modify (2, Big_V, Is_Constrained, A_Big_DR, Tagged_Rec);
+
+   -- not modified by call
+  Chk("InOut_Tests.Big_V(2000)",   Big_V(2000),        2000);
+  Chk("InOut_Tests.Is_Constrained.Another_Int",
+                   Is_Constrained.Another_Int,         142);
+  Chk("InOut_Tests.A_Big_DR.Even_More_Ints(20)",
+                   A_Big_DR.Even_More_Ints(20),        -20);
+  Chk("InOut_Tests.Tagged_Rec.Ext_2_Component",
+                   Tagged_Rec.Ext_2_Component,         1124);
+
+    -- modified by call
+  Chk("InOut_Tests.Big_V(1900)",   Big_V(1900),        135);
+  Chk("InOut_Tests.Is_Constrained.Ints_3(5)",
+                   Is_Constrained.Ints_3(5),           35);
+  Chk("InOut_Tests.A_Big_DR.Even_More_Ints(19)",
+                   A_Big_DR.Even_More_Ints(19),        190);
+  Chk("InOut_Tests.Tagged_Rec.In_Root",
+                   Tagged_Rec.In_Root,                 2201);
+
+end InOut_Tests;
+
+--------------------------------------------
+
+procedure Large_Array_Tests is
+    Ones  : constant Integer_Vector(1000..3000) := (1000..3000 => 1);
+    Twos  : constant Integer_Vector(1000..3000) := (1000..3000 => 2);
+    Fives : constant Integer_Vector(1000..3000) := (1000..3000 => 5);
+    Result : Integer_Vector(1000..3000) := (1000..3000 => 0);
+begin
+  Start_Test_Section ("large array parameters and function results");
+  Result :=  (Twos + Ones) + Twos;
+  if Result = Fives then
+    null;
+  else
+    Report.Failed ("large array parameters and/or array function results");
+  end if;
+end Large_Array_Tests;
+
+--------------------------------------------
+
+procedure Remote_Access_Tests is
+  -- access to remote subprogram tests
+  -- here we make sure the correct procedure is called by having
+  -- several procedures with the same parameter profile but each
+  -- procedure expects a different value to be passed to it as is
+  -- indicated by the procedure name.
+
+  P2, P3, P4 : CXE4004_Part_A2.Remote_Proc;
+begin
+  Start_Test_Section ("remote call via an access to subprogram");
+  P2 := CXE4004_Part_A2.Call_With_2'Access;
+  P3 := CXE4004_Part_A2.Call_With_3'Access;
+  P4 := CXE4004_Part_B.Call_With_4'Access;
+  -- try two different RCI packages that are in the same partition
+  P2((1..2 => 2));
+  P3((101..103 => 3));   -- do some sliding too
+  -- try a procedure that is in this partition
+  P4((1..4 => 4));
+end Remote_Access_Tests;
+
+--------------------------------------------
+
+begin  -- CXE4004_B
+  Report.Test ("CXE4004_B", "Parameter passing across partitions");
+
+  -- make sure partitioning was performed correctly
+  if CXE4004_Part_A1'Partition_ID = CXE4004_B'Partition_ID then
+    Report.Failed ("Partitioning Error - CXE4004_Part_A1 and CXE4004_B" &
+                   " are in the same partition.");
+  end if;
+  if CXE4004_Part_A2'Partition_ID = CXE4004_B'Partition_ID then
+    Report.Failed ("Partitioning Error - CXE4004_Part_A2 and CXE4004_B" &
+                   " are in the same partition.");
+  end if;
+  if CXE4004_Part_B'Partition_ID /= CXE4004_B'Partition_ID then
+    Report.Failed ("Partitioning Error - CXE4004_Part_B and CXE4004_B" &
+                   " are not in the same partition.");
+  end if;
+
+  -- do the tests
+  In_Tests;
+  Out_Tests;
+  InOut_Tests;
+  Large_Array_Tests;
+  Remote_Access_Tests;
+
+
+  -- finish up
+  CXE4004_Part_A1.Quit;
+  Report.Result;
+end CXE4004_B;
+
+-----------------------------------------------------------------------------
+
+with Report;
+with CXE4004_Shared;  use CXE4004_Shared;
+package body CXE4004_Part_A1 is
+
+  procedure Chk is new CXE4004_Shared.Gen_Chk (Integer);
+  procedure Chk is new CXE4004_Shared.Gen_Chk (Boolean);
+  procedure Chk is new CXE4004_Shared.Gen_Chk (Character);
+
+
+  procedure Check_In (Test_No: in Integer;
+                      Vec    : in Integer_Vector;
+                      Dr1    : in Discriminated_Record;
+                      Dr2    : in Another_Discriminated_Record;
+                      Tr     : in Extended_2) is
+  begin
+    Start_Test_Section ("IN parameter test #" & Integer'Image (Test_No));
+    -- check a sample of the data that came in
+    case Test_No is
+      when 1 =>
+        Chk ("Vec'First", Vec'First,  7);
+        Chk ("Vec'Last",  Vec'Last,   9);
+        Chk ("Vec(7)",    Vec(7),     77);
+        Chk ("Vec(8)",    Vec(8),     88);
+        Chk ("Vec(9)",    Vec(9),     99);
+        Chk ("Dr1.Disc",             Dr1.Disc,             False);
+        Chk ("Dr1.Common_Component", Dr1.Common_Component, 7);
+        Chk ("Dr1.Another_Int",      Dr1.Another_Int,      2);
+        Chk ("Dr2.Disc",      Dr2.Disc,      True);
+        Chk ("Dr2.Disc_Low",  Dr2.Disc_Low,  0);
+        Chk ("Dr2.Disc_High", Dr2.Disc_High, 0);
+        Chk ("Dr2.A_Char",    Dr2.A_Char,    'p');
+        Chk ("Tr.In_Root",         Tr.In_Root,          56);
+        Chk ("Tr.Ext_2_Component", Tr.Ext_2_Component,  57);
+
+      when 2 =>
+        Chk ("Dr2.Disc",               Dr2.Disc,               False);
+        Chk ("Dr2.Disc_Low",           Dr2.Disc_Low,           3);
+        Chk ("Dr2.Disc_High",          Dr2.Disc_High,          5);
+        Chk ("Dr2.Some_Ints(3)",       Dr2.Some_Ints(3),       30);
+        Chk ("Dr2.Some_Ints(5)",       Dr2.Some_Ints(5),       50);
+        Chk ("Dr2.Some_More_Ints(3)",  Dr2.Some_More_Ints(3),  3);
+        Chk ("Dr2.Even_More_Ints(19)", Dr2.Even_More_Ints(19), 319);
+        Chk ("Dr2.Even_More_Ints(20)", Dr2.Even_More_Ints(20), 200);
+
+      when others =>
+        Report.Failed ("Bad test number received for Check_In" &
+                       Integer'Image (Test_No));
+    end case;
+  end Check_In;
+
+
+  procedure Set_Out  (Test_No: in Integer;
+                      Vec    : out Integer_Vector;
+                      Dr1    : out Discriminated_Record;
+                      Dr2    : out Another_Discriminated_Record;
+                      Tr     : out Extended_2) is
+  begin
+    Start_Test_Section ("OUT parameter test #" & Integer'Image (Test_No));
+
+    -- check attributes and set the values expected by the caller
+    case Test_No is
+      when 1 =>
+         Chk("Vec'First",       Vec'First,       18);
+         Chk("Dr1'Constrained", Dr1'Constrained, True);
+         Chk("Dr2'Constrained", Dr2'Constrained, True);
+         Chk("Dr2.Disc_Low",    Dr2.Disc_Low,    2);
+
+         Vec(18..19) := (1800,1801);
+         Dr1.A_Char  := 'Z';
+         Dr2.Some_More_Ints(1..3) := (2221, 2222, 2223);
+         Tr.In_Root := 3333;
+         Tr.Ext_2_Component := 3334;
+
+      when 2 =>
+         Chk("Vec'First",       Vec'First,       -5);
+         Chk("Dr1'Constrained", Dr1'Constrained, False);
+         Chk("Dr2'Constrained", Dr2'Constrained, True);
+         Chk("Dr2.Disc_Low",    Dr2.Disc_Low,    2);
+
+         Vec(-5..-3) := (-5,-4,-3);
+         Dr2.Some_Ints(2..5) := (252, 253, 254, 255);
+
+      when others =>
+        Report.Failed ("Bad test number received for Set_Out" &
+                       Integer'Image (Test_No));
+    end case;
+  end Set_Out;
+
+
+  procedure Modify   (Test_No: in Integer;
+                      Vec    : in out Integer_Vector;
+                      Dr1    : in out Discriminated_Record;
+                      Dr2    : in out Another_Discriminated_Record;
+                      Tr     : in out Extended_2) is
+  begin
+    Start_Test_Section ("IN OUT Parameter test #" & Integer'Image (Test_No));
+
+    -- check attributes and set the values expected by the caller
+    case Test_No is
+      when 1 =>
+         -- check the attributes
+         Chk("Vec'First",          Vec'First,          12);
+         Chk("Dr1'Constrained",    Dr1'Constrained,    False);
+         Chk("Dr2.Disc_Low",       Dr2.Disc_Low,       9);
+         -- check the values we are going to modify
+         Chk("Vec(13)",            Vec(13),            188);
+         Chk("Dr1.Disc",           Dr1.Disc,           False);
+         Chk("Dr2.A_Char",         Dr2.A_Char,         'q');
+         Chk("Tr.Ext_2_Component", Tr.Ext_2_Component, 901);
+         -- modify the values we want to send back
+         Vec(13) := 881;
+         Dr1 := (True, 17, 't');
+         Dr2.A_Char := 's';
+         Tr.Ext_2_Component := 109;
+
+      when 2 =>
+         -- check the attributes
+         Chk("Vec'First",          Vec'First,          1000);
+         Chk("Dr1'Constrained",    Dr1'Constrained,    True);
+         Chk("Dr2.Disc_Low",       Dr2.Disc_Low,       19);
+         -- check the values we are going to modify
+         Chk("Vec(1900)",          Vec(1900),          1900);
+         Chk("Dr1.Ints_3(5)",      Dr1.Ints_3(5),      124);
+         Chk("Dr2.Even_More_Ints(19)",
+              Dr2.Even_More_Ints(19),                  -19);
+         Chk("Tr.In_Root",         Tr.In_Root,         1022);
+         -- modify the values we want to send back
+         Vec(1900) := 135;
+         Dr1.Ints_3(5) := 35;
+         Dr2.Even_More_Ints(19) := 190;
+         Tr.In_Root := 2201;
+
+      when others =>
+        Report.Failed ("Bad test number received for Modify" &
+                       Integer'Image (Test_No));
+    end case;
+  end Modify;
+
+
+  -- vector operation tests
+  function "+" (A, B : in Integer_Vector) return Integer_Vector is
+    Result : Integer_Vector(A'Range);
+  begin
+    for I in Result'Range loop
+      Result (I) := A(I) + B(I);
+    end loop;
+    return Result;
+  end "+";
+
+
+  ---------  partition termination coordination ----------
+  -- use a task to prevent the partition from completing its execution
+  -- until the main procedure in partition B tells it to quit.
+
+  task Wait_For_Quit is
+    entry Can_Quit;
+    entry Quit;
+  end Wait_For_Quit;
+
+  task body Wait_For_Quit is
+  begin
+    accept Can_Quit; -- Called once we've called Report.Test. (Else we might
+                     -- call Report.Result before Report.Test.)
+    accept Quit;
+    Report.Result;
+  end Wait_For_Quit;
+
+  procedure Can_Quit is
+  begin
+    Wait_For_Quit.Can_Quit;
+  end Can_Quit;
+
+  procedure Quit is
+  begin
+    Wait_For_Quit.Quit;
+  end Quit;
+
+
+end CXE4004_Part_A1;
+
+-----------------------------------------------------------------------------
+
+with Report;
+package body CXE4004_Part_A2 is
+
+  procedure Call_With_2 (T : Integer_Vector) is
+    Expected : constant Integer_Vector(1..2) := (2,2);
+  begin
+    if T /= Expected then
+      Report.Failed ("expected 2 2s but received:" &
+                     Integer'Image (T(T'First)) &
+                     " length:" &
+                     Integer'Image (T'Length));
+    end if;
+  end;
+
+  procedure Call_With_3 (T : Integer_Vector) is
+    Expected : constant Integer_Vector(1..3) := (3,3,3);
+  begin
+    if T /= Expected then
+      Report.Failed ("expected 3 3s but received:" &
+                     Integer'Image (T(T'First)) &
+                     " length:" &
+                     Integer'Image (T'Length));
+    end if;
+  end;
+
+end CXE4004_Part_A2;
+
+
+-----------------------------------------------------------------------------
+
+with Report;
+package body CXE4004_Part_B is
+
+  procedure Call_With_4 (T : Integer_Vector) is
+    Expected : constant Integer_Vector(1..4) := (4,4,4,4);
+  begin
+    if T /= Expected then
+      Report.Failed ("expected 4 4s but received:" &
+                     Integer'Image (T(T'First)) &
+                     " length:" &
+                     Integer'Image (T'Length));
+    end if;
+  end;
+
+end CXE4004_Part_B;

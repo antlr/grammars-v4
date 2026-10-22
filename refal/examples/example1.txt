@@ -1,0 +1,8 @@
+$ENTRY Go { = <Prout <Pal 'revolver'>> }
+
+Pal { = True;
+     s.1 = True;
+     s.1 e.2 s.1 = <Pal e.2>;
+     e.1 = False;  }
+
+

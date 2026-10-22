@@ -1,0 +1,4 @@
+490843|5237653|Amsterdam Central Station|4|
+496283|5226712|Abcoude Park and Ride|0|
+507226|5208633|Stadsbaan Utrecht|0|
+509797|5199465|Company in Vianen|2|

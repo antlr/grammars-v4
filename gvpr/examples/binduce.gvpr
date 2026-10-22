@@ -1,0 +1,45 @@
+/* Given a bipartite graph, induce a non-bipartite graph.
+ * argv[0]="name=value" This is used to identify the nodes used
+ * to induce edges. If aget(n,name) == value, 
+ *  if deg(n) == 1, delete
+ *  if deg(n) == 2, delete and connect to neighbor with edge
+ *  if deg(n) > 2, delete and add edge between all pairs of neighbors
+ *  Add weights to edge.
+ */
+BEGIN{
+  int i, cnt;
+  int wt[edge_t];
+  string values[int];
+  node_t nbrs[int];
+  edge_t e;
+  tokens(ARGV[0],values,"=");
+  string aname = values[0];
+  string value = values[1];
+  printf(2, "%s=%s\n", aname, value);
+}
+N[aget($,aname)==value] {
+  if ($.degree > 1) {
+    cnt = 0;
+    for (e = fstedge($); e; e = nxtedge(e, $))
+      nbrs[cnt++] = opp(e,$);
+    for (i = 0; i < cnt-1; i++) {
+      if ((e = isEdge(nbrs[i],nbrs[i+1],"")) != NULL) {
+        wt[e] += 1;
+      }
+      else if ($G.directed && (e = isEdge(nbrs[i+1],nbrs[i],""))) {
+        wt[e] += 1;
+      }
+      else if (nbrs[i] != nbrs[i+1]) { // avoid loops
+        e = edge(nbrs[i],nbrs[i+1],"");
+        wt[e] = 1;
+      }
+    }
+    unset(nbrs);
+  }
+  delete($G,$);
+}
+END_G{
+  for (wt[e]) {
+    e.multiplicity = sprintf ("%d", wt[e]);
+  }
+}

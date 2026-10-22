@@ -1,0 +1,20 @@
+
+                /* definitions for assembly interface module        */
+declare
+    fcb (33) byte external,        /* default file control block    */
+    maxb address external,         /* top of memory                 */
+    buff(128)byte external;        /* default buffer                */
+
+mon1: procedure(f,a) external;
+    declare f byte, a address;
+    end mon1;
+
+mon2: procedure(f,a) byte external;
+    declare f byte, a address;
+    end mon2;
+
+mon3: procedure(f,a) address external;
+    declare f byte, a address;
+    end mon3;
+
+

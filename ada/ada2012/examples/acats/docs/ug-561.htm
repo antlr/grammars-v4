@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>Expected Results for Executable Tests</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-56.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-562.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>5.6.1 Expected Results for Executable Tests</H1>
+<div class="Normal">Executable tests (classes A, C, D, E) must be processed 
+by the compiler and any post-compilation steps (e.g., binder, partitioner) 
+without any errors. They must be loaded into an execution target and 
+run. Normal execution of tests results in an introductory message that 
+summarizes the test objective, possibly some informative comments about 
+the test progress, a final message giving pass / fail status, and graceful, 
+silent termination. They may report &quot;PASSED&quot;, &quot;TENTATIVELY 
+PASSED&quot;, &quot;FAILED&quot;, OR &quot;NOT APPLICABLE&quot;.</div>
+<div class="Normal">A test that fails to compile and bind, including 
+compiling and binding any foundation code on which it depends is graded 
+as &quot;failed&quot;, unless the test includes features that need not 
+be supported by all implementations. For example, an implementation may 
+reject the declaration of a numeric type that it does not support. Allowable 
+cases are clearly stated in the Applicability Criteria of tests. Annex 
+M of the Ada Standard requires implementations to document such implementation-defined 
+characteristics.</div>
+<div class="Normal">A test that reports &quot;FAILED&quot; is graded 
+as &quot;failed&quot; unless the ACAL, and possibly the ACAA, determine 
+that the test is not applicable for the implementation.</div>
+<div class="Normal">A test that reports &quot;PASSED&quot; is graded 
+as &quot;passed&quot; unless the test produces the pass message but fails 
+to terminate gracefully (e.g., crashes, hangs, raises an unexpected exception, 
+produces an earlier or later &quot;FAILED&quot; message). This kind of 
+aberrant behavior may occur, for example, in certain tasking tests, where 
+there are multiple threads of control. A pass status message may be produced 
+by one thread, but another thread may  asynchronously crash or fail to 
+terminate properly.</div>
+<div class="Normal">A test that reports &quot;NOT APPLICABLE&quot; must 
+be run by the implementation and is graded as &quot;not applicable&quot; 
+unless it produces the not-applicable message and then fails to terminate 
+gracefully.</div>
+<div class="Normal">A test that reports &quot;TENTATIVELY PASSED&quot; 
+is graded as &quot;passed&quot; if the test results satisfy the pass/fail 
+criteria in the test. Normally, verification requires manual inspection 
+of the test output.</div>
+<div class="Normal">A test that fails to report, or produces only a partial 
+report, will be graded as &quot;failed&quot; unless the ACAL, and possibly 
+the ACAA, determine that the test is not applicable for the implementation.</div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-56.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-562.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>

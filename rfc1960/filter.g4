@@ -25,106 +25,113 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar filter;
 
-filter
-   : '(' filtercomp ')'
-   ;
+file_
+    : filter_ EOF
+    ;
+
+filter_
+    : '(' filtercomp ')'
+    ;
 
 filtercomp
-   : and
-   | or
-   | not
-   | item
-   ;
+    : and_
+    | or_
+    | not_
+    | item
+    ;
 
-and
-   : '&' filterlist
-   ;
+and_
+    : '&' filterlist
+    ;
 
-or
-   : '|' filterlist
-   ;
+or_
+    : '|' filterlist
+    ;
 
-not
-   : '!' filter
-   ;
+not_
+    : '!' filter_
+    ;
 
 filterlist
-   : filter
-   | filter filterlist
-   ;
+    : filter_
+    | filter_ filterlist
+    ;
 
 item
-   : simple
-   | present
-   | substring
-   ;
+    : simple
+    | present
+    | substring
+    ;
 
 simple
-   : attr filtertype value
-   ;
+    : attr filtertype value
+    ;
 
 filtertype
-   : EQUAL
-   | APPROX
-   | GREATER
-   | LESS
-   ;
+    : EQUAL
+    | APPROX
+    | GREATER
+    | LESS
+    ;
 
 EQUAL
-   : '='
-   ;
+    : '='
+    ;
 
 APPROX
-   : '~='
-   ;
+    : '~='
+    ;
 
 GREATER
-   : '>='
-   ;
+    : '>='
+    ;
 
 LESS
-   : '<='
-   ;
+    : '<='
+    ;
 
 present
-   : attr '=*'
-   ;
+    : attr '=*'
+    ;
 
 substring
-   : attr '=' initial? any final_?
-   ;
+    : attr '=' initial? any_ final_?
+    ;
 
 initial
-   : value
-   ;
+    : value
+    ;
 
-any
-   : '*' starval?
-   ;
+any_
+    : '*' starval?
+    ;
 
 starval
-   : value '*' starval?
-   ;
+    : value '*' starval?
+    ;
 
 final_
-   : value
-   ;
+    : value
+    ;
 
 attr
-   : OCTETSTRING
-   ;
+    : OCTETSTRING
+    ;
 
 value
-   : OCTETSTRING
-   ;
+    : OCTETSTRING
+    ;
+
 /*
 * cheap hack
 */
 
-
 OCTETSTRING
-   : [a-zA-Z0-9. ]+
-   ;
-
+    : [a-zA-Z0-9. ]+
+    ;

@@ -1,22 +1,24 @@
 package parser
 
-import "github.com/antlr/antlr4/runtime/Go/antlr"
+import "github.com/antlr4-go/antlr/v4"
 
 // JavaScriptLexerBase state
 type JavaScriptLexerBase struct {
-	*antlr.LexerBase
+	*antlr.BaseLexer
 
 	scopeStrictModes []bool
 	stackLength      int
 	stackIx          int
 
-	lastToken        antlr.Token
-	useStrictDefault bool
-	useStrictCurrent bool
+	lastToken          antlr.Token
+	useStrictDefault   bool
+	useStrictCurrent   bool
+	currentDepth       int
+	templateDepthStack []int
 }
 
-func (l *JavaScriptLexerBase) IsStartOfFile() {
-    return l.lastToken == nil
+func (l *JavaScriptLexerBase) IsStartOfFile() bool {
+	return l.lastToken == nil
 }
 
 func (l *JavaScriptLexerBase) pushStrictModeScope(v bool) {
@@ -43,7 +45,7 @@ func (l *JavaScriptLexerBase) IsStrictMode() bool {
 
 // NextToken from the character stream.
 func (l *JavaScriptLexerBase) NextToken() antlr.Token {
-	next := l.LexerBase.NextToken() // Get next token
+	next := l.BaseLexer.NextToken() // Get next token
 	if next.GetChannel() == antlr.TokenDefaultChannel {
 		// Keep track of the last token on default channel
 		l.lastToken = next
@@ -54,6 +56,7 @@ func (l *JavaScriptLexerBase) NextToken() antlr.Token {
 // ProcessOpenBrace is called when a { is encountered during
 // lexing, we push a new scope everytime.
 func (l *JavaScriptLexerBase) ProcessOpenBrace() {
+	l.currentDepth++
 	l.useStrictCurrent = l.useStrictDefault
 	if l.stackIx > 0 && l.scopeStrictModes[l.stackIx-1] {
 		l.useStrictCurrent = true
@@ -68,6 +71,7 @@ func (l *JavaScriptLexerBase) ProcessCloseBrace() {
 	if l.stackIx > 0 {
 		l.useStrictCurrent = l.popStrictModeScope()
 	}
+	l.currentDepth--
 }
 
 // ProcessStringLiteral is called when lexing a string literal.
@@ -81,6 +85,16 @@ func (l *JavaScriptLexerBase) ProcessStringLiteral() {
 			l.pushStrictModeScope(l.useStrictCurrent)
 		}
 	}
+}
+
+func (l *JavaScriptLexerBase) ProcessTemplateOpenBrace() {
+	l.currentDepth++
+	l.templateDepthStack = append(l.templateDepthStack, l.currentDepth)
+}
+
+func (l *JavaScriptLexerBase) ProcessTemplateCloseBrace() {
+	l.templateDepthStack = l.templateDepthStack[:len(l.templateDepthStack)-1]
+	l.currentDepth--
 }
 
 // IsRegexPossible returns true if the lexer can match a
@@ -100,4 +114,20 @@ func (l *JavaScriptLexerBase) IsRegexPossible() bool {
 	default:
 		return true
 	}
+}
+
+func (l *JavaScriptLexerBase) IsInTemplateString() bool {
+	return len(l.templateDepthStack) > 0 && l.templateDepthStack[len(l.templateDepthStack)-1] == l.currentDepth
+}
+
+func (l *JavaScriptLexerBase) Reset() {
+	l.scopeStrictModes = nil
+	l.stackLength = 0
+	l.stackIx = 0
+	l.lastToken = nil
+	l.useStrictDefault = false
+	l.useStrictCurrent = false
+	l.currentDepth = 0
+	l.templateDepthStack = make([]int, 0)
+	l.BaseLexer.Reset()
 }

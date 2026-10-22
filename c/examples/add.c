@@ -1,3 +1,5 @@
+int LAST;
+
     int main()
     {
         int i, sum = 0;

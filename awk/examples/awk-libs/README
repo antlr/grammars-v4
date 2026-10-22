@@ -1,0 +1,545 @@
+AWK library function descriptions
+
+Every function below is fully POSIX compliant, and has been tested on gawk 3
+and 4, as well as nawk 20110810 and mawk 1.3.4. Interval notation has not been
+used in this library, even though POSIX states that it should be supported,
+as most of the current implementations still do not support it.
+
+Note: mawk 1.3.3 is even less POSIX compliant than 1.3.4, and doesn't handle
+POSIX character classes in regexes (like [:space:] or [:alpha:]), among other
+things. It is currently the standard on ubuntu, and is most likely standard on
+other debian-based linux distributions, as well. The functions below are not
+guaranteed to work on versions of mawk prior to 1.3.4, although they should not
+be too difficult to alter in order to do so.
+
+If you are using gawk, I recommend adding the location of this repo to the
+AWKPATH environment variable. This will allow you to only supply the file name
+to -f and @include, instead of having to supply the actual path to the library.
+
+
+The 'examples' directory includes a sample script for each library, with sample
+usage of each function. While most of the examples are solely there to give
+examples, the "cfold" script is fully functioning and is (in my opinion) rather
+useful. It shows just how powerful these libraries can be... most of the script
+is just there to parse options. These examples are written with gawk extensions.
+Making them POSIX is left as an exercise to the user, if desired.
+
+
+Most of the functions in this library work by themselves, with the exception of
+the functions in sort.awk and the max() and min() functions in strings.awk.
+This means that they can easily be copy/pasted into a script, and will function
+fine on their own. In the case of sort.awk, the functions that the others depend
+on begin with '__', and which functions they go with (as well as which functions
+require what) are explained in the comments.
+
+
+
+
+Libraries, and the available functions within:
+
+math.awk
+
+  abs(number)
+    returns the absolute value of "number"
+
+  ceil(number)
+    returns "number" rounded UP to the nearest int
+
+  ceiling(multiple, number)
+    returns "number" rounded UP to the nearest multiple of "multiple". integers
+    only
+
+  floor(multiple, number)
+    returns "number" rounded DOWN to the nearest multiple of "multiple".
+    integers only
+
+  round(multiple, number)
+    returns "number" rounded to the nearest multiple of "multiple". integers
+    only
+
+  rint(number)
+    returns "number" rounded to the nearest integer
+
+  change_base(number, start_base, end_base)
+    converts "number" from "start_base" to "end_base"
+    bases must be between 2 and 64. the digits greater than 9 are represented
+    by the lowercase letters, the uppercase letters, @, and _, in that order.
+    if ibase is less than or equal to 36, lowercase and uppercase letters may
+    be used interchangeably to represent numbers between 10 and 35. integers
+    only. returns 0 if any argument is invalid
+
+  format_num(number)
+    adds commas to "number" to make it more readable. for example,
+    format_num(1000) will return "1,000", and format_num(123456.7890) will
+    return "123,456.7890". also trims leading zeroes
+    returns 0 if "number" is not a valid number
+
+  str_to_num(string)
+    examines "string", and returns its numeric value. if "string" begins with a
+    leading 0, assumes that "string" is an octal number. if "string" begins with
+    a leading "0x" or "0X", assumes that "string" is a hexadecimal number.
+    otherwise, decimal is assumed.
+
+  isint(string)
+    returns 1 if "string" is a valid integer, otherwise 0
+
+  isnum(string)
+    returns 1 if "string" is a valid number, otherwise 0
+
+  isprime(number)
+    returns 1 if "number" is a prime number, otherwise 0. "number" must be a
+    positive integer greater than one
+
+  gcd(a, b)
+    returns the greatest common denominator (greatest common factor) of a and b.
+    both a and b must be positive integers. uses the recursive euclid algorithm.
+
+  lcm(a, b)
+    returns the least common multiple of a and b. both a and b must be positive
+    integers.
+
+  calc_e()
+    approximates e by calculating the sumation from k=0 to k=50 of 1/k!
+    returns 10 decimal places
+
+  calc_pi()
+    returns pi, with an accuracy of 10 decimal places
+
+  calc_tau()
+    returns tau, with an accuracy of 10 decimal places
+    http://tauday.com/tau-manifesto
+
+  deg_to_rad(degrees)
+    converts degrees to radians
+
+  rad_to_deg(radians)
+    converts radians to degrees
+
+  tan(expr)
+    returns the tangent of expr, which is in radians
+
+  csc(expr)
+    returns the cosecant of expr, which is in radians
+
+  sec(expr)
+    returns the secant of expr, which is in radians
+
+  cot(expr)
+    returns the cotangent of expr, which is in radians
+
+
+
+sys.awk
+
+  isatty(fd)
+    Checks if "fd" is open on a tty. Returns 1 if so, 0 if not, and -1 if an
+    error occurs
+
+  mktemp(template [, type])
+    creates a temporary file or directory, safely, and returns its name.
+    if template is not a pathname, the file will be created in ENVIRON["TMPDIR"]
+    if set, otherwise /tmp. the last six characters of template must be "XXXXXX",
+    and these are replaced with a string that makes the filename unique. type, if
+    supplied, is either "f", "d", or "u": for file, directory, or dry run (just
+    returns the name, doesn't create a file), respectively. If template is not
+    provided, uses "tmp.XXXXXX". Files are created u+rw, and directories u+rwx,
+    minus umask restrictions. returns -1 if an error occurs.
+
+
+
+strings.awk
+
+  center(string [, width])
+    returns "string" centered based on "width". if "width" is not provided (or 
+    is 0), uses the width of the terminal, or 80 if standard output is not open
+    on a terminal.
+    note: does not check the length of the string. if it's wider than the
+    terminal, it will not center lines other than the first. for best results,
+    combine with fold() (see the "cfold" script in the "examples" directory for
+    a script that does exactly this!)
+
+  delete_arr(array)
+    deletes every element in "array"
+
+  fold(string, sep [, width])
+    returns "string", wrapped, with lines broken on "sep" to "width" columns.
+    "sep" is a list of characters to break at, similar to IFS in a POSIX shell.
+    if "sep" is empty, wraps at exactly "width" characters. if "width" is not
+    provided (or is 0), uses the width of the terminal, or 80 if standard output
+    is not open on a terminal.
+    note: currently, tabs are squeezed to a single space. this will be fixed
+
+  shell_esc(string)
+    returns the string escaped so that it can be used in a shell command
+
+  ssub(ere, repl [, in])
+    behaves like sub, except returns the result and doesn't modify "in".
+    note: 'ere' must not use /.../ literal regex quoting
+
+  sgsub(ere, repl [, in])
+    behaves like gsub, except returns the result and doesn't modify "in".
+    note: 'ere' must not use /.../ literal regex quoting
+
+  lsub(str, repl [, in])
+    substites the string "repl" in place of the first instance of "str" in the
+    string "in" and returns the result. does not modify the original string. if
+    "in" is not provided, uses $0
+
+  glsub(str, repl [, in])
+    behaves like lsub, except it replaces all occurances of "str"
+    note: does not work in mawk when 'str' is empty
+
+  str_to_arr(string, array)
+    converts string to an array, one char per element, 1-indexed
+    returns the array length
+
+  extract_range(string, start, stop)
+    extracts fields "start" through "stop" from "string", based on FS, with the
+    original field separators intact. returns the extracted fields.
+
+  fwidths(width_spec [, string])
+    extracts substrings from "string" according to "width_spec" from left to
+    right and assigns them to $1, $2, etc. also assigns the NF variable. if
+    "string" is not supplied, uses $0. "width_spec" is a space separated list of
+    numbers that specify field widths, just like GNU awk's FIELDWIDTHS variable.
+    if there is data left over after the last width_spec, adds it to a final
+    field. returns the value for NF.
+
+  fwidths_arr(width_spec, array [, string])
+    the behavior is the same as that of fwidths(), except that the values are
+    assigned to "array", indexed with sequential integers starting with 1.
+    returns the length. everything else is described in fwidths() above.
+
+  lsplit(str, arr, sep)
+    splits the string "str" into array elements "arr[1]", "arr[2]", .., "arr[n]",
+    and returns "n". all elements of "arr" are deleted before the split is
+    performed. the separation is done on the literal string "sep".
+
+  ssplit(str, arr, seps [, ere])
+    similar to GNU awk 4's "seps" functionality for split(). splits the string
+    "str" into the array "arr" and the separators array "seps" on the regular
+    expression "ere", and returns the number of fields. the value of "seps[i]"
+    is the separator that appeared in front of "arr[i+1]". if "ere" is omitted or
+    empty, FS is used instead. if "ere" is a single space, leading whitespace in
+    "str" will go into the extra array element "seps[0]" and trailing whitespace
+    will go into the extra array element "seps[len]", where "len" is the return
+    value.
+    note: /regex/ style quoting cannot be used for "ere".
+
+  ends_with(string, substring)
+    returns 1 if "strings" ends with "substring", otherwise 0
+
+  trim(string)
+    returns "string" with leading and trailing whitespace trimmed
+
+  rev(string)
+    returns "string" backwards
+
+  max(array [, how ])
+    returns the maximum value in "array", 0 if the array is empty, or -1 if an
+    error occurs. the optional string "how" controls the comparison mode.
+    requires the __mcompare() function.
+    valid values for "how" are:
+      "std"
+        use awk's standard rules for comparison. this is the default
+      "str"
+        force comparison as strings
+      "num"
+        force a numeric comparison
+
+  maxi(array [, how ])
+    the behavior is the same as that of max(), except that the array indices are
+    used, not the array values. everything else is explained in max() above.
+
+  min(array [, how ])
+    the behavior is the same as that of max(), except that the minimum value is
+    returned instead of the maximum. everything else is explained in max() above.
+
+  mini(array [, how ])
+    the behavior is the same as that of min(), except that the array indices are
+    used instead of the array values. everything else is explained in min() and
+    max() above.
+
+
+
+msort.awk
+
+  msort(s, d [, how])
+    sorts the elements in the array "s" using awk's normal rules for comparing
+    values, creating a new sorted array "d" indexed with sequential integers
+    starting with 1. returns the length, or -1 if an error occurs.. leaves the
+    indices of the source array "s" unchanged. the optional string "how" controls
+    the direction and the comparison mode. uses the merge sort algorithm, with an
+    insertion sort when the list size gets small enough. this is not a stable
+    sort. requires the __compare() and __mergesort() functions.
+    valid values for "how" are:
+      "std asc"
+        use awk's standard rules for comparison, ascending. this is the default
+      "std desc"
+        use awk's standard rules for comparison, descending.
+      "str asc"
+        force comparison as strings, ascending.
+      "str desc"
+        force comparison as strings, descending.
+      "num asc"
+        force a numeric comparison, ascending.
+      "num desc"
+        force a numeric comparison, descending.
+
+  imsort(s [, how])
+    the bevavior is the same as that of msort(), except that the array "s" is
+    sorted in-place. the original indices are destroyed and replaced with
+    sequential integers. everything else is described in msort() above.
+
+  msorti(s, d [, how])
+    the behavior is the same as that of msort(), except that the array indices
+    are used for sorting, not the array values. when done, the new array is
+    indexed numerically, and the values are those of the original indices.
+    everything else is described in msort() above.
+
+  imsorti(s [, how])
+    the bevavior is the same as that of msorti(), except that the array "s" is
+    sorted in-place. the original indices are destroyed and replaced with
+    sequential integers. everything else is described in msort() and msorti()
+    above.
+
+  msortv(s, d [, how])
+    sorts the indices in the array "s" based on the values, creating a new
+    sorted array "d" indexed with sequential integers starting with 1, and the
+    values the indices of "s". returns the length, or -1 if an error occurs.
+    leaves the source array "s" unchanged. the optional string "how" controls
+    the direction and the comparison mode. uses the merge sort algorithm, with
+    an insertion sort when the list size gets small enough. this is not a stable
+    sort. requires the __compare() and __mergesortv() functions. valid values for
+    "how" are explained in the msort() function above.
+
+
+
+qsort.awk
+
+  qsort(s, d [, how])
+    sorts the elements in the array "s" using awk's normal rules for comparing
+    values, creating a new sorted array "d" indexed with sequential integers
+    starting with 1. returns the length, or -1 if an error occurs.. leaves the
+    indices of the source array "s" unchanged. the optional string "how" controls
+    the direction and the comparison mode. uses the quick sort algorithm, with a
+    random pivot to avoid worst-case behavior on already sorted arrays. this is
+    not a stable sort. requires the __compare() and __quicksort() functions.
+    valid values for "how" are:
+      "std asc"
+        use awk's standard rules for comparison, ascending. this is the default
+      "std desc"
+        use awk's standard rules for comparison, descending.
+      "str asc"
+        force comparison as strings, ascending.
+      "str desc"
+        force comparison as strings, descending.
+      "num asc"
+        force a numeric comparison, ascending.
+      "num desc"
+        force a numeric comparison, descending.
+
+  iqsort(s [, how])
+    the bevavior is the same as that of qsort(), except that the array "s" is
+    sorted in-place. the original indices are destroyed and replaced with
+    sequential integers. everything else is described in qsort() above.
+
+  qsorti(s, d [, how])
+    the behavior is the same as that of qsort(), except that the array indices
+    are used for sorting, not the array values. when done, the new array is
+    indexed numerically, and the values are those of the original indices.
+    everything else is described in qsort() above.
+
+  iqsorti(s [, how])
+    the bevavior is the same as that of qsorti(), except that the array "s" is
+    sorted in-place. the original indices are destroyed and replaced with
+    sequential integers. everything else is described in qsort() and qsorti()
+    above.
+
+  qsortv(s, d [, how])
+    sorts the indices in the array "s" based on the values, creating a new
+    sorted array "d" indexed with sequential integers starting with 1, and the
+    values the indices of "s". returns the length, or -1 if an error occurs.
+    leaves the source array "s" unchanged. the optional string "how" controls
+    the direction and the comparison mode. uses the quicksort algorithm, with a
+    random pivot to avoid worst-case behavior on already sorted arrays. this is
+    not a stable sort. requires the __compare() and __vquicksort() functions.
+    valid values for "how" are explained in the qsort() function above.
+
+
+
+psort.awk
+
+  psort(s, d, patts, max [, how])
+    sorts the values of the array "s", based on the rules below. creates a new
+    sorted array "d" indexed with sequential integers starting with 1. "patts"
+    is a compact (*non-sparse) 1-indexed array containing regular expressions.
+    "max" is the length of the "patts" array. returns the length of the "d"
+    array. valid values for "how" are explained below. uses the quicksort
+    algorithm, with a random pivot to avoid worst-case behavior on already sorted
+    arrays. requires the __pcompare() and __pquicksort() functions.
+     Sorting rules:
+     - When sorting, values matching an expression in the "patts" array will
+       take priority over any other values
+     - Each expression in the "patts" array will have priority in ascending
+       order by index. "patts[1]" will have priority over "patts[2]" and
+       "patts[3]", etc
+     - Values both matching the same regex will be compared as usual
+     - All non-matching values will be compared as usual
+    valid values for "how" are:
+      "std asc"
+        use awk's standard rules for comparison, ascending. this is the default
+      "std desc"
+        use awk's standard rules for comparison, descending.
+      "str asc"
+        force comparison as strings, ascending.
+      "str desc"
+        force comparison as strings, descending.
+      "num asc"
+        force a numeric comparison, ascending.
+      "num desc"
+        force a numeric comparison, descending.
+
+  ipsort(s, patts, max [, how])
+    the bevavior is the same as that of psort(), except that the array "s" is
+    sorted in-place. the original indices are destroyed and replaced with
+    sequential integers. everything else is described in psort() above.
+
+  psorti(s, d, patts, max [, how])
+    the behavior is the same as that of psort(), except that the array indices
+    are used for sorting, not the array values. when done, the new array is
+    indexed numerically, and the values are those of the original indices.
+    everything else is described in psort() above.
+
+  ipsorti(s, patts, max [, how])
+    the bevavior is the same as that of psorti(), except that the array "s" is
+    sorted in-place. the original indices are destroyed and replaced with
+    sequential integers. everything else is described in psort() and psorti()
+    above.
+
+
+
+shuf.awk
+
+  shuf(s, d)
+    shuffles the array "s", creating a new shuffled array "d" indexed with
+    sequential integers starting with one. returns the length, or -1 if an error
+    occurs. leaves the indices of the source array "s" unchanged. uses the knuth-
+    fisher-yates algorithm. requires the __shuffle() function.
+
+  ishuf(s)
+    the behavior is the same as that of shuf(), except the array "s" is sorted
+    in-place. the original indices are destroyed and replaced with sequential
+    integers. everything else is described in shuf() above.
+
+  shufi(s, d)
+    the bevavior is the same as that of shuf(), except that the array indices
+    are shuffled, not the array values. when done, the new array is indexed
+    numerically, and the values are those of the original indices. everything
+    else is described in shuf() above.
+
+  ishufi(s)
+    the behavior is tha same as that of shufi(), except that the array "s" is
+    sorted in-place. the original indices are destroyed and replaced with
+    sequential integers. everything else is describmed in shuf() and shufi()
+    above.
+
+
+
+csv.awk
+
+  create_line(array, max [, sep [, qualifier [, quote_type] ] ])
+    Generates an output line in quoted CSV format, from the contents of "array"
+    "array" is expected to be an indexed array (1-indexed). "max" is the highest
+    index to be used. "sep", if provided, is the field separator. If it is more
+    than one character, the first character in the string is used. By default,
+    it is a comma. "qualifier", if provided, is the quote character. Like "sep",
+    it is one character. The default value is `"'. "quote_type", if provided, is
+    used to determine how the output fields are quoted. Valid values are given
+    below. For example, the array: a[1]="foo"; a[2]="bar,quux"; a[3]="blah\"baz"
+    when called with create_line(a, 3), will return: "foo","bar,quux","blah""baz"
+    note: expects a non-sparse array. empty or unset values will become
+    empty fields
+    Valid values for "quote_type":
+      "t": Quote all strings, do not quote numbers. This is the default
+      "a": Quote all fields
+      "m": Only quote fields with commas or quote characters in them
+
+  qsplit(string, array [, sep [, qualifier] ])
+    a version of split() designed for CSV-like data. splits "string" on "sep"
+    (,) if not provided, into array[1], array[2], ... array[n]. returns "n", or
+    "-1 * n" if the line is incomplete (it has an uneven number of quotes). both
+    "sep" and "qualifier" will use the first character in the provided string.
+    uses "qualifier" (" if not provided) and ignores "sep" within quoted fields.
+    doubled qualifiers are considered escaped, and a single qualifier character
+    is used in its place. for example, foo,"bar,baz""blah",quux will be split as
+    such: array[1] = "foo"; array[2] = "bar,baz\"blah"; array[3] = "quux";
+
+
+
+options.awk
+
+  getopts(optstring [, longopt_array ])
+    parses options, and deletes them from ARGV. "optstring" is of the form
+    "ab:c". each letter is a possible option. if the letter is followed by a
+    colon (:), then the option requires an argument. if an argument is not
+    provided, or an invalid option is given, getopts will print the appropriate
+    error message and return "?". returns each option as it's read, and -1 when
+    no options are left. "optind" will be set to the index of the next
+    non-option argument when finished.  "optarg" will be set to the option's
+    argument, when provided. if not provided, "optarg" will be empty. "optname"
+    will be set to the current option, as provided. getopts will delete each
+    option and argument that it successfully reads, so awk will be able to treat
+    whatever's left as filenames/assignments, as usual. if provided,
+    "longopt_array" is the name of an associative array that maps long options
+    to the appropriate short option. (do not include the hyphens on either).
+    sample usage can be found in the examples dir, with gawk extensions, or in
+    the ogrep script for a POSIX example: https://github.com/e36freak/ogrep
+
+
+
+times.awk
+
+  month_to_num(month)
+    converts human readable month to the decimal representation
+    returns the number, -1 if the month doesn't exist
+
+  day_to_num(day)
+    converts human readable day to the decimal representation
+    returns the number, -1 if the day doesn't exist
+    like date +%w, sunday is 0
+
+  hr_to_sec(timestamp)
+    converts HH:MM:SS to seconds, returns -1 if invalid format
+
+  sec_to_hr(seconds)
+    converts seconds to HH:MM:SS
+
+  ms_to_hr(milliseconds)
+    converts milliseconds to a "time(1)"-similar human readable format, such
+    as 1m4.356s
+
+  add_day_suff(day_of_month)
+    prepends the appropriate suffix to "day_of_month". for example,
+    add_day_suff(1) will return "1st", and add_day_suff(22) will return "22nd"
+    returns -1 if "day_of_month" is not a positive integer
+
+
+
+colors.awk
+  set_cols(array)
+    sets the following values in "array" with tput. printing them will format
+    any text afterwards. colors and formats are:
+      bold - bold text (can be combined with a color)
+      black - black text
+      red - red text
+      green - green text
+      yellow - yellow text
+      blue - blue text
+      magenta - magenta text
+      cyan - cyan text
+      white - white text
+      reset - resets to default settings
+
+
+You can do whatever you want with this stuff, but a thanks is always appreciated
