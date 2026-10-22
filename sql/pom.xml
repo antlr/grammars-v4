@@ -27,6 +27,7 @@
         <module>postgresql</module>
         <module>snowflake</module>
         <module>sqlite</module>
+        <module>tdengine</module>
         <module>teradata</module>
         <module>trino</module>
         <module>tsql</module>
