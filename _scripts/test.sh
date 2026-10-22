@@ -336,6 +336,7 @@ do
     if [ ! -f desc.xml ]
     then
         echo No desc.xml for $testname
+        failed+=( "$testname/$target" )
         popd > /dev/null
         continue
     fi
@@ -343,6 +344,7 @@ do
     if [ "${PIPESTATUS[0]}" -ne 0 ]
     then
         echo "The desc.xml for $testname is malformed. Skipping."
+        failed+=( "$testname/$target" )
         popd > /dev/null
         continue
     fi
@@ -379,25 +381,47 @@ do
     # Generate driver source code.
 
     if [ $quiet != "true" ]; then echo "Generating driver for $testname."; fi
+    build_start=$(date +"%s")
     trgen_opts=(-t "$target" --template-sources-directory "$full_path_templates" --antlr-tool-path "$antlr4jar")
     [[ -n "$antlr_version" ]] && trgen_opts+=(--antlr-version "$antlr_version")
-    bad=$(dotnet trash gen "${trgen_opts[@]}" 2>/dev/null)
-    for i in $bad; do failed+=( "$testname/$target" ); done
+    gen_output=$(dotnet trash gen "${trgen_opts[@]}" 2>&1)
+    gen_status=$?
+    if [ "$gen_status" -ne 0 ]; then
+        echo " Build: $(thetime $(($(date +"%s") - build_start)))"
+        echo ========
+        echo "Generation of $testname for $target failed (exit $gen_status)."
+        printf '%s\n' "$gen_output"
+        echo ========
+        failed+=( "$testname/$target" )
+        popd > /dev/null
+        continue
+    fi
 
-    for d in `echo Generated-$target-* Generated-$target`
-    do
-        if [ ! -d $d ]; then continue; fi
-        if [ ! -f $d/build.sh ]; then echo " no build.sh"; continue; fi
+    generated_dirs=()
+    for d in Generated-$target-* Generated-$target; do
+        if [ -d "$d" ]; then generated_dirs+=( "$d" ); fi
+    done
+    if [ "${#generated_dirs[@]}" -eq 0 ]; then
+        echo " Build: $(thetime $(($(date +"%s") - build_start)))"
+        echo "Generation of $testname for $target produced no driver directory."
+        failed+=( "$testname/$target" )
+        popd > /dev/null
+        continue
+    fi
+
+    built_dirs=()
+    for d in "${generated_dirs[@]}"; do
+        if [ ! -f "$d/build.sh" ]; then
+            echo "No build.sh in $d."
+            failed+=( "$testname/$target" )
+            continue
+        fi
 
         # Build driver code.
         if [ $quiet != "true" ]; then echo "Building."; fi
-        pushd $d > /dev/null
-        date1=$(date +"%s")
+        pushd "$d" > /dev/null
         bash build.sh > output.txt 2>&1
         status="$?"
-        date2=$(date +"%s")
-        DIFF=$(($date2-$date1))
-        length=" Build "`thetime $DIFF`
         if [ "$status" != "0" ]
         then
             echo ""
@@ -406,14 +430,17 @@ do
             cat output.txt
             failed+=( "$testname/$target" )
             echo ========
-            popd > /dev/null
-            continue
         else
-            echo "$length"
+            built_dirs+=( "$d" )
         fi
+        popd > /dev/null
+    done
+    echo " Build: $(thetime $(($(date +"%s") - build_start)))"
 
+    for d in "${built_dirs[@]}"; do
         # Test generated parser on examples.
         if [ $quiet != "true" ]; then echo "Parsing."; fi
+        pushd "$d" > /dev/null
         date1=$(date +"%s")
         bash test.sh > output.txt 2>&1
         status="$?"
@@ -439,7 +466,7 @@ do
     popd > /dev/null
 done
 
-if [[ "$failed" == "" ]]
+if [ "${#failed[@]}" -eq 0 ]
 then
     exit 0
 else
