@@ -347,6 +347,7 @@
 				<module>racket-isl</module>
                 <module>rapid</module>
 				<module>rcs</module>
+                <module>reaper</module>
 				<module>redcode</module>
 				<module>refal</module>
 				<module>rego</module>
