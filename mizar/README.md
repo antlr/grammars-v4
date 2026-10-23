@@ -1,7 +1,14 @@
-# Arithmetic Grammar
+# Mizar Grammar
 
-A simple ANTLR4 grammar for arithmetic.  
+An ANTLR4 grammar for [Mizar](http://mizar.org/), the formal mathematics
+language and proof-checking system.
 
-This grammar supports the basic addition, subtraction, multiplication, division
-and exponent operations. Floating point numbers using scientific notation 
-are supported as well as variable names consisting of letters.
+## Source
+The grammar is transcribed from the official
+["Grammar of Mizar"](https://mizar.uwb.edu.pl/language/syntax.html),
+version 7.4.01, February 10, 2005, by Grzegorz Bancerek.
+
+Note that `Symbol`, `Identifier`, `Numeral`, and `File-Name` are left as
+undefined "system terms" by that reference (their lexical form is resolved
+by the vocabulary files a real article imports, not by the grammar itself),
+so this grammar gives them pragmatic lexical definitions of its own.

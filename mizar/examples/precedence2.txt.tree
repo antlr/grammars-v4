@@ -1,1 +1,0 @@
-(equation (expression (atom (variable a))) (relop =) (expression (expression ( (expression (expression (atom (scientific 234))) ^ (expression (atom (scientific 4.23)))) )) / (expression (atom (scientific 345)))))

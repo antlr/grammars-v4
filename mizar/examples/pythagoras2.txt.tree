@@ -1,1 +1,0 @@
-(equation (expression (expression (atom (variable z))) ^ (expression (atom (scientific 2)))) (relop =) (expression (expression (expression (atom (variable a))) ^ (expression (atom (scientific 2)))) + (expression (expression (atom (variable b))) ^ (expression (atom (scientific 2))))))

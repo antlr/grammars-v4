@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2020, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved;
 
 Redistribution and  in source and binary forms, with or without
@@ -29,10 +29,13 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE;
 */
+
+// Transcribed from "Grammar of Mizar", version 7.4.01, February 10, 2005,
+// by Grzegorz Bancerek: https://mizar.uwb.edu.pl/language/syntax.html
 grammar mizar;
 
 article
-   : environmentDeclaration textProper
+   : environmentDeclaration textProper '.'
    ;
 
 environmentDeclaration
@@ -54,7 +57,7 @@ vocabularyName
    ;
 
 libraryDirective
-   : ('notations' | 'constructors' | 'registrations' | 'definitions' | 'expansions' | 'equalities' | 'theorems' | 'schemes') articleName (',' articleName)* ';'
+   : ('notations' | 'constructors' | 'registrations' | 'definitions' | 'theorems' | 'schemes') articleName (',' articleName)* ';'
    ;
 
 articleName
@@ -85,6 +88,7 @@ textItem
    | theorem
    | schemeItem
    | auxiliaryItem
+   | canceledTheorem
    ;
 
 reservation
@@ -112,11 +116,15 @@ notationItem
    ;
 
 definitionalBlock
-   : 'definition' ((definitionItem | definition | redefinition))* 'end'
+   : 'definition' ((definitionItem | definition))* (redefinitionBlock)? 'end'
+   ;
+
+redefinitionBlock
+   : 'redefine' ((definitionItem | definition))*
    ;
 
 registrationBlock
-   : 'registration' ((lociDeclaration | clusterRegistration | identifyRegistration | propertyRegistration | reductionRegistration | auxiliaryItem))* 'end'
+   : 'registration' ((lociDeclaration | clusterRegistration))* 'end'
    ;
 
 notationBlock
@@ -139,7 +147,7 @@ notationDeclaration
    ;
 
 lociDeclaration
-   : 'let' qualifiedVariables ('such' conditions) ';'
+   : 'let' qualifiedVariables ('such' conditions)? ';'
    ;
 
 permissiveAssumption
@@ -152,14 +160,11 @@ definition
    | functorDefinition
    | predicateDefinition
    | attributeDefinition
-   ;
-
-redefinition
-   : 'redefine' (modeDefinition | functorDefinition | predicateDefinition | attributeDefinition)
+   | canceledDefinition
    ;
 
 structureDefinition
-   : 'struct' ('(' ancestors ')') structureSymbol ('over' loci) '(#' fields '#)' ';'
+   : 'struct' ('(' ancestors ')')? structureSymbol ('over' loci)? '(#' fields '#)' ';'
    ;
 
 ancestors
@@ -199,7 +204,7 @@ specification
    ;
 
 modeDefinition
-   : 'mode' modePattern ((specification)? ('means' definiens)? ';' correctnessConditions | 'is' typeExpression ';') (modeProperty)*
+   : 'mode' modePattern ((specification)? ('means' definiens)? ';' correctnessConditions | 'is' typeExpression ';')
    ;
 
 modePattern
@@ -208,7 +213,6 @@ modePattern
 
 modeSymbol
    : symbol
-   | 'set'
    ;
 
 modeSynonym
@@ -240,10 +244,6 @@ partialDefiniens
    : (sentence | termExpression) 'if' sentence
    ;
 
-modeProperty
-   : 'sethood' justification ';'
-   ;
-
 functorDefinition
    : 'func' functorPattern (specification)? (('means' | 'equals') definiens)? ';' correctnessConditions (functorProperty)*
    ;
@@ -272,18 +272,14 @@ functorSymbol
 
 leftFunctorBracket
    : symbol
-   | '{'
-   | '['
    ;
 
 rightFunctorBracket
    : symbol
-   | '}'
-   | ']'
    ;
 
 predicateDefinition
-   : 'pred' predicatePattern ('means' definiens)? ';' correctnessConditions (predicateProperty)*
+   : 'pred' predicatePattern ('means' definiens)? ';' ('correctness' justification ';')? (predicateProperty)*
    ;
 
 predicatePattern
@@ -304,32 +300,30 @@ predicateAntonym
 
 predicateSymbol
    : symbol
-   | '='
    ;
 
 attributeDefinition
-   : 'attr' attributePattern 'means' definiens ';' correctnessConditions
+   : 'attr' attributePattern 'means' definiens ';' ('correctness' justification ';')?
    ;
 
 attributePattern
-   : locus 'is' (attributeLoci)? attributeSymbol
+   : locus 'is' attributeSymbol
    ;
 
 attributeSynonym
-   : 'synonym' attributePattern 'for' attributePattern ';'
+   : 'synonym' (attributePattern | predicatePattern) 'for' attributePattern ';'
    ;
 
 attributeAntonym
-   : 'antonym' attributePattern 'for' attributePattern ';'
+   : 'antonym' (attributePattern | predicatePattern) 'for' attributePattern ';'
    ;
 
 attributeSymbol
    : symbol
    ;
 
-attributeLoci
-   : loci
-   | '(' loci ')'
+canceledDefinition
+   : 'canceled' (numeral)? ';'
    ;
 
 clusterRegistration
@@ -339,7 +333,7 @@ clusterRegistration
    ;
 
 existentialRegistration
-   : 'cluster' adjectiveCluster 'for' typeExpression ';' correctnessConditions
+   : 'cluster' adjectiveCluster typeExpression ';' correctnessConditions
    ;
 
 adjectiveCluster
@@ -347,27 +341,15 @@ adjectiveCluster
    ;
 
 adjective
-   : ('non')? (adjectiveArguments)? attributeSymbol
+   : ('non')? attributeSymbol
    ;
 
 conditionalRegistration
-   : 'cluster' adjectiveCluster '->' adjectiveCluster 'for' typeExpression ';' correctnessConditions
+   : 'cluster' adjectiveCluster '->' adjectiveCluster typeExpression ';' correctnessConditions
    ;
 
 functorialRegistration
-   : 'cluster' termExpression '->' adjectiveCluster ('for' typeExpression)? ';' correctnessConditions
-   ;
-
-identifyRegistration
-   : 'identify' functorPattern 'with' functorPattern ('when' locus '=' locus (',' locus '=' locus)*)? ';' correctnessConditions
-   ;
-
-propertyRegistration
-   : 'sethood' 'of' typeExpression justification ';'
-   ;
-
-reductionRegistration
-   : 'reduce' termExpression 'to' termExpression ';' correctnessConditions
+   : 'cluster' termExpression '->' adjectiveCluster ';' correctnessConditions
    ;
 
 correctnessConditions
@@ -375,7 +357,7 @@ correctnessConditions
    ;
 
 correctnessCondition
-   : ('existence' | 'uniqueness' | 'coherence' | 'compatibility' | 'consistency' | 'reducibility') justification ';'
+   : ('existence' | 'uniqueness' | 'coherence' | 'compatibility' | 'consistency') justification ';'
    ;
 
 theorem
@@ -387,7 +369,7 @@ schemeItem
    ;
 
 schemeBlock
-   : 'scheme' schemeIdentifier '{' schemeParameters '}' ':' schemeConclusion ('provided' schemePremise ('and' schemePremise)*)? ('proof' | ';') reasoning 'end'
+   : 'scheme' schemeIdentifier '{' schemeParameters '}' ':' schemeConclusion ('provided' schemePremise ('and' schemePremise)*)? 'proof' (reasoningItem)* 'end'
    ;
 
 schemeIdentifier
@@ -432,6 +414,10 @@ auxiliaryItem
    | privateDefinition
    ;
 
+canceledTheorem
+   : 'canceled' (numeral)? ';'
+   ;
+
 privateDefinition
    : constantDefinition
    | privateFunctorDefinition
@@ -447,15 +433,15 @@ equatingList
    ;
 
 equating
-   : variableIdentifier ':' termExpression
+   : variableIdentifier '=' termExpression
    ;
 
 privateFunctorDefinition
-   : 'deffunc' privateFunctorPattern ':' termExpression ';'
+   : 'deffunc' privateFunctorPattern '=' termExpression
    ;
 
 privatePredicateDefinition
-   : 'defpred' privatePredicatePattern 'means' sentence ';'
+   : 'defpred' privatePredicatePattern 'means' sentence
    ;
 
 privateFunctorPattern
@@ -467,7 +453,7 @@ privatePredicatePattern
    ;
 
 reasoning
-   : (reasoningItem)* (('then')? 'per' 'cases' simpleJustification ';' (caseList | supposeList))?
+   : (reasoningItem)* ('per' 'cases' simpleJustification ';' (caseList | supposeList))?
    ;
 
 caseList
@@ -475,7 +461,7 @@ caseList
    ;
 
 case
-   : 'case' (proposition | conditions) ';' reasoning 'end' ';'
+   : 'case' (proposition | conditions) ';' (reasoningItem)* 'end' ';'
    ;
 
 supposeList
@@ -483,7 +469,7 @@ supposeList
    ;
 
 suppose
-   : 'suppose' (proposition | conditions) ';' reasoning 'end' ';'
+   : 'suppose' (proposition | conditions) ';' (reasoningItem)* 'end' ';'
    ;
 
 reasoningItem
@@ -521,12 +507,12 @@ existentialAssumption
    ;
 
 conclusion
-   : ('thus' | 'hence') (compactStatement | iterativeEquality)
-   | diffConclusion
+   : ('thus' | 'hence') compactStatement
+   | diffuseConclusion
    ;
 
-diffConclusion
-   : 'thus' diffStatement
+diffuseConclusion
+   : 'thus' diffuseStatement
    | 'hereby' reasoning 'end' ';'
    ;
 
@@ -541,7 +527,7 @@ example
 
 statement
    : ('then')? linkableStatement
-   | diffStatement
+   | diffuseStatement
    ;
 
 linkableStatement
@@ -556,7 +542,7 @@ compactStatement
    ;
 
 choiceStatement
-   : 'consider' qualifiedVariables 'such' conditions simpleJustification ';'
+   : 'consider' qualifiedVariables ('such' conditions)? simpleJustification ';'
    ;
 
 typeChangingStatement
@@ -568,10 +554,10 @@ typeChangeList
    ;
 
 iterativeEquality
-   : (labelIdentifier ':')? termExpression '=' termExpression simpleJustification ';=' termExpression simpleJustification (';=' termExpression simpleJustification)* ';'
+   : termExpression '=' termExpression simpleJustification ('.=' termExpression simpleJustification)+ ';'
    ;
 
-diffStatement
+diffuseStatement
    : (labelIdentifier ':')? 'now' reasoning 'end' ';'
    ;
 
@@ -586,7 +572,7 @@ simpleJustification
    ;
 
 proof
-   : 'proof' reasoning 'end'
+   : ('proof' | '@proof') reasoning 'end'
    ;
 
 straightforwardJustification
@@ -656,9 +642,7 @@ formulaExpression
    | atomicFormulaExpression
    | quantifiedFormulaExpression
    | formulaExpression '&' formulaExpression
-   | formulaExpression '&' ';;;' '&' formulaExpression
    | formulaExpression 'or' formulaExpression
-   | formulaExpression 'or' ';;;' 'or' formulaExpression
    | formulaExpression 'implies' formulaExpression
    | formulaExpression 'iff' formulaExpression
    | 'not' formulaExpression
@@ -667,8 +651,8 @@ formulaExpression
    ;
 
 atomicFormulaExpression
-   : (termExpressionList)? (('does' | 'do') 'not')? predicateSymbol (termExpressionList)? ((('does' | 'do') 'not')? predicateSymbol termExpressionList)*
-   | predicateIdentifier '[' (termExpressionList) ')'
+   : (termExpressionList)? predicateSymbol (termExpressionList)?
+   | predicateIdentifier '[' (termExpressionList)? ']'
    | termExpression 'is' adjective (adjective)*
    | termExpression 'is' typeExpression
    ;
@@ -704,52 +688,61 @@ qualification
    : ('being' | 'be') typeExpression
    ;
 
+// The reference's "Adjective-Cluster Type-Expression" alternative is nullable on
+// the left (Adjective-Cluster = {Adjective}), which would make this indirectly
+// left-recursive through zero consumed tokens; ANTLR4 can't rewrite that away
+// automatically (only direct self-recursion), so it's tightened to "one or more"
+// adjectives here, which denotes the same language (the zero-adjective case is
+// already covered by falling through to radixType).
 typeExpression
-   : '(' radixType ')'
-   | adjectiveCluster typeExpression
+   : '(' typeExpression ')'
+   | (adjective)+ typeExpression
    | radixType
    ;
 
 structureTypeExpression
-   : '(' structureSymbol ('over' termExpressionList) ')'
-   | adjectiveCluster structureSymbol ('over' termExpressionList)
+   : '(' structureTypeExpression ')'
+   | adjectiveCluster structureSymbol ('over' termExpressionList)?
    ;
 
 radixType
-   : modeSymbol ('of' termExpressionList)
-   | structureSymbol ('over' termExpressionList)
+   : modeSymbol ('of' termExpressionList)?
+   | structureSymbol ('over' termExpressionList)?
    ;
 
 typeExpressionList
    : typeExpression (',' typeExpression)*
    ;
 
+// The reference's "[Arguments] Functor-Symbol [Arguments]" alternative is
+// indirectly left-recursive (Arguments = Term-Expression | '(' ... ')'), which
+// ANTLR4 rejects as mutual left recursion across two rules (it only auto-rewrites
+// *direct* self-recursion within one rule). The leading-argument case is split
+// out here into its two shapes (bare term-expression, now directly
+// left-recursive and so handled automatically; parenthesized list, which starts
+// with a literal token and so isn't left-recursive) so it compiles; the trailing
+// optional argument keeps using the unchanged `arguments` rule, since recursion
+// there isn't at the start of the alternative.
 termExpression
    : '(' termExpression ')'
-   | (arguments) functorSymbol (arguments)
+   | termExpression functorSymbol (arguments)?
+   | '(' termExpressionList ')' functorSymbol (arguments)?
+   | functorSymbol (arguments)?
    | leftFunctorBracket termExpressionList rightFunctorBracket
-   | functorIdentifier '(' (termExpressionList) ')'
+   | functorIdentifier '(' (termExpressionList)? ')'
    | structureSymbol '(#' termExpressionList '#)'
-   | 'the' structureSymbol 'of' termExpression
    | variableIdentifier
-   | '{' termExpression (postqualification)* ':' sentence '}'
-   | 'the' 'set' 'of' 'all' termExpression (postqualification)*
+   | '{' termExpression (postqualification)? ':' sentence '}'
    | numeral
    | termExpression 'qua' typeExpression
    | 'the' selectorSymbol 'of' termExpression
    | 'the' selectorSymbol
-   | 'the' typeExpression
    | privateDefinitionParameter
    | 'it'
    ;
 
 arguments
    : termExpression
-   | '(' termExpressionList ')'
-   ;
-
-adjectiveArguments
-   : termExpressionList
    | '(' termExpressionList ')'
    ;
 
@@ -762,7 +755,7 @@ postqualification
    ;
 
 postqualifyingSegment
-   : postqualifiedVariable (',' postqualifiedVariable)* (('is' | 'are') typeExpression)
+   : postqualifiedVariable (',' postqualifiedVariable)* ('is' | 'are') typeExpression
    ;
 
 postqualifiedVariable
@@ -785,12 +778,19 @@ symbol
    : SYMBOL
    ;
 
+// Symbol, like Identifier, Numeral and File-Name, is left undefined by the
+// reference as a "system term" (its lexical form is determined by the
+// vocabulary files a real article imports, which is outside the scope of a
+// context-free grammar). To keep it lexically distinguishable from IDENTIFIER
+// without ambiguity, it's defined here as a run of special characters that
+// doesn't overlap with any multi-character literal used elsewhere in the
+// grammar ('->', '(#', '#)').
 SYMBOL
-   : '!'
+   : [+*/<=~^&|@%!?]+
    ;
 
 IDENTIFIER
-   : [a-zA-Z] [a-zA-Z]*
+   : [a-zA-Z] [a-zA-Z0-9_]*
    ;
 
 NUMERAL
@@ -813,4 +813,3 @@ privateDefinitionParameter
 WS
    : [ \r\n\t]+ -> skip
    ;
-
