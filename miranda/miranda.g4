@@ -103,7 +103,7 @@ exp
    | INFIX
    ;
 
-exp_list
+exp_seq
    : exp (',' exp)*
    ;
 
@@ -120,21 +120,21 @@ e1
    ;
 
 construct
-   : constructor argtype*
-   | type '$' constructor type
+   : data_constructor argtype*
+   | type '$' data_constructor type
    | '(' construct ')' argtype*
    ;
 
 simple
    : var
-   | constructor
+   | data_constructor
    | literal
    | 'readvals'
    | 'show'
    | '(' INFIX1 e1 ')'
    | '(' e1 (INFIX1 | INFIX) ')'
-   | '(' exp_list? ')'
-   | '[' exp_list? ']'
+   | '(' exp_seq? ')'
+   | '[' exp_seq? ']'
    | '[' exp ('..' exp?)? ']'
    | '[' exp ',' exp '..' exp? ']'
    | '[' exp '|' qualifs ']'
@@ -200,10 +200,10 @@ var_list
 pat
    : formal
    | INFIX numeral
-   | constructor formal*
+   | data_constructor formal*
    | pat INFIX1 pat
    | pat INFIX1 NAT
-   | pat '$' constructor pat
+   | pat '$' data_constructor pat
    | '(' pat ')' formal*
    ;
 
@@ -211,7 +211,7 @@ pat_list
    : pat (',' pat)*
    ;
 
-constructor
+data_constructor
    : IDENTIFIER
    ;
 
@@ -221,7 +221,7 @@ typename
 
 formal
    : var
-   | constructor
+   | data_constructor
    | literal1
    | '(' pat_list? ')'
    | '[' pat_list? ']'
