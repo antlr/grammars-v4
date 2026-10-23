@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2022, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,15 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// A grammar for HAL/S, following the BNF working grammar (Appendix G) of the
+
+
+// HAL/S Language Specification (PASS 32.0/BFS 17.0, USA003088):
+
+
+// https://web.archive.org/web/20090226213557/http://klabs.org/richcontent/software_content/hal_s/hal-s_language_specification.pdf
+
 grammar hals;
 
 compilation
@@ -44,9 +53,9 @@ compile_list
 arith_exp
    : term
    | '+' term
-   | '-1' term
+   | '-' term
    | arith_exp '+' term
-   | arith_exp '-1' term
+   | arith_exp '-' term
    ;
 
 term
@@ -74,11 +83,20 @@ pre_primary
    : '(' arith_exp ')'
    | number
    | compound_number
+   | arith_func_head '(' call_list ')'
+   ;
+
+compound_number
+   : '(' number (',' number)* ')'
    ;
 
 arith_func_head
    : arith_func
    | arith_conv subscript
+   ;
+
+arith_func
+   : identifier
    ;
 
 arith_conv
@@ -90,14 +108,7 @@ arith_conv
 
 primary
    : arith_var
-   ;
-
-pre_primary
-   : arith_func_head '(' call_list ')'
-   ;
-
-primary
-   : modified_arith_func
+   | modified_arith_func
    | arith_unline_def block_body closing ';'
    | pre_primary
    | pre_primary qualifier
@@ -131,7 +142,7 @@ basic_statement
    | call_key ';'
    | call_key '(' call_list ')' ';'
    | call_key assign '(' call_assign_list ')' ';'
-   | call_key (call_list) assign '(' call_assign_list ')' ';'
+   | call_key '(' call_list ')' assign '(' call_assign_list ')' ';'
    | RETURN ';'
    | RETURN expression ';'
    | do_group_head ending ';'
@@ -158,6 +169,10 @@ basic_statement
    | OFF ERROR subscript ';'
    | pct_macro_name ';'
    | pct_macro_head pct_macro_arg ')' ';'
+   ;
+
+pct_macro_name
+   : PCT_NAME
    ;
 
 pct_macro_head
@@ -187,6 +202,10 @@ bit_func_head
    | BIT sub_or_qualifier
    ;
 
+bit_func
+   : identifier
+   ;
+
 bit_cat
    : bit_prim
    | bit_cat cat bit_prim
@@ -209,8 +228,8 @@ relational_op
    | not '='
    | '<'
    | '>'
-   | '< ='
-   | '> ='
+   | '<='
+   | '>='
    | not '<'
    | not '>'
    ;
@@ -251,6 +270,10 @@ char_prim
 char_func_head
    : char_func
    | CHARACTER sub_or_qualifier
+   ;
+
+char_func
+   : identifier
    ;
 
 sub_or_qualifier
@@ -396,6 +419,10 @@ struct_func_head
    : struct_func
    ;
 
+struct_func
+   : identifier
+   ;
+
 list_exp
    : expression
    | arith_exp '#' expression
@@ -450,6 +477,22 @@ modified_struct_func
    : prefix no_arg_struct_func subscript
    ;
 
+no_arg_arith_func
+   : identifier
+   ;
+
+no_arg_bit_func
+   : identifier
+   ;
+
+no_arg_char_func
+   : identifier
+   ;
+
+no_arg_struct_func
+   : identifier
+   ;
+
 structure_var
    : qual_struct subscript
    ;
@@ -467,12 +510,36 @@ bit_var
    ;
 
 event_var
-   : prefix event subscript
+   : prefix event_name subscript
+   ;
+
+arith_id
+   : identifier
+   ;
+
+char_id
+   : identifier
+   ;
+
+bit_id
+   : identifier
+   ;
+
+event_name
+   : identifier
+   ;
+
+structure_id
+   : identifier
+   ;
+
+struct_template
+   : identifier
    ;
 
 qual_struct
    : structure_id
-   | qual_struct . structure_id
+   | qual_struct '.' structure_id
    ;
 
 prefix
@@ -496,17 +563,13 @@ subscript
    | empty
    ;
 
-sub_start
+sub_head
    : dollar '('
    | dollar '(' '@' prec_spec ','
    | sub_head ';'
    | sub_head ':'
    | sub_head ','
-   ;
-
-sub_head
-   : sub_start
-   | sub_start sub
+   | sub_head sub
    ;
 
 sub
@@ -528,7 +591,7 @@ sub_exp
 hash_expression
    : '#'
    | hash_expression '+' term
-   | hash_expression '-1' term
+   | hash_expression '-' term
    ;
 
 eq
@@ -550,7 +613,8 @@ or
    ;
 
 not
-   : 'squiggly thing'
+   : '¬'
+   | '~'
    | NOT
    ;
 
@@ -600,7 +664,7 @@ char_const
    ;
 
 io_control
-   : SKIP '(' arith_exp ')'
+   : SKIP_IO '(' arith_exp ')'
    | TAB '(' arith_exp ')'
    | COLUMN '(' arith_exp ')'
    | LINE '(' arith_exp ')'
@@ -737,11 +801,11 @@ declare_element
    : declare_statement
    | replace_stmt
    | structure_stmt
-   | EQUATE EXTERNAL identifier TO variable
+   | EQUATE EXTERNAL identifier TO variable ';'
    ;
 
 replace_stmt
-   : REPLACE replace_head BY text
+   : REPLACE replace_head BY text ';'
    ;
 
 replace_head
@@ -754,12 +818,16 @@ arg_list
    | arg_list ',' identifier
    ;
 
+text
+   : expression
+   ;
+
 temporary_stmt
-   : TEMPORARY declare_body
+   : TEMPORARY declare_body ';'
    ;
 
 declare_statement
-   : DECLARE declare_body
+   : DECLARE declare_body ';'
    ;
 
 declare_body
@@ -769,11 +837,7 @@ declare_body
 
 declaration_list
    : declaration
-   | dcl_list declaration
-   ;
-
-dcl_list
-   : declaration_list ','
+   | declaration_list ',' declaration
    ;
 
 declare_group
@@ -944,6 +1008,14 @@ number
    | level
    ;
 
+simple_number
+   : NUMBER
+   ;
+
+level
+   : NUMBER
+   ;
+
 closing
    : CLOSE
    | CLOSE label
@@ -1007,15 +1079,432 @@ char_string
    ;
 
 label
-   : IDENTIFER
+   : IDENTIFIER
+   ;
+
+empty
+   :
    ;
 
 STRING
-   : '\'' ~ '\''* '\''
+   : '\'' (~ '\'' | '\'\'')* '\''
    ;
 
-IDENTIFER
-   : [a-zA-Z] [a-zA-Z0-9]*
+NUMBER
+   : DIGITS ('.' DIGITS?)? EXPONENT*
+   | '.' DIGITS EXPONENT*
+   ;
+
+fragment DIGITS
+   : [0-9]+
+   ;
+
+fragment EXPONENT
+   : [BEH] [+-]? DIGITS
+   ;
+
+PCT_NAME
+   : '%' [a-zA-Z_] [a-zA-Z0-9_]*
+   ;
+
+ACCESS
+   : 'ACCESS'
+   ;
+
+AFTER
+   : 'AFTER'
+   ;
+
+ALIGNED
+   : 'ALIGNED'
+   ;
+
+AND
+   : 'AND'
+   ;
+
+ARRAY
+   : 'ARRAY'
+   ;
+
+ASSIGN
+   : 'ASSIGN'
+   ;
+
+AT
+   : 'AT'
+   ;
+
+AUTOMATIC
+   : 'AUTOMATIC'
+   ;
+
+BIN
+   : 'BIN'
+   ;
+
+BIT
+   : 'BIT'
+   ;
+
+BOOLEAN
+   : 'BOOLEAN'
+   ;
+
+BY
+   : 'BY'
+   ;
+
+CALL
+   : 'CALL'
+   ;
+
+CANCEL
+   : 'CANCEL'
+   ;
+
+CASE
+   : 'CASE'
+   ;
+
+CAT
+   : 'CAT'
+   ;
+
+CHAR
+   : 'CHAR'
+   ;
+
+CHARACTER
+   : 'CHARACTER'
+   ;
+
+CLOSE
+   : 'CLOSE'
+   ;
+
+COLUMN
+   : 'COLUMN'
+   ;
+
+COMPOOL
+   : 'COMPOOL'
+   ;
+
+CONSTANT
+   : 'CONSTANT'
+   ;
+
+DEC
+   : 'DEC'
+   ;
+
+DECLARE
+   : 'DECLARE'
+   ;
+
+DENSE
+   : 'DENSE'
+   ;
+
+DEPENDENT
+   : 'DEPENDENT'
+   ;
+
+DO
+   : 'DO'
+   ;
+
+DOUBLE
+   : 'DOUBLE'
+   ;
+
+ELSE
+   : 'ELSE'
+   ;
+
+END
+   : 'END'
+   ;
+
+EQUATE
+   : 'EQUATE'
+   ;
+
+ERROR
+   : 'ERROR'
+   ;
+
+EVENT
+   : 'EVENT'
+   ;
+
+EVERY
+   : 'EVERY'
+   ;
+
+EXCLUSIVE
+   : 'EXCLUSIVE'
+   ;
+
+EXIT
+   : 'EXIT'
+   ;
+
+EXPRESSION
+   : 'EXPRESSION'
+   ;
+
+EXTERNAL
+   : 'EXTERNAL'
+   ;
+
+FALSE
+   : 'FALSE'
+   ;
+
+FILE
+   : 'FILE'
+   ;
+
+FOR
+   : 'FOR'
+   ;
+
+FUNCTION
+   : 'FUNCTION'
+   ;
+
+GO
+   : 'GO'
+   ;
+
+HEX
+   : 'HEX'
+   ;
+
+IF
+   : 'IF'
+   ;
+
+IGNORE
+   : 'IGNORE'
+   ;
+
+IN
+   : 'IN'
+   ;
+
+INITIAL
+   : 'INITIAL'
+   ;
+
+INTEGER
+   : 'INTEGER'
+   ;
+
+LATCHED
+   : 'LATCHED'
+   ;
+
+LINE
+   : 'LINE'
+   ;
+
+LOCK
+   : 'LOCK'
+   ;
+
+MATRIX
+   : 'MATRIX'
+   ;
+
+NAME
+   : 'NAME'
+   ;
+
+NONHAL
+   : 'NONHAL'
+   ;
+
+NOT
+   : 'NOT'
+   ;
+
+NULL
+   : 'NULL'
+   ;
+
+OCT
+   : 'OCT'
+   ;
+
+OFF
+   : 'OFF'
+   ;
+
+ON
+   : 'ON'
+   ;
+
+OR
+   : 'OR'
+   ;
+
+PAGE
+   : 'PAGE'
+   ;
+
+PRIORITY
+   : 'PRIORITY'
+   ;
+
+PROCEDURE
+   : 'PROCEDURE'
+   ;
+
+PROGRAM
+   : 'PROGRAM'
+   ;
+
+READ
+   : 'READ'
+   ;
+
+READALL
+   : 'READALL'
+   ;
+
+REENTRANT
+   : 'REENTRANT'
+   ;
+
+REMOTE
+   : 'REMOTE'
+   ;
+
+REPEAT
+   : 'REPEAT'
+   ;
+
+REPLACE
+   : 'REPLACE'
+   ;
+
+RESET
+   : 'RESET'
+   ;
+
+RETURN
+   : 'RETURN'
+   ;
+
+RIGID
+   : 'RIGID'
+   ;
+
+SCALAR
+   : 'SCALAR'
+   ;
+
+SCHEDULE
+   : 'SCHEDULE'
+   ;
+
+SEND
+   : 'SEND'
+   ;
+
+SET
+   : 'SET'
+   ;
+
+SIGNAL
+   : 'SIGNAL'
+   ;
+
+SINGLE
+   : 'SINGLE'
+   ;
+
+SKIP_IO
+   : 'SKIP'
+   ;
+
+STATIC
+   : 'STATIC'
+   ;
+
+STRUCTURE
+   : 'STRUCTURE'
+   ;
+
+SUBBIT
+   : 'SUBBIT'
+   ;
+
+SYSTEM
+   : 'SYSTEM'
+   ;
+
+TAB
+   : 'TAB'
+   ;
+
+TASK
+   : 'TASK'
+   ;
+
+TEMPORARY
+   : 'TEMPORARY'
+   ;
+
+TERMINATE
+   : 'TERMINATE'
+   ;
+
+THEN
+   : 'THEN'
+   ;
+
+TO
+   : 'TO'
+   ;
+
+TRUE
+   : 'TRUE'
+   ;
+
+UNTIL
+   : 'UNTIL'
+   ;
+
+UPDATE
+   : 'UPDATE'
+   ;
+
+VECTOR
+   : 'VECTOR'
+   ;
+
+WAIT
+   : 'WAIT'
+   ;
+
+WHILE
+   : 'WHILE'
+   ;
+
+WRITE
+   : 'WRITE'
+   ;
+
+IDENTIFIER
+   : [a-zA-Z] ([a-zA-Z0-9] | '_' [a-zA-Z0-9])*
+   ;
+
+COMMENT
+   : '/*' .*? '*/' -> skip
    ;
 
 WS
