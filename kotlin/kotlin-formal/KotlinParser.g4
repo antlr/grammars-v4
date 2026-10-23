@@ -2,17 +2,23 @@
  * Kotlin Grammar for ANTLR v4
  *
  * Based on:
- * http://jetbrains.github.io/kotlin-spec/#_grammars_and_parsing
+ * jetbrains.github.io/kotlin-spec/#_grammars_and_parsing
  * and
- * http://kotlinlang.org/docs/reference/grammar.html
+ * kotlinlang.org/docs/reference/grammar.html
  *
  * Tested on
- * https://github.com/JetBrains/kotlin/tree/master/compiler/testData/psi
+ * github.com/JetBrains/kotlin/tree/master/compiler/testData/psi
+ * (stale link)
  */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
 
 parser grammar KotlinParser;
 
-options { tokenVocab = KotlinLexer; }
+options {
+    tokenVocab = KotlinLexer;
+}
 
 kotlinFile
     : shebangLine? NL* fileAnnotation* packageHeader importList topLevelObject* EOF
@@ -47,11 +53,12 @@ topLevelObject
     ;
 
 classDeclaration
-    : modifiers? ('class' | 'interface') NL* simpleIdentifier
-    (NL* typeParameters)? (NL* primaryConstructor)?
-    (NL* ':' NL* delegationSpecifiers)?
-    (NL* typeConstraints)?
-    (NL* classBody | NL* enumClassBody)?
+    : modifiers? ('class' | 'interface') NL* simpleIdentifier (NL* typeParameters)? (
+        NL* primaryConstructor
+    )? (NL* ':' NL* delegationSpecifiers)? (NL* typeConstraints)? (
+        NL* classBody
+        | NL* enumClassBody
+    )?
     ;
 
 primaryConstructor
@@ -130,12 +137,9 @@ enumEntry
     ;
 
 functionDeclaration
-    : modifiers?
-    'fun' (NL* typeParameters)? (NL* receiverType NL* '.')? NL* simpleIdentifier
-    NL* functionValueParameters
-    (NL* ':' NL* type_)?
-    (NL* typeConstraints)?
-    (NL* functionBody)?
+    : modifiers? 'fun' (NL* typeParameters)? (NL* receiverType NL* '.')? NL* simpleIdentifier NL* functionValueParameters (
+        NL* ':' NL* type_
+    )? (NL* typeConstraints)? (NL* functionBody)?
     ;
 
 functionValueParameters
@@ -160,27 +164,22 @@ functionBody
     ;
 
 objectDeclaration
-    : modifiers? 'object'
-    NL* simpleIdentifier
-    (NL* ':' NL* delegationSpecifiers)?
-    (NL* classBody)?
+    : modifiers? 'object' NL* simpleIdentifier (NL* ':' NL* delegationSpecifiers)? (NL* classBody)?
     ;
 
 companionObject
-    : modifiers? 'companion' NL* 'object'
-    (NL* simpleIdentifier)?
-    (NL* ':' NL* delegationSpecifiers)?
-    (NL* classBody)?
+    : modifiers? 'companion' NL* 'object' (NL* simpleIdentifier)? (
+        NL* ':' NL* delegationSpecifiers
+    )? (NL* classBody)?
     ;
 
 propertyDeclaration
-    : modifiers? ('val' | 'var')
-    (NL* typeParameters)?
-    (NL* receiverType NL* '.')?
-    (NL* (multiVariableDeclaration | variableDeclaration))
-    (NL* typeConstraints)?
-    (NL* ('=' NL* expression | propertyDelegate))?
-    (NL+ ';')? NL* (getter? (NL* semi? setter)? | setter? (NL* semi? getter)?)
+    : modifiers? ('val' | 'var') (NL* typeParameters)? (NL* receiverType NL* '.')? (
+        NL* (multiVariableDeclaration | variableDeclaration)
+    ) (NL* typeConstraints)? (NL* ('=' NL* expression | propertyDelegate))? (NL+ ';')? NL* (
+        getter? (NL* semi? setter)?
+        | setter? (NL* semi? getter)?
+    )
     /*
         XXX: actually, it's not that simple. You can put semi only on the same line as getter, but any other semicolons
         between property and getter are forbidden
@@ -207,7 +206,9 @@ getter
 
 setter
     : modifiers? 'set'
-    | modifiers? 'set' NL* '(' (annotation | parameterModifier)* setterParameter ')' (NL* ':' NL* type_)? NL* functionBody
+    | modifiers? 'set' NL* '(' (annotation | parameterModifier)* setterParameter ')' (
+        NL* ':' NL* type_
+    )? NL* functionBody
     ;
 
 typeAlias
@@ -233,11 +234,7 @@ typeParameterModifier
     ;
 
 type_
-    : typeModifiers?
-    ( parenthesizedType
-    | nullableType
-    | typeReference
-    | functionType)
+    : typeModifiers? (parenthesizedType | nullableType | typeReference | functionType)
     ;
 
 typeModifiers
@@ -245,7 +242,8 @@ typeModifiers
     ;
 
 typeModifier
-    : annotation | 'suspend' NL*
+    : annotation
+    | 'suspend' NL*
     ;
 
 parenthesizedType
@@ -266,10 +264,7 @@ functionType
     ;
 
 receiverType
-    : typeModifiers?
-    ( parenthesizedType
-    | nullableType
-    | typeReference)
+    : typeModifiers? (parenthesizedType | nullableType | typeReference)
     ;
 
 userType
@@ -306,11 +301,7 @@ statements
     ;
 
 statement
-    : (label | annotation)*
-    ( declaration
-    | assignment
-    | loopStatement
-    | expression)
+    : (label | annotation)* (declaration | assignment | loopStatement | expression)
     ;
 
 declaration
@@ -439,7 +430,8 @@ typeArguments
     ;
 
 typeProjection
-    : typeProjectionModifiers? type_ | '*'
+    : typeProjectionModifiers? type_
+    | '*'
     ;
 
 typeProjectionModifiers
@@ -540,12 +532,9 @@ lambdaParameter
     ;
 
 anonymousFunction
-    : 'fun'
-    (NL* type_ NL* '.')?
-    NL* functionValueParameters
-    (NL* ':' NL* type_)?
-    (NL* typeConstraints)?
-    (NL* functionBody)?
+    : 'fun' (NL* type_ NL* '.')? NL* functionValueParameters (NL* ':' NL* type_)? (
+        NL* typeConstraints
+    )? (NL* functionBody)?
     ;
 
 functionLiteral
@@ -574,7 +563,9 @@ controlStructureBody
     ;
 
 ifExpression
-    : 'if' NL* '(' NL* expression NL* ')' NL* controlStructureBody (';'? NL* 'else' NL* controlStructureBody)?
+    : 'if' NL* '(' NL* expression NL* ')' NL* controlStructureBody (
+        ';'? NL* 'else' NL* controlStructureBody
+    )?
     | 'if' NL* '(' NL* expression NL* ')' NL* (';' NL*)? 'else' NL* controlStructureBody
     ;
 
@@ -635,8 +626,10 @@ doWhileStatement
 jumpExpression
     : 'throw' NL* expression
     | ('return' | RETURN_AT) expression?
-    | 'continue' | CONTINUE_AT
-    | 'break' | BREAK_AT
+    | 'continue'
+    | CONTINUE_AT
+    | 'break'
+    | BREAK_AT
     ;
 
 callableReference // ?:: here is not an actual operator, it's just a lexer hack to avoid (?: + :) vs (? + ::) ambiguity
@@ -666,15 +659,18 @@ comparisonOperator
     ;
 
 inOperator
-    : 'in' | NOT_IN
+    : 'in'
+    | NOT_IN
     ;
 
 isOperator
-    : 'is' | NOT_IS
+    : 'is'
+    | NOT_IS
     ;
 
 additiveOperator
-    : '+' | '-'
+    : '+'
+    | '-'
     ;
 
 multiplicativeOperator
@@ -703,7 +699,9 @@ postfixUnaryOperator
     ;
 
 memberAccessOperator
-    : '.' | safeNav | '::'
+    : '.'
+    | safeNav
+    | '::'
     ;
 
 modifiers
@@ -711,14 +709,16 @@ modifiers
     ;
 
 modifier
-    : (classModifier
-    | memberModifier
-    | visibilityModifier
-    | functionModifier
-    | propertyModifier
-    | inheritanceModifier
-    | parameterModifier
-    | platformModifier) NL*
+    : (
+        classModifier
+        | memberModifier
+        | visibilityModifier
+        | functionModifier
+        | propertyModifier
+        | inheritanceModifier
+        | parameterModifier
+        | platformModifier
+    ) NL*
     ;
 
 classModifier

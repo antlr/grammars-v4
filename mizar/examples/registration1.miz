@@ -1,0 +1,6 @@
+environ
+begin
+registration
+ cluster ~ @ ;
+end;
+.

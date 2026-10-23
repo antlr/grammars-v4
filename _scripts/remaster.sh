@@ -1,7 +1,7 @@
 #
 
 list=`find examples -name '*.tree'`
-trgen -t Java
+dotnet trash gen -t Java
 cd Generated; make
 
 for i in $list

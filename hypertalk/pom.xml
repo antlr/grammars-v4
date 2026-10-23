@@ -44,7 +44,7 @@
                         <configuration>
                             <verbose>false</verbose>
                             <showTree>false</showTree>
-                            <entryPoint>script</entryPoint>
+                            <entryPoint>start_script</entryPoint>
                             <grammarName>HyperTalk</grammarName>
                             <exampleFiles>example-scripts/</exampleFiles>
                         </configuration>
@@ -57,7 +57,7 @@
                         <configuration>
                             <verbose>false</verbose>
                             <showTree>false</showTree>
-                            <entryPoint>scriptlet</entryPoint>
+                            <entryPoint>start_scriptlet</entryPoint>
                             <grammarName>HyperTalk</grammarName>
                             <exampleFiles>example-scriptlets/</exampleFiles>
                         </configuration>

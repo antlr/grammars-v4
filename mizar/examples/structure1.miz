@@ -1,0 +1,8 @@
+environ
+begin
+definition
+ struct ^ (# % -> @ #);
+ func x + means thesis;
+ pred x < means thesis;
+end;
+.

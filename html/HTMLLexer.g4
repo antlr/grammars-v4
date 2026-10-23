@@ -26,193 +26,109 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-lexer grammar  HTMLLexer;
+// $antlr-format alignTrailingComments true, columnLimit 150, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine true, allowShortBlocksOnASingleLine true, minEmptyLines 0, alignSemicolons ownLine
+// $antlr-format alignColons trailing, singleLineOverrulesHangingColon true, alignLexerCommands true, alignLabels true, alignTrailers true
 
-HTML_COMMENT
-    : '<!--' .*? '-->'
-    ;
+lexer grammar HTMLLexer;
 
-HTML_CONDITIONAL_COMMENT
-    : '<![' .*? ']>'
-    ;
+HTML_COMMENT: '<!--' .*? '-->';
 
-XML
-    : '<?xml' .*? '>'
-    ;
+HTML_CONDITIONAL_COMMENT: '<![' .*? ']>';
 
-CDATA
-    : '<![CDATA[' .*? ']]>'
-    ;
+XML: '<?xml' .*? '>';
 
-DTD
-    : '<!' .*? '>'
-    ;
+CDATA: '<![CDATA[' .*? ']]>';
 
-SCRIPTLET
-    : '<?' .*? '?>'
-    | '<%' .*? '%>'
-    ;
+DTD: '<!' .*? '>';
 
-SEA_WS
-    :  (' '|'\t'|'\r'? '\n')+
-    ;
+SCRIPTLET: '<?' .*? '?>' | '<%' .*? '%>';
 
-SCRIPT_OPEN
-    : '<script' .*? '>' ->pushMode(SCRIPT)
-    ;
+SEA_WS: (' ' | '\t' | '\r'? '\n')+;
 
-STYLE_OPEN
-    : '<style' .*? '>'  ->pushMode(STYLE)
-    ;
+SCRIPT_OPEN: '<script' .*? '>' -> pushMode(SCRIPT);
 
-TAG_OPEN
-    : '<' -> pushMode(TAG)
-    ;
+STYLE_OPEN: '<style' .*? '>' -> pushMode(STYLE);
 
-HTML_TEXT
-    : ~'<'+
-    ;
+TAG_OPEN: '<' -> pushMode(TAG);
 
+HTML_TEXT: ~'<'+;
 
 // tag declarations
 
 mode TAG;
 
-TAG_CLOSE
-    : '>' -> popMode
-    ;
+TAG_CLOSE: '>' -> popMode;
 
-TAG_SLASH_CLOSE
-    : '/>' -> popMode
-    ;
+TAG_SLASH_CLOSE: '/>' -> popMode;
 
-TAG_SLASH
-    : '/'
-    ;
-
+TAG_SLASH: '/';
 
 // lexing mode for attribute values
 
-TAG_EQUALS
-    : '=' -> pushMode(ATTVALUE)
-    ;
+TAG_EQUALS: '=' -> pushMode(ATTVALUE);
 
-TAG_NAME
-    : TAG_NameStartChar TAG_NameChar*
-    ;
+TAG_NAME: TAG_NameStartChar TAG_NameChar*;
 
-TAG_WHITESPACE
-    : [ \t\r\n] -> channel(HIDDEN)
-    ;
+TAG_WHITESPACE: [ \t\r\n] -> channel(HIDDEN);
 
-fragment
-HEXDIGIT
-    : [a-fA-F0-9]
-    ;
+fragment HEXDIGIT: [a-fA-F0-9];
 
-fragment
-DIGIT
-    : [0-9]
-    ;
+fragment DIGIT: [0-9];
 
-fragment
-TAG_NameChar
-    : TAG_NameStartChar
+fragment TAG_NameChar:
+    TAG_NameStartChar
     | '-'
     | '_'
     | '.'
     | DIGIT
     | '\u00B7'
-    | '\u0300'..'\u036F'
-    | '\u203F'..'\u2040'
-    ;
+    | '\u0300' ..'\u036F'
+    | '\u203F' ..'\u2040'
+;
 
-fragment
-TAG_NameStartChar
-    : [:a-zA-Z]
-    | '\u2070'..'\u218F'
-    | '\u2C00'..'\u2FEF'
-    | '\u3001'..'\uD7FF'
-    | '\uF900'..'\uFDCF'
-    | '\uFDF0'..'\uFFFD'
-    ;
-
+fragment TAG_NameStartChar:
+    [:a-zA-Z]
+    | '\u2070' ..'\u218F'
+    | '\u2C00' ..'\u2FEF'
+    | '\u3001' ..'\uD7FF'
+    | '\uF900' ..'\uFDCF'
+    | '\uFDF0' ..'\uFFFD'
+;
 
 // <scripts>
 
 mode SCRIPT;
 
-SCRIPT_BODY
-    : .*? '</script>' -> popMode
-    ;
+SCRIPT_BODY: .*? '</script>' -> popMode;
 
-SCRIPT_SHORT_BODY
-    : .*? '</>' -> popMode
-    ;
-
+SCRIPT_SHORT_BODY: .*? '</>' -> popMode;
 
 // <styles>
 
 mode STYLE;
 
-STYLE_BODY
-    : .*? '</style>' -> popMode
-    ;
+STYLE_BODY: .*? '</style>' -> popMode;
 
-STYLE_SHORT_BODY
-    : .*? '</>' -> popMode
-    ;
-
+STYLE_SHORT_BODY: .*? '</>' -> popMode;
 
 // attribute values
 
 mode ATTVALUE;
 
 // an attribute value may have spaces b/t the '=' and the value
-ATTVALUE_VALUE
-    : ' '* ATTRIBUTE -> popMode
-    ;
+ATTVALUE_VALUE: ' '* ATTRIBUTE -> popMode;
 
-ATTRIBUTE
-    : DOUBLE_QUOTE_STRING
-    | SINGLE_QUOTE_STRING
-    | ATTCHARS
-    | HEXCHARS
-    | DECCHARS
-    ;
+ATTRIBUTE: DOUBLE_QUOTE_STRING | SINGLE_QUOTE_STRING | ATTCHARS | HEXCHARS | DECCHARS;
 
-fragment ATTCHARS
-    : ATTCHAR+ ' '?
-    ;
+fragment ATTCHARS: ATTCHAR+ ' '?;
 
-fragment ATTCHAR
-    : '-'
-    | '_'
-    | '.'
-    | '/'
-    | '+'
-    | ','
-    | '?'
-    | '='
-    | ':'
-    | ';'
-    | '#'
-    | [0-9a-zA-Z]
-    ;
+fragment ATTCHAR: '-' | '_' | '.' | '/' | '+' | ',' | '?' | '=' | ':' | ';' | '#' | [0-9a-zA-Z];
 
-fragment HEXCHARS
-    : '#' [0-9a-fA-F]+
-    ;
+fragment HEXCHARS: '#' [0-9a-fA-F]+;
 
-fragment DECCHARS
-    : [0-9]+ '%'?
-    ;
+fragment DECCHARS: [0-9]+ '%'?;
 
-fragment DOUBLE_QUOTE_STRING
-    : '"' ~[<"]* '"'
-    ;
+fragment DOUBLE_QUOTE_STRING: '"' ~[<"]* '"';
 
-fragment SINGLE_QUOTE_STRING
-    : '\'' ~[<']* '\''
-    ;
-
+fragment SINGLE_QUOTE_STRING: '\'' ~[<']* '\'';

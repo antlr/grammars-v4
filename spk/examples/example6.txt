@@ -1,0 +1,8 @@
+MAIN: PROCEDURE OPTIONS(MAIN);
+    DECLARE X FIXED;
+    X = 1;
+    DO;
+        X = X + 1;
+        PUT LIST(X);
+    END;
+END;

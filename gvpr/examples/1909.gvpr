@@ -1,0 +1,9 @@
+BEG_G{
+  print("// begin");
+}
+// remove the "E" section to get correct NODE names!!
+E{
+  int dummy;
+  dummy=4;
+  //$._bogus="z2";
+}

@@ -1,0 +1,7 @@
+begin
+    integer i;
+    i := 0;
+L1: i := i + 1;
+    if i < 5 then goto L1;
+    outint(i, 0)
+end

@@ -29,83 +29,49 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine true, allowShortBlocksOnASingleLine true, minEmptyLines 0, alignSemicolons ownLine
+// $antlr-format alignColons trailing, singleLineOverrulesHangingColon true, alignLexerCommands true, alignLabels true, alignTrailers true
+
 lexer grammar qifLexer;
 
-TYPE
-   : '!Type:' -> pushMode (LINETEXT)
-   ;
+TYPE: '!Type:' -> pushMode (LINETEXT);
 
-T
-   : 'T' -> pushMode (LINETEXT)
-   ;
+T: 'T' -> pushMode (LINETEXT);
 
-C
-   : 'C'
-   ;
+C: 'C';
 
-N
-   : 'N' -> pushMode (LINETEXT)
-   ;
+N: 'N' -> pushMode (LINETEXT);
 
-M
-   : 'M' -> pushMode (LINETEXT)
-   ;
+M: 'M' -> pushMode (LINETEXT);
 
-P
-   : 'P' -> pushMode (LINETEXT)
-   ;
+P: 'P' -> pushMode (LINETEXT);
 
-L
-   : 'L' -> pushMode (ACCTCATE)
-   ;
+L: 'L' -> pushMode (ACCTCATE);
 
-D
-   : 'D' -> pushMode (LINETEXT)
-   ;
+D: 'D' -> pushMode (LINETEXT);
 
-STATE
-   : ('X' | 'x' | '*')
-   ;
+STATE: ('X' | 'x' | '*');
 
-EOR
-   : '^'
-   ;
+EOR: '^';
 
-WS
-   : [ \r\n\t]+ -> skip
-   ;
+WS: [ \r\n\t]+ -> skip;
 
 mode LINETEXT;
-DATE
-   : [0-9]+ '/' [0-9]+ '/' [0-9]+
-   ;
+DATE: [0-9]+ '/' [0-9]+ '/' [0-9]+;
 
-NUM
-   : '-'? [0-9,]+ ('.' [0-9]+)?
-   ;
+NUM: '-'? [0-9,]+ ('.' [0-9]+)?;
 
-TEXT
-   : ~ [\r\n]+
-   ;
+TEXT: ~ [\r\n]+;
 
-EOL
-   : [\r\n]+ -> skip , popMode
-   ;
+EOL: [\r\n]+ -> skip, popMode;
 
 mode ACCTCATE;
-LB
-   : '['
-   ;
+LB: '[';
 
-ACCNTCATNAME
-   : [a-zA-Z0-9 ]+
-   ;
+ACCNTCATNAME: [a-zA-Z0-9 ]+;
 
-RB
-   : ']'
-   ;
+RB: ']';
 
-EOL2
-   : [\r\n]+ -> skip , popMode
-   ;
-
+EOL2: [\r\n]+ -> skip, popMode;
