@@ -29,599 +29,611 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 Adapted from m2pim4_LL1.g by Benjamin Kowarsch
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar m2pim4;
 
 ident
-   : IDENT
-   ;
+    : IDENT
+    ;
 
 number
-   : INTEGER
-   | REAL
-   ;
+    : INTEGER
+    | REAL
+    ;
 
 integer
-   : INTEGER
-   ;
+    : INTEGER
+    ;
 
 real
-   : REAL
-   ;
+    : REAL
+    ;
 
 scaleFactor
-   : SCALE_FACTOR
-   ;
+    : SCALE_FACTOR
+    ;
 
 hexDigit
-   : HEX_DIGIT
-   ;
+    : HEX_DIGIT
+    ;
 
 digit
-   : DIGIT
-   ;
+    : DIGIT
+    ;
 
 octalDigit
-   : OCTAL_DIGIT
-   ;
+    : OCTAL_DIGIT
+    ;
 
 string
-   : STRING
-   ;
+    : STRING
+    ;
 
 qualident
-   : ident ('.' ident)*
-   ;
+    : ident ('.' ident)*
+    ;
 
 constantDeclaration
-   : ident '=' constExpression
-   ;
+    : ident '=' constExpression
+    ;
 
 constExpression
-   : simpleConstExpr (relation simpleConstExpr)?
-   ;
+    : simpleConstExpr (relation simpleConstExpr)?
+    ;
 
 relation
-   : '='
-   | '#'
-   | '<>'
-   | '<'
-   | '<='
-   | '>'
-   | '>='
-   | 'IN' {       }
-   ;
+    : '='
+    | '#'
+    | '<>'
+    | '<'
+    | '<='
+    | '>'
+    | '>='
+    | 'IN' {       }
+    ;
 
 simpleConstExpr
-   : ('+' | '-' {       })? constTerm (addOperator constTerm)*
-   ;
+    : ('+' | '-' {       })? constTerm (addOperator constTerm)*
+    ;
 
 addOperator
-   : '+'
-   | '-'
-   | OR
-   ;
+    : '+'
+    | '-'
+    | OR
+    ;
 
 constTerm
-   : constFactor (mulOperator constFactor)*
-   ;
+    : constFactor (mulOperator constFactor)*
+    ;
 
 mulOperator
-   : '*'
-   | '/'
-   | DIV
-   | MOD
-   | AND
-   | '&'
-   ;
+    : '*'
+    | '/'
+    | DIV
+    | MOD
+    | AND
+    | '&'
+    ;
 
 constFactor
-   : number
-   | string
-   | setOrQualident
-   | '(' constExpression ')'
-   | (NOT | '~' {       }) constFactor
-   ;
+    : number
+    | string
+    | setOrQualident
+    | '(' constExpression ')'
+    | (NOT | '~' {       }) constFactor
+    ;
 
 setOrQualident
-   : set_
-   | qualident set_?
-   ;
+    : set_
+    | qualident set_?
+    ;
 
 set_
-   : '{' (element (',' element)*)? '}'
-   ;
+    : '{' (element (',' element)*)? '}'
+    ;
 
 element
-   : constExpression ('..' constExpression)?
-   ;
+    : constExpression ('..' constExpression)?
+    ;
 
 typeDeclaration
-   : ident '=' type_
-   ;
+    : ident '=' type_
+    ;
 
 type_
-   : simpleType
-   | arrayType
-   | recordType
-   | setType
-   | pointerType
-   | procedureType
-   ;
+    : simpleType
+    | arrayType
+    | recordType
+    | setType
+    | pointerType
+    | procedureType
+    ;
 
 simpleType
-   : qualident
-   | enumeration
-   | subrangeType
-   ;
+    : qualident
+    | enumeration
+    | subrangeType
+    ;
 
 enumeration
-   : '(' identList ')'
-   ;
+    : '(' identList ')'
+    ;
 
 identList
-   : ident (',' ident)*
-   ;
+    : ident (',' ident)*
+    ;
 
 subrangeType
-   : '[' constExpression '..' constExpression ']'
-   ;
+    : '[' constExpression '..' constExpression ']'
+    ;
 
 arrayType
-   : ARRAY simpleType (',' simpleType)* OF type_
-   ;
+    : ARRAY simpleType (',' simpleType)* OF type_
+    ;
 
 recordType
-   : RECORD fieldListSequence END
-   ;
+    : RECORD fieldListSequence END
+    ;
 
 fieldListSequence
-   : fieldList (';' fieldList)*
-   ;
+    : fieldList (';' fieldList)*
+    ;
 
 fieldList
-   : (identList ':' type_ | CASE ident ((':' | '.' {       }) qualident)? OF variant ('|' variant)* (ELSE fieldListSequence)? END)?
-   ;
+    : (
+        identList ':' type_
+        | CASE ident ((':' | '.' {       }) qualident)? OF variant ('|' variant)* (
+            ELSE fieldListSequence
+        )? END
+    )?
+    ;
 
 variant
-   : caseLabelList ':' fieldListSequence
-   ;
+    : caseLabelList ':' fieldListSequence
+    ;
 
 caseLabelList
-   : caseLabels (',' caseLabels)*
-   ;
+    : caseLabels (',' caseLabels)*
+    ;
 
 caseLabels
-   : constExpression ('..' constExpression)?
-   ;
+    : constExpression ('..' constExpression)?
+    ;
 
 setType
-   : SET OF simpleType
-   ;
+    : SET OF simpleType
+    ;
 
 pointerType
-   : POINTER TO type_
-   ;
+    : POINTER TO type_
+    ;
 
 procedureType
-   : PROCEDURE formalTypeList?
-   ;
+    : PROCEDURE formalTypeList?
+    ;
 
 formalTypeList
-   : '(' (VAR? formalType (',' VAR? formalType)*)? ')' (':' qualident)?
-   ;
+    : '(' (VAR? formalType (',' VAR? formalType)*)? ')' (':' qualident)?
+    ;
 
 variableDeclaration
-   : identList ':' type_
-   ;
+    : identList ':' type_
+    ;
 
 designator
-   : qualident (designatorTail)?
-   ;
+    : qualident (designatorTail)?
+    ;
 
 designatorTail
-   : (('[' expList ']' | '^') ('.' ident)*) +
-   ;
+    : (('[' expList ']' | '^') ('.' ident)*)+
+    ;
 
 expList
-   : expression (',' expression)*
-   ;
+    : expression (',' expression)*
+    ;
 
 expression
-   : simpleExpression (relation simpleExpression)?
-   ;
+    : simpleExpression (relation simpleExpression)?
+    ;
 
 simpleExpression
-   : ('+' | '-' {       })? term (addOperator term)*
-   ;
+    : ('+' | '-' {       })? term (addOperator term)*
+    ;
 
 term
-   : factor (mulOperator factor)*
-   ;
+    : factor (mulOperator factor)*
+    ;
 
 factor
-   : number
-   | string
-   | setOrDesignatorOrProcCall
-   | '(' expression ')'
-   | (NOT | '~' {       }) factor
-   ;
+    : number
+    | string
+    | setOrDesignatorOrProcCall
+    | '(' expression ')'
+    | (NOT | '~' {       }) factor
+    ;
 
 setOrDesignatorOrProcCall
-   : set_
-   | qualident (set_ | designatorTail? actualParameters?)
-   ;
+    : set_
+    | qualident (set_ | designatorTail? actualParameters?)
+    ;
 
 actualParameters
-   : '(' expList? ')'
-   ;
+    : '(' expList? ')'
+    ;
 
 statement
-   : (assignmentOrProcCall | ifStatement | caseStatement | whileStatement | repeatStatement | loopStatement | forStatement | withStatement | EXIT | RETURN expression?)?
-   ;
+    : (
+        assignmentOrProcCall
+        | ifStatement
+        | caseStatement
+        | whileStatement
+        | repeatStatement
+        | loopStatement
+        | forStatement
+        | withStatement
+        | EXIT
+        | RETURN expression?
+    )?
+    ;
 
 assignmentOrProcCall
-   : designator (':=' expression | actualParameters?)
-   ;
+    : designator (':=' expression | actualParameters?)
+    ;
 
 statementSequence
-   : statement (';' statement)*
-   ;
+    : statement (';' statement)*
+    ;
 
 ifStatement
-   : IF expression THEN statementSequence (ELSIF expression THEN statementSequence)* (ELSE statementSequence)? END
-   ;
+    : IF expression THEN statementSequence (ELSIF expression THEN statementSequence)* (
+        ELSE statementSequence
+    )? END
+    ;
 
 caseStatement
-   : CASE expression OF ccase ('|' ccase)* (ELSE statementSequence)? END
-   ;
+    : CASE expression OF ccase ('|' ccase)* (ELSE statementSequence)? END
+    ;
 
 ccase
-   : caseLabelList ':' statementSequence
-   ;
+    : caseLabelList ':' statementSequence
+    ;
 
 whileStatement
-   : WHILE expression DO statementSequence END
-   ;
+    : WHILE expression DO statementSequence END
+    ;
 
 repeatStatement
-   : REPEAT statementSequence UNTIL expression
-   ;
+    : REPEAT statementSequence UNTIL expression
+    ;
 
 forStatement
-   : FOR ident ':=' expression TO expression (BY constExpression)? DO statementSequence END
-   ;
+    : FOR ident ':=' expression TO expression (BY constExpression)? DO statementSequence END
+    ;
 
 loopStatement
-   : LOOP statementSequence END
-   ;
+    : LOOP statementSequence END
+    ;
 
 withStatement
-   : WITH designator DO statementSequence END
-   ;
+    : WITH designator DO statementSequence END
+    ;
 
 procedureDeclaration
-   : procedureHeading ';' block ident
-   ;
+    : procedureHeading ';' block ident
+    ;
 
 procedureHeading
-   : PROCEDURE ident formalParameters?
-   ;
+    : PROCEDURE ident formalParameters?
+    ;
 
 block
-   : declaration* (BEGIN statementSequence)? END
-   ;
+    : declaration* (BEGIN statementSequence)? END
+    ;
 
 declaration
-   : CONST (constantDeclaration ';')*
-   | TYPE (typeDeclaration ';')*
-   | VAR (variableDeclaration ';')*
-   | procedureDeclaration ';'
-   | moduleDeclaration ';'
-   ;
+    : CONST (constantDeclaration ';')*
+    | TYPE (typeDeclaration ';')*
+    | VAR (variableDeclaration ';')*
+    | procedureDeclaration ';'
+    | moduleDeclaration ';'
+    ;
 
 formalParameters
-   : '(' (fpSection (';' fpSection)*)? ')' (':' qualident)?
-   ;
+    : '(' (fpSection (';' fpSection)*)? ')' (':' qualident)?
+    ;
 
 fpSection
-   : VAR? identList ':' formalType
-   ;
+    : VAR? identList ':' formalType
+    ;
 
 formalType
-   : (ARRAY OF)? qualident
-   ;
+    : (ARRAY OF)? qualident
+    ;
 
 moduleDeclaration
-   : MODULE ident priority? ';' importList* exportList? block ident
-   ;
+    : MODULE ident priority? ';' importList* exportList? block ident
+    ;
 
 priority
-   : '[' constExpression ']'
-   ;
+    : '[' constExpression ']'
+    ;
 
 exportList
-   : EXPORT QUALIFIED? identList ';'
-   ;
+    : EXPORT QUALIFIED? identList ';'
+    ;
 
 importList
-   : (FROM ident)? IMPORT identList ';'
-   ;
+    : (FROM ident)? IMPORT identList ';'
+    ;
 
 definitionModule
-   : DEFINITION MODULE ident ';' importList* exportList? definition* END ident '.'
-   ;
+    : DEFINITION MODULE ident ';' importList* exportList? definition* END ident '.'
+    ;
 
 definition
-   : CONST (constantDeclaration ';')*
-   | TYPE (ident ('=' type_)? ';')*
-   | VAR (variableDeclaration ';')*
-   | procedureHeading ';'
-   ;
+    : CONST (constantDeclaration ';')*
+    | TYPE (ident ('=' type_)? ';')*
+    | VAR (variableDeclaration ';')*
+    | procedureHeading ';'
+    ;
 
 programModule
-   : MODULE ident priority? ';' importList* block ident '.'
-   ;
+    : MODULE ident priority? ';' importList* block ident '.'
+    ;
 
 compilationUnit
-   : ( definitionModule | IMPLEMENTATION? programModule ) EOF
-   ;
-
+    : (definitionModule | IMPLEMENTATION? programModule) EOF
+    ;
 
 AND
-   : 'AND'
-   ;
-
+    : 'AND'
+    ;
 
 ARRAY
-   : 'ARRAY'
-   ;
-
+    : 'ARRAY'
+    ;
 
 BEGIN
-   : 'BEGIN'
-   ;
-
+    : 'BEGIN'
+    ;
 
 BY
-   : 'BY'
-   ;
-
+    : 'BY'
+    ;
 
 CASE
-   : 'CASE'
-   ;
-
+    : 'CASE'
+    ;
 
 CONST
-   : 'CONST'
-   ;
-
+    : 'CONST'
+    ;
 
 DEFINITION
-   : 'DEFINITION'
-   ;
-
+    : 'DEFINITION'
+    ;
 
 DIV
-   : 'DIV'
-   ;
-
+    : 'DIV'
+    ;
 
 DO
-   : 'DO'
-   ;
-
+    : 'DO'
+    ;
 
 ELSE
-   : 'ELSE'
-   ;
-
+    : 'ELSE'
+    ;
 
 ELSIF
-   : 'ELSIF'
-   ;
-
+    : 'ELSIF'
+    ;
 
 END
-   : 'END'
-   ;
-
+    : 'END'
+    ;
 
 EXIT
-   : 'EXIT'
-   ;
-
+    : 'EXIT'
+    ;
 
 EXPORT
-   : 'EXPORT'
-   ;
-
+    : 'EXPORT'
+    ;
 
 FOR
-   : 'FOR'
-   ;
-
+    : 'FOR'
+    ;
 
 FROM
-   : 'FROM'
-   ;
-
+    : 'FROM'
+    ;
 
 IF
-   : 'IF'
-   ;
-
+    : 'IF'
+    ;
 
 IMPLEMENTATION
-   : 'IMPLEMENTATION'
-   ;
-
+    : 'IMPLEMENTATION'
+    ;
 
 IMPORT
-   : 'IMPORT'
-   ;
-
+    : 'IMPORT'
+    ;
 
 IN
-   : 'IN'
-   ;
-
+    : 'IN'
+    ;
 
 LOOP
-   : 'LOOP'
-   ;
-
+    : 'LOOP'
+    ;
 
 MOD
-   : 'MOD'
-   ;
-
+    : 'MOD'
+    ;
 
 MODULE
-   : 'MODULE'
-   ;
-
+    : 'MODULE'
+    ;
 
 NOT
-   : 'NOT'
-   ;
-
+    : 'NOT'
+    ;
 
 OF
-   : 'OF'
-   ;
-
+    : 'OF'
+    ;
 
 OR
-   : 'OR'
-   ;
-
+    : 'OR'
+    ;
 
 POINTER
-   : 'POINTER'
-   ;
-
+    : 'POINTER'
+    ;
 
 PROCEDURE
-   : 'PROCEDURE'
-   ;
-
+    : 'PROCEDURE'
+    ;
 
 QUALIFIED
-   : 'QUALIFIED'
-   ;
-
+    : 'QUALIFIED'
+    ;
 
 RECORD
-   : 'RECORD'
-   ;
-
+    : 'RECORD'
+    ;
 
 REPEAT
-   : 'REPEAT'
-   ;
-
+    : 'REPEAT'
+    ;
 
 RETURN
-   : 'RETURN'
-   ;
-
+    : 'RETURN'
+    ;
 
 SET
-   : 'SET'
-   ;
-
+    : 'SET'
+    ;
 
 THEN
-   : 'THEN'
-   ;
-
+    : 'THEN'
+    ;
 
 TO
-   : 'TO'
-   ;
-
+    : 'TO'
+    ;
 
 TYPE
-   : 'TYPE'
-   ;
-
+    : 'TYPE'
+    ;
 
 UNTIL
-   : 'UNTIL'
-   ;
-
+    : 'UNTIL'
+    ;
 
 VAR
-   : 'VAR'
-   ;
-
+    : 'VAR'
+    ;
 
 WHILE
-   : 'WHILE'
-   ;
-
+    : 'WHILE'
+    ;
 
 WITH
-   : 'WITH'
-   ;
-
+    : 'WITH'
+    ;
 
 IDENT
-   : LETTER (LETTER | DIGIT)*
-   ;
-
+    : LETTER (LETTER | DIGIT)*
+    ;
 
 INTEGER
-   : DIGIT + | OCTAL_DIGIT + ('B' | 'C') | DIGIT (HEX_DIGIT)* 'H'
-   ;
-
+    : DIGIT+
+    | OCTAL_DIGIT+ ('B' | 'C')
+    | DIGIT (HEX_DIGIT)* 'H'
+    ;
 
 REAL
-   : DIGIT + '.' DIGIT* SCALE_FACTOR?
-   ;
-
+    : DIGIT+ '.' DIGIT* SCALE_FACTOR?
+    ;
 
 STRING
-   : '\'' (CHARACTER | '"')* '\'' | '"' (CHARACTER | '\'')* '"'
-   ;
-
+    : '\'' (CHARACTER | '"')* '\''
+    | '"' (CHARACTER | '\'')* '"'
+    ;
 
 fragment LETTER
-   : 'A' .. 'Z' | 'a' .. 'z'
-   ;
-
+    : 'A' .. 'Z'
+    | 'a' .. 'z'
+    ;
 
 DIGIT
-   : OCTAL_DIGIT | '8' | '9'
-   ;
-
+    : OCTAL_DIGIT
+    | '8'
+    | '9'
+    ;
 
 OCTAL_DIGIT
-   : '0' .. '7'
-   ;
-
+    : '0' .. '7'
+    ;
 
 HEX_DIGIT
-   : DIGIT | 'A' | 'B' | 'C' | 'D' | 'E' | 'F'
-   ;
-
+    : DIGIT
+    | 'A'
+    | 'B'
+    | 'C'
+    | 'D'
+    | 'E'
+    | 'F'
+    ;
 
 SCALE_FACTOR
-   : 'E' ('+' | '-')? DIGIT +
-   ;
-
+    : 'E' ('+' | '-')? DIGIT+
+    ;
 
 fragment CHARACTER
-   : DIGIT | LETTER | ' ' | '!' | '#' | '$' | '%' | '&' | '(' | ')' | '*' | '+' | ',' | '-' | '.' | ':' | ';' | '<' | '=' | '>' | '?' | '@' | '[' | '\\' | ']' | '^' | '_' | '`' | '{' | '|' | '}' | '~'
-   ;
-
+    : DIGIT
+    | LETTER
+    | ' '
+    | '!'
+    | '#'
+    | '$'
+    | '%'
+    | '&'
+    | '('
+    | ')'
+    | '*'
+    | '+'
+    | ','
+    | '-'
+    | '.'
+    | ':'
+    | ';'
+    | '<'
+    | '='
+    | '>'
+    | '?'
+    | '@'
+    | '['
+    | '\\'
+    | ']'
+    | '^'
+    | '_'
+    | '`'
+    | '{'
+    | '|'
+    | '}'
+    | '~'
+    ;
 
 COMMENT
-   : '(*' .*? '*)' -> skip
-   ;
-
+    : '(*' .*? '*)' -> skip
+    ;
 
 WS
-   : [ \t\r\n] -> skip
-   ;
+    : [ \t\r\n] -> skip
+    ;

@@ -24,7 +24,7 @@ bool JavaScriptParserBase::next(std::string str)
 
 bool JavaScriptParserBase::notLineTerminator()
 {
-    return !here(JavaScriptParser::LineTerminator);
+    return !lineTerminatorAhead();
 }
 
 bool JavaScriptParserBase::notOpenBraceAndNotFunction()
@@ -39,21 +39,11 @@ bool JavaScriptParserBase::closeBrace()
     return _input->LT(1)->getType() == JavaScriptParser::CloseBrace;
 }
 
-bool JavaScriptParserBase::here(int type)
-{
-    // Get the token ahead of the current index.
-    int possibleIndexEosToken = this->getCurrentToken()->getTokenIndex() - 1;
-    auto ahead = _input->get(possibleIndexEosToken);
-
-    // Check if the token resides on the HIDDEN channel and if it's of the
-    // provided type.
-    return (ahead->getChannel() == Lexer::HIDDEN) && (ahead->getType() == type);
-}
-
 bool JavaScriptParserBase::lineTerminatorAhead()
 {
     // Get the token ahead of the current index.
     int possibleIndexEosToken = this->getCurrentToken()->getTokenIndex() - 1;
+    if (possibleIndexEosToken < 0) return false;
     auto ahead = _input->get(possibleIndexEosToken);
 
     if (ahead->getChannel() != Lexer::HIDDEN) {
@@ -69,6 +59,7 @@ bool JavaScriptParserBase::lineTerminatorAhead()
     if (ahead->getType() == JavaScriptParser::WhiteSpaces) {
         // Get the token ahead of the current whitespaces.
         possibleIndexEosToken = this->getCurrentToken()->getTokenIndex() - 2;
+        if (possibleIndexEosToken < 0) return false;
         ahead = _input->get(possibleIndexEosToken);
     }
 

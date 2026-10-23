@@ -32,45 +32,49 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // https://en.wikipedia.org/wiki/Mathematical_operators_and_symbols_in_Unicode
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar tl;
 
-file_ : proposition EOF;
+file_
+    : proposition EOF
+    ;
 
 proposition
-   :
-   | TL_UPTACK
-   | ATOMIC
-   | TL_NOT proposition
-   | proposition TL_OR proposition
-   | (TL_ALWAYS | TL_WAS) proposition
-   | '(' proposition ')'
-   ;
+    :
+    | TL_UPTACK
+    | ATOMIC
+    | TL_NOT proposition
+    | proposition TL_OR proposition
+    | (TL_ALWAYS | TL_WAS) proposition
+    | '(' proposition ')'
+    ;
 
 ATOMIC
-   : [a-z]+
-   ;
+    : [a-z]+
+    ;
 
 TL_ALWAYS
-   : 'G'
-   ;
+    : 'G'
+    ;
 
 TL_WAS
-   : 'H'
-   ;
+    : 'H'
+    ;
 
 TL_OR
-   : '\u2228'
-   ;
+    : '\u2228'
+    ;
 
 TL_UPTACK
-   : '\u22a5'
-   ;
+    : '\u22a5'
+    ;
 
 TL_NOT
-   : '\u2310'
-   ;
+    : '\u2310'
+    ;
 
 WS
-   : [ \r\n\t]+ -> skip
-   ;
-
+    : [ \r\n\t]+ -> skip
+    ;

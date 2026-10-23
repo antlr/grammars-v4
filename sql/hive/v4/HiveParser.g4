@@ -14,11 +14,15 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar HiveParser;
 
 options
 {
-    tokenVocab=HiveLexer;
+    tokenVocab = HiveLexer;
 }
 
 // starting rule
@@ -27,10 +31,7 @@ statement
     ;
 
 explainStatement
-    : KW_EXPLAIN (
-        explainOption* execStatement
-        | KW_REWRITE queryStatementExpression
-      )
+    : KW_EXPLAIN (explainOption* execStatement | KW_REWRITE queryStatementExpression)
     ;
 
 explainOption
@@ -86,35 +87,27 @@ replicationClause
     ;
 
 exportStatement
-    : KW_EXPORT
-      KW_TABLE tableOrPartition
-      KW_TO StringLiteral
-      replicationClause?
+    : KW_EXPORT KW_TABLE tableOrPartition KW_TO StringLiteral replicationClause?
     ;
 
 importStatement
-       : KW_IMPORT
-         (KW_EXTERNAL? KW_TABLE tableOrPartition)?
-         KW_FROM path=StringLiteral
-         tableLocation?
+    : KW_IMPORT (KW_EXTERNAL? KW_TABLE tableOrPartition)? KW_FROM path = StringLiteral tableLocation?
     ;
 
 replDumpStatement
-    : KW_REPL KW_DUMP
-        dbPolicy=replDbPolicy
-        (KW_REPLACE oldDbPolicy=replDbPolicy)?
-        (KW_WITH replConf=replConfigs)?
+    : KW_REPL KW_DUMP dbPolicy = replDbPolicy (KW_REPLACE oldDbPolicy = replDbPolicy)? (
+        KW_WITH replConf = replConfigs
+    )?
     ;
 
 replDbPolicy
-    : dbName=id_ (DOT tablePolicy=replTableLevelPolicy)?
+    : dbName = id_ (DOT tablePolicy = replTableLevelPolicy)?
     ;
 
 replLoadStatement
-    : KW_REPL KW_LOAD
-      sourceDbPolicy=replDbPolicy
-      (KW_INTO dbName=id_)?
-      (KW_WITH replConf=replConfigs)?
+    : KW_REPL KW_LOAD sourceDbPolicy = replDbPolicy (KW_INTO dbName = id_)? (
+        KW_WITH replConf = replConfigs
+    )?
     ;
 
 replConfigs
@@ -126,13 +119,11 @@ replConfigsList
     ;
 
 replTableLevelPolicy
-    : replTablesIncludeList=StringLiteral (DOT replTablesExcludeList=StringLiteral)?
+    : replTablesIncludeList = StringLiteral (DOT replTablesExcludeList = StringLiteral)?
     ;
 
 replStatusStatement
-    : KW_REPL KW_STATUS
-        dbName=id_
-        (KW_WITH replConf=replConfigs)?
+    : KW_REPL KW_STATUS dbName = id_ (KW_WITH replConf = replConfigs)?
     ;
 
 ddlStatement
@@ -217,27 +208,20 @@ orReplace
     ;
 
 createDatabaseStatement
-    : KW_CREATE db_schema
-        ifNotExists?
-        name=id_
-        databaseComment?
-        dbLocation?
-        dbManagedLocation?
-        (KW_WITH KW_DBPROPERTIES dbprops=dbProperties)?
-    | KW_CREATE KW_REMOTE db_schema
-        ifNotExists?
-        name=id_
-        databaseComment?
-        dbConnectorName
-        (KW_WITH KW_DBPROPERTIES dbprops=dbProperties)?
+    : KW_CREATE db_schema ifNotExists? name = id_ databaseComment? dbLocation? dbManagedLocation? (
+        KW_WITH KW_DBPROPERTIES dbprops = dbProperties
+    )?
+    | KW_CREATE KW_REMOTE db_schema ifNotExists? name = id_ databaseComment? dbConnectorName (
+        KW_WITH KW_DBPROPERTIES dbprops = dbProperties
+    )?
     ;
 
 dbLocation
-    : KW_LOCATION locn=StringLiteral
+    : KW_LOCATION locn = StringLiteral
     ;
 
 dbManagedLocation
-    : KW_MANAGEDLOCATION locn=StringLiteral
+    : KW_MANAGEDLOCATION locn = StringLiteral
     ;
 
 dbProperties
@@ -249,7 +233,7 @@ dbPropertiesList
     ;
 
 dbConnectorName
-    : KW_USING dcName=id_
+    : KW_USING dcName = id_
     ;
 
 switchDatabaseStatement
@@ -261,7 +245,7 @@ dropDatabaseStatement
     ;
 
 databaseComment
-    : KW_COMMENT comment=StringLiteral
+    : KW_COMMENT comment = StringLiteral
     ;
 
 truncateTableStatement
@@ -273,12 +257,11 @@ dropTableStatement
     ;
 
 inputFileFormat
-    : KW_INPUTFORMAT inFmt=StringLiteral KW_SERDE serdeCls=StringLiteral
+    : KW_INPUTFORMAT inFmt = StringLiteral KW_SERDE serdeCls = StringLiteral
     ;
 
 tabTypeExpr
-    : id_ (DOT id_)?
-        (id_ (DOT (KW_ELEM_TYPE | KW_KEY_TYPE | KW_VALUE_TYPE | id_))*)?
+    : id_ (DOT id_)? (id_ (DOT (KW_ELEM_TYPE | KW_KEY_TYPE | KW_VALUE_TYPE | id_))*)?
     ;
 
 partTypeExpr
@@ -290,21 +273,23 @@ tabPartColTypeExpr
     ;
 
 descStatement
-    : (KW_DESCRIBE | KW_DESC)
-    (
-        db_schema KW_EXTENDED? dbName=id_
-        | KW_DATACONNECTOR KW_EXTENDED? dcName=id_
-        | KW_FUNCTION KW_EXTENDED? name=descFuncNames
-        | (descOptions=KW_FORMATTED | descOptions=KW_EXTENDED) parttype=tabPartColTypeExpr
-        | parttype=tabPartColTypeExpr
+    : (KW_DESCRIBE | KW_DESC) (
+        db_schema KW_EXTENDED? dbName = id_
+        | KW_DATACONNECTOR KW_EXTENDED? dcName = id_
+        | KW_FUNCTION KW_EXTENDED? name = descFuncNames
+        | (descOptions = KW_FORMATTED | descOptions = KW_EXTENDED) parttype = tabPartColTypeExpr
+        | parttype = tabPartColTypeExpr
     )
     ;
 
 analyzeStatement
-    : KW_ANALYZE KW_TABLE parttype=tableOrPartition
-      ( KW_COMPUTE KW_STATISTICS (noscan=KW_NOSCAN | KW_FOR KW_COLUMNS statsColumnName=columnNameList?)?
-      | KW_CACHE KW_METADATA
-      )
+    : KW_ANALYZE KW_TABLE parttype = tableOrPartition (
+        KW_COMPUTE KW_STATISTICS (
+            noscan = KW_NOSCAN
+            | KW_FOR KW_COLUMNS statsColumnName = columnNameList?
+        )?
+        | KW_CACHE KW_METADATA
+    )
     ;
 
 from_in
@@ -319,24 +304,33 @@ db_schema
 
 showStatement
     : KW_SHOW (KW_DATABASES | KW_SCHEMAS) (KW_LIKE showStmtIdentifier)?
-    | KW_SHOW isExtended=KW_EXTENDED? KW_TABLES (from_in db_name=id_)? filter=showTablesFilterExpr?
-    | KW_SHOW KW_VIEWS (from_in db_name=id_)? (KW_LIKE showStmtIdentifier | showStmtIdentifier)?
-    | KW_SHOW KW_MATERIALIZED KW_VIEWS (from_in db_name=id_)? (KW_LIKE showStmtIdentifier|showStmtIdentifier)?
-    | KW_SHOW KW_SORTED? KW_COLUMNS from_in tableName (from_in db_name=id_)? (KW_LIKE showStmtIdentifier|showStmtIdentifier)?
+    | KW_SHOW isExtended = KW_EXTENDED? KW_TABLES (from_in db_name = id_)? filter = showTablesFilterExpr?
+    | KW_SHOW KW_VIEWS (from_in db_name = id_)? (KW_LIKE showStmtIdentifier | showStmtIdentifier)?
+    | KW_SHOW KW_MATERIALIZED KW_VIEWS (from_in db_name = id_)? (
+        KW_LIKE showStmtIdentifier
+        | showStmtIdentifier
+    )?
+    | KW_SHOW KW_SORTED? KW_COLUMNS from_in tableName (from_in db_name = id_)? (
+        KW_LIKE showStmtIdentifier
+        | showStmtIdentifier
+    )?
     | KW_SHOW KW_FUNCTIONS (KW_LIKE showFunctionIdentifier)?
-    | KW_SHOW KW_PARTITIONS tabName=tableName partitionSpec? whereClause? orderByClause? limitClause?
-    | KW_SHOW KW_CREATE (db_schema db_name=id_ | KW_TABLE tabName=tableName)
-    | KW_SHOW KW_TABLE KW_EXTENDED (from_in db_name=id_)? KW_LIKE showStmtIdentifier partitionSpec?
-    | KW_SHOW KW_TBLPROPERTIES tableName (LPAREN prptyName=StringLiteral RPAREN)?
-    | KW_SHOW KW_LOCKS (db_schema dbName=id_ isExtended=KW_EXTENDED? | parttype=partTypeExpr? isExtended=KW_EXTENDED?)
-    | KW_SHOW KW_COMPACTIONS
-      ( compactionId
-      | db_schema dbName=id_ compactionPool? compactionType? compactionStatus? orderByClause? limitClause?
-      | parttype=partTypeExpr? compactionPool? compactionType? compactionStatus? orderByClause? limitClause?
-      )
+    | KW_SHOW KW_PARTITIONS tabName = tableName partitionSpec? whereClause? orderByClause? limitClause?
+    | KW_SHOW KW_CREATE (db_schema db_name = id_ | KW_TABLE tabName = tableName)
+    | KW_SHOW KW_TABLE KW_EXTENDED (from_in db_name = id_)? KW_LIKE showStmtIdentifier partitionSpec?
+    | KW_SHOW KW_TBLPROPERTIES tableName (LPAREN prptyName = StringLiteral RPAREN)?
+    | KW_SHOW KW_LOCKS (
+        db_schema dbName = id_ isExtended = KW_EXTENDED?
+        | parttype = partTypeExpr? isExtended = KW_EXTENDED?
+    )
+    | KW_SHOW KW_COMPACTIONS (
+        compactionId
+        | db_schema dbName = id_ compactionPool? compactionType? compactionStatus? orderByClause? limitClause?
+        | parttype = partTypeExpr? compactionPool? compactionType? compactionStatus? orderByClause? limitClause?
+    )
     | KW_SHOW KW_TRANSACTIONS
     | KW_SHOW KW_CONF StringLiteral
-    | KW_SHOW KW_RESOURCE (KW_PLAN rp_name=id_ | KW_PLANS)
+    | KW_SHOW KW_RESOURCE (KW_PLAN rp_name = id_ | KW_PLANS)
     | KW_SHOW KW_DATACONNECTORS
     ;
 
@@ -351,7 +345,7 @@ lockStatement
     ;
 
 lockDatabase
-    : KW_LOCK db_schema dbName=id_ lockMode
+    : KW_LOCK db_schema dbName = id_ lockMode
     ;
 
 lockMode
@@ -364,22 +358,19 @@ unlockStatement
     ;
 
 unlockDatabase
-    : KW_UNLOCK db_schema dbName=id_
+    : KW_UNLOCK db_schema dbName = id_
     ;
 
 createRoleStatement
-    : KW_CREATE KW_ROLE roleName=id_
+    : KW_CREATE KW_ROLE roleName = id_
     ;
 
 dropRoleStatement
-    : KW_DROP KW_ROLE roleName=id_
+    : KW_DROP KW_ROLE roleName = id_
     ;
 
 grantPrivileges
-    : KW_GRANT privList=privilegeList
-      privilegeObject?
-      KW_TO principalSpecification
-      withGrantOption?
+    : KW_GRANT privList = privilegeList privilegeObject? KW_TO principalSpecification withGrantOption?
     ;
 
 revokePrivileges
@@ -407,11 +398,7 @@ showCurrentRole
     ;
 
 setRole
-    : KW_SET KW_ROLE
-        ( all=KW_ALL
-        | none=KW_NONE
-        | id_
-        )
+    : KW_SET KW_ROLE (all = KW_ALL | none = KW_NONE | id_)
     ;
 
 showGrants
@@ -419,7 +406,7 @@ showGrants
     ;
 
 showRolePrincipals
-    : KW_SHOW KW_PRINCIPALS roleName=id_
+    : KW_SHOW KW_PRINCIPALS roleName = id_
     ;
 
 privilegeIncludeColObject
@@ -437,14 +424,14 @@ database or table type. Type is optional, default type is table
 privObject
     : db_schema id_
     | KW_TABLE? tableName partitionSpec?
-    | KW_URI path=StringLiteral
+    | KW_URI path = StringLiteral
     | KW_SERVER id_
     ;
 
 privObjectCols
     : db_schema id_
-    | KW_TABLE? tableName (LPAREN cols=columnNameList RPAREN)? partitionSpec?
-    | KW_URI path=StringLiteral
+    | KW_TABLE? tableName (LPAREN cols = columnNameList RPAREN)? partitionSpec?
+    | KW_URI path = StringLiteral
     | KW_SERVER id_
     ;
 
@@ -453,7 +440,7 @@ privilegeList
     ;
 
 privlegeDef
-    : privilegeType (LPAREN cols=columnNameList RPAREN)?
+    : privilegeType (LPAREN cols = columnNameList RPAREN)?
     ;
 
 privilegeType
@@ -496,18 +483,19 @@ withAdminOption
     ;
 
 metastoreCheck
-    : KW_MSCK repair=KW_REPAIR?
-      (KW_TABLE tableName
-          (opt=(KW_ADD | KW_DROP | KW_SYNC) parts=KW_PARTITIONS partitionSelectorSpec?)?
-      )
+    : KW_MSCK repair = KW_REPAIR? (
+        KW_TABLE tableName (
+            opt = (KW_ADD | KW_DROP | KW_SYNC) parts = KW_PARTITIONS partitionSelectorSpec?
+        )?
+    )
     ;
 
 resourceList
-    :  resource (COMMA resource)*
+    : resource (COMMA resource)*
     ;
 
 resource
-    : resType=resourceType resPath=StringLiteral
+    : resType = resourceType resPath = StringLiteral
     ;
 
 resourceType
@@ -517,12 +505,13 @@ resourceType
     ;
 
 createFunctionStatement
-    : KW_CREATE temp=KW_TEMPORARY? KW_FUNCTION functionIdentifier KW_AS StringLiteral
-      (KW_USING rList=resourceList)?
+    : KW_CREATE temp = KW_TEMPORARY? KW_FUNCTION functionIdentifier KW_AS StringLiteral (
+        KW_USING rList = resourceList
+    )?
     ;
 
 dropFunctionStatement
-    : KW_DROP temp=KW_TEMPORARY? KW_FUNCTION ifExists? functionIdentifier
+    : KW_DROP temp = KW_TEMPORARY? KW_FUNCTION ifExists? functionIdentifier
     ;
 
 reloadFunctionsStatement
@@ -530,8 +519,7 @@ reloadFunctionsStatement
     ;
 
 createMacroStatement
-    : KW_CREATE KW_TEMPORARY KW_MACRO Identifier
-      LPAREN columnNameTypeList? RPAREN expression
+    : KW_CREATE KW_TEMPORARY KW_MACRO Identifier LPAREN columnNameTypeList? RPAREN expression
     ;
 
 dropMacroStatement
@@ -539,15 +527,13 @@ dropMacroStatement
     ;
 
 createViewStatement
-    : KW_CREATE orReplace? KW_VIEW ifNotExists? name=tableName
-        (LPAREN columnNameCommentList RPAREN)? tableComment? viewPartition?
-        tablePropertiesPrefixed?
-        KW_AS
-        selectStatementWithCTE
+    : KW_CREATE orReplace? KW_VIEW ifNotExists? name = tableName (
+        LPAREN columnNameCommentList RPAREN
+    )? tableComment? viewPartition? tablePropertiesPrefixed? KW_AS selectStatementWithCTE
     ;
 
 viewPartition
-    : KW_PARTITIONED KW_ON (LPAREN columnNameList | KW_SPEC LPAREN spec=partitionTransformSpec) RPAREN
+    : KW_PARTITIONED KW_ON (LPAREN columnNameList | KW_SPEC LPAREN spec = partitionTransformSpec) RPAREN
     ;
 
 viewOrganization
@@ -564,11 +550,11 @@ viewComplexSpec
     ;
 
 viewDistSpec
-    : KW_DISTRIBUTED KW_ON LPAREN colList=columnNameList RPAREN
+    : KW_DISTRIBUTED KW_ON LPAREN colList = columnNameList RPAREN
     ;
 
 viewSortSpec
-    : KW_SORTED KW_ON LPAREN colList=columnNameList RPAREN
+    : KW_SORTED KW_ON LPAREN colList = columnNameList RPAREN
     ;
 
 dropViewStatement
@@ -576,10 +562,8 @@ dropViewStatement
     ;
 
 createMaterializedViewStatement
-    : KW_CREATE KW_MATERIALIZED KW_VIEW ifNotExists? name=tableName
-        rewriteDisabled? tableComment? viewPartition? viewOrganization?
-        tableRowFormat? tableFileFormat? tableLocation?
-        tablePropertiesPrefixed? KW_AS selectStatementWithCTE
+    : KW_CREATE KW_MATERIALIZED KW_VIEW ifNotExists? name = tableName rewriteDisabled? tableComment? viewPartition? viewOrganization? tableRowFormat?
+        tableFileFormat? tableLocation? tablePropertiesPrefixed? KW_AS selectStatementWithCTE
     ;
 
 dropMaterializedViewStatement
@@ -587,19 +571,15 @@ dropMaterializedViewStatement
     ;
 
 createScheduledQueryStatement
-    : KW_CREATE KW_SCHEDULED KW_QUERY name=id_
-        scheduleSpec
-        executedAsSpec?
-        enableSpecification?
-        definedAsSpec
+    : KW_CREATE KW_SCHEDULED KW_QUERY name = id_ scheduleSpec executedAsSpec? enableSpecification? definedAsSpec
     ;
 
 dropScheduledQueryStatement
-    : KW_DROP KW_SCHEDULED KW_QUERY name=id_
+    : KW_DROP KW_SCHEDULED KW_QUERY name = id_
     ;
 
 alterScheduledQueryStatement
-    : KW_ALTER KW_SCHEDULED KW_QUERY name=id_ mod=alterScheduledQueryChange
+    : KW_ALTER KW_SCHEDULED KW_QUERY name = id_ mod = alterScheduledQueryChange
     ;
 
 alterScheduledQueryChange
@@ -611,13 +591,14 @@ alterScheduledQueryChange
     ;
 
 scheduleSpec
-    : KW_CRON cronString=StringLiteral
-    | KW_EVERY value=Number? qualifier=intervalQualifiers
-        ((KW_AT | KW_OFFSET KW_BY) offsetTs=StringLiteral)?
+    : KW_CRON cronString = StringLiteral
+    | KW_EVERY value = Number? qualifier = intervalQualifiers (
+        (KW_AT | KW_OFFSET KW_BY) offsetTs = StringLiteral
+    )?
     ;
 
 executedAsSpec
-    : KW_EXECUTED KW_AS executedAs=StringLiteral
+    : KW_EXECUTED KW_AS executedAs = StringLiteral
     ;
 
 definedAsSpec
@@ -635,14 +616,14 @@ showStmtIdentifier
     ;
 
 tableComment
-    : KW_COMMENT comment=StringLiteral
+    : KW_COMMENT comment = StringLiteral
     ;
 
 createTablePartitionSpec
-    : KW_PARTITIONED KW_BY
-        ( LPAREN (opt1=createTablePartitionColumnTypeSpec | opt2=createTablePartitionColumnSpec)
-        | KW_SPEC LPAREN spec=partitionTransformSpec
-        ) RPAREN
+    : KW_PARTITIONED KW_BY (
+        LPAREN (opt1 = createTablePartitionColumnTypeSpec | opt2 = createTablePartitionColumnSpec)
+        | KW_SPEC LPAREN spec = partitionTransformSpec
+    ) RPAREN
     ;
 
 createTablePartitionColumnTypeSpec
@@ -664,20 +645,21 @@ columnNameTransformConstraint
 partitionTransformType
     : columnName
     | (KW_YEAR | KW_MONTH | KW_DAY | KW_HOUR) LPAREN columnName RPAREN
-    | (KW_TRUNCATE | KW_BUCKET) LPAREN value=Number COMMA columnName RPAREN
+    | (KW_TRUNCATE | KW_BUCKET) LPAREN value = Number COMMA columnName RPAREN
     ;
 
 tableBuckets
-    : KW_CLUSTERED KW_BY LPAREN bucketCols=columnNameList RPAREN
-        (KW_SORTED KW_BY LPAREN sortCols=columnNameOrderList RPAREN)? KW_INTO num=Number KW_BUCKETS
+    : KW_CLUSTERED KW_BY LPAREN bucketCols = columnNameList RPAREN (
+        KW_SORTED KW_BY LPAREN sortCols = columnNameOrderList RPAREN
+    )? KW_INTO num = Number KW_BUCKETS
     ;
 
 tableImplBuckets
-    : KW_CLUSTERED KW_INTO num=Number KW_BUCKETS
+    : KW_CLUSTERED KW_INTO num = Number KW_BUCKETS
     ;
 
 tableSkewed
-    : KW_SKEWED KW_BY LPAREN skewedCols=columnNameList RPAREN KW_ON LPAREN skewedValues=skewedValueElement RPAREN storedAsDirs?
+    : KW_SKEWED KW_BY LPAREN skewedCols = columnNameList RPAREN KW_ON LPAREN skewedValues = skewedValueElement RPAREN storedAsDirs?
     ;
 
 rowFormat
@@ -694,12 +676,14 @@ recordWriter
     ;
 
 rowFormatSerde
-    : KW_ROW KW_FORMAT KW_SERDE name=StringLiteral (KW_WITH KW_SERDEPROPERTIES serdeprops=tableProperties)?
+    : KW_ROW KW_FORMAT KW_SERDE name = StringLiteral (
+        KW_WITH KW_SERDEPROPERTIES serdeprops = tableProperties
+    )?
     ;
 
 rowFormatDelimited
-    : KW_ROW KW_FORMAT KW_DELIMITED tableRowFormatFieldIdentifier? tableRowFormatCollItemsIdentifier?
-        tableRowFormatMapKeysIdentifier? tableRowFormatLinesIdentifier? tableRowNullFormat?
+    : KW_ROW KW_FORMAT KW_DELIMITED tableRowFormatFieldIdentifier? tableRowFormatCollItemsIdentifier? tableRowFormatMapKeysIdentifier?
+        tableRowFormatLinesIdentifier? tableRowNullFormat?
     ;
 
 tableRowFormat
@@ -721,49 +705,50 @@ tablePropertiesList
     ;
 
 keyValueProperty
-    : key=StringLiteral EQUAL value=StringLiteral
+    : key = StringLiteral EQUAL value = StringLiteral
     ;
 
 keyProperty
-    : key=StringLiteral
+    : key = StringLiteral
     ;
 
 tableRowFormatFieldIdentifier
-    : KW_FIELDS KW_TERMINATED KW_BY fldIdnt=StringLiteral (KW_ESCAPED KW_BY fldEscape=StringLiteral)?
+    : KW_FIELDS KW_TERMINATED KW_BY fldIdnt = StringLiteral (
+        KW_ESCAPED KW_BY fldEscape = StringLiteral
+    )?
     ;
 
 tableRowFormatCollItemsIdentifier
-    : KW_COLLECTION KW_ITEMS KW_TERMINATED KW_BY collIdnt=StringLiteral
+    : KW_COLLECTION KW_ITEMS KW_TERMINATED KW_BY collIdnt = StringLiteral
     ;
 
 tableRowFormatMapKeysIdentifier
-    : KW_MAP KW_KEYS KW_TERMINATED KW_BY mapKeysIdnt=StringLiteral
+    : KW_MAP KW_KEYS KW_TERMINATED KW_BY mapKeysIdnt = StringLiteral
     ;
 
 tableRowFormatLinesIdentifier
-    : KW_LINES KW_TERMINATED KW_BY linesIdnt=StringLiteral
+    : KW_LINES KW_TERMINATED KW_BY linesIdnt = StringLiteral
     ;
 
 tableRowNullFormat
-    : KW_NULL KW_DEFINED KW_AS nullIdnt=StringLiteral
+    : KW_NULL KW_DEFINED KW_AS nullIdnt = StringLiteral
     ;
 
 tableFileFormat
-    : KW_STORED KW_AS KW_INPUTFORMAT
-        inFmt=StringLiteral KW_OUTPUTFORMAT
-        outFmt=StringLiteral
-        (KW_INPUTDRIVER inDriver=StringLiteral KW_OUTPUTDRIVER outDriver=StringLiteral)?
-    | KW_STORED KW_BY storageHandler=StringLiteral
-        (KW_WITH KW_SERDEPROPERTIES serdeprops=tableProperties)?
-        (KW_STORED KW_AS fileformat=id_)?
-    | KW_STORED KW_BY genericSpec=id_
-        (KW_WITH KW_SERDEPROPERTIES serdeprops=tableProperties)?
-        (KW_STORED KW_AS fileformat=id_)?
-    | KW_STORED KW_AS genericSpec=id_
+    : KW_STORED KW_AS KW_INPUTFORMAT inFmt = StringLiteral KW_OUTPUTFORMAT outFmt = StringLiteral (
+        KW_INPUTDRIVER inDriver = StringLiteral KW_OUTPUTDRIVER outDriver = StringLiteral
+    )?
+    | KW_STORED KW_BY storageHandler = StringLiteral (
+        KW_WITH KW_SERDEPROPERTIES serdeprops = tableProperties
+    )? (KW_STORED KW_AS fileformat = id_)?
+    | KW_STORED KW_BY genericSpec = id_ (KW_WITH KW_SERDEPROPERTIES serdeprops = tableProperties)? (
+        KW_STORED KW_AS fileformat = id_
+    )?
+    | KW_STORED KW_AS genericSpec = id_
     ;
 
 tableLocation
-    : KW_LOCATION locn=StringLiteral
+    : KW_LOCATION locn = StringLiteral
     ;
 
 columnNameTypeList
@@ -819,16 +804,16 @@ enforcedSpecification
     ;
 
 relySpecification
-    :  KW_RELY
-    |  KW_NORELY
+    : KW_RELY
+    | KW_NORELY
     ;
 
 createConstraint
-    : (KW_CONSTRAINT constraintName=id_)? tableLevelConstraint constraintOptsCreate?
+    : (KW_CONSTRAINT constraintName = id_)? tableLevelConstraint constraintOptsCreate?
     ;
 
 alterConstraintWithName
-    : KW_CONSTRAINT constraintName=id_ tableLevelConstraint constraintOptsAlter?
+    : KW_CONSTRAINT constraintName = id_ tableLevelConstraint constraintOptsAlter?
     ;
 
 tableLevelConstraint
@@ -837,7 +822,7 @@ tableLevelConstraint
     ;
 
 pkUkConstraint
-    : tableConstraintType pkCols=columnParenthesesList
+    : tableConstraintType pkCols = columnParenthesesList
     ;
 
 checkConstraint
@@ -845,13 +830,13 @@ checkConstraint
     ;
 
 createForeignKey
-    : (KW_CONSTRAINT constraintName=id_)? KW_FOREIGN KW_KEY fkCols=columnParenthesesList
-        KW_REFERENCES tabName=tableName parCols=columnParenthesesList constraintOptsCreate?
+    : (KW_CONSTRAINT constraintName = id_)? KW_FOREIGN KW_KEY fkCols = columnParenthesesList KW_REFERENCES tabName = tableName parCols =
+        columnParenthesesList constraintOptsCreate?
     ;
 
 alterForeignKeyWithName
-    : KW_CONSTRAINT constraintName=id_ KW_FOREIGN KW_KEY fkCols=columnParenthesesList
-        KW_REFERENCES tabName=tableName parCols=columnParenthesesList constraintOptsAlter?
+    : KW_CONSTRAINT constraintName = id_ KW_FOREIGN KW_KEY fkCols = columnParenthesesList KW_REFERENCES tabName = tableName parCols =
+        columnParenthesesList constraintOptsAlter?
     ;
 
 skewedValueElement
@@ -864,7 +849,7 @@ skewedColumnValuePairList
     ;
 
 skewedColumnValuePair
-    : LPAREN colValues=skewedColumnValues RPAREN
+    : LPAREN colValues = skewedColumnValues RPAREN
     ;
 
 skewedColumnValues
@@ -890,7 +875,7 @@ nullOrdering
     ;
 
 columnNameOrder
-    : id_ orderSpec=orderSpecification? nullSpec=nullOrdering?
+    : id_ orderSpec = orderSpecification? nullSpec = nullOrdering?
     ;
 
 columnNameCommentList
@@ -898,7 +883,7 @@ columnNameCommentList
     ;
 
 columnNameComment
-    : colName=id_ (KW_COMMENT comment=StringLiteral)?
+    : colName = id_ (KW_COMMENT comment = StringLiteral)?
     ;
 
 orderSpecificationRewrite
@@ -907,11 +892,11 @@ orderSpecificationRewrite
     ;
 
 columnRefOrder
-    : expression orderSpec=orderSpecificationRewrite? nullSpec=nullOrdering?
+    : expression orderSpec = orderSpecificationRewrite? nullSpec = nullOrdering?
     ;
 
 columnNameType
-    : colName=id_ colType (KW_COMMENT comment=StringLiteral)?
+    : colName = id_ colType (KW_COMMENT comment = StringLiteral)?
     ;
 
 columnNameTypeOrConstraint
@@ -925,7 +910,7 @@ tableConstraint
     ;
 
 columnNameTypeConstraint
-    : colName=id_ colType columnConstraint? (KW_COMMENT comment=StringLiteral)?
+    : colName = id_ colType columnConstraint? (KW_COMMENT comment = StringLiteral)?
     ;
 
 columnConstraint
@@ -934,11 +919,11 @@ columnConstraint
     ;
 
 foreignKeyConstraint
-    : (KW_CONSTRAINT constraintName=id_)? KW_REFERENCES tabName=tableName LPAREN colName=columnName RPAREN constraintOptsCreate?
+    : (KW_CONSTRAINT constraintName = id_)? KW_REFERENCES tabName = tableName LPAREN colName = columnName RPAREN constraintOptsCreate?
     ;
 
 colConstraint
-    : (KW_CONSTRAINT constraintName=id_)? columnConstraintType constraintOptsCreate?
+    : (KW_CONSTRAINT constraintName = id_)? columnConstraintType constraintOptsCreate?
     ;
 
 alterColumnConstraint
@@ -947,11 +932,11 @@ alterColumnConstraint
     ;
 
 alterForeignKeyConstraint
-    : (KW_CONSTRAINT constraintName=id_)? KW_REFERENCES tabName=tableName LPAREN colName=columnName RPAREN constraintOptsAlter?
+    : (KW_CONSTRAINT constraintName = id_)? KW_REFERENCES tabName = tableName LPAREN colName = columnName RPAREN constraintOptsAlter?
     ;
 
 alterColConstraint
-    : (KW_CONSTRAINT constraintName=id_)? columnConstraintType constraintOptsAlter?
+    : (KW_CONSTRAINT constraintName = id_)? columnConstraintType constraintOptsAlter?
     ;
 
 columnConstraintType
@@ -981,7 +966,7 @@ constraintOptsAlter
     ;
 
 columnNameColonType
-    : colName=id_ COLON colType (KW_COMMENT comment=StringLiteral)?
+    : colName = id_ COLON colType (KW_COMMENT comment = StringLiteral)?
     ;
 
 colType
@@ -997,7 +982,8 @@ type
     | listType
     | structType
     | mapType
-    | unionType;
+    | unionType
+    ;
 
 primitiveType
     : KW_TINYINT
@@ -1020,8 +1006,8 @@ primitiveType
     //| KW_INTERVAL KW_DAY KW_TO KW_SECOND
     | KW_STRING
     | KW_BINARY
-    | KW_DECIMAL (LPAREN prec=Number (COMMA scale=Number)? RPAREN)?
-    | (KW_VARCHAR | KW_CHAR) LPAREN length=Number RPAREN
+    | KW_DECIMAL (LPAREN prec = Number (COMMA scale = Number)? RPAREN)?
+    | (KW_VARCHAR | KW_CHAR) LPAREN length = Number RPAREN
     ;
 
 listType
@@ -1033,7 +1019,7 @@ structType
     ;
 
 mapType
-    : KW_MAP LESSTHAN left=primitiveType COMMA right=type GREATERTHAN
+    : KW_MAP LESSTHAN left = primitiveType COMMA right = type GREATERTHAN
     ;
 
 unionType
@@ -1049,7 +1035,7 @@ queryStatementExpression
        But the predicate gets pushed as a lookahead decision.
        Calling rule doesnot know about topLevel
     */
-    : w=withClause? queryStatementExpressionBody
+    : w = withClause? queryStatementExpressionBody
     ;
 
 queryStatementExpressionBody
@@ -1062,15 +1048,15 @@ withClause
     ;
 
 cteStatement
-    : id_ (LPAREN colAliases=columnNameList RPAREN)? KW_AS LPAREN queryStatementExpression RPAREN
+    : id_ (LPAREN colAliases = columnNameList RPAREN)? KW_AS LPAREN queryStatementExpression RPAREN
     ;
 
 fromStatement
-    : singleFromStatement (u=setOperator r=singleFromStatement)*
+    : singleFromStatement (u = setOperator r = singleFromStatement)*
     ;
 
 singleFromStatement
-    : fromClause b+=body+
+    : fromClause b += body+
     ;
 
 /*
@@ -1080,81 +1066,50 @@ The valuesClause rule below ensures that the parse tree for
 very similar to the tree for "insert into table FOO select a,b from BAR".
 */
 regularBody
-    : i=insertClause s=selectStatement
+    : i = insertClause s = selectStatement
     | selectStatement
     ;
 
 atomSelectStatement
-    : s=selectClause
-      f=fromClause?
-      w=whereClause?
-      g=groupByClause?
-      h=havingClause?
-      win=window_clause?
-      q=qualifyClause?
+    : s = selectClause f = fromClause? w = whereClause? g = groupByClause? h = havingClause? win = window_clause? q = qualifyClause?
     | LPAREN selectStatement RPAREN
     | valuesSource
     ;
 
 selectStatement
-    : a=atomSelectStatement
-      set=setOpSelectStatement?
-      o=orderByClause?
-      c=clusterByClause?
-      d=distributeByClause?
-      sort=sortByClause?
-      l=limitClause?
+    : a = atomSelectStatement set = setOpSelectStatement? o = orderByClause? c = clusterByClause? d = distributeByClause? sort = sortByClause? l =
+        limitClause?
     ;
 
 setOpSelectStatement
-    : (u=setOperator b=atomSelectStatement)+
+    : (u = setOperator b = atomSelectStatement)+
     ;
 
 selectStatementWithCTE
-    : w=withClause? selectStatement
+    : w = withClause? selectStatement
     ;
 
 body
-    : insertClause
-      selectClause
-      lateralView?
-      whereClause?
-      groupByClause?
-      havingClause?
-      window_clause?
-      qualifyClause?
-      orderByClause?
-      clusterByClause?
-      distributeByClause?
-      sortByClause?
-      limitClause?
-    | selectClause
-      lateralView?
-      whereClause?
-      groupByClause?
-      havingClause?
-      window_clause?
-      qualifyClause?
-      orderByClause?
-      clusterByClause?
-      distributeByClause?
-      sortByClause?
-      limitClause?
+    : insertClause selectClause lateralView? whereClause? groupByClause? havingClause? window_clause? qualifyClause? orderByClause? clusterByClause?
+        distributeByClause? sortByClause? limitClause?
+    | selectClause lateralView? whereClause? groupByClause? havingClause? window_clause? qualifyClause? orderByClause? clusterByClause?
+        distributeByClause? sortByClause? limitClause?
     ;
 
 insertClause
-    : KW_INSERT ( KW_OVERWRITE destination ifNotExists?
-                | KW_INTO KW_TABLE? tableOrPartition (LPAREN targetCols=columnNameList RPAREN)?
-                )
+    : KW_INSERT (
+        KW_OVERWRITE destination ifNotExists?
+        | KW_INTO KW_TABLE? tableOrPartition (LPAREN targetCols = columnNameList RPAREN)?
+    )
     ;
 
 destination
-    : local=KW_LOCAL? KW_DIRECTORY StringLiteral tableRowFormat? tableFileFormat?
+    : local = KW_LOCAL? KW_DIRECTORY StringLiteral tableRowFormat? tableFileFormat?
     | KW_TABLE tableOrPartition
     ;
 
 limitClause
-    : KW_LIMIT ((offset=Number COMMA)? num=Number | num=Number KW_OFFSET offset=Number)
+    : KW_LIMIT ((offset = Number COMMA)? num = Number | num = Number KW_OFFSET offset = Number)
     ;
 
 /**
@@ -1199,7 +1154,7 @@ sqlTransactionStatement
     ;
 
 startTransactionStatement
-    : KW_START KW_TRANSACTION (transactionMode (COMMA transactionMode)* )?
+    : KW_START KW_TRANSACTION (transactionMode (COMMA transactionMode)*)?
     ;
 
 transactionMode
@@ -1231,6 +1186,7 @@ rollbackStatement
 setAutoCommitStatement
     : KW_SET KW_AUTOCOMMIT booleanValueTok
     ;
+
 /*
 END user defined transaction boundaries
 */
@@ -1249,6 +1205,7 @@ BEGIN SQL Merge statement
 mergeStatement
     : KW_MERGE QUERY_HINT? KW_INTO tableName (KW_AS? id_)? KW_USING joinSourcePart KW_ON expression whenClauses
     ;
+
 /*
 Allow 0,1 or 2 WHEN MATCHED clauses and 0 or 1 WHEN NOT MATCHED
 Each WHEN clause may have AND <boolean predicate>.
@@ -1260,7 +1217,7 @@ whenClauses
     ;
 
 whenNotMatchedClause
-    : KW_WHEN KW_NOT KW_MATCHED (KW_AND expression)? KW_THEN KW_INSERT targetCols=columnParenthesesList? KW_VALUES valueRowConstructor
+    : KW_WHEN KW_NOT KW_MATCHED (KW_AND expression)? KW_THEN KW_INSERT targetCols = columnParenthesesList? KW_VALUES valueRowConstructor
     ;
 
 whenMatchedAndClause
@@ -1275,6 +1232,7 @@ updateOrDelete
     : KW_UPDATE setColumnsClause
     | KW_DELETE
     ;
+
 /*
 END SQL Merge statement
 */
@@ -1287,19 +1245,19 @@ killQueryStatement
 BEGIN SHOW COMPACTIONS statement
 */
 compactionId
-    : KW_COMPACT_ID EQUAL compactId=Number
+    : KW_COMPACT_ID EQUAL compactId = Number
     ;
 
 compactionPool
-    : KW_POOL poolName=StringLiteral
+    : KW_POOL poolName = StringLiteral
     ;
 
 compactionType
-    : KW_TYPE compactType=StringLiteral
+    : KW_TYPE compactType = StringLiteral
     ;
 
 compactionStatus
-    : KW_STATUS status=StringLiteral
+    : KW_STATUS status = StringLiteral
     ;
 
 /*
@@ -1307,12 +1265,13 @@ END SHOW COMPACTIONS statement
 */
 
 alterStatement
-    : KW_ALTER ( KW_TABLE tableName alterTableStatementSuffix
-               | KW_VIEW tableName KW_AS? alterViewStatementSuffix
-               | KW_MATERIALIZED KW_VIEW tableNameTree=tableName alterMaterializedViewStatementSuffix
-               | db_schema alterDatabaseStatementSuffix
-               | KW_DATACONNECTOR alterDataConnectorStatementSuffix
-               )
+    : KW_ALTER (
+        KW_TABLE tableName alterTableStatementSuffix
+        | KW_VIEW tableName KW_AS? alterViewStatementSuffix
+        | KW_MATERIALIZED KW_VIEW tableNameTree = tableName alterMaterializedViewStatementSuffix
+        | db_schema alterDatabaseStatementSuffix
+        | KW_DATACONNECTOR alterDataConnectorStatementSuffix
+    )
     ;
 
 alterTableStatementSuffix
@@ -1370,8 +1329,8 @@ alterMaterializedViewStatementSuffix
     ;
 
 alterMaterializedViewSuffixRewrite
-    : mvRewriteFlag=rewriteEnabled
-    | mvRewriteFlag2=rewriteDisabled
+    : mvRewriteFlag = rewriteEnabled
+    | mvRewriteFlag2 = rewriteDisabled
     ;
 
 alterMaterializedViewSuffixRebuild
@@ -1385,19 +1344,19 @@ alterDatabaseStatementSuffix
     ;
 
 alterDatabaseSuffixProperties
-    : name=id_ KW_SET KW_DBPROPERTIES dbProperties
+    : name = id_ KW_SET KW_DBPROPERTIES dbProperties
     ;
 
 alterDatabaseSuffixSetOwner
-    : dbName=id_ KW_SET KW_OWNER principalName
+    : dbName = id_ KW_SET KW_OWNER principalName
     ;
 
 alterDatabaseSuffixSetLocation
-    : dbName=id_ KW_SET (KW_LOCATION | KW_MANAGEDLOCATION) newLocation=StringLiteral
+    : dbName = id_ KW_SET (KW_LOCATION | KW_MANAGEDLOCATION) newLocation = StringLiteral
     ;
 
 alterDatabaseSuffixSetManagedLocation
-    : dbName=id_ KW_SET KW_MANAGEDLOCATION newLocation=StringLiteral
+    : dbName = id_ KW_SET KW_MANAGEDLOCATION newLocation = StringLiteral
     ;
 
 alterStatementSuffixRename
@@ -1405,11 +1364,11 @@ alterStatementSuffixRename
     ;
 
 alterStatementSuffixAddCol
-    : (add=KW_ADD | replace=KW_REPLACE) KW_COLUMNS LPAREN columnNameTypeList RPAREN restrictOrCascade?
+    : (add = KW_ADD | replace = KW_REPLACE) KW_COLUMNS LPAREN columnNameTypeList RPAREN restrictOrCascade?
     ;
 
 alterStatementSuffixAddConstraint
-    :  KW_ADD (fk=alterForeignKeyWithName | alterConstraintWithName)
+    : KW_ADD (fk = alterForeignKeyWithName | alterConstraintWithName)
     ;
 
 alterStatementSuffixUpdateColumns
@@ -1417,16 +1376,19 @@ alterStatementSuffixUpdateColumns
     ;
 
 alterStatementSuffixDropConstraint
-    : KW_DROP KW_CONSTRAINT cName=id_
+    : KW_DROP KW_CONSTRAINT cName = id_
     ;
 
 alterStatementSuffixRenameCol
-    : KW_CHANGE KW_COLUMN? oldName=id_ newName=id_ colType alterColumnConstraint?
-        (KW_COMMENT comment=StringLiteral)? alterStatementChangeColPosition? restrictOrCascade?
+    : KW_CHANGE KW_COLUMN? oldName = id_ newName = id_ colType alterColumnConstraint? (
+        KW_COMMENT comment = StringLiteral
+    )? alterStatementChangeColPosition? restrictOrCascade?
     ;
 
 alterStatementSuffixUpdateStatsCol
-    : KW_UPDATE KW_STATISTICS KW_FOR KW_COLUMN? colName=id_ KW_SET tableProperties (KW_COMMENT comment=StringLiteral)?
+    : KW_UPDATE KW_STATISTICS KW_FOR KW_COLUMN? colName = id_ KW_SET tableProperties (
+        KW_COMMENT comment = StringLiteral
+    )?
     ;
 
 alterStatementSuffixUpdateStats
@@ -1434,8 +1396,8 @@ alterStatementSuffixUpdateStats
     ;
 
 alterStatementChangeColPosition
-    : first=KW_FIRST
-    | KW_AFTER afterCol=id_
+    : first = KW_FIRST
+    | KW_AFTER afterCol = id_
     ;
 
 alterStatementSuffixAddPartitions
@@ -1459,11 +1421,13 @@ alterStatementSuffixUnArchive
     ;
 
 partitionLocation
-    : KW_LOCATION locn=StringLiteral
+    : KW_LOCATION locn = StringLiteral
     ;
 
 alterStatementSuffixDropPartitions
-    : KW_DROP ifExists? KW_PARTITION partitionSelectorSpec (COMMA KW_PARTITION partitionSelectorSpec)* KW_PURGE? replicationClause?
+    : KW_DROP ifExists? KW_PARTITION partitionSelectorSpec (
+        COMMA KW_PARTITION partitionSelectorSpec
+    )* KW_PURGE? replicationClause?
     ;
 
 alterStatementSuffixProperties
@@ -1477,9 +1441,10 @@ alterViewSuffixProperties
     ;
 
 alterStatementSuffixSerdeProperties
-    : KW_SET ( KW_SERDE serdeName=StringLiteral (KW_WITH KW_SERDEPROPERTIES tableProperties)?
-             | KW_SERDEPROPERTIES tableProperties
-             )
+    : KW_SET (
+        KW_SERDE serdeName = StringLiteral (KW_WITH KW_SERDEPROPERTIES tableProperties)?
+        | KW_SERDEPROPERTIES tableProperties
+    )
     | KW_UNSET KW_SERDEPROPERTIES tableProperties
     ;
 
@@ -1509,11 +1474,11 @@ skewedLocationsList
     ;
 
 skewedLocationMap
-    : key=skewedValueLocationElement EQUAL value=StringLiteral
+    : key = skewedValueLocationElement EQUAL value = StringLiteral
     ;
 
 alterStatementSuffixLocation
-    : KW_SET KW_LOCATION newLoc=StringLiteral
+    : KW_SET KW_LOCATION newLoc = StringLiteral
     ;
 
 alterStatementSuffixSkewedby
@@ -1522,7 +1487,7 @@ alterStatementSuffixSkewedby
     ;
 
 alterStatementSuffixExchangePartition
-    : KW_EXCHANGE partitionSpec KW_WITH KW_TABLE exchangename=tableName
+    : KW_EXCHANGE partitionSpec KW_WITH KW_TABLE exchangename = tableName
     ;
 
 alterStatementSuffixRenamePart
@@ -1530,7 +1495,9 @@ alterStatementSuffixRenamePart
     ;
 
 alterStatementSuffixStatsPart
-    : KW_UPDATE KW_STATISTICS KW_FOR KW_COLUMN? colName=id_ KW_SET tableProperties (KW_COMMENT comment=StringLiteral)?
+    : KW_UPDATE KW_STATISTICS KW_FOR KW_COLUMN? colName = id_ KW_SET tableProperties (
+        KW_COMMENT comment = StringLiteral
+    )?
     ;
 
 alterStatementSuffixMergeFiles
@@ -1538,7 +1505,7 @@ alterStatementSuffixMergeFiles
     ;
 
 alterStatementSuffixBucketNum
-    : KW_INTO num=Number KW_BUCKETS
+    : KW_INTO num = Number KW_BUCKETS
     ;
 
 blocking
@@ -1546,11 +1513,13 @@ blocking
     ;
 
 compactPool
-    : KW_POOL poolName=StringLiteral
+    : KW_POOL poolName = StringLiteral
     ;
 
 alterStatementSuffixCompact
-    : KW_COMPACT compactType=StringLiteral tableImplBuckets? blocking? compactPool? (KW_WITH KW_OVERWRITE KW_TBLPROPERTIES tableProperties)?
+    : KW_COMPACT compactType = StringLiteral tableImplBuckets? blocking? compactPool? (
+        KW_WITH KW_OVERWRITE KW_TBLPROPERTIES tableProperties
+    )?
     ;
 
 alterStatementSuffixSetOwner
@@ -1558,20 +1527,22 @@ alterStatementSuffixSetOwner
     ;
 
 alterStatementSuffixSetPartSpec
-    : KW_SET KW_PARTITION KW_SPEC LPAREN spec=partitionTransformSpec RPAREN
+    : KW_SET KW_PARTITION KW_SPEC LPAREN spec = partitionTransformSpec RPAREN
     ;
 
 alterStatementSuffixExecute
-    : KW_EXECUTE ( KW_ROLLBACK LPAREN rollbackParam=(StringLiteral | Number)
-                 | KW_EXPIRE_SNAPSHOTS LPAREN expireParam=StringLiteral
-                 | KW_SET_CURRENT_SNAPSHOT LPAREN snapshotParam=Number
-                 ) RPAREN
+    : KW_EXECUTE (
+        KW_ROLLBACK LPAREN rollbackParam = (StringLiteral | Number)
+        | KW_EXPIRE_SNAPSHOTS LPAREN expireParam = StringLiteral
+        | KW_SET_CURRENT_SNAPSHOT LPAREN snapshotParam = Number
+    ) RPAREN
     ;
 
 fileFormat
-    : KW_INPUTFORMAT inFmt=StringLiteral KW_OUTPUTFORMAT outFmt=StringLiteral KW_SERDE serdeCls=StringLiteral
-        (KW_INPUTDRIVER inDriver=StringLiteral KW_OUTPUTDRIVER outDriver=StringLiteral)?
-    | genericSpec=id_
+    : KW_INPUTFORMAT inFmt = StringLiteral KW_OUTPUTFORMAT outFmt = StringLiteral KW_SERDE serdeCls = StringLiteral (
+        KW_INPUTDRIVER inDriver = StringLiteral KW_OUTPUTDRIVER outDriver = StringLiteral
+    )?
+    | genericSpec = id_
     ;
 
 alterDataConnectorStatementSuffix
@@ -1581,79 +1552,55 @@ alterDataConnectorStatementSuffix
     ;
 
 alterDataConnectorSuffixProperties
-    : name=id_ KW_SET KW_DCPROPERTIES dcProperties
+    : name = id_ KW_SET KW_DCPROPERTIES dcProperties
     ;
 
 alterDataConnectorSuffixSetOwner
-    : dcName=id_ KW_SET KW_OWNER principalName
+    : dcName = id_ KW_SET KW_OWNER principalName
     ;
 
 alterDataConnectorSuffixSetUrl
-    : dcName=id_ KW_SET KW_URL newUri=StringLiteral
+    : dcName = id_ KW_SET KW_URL newUri = StringLiteral
     ;
 
 likeTableOrFile
     : KW_LIKE KW_FILE
-    | KW_LIKE KW_FILE format=id_ uri=StringLiteral
-    | KW_LIKE likeName=tableName
+    | KW_LIKE KW_FILE format = id_ uri = StringLiteral
+    | KW_LIKE likeName = tableName
     ;
 
 /**
 Rules for parsing createtable
 */
 createTableStatement
-    : KW_CREATE temp=KW_TEMPORARY? trans=KW_TRANSACTIONAL? ext=KW_EXTERNAL? KW_TABLE ifNotExists? name=tableName
-      (  likeTableOrFile
-         createTablePartitionSpec?
-         tableRowFormat?
-         tableFileFormat?
-         tableLocation?
-         tablePropertiesPrefixed?
-       | (LPAREN columnNameTypeOrConstraintList RPAREN)?
-         tableComment?
-         createTablePartitionSpec?
-         tableBuckets?
-         tableSkewed?
-         tableRowFormat?
-         tableFileFormat?
-         tableLocation?
-         tablePropertiesPrefixed?
-         (KW_AS selectStatementWithCTE)?
-      )
-    | KW_CREATE mgd=KW_MANAGED KW_TABLE ifNotExists? name=tableName
-       ( likeTableOrFile
-         tableRowFormat?
-         tableFileFormat?
-         tableLocation?
-         tablePropertiesPrefixed?
-       | (LPAREN columnNameTypeOrConstraintList RPAREN)?
-         tableComment?
-         createTablePartitionSpec?
-         tableBuckets?
-         tableSkewed?
-         tableRowFormat?
-         tableFileFormat?
-         tableLocation?
-         tablePropertiesPrefixed?
-         (KW_AS selectStatementWithCTE)?
-       )
+    : KW_CREATE temp = KW_TEMPORARY? trans = KW_TRANSACTIONAL? ext = KW_EXTERNAL? KW_TABLE ifNotExists? name = tableName (
+        likeTableOrFile createTablePartitionSpec? tableRowFormat? tableFileFormat? tableLocation? tablePropertiesPrefixed?
+        | (LPAREN columnNameTypeOrConstraintList RPAREN)? tableComment? createTablePartitionSpec? tableBuckets? tableSkewed? tableRowFormat?
+            tableFileFormat? tableLocation? tablePropertiesPrefixed? (KW_AS selectStatementWithCTE)?
+    )
+    | KW_CREATE mgd = KW_MANAGED KW_TABLE ifNotExists? name = tableName (
+        likeTableOrFile tableRowFormat? tableFileFormat? tableLocation? tablePropertiesPrefixed?
+        | (LPAREN columnNameTypeOrConstraintList RPAREN)? tableComment? createTablePartitionSpec? tableBuckets? tableSkewed? tableRowFormat?
+            tableFileFormat? tableLocation? tablePropertiesPrefixed? (KW_AS selectStatementWithCTE)?
+    )
     ;
 
 createDataConnectorStatement
-    : KW_CREATE KW_DATACONNECTOR ifNotExists? name=id_ dataConnectorType dataConnectorUrl dataConnectorComment?
-        (KW_WITH KW_DCPROPERTIES dcprops=dcProperties)?
+    : KW_CREATE KW_DATACONNECTOR ifNotExists? name = id_ dataConnectorType dataConnectorUrl dataConnectorComment? (
+        KW_WITH KW_DCPROPERTIES dcprops = dcProperties
+    )?
     ;
 
 dataConnectorComment
-    : KW_COMMENT comment=StringLiteral
+    : KW_COMMENT comment = StringLiteral
     ;
 
 dataConnectorUrl
-    : KW_URL url=StringLiteral
+    : KW_URL url = StringLiteral
     ;
 
 dataConnectorType
-    : KW_TYPE dcType=StringLiteral
+    : KW_TYPE dcType = StringLiteral
     ;
 
 dcProperties
@@ -1708,7 +1655,9 @@ atomjoinSource
     ;
 
 joinSource
-    : atomjoinSource (joinToken joinSourcePart (KW_ON expression | KW_USING columnParenthesesList)?)*
+    : atomjoinSource (
+        joinToken joinSourcePart (KW_ON expression | KW_USING columnParenthesesList)?
+    )*
     ;
 
 joinSourcePart
@@ -1729,18 +1678,20 @@ uniqueJoinToken
 
 joinToken
     : COMMA
-    | ( KW_INNER
-      | KW_CROSS
-      | (KW_RIGHT | KW_FULL) KW_OUTER?
-      | KW_LEFT (KW_SEMI | KW_ANTI | KW_OUTER)?
-      )? KW_JOIN
+    | (
+        KW_INNER
+        | KW_CROSS
+        | (KW_RIGHT | KW_FULL) KW_OUTER?
+        | KW_LEFT (KW_SEMI | KW_ANTI | KW_OUTER)?
+    )? KW_JOIN
     ;
 
 lateralView
     : KW_LATERAL KW_VIEW KW_OUTER function_ tableAlias (KW_AS id_ (COMMA id_)*)?
-    | COMMA? KW_LATERAL ( KW_VIEW function_ tableAlias (KW_AS id_ (COMMA id_)*)?
-                        | KW_TABLE LPAREN valuesClause RPAREN KW_AS? tableAlias (LPAREN id_ (COMMA id_)* RPAREN)?
-                        )
+    | COMMA? KW_LATERAL (
+        KW_VIEW function_ tableAlias (KW_AS id_ (COMMA id_)*)?
+        | KW_TABLE LPAREN valuesClause RPAREN KW_AS? tableAlias (LPAREN id_ (COMMA id_)* RPAREN)?
+    )
     ;
 
 tableAlias
@@ -1748,8 +1699,9 @@ tableAlias
     ;
 
 tableBucketSample
-    : KW_TABLESAMPLE LPAREN KW_BUCKET numerator=Number KW_OUT KW_OF denominator=Number
-        (KW_ON expr+=expression (COMMA expr+=expression)*)? RPAREN
+    : KW_TABLESAMPLE LPAREN KW_BUCKET numerator = Number KW_OUT KW_OF denominator = Number (
+        KW_ON expr += expression (COMMA expr += expression)*
+    )? RPAREN
     ;
 
 splitSample
@@ -1762,26 +1714,29 @@ tableSample
     ;
 
 tableSource
-    : tabname=tableName props=tableProperties? ts=tableSample? asOf=asOfClause? (KW_AS? alias=id_)?
+    : tabname = tableName props = tableProperties? ts = tableSample? asOf = asOfClause? (
+        KW_AS? alias = id_
+    )?
     ;
 
 asOfClause
-    : KW_FOR ( KW_SYSTEM_TIME KW_AS KW_OF asOfTime=expression
-             | KW_FOR KW_SYSTEM_VERSION KW_AS KW_OF asOfVersion=Number
-             )
+    : KW_FOR (
+        KW_SYSTEM_TIME KW_AS KW_OF asOfTime = expression
+        | KW_FOR KW_SYSTEM_VERSION KW_AS KW_OF asOfVersion = Number
+    )
     ;
 
 uniqueJoinTableSource
-    : tabname=tableName ts=tableSample? (KW_AS? alias=id_)?
+    : tabname = tableName ts = tableSample? (KW_AS? alias = id_)?
     ;
 
 tableName
-    : db=id_ DOT tab=id_ (DOT meta=id_)?
-    | tab=id_
+    : db = id_ DOT tab = id_ (DOT meta = id_)?
+    | tab = id_
     ;
 
 viewName
-    : (db=id_ DOT)? view=id_
+    : (db = id_ DOT)? view = id_
     ;
 
 subQuerySource
@@ -1806,10 +1761,9 @@ partitionTableFunctionSource
     ;
 
 partitionedTableFunction
-    : n=id_ LPAREN KW_ON
-        ptfsrc=partitionTableFunctionSource spec=partitioningSpec?
-        (Identifier LPAREN expression RPAREN (COMMA Identifier LPAREN expression RPAREN)*)?
-        RPAREN alias=id_?
+    : n = id_ LPAREN KW_ON ptfsrc = partitionTableFunctionSource spec = partitioningSpec? (
+        Identifier LPAREN expression RPAREN (COMMA Identifier LPAREN expression RPAREN)*
+    )? RPAREN alias = id_?
     ;
 
 /**
@@ -1884,11 +1838,9 @@ selectList
     ;
 
 selectTrfmClause
-    : LPAREN selectExpressionList RPAREN
-        rowFormat recordWriter
-        KW_USING StringLiteral
-        (KW_AS (LPAREN (aliasList | columnNameTypeList) RPAREN | aliasList | columnNameTypeList))?
-        rowFormat recordReader
+    : LPAREN selectExpressionList RPAREN rowFormat recordWriter KW_USING StringLiteral (
+        KW_AS (LPAREN (aliasList | columnNameTypeList) RPAREN | aliasList | columnNameTypeList)
+    )? rowFormat recordReader
     ;
 
 selectItem
@@ -1897,11 +1849,9 @@ selectItem
     ;
 
 trfmClause
-    : (KW_MAP | KW_REDUCE) selectExpressionList
-        rowFormat recordWriter
-        KW_USING StringLiteral
-        (KW_AS (LPAREN (aliasList | columnNameTypeList) RPAREN | aliasList | columnNameTypeList))?
-        rowFormat recordReader
+    : (KW_MAP | KW_REDUCE) selectExpressionList rowFormat recordWriter KW_USING StringLiteral (
+        KW_AS (LPAREN (aliasList | columnNameTypeList) RPAREN | aliasList | columnNameTypeList)
+    )? rowFormat recordReader
     ;
 
 selectExpression
@@ -1935,15 +1885,17 @@ window_frame
     ;
 
 window_range_expression
-    : KW_ROWS ( window_frame_start_boundary
-              | KW_BETWEEN window_frame_boundary KW_AND window_frame_boundary
-              )
+    : KW_ROWS (
+        window_frame_start_boundary
+        | KW_BETWEEN window_frame_boundary KW_AND window_frame_boundary
+    )
     ;
 
 window_value_expression
-    : KW_RANGE ( window_frame_start_boundary
-               | KW_BETWEEN window_frame_boundary KW_AND window_frame_boundary
-               )
+    : KW_RANGE (
+        window_frame_start_boundary
+        | KW_BETWEEN window_frame_boundary KW_AND window_frame_boundary
+    )
     ;
 
 window_frame_start_boundary
@@ -1975,15 +1927,14 @@ groupByEmpty
 
 // standard rollup syntax
 rollupStandard
-    : (rollup=KW_ROLLUP | cube=KW_CUBE)
-    LPAREN expression (COMMA expression)* RPAREN
+    : (rollup = KW_ROLLUP | cube = KW_CUBE) LPAREN expression (COMMA expression)* RPAREN
     ;
 
 // old hive rollup syntax
 rollupOldSyntax
-    : expr=expressionsNotInParenthesis
-        (rollup=KW_WITH KW_ROLLUP | cube=KW_WITH KW_CUBE)?
-        (sets=KW_GROUPING KW_SETS LPAREN groupingSetExpression (COMMA groupingSetExpression)* RPAREN)?
+    : expr = expressionsNotInParenthesis (rollup = KW_WITH KW_ROLLUP | cube = KW_WITH KW_CUBE)? (
+        sets = KW_GROUPING KW_SETS LPAREN groupingSetExpression (COMMA groupingSetExpression)* RPAREN
+    )?
     ;
 
 groupingSetExpression
@@ -2016,7 +1967,7 @@ expressionsInParenthesis
     ;
 
 expressionsNotInParenthesis
-    : first=expressionOrDefault more=expressionPart?
+    : first = expressionOrDefault more = expressionPart?
     ;
 
 expressionPart
@@ -2033,14 +1984,14 @@ Parses comma separated list of expressions with optionally specified aliases.
  <expression> [<alias>] [, <expression> [<alias>]]
 */
 firstExpressionsWithAlias
-    : first=expression KW_AS? colAlias=id_? (COMMA expressionWithAlias)*
+    : first = expression KW_AS? colAlias = id_? (COMMA expressionWithAlias)*
     ;
 
 /** Parses expressions which may have alias.
  If alias is not specified generate one.
 */
 expressionWithAlias
-    : expression KW_AS? alias=id_?
+    : expression KW_AS? alias = id_?
     ;
 
 expressions
@@ -2079,26 +2030,26 @@ sortByClause
 
 // TRIM([LEADING|TRAILING|BOTH] trim_characters FROM str)
 trimFunction
-    : KW_TRIM LPAREN (leading=KW_LEADING | trailing=KW_TRAILING | KW_BOTH)?
-        trim_characters=selectExpression? KW_FROM str=selectExpression RPAREN
+    : KW_TRIM LPAREN (leading = KW_LEADING | trailing = KW_TRAILING | KW_BOTH)? trim_characters = selectExpression? KW_FROM str = selectExpression
+        RPAREN
     ;
 
 // fun(par1, par2, par3)
 function_
     : trimFunction
-    | functionName
-    LPAREN
-      (star=STAR | dist=all_distinct? (selectExpression (COMMA selectExpression)*)?)
-      (
+    | functionName LPAREN (
+        star = STAR
+        | dist = all_distinct? (selectExpression (COMMA selectExpression)*)?
+    ) (
         // SELECT rank(3) WITHIN GROUP (<order by clause>)
-        RPAREN within=KW_WITHIN KW_GROUP LPAREN ordBy=orderByClause RPAREN
+        RPAREN within = KW_WITHIN KW_GROUP LPAREN ordBy = orderByClause RPAREN
         // No null treatment: SELECT first_value(b) OVER (<window spec>)
         // Standard null treatment spec: SELECT first_value(b) IGNORE NULLS OVER (<window spec>)
-        | RPAREN nt=null_treatment? KW_OVER ws=window_specification
+        | RPAREN nt = null_treatment? KW_OVER ws = window_specification
         // Non-standard null treatment spec: SELECT first_value(b IGNORE NULLS) OVER (<window spec>)
-        | nt=null_treatment RPAREN KW_OVER ws=window_specification
+        | nt = null_treatment RPAREN KW_OVER ws = window_specification
         | RPAREN
-      )
+    )
     ;
 
 null_treatment
@@ -2112,31 +2063,19 @@ functionName
     ;
 
 castExpression
-    : KW_CAST
-    LPAREN
-          expression
-          KW_AS
-          toType=primitiveType
-          (fmt=KW_FORMAT StringLiteral)?
-    RPAREN
+    : KW_CAST LPAREN expression KW_AS toType = primitiveType (fmt = KW_FORMAT StringLiteral)? RPAREN
     ;
 
 caseExpression
-    : KW_CASE expression
-    (KW_WHEN expression KW_THEN expression)+
-    (KW_ELSE expression)?
-    KW_END
+    : KW_CASE expression (KW_WHEN expression KW_THEN expression)+ (KW_ELSE expression)? KW_END
     ;
 
 whenExpression
-    : KW_CASE
-    (KW_WHEN expression KW_THEN expression)+
-    (KW_ELSE expression)?
-    KW_END
+    : KW_CASE (KW_WHEN expression KW_THEN expression)+ (KW_ELSE expression)? KW_END
     ;
 
 floorExpression
-    : KW_FLOOR LPAREN expression (KW_TO floorUnit=floorDateQualifiers)? RPAREN
+    : KW_FLOOR LPAREN expression (KW_TO floorUnit = floorDateQualifiers)? RPAREN
     ;
 
 floorDateQualifiers
@@ -2151,7 +2090,7 @@ floorDateQualifiers
     ;
 
 extractExpression
-    : KW_EXTRACT LPAREN timeUnit=timeQualifiers KW_FROM expression RPAREN
+    : KW_EXTRACT LPAREN timeUnit = timeQualifiers KW_FROM expression RPAREN
     ;
 
 timeQualifiers
@@ -2183,7 +2122,7 @@ constant
     ;
 
 prepareStmtParam
-    : p=parameterIdx
+    : p = parameterIdx
     ;
 
 parameterIdx
@@ -2195,7 +2134,7 @@ stringLiteralSequence
     ;
 
 charSetStringLiteral
-    : csName=CharSetName csLiteral=CharSetLiteral
+    : csName = CharSetName csLiteral = CharSetLiteral
     ;
 
 dateLiteral
@@ -2218,12 +2157,12 @@ intervalValue
     ;
 
 intervalLiteral
-    : value=intervalValue qualifiers=intervalQualifiers
+    : value = intervalValue qualifiers = intervalQualifiers
     ;
 
 intervalExpression
-    : LPAREN value=intervalValue RPAREN qualifiers=intervalQualifiers
-    | KW_INTERVAL (value=intervalValue | LPAREN expr=expression RPAREN) qualifiers=intervalQualifiers
+    : LPAREN value = intervalValue RPAREN qualifiers = intervalQualifiers
+    | KW_INTERVAL (value = intervalValue | LPAREN expr = expression RPAREN) qualifiers = intervalQualifiers
     ;
 
 intervalQualifiers
@@ -2274,7 +2213,9 @@ precedenceBitwiseXorOperator
     ;
 
 precedenceBitwiseXorExpression
-    : precedenceUnaryPrefixExpression (precedenceBitwiseXorOperator precedenceUnaryPrefixExpression)*
+    : precedenceUnaryPrefixExpression (
+        precedenceBitwiseXorOperator precedenceUnaryPrefixExpression
+    )*
     ;
 
 precedenceStarOperator
@@ -2302,8 +2243,7 @@ precedenceConcatenateOperator
     ;
 
 precedenceConcatenateExpression
-    : precedencePlusExpression (precedenceConcatenateOperator plus=precedencePlusExpression)*
-
+    : precedencePlusExpression (precedenceConcatenateOperator plus = precedencePlusExpression)*
     ;
 
 precedenceAmpersandOperator
@@ -2346,19 +2286,19 @@ precedenceSimilarExpression
     ;
 
 precedenceSimilarExpressionMain
-    : a=precedenceBitwiseOrExpression part=precedenceSimilarExpressionPart?
+    : a = precedenceBitwiseOrExpression part = precedenceSimilarExpressionPart?
     ;
 
 precedenceSimilarExpressionPart
-    : precedenceSimilarOperator equalExpr=precedenceBitwiseOrExpression
+    : precedenceSimilarOperator equalExpr = precedenceBitwiseOrExpression
     | precedenceSimilarExpressionAtom
     | KW_NOT precedenceSimilarExpressionPartNot
     ;
 
 precedenceSimilarExpressionAtom
     : KW_IN precedenceSimilarExpressionIn
-    | KW_BETWEEN min=precedenceBitwiseOrExpression KW_AND max=precedenceBitwiseOrExpression
-    | KW_LIKE (KW_ANY | KW_ALL) expr=expressionsInParenthesis
+    | KW_BETWEEN min = precedenceBitwiseOrExpression KW_AND max = precedenceBitwiseOrExpression
+    | KW_LIKE (KW_ANY | KW_ALL) expr = expressionsInParenthesis
     | precedenceSimilarExpressionQuantifierPredicate
     ;
 
@@ -2374,11 +2314,11 @@ quantifierType
 
 precedenceSimilarExpressionIn
     : subQueryExpression
-    | expr=expressionsInParenthesis
+    | expr = expressionsInParenthesis
     ;
 
 precedenceSimilarExpressionPartNot
-    : precedenceRegexpOperator notExpr=precedenceBitwiseOrExpression
+    : precedenceRegexpOperator notExpr = precedenceBitwiseOrExpression
     | precedenceSimilarExpressionAtom
     ;
 
@@ -2394,10 +2334,10 @@ precedenceEqualOperator
     ;
 
 precedenceEqualExpression
-    : precedenceSimilarExpression
-        ( equal+=precedenceEqualOperator p+=precedenceSimilarExpression
-        | dist+=precedenceDistinctOperator p+=precedenceSimilarExpression
-        )*
+    : precedenceSimilarExpression (
+        equal += precedenceEqualOperator p += precedenceSimilarExpression
+        | dist += precedenceDistinctOperator p += precedenceSimilarExpression
+    )*
     ;
 
 isCondition
@@ -2412,7 +2352,7 @@ isCondition
     ;
 
 precedenceUnarySuffixExpression
-    : precedenceEqualExpression (a=KW_IS isCondition)?
+    : precedenceEqualExpression (a = KW_IS isCondition)?
     ;
 
 precedenceNotOperator
@@ -2541,7 +2481,7 @@ id_
     ;
 
 functionIdentifier
-    : id_ (DOT fn=id_)?
+    : id_ (DOT fn = id_)?
     ;
 
 principalIdentifier
@@ -2877,7 +2817,7 @@ resourcePlanDdlStatements
     ;
 
 rpAssign
-    : KW_QUERY_PARALLELISM EQUAL parallelism=Number
+    : KW_QUERY_PARALLELISM EQUAL parallelism = Number
     | KW_DEFAULT KW_POOL EQUAL poolPath
     ;
 
@@ -2895,8 +2835,10 @@ rpUnassignList
     ;
 
 createResourcePlanStatement
-    : KW_CREATE KW_RESOURCE KW_PLAN ifNotExists?
-        (name=id_ KW_LIKE likeName=id_ | name=id_ (KW_WITH rpAssignList)?)
+    : KW_CREATE KW_RESOURCE KW_PLAN ifNotExists? (
+        name = id_ KW_LIKE likeName = id_
+        | name = id_ (KW_WITH rpAssignList)?
+    )
     ;
 
 withReplace
@@ -2920,15 +2862,15 @@ unmanaged
     ;
 
 alterResourcePlanStatement
-    : KW_ALTER KW_RESOURCE KW_PLAN name=id_ (
-          KW_VALIDATE
+    : KW_ALTER KW_RESOURCE KW_PLAN name = id_ (
+        KW_VALIDATE
         | KW_DISABLE
         | KW_SET rpAssignList
         | KW_UNSET rpUnassignList
-        | KW_RENAME KW_TO newName=id_
+        | KW_RENAME KW_TO newName = id_
         | activate enable?
         | enable activate?
-      )
+    )
     ;
 
 /** It might make sense to make this more generic, if something else could be enabled/disabled.
@@ -2939,13 +2881,13 @@ globalWmStatement
 
 replaceResourcePlanStatement
     : KW_REPLACE (
-          KW_ACTIVE KW_RESOURCE KW_PLAN KW_WITH src=id_
-        | KW_RESOURCE KW_PLAN dest=id_ KW_WITH src=id_
-      )
+        KW_ACTIVE KW_RESOURCE KW_PLAN KW_WITH src = id_
+        | KW_RESOURCE KW_PLAN dest = id_ KW_WITH src = id_
+    )
     ;
 
 dropResourcePlanStatement
-    : KW_DROP KW_RESOURCE KW_PLAN ifExists? name=id_
+    : KW_DROP KW_RESOURCE KW_PLAN ifExists? name = id_
     ;
 
 poolPath
@@ -2995,27 +2937,27 @@ triggerActionExpressionStandalone
     ;
 
 createTriggerStatement
-    : KW_CREATE KW_TRIGGER rpName=id_ DOT triggerName=id_
-      KW_WHEN triggerExpression KW_DO triggerActionExpression
+    : KW_CREATE KW_TRIGGER rpName = id_ DOT triggerName = id_ KW_WHEN triggerExpression KW_DO triggerActionExpression
     ;
 
 alterTriggerStatement
-    : KW_ALTER KW_TRIGGER rpName=id_ DOT triggerName=id_
-      ( KW_WHEN triggerExpression KW_DO triggerActionExpression
-      | (KW_ADD KW_TO | KW_DROP KW_FROM) (KW_POOL poolName=poolPath | KW_UNMANAGED)
-      )
+    : KW_ALTER KW_TRIGGER rpName = id_ DOT triggerName = id_ (
+        KW_WHEN triggerExpression KW_DO triggerActionExpression
+        | (KW_ADD KW_TO | KW_DROP KW_FROM) (KW_POOL poolName = poolPath | KW_UNMANAGED)
+    )
     ;
 
 dropTriggerStatement
-    : KW_DROP KW_TRIGGER rpName=id_ DOT triggerName=id_
+    : KW_DROP KW_TRIGGER rpName = id_ DOT triggerName = id_
     ;
 
 poolAssign
-    : ( KW_ALLOC_FRACTION EQUAL allocFraction=Number
-      | KW_QUERY_PARALLELISM EQUAL parallelism=Number
-      | KW_SCHEDULING_POLICY EQUAL policy=StringLiteral
-      | KW_PATH EQUAL path=poolPath
-      )
+    : (
+        KW_ALLOC_FRACTION EQUAL allocFraction = Number
+        | KW_QUERY_PARALLELISM EQUAL parallelism = Number
+        | KW_SCHEDULING_POLICY EQUAL policy = StringLiteral
+        | KW_PATH EQUAL path = poolPath
+    )
     ;
 
 poolAssignList
@@ -3023,37 +2965,35 @@ poolAssignList
     ;
 
 createPoolStatement
-    : KW_CREATE KW_POOL rpName=id_ DOT poolPath
-      KW_WITH poolAssignList
+    : KW_CREATE KW_POOL rpName = id_ DOT poolPath KW_WITH poolAssignList
     ;
 
 alterPoolStatement
-    : KW_ALTER KW_POOL rpName=id_ DOT poolPath
-        ( KW_SET poolAssignList
+    : KW_ALTER KW_POOL rpName = id_ DOT poolPath (
+        KW_SET poolAssignList
         | KW_UNSET KW_SCHEDULING_POLICY
-        | (KW_ADD | KW_DROP) KW_TRIGGER triggerName=id_
-        )
+        | (KW_ADD | KW_DROP) KW_TRIGGER triggerName = id_
+    )
     ;
 
 dropPoolStatement
-    : KW_DROP KW_POOL rpName=id_ DOT poolPath
+    : KW_DROP KW_POOL rpName = id_ DOT poolPath
     ;
 
 createMappingStatement
-    : KW_CREATE mappingType=(KW_USER | KW_GROUP | KW_APPLICATION)
-         KW_MAPPING name=StringLiteral
-         KW_IN rpName=id_ (KW_TO path=poolPath | unmanaged)
-         (KW_WITH KW_ORDER order=Number)?
+    : KW_CREATE mappingType = (KW_USER | KW_GROUP | KW_APPLICATION) KW_MAPPING name = StringLiteral KW_IN rpName = id_ (
+        KW_TO path = poolPath
+        | unmanaged
+    ) (KW_WITH KW_ORDER order = Number)?
     ;
 
 alterMappingStatement
-    : KW_ALTER mappingType=(KW_USER | KW_GROUP | KW_APPLICATION)
-         KW_MAPPING name=StringLiteral
-         KW_IN rpName=id_ (KW_TO path=poolPath | unmanaged)
-         (KW_WITH KW_ORDER order=Number)?
+    : KW_ALTER mappingType = (KW_USER | KW_GROUP | KW_APPLICATION) KW_MAPPING name = StringLiteral KW_IN rpName = id_ (
+        KW_TO path = poolPath
+        | unmanaged
+    ) (KW_WITH KW_ORDER order = Number)?
     ;
 
 dropMappingStatement
-    : KW_DROP mappingType=(KW_USER | KW_GROUP | KW_APPLICATION) KW_MAPPING
-         name=StringLiteral KW_IN rpName=id_
+    : KW_DROP mappingType = (KW_USER | KW_GROUP | KW_APPLICATION) KW_MAPPING name = StringLiteral KW_IN rpName = id_
     ;

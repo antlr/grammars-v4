@@ -26,7 +26,7 @@ bool JavaScriptLexerBase::IsStrictMode()
 
 bool JavaScriptLexerBase::IsInTemplateString()
 {
-	return _templateDepth > 0;
+    return !templateDepthStack.empty() && templateDepthStack.top() == currentDepth;
 }
 
 std::unique_ptr<antlr4::Token> JavaScriptLexerBase::nextToken() {
@@ -43,6 +43,7 @@ std::unique_ptr<antlr4::Token> JavaScriptLexerBase::nextToken() {
 
 void JavaScriptLexerBase::ProcessOpenBrace()
 {
+    currentDepth++;
     useStrictCurrent = scopeStrictModes.size() > 0 && scopeStrictModes.top() ? true : useStrictDefault;
     scopeStrictModes.push(useStrictCurrent);
 }
@@ -55,6 +56,7 @@ void JavaScriptLexerBase::ProcessCloseBrace()
     } else {
         useStrictCurrent = useStrictDefault;
     }
+    currentDepth--;
 }
 
 void JavaScriptLexerBase::ProcessStringLiteral()
@@ -72,14 +74,14 @@ void JavaScriptLexerBase::ProcessStringLiteral()
     }
 }
 
-void JavaScriptLexerBase::IncreaseTemplateDepth()
-{
-	_templateDepth++;
+void JavaScriptLexerBase::ProcessTemplateOpenBrace() {
+    currentDepth++;
+    templateDepthStack.push(currentDepth);
 }
 
-void JavaScriptLexerBase::DecreaseTemplateDepth()
-{
-	_templateDepth--;
+void JavaScriptLexerBase::ProcessTemplateCloseBrace() {
+    templateDepthStack.pop();
+    currentDepth--;
 }
 
 bool JavaScriptLexerBase::IsRegexPossible()
@@ -109,4 +111,16 @@ bool JavaScriptLexerBase::IsRegexPossible()
             // In all other cases, a regex literal _is_ possible.
             return true;
     }
+}
+
+void JavaScriptLexerBase::reset()
+{
+    while(!scopeStrictModes.empty()) scopeStrictModes.pop();
+    lastToken = false;
+    lastTokenType = 0;
+    useStrictDefault = false;
+    useStrictCurrent = false;
+    currentDepth = 0;
+    while(!templateDepthStack.empty()) templateDepthStack.pop();
+    Lexer::reset();
 }

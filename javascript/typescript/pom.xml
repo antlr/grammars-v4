@@ -14,7 +14,6 @@
         <src.dir>Java</src.dir>
     </properties>
 	<build>
-        <sourceDirectory>Java</sourceDirectory>
         <plugins>
 			<plugin>
 				<groupId>org.antlr</groupId>
