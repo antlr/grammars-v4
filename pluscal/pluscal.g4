@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2021, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -44,11 +44,11 @@ macro
    ;
 
 procedure
-   : 'procedure' name '(' (pVarDecls (',' pVarDecls)*)? ')' pVarDecls? compoundStmt ';'?
+   : 'procedure' name '(' (pVarDecl (',' pVarDecl)*)? ')' pVarDecls? compoundStmt ';'?
    ;
 
 process
-   : 'process' '(' name (EQ | IN) expr ')' varDecls? compoundStmt ';'?
+   : ('fair' '+'? )? 'process' '(' name (EQ | IN) expr ')' varDecls? compoundStmt ';'?
    ;
 
 varDecls
@@ -64,7 +64,7 @@ pVarDecls
    ;
 
 pVarDecl
-   : variable (EQ expr)? ';'
+   : variable (EQ expr)?
    ;
 
 compoundStmt
@@ -139,23 +139,27 @@ macrocall
    ;
 
 expr
-   : atom ((AND | OR) atom)*
-   | list
-   | compare
-   ;
-
-compare
-   : atom '=' atom
+   : expr '[' expr (',' expr)* ']'                      # indexExpr
+   | '-' expr                                            # negExpr
+   | '~' expr                                             # notExpr
+   | expr ('*' | '/' | '%' | '\\div') expr               # mulExpr
+   | expr ('+' | '-') expr                               # addExpr
+   | expr '..' expr                                       # rangeExpr
+   | expr (EQ | NEQ | LE | GE | '<' | '>') expr          # compareExpr
+   | expr (IN | NOTIN) expr                               # inExpr
+   | expr AND expr                                        # andExpr
+   | expr OR expr                                         # orExpr
+   | 'IF' expr 'THEN' expr 'ELSE' expr                    # ifExpr
+   | '[' name IN expr '|->' expr ']'                      # funcConstructExpr
+   | '{' (expr (',' expr)*)? '}'                          # setExpr
+   | '(' expr ')'                                          # parenExpr
+   | atom                                                  # atomExpr
    ;
 
 atom
    : bool
    | numb
    | name
-   ;
-
-list
-   : '{' atom (',' atom)* '}'
    ;
 
 numb
@@ -199,6 +203,22 @@ IN
    : '\\in'
    ;
 
+NOTIN
+   : '\\notin'
+   ;
+
+NEQ
+   : '/=' | '#'
+   ;
+
+LE
+   : '<=' | '=<' | '\\leq'
+   ;
+
+GE
+   : '>=' | '\\geq'
+   ;
+
 DIGIT
    : '0' .. '9'
    ;
@@ -208,11 +228,11 @@ ID
    ;
 
 COMMENT
-   : ';' ~ [\r\n]*
+   : '\\*' ~ [\r\n]* -> skip
    ;
 
 COMMENT2
-   : '\\*' ~ [\r\n]*
+   : '(*' .*? '*)' -> skip
    ;
 
 WS
