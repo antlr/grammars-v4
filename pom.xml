@@ -362,6 +362,7 @@
 				<module>rfc1960</module>
 				<module>rfc3080</module>
 				<module>robotwars</module>
+                <module>robotalk</module>
 				<module>romannumerals</module>
 				<module>ron</module>
 				<module>rpn</module>
