@@ -345,6 +345,7 @@
 				<module>r</module>
 				<module>racket-bsl</module>
 				<module>racket-isl</module>
+                <module>rapid</module>
 				<module>rcs</module>
 				<module>redcode</module>
 				<module>refal</module>

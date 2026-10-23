@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2020, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -30,198 +30,391 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+/*
+* Grammar for the RAPID language (ABB industrial robot programming language).
+*/
 grammar rapid;
 
-Data := Value
-AccSet Acc Ramp ActUnit MecUnit Add Name AddValue Break
-CallBy Var Name Number Clear Name
-   Overview
-3-45
-ClkReset ClkStart
-ClkStop
-Close IODevice ! Comment
-ConfJ [\On] | [\Off]
-ConfL [\On] | [\Off] CONNECT Interrupt WITH CorrCon Descr
-CorrDiscon Descr
-CorrWrite Descr Data CorrClear
-DeactUnit MecUnit
-Decr Name
-EOffsSet EAxOffs
+rapid
+   : module+ EOF
+   ;
 
-ErrWrite [ \W ] Header Reason [ \RL2]
-Exit
-ExitCycle
-FOR Loop counter FROM Start value [STEP Step value] DO ... ENDFOR
-GOTO Label
-GripLoad Load
-GetSysData DestObject [\ ObjectName ] IDelete Interrupt
-IF Condition ...
-IF Condition THEN ... {ELSEIF Condition THEN ...}
-[ \RL3] [ \RL4]
-TO End value
-[ELSE ...] ENDIF
-Incr Name IndAMove
-[ \Ramp ]
-IndCMove IndDMove
-MecUnit Axis [ \ToAbsPos ] | [ \ToAbsNum ] Speed
-MecUnit Axis Speed [ \Ramp ]
-MecUnit Axis Delta Speed [ \Ramp ]
-IndReset MecUnit Axis [ \RefPos ] | [ \RefNum ] | [ \Short ] | [ \Fwd ] | [ \Bwd ] | [ \Old ]
-IndRMove MecUnit Axis [ \ToRelPos ] | [ \ToRelNum ] | [ \Short ] | [ \Fwd ] | [ \Bwd ] Speed [ \Ramp ]
-InvertDO Signal
-IODisable UnitName MaxTime
-IOEnable ISignalDI ISignalDO
-UnitName MaxTime
-[ \Single ] Signal TriggValue Interrupt
-[ \Single ] Signal TriggValue Interrupt
+module
+   : MODULE IDENT moduleAttributeList? moduleMember* ENDMODULE
+   ;
 
-ISleep
-ITimer
-Interrupt
-[ \Single ] Time Interrupt
-IVarValue VarNo Value, Interrupt
-IWatch Interrupt
-Label:
-MoveAbsJ [ \Conc ] ToJointPos Speed [ \V ] | [ \T ] Zone [ \Z]
-Tool [ \WObj ]
-MoveC [ \Conc ] CirPoint ToPoint Speed [ \V ] | [ \T ] Zone [ \Z] Tool [ \WObj ]
-MoveCDO CirPoint ToPoint Speed [ \T ] Zone Tool [\WObj ] Signal Value
-MoveCSync CirPoint ToPoint Speed [ \T ] Zone Tool [\WObj ] ProcName
-MoveJ [\Conc] ToPoint Speed [\V]|[\T] Zone [\Z] Tool [ \WObj ]
-MoveJDO ToPoint Speed [ \T ] Zone Tool [ \WObj ] Signal Value
-MoveJSync ToPoint Speed [ \T ] Zone Tool [ \WObj ] ProcName
-MoveL [\Conc] ToPoint Speed [\V]|[\T] Zone [\Z] Tool [ \WObj ]
-MoveLDO ToPoint Speed [ \T ] Zone Tool [ \WObj ] Signal Value
-MoveLSync ToPoint Speed [ \T ] Zone Tool [ \WObj ] ProcName
-Open Object [\File] IODevice [\Read] | [\Write] | [\Append] | [\Bin] PathResol Value
-PDispOn [ \Rot ] [ \ExeP ] ProgPoint Tool [ \WObj ]
-PDispSet DispFrame
+moduleAttributeList
+   : '(' IDENT (',' IDENT)* ')'
+   ;
 
-Procedure
-PulseDO
-RAISE
-{ Argument }
-[ \PLength ] Signal
-[ Error no ]
-Reset Signal
-RETURN [ Return value ]
-Rewind IODevice
-SearchC [ \Stop ] | [ \PStop ] | [ \Sup ] Signal SearchPoint CirPoint
-ToPointSpeed [\V]|[\T] Tool [\WObj]
-SearchL [ \Stop ] | [ \PStop ] | [ \Sup ] Signal SearchPoint ToPoint Speed [ \V ] | [ \T ] Tool [ \WObj ]
-Set Signal
-SetAO
-SetDO
-SetGO
-SingArea
-SoftAct Axis Softness [\Ramp ] Stop [ \NoRegain ]
-Signal Value
-[ \SDelay ] Signal Value Signal Value
-[ \Wrist] | [ \Arm] | [ \Off]
-TEST Test data {CASE Test value {, Test value} : ...} [ DEFAULT: ...] ENDTEST
-TPReadFK Answer String FK1 FK2 FK3 FK4 FK5 [\MaxTime] [\DIBreak] [\BreakFlag]
-TPReadNum Answer String [\MaxTime] [\DIBreak] [\BreakFlag] TPShow Window
-TPWrite String [\Num] | [\Bool] | [\Pos] | [\Orient]
-TriggC CirPoint ToPoint Speed [ \T ] Trigg_1 [ \T2 ] [ \T3 ]
-[ \T4] Zone Tool [ \WObj ]
-TriggInt TriggData Distance [ \Start ] | [ \Time ] Interrupt
-TriggIO TriggData Distance [ \Start ] | [ \Time ] [ \DOp ] | [ \GOp ] |
-RAPID Summary Syntax Summary
-[\AOp ] SetValue [ \DODelay ] | [ \AORamp ]
-TriggJ ToPoint Speed [ \T ] Trigg_1 [ \T2 ] Zone Tool [ \WObj ]
-TriggL ToPoint Speed [ \T ] Trigg_1 [ \T2 ] Zone Tool [ \WObj ]
-TuneServo MecUnit Axis TuneValue TuneServo MecUnit Axis TuneValue [\Type]
-[ \T3 ]
-[ \T3 ]
-[ \T4 ]
-[ \T4 ]
- Overview
-3-49
-UnLoad
-VelSet
-WaitDI
-WaitDO
-FilePath [\File] Override Max
-WaitTime
-WaitUntil
+moduleMember
+   : dataDeclaration
+   | routineDeclaration
+   ;
+
+dataDeclaration
+   : LOCAL? (VAR | PERS | CONST) dataType IDENT dim? (':=' expression)? ';'
+   ;
+
+dim
+   : '{' expression (',' expression)* '}'
+   ;
+
+dataType
+   : IDENT
+   ;
+
+routineDeclaration
+   : procDeclaration
+   | funcDeclaration
+   | trapDeclaration
+   ;
+
+procDeclaration
+   : LOCAL? PROC IDENT '(' paramList? ')' dataDeclaration* statement* ENDPROC
+   ;
+
+funcDeclaration
+   : LOCAL? FUNC dataType IDENT '(' paramList? ')' dataDeclaration* statement* ENDFUNC
+   ;
+
+trapDeclaration
+   : LOCAL? TRAP IDENT dataDeclaration* statement* ENDTRAP
+   ;
+
+paramList
+   : param (',' param)*
+   ;
+
+param
+   : paramAlternative ('|' paramAlternative)*
+   ;
+
+paramAlternative
+   : '\\'? (INOUT | VAR | PERS)? dataType IDENT arrayMarker?
+   ;
+
+arrayMarker
+   : '{' '*' (',' '*')* '}'
+   ;
+
+statement
+   : assignmentStatement
+   | procCallStatement
+   | ifStatement
+   | forStatement
+   | whileStatement
+   | testStatement
+   | returnStatement
+   | gotoStatement
+   | labelStatement
+   ;
+
+assignmentStatement
+   : expression ':=' expression ';'
+   ;
+
+procCallStatement
+   : IDENT (argumentElement (',' argumentElement)*)? ';'
+   ;
+
+argumentElement
+   : expression switchSuffix*
+   | switchSuffix+
+   ;
+
+switchSuffix
+   : '\\' IDENT (':=' expression)?
+   ;
+
+ifStatement
+   : IF expression THEN statement* (ELSEIF expression THEN statement*)* (ELSE statement*)? ENDIF
+   ;
+
+forStatement
+   : FOR IDENT FROM expression TO expression (STEP expression)? DO statement* ENDFOR
+   ;
+
+whileStatement
+   : WHILE expression DO statement* ENDWHILE
+   ;
+
+testStatement
+   : TEST expression (CASE expression (',' expression)* ':' statement*)* (DEFAULT ':' statement*)? ENDTEST
+   ;
+
+returnStatement
+   : RETURN expression? ';'
+   ;
+
+gotoStatement
+   : GOTO IDENT ';'
+   ;
+
+labelStatement
+   : IDENT ':'
+   ;
+
+expression
+   : orExpression
+   ;
+
+orExpression
+   : andExpression ((OR | XOR) andExpression)*
+   ;
+
+andExpression
+   : notExpression (AND notExpression)*
+   ;
+
+notExpression
+   : NOT? relationalExpression
+   ;
+
+relationalExpression
+   : additiveExpression ((EQ | NEQ | LT | GT | LE | GE) additiveExpression)?
+   ;
+
+additiveExpression
+   : multiplicativeExpression (('+' | '-') multiplicativeExpression)*
+   ;
+
+multiplicativeExpression
+   : unaryExpression (('*' | '/' | DIV | MOD) unaryExpression)*
+   ;
+
+unaryExpression
+   : '-' unaryExpression
+   | primaryExpression
+   ;
+
+primaryExpression
+   : literal
+   | functionCall
+   | variableAccess
+   | '(' expression ')'
+   ;
+
+functionCall
+   : IDENT '(' (argumentElement (',' argumentElement)*)? ')'
+   ;
+
+variableAccess
+   : IDENT component*
+   ;
+
+component
+   : '{' expression (',' expression)* '}'
+   | '.' IDENT
+   ;
+
+literal
+   : NUMBER
+   | STRING
+   | TRUE
+   | FALSE
+   ;
+
+MODULE
+   : 'MODULE'
+   ;
+
+ENDMODULE
+   : 'ENDMODULE'
+   ;
+
+LOCAL
+   : 'LOCAL'
+   ;
+
+VAR
+   : 'VAR'
+   ;
+
+PERS
+   : 'PERS'
+   ;
+
+CONST
+   : 'CONST'
+   ;
+
+INOUT
+   : 'INOUT'
+   ;
+
+PROC
+   : 'PROC'
+   ;
+
+ENDPROC
+   : 'ENDPROC'
+   ;
+
+FUNC
+   : 'FUNC'
+   ;
+
+ENDFUNC
+   : 'ENDFUNC'
+   ;
+
+TRAP
+   : 'TRAP'
+   ;
+
+ENDTRAP
+   : 'ENDTRAP'
+   ;
+
+IF
+   : 'IF'
+   ;
+
+THEN
+   : 'THEN'
+   ;
+
+ELSEIF
+   : 'ELSEIF'
+   ;
+
+ELSE
+   : 'ELSE'
+   ;
+
+ENDIF
+   : 'ENDIF'
+   ;
+
+FOR
+   : 'FOR'
+   ;
+
+FROM
+   : 'FROM'
+   ;
+
+TO
+   : 'TO'
+   ;
+
+STEP
+   : 'STEP'
+   ;
+
+DO
+   : 'DO'
+   ;
+
+ENDFOR
+   : 'ENDFOR'
+   ;
+
 WHILE
-[\InPos] Time
-[\InPos] Cond [\MaxTime] [\TimeFlag] Condition DO ... ENDWHILE
-Signal Value [\MaxTime] [\TimeFlag] Signal Value [\MaxTime] [\TimeFlag]
-Write IODevice String [\Num] | [\Bool] | [\Pos] | [\Orient]
-[\NoNewLine]
-WriteBin IODevice Buffer NChar
-WriteStrBin IODevice Str
-WZBoxDef [\Inside] | [\Outside] Shape LowPoint HighPoint 1
-WZCylDef [\Inside] | [\Outside] Shape CentrePoint Radius Height
-WZDisable WorldZone
-WZDOSet [\Temp] | [\Stat] WorldZone [\Inside] | [\Before] Shape Signal SetValue
-WZEnable WorldZone WZFree WorldZone
-WZLimSup WZSphDef
-[\Temp] | [\Stat] WorldZone Shape
-[\Inside] | [\Outside] Shape CentrePoint Radius
+   : 'WHILE'
+   ;
 
-Syntax Summary
-RAPID Summary
-  19.2 Functions
-Abs (Input)
-ACos (Value)
-AOutput (Signal)
-ArgName (Parameter)
-ASin (Value)
-ATan (Value)
-ATan2 (Y X)
-ByteToStr (ByteData [\Hex] | [\Okt] | [\Bin] | [\Char])
-ClkRead (Clock)
-CorrRead
-Cos (Angle)
-CPos ([Tool] [\WObj])
-CRobT ([Tool] [\WObj])
-DefDFrame (OldP1 OldP2 OldP3 NewP1 NewP2 NewP3) DefFrame (NewP1 NewP2 NewP3 [\Origin])
-Dim (ArrPar DimNo)
-DOutput (Signal)
-DotProd (Vector1 Vector2)
-EulerZYX ([\X] | [\Y] | [\Z] Rotation)
-Exp (Exponent)
-FileTime ( Path [\ModifyTime] | [\AccessTime] | [\StatCTime] ) GOutput (Signal)
+ENDWHILE
+   : 'ENDWHILE'
+   ;
 
-GetTime IndInpos
-( [\WDay] | [\Hour] | [\Min] | [\Sec] ) MecUnit Axis
+TEST
+   : 'TEST'
+   ;
 
+CASE
+   : 'CASE'
+   ;
 
-IndSpeed MecUnit Axis [\InSpeed] | [\ZeroSpeed] IsPers (DatObj)
-IsVar (DatObj)
-MirPos (Point MirPlane [\WObj] [\MirY])
-ModTime ( Object ) NOrient (Rotation)
-NumToStr (Val Dec [\Exp])
-Offs (Point XOffset YOffset ZOffset)
-OrientZYX (ZAngle YAngle XAngle)
-ORobT (OrgPoint [\InPDisp] | [\InEOffs])
-PoseInv (Pose)
-PoseMult (Pose1 Pose2)
-PoseVect (Pose Pos)
-Pow (Base Exponent)
-Present (OptPar)
-ReadBin (IODevice [\Time])
-ReadMotor [\MecUnit ] Axis
-ReadNum (IODevice [\Time])
-ReadStr (IODevice [\Time])
-RelTool (Point Dx Dy Dz [\Rx] [\Ry] [\Rz]) Round ( Val [\Dec])
-Sin (Angle)
-Sqrt (Value)
-StrFind (Str ChPos Set [\NotInSet])
-StrLen (Str)
+DEFAULT
+   : 'DEFAULT'
+   ;
 
-StrMap ( Str FromMap ToMap)
-StrMatch (Str ChPos Pattern)
-StrMemb (Str ChPos Set)
-StrOrder ( Str1 Str2 Order)
-StrPart (Str ChPos Len)
-StrToByte (ConStr [\Hex] | [\Okt] | [\Bin] | [\Char]) StrToVal ( Str Val )
-Tan (Angle)
-TestDI (Signal) TestAndSet Object Trunc ( Val [\Dec] ) ValToStr ( Val ) VectMagn (Vector)
+ENDTEST
+   : 'ENDTEST'
+   ;
 
+RETURN
+   : 'RETURN'
+   ;
+
+GOTO
+   : 'GOTO'
+   ;
+
+AND
+   : 'AND'
+   ;
+
+OR
+   : 'OR'
+   ;
+
+XOR
+   : 'XOR'
+   ;
+
+NOT
+   : 'NOT'
+   ;
+
+DIV
+   : 'DIV'
+   ;
+
+MOD
+   : 'MOD'
+   ;
+
+TRUE
+   : 'TRUE'
+   ;
+
+FALSE
+   : 'FALSE'
+   ;
+
+EQ
+   : '='
+   ;
+
+NEQ
+   : '<>'
+   ;
+
+LE
+   : '<='
+   ;
+
+GE
+   : '>='
+   ;
+
+LT
+   : '<'
+   ;
+
+GT
+   : '>'
+   ;
+
+NUMBER
+   : [0-9]+ ('.' [0-9]+)? ([eE] [+-]? [0-9]+)?
+   ;
+
+STRING
+   : '"' (~["\r\n])* '"'
+   ;
+
+IDENT
+   : [a-zA-Z_] [a-zA-Z_0-9]*
+   ;
+
+COMMENT
+   : '!' ~[\r\n]* -> skip
+   ;
 
 WS
-   : [ \r\n\t] + -> skip
+   : [ \t\r\n]+ -> skip
    ;
