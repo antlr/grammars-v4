@@ -12,7 +12,7 @@ grammar WavefrontOBJ;
 // PARSER RULES
 
 start_
-    : NL* (statement (NL+ | EOF))+
+    : NL* (statement NL+)* statement? EOF
     ;
 
 statement

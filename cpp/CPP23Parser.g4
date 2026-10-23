@@ -157,8 +157,8 @@ literal
 /* A.4 Basics */
 
 translationUnit
-	: declarationseq? /* EOF */
-	| globalModuleFragment? moduleDeclaration declarationseq? privateModuleFragment?
+	: (declarationseq?
+	| globalModuleFragment? moduleDeclaration declarationseq? privateModuleFragment?) EOF
 	;
 
 

@@ -1615,7 +1615,7 @@ yield_statement
 // Source: §14.2 Compilation units
 compilation_unit
     : extern_alias_directive* using_directive* global_attributes?
-      namespace_member_declaration*
+      namespace_member_declaration* EOF
     ;
 
 // Source: §14.3 Namespace declarations

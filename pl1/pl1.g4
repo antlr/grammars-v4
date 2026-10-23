@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar pl1;
 
 program
-   : (statements | percent_statements)*
+   : (statements | percent_statements)* EOF
    ;
 
 statements

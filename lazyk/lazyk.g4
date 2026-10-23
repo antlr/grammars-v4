@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar lazyk;
 
 program
-   : ccexpr
+   : ccexpr EOF
    ;
 
 ccexpr

@@ -25,7 +25,7 @@ start_
     ;
 
 chunk
-    : block
+    : block EOF
     ;
 
 block
