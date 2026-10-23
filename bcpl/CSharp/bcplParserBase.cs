@@ -29,13 +29,13 @@ public abstract class bcplParserBase : Parser {
     // loop to commit to another iteration when there is no further X to parse.
     public bool IsDeclarationStart()
     {
-        var la = this.InputStream.La(1);
+        var la = this.InputStream.LA(1);
         return la == bcplParser.KLET || la == bcplParser.KMANIFEST || la == bcplParser.KGLOBAL || la == bcplParser.KSTATIC;
     }
 
     public bool IsNotCB()
     {
-        var la = this.InputStream.La(1);
+        var la = this.InputStream.LA(1);
         return la != bcplParser.CB;
     }
 }
