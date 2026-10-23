@@ -1,0 +1,11 @@
+# Trigonometric and math operators, and vector store/recall.
+30 100 SIN
+30 100 COS
+30 100 COSINE
+10 SQRT
+-5 0 ARCTAN
+1000 707 ARCCOS
+1000 707 ARCSIN
+10 10 DIST
+42 1 VSTORE
+1 VRECALL
