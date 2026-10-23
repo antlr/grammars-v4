@@ -1,0 +1,1594 @@
+PIPMOD:
+DO;
+/* P E R I P H E R A L  I N T E R C H A N G E  P R O G R A M
+
+         COPYRIGHT (C) 1976, 1977, 1978, 1979, 1980
+         DIGITAL RESEARCH
+         BOX 579
+         PACIFIC GROVE, CA
+         93950
+    */
+
+DECLARE
+    CPMVERSION LITERALLY '0020H'; /* REQUIRED FOR OPERATION */
+
+DECLARE
+    IOBYTE   BYTE EXTERNAL,     /* IOBYTE AT 0003H */
+    MAXB  ADDRESS EXTERNAL,     /* ADDR FIELD OF JMP BDOS */
+    FCB (33) BYTE EXTERNAL,     /* DEFAULT FILE CONTROL BLOCK */
+    BUFF(128)BYTE EXTERNAL;     /* DEFAULT BUFFER */
+
+DECLARE
+    ENDFILE LITERALLY '1AH',    /* END OF FILE MARK */
+    JMP   LITERALLY '0C3H',     /* 8080 JUMP INSTRUCTION */
+    RET   LITERALLY '0C9H';     /* 8080 RETURN */
+
+/* THE FIRST PORTION OF THE PIP PROGRAM 'FAKES' THE PAGE ONE
+(100H - 1FFH) SECTION OF PIP WHICH CONTAINS A JUMP TO PIPENTRY, AND
+SPACE FOR CUSTOM I/O DRIVERS (WHICH CAN BE 'PATCHED' USING DDT) IN THE
+REMAINING PAGE ONE AREA.  THE PIP PROGRAM ACTUALLY STARTS AT 200H */
+
+DECLARE JUMP BYTE DATA(JMP); /* JMP INSTRUCTION TO */
+/* JMP .PIPENTRY-3 WHERE THE LXI SP,STACK ACTUALLY OCCURS */
+DECLARE JADR ADDRESS DATA(.PIPENTRY-3); /* START OF PIP */
+DECLARE INPSUB(3) BYTE DATA(RET,0,0);     /* INP: RET NOP NOP */
+DECLARE OUTSUB(3) BYTE DATA(RET,0,0);     /* OUT: RET NOP NOP */
+DECLARE INPDATA BYTE DATA(ENDFILE); /* RETURNED DATA */
+    /* NOTE:  PAGE 1 AT 100H CONTAINS THE FOLLOWING
+    100H:  JMP PIPENTRY    ;TO START THE PIP PROGRAM
+    103H:  RET             ;INP: DEFAULTS TO EMPTY INPUT (DATA 1AH AT 109H)
+    104H:  NOP
+    105H:  NOP
+    106H:  RET             ;OUT: DEFAULTS TO EMPTY OUTPUT
+    107H:  NOP
+    108H:  NOP
+    109H: 1AH=ENDFILE      ;DATA FROM INP: FUNCTION IS STORED HERE ON
+                           ;RETURN FROM THE INP: ENTRY POINT
+    10AH: - 1FFH           ;SPACE RESERVED FOR SPECIAL PURPOSE
+    ; DRIVERS - IF INCLUDED, THEN REPLACE 103H AND 106H BY JMP'S
+    ; TO THE PROPER LOCATIONS WITHIN THE RESERVED AREA.
+    ;  ALSO, RETURN DATA FROM INP: ENTRY POINT AT 109H.
+    ; THESE DRIVERS ARE MOST EASILY INSERTED WITH THE DDT PROGRAM
+    ; UNDER CP/M
+    */
+
+DECLARE /* 16 BYTE MESSAGE */
+    FREEMEMORY LITERALLY '''(INP:/OUT:SPACE)''',
+    /* 256 BYTE AREA FOR INP: OUT: PATCHING */
+    RESERVED(*) BYTE DATA(0,0,0,0,0,0,
+    FREEMEMORY, FREEMEMORY, FREEMEMORY,
+    FREEMEMORY, FREEMEMORY, FREEMEMORY, FREEMEMORY,
+    FREEMEMORY, FREEMEMORY, FREEMEMORY, FREEMEMORY,
+    FREEMEMORY, FREEMEMORY, FREEMEMORY, FREEMEMORY);
+
+
+
+
+    DECLARE COPYRIGHT(*) BYTE DATA (
+    '   COPYRIGHT (C) 1979, DIGITAL RESEARCH,  PIP VERS 1.5');
+
+    DECLARE INPLOC ADDRESS DATA (.INPSUB);  /* ADDRESS OF INP: DEVICE */
+    DECLARE OUTLOC ADDRESS DATA (.OUTSUB);  /* ADDRESS OF OUT: DEVICE */
+
+OUT: PROCEDURE(B);
+    DECLARE B BYTE;
+    /* SEND B TO OUT: DEVICE */
+    CALL OUTLOC;
+    END OUT;
+
+INP: PROCEDURE BYTE;
+    CALL INPLOC;
+    RETURN INPDATA;
+    END INP;
+
+
+TIMEOUT: PROCEDURE;
+    /* WAIT FOR 50 MSEC */
+    CALL TIME(250); CALL TIME(250);
+    END TIMEOUT;
+
+  /* LITERAL DECLARATIONS */
+  DECLARE
+    LIT LITERALLY 'LITERALLY',
+    LPP LIT '60',     /* LINES PER PAGE */
+    TAB LIT '09H',    /* HORIZONTAL TAB */
+    FF  LIT '0CH',    /* FORM FEED */
+    LA  LIT '05FH',   /* LEFT ARROW */
+    LB  LIT '05BH',   /* LEFT BRACKET */
+    RB   LIT '05DH',  /* RIGHT BRACKET */
+    XOFF LIT '13H', /* TRANSMIT BUFFER FUNCTION */
+
+    RDR LIT '5',
+    LST LIT '10',
+    PUNP LIT '15',                 /* POSITION OF 'PUN' + 1 */
+    CONP LIT '19',                 /* CONSOLE */
+    NULP LIT '19',                /* NUL: BEFORE INCREMENT */
+    EOFP LIT '20',                /* EOF: BEFORE INCREMENT */
+    HSRDR LIT 'RDR',              /* READER DEVICES */
+    PRNT  LIT '10',                /* PRINTER */
+
+
+    FSIZE LIT '33',
+    FRSIZE LIT '36', /* SIZE OF RANDOM FCB */
+    NSIZE LIT '8',
+    FNSIZE LIT '11',
+    MDISK LIT '1',
+    FNAM LIT '8',
+    FEXT LIT '9',
+    FEXTL LIT '3',
+    ROFILE  LITERALLY '9',  /* READ ONLY FILE FIELD */
+    SYSFILE LITERALLY '10', /* SYSTEM FILE FIELD */
+    FREEL LIT '12',  /* REEL NUMBER FIELD OF FCB */
+
+    HBUFS LIT '80',               /* "HEX" BUFFER SIZE */
+
+    ERR LIT '0',
+    SPECL LIT '1',
+    FILE LIT '2',
+    PERIPH LIT '3',
+    DISKNAME LIT '4';
+
+DECLARE
+    COLUMN BYTE,     /* COLUMN COUNT FOR PRINTER TABS */
+    LINENO BYTE,     /* LINE WITHIN PAGE */
+    AMBIG BYTE,                   /* SET FOR AMBIGUOUS FILE REFS */
+    PARSET BYTE,                  /* TRUE IF PARAMETERS PRESENT */
+    FEEDBASE BYTE,                /* USED TO FEED SEARCH CHARACTERS */
+    FEEDLEN BYTE,                 /* LENGTH OF FEED STRING */
+    MATCHLEN BYTE,                /* USED IN MATCHING STRINGS */
+    QUITLEN BYTE,                 /* USED TO TERMINATE QUIT COMMAND */
+    NBUF BYTE,                    /* NUM BUFFERS-1 IN SBUFF AND DBUFF */
+    CDISK BYTE,                   /* CURRENT DISK */
+    BUFFER LITERALLY 'BUFF',      /* DEFAULT BUFFER */
+    SEARFCB LITERALLY 'FCB',      /* SEARCH FCB IN MULTI COPY */
+    MEMSIZE LITERALLY 'MAXB',     /* MEMORY SIZE */
+    SBLEN ADDRESS,                /* SOURCE BUFFER LENGTH */
+    DBLEN ADDRESS,                /* DEST BUFFER LENGTH */
+    SBASE ADDRESS,                /* SOURCE BUFFER BASE */
+    /* THE VECTORS DBUFF AND SBUFF ARE DECLARED WITH DIMENSION
+    1024, BUT ACTUALLY VARY WITH THE FREE MEMORY SIZE */
+    DBUFF(1024) BYTE AT (.MEMORY), /* DESTINATION BUFFER */
+    SBUFF BASED SBASE (1024) BYTE, /* SOURCE BUFFER */
+    SDISK BYTE,                   /* SOURCE DISK */
+    (SCOM, DHEX) BYTE,            /* SOURCE IS 'COM' FILE IF TRUE */
+                                  /* DEST IS 'HEX' FILE IF TRUE   */
+    SOURCE (FSIZE) BYTE,          /* SOURCE FCB */
+    SFUB BYTE AT(.SOURCE(13)),    /* UNFILLED BYTES FIELD */
+    DEST (FRSIZE) BYTE,           /* DESTINATION FCB */
+    DESTR ADDRESS AT(.DEST(33)),  /* RANDOM RECORD POSITION */
+    DESTO BYTE    AT(.DEST(35)),  /* RANDOM OVERFLOW BYTE */
+    DFUB BYTE AT (.DEST(13)),     /* UNFILLED BYTES FIELD */
+    DDISK BYTE,                   /* DESTINATION DISK */
+    HBUFF(HBUFS) BYTE,            /* HEX FILE BUFFER */
+    HSOURCE BYTE,                 /* NEXT HEX SOURCE CHARACTER */
+
+    NSOURCE ADDRESS,              /* NEXT SOURCE CHARACTER */
+    HARDEOF ADDRESS,              /* SET TO NSOURCE ON REAL EOF */
+    NDEST ADDRESS;                /* NEXT DESTINATION CHARACTER */
+
+DECLARE
+    /* SUBMIT FILE CONTROL BLOCK FOR ERROR DELETE */
+    SUBFCB (*) BYTE DATA (0,'$$$     SUB',0,0,0);
+
+  DECLARE
+    PDEST BYTE,                   /* DESTINATION DEVICE */
+    PSOURCE BYTE;                 /* CURRENT SOURCE DEVICE */
+
+  DECLARE
+    MULTCOM BYTE,                 /* FALSE IF PROCESSING ONE LINE */
+    PUTNUM BYTE,                  /* SET WHEN READY FOR NEXT LINE NUM */
+    CONCNT BYTE,                   /* COUNTER FOR CONSOLE READY CHECK */
+    CHAR BYTE,                    /* LAST CHARACTER SCANNED */
+    TYPE BYTE,                    /* TYPE OF CHARACTER SCANNED */
+    FLEN BYTE;                    /* FILE NAME LENGTH */
+
+MON1: PROCEDURE(F,A) EXTERNAL;
+    DECLARE F BYTE,
+    A ADDRESS;
+    END MON1;
+
+MON2: PROCEDURE(F,A) BYTE EXTERNAL;
+    DECLARE F BYTE,
+    A ADDRESS;
+    END MON2;
+
+MON3: PROCEDURE(F,A) ADDRESS EXTERNAL;
+    DECLARE F BYTE,
+    A ADDRESS;
+    END MON3;
+
+BOOT: PROCEDURE EXTERNAL;
+    /* SYSTEM REBOOT */
+    END BOOT;
+
+READRDR: PROCEDURE BYTE;
+    /* READ CURRENT READER DEVICE */
+    RETURN MON2(3,0);
+    END READRDR;
+
+READCHAR: PROCEDURE BYTE;
+    /* READ CONSOLE CHARACTER */
+    RETURN MON2(1,0);
+    END READCHAR;
+
+DECLARE
+    TRUE LITERALLY '1',
+    FALSE LITERALLY '0',
+    FOREVER LITERALLY 'WHILE TRUE',
+    CR LITERALLY '13',
+    LF LITERALLY '10',
+    WHAT LITERALLY '63';
+
+PRINTCHAR: PROCEDURE(CHAR);
+    DECLARE CHAR BYTE;
+    CALL MON1(2,CHAR AND 7FH);
+    END PRINTCHAR;
+
+CRLF: PROCEDURE;
+    CALL PRINTCHAR(CR);
+    CALL PRINTCHAR(LF);
+    END CRLF;
+
+PRINT: PROCEDURE(A);
+    DECLARE A ADDRESS;
+    /* PRINT THE STRING STARTING AT ADDRESS A UNTIL THE
+    NEXT DOLLAR SIGN IS ENCOUNTERED */
+    CALL CRLF;
+    CALL MON1(9,A);
+    END PRINT;
+
+DECLARE DCNT BYTE;
+
+VERSION: PROCEDURE ADDRESS;
+    RETURN MON3(12,0); /* VERSION NUMBER */
+    END VERSION;
+
+INITIALIZE: PROCEDURE;
+    CALL MON1(13,0);
+    END INITIALIZE;
+
+SELECT: PROCEDURE(D);
+    DECLARE D BYTE;
+    CALL MON1(14,D);
+    END SELECT;
+
+OPEN: PROCEDURE(FCB);
+    DECLARE FCB ADDRESS;
+    DCNT = MON2(15,FCB);
+    END OPEN;
+
+CLOSE: PROCEDURE(FCB);
+    DECLARE FCB ADDRESS;
+    DCNT = MON2(16,FCB);
+    END CLOSE;
+
+SEARCH: PROCEDURE(FCB);
+    DECLARE FCB ADDRESS;
+    DCNT = MON2(17,FCB);
+    END SEARCH;
+
+SEARCHN: PROCEDURE;
+    DCNT = MON2(18,0);
+    END SEARCHN;
+
+DELETE: PROCEDURE(FCB);
+    DECLARE FCB ADDRESS;
+    CALL MON1(19,FCB);
+    END DELETE;
+
+DISKREAD: PROCEDURE(FCB) BYTE;
+    DECLARE FCB ADDRESS;
+    RETURN MON2(20,FCB);
+    END DISKREAD;
+
+DISKWRITE: PROCEDURE(FCB) BYTE;
+    DECLARE FCB ADDRESS;
+    RETURN MON2(21,FCB);
+    END DISKWRITE;
+
+MAKE: PROCEDURE(FCB);
+    DECLARE FCB ADDRESS;
+    DCNT = MON2(22,FCB);
+    END MAKE;
+
+RENAME: PROCEDURE(FCB);
+    DECLARE FCB ADDRESS;
+    CALL MON1(23,FCB);
+    END RENAME;
+
+DECLARE
+    CUSER BYTE, /* CURRENT USER NUMBER */
+    SUSER BYTE; /* SOURCE USER NUMBER ('G' PARAMETER) */
+
+SETIND: PROCEDURE(FCB);
+    DECLARE FCB ADDRESS;
+    CALL MON1(30,FCB);
+    END SETIND;
+
+GETUSER: PROCEDURE BYTE;
+    RETURN MON2(32,0FFH);
+    END GETUSER;
+
+SETUSER: PROCEDURE(USER);
+    DECLARE USER BYTE;
+    CALL MON1(32,USER);
+    END SETUSER;
+
+SETCUSER: PROCEDURE;
+    CALL SETUSER(CUSER);
+    END SETCUSER;
+
+SETSUSER: PROCEDURE;
+    CALL SETUSER(SUSER);
+    END SETSUSER;
+
+READ$RANDOM: PROCEDURE(FCB) BYTE;
+    DECLARE FCB ADDRESS;
+    RETURN MON2(33,FCB);
+    END READ$RANDOM;
+
+WRITE$RANDOM: PROCEDURE(FCB) BYTE;
+    DECLARE FCB ADDRESS;
+    RETURN MON2(34,FCB);
+    END WRITE$RANDOM;
+
+SET$RANDOM: PROCEDURE(FCB);
+    DECLARE FCB ADDRESS;
+    /* SET RANDOM RECORD POSITION */
+    CALL MON1(36,FCB);
+    END SET$RANDOM;
+
+DECLARE CBUFF(130) BYTE,   /* COMMAND BUFFER */
+    MAXLEN BYTE AT (.CBUFF(0)),  /* MAX BUFFER LENGTH */
+    COMLEN BYTE AT (.CBUFF(1)),  /* CURRENT LENGTH */
+    COMBUFF (128) BYTE AT (.CBUFF(2)); /* COMMAND BUFFER CONTENTS */
+DECLARE (TCBP,CBP) BYTE;   /* TEMP CBP, COMMAND BUFFER POINTER */
+
+READCOM: PROCEDURE;
+    /* READ INTO COMMAND BUFFER */
+    MAXLEN = 128;
+    CALL MON1(10,.MAXLEN);
+    END READCOM;
+
+DECLARE MCBP BYTE;
+
+CONBRK: PROCEDURE BYTE;
+    /* CHECK CONSOLE CHARACTER READY */
+    RETURN MON2(11,0);
+    END CONBRK;
+
+DECLARE /* CONTROL TOGGLE VECTOR */
+    CONT(26) BYTE,   /* ONE FOR EACH ALPHABETIC */
+    /* 00 01 02 03 04 05 06 07 08 09 10 11 12 13
+        A  B  C  D  E  F  G  H  I  J  K  L  M  N
+       14 15 16 17 18 19 20 21 22 23 24 25
+        O  P  Q  R  S  T  U  V  W  X  Y  Z   */
+    BLOCK  BYTE  AT(.CONT(1)),     /* BLOCK MODE TRANSFER */
+    DELET  BYTE  AT(.CONT(3)),     /* DELETE CHARACTERS */
+    ECHO   BYTE  AT(.CONT(4)),     /* ECHO CONSOLE CHARACTERS */
+    FORMF  BYTE  AT(.CONT(5)),     /* FORM FILTER */
+    GETU   BYTE  AT(.CONT(6)),     /* GET FILE, USER # */
+    HEXT   BYTE  AT(.CONT(7)),     /* HEX FILE TRANSFER */
+    IGNOR  BYTE  AT(.CONT(8)),     /* IGNORE :00 RECORD ON FILE */
+    LOWER  BYTE  AT(.CONT(11)),    /* TRANSLATE TO LOWER CASE */
+    NUMB   BYTE  AT(.CONT(13)),    /* NUMBER OUTPUT LINES */
+    OBJ    BYTE  AT(.CONT(14)),    /* OBJECT FILE TRANSFER */
+    PAGCNT BYTE  AT(.CONT(15)),    /* PAGE LENGTH */
+    QUITS  BYTE  AT(.CONT(16)),    /* QUIT COPY */
+    RSYS   BYTE  AT(.CONT(17)),    /* READ SYSTEM FILES */
+    STARTS BYTE  AT(.CONT(18)),    /* START COPY */
+    TABS   BYTE  AT(.CONT(19)),    /* TAB SET */
+    UPPER  BYTE  AT(.CONT(20)),    /* UPPER CASE TRANSLATE */
+    VERIF  BYTE  AT(.CONT(21)),    /* VERIFY EQUAL FILES ONLY */
+    WRROF  BYTE  AT(.CONT(22)),    /* WRITE TO R/O FILE */
+    ZEROP  BYTE  AT(.CONT(25));    /* ZERO PARITY ON INPUT */
+
+  SETDMA: PROCEDURE(A);
+       DECLARE A ADDRESS;
+       CALL MON1(26,A);
+       END SETDMA;
+
+  /* INTELLEC 8 INTEL/ICOM READER INPUT */
+
+INTIN: PROCEDURE BYTE;
+    /* READ THE INTEL / ICOM READER */
+    DECLARE PTRI LITERALLY '3',  /* DATA */
+            PTRS LITERALLY '1',  /* STATUS */
+            PTRC LITERALLY '1',  /* COMMAND */
+            PTRG LITERALLY '0CH', /* GO */
+            PTRN LITERALLY '08H'; /* STOP */
+
+    /* STROBE THE READER */
+    OUTPUT(PTRC) = PTRG;
+    OUTPUT(PTRC) = PTRN;
+        DO WHILE NOT ROL(INPUT(PTRS),3); /* NOT READY */
+        END;
+    /* DATA READY */
+    RETURN INPUT(PTRI) AND 7FH;
+    END INTIN;
+
+
+DECLARE ZEROSUP BYTE,  /* ZERO SUPPRESSION */
+    (C3,C2,C1) BYTE;     /* LINE COUNT ON PRINTER  */
+
+  ERROR: PROCEDURE(A);
+    DECLARE A ADDRESS, I BYTE;
+    CALL SETCUSER;
+    CALL PRINT(A); CALL PRINTCHAR(':'); CALL PRINTCHAR(' ');
+        DO I = TCBP TO CBP;
+        IF I < COMLEN THEN CALL PRINTCHAR(COMBUFF(I));
+        END;
+    /* ZERO THE COMLEN IN CASE THIS IS A SINGLE COMMAND */
+    COMLEN = 0;
+    /* DELETE ANY $$$.SUB FILES IN CASE BATCH PROCESSING */
+    /* DELETE SUB FILE ONLY IF PRESENT (MAY BE R/O DISK) */
+    CALL SEARCH(.SUBFCB);
+    IF DCNT <> 255 THEN CALL DELETE(.SUBFCB);
+    CALL CRLF;
+    GO TO RETRY;
+    END ERROR;
+
+  MOVE: PROCEDURE(S,D,N);
+    DECLARE (S,D) ADDRESS, N BYTE;
+    DECLARE A BASED S BYTE, B BASED D BYTE;
+        DO WHILE (N:=N-1) <> 255;
+        B = A; S = S+1; D = D+1;
+        END;
+    END MOVE;
+
+
+  FILLSOURCE: PROCEDURE;
+    /* FILL THE SOURCE BUFFERS */
+    DECLARE (I,J) BYTE;
+    NSOURCE = 0;
+    CALL SELECT(SDISK);
+    CALL SETSUSER; /* SOURCE USER NUMBER SET */
+        DO I = 0 TO NBUF;
+        /* SET DMA ADDRESS TO NEXT BUFFER POSIITION */
+        CALL SETDMA(.SBUFF(NSOURCE));
+        IF (J := DISKREAD(.SOURCE)) <> 0 THEN
+            DO; IF J <> 1 THEN
+                CALL ERROR(.('DISK READ ERROR$'));
+            /* END - OF - FILE */
+            HARDEOF = NSOURCE; /* SET HARD END-OF-FILE */
+            SBUFF(NSOURCE) = ENDFILE; I = NBUF;
+            END; ELSE
+        NSOURCE = NSOURCE + 128;
+        END;
+    NSOURCE = 0;
+    CALL SETCUSER; /* BACK TO CURRENT USER NUMBER */
+    END FILLSOURCE;
+
+
+  WRITEDEST: PROCEDURE;
+    /* WRITE OUTPUT BUFFERS UP TO BUT NOT INCLUDING POSITION
+    NDEST - THE LOW ORDER 7 BITS OF NDEST ARE ZERO */
+    DECLARE (I, J, N) BYTE;
+    DECLARE DMA ADDRESS;
+    DECLARE DATAOK BYTE;
+    IF (N := LOW(SHR(NDEST,7)) - 1) = 255 THEN RETURN ;
+    NDEST = 0;
+    CALL SELECT(DDISK);
+    CALL SETRANDOM(.DEST); /* SET BASE RECORD FOR VERIFY */
+        DO I = 0 TO N;
+        /* SET DMA ADDRESS TO NEXT BUFFER */
+        DMA = .DBUFF(NDEST);
+        CALL SETDMA(DMA);
+        IF DISKWRITE(.DEST) <> 0 THEN
+            CALL ERROR(.('DISK WRITE ERROR$'));
+        NDEST = NDEST + 128;
+        END;
+    IF VERIF THEN /* VERIFY DATA WRITTEN OK */
+        DO;
+        NDEST = 0;
+        CALL SETDMA(.BUFF); /* FOR COMPARE */
+            DO I = 0 TO N;
+            DATAOK = READRANDOM(.DEST) = 0;
+            DESTR = DESTR + 1; /* NEXT RANDOM READ */
+            J = 0;
+                /* PERFORM COMPARISON */
+                DO WHILE DATAOK AND J < 80H;
+                DATAOK = BUFFER(J) = DBUFF(NDEST+J);
+                J = J + 1;
+                END;
+            NDEST = NDEST + 128;
+            IF NOT DATAOK THEN
+                CALL ERROR(.('VERIFY ERROR$'));
+            END;
+        DATAOK = DISKWRITE(.DEST);
+        /* NOW READY TO CONTINUE THE WRITE OPERATION */
+        END;
+    NDEST = 0;
+    END WRITEDEST;
+
+  PUTDCHAR: PROCEDURE(B);
+    DECLARE (B,IOB) BYTE;
+    /* WRITE BYTE B TO THE DESTINATION DEVICE GIVEN BY PDEST */
+    IF B >= ' ' THEN
+        DO; COLUMN = COLUMN + 1;
+        IF DELET > 0 THEN /* MAY BE PAST RIGHT SIDE */
+            DO; IF COLUMN > DELET THEN RETURN;
+            END;
+        END;
+    IOB = IOBYTE; /* IN CASE IT IS ALTERED */
+        DO CASE PDEST;
+        /* CASE 0 IS THE DESTINATION FILE */
+            DO;
+            IF NDEST >= DBLEN THEN CALL WRITEDEST;
+            DBUFF(NDEST) = B;
+            NDEST = NDEST+1;
+            END;
+        /* CASE 1 IS ARD (ADDMASTER) */
+            GO TO NOTDEST;
+       /* CASE 2 IS IRD (INTEL/ICOM) */
+            GO TO NOTDEST;
+        /* CASE 3 IS PTR */
+            GO TO NOTDEST;
+        /* CASE 4 IS UR1 */
+            GO TO NOTDEST;
+        /* CASE 5 IS UR2 */
+            GO TO NOTDEST;
+        /* CASE 6 IS RDR */
+            NOTDEST:
+                CALL ERROR(.('NOT A CHARACTER SINK$'));
+        /* CASE 7 IS OUT */
+            CALL OUT(B);
+        /* CASE 8 IS LPT */
+                DO; IOBYTE = 1000$0000B; GO TO LSTL;
+                END;
+        /* CASE 9 IS UL1 */
+                DO; IOBYTE = 1100$0000B; GO TO LSTL;
+                END;
+        /* CASE 10 IS PRN (TABS EXPANDED, LINES LISTED, CHANGED TO LST) */
+                DO; IOBYTE = 1000$0000B; GO TO LSTL;
+                END;
+        /* CASE 11 IS LST */
+            LSTL:
+                CALL MON1(5,B);
+        /* CASE 12 IS PTP */
+            DO; IOBYTE = 0001$0000B; GO TO PUNL;
+            END;
+        /* CASE 13 IS UP1 */
+            DO; IOBYTE = 0010$0000B; GO TO PUNL;
+            END;
+        /* CASE 14 IS UP2 */
+            DO; IOBYTE = 0011$0000B; GO TO PUNL;
+            END;
+        /* CASE 15 IS PUN */
+            PUNL:
+                CALL MON1(4,B);
+          /* CASE 16 IS TTY */
+              DO; IOBYTE = 0; GO TO CONL;
+              END;
+          /* CASE 17 IS CRT */
+              DO; IOBYTE = 1; GO TO CONL;
+              END;
+          /* CASE 18 IS UC1 */
+              DO; IOBYTE = 11B; GO TO CONL;
+              END;
+          /* CASE 19 IS CON */
+              CONL:
+                  CALL MON1(2,B);
+          END;
+    IOBYTE = IOB;
+    END PUTDCHAR;
+
+PUTDESTC: PROCEDURE(B);
+    DECLARE (B,I) BYTE;
+    /* WRITE DESTINATION CHARACTER, TAB EXPANSION */
+    IF B <> TAB THEN CALL PUTDCHAR(B); ELSE
+    IF TABS = 0 THEN CALL PUTDCHAR(B); ELSE
+        /* B IS TAB CHAR, TABS > 0 */
+        DO; I = COLUMN;
+            DO WHILE I >= TABS;
+            I = I - TABS;
+            END;
+        I = TABS - I;
+            DO WHILE I > 0;
+            I = I - 1;
+            CALL PUTDCHAR(' ');
+            END;
+        END;
+    IF B = CR THEN COLUMN = 0;
+    END PUTDESTC;
+
+PRINT1: PROCEDURE(B);
+    DECLARE B BYTE;
+    IF (ZEROSUP := ZEROSUP AND B = 0) THEN CALL PUTDESTC(' '); ELSE
+        CALL PUTDESTC('0'+B);
+    END PRINT1;
+
+PRINTDIG: PROCEDURE(D);
+    DECLARE D BYTE;
+    CALL PRINT1(SHR(D,4)); CALL PRINT1(D AND 1111B);
+    END PRINTDIG;
+
+NEWLINE: PROCEDURE;
+    DECLARE ONE BYTE;
+    ONE = 1;
+    ZEROSUP = NUMB = 1;
+    C1 = DEC(C1+ONE); C2 = DEC(C2 PLUS 0); C3 = DEC(C3 PLUS 0);
+    CALL PRINTDIG(C3); CALL PRINTDIG(C2); CALL PRINTDIG(C1);
+    IF NUMB = 1 THEN /* USUALLY PRINTER OUTPUT */
+        DO; CALL PUTDESTC(':'); CALL PUTDESTC(' ');
+        END; ELSE
+        CALL PUTDESTC(TAB);
+    END NEWLINE;
+
+CLEARBUFF: PROCEDURE;
+    /* CLEAR OUTPUT BUFFER IN BLOCK MODE TRANSMISION */
+    DECLARE NA ADDRESS;
+    DECLARE I BYTE;
+    I = LOW(NDEST) AND 7FH;  /* REMAINING PARTIAL BUFFER LENGTH */
+    NA = NDEST AND 0FF80H;   /* START OF SEGMENT NOT WRITTEN */
+    CALL WRITEDEST;          /* CLEARS BUFFERS */
+    CALL MOVE(.DBUFF(NA),.DBUFF,I);
+    /* DATA MOVED TO BEGINNING OF BUFFER */
+    NDEST = I;
+    END CLEARBUFF;
+
+PUTDEST: PROCEDURE(B);
+    DECLARE (I,B) BYTE;
+    /* WRITE DESTINATION CHARACTER, CHECK TABS AND LINES */
+    IF FORMF THEN /* SKIP FORM FEEDS */
+        DO; IF B = FF THEN RETURN;
+        END;
+    IF PUTNUM THEN /* END OF LINE OR START OF FILE */
+        DO;
+        IF B <> FF THEN /* NOT FORM FEED */
+            DO;
+            IF (I:=PAGCNT) <> 0 THEN /* PAGE EJECT */
+                DO; IF I=1 THEN I=LPP;
+                IF (LINENO := LINENO + 1) >= I THEN
+                    DO; LINENO = 0; /* NEW PAGE */
+                    CALL PUTDESTC(FF);
+                    END;
+                END;
+            IF NUMB > 0 THEN
+                CALL NEWLINE;
+            PUTNUM = FALSE;
+            END;
+        END;
+    IF BLOCK THEN /* BLOCK MODE TRANSFER */
+        DO;
+        IF B = XOFF AND PDEST = 0 THEN
+            DO; CALL CLEARBUFF; /* BUFFERS WRITTEN */
+            RETURN; /* DON'T PASS THE X-OFF */
+            END;
+        END;
+    IF B = FF THEN LINENO = 0;
+    CALL PUTDESTC(B);
+    IF B = LF THEN PUTNUM = TRUE;
+    END PUTDEST;
+
+
+UTRAN: PROCEDURE(B) BYTE;
+    DECLARE B BYTE;
+    /* TRANSLATE ALPHA TO UPPER CASE */
+    IF B >= 110$0001B AND B <= 111$1010B THEN /* LOWER CASE */
+        B = B AND 101$1111B; /* TO UPPER CASE */
+    RETURN B;
+    END UTRAN;
+
+LTRAN: PROCEDURE(B) BYTE;
+    DECLARE B BYTE;
+    /* TRANSLATE TO LOWER CASE ALPHA */
+    IF B >= 'A' AND B <= 'Z' THEN B = B OR 10$0000B; /* TO LOWER */
+    RETURN B;
+    END LTRAN;
+
+GETSOURCEC: PROCEDURE BYTE;
+    /* READ NEXT SOURCE CHARACTER */
+    DECLARE (IOB,B,CONCHK) BYTE;
+
+    IF PSOURCE - 1 <= RDR THEN /* 1 ... RDR+1 */
+        DO; IF (BLOCK OR HEXT) AND CONBRK THEN
+            DO;
+            IF READCHAR = ENDFILE THEN RETURN ENDFILE;
+            CALL PRINT(.('READER STOPPING',CR,LF,'$'));
+            RETURN XOFF;
+            END;
+        END;
+    CONCHK = TRUE; /* CONSOLE STATUS CHECK BELOW */
+    IOB = IOBYTE; /* SAVE IT IN CASE IT IS ALTERED */
+        DO CASE PSOURCE;
+        /* CASE 0 IS SOURCE FILE */
+            DO; IF NSOURCE >= SBLEN THEN CALL FILLSOURCE;
+            B = SBUFF(NSOURCE);
+            NSOURCE = NSOURCE + 1;
+            END;
+        /* CASE 1 IS INP */
+            B = INP;
+        /* CASE 2 IS IRD (INTEL/ICOM) */
+            B = INTIN;
+        /* CASE 3 IS PTR */
+               DO; IOBYTE = 0000$0100B; GO TO RDRL;
+               END;
+        /* CASE 4 IS UR1 */
+               DO; IOBYTE = 0000$1000B; GO TO RDRL;
+               END;
+        /* CASE 5 IS UR2 */
+               DO; IOBYTE = 0000$1100B; GO TO RDRL;
+               END;
+        /* CASE 6 IS RDR */
+            RDRL:
+                B = MON2(3,0) AND 7FH;
+        /* CASE 7 IS OUT */
+            GO TO NOTSOURCE;
+        /* CASE 8 IS LPT */
+            GO TO NOTSOURCE;
+        /* CASE 9 IS UL1 */
+            GO TO NOTSOURCE;
+        /* CASE 10 IS PRN */
+            GO TO NOTSOURCE;
+        /* CASE 11 IS LST */
+            GO TO NOTSOURCE;
+        /* CASE 12 IS PTP */
+            GO TO NOTSOURCE;
+        /* CASE 13 IS UP1 */
+            GO TO NOTSOURCE;
+        /* CASE 14 IS UP2 */
+            GO TO NOTSOURCE;
+        /* CASE 15 IS PUN */
+            NOTSOURCE:
+                DO; CALL ERROR(.('NOT A CHARACTER SOURCE$'));
+                END;
+        /* CASE 16 IS TTY */
+                DO; IOBYTE = 0; GO TO CONL;
+                END;
+        /* CASE 17 IS CRT */
+                DO; IOBYTE = 01B; GO TO CONL;
+                END;
+        /* CASE 18 IS UC1 */
+                DO; IOBYTE = 11B; GO TO CONL;
+                END;
+        /* CASE 19 IS CON */
+            CONL:
+                DO; CONCHK = FALSE; /* DON'T CHECK CONSOLE STATUS */
+                B = MON2(1,0);
+                END;
+        END; /* OF CASES */
+    IOBYTE = IOB; /* RESTORE IOBYTE */
+    IF ECHO THEN /* COPY TO CONSOLE DEVICE */
+        DO; IOB = PDEST; PDEST = CONP; CALL PUTDEST(B);
+        PDEST = IOB;
+        END;
+    IF CONCHK THEN /* TEST FOR CONSOLE CHAR READY */
+        DO;
+        IF SCOM THEN /* SOURCE IS A COM FILE */
+            CONCHK = (CONCNT := CONCNT + 1) = 0; ELSE /* ASCII */
+            CONCHK = B = LF;
+        IF CONCHK THEN
+            DO; IF CONBRK THEN
+                DO;
+                IF READCHAR = ENDFILE THEN RETURN ENDFILE;
+                CALL ERROR(.('ABORTED$'));
+                END;
+            END;
+        END;
+    IF ZEROP THEN B = B AND 7FH;
+    IF UPPER THEN RETURN UTRAN(B);
+    IF LOWER THEN RETURN LTRAN(B);
+    RETURN B;
+    END GETSOURCEC;
+
+GETSOURCE: PROCEDURE BYTE;
+    /* GET NEXT SOURCE CHARACTER */
+    DECLARE CHAR BYTE;
+    MATCH: PROCEDURE(B) BYTE;
+        /* MATCH START AND QUIT STRINGS */
+        DECLARE (B,C) BYTE;
+        IF (C:=COMBUFF(B:=(B+MATCHLEN))) = ENDFILE THEN /* END MATCH */
+            DO; COMBUFF(B) = CHAR; /* SAVE CURRENT CHARACTER */
+            RETURN TRUE;
+            END;
+        IF C = CHAR THEN MATCHLEN = MATCHLEN + 1; ELSE
+            MATCHLEN = 0; /* NO MATCH */
+        RETURN FALSE;
+        END MATCH;
+    IF QUITLEN > 0 THEN
+        DO; IF (QUITLEN := QUITLEN - 1) = 1 THEN RETURN LF;
+        RETURN ENDFILE; /* TERMINATED WITH CR,LF,ENDFILE */
+        END;
+    DO FOREVER; /* LOOKING FOR START */
+    IF FEEDLEN > 0 THEN /* GET SEARCH CHARACTERS */
+        DO; FEEDLEN = FEEDLEN - 1;
+        CHAR = COMBUFF(FEEDBASE);
+        FEEDBASE = FEEDBASE + 1;
+        RETURN CHAR;
+        END;
+    IF (CHAR := GETSOURCEC) = ENDFILE THEN RETURN ENDFILE;
+    IF STARTS > 0 THEN /* LOOKING FOR START STRING */
+        DO; IF MATCH(STARTS) THEN
+            DO; FEEDBASE = STARTS; STARTS = 0;
+            FEEDLEN = MATCHLEN + 1;
+            END; /* OTHERWISE NO MATCH, SKIP CHARACTER */
+        END; ELSE
+    IF QUITS > 0 THEN /* PASS CHARACTERS TIL MATCH */
+        DO; IF MATCH(QUITS) THEN
+            DO; QUITS = 0; QUITLEN = 2;
+            /* SUBSEQUENTLY RETURN CR, LF, ENDFILE */
+            RETURN CR;
+            END;
+        RETURN CHAR;
+        END; ELSE
+    RETURN CHAR;
+    END; /* OF DO FOREVER */
+    END GETSOURCE;
+
+DECLARE DISK BYTE;            /* SELECTED DISK */
+
+  GNC: PROCEDURE BYTE;
+    IF (CBP := CBP + 1) >= COMLEN THEN RETURN CR;
+    RETURN UTRAN(COMBUFF(CBP));
+    END GNC;
+
+  DEBLANK: PROCEDURE;
+        DO WHILE (CHAR := GNC) = ' ';
+        END;
+    END DEBLANK;
+
+  SCAN: PROCEDURE(FCBA);
+    DECLARE FCBA ADDRESS,         /* ADDRESS OF FCB TO FILL */
+    FCB BASED FCBA (FSIZE) BYTE;  /* FCB TEMPLATE */
+    DECLARE (I,J,K) BYTE; /* TEMP COUNTERS */
+
+  /* SCAN LOOKS FOR THE NEXT DELIMITER, DEVICE NAME, OR FILE NAME.
+     THE VALUE OF CBP MUST BE 255 UPON ENTRY THE FIRST TIME */
+
+    DELIMITER: PROCEDURE(C) BYTE;
+        DECLARE (I,C) BYTE;
+        DECLARE DEL(*) BYTE DATA
+        (' =.:,<>',CR,LA,LB,RB);
+            DO I = 0 TO LAST(DEL);
+            IF C = DEL(I) THEN RETURN TRUE;
+            END;
+        RETURN FALSE;
+        END DELIMITER;
+
+    PUTCHAR: PROCEDURE;
+        FCB(FLEN:=FLEN+1) = CHAR;
+        IF CHAR = WHAT THEN AMBIG = TRUE; /* CONTAINS AMBIGUOUS REF */
+        END PUTCHAR;
+
+    FILLQ: PROCEDURE(LEN);
+        /* FILL CURRENT NAME OR TYPE WITH QUESTION MARKS */
+        DECLARE LEN BYTE;
+        CHAR = WHAT; /* QUESTION MARK */
+            DO WHILE FLEN < LEN; 
+            CALL PUTCHAR;
+            END;
+        END FILLQ;
+
+    GETFCB: PROCEDURE(I) BYTE;
+        DECLARE I BYTE;
+        RETURN FCB(I);
+        END GETFCB;
+
+    SCANPAR: PROCEDURE;
+        DECLARE (I,J) BYTE;
+        /* SCAN OPTIONAL PARAMETERS */
+        PARSET = TRUE;
+        SUSER = CUSER; /* SOURCE USER := CURRENT USER */
+        CHAR = GNC; /* SCAN PAST BRACKET */
+            DO WHILE NOT(CHAR = CR OR CHAR = RB);
+            IF (I := CHAR - 'A') > 25 THEN /* NOT ALPHA */
+                DO; IF CHAR = ' ' THEN CHAR = GNC; ELSE
+                CALL ERROR(.('BAD PARAMETER$'));
+                END; ELSE
+                DO; /* SCAN PARAMETER VALUE */
+                IF CHAR = 'S' OR CHAR = 'Q' THEN
+                    DO; /* START OR QUIT COMMAND */
+                    J = CBP + 1; /* START OF STRING */
+                        DO WHILE NOT ((CHAR := GNC) = ENDFILE OR CHAR = CR);
+                        END;
+                     CHAR=GNC;
+                    END; ELSE
+                IF (J := (CHAR := GNC) - '0') > 9 THEN J = 1;
+                ELSE
+                    DO WHILE (K := (CHAR := GNC) - '0') <= 9;
+                    J = J * 10 + K;
+                    END;
+                CONT(I) = J;
+                IF I = 6 THEN /* SET SOURCE USER */
+                    DO;
+                    IF J > 31 THEN
+                        CALL ERROR(.('INVALID USER NUMBER$'));
+                    SUSER = J;
+                    END;
+                END;
+            END;
+        CHAR = GNC;
+        END SCANPAR;
+
+    CHKSET: PROCEDURE;
+        IF CHAR = LA THEN CHAR = '=';
+        END CHKSET;
+
+    /* INITIALIZE FILE CONTROL BLOCK TO EMPTY */
+    AMBIG = FALSE; TYPE = ERR; CHAR = ' '; FLEN = 0;
+        DO WHILE FLEN < FSIZE-1;
+        IF FLEN = FNSIZE THEN CHAR = 0;
+        CALL PUTCHAR;
+        END;
+
+    /* DEBLANK COMMAND BUFFER */
+        CALL DEBLANK;
+
+    /* SAVE STARTING POSITION OF SCAN FOR DIAGNOSTICS */
+    TCBP = CBP;
+
+    /* MAY BE A SEPARATOR */
+    IF DELIMITER(CHAR) THEN
+        DO; CALL CHKSET;
+        TYPE = SPECL; RETURN;
+        END;
+
+    /* CHECK PERIPHERALS AND DISK FILES */
+    DISK = 0;
+    /* CLEAR PARAMETERS */
+        DO I = 0 TO 25; CONT(I) = 0;
+        END;
+    PARSET = FALSE;
+    FEEDLEN,MATCHLEN,QUITLEN = 0;
+    /* SCAN NEXT NAME */
+        DO FOREVER;
+        FLEN = 0;
+            DO WHILE NOT DELIMITER(CHAR);
+            IF FLEN >= NSIZE THEN /* ERROR, FILE NAME TOO LONG */
+                RETURN;
+            IF CHAR = '*' THEN CALL FILLQ(NSIZE); ELSE CALL PUTCHAR;
+            CHAR = GNC;
+            END;
+
+        /* CHECK FOR DISK NAME OR DEVICE NAME */
+        IF CHAR = ':' THEN
+            DO; IF DISK <> 0 THEN RETURN; /* ALREADY SET */
+            IF FLEN = 1 THEN
+                /* MAY BE DISK NAME A ... Z */
+                DO;
+                IF (DISK := GETFCB(1) - 'A' + 1) > 26 THEN
+                /* ERROR, INVALID DISK NAME */ RETURN;
+                CALL DEBLANK; /* MAY BE DISK NAME ONLY */
+                IF DELIMITER(CHAR) THEN
+                    DO; IF CHAR = LB THEN
+                        CALL SCANPAR;
+                    CBP = CBP - 1;
+                    TYPE = DISKNAME;
+                    RETURN;
+                    END;
+                END; ELSE
+
+            /* MAY BE A THREE CHARACTER DEVICE NAME */
+            IF FLEN <> 3 THEN /* ERROR, CANNOT BE DEVICE NAME */
+                RETURN; ELSE
+
+                /* LOOK FOR DEVICE NAME */
+                DO; DECLARE (I,J,K) BYTE, M LITERALLY '20',
+                IO(*) BYTE DATA
+                ('INPIRDPTRUR1UR2RDROUTLPTUL1PRNLST',
+                 'PTPUP1UP2PUNTTYCRTUC1CONNULEOF',0);
+                /* NOTE THAT ALL READER-LIKE DEVICES MUST BE
+                PLACED BEFORE 'RDR', AND ALL LISTING-LIKE DEVICES
+                MUST APPEAR BELOW LST, BUT ABOVE RDR.  THE LITERAL
+                DECLARATIONS FOR RDR, LST, AND PUNP MUST INDICATE
+                THE POSITIONS OF THESE DEVICES IN THE LIST */
+                J = 255;
+                    DO K = 0 TO M;
+                    I = 0;
+                        DO WHILE ((I:=I+1) <= 3) AND
+                        IO(J+I) = GETFCB(I);
+                        END;
+                    IF I = 4 THEN /* COMPLETE MATCH */
+                        DO; TYPE = PERIPH;
+                        /* SCAN PARAMETERS */
+                        IF GNC = LB THEN CALL SCANPAR;
+                        CBP = CBP - 1; CHAR = K;
+                        RETURN;
+                        END;
+                    /* OTHERWISE TRY NEXT DEVICE */ J = J + 3;
+                    END;
+
+                /* ERROR, NO DEVICE NAME MATCH */ RETURN;
+                END;
+            IF CHAR = LB THEN /* PARAMETERS FOLLOW */
+                CALL SCANPAR;
+            END; ELSE
+
+        /* CHAR IS NOT ':', SO FILE NAME IS SET. SCAN REMAINDER */
+            DO; IF FLEN = 0 THEN /* ERROR, NO PRIMARY NAME */
+                RETURN;
+            FLEN = FNAM;
+            IF CHAR = '.' THEN /* SCAN FILE TYPE */
+                DO WHILE NOT DELIMITER(CHAR := GNC);
+                IF FLEN >= FNSIZE THEN
+                /* ERROR, TYPE FIELD TOO LONG */ RETURN;
+                IF CHAR = '*' THEN CALL FILLQ(FNSIZE);
+                    ELSE CALL PUTCHAR;
+                END;
+
+            IF CHAR = LB THEN
+                CALL SCANPAR;
+            /* RESCAN DELIMITER NEXT TIME AROUND */
+            CBP = CBP - 1;
+            TYPE = FILE;
+            /* DISK IS THE SELECTED DISK (1 2 3 ... ) */
+            IF DISK = 0 THEN DISK = CDISK + 1; /* DEFAULT */
+            FCB(0),FCB(32) = 0;
+            RETURN;
+            END;
+        END;
+    END SCAN;
+
+  NULLS: PROCEDURE;
+    /* SEND 40 NULLS TO OUTPUT DEVICE */
+    DECLARE I BYTE;
+        DO I = 0 TO 39; CALL PUTDEST(0);
+        END;
+    END NULLS;
+
+
+  DECLARE FEXTH(FEXTL) BYTE,      /* HOLDS DESTINATION FILE TYPE */
+    COPYING BYTE;                 /* TRUE WHILE COPYING TO DEST FILE */
+
+  MOVEXT: PROCEDURE(A);
+    DECLARE A ADDRESS;
+    /* MOVE THREE CHARACTER EXTENT INTO DEST FCB */
+    CALL MOVE(A,.DEST(FEXT),FEXTL);
+    END MOVEXT;
+
+EQUAL: PROCEDURE(A,B) BYTE;
+    /* COMPARE THE STRINGS AT A AND B UNTIL EITHER A MISMATCH OR
+    A '$' IS ENCOUNTERED IN STRING B */
+    DECLARE (A,B) ADDRESS,
+    (SA BASED A, SB BASED B) BYTE;
+        DO WHILE SB <> '$';
+        IF (SB AND 7FH) <> (SA AND 7FH) THEN RETURN FALSE;
+        A = A + 1; B = B + 1;
+        END;
+    RETURN TRUE;
+    END EQUAL;
+
+READ$EOF: PROCEDURE BYTE;
+    /* RETURN TRUE IF END OF FILE */
+    CHAR = GETSOURCE;
+   IF SCOM THEN RETURN HARDEOF < NSOURCE;
+    RETURN CHAR = ENDFILE;
+    END READ$EOF;
+
+
+HEXRECORD: PROCEDURE BYTE;
+    /* READ ONE RECORD INTO SBUFF AND CHECK FOR PROPER FORM
+        RETURNS 0 IF RECORD OK
+        RETURNS 1 IF END OF TAPE (:00000)
+        RETURNS 2 IF ERROR IN RECORD       */
+
+
+    DECLARE XOFFSET BYTE; /* TRUE IF XOFF RECVD */
+    DECLARE NOERRS BYTE; /* TRUE IF NO ERRORS IN THIS RECORD */
+
+    PRINTERR: PROCEDURE(A);
+        /* PRINT ERROR MESSAGE IF NOERRS TRUE */
+        DECLARE A ADDRESS;
+        IF NOERRS THEN
+            DO; NOERRS = FALSE;
+            CALL PRINT(A);
+            END;
+        END PRINTERR;
+
+    CHECKXOFF: PROCEDURE;
+        IF XOFFSET THEN
+            DO; XOFFSET = FALSE;
+            CALL CLEARBUFF;
+            END;
+        END CHECKXOFF;
+
+    SAVECHAR: PROCEDURE BYTE;
+        /* READ CHARACTER AND SAVE IN BUFFER */
+        DECLARE I BYTE;
+        IF NOERRS THEN
+            DO;
+                DO WHILE (I := GETSOURCE) = XOFF; XOFFSET = TRUE;
+                END;
+            HBUFF(HSOURCE) = I;
+            IF (HSOURCE := HSOURCE + 1) >= LAST(HBUFF) THEN
+                CALL PRINTERR(.('RECORD TOO LONG$'));
+            RETURN I;
+            END;
+        RETURN ENDFILE; /* ON ERROR FLAG */
+        END SAVECHAR;
+
+    DECLARE (M, RL, CS, RT) BYTE,
+        LDA ADDRESS;  /* LOAD ADDRESS WHICH FOLLOWS : */
+
+   READHEX: PROCEDURE BYTE;
+        DECLARE H BYTE;
+        IF (H := SAVECHAR) - '0' <= 9 THEN RETURN H-'0';
+        IF H - 'A' > 5 THEN
+            CALL PRINTERR(.('INVALID DIGIT$'));
+        RETURN H - 'A' + 10;
+        END READHEX;
+
+    READBYTE: PROCEDURE BYTE;
+        /* READ TWO HEX DIGITS */
+        RETURN SHL(READHEX,4) OR READHEX;
+        END READBYTE;
+
+    READCS: PROCEDURE BYTE;
+        /* READ BYTE WITH CHECKSUM */
+        RETURN CS := CS + READBYTE;
+        END READCS;
+
+    READADDR: PROCEDURE ADDRESS;
+        /* READ DOUBLE BYTE WITH CHECKSUM */
+        RETURN SHL(DOUBLE(READCS),8) OR READCS;
+        END READADDR;
+
+    NOERRS = TRUE; /* NO ERRORS DETECTED IN THIS RECORD */
+
+    /* READ NEXT RECORD */
+        /* SCAN FOR THE ':' */
+        HSOURCE = 0;
+            DO WHILE (CS := SAVECHAR) <> ':';
+            HSOURCE = 0;
+            IF CS = ENDFILE THEN
+                DO; CALL PRINT(.('END OF FILE, CTL-Z',WHAT,'$'));
+                IF READCHAR = ENDFILE THEN RETURN 1;
+                    ELSE HSOURCE = 0;
+                END;
+            CALL CHECKXOFF;
+            END;
+
+        /* ':' FOUND */
+        CS = 0;
+        IF (RL := READCS) = 0 THEN /* END OF TAPE */
+            DO; DO WHILE (RL := SAVECHAR) <> ENDFILE;
+                CALL CHECKXOFF;
+                END;
+            IF NOERRS THEN RETURN 1;
+            RETURN 2;
+            END;
+
+    /* RECORD LENGTH IS NOT ZERO */
+        LDA = READADDR; /* LOAD ADDRESS */
+
+    /* READ WORDS UNTIL RECORD LENGTH EXHAUSTED */
+        RT = READCS; /* RECORD TYPE */
+           DO WHILE RL <> 0 AND NOERRS; RL = RL - 1;
+           M = READCS;
+          /* INCREMENT LA HERE FOR EXACT ADDRESS */
+           END;
+
+    /* CHECK SUM */
+        IF CS + READBYTE <> 0 THEN
+            CALL PRINTERR(.('CHECKSUM ERROR$'));
+
+    CALL CHECKXOFF;
+    IF NOERRS THEN RETURN 0;
+    RETURN 2;
+    END HEXRECORD;
+
+READTAPE: PROCEDURE;
+    /* READ HEX FILE FROM HIGH SPEED READER TO 'HEX' FILE,
+    CHECK EACH RECORD FOR VALID DIGITS, AND PROPER CHECKSUM */
+    DECLARE (I,A) BYTE;
+        DO FOREVER;
+            DO WHILE (I := HEXRECORD) <= 1;
+            IF NOT (I = 1 AND IGNOR) THEN
+                DO A = 1 TO HSOURCE;
+                CALL PUTDEST(HBUFF(A-1));
+                END;
+            CALL PUTDEST(CR); CALL PUTDEST(LF);
+            IF I = 1 THEN /* END OF TAPE ENCOUNTERED */
+                RETURN;
+            END;
+        CALL CRLF; HBUFF(HSOURCE) = '$';
+        CALL PRINT(.HBUFF);
+        CALL PRINT(.('CORRECT ERROR, TYPE RETURN OR CTL-Z$'));
+        CALL CRLF;
+        IF READCHAR = ENDFILE THEN RETURN;
+        END;
+    END READTAPE;
+
+FORMERR: PROCEDURE;
+    CALL ERROR(.('INVALID FORMAT$'));
+    END FORMERR;
+
+SETUPDEST: PROCEDURE;
+    CALL SELECT(DDISK);
+    DHEX = EQUAL(.DEST(FEXT),.('HEX$'));
+    CALL MOVE(.DEST(FEXT),.FEXTH,FEXTL); /* SAVE TYPE */
+    DEST(ROFILE) = DEST(ROFILE) AND 7FH;
+    DEST(SYSFILE)= DEST(SYSFILE)AND 7FH;
+    CALL MOVEXT(.('$$$'));
+    CALL DELETE(.DEST); /* REMOVE OLD $$$ FILE */
+    CALL MAKE(.DEST); /* CREATE A NEW ONE */
+    IF DCNT = 255 THEN CALL ERROR(.('NO DIRECTORY SPACE$'));
+    DEST(32),NDEST = 0;
+    END SETUPDEST;
+
+SETUPSOURCE: PROCEDURE;
+    HARDEOF = 0FFFFH;
+    CALL SETSUSER; /* SOURCE USER */
+    CALL SELECT(SDISK);
+    CALL OPEN(.SOURCE);
+    CALL SETCUSER; /* BACK TO CURRENT USER */
+    IF (NOT RSYS) AND ROL(SOURCE(SYSFILE),1) THEN
+        DCNT = 255;
+    IF DCNT = 255 THEN CALL ERROR(.('NO FILE$'));
+    SOURCE(32) = 0;
+    /* CAUSE IMMEDIATE READ */
+    SCOM = EQUAL(.SOURCE(FEXT),.('COM$'));
+    NSOURCE = SBLEN;
+    END SETUPSOURCE;
+
+CHECK$STRINGS: PROCEDURE;
+    IF STARTS > 0 THEN
+        CALL ERROR(.('START NOT FOUND$'));
+    IF QUITS  > 0 THEN
+        CALL ERROR(.('QUIT NOT FOUND$'));
+    END CHECK$STRINGS;
+
+CLOSEDEST: PROCEDURE(DIRECT);
+    DECLARE DIRECT BYTE;
+    /* DIRECT IS TRUE IF SECTOR-BY-SECTOR COPY */
+    IF DIRECT THEN
+        /* GET UNFILLED BYTES FROM SOURCE BUFFER */
+        DFUB = SFUB; ELSE DFUB = 0;
+        DO WHILE (LOW(NDEST) AND 7FH) <> 0;
+        DFUB = DFUB + 1;
+        CALL PUTDEST(ENDFILE);
+        END;
+    CALL CHECK$STRINGS;
+    CALL WRITEDEST;
+    CALL SELECT(DDISK);
+    CALL CLOSE(.DEST);
+    IF DCNT = 255 THEN
+        CALL ERROR(.('CANNOT CLOSE DESTINATION FILE$'));
+    CALL MOVEXT(.FEXTH); /* RECALL ORIGINAL TYPTE */
+  DEST(12) = 0;
+    CALL OPEN(.DEST);
+    IF DCNT <> 255 THEN /* FILE EXISTS */
+        DO;
+        IF ROL(DEST(ROFILE),1) THEN /* READ ONLY */
+            DO;
+            IF NOT WRROF THEN
+                DO;
+                CALL PRINT (.('DESTINATION IS R/O, DELETE (Y/N)?$'));
+                IF UTRAN(READCHAR) <> 'Y' THEN
+                    DO; CALL PRINT(.('**NOT DELETED**$'));
+                    CALL CRLF;
+                    CALL MOVEXT(.('$$$'));
+                    CALL DELETE(.DEST);
+                    RETURN;
+                    END;
+                CALL CRLF;
+                END;
+            DEST(ROFILE) = DEST(ROFILE) AND 7FH;
+            CALL SETIND(.DEST);
+            END;
+        CALL DELETE(.DEST);
+        END;
+    CALL MOVE(.DEST,.DEST(16),16); /* READY FOR RENAME */
+    CALL MOVEXT(.('$$$'));
+    CALL RENAME(.DEST);
+    END CLOSEDEST;
+
+SIZE$NBUF: PROCEDURE;
+    /* COMPUTE NUMBER OF BUFFERS - 1 FROM DBLEN */
+    NBUF = (SHR(DBLEN,7) AND 0FFH) - 1;
+    /* COMPUTED AS DBLEN/128-1, WHERE DBLEN <= 32K (AND THUS
+    NBUF RESULTS IN A VALUE <= 2**15/2**7-1 = 2**8-1 = 255) */
+    END SIZE$NBUF;
+
+SET$DBLEN: PROCEDURE;
+    /* ABSORB THE SOURCE BUFFER INTO THE DEST BUFFER */
+    SBASE = .MEMORY;
+    IF DBLEN >= 4000H THEN DBLEN = 7F80H; ELSE
+       DBLEN = DBLEN + SBLEN;
+    CALL SIZE$NBUF;
+    END SET$DBLEN;
+
+SIZE$MEMORY: PROCEDURE;
+    /* SET UP SOURCE AND DESTINATION BUFFERS */
+    SBASE = .MEMORY + SHR(MEMSIZE - .MEMORY,1);
+    SBLEN, DBLEN = SHR((MEMSIZE - .MEMORY) AND 0FF00H,1);
+    CALL SIZE$NBUF;
+    END SIZE$MEMORY;
+
+COPYCHAR: PROCEDURE;
+    /* PERFORM THE ACTUAL COPY FUNCTION */
+    DECLARE RESIZED BYTE; /* TRUE IF SBUFF AND DBUFF COMBINED */
+    IF (RESIZED := (BLOCK AND PSOURCE <> 0)) THEN /* BLOCK MODE */
+        CALL SET$DBLEN; /* ABSORB SOURCE BUFFER */
+    IF HEXT OR IGNOR THEN /* HEX FILE */
+        CALL READTAPE; ELSE
+        DO WHILE NOT READ$EOF;
+        CALL PUTDEST(CHAR);
+        END;
+    IF RESIZED THEN
+        DO; CALL CLEARBUFF;
+        CALL SIZE$MEMORY;
+        END;
+    END COPYCHAR;
+
+SIMPLECOPY: PROCEDURE;
+    DECLARE (FASTCOPY,I) BYTE;
+    REAL$EOF: PROCEDURE BYTE;
+        RETURN HARDEOF <> 0FFFFH;
+        END REALEOF;
+    CALL SIZE$MEMORY;
+    TCBP = MCBP; /* FOR ERROR TRACING */
+    CALL SETUPDEST;
+    CALL SETUPSOURCE;
+    /* FILES READY FOR DIRECT COPY */
+    FASTCOPY = TRUE;
+        /* LOOK FOR PARAMETERS */
+        DO I = 0 TO 25;
+        IF CONT(I) <> 0 THEN
+            DO;
+            IF NOT(I=6 OR I=14 OR I=17 OR I=21 OR I=22) THEN
+            /* NOT OBJ OR VERIFY */
+            FASTCOPY = FALSE;
+            END;
+        END;
+    IF FASTCOPY THEN /* COPY DIRECTLY TO DBUFF */
+        DO; CALL SET$DBLEN; /* EXTEND DBUFF */
+            DO WHILE NOT REAL$EOF;
+            CALL FILLSOURCE;
+            IF REAL$EOF THEN
+                NDEST = HARDEOF; ELSE NDEST = DBLEN;
+            CALL WRITEDEST;
+            END;
+        CALL SIZE$MEMORY; /* RESET TO TWO BUFFERS */
+        END; ELSE
+    CALL COPYCHAR;
+    CALL CLOSEDEST(FASTCOPY);
+    END SIMPLECOPY;
+
+MULTCOPY: PROCEDURE;
+    DECLARE (NEXTDIR, NDCNT, NCOPIED) ADDRESS;
+    PRNAME: PROCEDURE;
+        /* PRINT CURRENT FILE NAME */
+        DECLARE (I,C) BYTE;
+        CALL CRLF;
+            DO I = 1 TO FNSIZE;
+            IF (C := DEST(I)) <> ' ' THEN
+                  DO; IF I = FEXT THEN CALL PRINTCHAR('.');
+                  CALL PRINTCHAR(C);
+                  END;
+            END;
+        END PRNAME;
+
+    NEXTDIR,NCOPIED = 0;
+        DO FOREVER;
+        /* FIND A MATCHING ENTRY */
+        CALL SETSUSER; /* SOURCE USER */
+        CALL SELECT(SDISK);
+        CALL SETDMA(.BUFFER);
+        CALL SEARCH(.SEARFCB);
+        NDCNT = 0;
+            DO WHILE (DCNT <> 255) AND NDCNT < NEXTDIR;
+            NDCNT = NDCNT + 1;
+            CALL SEARCHN;
+            END;
+        CALL SETCUSER;
+        /* FILE CONTROL BLOCK IN BUFFER */
+        IF DCNT = 255 THEN
+            DO; IF NCOPIED = 0 THEN
+            CALL ERROR(.('NOT FOUND$')); CALL CRLF;
+            RETURN;
+            END;
+        NEXTDIR = NDCNT + 1;
+        /* GET THE FILE CONTROL BLOCK NAME TO DEST */
+        CALL MOVE(.BUFFER+SHL(DCNT AND 11B,5),.DEST,16);
+	DEST(0) = 0;
+	DEST(12) = 0;
+        CALL MOVE(.DEST,.SOURCE,16); /* FILL BOTH FCB'S */
+        IF RSYS OR NOT ROL(DEST(SYSFILE),1) THEN /* OK TO READ */
+            DO;
+            IF (NCOPIED := NCOPIED + 1) = 1 THEN
+            CALL PRINT(.('COPYING -$'));
+            CALL PRNAME;
+            CALL SIMPLECOPY;
+            END;
+        END;
+    END MULTCOPY;
+
+SET$SDISK: PROCEDURE;
+    IF DISK > 0 THEN SDISK = DISK - 1; ELSE SDISK = CDISK;
+    END SET$SDISK;
+
+SET$DDISK: PROCEDURE;
+    IF PARSET THEN /* PARAMETERS PRESENT */ CALL FORMERR;
+    IF DISK > 0 THEN DDISK = DISK - 1; ELSE DDISK = CDISK;
+    END SET$DDISK;
+
+CHECK$DISK: PROCEDURE;
+    IF SUSER <> CUSER THEN /* DIFFERENT DISKS */
+        RETURN;
+    IF DDISK = SDISK THEN CALL FORMERR;
+    END CHECK$DISK;
+
+CHECK$EOL: PROCEDURE;
+    CALL DEBLANK;
+    IF CHAR <> CR THEN CALL FORMERR;
+    END CHECK$EOL;
+
+SCANDEST: PROCEDURE(COPYFCB);
+    DECLARE COPYFCB ADDRESS;
+    CALL SET$SDISK;
+    CALL CHECK$EOL;
+    CALL MOVE(.SOURCE,COPYFCB,33);
+    CALL CHECK$DISK;
+    END SCANDEST;
+
+SCANEQL: PROCEDURE;
+    CALL SCAN(.SOURCE);
+    IF NOT (TYPE = SPECL AND CHAR = '=') THEN CALL FORMERR;
+    MCBP = CBP; /* FOR ERROR PRINTING */
+    END SCANEQL;
+
+
+PIPENTRY:
+  /* BUFFER AT 80H CONTAINS REMAINDER OF LINE TYPED
+  FOLLOWING THE COMMAND 'PIP' - IF ZERO THEN PROMPT TIL CR */
+  CALL MOVE(.BUFF,.COMLEN,80H);
+  MULTCOM = COMLEN = 0;
+
+  /* GET CURRENT CP/M VERSION */
+  IF VERSION < CPMVERSION THEN
+     DO;
+     CALL PRINT(.('REQUIRES CP/M 2.0 OR NEWER FOR OPERATION.$'));
+     CALL BOOT;
+     END;
+  /* GET CURRENT USER */
+  CUSER = GETUSER;
+  /* GET CURRENT DISK */
+  CDISK = MON2(25,0);
+
+  RETRY:
+  /* ENTER HERE ON ERROR EXIT FROM THE PROCEDURE 'ERROR' */
+    CALL SIZE$MEMORY;
+    /* MAIN PROCESSING LOOP.  PROCESS UNTIL CR ONLY */
+    DO FOREVER;
+    SUSER = CUSER;
+    C1, C2, C3 = 0; /* LINE COUNT = 000000 */
+    PUTNUM = TRUE; /* ACTS LIKE LF OCCURRED ON ASCII FILE */
+    CONCNT,COLUMN = 0; /* PRINTER TABS */
+    LINENO = 254; /* INCREMENTED TO 255 > PAGCNT */
+    /* READ FROM CONSOLE IF NOT A ONELINER */
+    IF MULTCOM THEN
+        DO; CALL PRINTCHAR('*'); CALL READCOM;
+        CALL CRLF;
+        END;
+    CBP = 255;
+    IF COMLEN = 0 THEN /* SINGLE CARRIAGE RETURN */
+        DO; CALL SELECT(CDISK);
+        CALL BOOT;
+        END;
+
+  /* LOOK FOR SPECIAL CASES FIRST */
+  DDISK,SDISK,PSOURCE,PDEST = 0;
+    CALL SCAN(.DEST);
+    IF TYPE = PERIPH THEN GO TO SIMPLECOM;
+    IF TYPE = DISKNAME THEN
+        DO; DDISK = DISK - 1;
+        CALL SCANEQL;
+        CALL SCAN(.SOURCE);
+        /* MAY BE MULTI COPY */
+        IF TYPE <> FILE THEN CALL FORMERR;
+        IF AMBIG THEN
+            DO; CALL SCANDEST(.SEARFCB);
+            CALL MULTCOPY;
+            END; ELSE
+            DO; CALL SCANDEST(.DEST);
+            /* FORM IS A:=B:UFN */
+            CALL SIMPLECOPY;
+            END;
+        GO TO ENDCOM;
+        END;
+
+
+  IF TYPE <> FILE OR AMBIG THEN CALL FORMERR;
+    CALL SET$DDISK;
+    CALL SCANEQL;
+    CALL SCAN(.SOURCE);
+    IF TYPE = DISKNAME THEN
+        DO;
+        CALL SET$SDISK; CALL CHECK$DISK;
+        CALL MOVE(.DEST,.SOURCE,33);
+        CALL CHECK$EOL;
+        CALL SIMPLECOPY;
+        GO TO ENDCOM;
+        END;
+    /* MAY BE POSSIBLE TO DO A FAST DISK COPY */
+    IF TYPE = FILE THEN /* FILE TO FILE */
+        DO; CALL DEBLANK; IF CHAR <> CR THEN GO TO SIMPLECOM;
+        /* FILE TO FILE */
+        CALL SET$SDISK;
+        CALL SIMPLECOPY;
+        GO TO ENDCOM;
+        END;
+
+SIMPLECOM:
+    CBP = 255; /* READY FOR RESCAN */
+
+    /* OTHERWISE PROCESS SIMPLE REQUEST */
+    CALL SCAN(.DEST);
+    IF (TYPE < FILE) OR AMBIG THEN /* DELIMITER OR ERROR */
+        CALL ERROR(.('UNRECOGNIZED DESTINATION$'));
+
+    DHEX = FALSE;
+    IF TYPE = FILE THEN
+        DO; /* DESTINATION IS A FILE, SAVE EXTENT NAME */
+        CALL SET$DDISK;
+        CALL SETUPDEST;
+        CHAR = 255;
+        END; ELSE
+    /* PERIPHERAL NAME */
+    IF CHAR >= NULP OR CHAR <= RDR THEN CALL ERROR(.('CANNOT WRITE$'));
+
+    IF (PDEST := CHAR + 1) = PUNP THEN CALL NULLS;
+
+    /* NOW SCAN THE DELIMITER */
+    CALL SCAN(.SOURCE);
+    IF TYPE <> SPECL OR CHAR <> '=' THEN
+        CALL ERROR(.('INVALID PIP FORMAT$'));
+
+    /* OTHERWISE SCAN AND COPY UNTIL CR */
+    COPYING = TRUE;
+        DO WHILE COPYING;
+        SUSER = CUSER;
+        CALL SCAN(.SOURCE);
+        /* SUSER MAY HAVE BEEN RESET */
+        SCOM = FALSE;
+        IF TYPE = FILE AND NOT AMBIG THEN /* A SOURCE FILE */
+            DO;
+            CALL SET$SDISK;
+            CALL SETUPSOURCE;
+            CHAR = 255;
+            END; ELSE
+
+        IF TYPE <> PERIPH OR (CHAR <= LST AND CHAR > RDR) THEN
+            CALL ERROR(.('CANNOT READ$'));
+
+
+      SCOM = SCOM OR OBJ; /* MAY BE ABSOLUTE COPY */
+      PSOURCE = CHAR + 1;
+      IF CHAR = NULP THEN CALL NULLS; ELSE
+      IF CHAR = EOFP THEN CALL PUTDEST(ENDFILE); ELSE
+          DO; /* DISK COPY */
+          IF (CHAR < HSRDR AND DHEX) THEN HEXT = 1;
+          /* HEX FILE SET IF SOURCE IS RDR AND DEST IS HEX FILE */
+          IF PDEST = PRNT THEN
+              DO; NUMB = 1;
+              IF TABS = 0 THEN TABS = 8;
+              IF PAGCNT = 0 THEN PAGCNT = 1;
+              END;
+          CALL COPYCHAR;
+          END;
+
+        CALL CHECK$STRINGS;
+        /* READ ENDFILE, GO TO NEXT SOURCE */
+        CALL SCAN(.SOURCE);
+        IF TYPE <> SPECL OR (CHAR <> ',' AND CHAR <> CR) THEN
+            CALL ERROR(.('INVALID SEPARATOR$'));
+
+        COPYING = CHAR <> CR;
+        END;
+
+    /* IF NECESSARY, CLOSE FILE OR PUNCH TRAILER */
+    IF PDEST = PUNP THEN
+        DO; CALL PUTDEST(ENDFILE); CALL NULLS;
+        END;
+    IF PDEST = 0 THEN /* FILE HAS TO BE CLOSED AND RENAMED */
+        CALL CLOSEDEST(FALSE);
+
+    /* COMLEN SET TO 0 IF NOT PROCESSING MULTIPLE COMMANDS */
+ENDCOM:
+    COMLEN = MULTCOM;
+
+    END; /* DO FOREVER */
+END;
+

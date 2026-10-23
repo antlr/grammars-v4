@@ -1,0 +1,4 @@
+factors 12
+where
+   factors n = { a <- 1..n/2 ; n rem a = 0 }
+?

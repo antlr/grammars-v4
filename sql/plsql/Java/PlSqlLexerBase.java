@@ -1,18 +1,37 @@
+///{packageLine}
+
 import org.antlr.v4.runtime.*;
 
 public abstract class PlSqlLexerBase extends Lexer
 {
-    public PlSqlLexerBase self;
-    
     public PlSqlLexerBase(CharStream input)
     {
         super(input);
-        self = this;
     }
 
     protected boolean IsNewlineAtPos(int pos)
     {
         int la = _input.LA(pos);
         return la == -1 || la == '\n';
+    }
+
+    protected boolean IsQQuoteDelimiter()
+    {
+        int openingOffset = _tokenStartCharIndex + 2 - _input.index();
+        int opening = _input.LA(openingOffset);
+        int closing = _input.LA(-2);
+        if (Character.isHighSurrogate((char) opening)) {
+            opening = Character.toCodePoint((char) opening, (char) _input.LA(openingOffset + 1));
+        }
+        if (Character.isLowSurrogate((char) closing)) {
+            closing = Character.toCodePoint((char) _input.LA(-3), (char) closing);
+        }
+        switch (opening) {
+            case '[': return closing == ']';
+            case '{': return closing == '}';
+            case '<': return closing == '>';
+            case '(': return closing == ')';
+            default: return closing == opening;
+        }
     }
 }

@@ -1,0 +1,235 @@
+-- CXB50042.AM
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that using Pragma Import (which references a Fortran subprogram)
+--      as a completion of a subprogram declaration will allow the use of the 
+--      imported subprogram by the calling routine.
+--      
+-- TEST DESCRIPTION:
+--      This test checks that user-defined Fortran language procedures can
+--      be imported and referenced from an Ada program.  Two Fortran
+--      subprograms are specified in files CXB50040.FTN and CXB50041.FTN. 
+--      These subprograms are imported to this test program, using calls to 
+--      Pragma Import with convention identifier "Fortran".  These subprograms
+--      are used as completions to Ada subprogram specifications.  Each 
+--      subprogram is then called in this test, and the results of the call
+--      are verified.
+--
+--      The two subprogram cases tested are as follows:
+--      1) A Fortran procedure ("subroutine") that takes six arguments,
+--         modifies the arguments, and returns the modified values to
+--         this main program.
+--      
+--      2) A Fortran function that takes a real value argument, computes
+--         a tax value based on the argument, and returns the calculated
+--         value to this main program through the function name.
+--
+--      This test assumes that the following characters are all included
+--      in the implementation defined type Interfaces.Fortran.Character_Set:
+--      ' ', 'a', 'b', 'd', 'A', 'F', 'N', 'O', 'R', 'T', and 'Z'.
+--      
+-- SPECIAL REQUIREMENTS:
+--      The files CXB50040.FTN and CXB50041.FTN must be compiled with a 
+--      Fortran compiler.  Implementation dialects of Fortran may require 
+--      alteration of the Fortran program syntax.  An implementation must 
+--      provide the necessary modifications to satisfy the subprogram
+--      requirements.
+--     
+--      Note that the compiled Fortran code must be bound with the compiled
+--      Ada code to create an executable image.  The necesssary commands are
+--      not part of the Ada language definition and must be provided as 
+--      required for an individual implementation.
+--     
+-- TEST FILES:
+--      The following files comprise this test:
+--
+--         CXB50040.FTN
+--         CXB50041.FTN
+--      => CXB50042.AM
+--
+-- APPLICABILITY CRITERIA: 
+--      This test is applicable to all implementations that provide 
+--      package Interfaces.Fortran and support the binding of Fortran code
+--      to Ada programs.
+--      If an implementation does not provide package Interfaces.Fortran
+--      then the line marked "-- N/A => ERROR" must be rejected, and the
+--      test is graded Not Applicable.
+--      If an implementation does not support the binding of Fortran code
+--      to Ada programs, then the test may be rejected at compile time,
+--      preferable by flagging the lines containing "pragma Import(Fortran...",
+--      or the test may fail at link/bind time.  In either case, the test
+--      should be graded Not Applicable.
+--      If an executable is created, then it must be executed and report
+--      "PASSED"; else the test must be graded Failed.
+--
+--       
+-- CHANGE HISTORY:
+--      21 Mar 96   SAIC    Initial release for 2.1.
+--      10 Jun 96   SAIC    Incorporated reviewer comments for ACVC 2.1.
+--      27 Oct 96   SAIC    Incorporated reviewer comments.
+--      01 DEC 97   EDS     Correct bad Fortran in CXB50040.
+--      29 JUN 98   EDS     Changed applicability criteria to permit
+--                          support of Interfaces.Fortran without being
+--                          able to actually bind Fortran code.
+--!
+
+with Report;
+with Impdef;
+with Ada.Exceptions;
+with Interfaces.Fortran;                                    -- N/A => ERROR
+
+procedure CXB50042 is
+begin
+
+   Report.Test ("CXB5004", "Check that using Pragma Import, which "         &
+                           "references a Fortran subprogram, as a "         &
+                           "completion of a subprogram declaration "        &
+                           "will allow the use of the imported subprogram " &
+                           "by the calling routine");
+
+   Test_Block:
+   declare
+
+      use Interfaces.Fortran;
+      use Ada.Exceptions;
+
+      type Integer_Array_Type is array (1..3) of Fortran_Integer;
+      subtype Fortran_String  is Fortran_Character(1..7);
+
+
+      -- The Modify_Args procedure takes six parameter values, and will
+      -- modify each of the parameters in the following manner:
+      --   Int_Array  - each element of the integer array will be doubled.
+      --   Real_Value - this value will be squared.
+      --   Char       - this parameter value will be set to 'Z'.
+      --   String_Val - this parameter will be set to "FORTRAN".
+      --   Bool       - this parameter will be set to True.
+      --   Dbl_Prec   - the square root of the actual parameter will be
+      --                computed and returned.
+      --   
+      -- Note: The actual value provided for parameter Dbl_Prec must be
+      --       positive.
+
+      procedure Modify_Args (Int_Array  : in out Integer_Array_Type;
+                             Real_Value : in out Real;
+                             Char       : in out Character_Set;
+                             String_Val : in out Fortran_String;
+                             Bool       : in out Logical;
+                             Dbl_Prec   : in out Double_Precision);
+
+
+      -- Function Tax will return the tax due on the Taxable_Amount 
+      -- parameter provided in the call.
+
+      function Tax (Taxable_Amount : in Real) return Real;
+
+
+      -- Use Fortran subprograms as completions to the Ada subprogram 
+      -- specifications above.
+
+      pragma Import(Fortran, Modify_Args, Impdef.CXB50040_External_Name);
+      pragma Import(Fortran, Tax,         Impdef.CXB50041_External_Name);
+
+      Epsilon       : Double_Precision   := 0.0001;
+
+      Int_Arr       : Integer_Array_Type := (6, 283, 6174);
+      Real_Val      : Real               := 123.0;
+      Chr           : Character_Set      := 'b';
+      Str_Val       : Fortran_String     := "  Ada  ";
+      Bool_Val      : Logical            := False;
+      Dbl           : Double_Precision   := 2.00000;
+
+      TC_Int_Array  : Integer_Array_Type := (12, 566, 12348);
+      TC_Real_Value : Real               := 15129.0;     -- Square of 123.0
+      TC_Char       : Character_Set      := 'Z';
+      TC_String_Val : Fortran_String     := "FORTRAN";
+      TC_Bool       : Logical            := True;
+      TC_Dbl_Prec   : Double_Precision   := 1.41421356;  -- Sqrt of 2.0
+
+   begin
+
+      -- Call the imported Fortran procedure and verify that the 
+      -- returned results are correct.
+
+      Modify_Args (Int_Array  => Int_Arr,
+                   Real_Value => Real_Val,
+                   Char       => Chr,
+                   String_Val => Str_Val,
+                   Bool       => Bool_Val,
+                   Dbl_Prec   => Dbl);
+
+      -- Verify the modified parameters against expected values.
+
+      if Int_Arr(1) /= TC_Int_Array(1) or
+         Int_Arr(2) /= TC_Int_Array(2) or
+         Int_Arr(3) /= TC_Int_Array(3)
+      then
+         Report.Failed("Incorrect result from Modify_Args for parameter 1");
+      end if;
+
+      if Real_Val /= TC_Real_Value then
+         Report.Failed("Incorrect result from Modify_Args for parameter 2");
+      end if;
+
+      if Chr /= TC_Char then
+         Report.Failed("Incorrect result from Modify_Args for parameter 3");
+      end if;
+
+      if Str_Val /= TC_String_Val then
+         Report.Failed("Incorrect result from Modify_Args for parameter 4");
+      end if;
+
+      if Bool_Val /= TC_Bool then
+         Report.Failed("Incorrect result from Modify_Args for parameter 5");
+      end if;
+
+      if Dbl >= TC_Dbl_Prec + Epsilon or
+         Dbl <= TC_Dbl_Prec - Epsilon
+      then
+         Report.Failed("Incorrect result from Modify_Args for parameter 6");
+      end if;
+
+
+
+      -- Call the Fortran function and verify the results.
+
+      if Tax(0.09)  >= Tax(0.11)  or
+         Tax(0.2)   >= Tax(0.350) or
+         Tax(0.56)  >= Tax(0.90)  or
+         Tax(1.08)  >= Tax(10.80) 
+      then
+         Report.Failed("Incorrect result from Fortran Tax function");
+      end if;
+
+   exception
+      when The_Error : others => 
+         Report.Failed("The following exception was raised in the " &
+                       "Test_Block: " & Exception_Name(The_Error));
+   end Test_Block;
+
+   Report.Result;
+
+end CXB50042;

@@ -1,0 +1,322 @@
+-- BA12007.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that the rename of a child unit (i.e. a library unit with  
+--      an expanded name) does not make declarations within ancestors of
+--      the child visible.
+--
+--      Check that a parent unit name (in the defining declaration of a
+--      child unit) does not designate a renaming declaration.
+--
+-- TEST DESCRIPTION:
+--      Declare a parent package.  Declare a public child package.  Declare 
+--      a public grandchild package.  Declare a public grandchild function.
+--      Declare a public generic grandchild.  
+--      Rename the public grandchild package, the public grandchild function,
+--      and the public grandchild generic package as compilation units.  
+--      In separate packages, "with"s the renamed package and accesses the 
+--      grandparent and parent types.
+--      Rename the public child package as a compilation unit.
+--      In separate packages, accesses the renamed package as a parent unit
+--      name.
+--
+--                      BA12007_0         BA12007_5  BA12007_6, etc
+--                           |
+--                           |
+--                       BA12007_1
+-- renamed as           /    | _14\
+--                     /     |     \              
+--              BA12007_2 BA12007_3 BA12007_4
+-- renamed as          _8        _9        _10
+--
+--
+-- CHANGE HISTORY:
+--      06 Dec 94   SAIC    ACVC 2.0
+--      14 Mar 95   SAIC    Changed with BA12007_14.BA12007_2 to be ERROR;
+--                          Modified function renaming. Added new case. 
+--      07 Nov 95   SAIC    Update and repair for ACVC 2.0.1
+--      07 Sep 96   SAIC    ACVC 2.1
+--
+--!
+
+-- Parent package
+
+package BA12007_0 is
+
+   -- Type definitions.
+
+   type Parent_Type is range 1 .. 10;
+
+end BA12007_0;
+
+-- No body provided for BA12007_0.
+
+
+     --=================================================================--
+
+-- Public child
+
+package BA12007_0.BA12007_1 is
+
+   type Child_Type is range 100 .. 200;
+
+end BA12007_0.BA12007_1;
+
+
+-- No body provided for BA12007_0.BA12007_1.
+
+
+     --=================================================================--
+
+-- Public grandchild package
+
+package BA12007_0.BA12007_1.BA12007_2 is
+
+   Grand_Child_Var1 : Parent_Type := 8;
+
+   Grand_Child_Var2 : Child_Type  := 135;
+
+end BA12007_0.BA12007_1.BA12007_2;
+
+
+-- No body provided for BA12007_0.BA12007_1.BA12007_2.
+
+     --=================================================================--
+
+function BA12007_0.BA12007_1.BA12007_3 (I : Child_Type) 
+  return Child_Type is
+
+begin
+
+   -- Real body of child function goes here.
+
+   return I + 2;
+
+end BA12007_0.BA12007_1.BA12007_3;
+
+
+     --=================================================================--
+
+-- Generic grandchild package
+
+generic
+
+   -- Parameters go here.
+
+package BA12007_0.BA12007_1.BA12007_4 is
+
+   Generic_Grandchild_Var1 : Parent_Type := 4;
+
+   Generic_Grandchild_Var2 : Child_Type  := 197;
+
+end BA12007_0.BA12007_1.BA12007_4;
+
+
+-- No body provided for BA12007_0.BA12007_1.BA12007_4.
+
+
+     --=================================================================--
+
+with BA12007_0.BA12007_1.BA12007_2;     -- public grandchild package
+                                        -- implicit with BA12007_0,     
+                                        -- BA12007_0.BA12007_1
+package BA12007_5 is
+
+   Client_Var1 : BA12007_0.Parent_Type                            -- OK.
+               := BA12007_0.BA12007_1.BA12007_2.Grand_Child_Var1;  
+
+   Client_Var2 : BA12007_0.BA12007_1.Child_Type                   -- OK.
+               := BA12007_0.BA12007_1.BA12007_2.Grand_Child_Var2;  
+
+end BA12007_5;
+
+
+-- No body provided for BA12007_5.
+
+
+     --=================================================================--
+
+with BA12007_0.BA12007_1.BA12007_3;     -- public grandchild function
+                                        -- implicit with BA12007_0,     
+                                        -- BA12007_0.BA12007_1
+package BA12007_6 is
+
+   Client_Var3 : BA12007_0.Parent_Type;                           -- OK.
+
+   Client_Var4 : BA12007_0.BA12007_1.Child_Type;                  -- OK.
+
+   Client_Var5 : BA12007_0.BA12007_1.Child_Type
+               := BA12007_0.BA12007_1.BA12007_3 (Client_Var4);    -- OK.
+
+end BA12007_6;
+
+
+-- No body provided for BA12007_6.
+
+     --=================================================================--
+
+with BA12007_0.BA12007_1.BA12007_4;     -- generic grandchild package
+                                        -- implicit with BA12007_0,     
+                                        -- BA12007_0.BA12007_1
+package BA12007_7 is
+
+   -- Instantiate the public grandchild.
+
+   package Grandchild_Pkg is new BA12007_0.BA12007_1.BA12007_4;  
+
+   Client_Var6 : BA12007_0.Parent_Type                            -- OK.
+               := Grandchild_Pkg.Generic_Grandchild_Var1;  
+
+   Client_Var7 : BA12007_0.BA12007_1.Child_Type                   -- OK.
+               := Grandchild_Pkg.Generic_Grandchild_Var2;       
+
+end BA12007_7;
+
+
+-- No body provided for BA12007_7.
+
+     --=================================================================--
+
+-- Package renaming as compilation units.
+
+with BA12007_0.BA12007_1.BA12007_2;     -- public grandchild package
+package BA12007_8 renames BA12007_0.BA12007_1.BA12007_2;
+
+with BA12007_0.BA12007_1.BA12007_3;     -- public grandchild function
+function BA12007_9 (I : BA12007_0.BA12007_1.Child_Type) return 
+  BA12007_0.BA12007_1.Child_Type renames BA12007_0.BA12007_1.BA12007_3;
+
+with BA12007_0.BA12007_1.BA12007_4;     -- public generic grandchild package
+generic package BA12007_10 renames BA12007_0.BA12007_1.BA12007_4;
+
+
+     --=================================================================--
+
+with BA12007_8;                         -- rename declaration of public
+                                        -- grandchild package.
+                                        -- BA12007_0, BA12007_0.BA12007_1
+                                        -- CANNOT be referenced.
+
+package BA12007_11 is
+
+   Test_Var1 : BA12007_0.Parent_Type                              -- ERROR:
+                                                  -- BA12007_0 not visible.
+             := BA12007_8.Grand_Child_Var1;  
+
+   Test_Var2 : BA12007_0.BA12007_1.Child_Type                     -- ERROR:
+                                        -- BA12007_0.BA12007_1 not visible.
+             := BA12007_8.Grand_Child_Var2;  
+
+end BA12007_11;
+
+
+-- No body provided for BA12007_11.
+
+     --=================================================================--
+
+with BA12007_9;                         -- rename declaration of public
+                                        -- grandchild function.
+                                        -- BA12007_0, BA12007_0.BA12007_1
+                                        -- CANNOT be referenced.
+
+package BA12007_12 is
+
+   Test_Var3 : BA12007_0.Parent_Type;                             -- ERROR:
+                                                  -- BA12007_0 not visible.
+
+   Test_Var4 : BA12007_0.BA12007_1.Child_Type;                    -- ERROR:
+                                        -- BA12007_0.BA12007_1 not visible.
+end BA12007_12;
+
+
+-- No body provided for BA12007_12.
+
+     --=================================================================--
+
+with BA12007_10;                        -- rename declaration of public
+                                        -- generic package.
+                                        -- BA12007_0, BA12007_0.BA12007_1
+                                        -- CANNOT be referenced.
+
+package BA12007_13 is
+
+   -- Instantiate the public grandchild.
+
+   package Grandchild_Pkg is new BA12007_10;
+
+   Test_Var5 : BA12007_0.Parent_Type                              -- ERROR:
+                                                  -- BA12007_0 not visible.
+               := Grandchild_Pkg.Generic_Grandchild_Var1;  
+
+   Test_Var6 : BA12007_0.BA12007_1.Child_Type                    -- ERROR:
+                                       -- BA12007_0.BA12007_1 not visible.
+               := Grandchild_Pkg.Generic_Grandchild_Var2;  
+
+end BA12007_13;
+
+
+-- No body provided for BA12007_13.
+
+     --=================================================================--
+
+-- Package renaming as compilation units.
+
+with BA12007_0.BA12007_1;               -- public parent package
+package BA12007_14 renames BA12007_0.BA12007_1;
+
+     --=================================================================--
+
+with BA12007_14.BA12007_2;                                        -- OK.
+package BA12007_15 is
+
+   type Boolean_Arr is array (1 .. 2) of Boolean;
+
+end BA12007_15;
+
+-- No body provided for BA12007_15.
+
+
+     --=================================================================--
+
+package BA12007_14.BA12007_16 is                                 -- ERROR:
+                             -- BA12007_14 not allowed as parent unit name
+end;
+
+     --=================================================================--
+
+with BA12007_14;                  -- rename declaration of parent package.
+
+with BA12007_0.BA12007_1.BA12007_2;     -- public grandchild package
+                                        -- implicit with BA12007_0.
+                                        
+package BA12007_18 is
+
+   Test_Var9 : BA12007_0.Parent_Type                            -- OK.
+             := BA12007_14.BA12007_2.Grand_Child_Var1; 
+
+end BA12007_18;
+
+-- No body provided for BA12007_18.

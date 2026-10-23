@@ -26,54 +26,36 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine true, allowShortBlocksOnASingleLine true, minEmptyLines 0, alignSemicolons ownLine
+// $antlr-format alignColons trailing, singleLineOverrulesHangingColon true, alignLexerCommands true, alignLabels true, alignTrailers true
+
 lexer grammar JavadocLexer;
 
-NAME
-	: [a-zA-Z]+
-	;
+NAME: [a-zA-Z]+;
 
-NEWLINE
-	: '\n' (SPACE? (STAR {_input.LA(1) != '/'}?)+)?
-	| '\r\n' (SPACE? (STAR {_input.LA(1) != '/'}?)+)?
-	| '\r' (SPACE? (STAR {_input.LA(1) != '/'}?)+)?
-	;
+NEWLINE:
+    '\n' (SPACE? (STAR     {_input.LA(1) != '/'}?)+)?
+    | '\r\n' (SPACE? (STAR {_input.LA(1) != '/'}?)+)?
+    | '\r' (SPACE? (STAR   {_input.LA(1) != '/'}?)+)?
+;
 
-SPACE
-	: (' '|'\t')+
-	;
+SPACE: (' ' | '\t')+;
 
-TEXT_CONTENT
-	: ~[\n\r\t @*{}/a-zA-Z]+
-	;
+TEXT_CONTENT: ~[\n\r\t @*{}/a-zA-Z]+;
 
-AT
-	: '@'
-	;
+AT: '@';
 
-STAR
-	: '*'
-	;
+STAR: '*';
 
-SLASH
-	: '/'
-	;
+SLASH: '/';
 
-JAVADOC_START
-	: '/**' STAR*
-	;
+JAVADOC_START: '/**' STAR*;
 
-JAVADOC_END
-	: SPACE? STAR* '*/'
-	;
+JAVADOC_END: SPACE? STAR* '*/';
 
-INLINE_TAG_START
-	: '{@'
-	;
+INLINE_TAG_START: '{@';
 
-BRACE_OPEN
-	: '{'
-	;
+BRACE_OPEN: '{';
 
-BRACE_CLOSE
-	: '}'
-	;
+BRACE_CLOSE: '}';

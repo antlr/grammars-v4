@@ -1,0 +1,25 @@
+<rulelist> ::= <rules> <EOF>
+
+<rules> ::= <rule> | <rule> <rules>
+
+<rule> ::= <lhs> <ASSIGN> <rhs>
+
+<lhs> ::= <id>
+
+<rhs> ::= <alternatives>
+
+<alternatives> ::= <alternative> | <alternative> <bar> <alternatives>
+
+<alternative> ::= <optional> | <zeroormore> | <oneormore> | <text> | <id>
+
+<optional> ::= [ <alternatives> ]
+
+<zeroormore> ::= { <alternatives> }
+
+<oneormore> ::= ( <alternatives> )
+
+<text> ::= <TEXT>
+
+<id> ::= <ID>
+
+<bar> ::= <BAR>

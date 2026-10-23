@@ -1,0 +1,1 @@
+max by (very, second)(foo_metric{very=~'important', something='else'}) > 0 AND ON(host,project)(metric_name) > 0

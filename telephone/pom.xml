@@ -38,7 +38,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>number</entryPoint>
+					<entryPoint>test</entryPoint>
 					<grammarName>telephone</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>

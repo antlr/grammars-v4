@@ -1,0 +1,39 @@
+#! /bin/sh
+
+case `uname` in
+CYGWIN)	EXE=a.exe ;;
+*)	EXE=a.out ;;
+esac
+
+if [ ! -f $EXE ]
+then
+	make || exit 1
+fi
+
+if [ -d testdir ]
+then
+	true	# do nothing
+elif [ -f awktest.tar ]
+then
+	echo extracting testdir
+	tar -xpf awktest.tar
+else
+	echo $0: No testdir directory and no awktest.tar to extract it from! >&2
+	exit 1
+fi
+
+cd testdir
+pwd
+PATH=.:$PATH
+export PATH
+if (ulimit -c unlimited > /dev/null 2>&1)
+then
+	# Workaround broken default on MacOS X
+	ulimit -c unlimited
+fi
+
+REGRESS
+
+cd ..
+cd bugs-fixed
+REGRESS
