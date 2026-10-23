@@ -1,0 +1,1 @@
+DESCRIBE OUTPUT myquery;

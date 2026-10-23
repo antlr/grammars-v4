@@ -1,0 +1,263 @@
+-- B730008.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--     The ACAA has created and maintains the Ada Conformity Assessment Test
+--     Suite for the purpose of conformity assessments conducted in accordance
+--     with the International Standard ISO/IEC 18009 - Ada: Conformity
+--     assessment of a language processor. This test suite should not be used
+--     to make claims of conformance unless used in accordance with
+--     ISO/IEC 18009 and any applicable ACAA procedures.
+--*
+-- OBJECTIVE:
+--      Check that a tagged partial view and its completion must have
+--      the same set of interfaces.
+--
+-- TEST DESCRIPTION:
+--      We declare a variety of interfaces and types with those interfaces,
+--      then make sure that the completions have exactly the same set of
+--      interfaces. We try each kind of completion.
+--
+--      This test is checking 7.3(7.3/2), the so-called "no hidden interfaces"
+--      rule (but the rule also requires "no missing interfaces" as well).
+--
+-- CHANGE HISTORY:
+--      07 Jun 05   H K     Initial version.
+--      30 Dec 13   RLB     Created from three submitted tests and several
+--                          additional cases.
+--      22 Apr 21   RLB     Added error location indicators.
+--!
+package B730008A is
+   type Iface is interface;
+   procedure Foo (X : Iface) is abstract;
+
+   type L_Iface is limited interface;
+
+   type S_Iface is synchronized interface;
+
+   type Parent_1 is tagged null record;
+
+   type Parent_2 is new Parent_1 and Iface with null record;
+   procedure Foo (X : Parent_2) is null;
+
+   type Parent_3 is new Parent_1 and L_Iface with null record;
+
+end B730008A;
+
+with B730008A;
+package B730008 is
+
+   type Priv01 is abstract new B730008A.Iface with private;
+
+   type Priv02 is abstract new B730008A.Iface with private;
+
+   type Priv03 is abstract new B730008A.Iface with private;
+
+   type Priv04 is abstract new B730008A.Iface with private;
+
+   type Priv05 is abstract new B730008A.Iface with private;
+
+   type Priv10 is new B730008A.Parent_1 with private;
+
+   type Priv11 is new B730008A.Parent_1 with private;
+
+   type Priv20 is new B730008A.Parent_1 and B730008A.Iface with private;
+
+   type Priv21 is new B730008A.Parent_1 and B730008A.Iface with private;
+
+   type Priv22 is new B730008A.Parent_1 and B730008A.Iface with private;
+
+   type Priv23 is new B730008A.Parent_1 and B730008A.Iface with private;
+
+   type Priv24 is new B730008A.Parent_1 and B730008A.Iface with private;
+
+   type Priv30 is new B730008A.L_Iface and B730008A.Iface with private;
+
+   type Priv31 is new B730008A.L_Iface and B730008A.Iface with private;
+
+   type Priv40 is tagged private;
+
+   type Priv41 is tagged private;
+
+   type Priv42 is tagged private;
+
+   type Priv43 is abstract tagged private;
+
+   type Priv50 is private;
+
+   type Priv51 is private;
+
+   type Priv52 is private;
+
+   type Priv60 is synchronized new B730008A.S_Iface with private;
+
+   type Priv61 is synchronized new B730008A.S_Iface with private;
+
+   type Priv62 is synchronized new B730008A.S_Iface with private;
+
+   type Priv63 is synchronized new B730008A.S_Iface with private;
+
+   type Priv64 is synchronized new B730008A.S_Iface with private;
+
+   type Priv65 is synchronized new B730008A.S_Iface with private;
+
+   type Priv66 is synchronized new B730008A.S_Iface with private;
+
+   type Priv67 is synchronized new B730008A.S_Iface with private;
+
+   type Priv70 is synchronized new B730008A.S_Iface and
+                  B730008A.L_Iface with private;
+
+   type Priv71 is synchronized new B730008A.S_Iface and
+                  B730008A.L_Iface with private;
+
+   type Priv80 is abstract synchronized new B730008A.S_Iface with private;
+
+private
+   type Priv01 is abstract new B730008A.Iface
+                     with null record;                       -- OK. {1:4;1}
+
+   -- Different interface:
+   type Priv02 is abstract new B730008A.L_Iface
+                     with null record;                       -- ERROR: {1:4;1}
+
+   -- Partial view isn't descended from the interface defined by Priv03
+   -- (see AARM 7.3(7.cc/2)):
+   type Priv03 is interface and B730008A.Iface;              -- ERROR: {4;1}
+
+   type Priv04 is new B730008A.Parent_2 with null record;    -- OK. {4;1}
+
+   -- Partial view doesn't have L_IFace:
+   type Priv05 is new B730008A.Parent_3 with null record;    -- ERROR: {4;1}
+
+   -- Partial view doesn't have IFace:
+   type Priv10 is new B730008A.Parent_1 and
+                      B730008A.Iface with null record;       -- ERROR: {1:4;1}
+   procedure Foo (X : Priv10) is null;
+
+   -- Partial view doesn't have IFace:
+   type Priv11 is new B730008A.Parent_2 with null record;    -- ERROR: {4;1}
+
+
+   type Priv20 is new B730008A.Parent_2 with null record;    -- OK. {4;1}
+
+   type Priv21 is new B730008A.Parent_1 and
+                      B730008A.Iface with null record;       -- OK. {1:4;1}
+   procedure Foo (X : Priv21) is null;
+
+   -- Different interface:
+   type Priv22 is new B730008A.Parent_1 and
+                      B730008A.L_Iface with null record;     -- ERROR: {1:4;1}
+
+   -- Different interface:
+   type Priv23 is new B730008A.Parent_3 with null record;    -- ERROR: {4;1}
+
+   -- Missing interface:
+   type Priv24 is new B730008A.Parent_1 with null record;    -- ERROR: {4;1}
+
+   type Priv30 is new B730008A.Parent_2 and
+                      B730008A.L_Iface with null record;     -- OK. {1:4;1}
+
+   -- Missing interface:
+   type Priv31 is new B730008A.Parent_1 and
+                      B730008A.L_Iface with null record;     -- ERROR: {1:4;1}
+
+   -- Partial view doesn't have IFace:
+   type Priv40 is new B730008A.Iface with null record;       -- ERROR: {4;1}
+   procedure Foo (X : Priv40) is null;
+
+   -- Partial view doesn't have IFace:
+   type Priv41 is new B730008A.Parent_2 with null record;    -- ERROR: {4;1}
+
+   type Priv42 is new B730008A.Parent_1 with null record;    -- OK. {4;1}
+
+   -- Partial view isn't descended from the interface defined by Priv42:
+   type Priv43 is interface;                                 -- ERROR: {4;1}
+
+   -- Partial view is not tagged:
+   type Priv50 is new B730008A.Iface with null record;       -- OK. {4;1}
+   procedure Foo (X : Priv50) is null;
+
+   -- Partial view is not tagged:
+   type Priv51 is new B730008A.Parent_2 with null record;    -- OK. {4;1}
+
+   -- Partial view is not tagged:
+   type Priv52 is new B730008A.Parent_1 with null record;    -- OK. {4;1}
+
+   -- Missing interface:
+   protected type Priv60 is                                  -- ERROR: {4}
+   private
+      Foo : Natural;
+   end Priv60;
+
+   -- Wrong interface:
+   protected type Priv61 is new B730008A.L_Iface with        -- ERROR: {4}
+   private
+      Foo : Natural;
+   end Priv61;
+
+   protected type Priv62 is new B730008A.S_Iface with        -- OK. {4}
+   private
+      Foo : Natural;
+   end Priv62;
+
+   -- Partial view doesn't have L_IFace:
+   protected type Priv63 is new B730008A.S_Iface and
+                                B730008A.L_Iface with        -- ERROR: {1:4}
+   private
+      Foo : Natural;
+   end Priv63;
+
+   -- Missing interface:
+   task type Priv64 is                                       -- ERROR: {4}
+   end Priv64;
+
+   -- Wrong interface:
+   task type Priv65 is new B730008A.L_Iface with             -- ERROR: {4}
+   end Priv65;
+
+   task type Priv66 is new B730008A.S_Iface with             -- OK. {4}
+   end Priv66;
+
+   -- Partial view doesn't have L_IFace:
+   task type Priv67 is new B730008A.L_Iface and
+                           B730008A.S_Iface with             -- ERROR: {1:4}
+   end Priv67;
+
+   -- Missing interface:
+   protected type Priv70 is new B730008A.S_Iface with        -- ERROR: {4}
+   private
+      Foo : Natural;
+   end Priv70;
+
+   -- Missing interface:
+   task type Priv71 is new B730008A.L_Iface with             -- ERROR: {4}
+   end Priv71;
+
+   -- Partial view isn't descended from the interface defined by Priv42:
+   type Priv80 is synchronized interface and
+                           B730008A.S_Iface;                 -- ERROR: {1:4;1}
+
+end B730008;

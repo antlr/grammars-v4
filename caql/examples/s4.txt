@@ -1,0 +1,1 @@
+histogram:percentile(50,95,99) | label("Median", "95th Percentile", "99th Percentile")

@@ -1,0 +1,123 @@
+-- BA150029.AM
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making
+--     this public release, the Government intends to confer upon all
+--     recipients unlimited rights  equal to those held by the Government.
+--     These rights include rights to use, duplicate, release or disclose the
+--     released technical data and computer software in whole or in part, in
+--     any manner and for any purpose whatsoever, and to have or permit others
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE
+--     See BA150020.A.
+--
+-- TEST DESCRIPTION
+--     See BA150020.A.
+--
+-- TEST FILES:
+--      This test consists of the following files:
+--         BA150020.A
+--         BA150021.A
+--         BA150022.A
+--         BA150023.A
+--         BA150024.A
+--         BA150025.A
+--         BA150026.A
+--         BA150027.A
+--         BA150028.A
+--      -> BA150029.AM
+--
+-- PASS/FAIL CRITERIA:
+--     See BA150020.A.
+--
+-- CHANGE HISTORY:
+--      29 JUN 1999   RAD   Initial Version
+--      08 JUL 1999   RLB   Cleaned up and added to test suite.
+--      26 AUG 1999   RLB   Made the body a body, as intended.
+--      30 AUG 1999   RLB   Removed instantation of unit with errors.
+--
+--!
+
+package BA15002.Body_Pragmas is
+    procedure Dummy; -- To force a body. Usually, we've use
+                     -- pragma Elaborate_Body for that, but that would
+                     -- be confusing in this test.
+end BA15002.Body_Pragmas;
+
+package body BA15002.Body_Pragmas is
+
+    -- These pragmas are not allowed to apply to a package body:
+
+    pragma Elaborate_Body; -- ERROR:
+    pragma Preelaborate; -- ERROR:
+    pragma Pure; -- ERROR:
+
+    pragma Elaborate_Body(BA15002.Body_Pragmas); -- ERROR:
+    pragma Preelaborate(BA15002.Body_Pragmas); -- ERROR:
+    pragma Pure(BA15002.Body_Pragmas); -- ERROR:
+
+    procedure Dummy is
+    begin
+        null;
+    end Dummy;
+
+end BA15002.Body_Pragmas;
+
+----------------
+
+with BA15002.OK_Inline;
+with BA15002.Procedure_Inline;
+with BA15002.Bad_Inline; -- OPTIONAL ERROR:
+
+with BA15002.OK_Elaborate_Body;
+with BA15002.OK_Bare_Elaborate_Body;
+with BA15002.Bad_Elaborate_Body; -- OPTIONAL ERROR:
+with BA15002.Bad_Bare_Elaborate_Body; -- OPTIONAL ERROR:
+with BA15002.Private_Elaborate_Body; -- OPTIONAL ERROR:
+with BA15002.Private_Generic_Elaborate_Body; -- OPTIONAL ERROR:
+with BA15002.Very_Bad_Elaborate_Body; -- OPTIONAL ERROR:
+with BA15002.Also_Bad_Elaborate_Body; -- OPTIONAL ERROR:
+
+with BA15002.OK_Preelaborate;
+with BA15002.OK_Bare_Preelaborate;
+with BA15002.Bad_Preelaborate; -- OPTIONAL ERROR:
+with BA15002.Bad_Bare_Preelaborate; -- OPTIONAL ERROR:
+with BA15002.Private_Preelaborate; -- OPTIONAL ERROR:
+with BA15002.Private_Generic_Preelaborate; -- OPTIONAL ERROR:
+with BA15002.Very_Bad_Preelaborate; -- OPTIONAL ERROR:
+with BA15002.Also_Bad_Preelaborate; -- OPTIONAL ERROR:
+with BA15002.Generic_Preelaborate; -- OPTIONAL ERROR:
+with BA15002.Generic_Preelaborate_2; -- OPTIONAL ERROR:
+
+with BA15002.OK_Pure;
+with BA15002.OK_Bare_Pure;
+with BA15002.Bad_Pure; -- OPTIONAL ERROR:
+with BA15002.Bad_Bare_Pure; -- OPTIONAL ERROR:
+with BA15002.Private_Pure; -- OPTIONAL ERROR:
+with BA15002.Private_Generic_Pure; -- OPTIONAL ERROR:
+with BA15002.Very_Bad_Pure; -- OPTIONAL ERROR:
+with BA15002.Also_Bad_Pure; -- OPTIONAL ERROR:
+with BA15002.Generic_Pure; -- OPTIONAL ERROR:
+with BA15002.Generic_Pure_2; -- OPTIONAL ERROR:
+
+with BA15002.Body_Pragmas;
+
+procedure BA15002.Main is
+begin
+    null;
+end BA15002.Main;
+

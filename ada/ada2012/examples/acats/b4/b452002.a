@@ -1,0 +1,292 @@
+-- B452002.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--     The ACAA has created and maintains the Ada Conformity Assessment Test
+--     Suite for the purpose of conformity assessments conducted in accordance
+--     with the International Standard ISO/IEC 18009 - Ada: Conformity
+--     assessment of a language processor. This test suite should not be used
+--     to make claims of conformance unless used in accordance with
+--     ISO/IEC 18009 and any applicable ACAA procedures.
+--*
+-- OBJECTIVES:
+--     [A] Check that a universal access equality operator does not resolve
+--     if neither operand is a specific anonymous access type.
+--
+--     [B] Check that a universal access equality operator is illegal if one
+--     of the operands is access-to-object and the other is
+--     access-to-subprogram.
+--
+--     [C] Check that a universal access equality operator is illegal when both
+--     operands have access-to-object types and the designated subtypes of
+--     the operands are different kinds of types.
+--
+--     [D] Check that a universal access equality operator is illegal when both
+--     operands have access-to-object types and the designated subtypes of
+--     the operands are elementary and do not statically match.
+--
+--     [E] Check that a universal access equality operator is illegal when both
+--     operands have access-to-object types and the designated subtypes of the
+--     operands are array types and do not statically match.
+--
+--     [F] Check that a universal access equality operator is illegal when both
+--     operands have access-to-object types and the designated types of the
+--     operands are record types and one does not cover the other.
+--
+--     [G] Check that a universal access equality operator is illegal when both
+--     operands have access-to-subprogram types and the designated profiles of
+--     the operand types are not subtype conformant.
+--
+-- TEST DESCRIPTION:
+--     We declare a bunch-o-types to serve as designated types (along with a
+--     anonymous access components), then declare a few procedures with a lot
+--     of anonymous access parameters and a few SOAATs. We then try comparing
+--     various objects.
+--
+--     The test is verifying that RM 4.5.2(9.5/2), 4.5.2(9.6/2), and
+--     4.5.2(9.7/2) are correctly implemented.
+--
+--     Note: When a named access type is involved, we use Standard."=" to
+--     ensure that the universal access operator is being used. We don't
+--     want the compiler to be confused by the predefined "=" for the named
+--     access type.
+--
+-- CHANGE HISTORY:
+--     29 Mar 2019  RLB  Created new test.
+
+package B452002_0 is
+   -- Some named access types to use in equality:
+   Var : Natural := 0;
+   subtype Dyn is Integer range Var .. Integer'Last;
+
+   type Pool_Acc is access Positive;
+
+   type General_Acc is access all Positive;
+   subtype NNGen_Acc is not null General_Acc;
+
+   type Func_Acc is access function return Positive;
+
+   type My_Array is array (Positive range <>) of Natural;
+
+   subtype Short_Array is My_Array (1 .. 4);
+
+   subtype Long_Array is My_Array (1 .. 20);
+
+   subtype Dyn_Array is My_Array (1 .. Var + 4);
+
+   type Arr_Acc is access My_Array;
+
+   type Root is tagged null record;
+
+   type Child is new Root with null record;
+
+   type AChild_Acc is access all Child'Class;
+
+   type Grandchild is new Child with null record;
+
+   type Sibling is new Root with null record;
+
+   type Disc_Rec (D : Natural) is record
+      C : Natural;
+   end record;
+
+   subtype Four_Rec is Disc_Rec(4);
+
+   subtype Six_Rec is Disc_Rec(6);
+
+   type Rec_Comp is record
+       Comp_Pos  : access Positive;
+       Comp_Nat  : access Natural;
+       Comp_Dyn  : access Dyn;
+       Comp_Flt  : access Float;
+       Comp_SArr : access Short_Array;
+       Comp_DArr : access Dyn_Array;
+       Comp_Func : access function return Natural;
+       Comp_Proc : access procedure (N : in Natural);
+       Comp_NNAcc: access NNGen_Acc;
+       Comp_Child: access Child'Class;
+       Comp_Sibl : access Sibling;
+       Comp_GAcc : access General_Acc;
+       Comp_4Rec : access Four_Rec;
+       Comp_DRec : access Disc_Rec;
+   end record;
+
+end B452002_0;
+
+
+with B452002_0; use B452002_0;
+procedure B452002 is
+
+    procedure Test_It (
+       Param_Pos  : access Positive;
+       Param_Nat  : access Natural;
+       Param_Flt  : access Float;
+       Param_Arr  : access My_Array;
+       Param_LArr : access Long_Array;
+       Param_DArr : access Dyn_Array;
+       Param_Func : access function return Positive;
+       Param_Proc : access procedure (P : in Positive);
+       Param_MProc: access procedure (N : in out Natural);
+       Param_GAcc : access General_Acc;
+       Param_NNAcc: access NNGen_Acc;
+       Param_Root : access Root;
+       Param_Sibl : access Sibling;
+       Param_GCld : access Grandchild;
+       Param_Any  : access Root'Class;
+       Param_DRec : access Disc_Rec;
+       Param_6Rec : access Six_Rec) is
+
+       Obj_PAcc : Pool_Acc := null;
+       Obj_GAcc : General_Acc := null;
+       Obj_NAcc : NNGen_Acc := null;
+
+       Obj_FAcc : Func_Acc := null;
+       Obj_AAcc : Arr_Acc := null;
+
+       Rec_Obj : Rec_Comp;
+
+       AObj_Pos  : access Positive := Param_Pos;
+       AObj_LArr : access Long_Array := Param_LArr;
+       AObj_Func : access function return Positive := Param_Func;
+       AObj_Proc : access procedure (P : Positive) := Param_Proc;
+       AObj_GC   : access Grandchild := Param_GCld;
+   begin
+       if Standard."=" (Obj_PAcc, null) then               -- ERROR: [A] {11;5}
+          null;
+       elsif Standard."=" (Obj_AAcc, null) then            -- ERROR: [A] {14;5}
+          null;
+       elsif Standard."=" (Obj_FAcc, null) then            -- ERROR: [A] {14;5}
+          null;
+       elsif Standard."=" (Obj_PAcc, Obj_GAcc) then        -- ERROR: [A] {14;5}
+          null;
+       elsif Standard."=" (Obj_PAcc, AObj_Pos) then        -- OK. {14;5}
+          null;
+       elsif Standard."=" (AObj_LArr, null) then           -- OK. {14;5}
+          null;
+       end if;
+
+       if Standard."="(Obj_PAcc, AObj_Func) then           -- ERROR: [B] {11;5}
+          null;
+       elsif Rec_Obj.Comp_Func = Param_Nat then            -- ERROR: [B] {14;5}
+          null;
+       elsif Param_Func = Param_Any then                   -- ERROR: [B] {14;5}
+          null;
+       elsif Param_Proc = Rec_Obj.Comp_Func then           -- ERROR: [B] {14;5}
+          null;
+       elsif Rec_Obj.Comp_Func = null then                 -- OK. {14;5}
+          null;
+       end if;
+
+       if Standard."="(Obj_GAcc, Param_Flt) then           -- ERROR: [C] {11;5}
+          null;
+       elsif AObj_Pos = Rec_Obj.Comp_SArr then             -- ERROR: [C] {14;5}
+          null;
+       elsif Param_Root = Param_LArr then                  -- ERROR: [C] {14;5}
+          null;
+       elsif Param_GAcc = Rec_Obj.Comp_Pos then            -- ERROR: [C] {14;5}
+          null;
+       elsif Param_Sibl = Rec_Obj.Comp_GAcc then           -- ERROR: [C] {14;5}
+          null;
+       elsif Param_GCld = AObj_GC then                     -- OK. {14;5}
+          null;
+       end if;
+
+       if Rec_Obj.Comp_Pos = Param_Nat then                -- ERROR: [D] {11;5}
+          null;
+       elsif Rec_Obj.Comp_Nat = AObj_Pos then              -- ERROR: [D] {14;5}
+          null;
+       elsif Standard."="(Obj_PAcc, Param_Nat) then        -- ERROR: [D] {14;5}
+          null;
+       elsif Param_Nat = Rec_Obj.Comp_Dyn then             -- ERROR: [D] {14;5}
+          null;
+       elsif Param_NNAcc = Rec_Obj.Comp_GAcc then          -- ERROR: [D] {14;5}
+          null;
+       elsif Param_NNAcc = Param_GAcc then                 -- ERROR: [D] {14;5}
+          null;
+       elsif Rec_Obj.Comp_Pos = AObj_Pos then              -- OK. {14;5}
+          null;
+       elsif Param_Nat = Rec_Obj.Comp_Nat then             -- OK. {14;5}
+          null;
+       elsif Param_GAcc = Rec_Obj.Comp_GAcc then           -- OK. {14;5}
+          null;
+       end if;
+
+       if Rec_Obj.Comp_SArr = Param_LArr then              -- ERROR: [E] {11;5}
+          null;
+       elsif AObj_LArr = Param_Arr then                    -- ERROR: [E] {14;5}
+          null;
+       elsif Standard."="(Obj_AAcc, Param_DArr) then       -- ERROR: [E] {14;5}
+          null;
+       elsif Rec_Obj.Comp_SArr = Param_DArr then           -- ERROR: [E] {14;5}
+          null;
+       elsif AObj_LArr = Param_LArr then                   -- OK. {14;5}
+          null;
+       elsif Rec_Obj.Comp_DArr = Param_DArr then           -- OK. {14;5}
+          null;
+       end if;
+
+       if Param_Any = AObj_GC then                         -- OK. {11;5}
+          null;
+       elsif Rec_Obj.Comp_Child = Param_Root then          -- ERROR: [F] {14;5}
+          null;
+       elsif Param_Sibl = Rec_Obj.Comp_Child then          -- ERROR: [F] {14;5}
+          null;
+       elsif AObj_GC = Rec_Obj.Comp_Child then             -- OK. {14;5}
+          null;
+       elsif Param_Sibl = Rec_Obj.Comp_Sibl then           -- OK. {14;5}
+          null;
+       elsif Rec_Obj.Comp_Sibl = Param_Root then           -- ERROR: [F] {14;5}
+          null;
+       elsif Rec_Obj.Comp_Sibl = AObj_GC then              -- ERROR: [F] {14;5}
+          null;
+       -- Note: The rules DO NOT require static matching of constraints
+       -- for discriminated types. Thus all of the following are legal:
+       elsif Param_DRec = Param_6Rec then                  -- OK. {14;5}
+          null;
+       elsif Param_6Rec = Rec_Obj.Comp_4Rec then           -- OK. {14;5}
+          null;
+       elsif Rec_Obj.Comp_DRec = Param_6Rec then           -- OK. {14;5}
+          null;
+       end if;
+
+       if Standard."="(Param_Func, Obj_FAcc) then          -- OK. {11;5}
+          null;
+       elsif Rec_Obj.Comp_Func = Param_Func then           -- ERROR: [G] {14;5}
+          null;
+       elsif Rec_Obj.Comp_Func = AObj_Func then            -- ERROR: [G] {14;5}
+          null;
+       elsif Rec_Obj.Comp_Proc = Param_Proc then           -- ERROR: [G] {14;5}
+          null;
+       elsif Param_MProc = Rec_Obj.Comp_Proc then          -- ERROR: [G] {14;5}
+          null;
+       elsif AObj_Proc = Param_Proc then                   -- OK. {14;5}
+          null;
+       end if;
+
+    end Test_It;
+
+begin
+   null;
+end B452002;

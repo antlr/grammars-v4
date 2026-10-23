@@ -1,274 +1,432 @@
+/*
+HTTP grammar.
+The MIT License (MIT).
+
+Copyright (c) 2024, Martin Mirchev.
+Copyright (c) 2024, Volodya Lombrozo.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
+/*
+* This grammar is based on the HTTP/1.1 specification (RFC 7230, RFC 7231).
+*/
 grammar http;
 
 /*
- HTTP-message = start‑line ( header‑field  CRLF ) CRLF [ message‑body ]
+ HTTP-message = start‑line *( header‑field CRLF ) CRLF [ message‑body ]
  */
-http_message: start_line (header_field CRLF)* CRLF //message_body
-            ;
+http_message
+    : start_line (header_field CRLF)* EOF // CRLF message_body
+    ;
 
 /*
- start-line = request‑line / status‑line
+ start-line = request‑line / status‑line
  */
-start_line: request_line;
+start_line
+    : request_line // status_line
+    ;
 
 /*
- request-line = method  SP  request‑target  SP  HTTP‑version  CRLF
+ request-line = method SP request‑target SP HTTP‑version CRLF
  */
-request_line: method SP request_target SP http_version CRLF;
+request_line
+    : method SP request_target SP http_version CRLF
+    ;
 
 /*
- method = token ; "GET" ; → RFC 7231 – Section 4.3.1 ; "HEAD" ; → RFC 7231 – Section 4.3.2 ; "POST"
- ; → RFC 7231 – Section 4.3.3 ; "PUT" ; → RFC 7231 – Section 4.3.4 ; "DELETE" ; → RFC 7231 – Section
- 4.3.5 ; "CONNECT" ; → RFC 7231 – Section 4.3.6 ; "OPTIONS" ; → RFC 7231 – Section 4.3.7 ; "TRACE"
- ; → RFC 7231 – Section 4.3.8
+ method = token ; "GET" ; → RFC 7231 – Section 4.3.1 ; "HEAD" ; → RFC 7231 – Section 4.3.2 ; "POST"
+ ; → RFC 7231 – Section 4.3.3 ; "PUT" ; → RFC 7231 – Section 4.3.4 ; "DELETE" ; → RFC 7231 – Section
+ 4.3.5 ; "CONNECT" ; → RFC 7231 – Section 4.3.6 ; "OPTIONS" ; → RFC 7231 – Section 4.3.7 ; "TRACE"
+ ; → RFC 7231 – Section 4.3.8
  */
-method:
-	'GET'
-	| 'HEAD'
-	| 'POST'
-	| 'PUT'
-	| 'DELETE'
-	| 'CONNECT'
-	| 'OPTIONS'
-	| 'TRACE';
+method
+    : token
+    ;
 
 /*
- request-target = origin-form / absolute-form / authority-form / asterisk-form
+ request-target = origin-form / absolute-form / authority-form / asterisk-form
  */
-request_target: origin_form;
+request_target
+    : origin_form // absolute_form | authority_form | asterisk_form
+    ;
 
 /*
- origin-form = absolute-path  [ "?"  query ]
+ origin-form = absolute-path  [ "?"  query ]
  */
-origin_form: absolute_path (QuestionMark query)?;
+origin_form
+    : absolute_path ('?' query)?
+    ;
 
 /*
- absolute-path = 1*( "/"  segment )
+ absolute-path = 1*( "/" segment )
  */
-absolute_path: (Slash segment)+;
+absolute_path
+    : ('/' segment)+
+    ;
 
 /*
- segment = pchar
+ segment = *pchar
  */
-segment: pchar*;
+segment
+    : pchar*
+    ;
 
 /*
- query = ( pchar /  "/" /  "?" )
+ query = *( pchar /  "/" /  "?" )
  */
-query: (pchar | Slash | QuestionMark)*;
+query
+    : (pchar | '/' | '?')*
+    ;
 
 /*
- HTTP-version = HTTP-name '/' DIGIT  "."  DIGIT
+ HTTP-version = HTTP-name '/' DIGIT  "." DIGIT
+ HTTP-name = %x48.54.54.50 ; "HTTP", case-sensitive
  */
-http_version: http_name DIGIT Dot DIGIT;
+http_version
+    : 'HTTP' '/' DIGIT '.' DIGIT
+    ;
 
 /*
- HTTP-name = %x48.54.54.50 ; "HTTP", case-sensitive
+ header-field = field-name  ":"  OWS  field-value  OWS
  */
-http_name: 'HTTP/';
-
-
-/*
- header-field = field-name  ":"  OWS  field-value  OWS 
- */
-header_field: field_name Colon OWS* field_value OWS*;
+header_field
+    : field_name ':' ows field_value ows
+    ;
 
 /*
- field-name = token
+ field-name = token
  */
-field_name: token;
+field_name
+    : token
+    ;
 
 /*
  token
  */
-token: tchar+;
-/*
- field-value = ( field-content / obs-fold )
- */
-field_value: (field_content | obs_fold)+;
+token
+    : tchar+
+    ;
 
 /*
- field-content = field-vchar [ 1*( SP / HTAB )  field-vchar ]
+ tchar = "!" / "#" / "$" / "%" / "&" / "'" / "*" / "+" / "-" / "." / "^" / "_" / "`" /
+ "|" / "~" / DIGIT / ALPHA
  */
-field_content: field_vchar ((SP | HTAB)+ field_vchar)?;
+tchar
+    : EXCLAMATION_MARK
+    | DOLLAR_SIGN
+    | HASHTAG
+    | PERCENT
+    | AMPERSAND
+    | SQUOTE
+    | STAR
+    | PLUS
+    | MINUS
+    | DOT
+    | CARET
+    | UNDERSCORE
+    | BACK_QUOTE
+    | VBAR
+    | TILDE
+    | DIGIT
+    | HEX_LETTER
+    | ALPHA
+    ;
 
 /*
- field-vchar = VCHAR / obs-text
+ field-value = *( field-content / obs-fold )
  */
-field_vchar: vCHAR | obs_text;
-/*
- obs-text = %x80-FF
- */
-obs_text: OBS_TEXT;
-/*
- obs-fold = CRLF  1*( SP / HTAB ) ; see RFC 7230 – Section 3.2.4
- */
-obs_fold: CRLF (SP | HTAB)+;
+field_value
+    : (field_content | obs_fold)*
+    ;
 
 /*
- message-body = OCTET
+ field-content = field-vchar [ 1*( SP / HTAB ) field-vchar ]
  */
-//message_body: OCTET*;
-
+field_content
+    : field_vchar ((SP | HTAB)+ field_vchar)*
+    ;
 
 /*
- SP = %x20 ; space
+ OWS = *( SP / HTAB ) ; optional whitespace
  */
-SP: ' ';
-/*
- pchar = unreserved / pct‑encoded / sub‑delims / ":" / "@"
- */
-pchar: unreserved | Pct_encoded | sub_delims | Colon | At;
+ows : (SP | HTAB)*;
 
 /*
- unreserved = ALPHA /  DIGIT /  "-" /  "." /  "_" /  "~"
+ field-vchar = VCHAR / obs-text
  */
-unreserved: ALPHA | DIGIT | Minus | Dot | Underscore | Tilde;
+field_vchar
+    : vchar
+    | obs_text
+    ;
 
 /*
- ALPHA = %x41‑5A /  %x61‑7A ; A‑Z / a‑z
+ obs-text = %x80-FF
  */
-ALPHA: [A-Za-z];
+obs_text
+    : OBS_TEXT
+    ;
 
 /*
- DIGIT = %x30‑39 ; 0-9
+ obs-fold = CRLF 1*( SP / HTAB ) ; see RFC 7230 – Section 3.2.4
  */
-DIGIT: [0-9];
+obs_fold
+    : CRLF (SP | HTAB)+
+    ;
 
 /*
- pct-encoded = "%"  HEXDIG  HEXDIG
+ pchar = unreserved / pct‑encoded / sub‑delims / ":" / "@"
  */
-Pct_encoded: Percent HEXDIG HEXDIG;
+pchar
+    : unreserved
+    | pct_encoded
+    | sub_delims
+    | hexdig
+    | COLON
+    | AT
+    ;
 
 /*
- HEXDIG = DIGIT /  "A" /  "B" /  "C" /  "D" /  "E" /  "F"
+ pct-encoded = "%"  HEXDIG HEXDIG
  */
-HEXDIG: DIGIT | 'A' | 'B' | 'C' | 'D' | 'E' | 'F';
+pct_encoded
+    : PERCENT hexdig hexdig
+    ;
 
 /*
- sub-delims = "!" /  "$" /  "&" /  "'" /  "(" /  ")" /  "*" /  "+" /  "," /  ";" /  "="
- */
-sub_delims:
-	ExclamationMark
-	| DollarSign
-	| Ampersand
-	| SQuote
-	| LColumn
-	| RColumn
-	| Star
-	| Plus
-	| SemiColon
-	| Period
-	| Equals;
-
-LColumn:'(';
-RColumn:')';
-SemiColon:';';
-Equals:'=';
-Period:',';
+ HEXDIG = DIGIT / "A" / "B" / "C" / "D" / "E" / "F"
+*/
+hexdig
+    : DIGIT
+    | HEX_LETTER
+    ;
 
 /*
- CRLF = CR  LF ; Internet standard newline
+ unreserved = ALPHA / DIGIT / "-" / "." / "_" / "~"
  */
-CRLF: '\n';
+unreserved
+    : ALPHA
+    | DIGIT
+    | MINUS
+    | DOT
+    | UNDERSCORE
+    | TILDE
+    ;
 
 /*
- tchar = "!" /  "#" /  "$" /  "%" /  "&" /  "'" /  "*" /  "+" /  "-" /  "." /  "^" /  "_" /  "`" / 
- "|" /  "~" /  DIGIT /  ALPHA
+ sub-delims = "!" / "$" / "&" / "'" / "(" / ")" / "*" / "+" / "," / ";" / "="
  */
-tchar:
-	  ExclamationMark
-	| DollarSign
-	| Hashtag
-	| Percent
-	| Ampersand
-	| SQuote
-	| Star
-	| Plus
-    | Minus
-	| Dot
-	| Caret
-    | Underscore
-	| BackQuote
-	| VBar
-	| Tilde
-	| DIGIT
-	| ALPHA;
-
-Minus :'-';
-Dot   : '.';
-Underscore: '_';
-Tilde : '~';
-QuestionMark :'?';
-Slash :'/';
-ExclamationMark: '!';
-Colon:':';
-At: '@';
-DollarSign:'$';
-Hashtag:'#';
-Ampersand:'&';
-Percent:'%';
-SQuote:'\'';
-Star:'*';
-Plus:'+';
-Caret:'^';
-BackQuote:'`';
-VBar:'|';
+sub_delims
+    : EXCLAMATION_MARK
+    | DOLLAR_SIGN
+    | AMPERSAND
+    | SQUOTE
+    | LCOLUMN
+    | RCOLUMN
+    | STAR
+    | PLUS
+    | PERIOD
+    | SEMICOLON
+    | EQUALS
+    ;
 
 /*
- OWS = ( SP / HTAB ) ; optional whitespace
- */
-OWS: SP | HTAB;
+VCHAR = %x21-7E ; visible (printing) characters
+*/
+vchar
+    : LCOLUMN
+    | RCOLUMN
+    | SEMICOLON
+    | EQUALS
+    | PERIOD
+    | MINUS
+    | DOT
+    | UNDERSCORE
+    | TILDE
+    | QUESTION_MARK
+    | SLASH
+    | EXCLAMATION_MARK
+    | COLON
+    | AT
+    | DOLLAR_SIGN
+    | HASHTAG
+    | AMPERSAND
+    | PERCENT
+    | SQUOTE
+    | STAR
+    | PLUS
+    | CARET
+    | BACK_QUOTE
+    | VBAR
+    | HEX_LETTER
+    | ALPHA
+    | DIGIT
+    | VCHAR
+    ;
+
+LCOLUMN
+    : '('
+    ;
+
+RCOLUMN
+    : ')'
+    ;
+
+SEMICOLON
+    : ';'
+    ;
+
+EQUALS
+    : '='
+    ;
+
+PERIOD
+    : ','
+    ;
+
+MINUS
+    : '-'
+    ;
+
+DOT
+    : '.'
+    ;
+
+UNDERSCORE
+    : '_'
+    ;
+
+TILDE
+    : '~'
+    ;
+
+QUESTION_MARK
+    : '?'
+    ;
+
+SLASH
+    : '/'
+    ;
+
+EXCLAMATION_MARK
+    : '!'
+    ;
+
+COLON
+    : ':'
+    ;
+
+AT
+    : '@'
+    ;
+
+DOLLAR_SIGN
+    : '$'
+    ;
+
+HASHTAG
+    : '#'
+    ;
+
+AMPERSAND
+    : '&'
+    ;
+
+PERCENT
+    : '%'
+    ;
+
+SQUOTE
+    : '\''
+    ;
+
+STAR
+    : '*'
+    ;
+
+PLUS
+    : '+'
+    ;
+
+CARET
+    : '^'
+    ;
+
+BACK_QUOTE
+    : '`'
+    ;
+
+VBAR
+    : '|'
+    ;
 
 /*
- HTAB = %x09 ; horizontal tab
+ DIGIT = %x30‑39 ; 0-9
  */
-HTAB: '\t';
+DIGIT
+    : [0-9]
+    ;
 
+ /*
+ HEX_LETTER = "A" / "B" / "C" / "D" / "E" / "F"
+ */
+HEX_LETTER: [A-F];
 
 /*
- VCHAR = %x21-7E ; visible (printing) characters
+ ALPHA = %x41‑5A / %x61‑7A ; A‑Z / a‑z
  */
-vCHAR: ALPHA | DIGIT | VCHAR;
-
-VCHAR:
-	ExclamationMark
-	| '"'
-	| Hashtag
-	| DollarSign
-	| Percent
-	| Ampersand
-	| SQuote
-	| LColumn
-	| RColumn
-	| RColumn
-	| Star
-	| Plus
-	| Period
-	| Minus
-	| Dot
-	| Slash
-	| Colon
-	| SemiColon
-	| '<'
-	| Equals
-	| '>'
-	| QuestionMark
-	| At
-	| '['
-	| '\\'
-	| Caret
-	| Underscore
-	| ']'
-	| BackQuote
-	| '{'
-	| '}'
-	| VBar
-	| Tilde;
-
-OBS_TEXT: '\u0080' ..'\u00ff';
+ALPHA
+    : [A-Za-z]
+    ;
 
 /*
- OCTET = %x00-FF ; 8 bits of data
+ VCHAR = %x21-7E ; visible (printing) characters
  */
-//OCTET: '\u0000' .. '\u001f' | VCHAR | '\u007f' .. '\u00ff' ;
+VCHAR
+    : '\u0021' .. '\u007e'
+    ;
+
+/*
+ OBS_TEXT = %x80-FF
+*/
+OBS_TEXT
+    : '\u0080' ..'\u00ff'
+    ;
+
+/*
+ SP = %x20 ; space
+ */
+SP
+    : ' '
+    ;
+
+/*
+ HTAB = %x09 ; horizontal tab
+ */
+HTAB
+    : '\t'
+    ;
+
+/*
+ CRLF= CR LF ; Internet standard newline
+ */
+CRLF
+    : '\r\n' | '\n'
+    ;

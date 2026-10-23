@@ -18,88 +18,235 @@
 // reference document:
 // https://www.loc.gov/standards/datetime/iso-tc154-wg5_n0038_iso_wd_8601-1_2016-02-16.pdf
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar iso8601;
 
 // lexer
-Newline: [\r\n] -> channel(HIDDEN);
-T: [Tt];
-Z: [Zz];
-W: [Ww];
-P: [Pp];
-Y: [Yy];
-M: [Mm];
-D: [Dd];
-H: [Hh];
-S: [Ss];
-R: [Rr];
-Digit: [0-9];
-Fraction: [,.] Digit+;
+Newline
+    : [\r\n] -> channel(HIDDEN)
+    ;
+
+T
+    : [Tt]
+    ;
+
+Z
+    : [Zz]
+    ;
+
+W
+    : [Ww]
+    ;
+
+P
+    : [Pp]
+    ;
+
+Y
+    : [Yy]
+    ;
+
+M
+    : [Mm]
+    ;
+
+D
+    : [Dd]
+    ;
+
+H
+    : [Hh]
+    ;
+
+S
+    : [Ss]
+    ;
+
+R
+    : [Rr]
+    ;
+
+Digit
+    : [0-9]
+    ;
+
+Fraction
+    : [,.] Digit+
+    ;
 
 // number
-int_: Digit+;
-dec: Digit+ Fraction?;
-int2: Digit Digit;
-int3: Digit Digit Digit;
-int4: Digit Digit Digit Digit;
-sint2p: ('+'|'-') Digit Digit+;
-sint4p: ('+'|'-') Digit Digit Digit Digit+;
-dec2: Digit Digit Fraction?;
+int_
+    : Digit+
+    ;
+
+dec
+    : Digit+ Fraction?
+    ;
+
+int2
+    : Digit Digit
+    ;
+
+int3
+    : Digit Digit Digit
+    ;
+
+int4
+    : Digit Digit Digit Digit
+    ;
+
+sint2p
+    : ('+' | '-') Digit Digit+
+    ;
+
+sint4p
+    : ('+' | '-') Digit Digit Digit Digit+
+    ;
+
+dec2
+    : Digit Digit Fraction?
+    ;
 
 // datetime element
 century
-    : int2      # CompleteCentury
-    | sint2p    # ExpandedCentury
+    : int2   # CompleteCentury
+    | sint2p # ExpandedCentury
     ;
+
 year
-    : int4      # CompleteYear
-    | sint4p    # ExpandedYear
+    : int4   # CompleteYear
+    | sint4p # ExpandedYear
     ;
-month: int2;
-day: int2;
-ordinalDay: int3;
-week: int2;
-weekDay: Digit;
-hour: int2;
-minute: int2;
-second: int2;
-hourFraction: dec2;
-minuteFraction: dec2;
-secondFraction: dec2;
+
+month
+    : int2
+    ;
+
+day
+    : int2
+    ;
+
+ordinalDay
+    : int3
+    ;
+
+week
+    : int2
+    ;
+
+weekDay
+    : Digit
+    ;
+
+hour
+    : int2
+    ;
+
+minute
+    : int2
+    ;
+
+second
+    : int2
+    ;
+
+hourFraction
+    : dec2
+    ;
+
+minuteFraction
+    : dec2
+    ;
+
+secondFraction
+    : dec2
+    ;
 
 // ENTRYRULE 1926-08-17 4.1.2.2 & 4.1.2.4 a
-calendarDate: calendarDateBasic | calendarDateExtended;
-calendarDateBasic: year month day;
-calendarDateExtended: year '-' month '-' day;
+calendarDate
+    : calendarDateBasic
+    | calendarDateExtended
+    ;
+
+calendarDateBasic
+    : year month day
+    ;
+
+calendarDateExtended
+    : year '-' month '-' day
+    ;
 
 // ENTRYRULE 1926-08 4.1.2.3 a & 4.1.2.4 b
-specificMonthCalendarDate: year '-' month;
+specificMonthCalendarDate
+    : year '-' month
+    ;
+
 // ENTRYRULE 1926 4.1.2.3 b & 4.1.2.4 c
-specificYearCalendarDate: year;
+specificYearCalendarDate
+    : year
+    ;
+
 // ENTRYRULE 19 (it means 20 century here) 4.1.2.3 c & 4.1.2.4 d
-specificCenturyCalendarDate: century;
+specificCenturyCalendarDate
+    : century
+    ;
 
 // ENTRYRULE 1926-229 4.1.3.2 & 4.1.3.3
-ordinalDate: ordinalDateBasic | ordinalDateExtended;
-ordinalDateBasic: year ordinalDay;
-ordinalDateExtended: year '-' ordinalDay;
+ordinalDate
+    : ordinalDateBasic
+    | ordinalDateExtended
+    ;
+
+ordinalDateBasic
+    : year ordinalDay
+    ;
+
+ordinalDateExtended
+    : year '-' ordinalDay
+    ;
 
 // ENTRYRULE 1926-W33-2 4.1.4.2 & 4.1.4.4 a
-weekDate: weekDateBasic | weekDateExtended;
-weekDateBasic: year W week weekDay;
-weekDateExtended: year '-' W week '-' weekDay;
+weekDate
+    : weekDateBasic
+    | weekDateExtended
+    ;
+
+weekDateBasic
+    : year W week weekDay
+    ;
+
+weekDateExtended
+    : year '-' W week '-' weekDay
+    ;
 
 // ENTRYRULE 1926-W33 4.1.4.3 & 4.1.4.4 b
-specificWeekWeekDate: specificWeekWeekDateBasic | specificWeekWeekDateExtended;
-specificWeekWeekDateBasic: year W week;
-specificWeekWeekDateExtended: year '-' W week;
+specificWeekWeekDate
+    : specificWeekWeekDateBasic
+    | specificWeekWeekDateExtended
+    ;
+
+specificWeekWeekDateBasic
+    : year W week
+    ;
+
+specificWeekWeekDateExtended
+    : year '-' W week
+    ;
 
 // ENTRYRULE (any date precise to day)
-datePrecise: datePreciseBasic | datePreciseExtended;
+datePrecise
+    : datePreciseBasic
+    | datePreciseExtended
+    ;
+
 datePreciseBasic
     : calendarDateBasic
     | ordinalDateBasic
     | weekDateBasic
     ;
+
 datePreciseExtended
     : calendarDateExtended
     | ordinalDateExtended
@@ -107,7 +254,11 @@ datePreciseExtended
     ;
 
 // ENTRYRULE (any date format)
-date: dateBasic | dateExtended;
+date
+    : dateBasic
+    | dateExtended
+    ;
+
 dateBasic
     : datePreciseBasic
     | specificMonthCalendarDate
@@ -115,6 +266,7 @@ dateBasic
     | specificCenturyCalendarDate
     | specificWeekWeekDateBasic
     ;
+
 dateExtended
     : datePreciseExtended
     | specificMonthCalendarDate
@@ -124,61 +276,140 @@ dateExtended
     ;
 
 // ENTRYRULE 12:34:56.0721 4.2.2.2 & 4.2.2.4 a
-localTimePrecise: localTimePreciseBasic | localTimePreciseExtended;
-localTimePreciseBasic: hour minute secondFraction;
-localTimePreciseExtended: hour ':' minute ':' secondFraction;
+localTimePrecise
+    : localTimePreciseBasic
+    | localTimePreciseExtended
+    ;
+
+localTimePreciseBasic
+    : hour minute secondFraction
+    ;
+
+localTimePreciseExtended
+    : hour ':' minute ':' secondFraction
+    ;
 
 // ENTRYRULE 12:34.5 4.2.2.3 a & 4.2.2.4 b
-specificMinuteLocalTime: specificMinuteLocalTimeBasic | specificMinuteLocalTimeExtended;
-specificMinuteLocalTimeBasic: hour minuteFraction;
-specificMinuteLocalTimeExtended: hour ':' minuteFraction;
+specificMinuteLocalTime
+    : specificMinuteLocalTimeBasic
+    | specificMinuteLocalTimeExtended
+    ;
+
+specificMinuteLocalTimeBasic
+    : hour minuteFraction
+    ;
+
+specificMinuteLocalTimeExtended
+    : hour ':' minuteFraction
+    ;
 
 // ENTRYRULE 12.5 (12:30:00) 4.2.2.3.b & 4.2.2.4 c
-specificHourLocalTime: hourFraction;
+specificHourLocalTime
+    : hourFraction
+    ;
 
 // ENTRYRULE (time without T and timezone)
-localTime: localTimeBasic | localTimeExtended;
+localTime
+    : localTimeBasic
+    | localTimeExtended
+    ;
+
 localTimeBasic
     : localTimePreciseBasic
     | specificMinuteLocalTimeBasic
     | specificHourLocalTime
     ;
+
 localTimeExtended
-     : localTimePreciseExtended
-     | specificMinuteLocalTimeExtended
-     | specificHourLocalTime
-     ;
+    : localTimePreciseExtended
+    | specificMinuteLocalTimeExtended
+    | specificHourLocalTime
+    ;
 
 // 4.2.4
-timeZoneUtc: Z;
+timeZoneUtc
+    : Z
+    ;
 
 // ENTRYRULE +08:00 4.2.5.1
-timeZone: timeZoneBasic | timeZoneExtended;
-timeZoneBasic: (('+'|'-') hour minute?)|timeZoneUtc;
-timeZoneExtended: (('+'|'-') hour (':' minute)?)|timeZoneUtc;
+timeZone
+    : timeZoneBasic
+    | timeZoneExtended
+    ;
+
+timeZoneBasic
+    : (('+' | '-') hour minute?)
+    | timeZoneUtc
+    ;
+
+timeZoneExtended
+    : (('+' | '-') hour (':' minute)?)
+    | timeZoneUtc
+    ;
 
 // ENTRYRULE (time with timezone without T) 4.2.5.2
-localTimeAndTimeZone: localTimeAndTimeZoneBasic | localTimeAndTimeZoneExtended;
-localTimeAndTimeZoneBasic: localTimeBasic timeZoneBasic;
-localTimeAndTimeZoneExtended: localTimeExtended timeZoneExtended;
+localTimeAndTimeZone
+    : localTimeAndTimeZoneBasic
+    | localTimeAndTimeZoneExtended
+    ;
+
+localTimeAndTimeZoneBasic
+    : localTimeBasic timeZoneBasic
+    ;
+
+localTimeAndTimeZoneExtended
+    : localTimeExtended timeZoneExtended
+    ;
 
 // ENTRYRULE (any time format)
-time: T? localTime timeZone?;
+time
+    : T? localTime timeZone?
+    ;
 
 // ENTRYRULE 1957-10-05T01:28:34+06:00 4.3.2
-datetimePrecise: datetimePreciseBasic | datetimePreciseExtended;
-datetimePreciseBasic: calendarDateBasic T localTimePreciseBasic timeZoneBasic?;
-datetimePreciseExtended: calendarDateExtended T localTimePreciseExtended timeZoneExtended?;
+datetimePrecise
+    : datetimePreciseBasic
+    | datetimePreciseExtended
+    ;
+
+datetimePreciseBasic
+    : calendarDateBasic T localTimePreciseBasic timeZoneBasic?
+    ;
+
+datetimePreciseExtended
+    : calendarDateExtended T localTimePreciseExtended timeZoneExtended?
+    ;
 
 // ENTRYRULE (any datetime format)4.3.3
-datetime: datetimeBasic | datetimeExtended;
-datetimeBasic: datePreciseBasic T localTimeBasic timeZoneBasic?;
-datetimeExtended: datePreciseExtended T localTimeExtended timeZoneExtended?;
+datetime
+    : datetimeBasic
+    | datetimeExtended
+    ;
+
+datetimeBasic
+    : datePreciseBasic T localTimeBasic timeZoneBasic?
+    ;
+
+datetimeExtended
+    : datePreciseExtended T localTimeExtended timeZoneExtended?
+    ;
 
 // ENTRYRULE (any interval format) 4.4.3.2 & 4.4.4.2.1
-interval: intervalT | intervalYMD;
-intervalBasic: intervalT | intervalYMDBasic;
-intervalExtended: intervalT | intervalYMDExtended;
+interval
+    : intervalT
+    | intervalYMD
+    ;
+
+intervalBasic
+    : intervalT
+    | intervalYMDBasic
+    ;
+
+intervalExtended
+    : intervalT
+    | intervalYMDExtended
+    ;
+
 // ENTRYRULE P1Y2M3DT4H5M6.789S
 intervalT
     : P (int_ Y)? (int_ M)? (int_ D)? T (int_ H)? (int_ M)? dec S
@@ -193,6 +424,7 @@ intervalT
 monthDateBasic
     : month day
     ;
+
 monthDateExtended
     : month '-' day
     ;
@@ -204,6 +436,7 @@ intervalYMDTimeBasic
     | dateBasic
     | localTimeBasic
     ;
+
 intervalYMDTimeExtended
     : monthDateExtended
     | day
@@ -214,33 +447,74 @@ intervalYMDTimeExtended
     ;
 
 // ENTRYRULE P0001-02-03T00:00:00 4.4.4.2.2
-intervalYMD: intervalYMDBasic | intervalYMDExtended;
-intervalYMDBasic: P intervalYMDTimeBasic;
-intervalYMDExtended: P intervalYMDTimeExtended;
+intervalYMD
+    : intervalYMDBasic
+    | intervalYMDExtended
+    ;
+
+intervalYMDBasic
+    : P intervalYMDTimeBasic
+    ;
+
+intervalYMDExtended
+    : P intervalYMDTimeExtended
+    ;
 
 // ENTRYRULE 1234-05-06T00:07:08/1234-05-06T00:07:09 4.4.4.1
-timeBeginEnd: timeBeginEndBasic | timeBeginEndExtended;
-timeBeginEndBasic: intervalYMDTimeBasic '/' intervalYMDTimeBasic;
-timeBeginEndExtended: intervalYMDTimeExtended '/' intervalYMDTimeExtended;
+timeBeginEnd
+    : timeBeginEndBasic
+    | timeBeginEndExtended
+    ;
+
+timeBeginEndBasic
+    : intervalYMDTimeBasic '/' intervalYMDTimeBasic
+    ;
+
+timeBeginEndExtended
+    : intervalYMDTimeExtended '/' intervalYMDTimeExtended
+    ;
 
 // ENTRYRULE 1234-05-06T00:07:08/P1M 4.4.4.3
-timeBeginInterval: timeBeginIntervalBasic|timeBeginIntervalExtended;
-timeBeginIntervalBasic: datetimeBasic '/' intervalBasic;
-timeBeginIntervalExtended: datetimeExtended '/' intervalExtended;
+timeBeginInterval
+    : timeBeginIntervalBasic
+    | timeBeginIntervalExtended
+    ;
+
+timeBeginIntervalBasic
+    : datetimeBasic '/' intervalBasic
+    ;
+
+timeBeginIntervalExtended
+    : datetimeExtended '/' intervalExtended
+    ;
 
 // ENTRYRULE P138Y/1234-05-06T00:07:09 4.4.4.4
-timeIntervalEnd: timeIntervalEndBasic|timeIntervalEndExtended;
-timeIntervalEndBasic: intervalBasic '/' datetimeBasic;
-timeIntervalEndExtended: intervalExtended '/' datetimeExtended;
+timeIntervalEnd
+    : timeIntervalEndBasic
+    | timeIntervalEndExtended
+    ;
+
+timeIntervalEndBasic
+    : intervalBasic '/' datetimeBasic
+    ;
+
+timeIntervalEndExtended
+    : intervalExtended '/' datetimeExtended
+    ;
 
 // ENTRYRULE (any duration)
-duration: durationBasic | durationExtended;
+duration
+    : durationBasic
+    | durationExtended
+    ;
+
 durationBasic
     : timeBeginEndBasic
     | timeBeginIntervalBasic
     | timeIntervalEndBasic
     | intervalBasic
     ;
+
 durationExtended
     : timeBeginEndExtended
     | timeBeginIntervalExtended
@@ -248,11 +522,23 @@ durationExtended
     | intervalExtended
     ;
 
-recurringCount: R int_?;
+recurringCount
+    : R int_?
+    ;
+
 // ENTRYRULE R12/1900-01-01T00:00:00/P4294967296S 4.5.3
-recurring: recurringBasic | recurringExtended;
-recurringBasic: recurringCount '/' durationBasic;
-recurringExtended: recurringCount '/' durationExtended;
+recurring
+    : recurringBasic
+    | recurringExtended
+    ;
+
+recurringBasic
+    : recurringCount '/' durationBasic
+    ;
+
+recurringExtended
+    : recurringCount '/' durationExtended
+    ;
 
 // try everything
 // if you just want parse 1926-08-17T12:34:56+08:00
@@ -261,9 +547,5 @@ recurringExtended: recurringCount '/' durationExtended;
 iso
     :
     // put time before date, to mitigate confusion between century and hour
-    ( time
-    | date
-    | datetime
-    | duration
-    | recurring
-    ) EOF;
+    (time | date | datetime | duration | recurring) EOF
+    ;
