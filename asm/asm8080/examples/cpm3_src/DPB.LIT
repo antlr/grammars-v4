@@ -1,0 +1,14 @@
+
+/* indices into disk parameter block, used as parameters to dpb procedure */
+
+dcl        spt$w        lit        '0',
+           blkshf$b     lit        '2',
+           blkmsk$b     lit        '3',
+           extmsk$b     lit        '4',
+           blkmax$w     lit        '5',
+           dirmax$w     lit        '7',
+           dirblk$w     lit        '9',
+           chksiz       lit        '11',
+           offset$w     lit        '13';
+
+

@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>Allowed Test Modifications</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-524.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-53.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>5.2.5 Allowed Test Modifications</H1>
+<div class="Normal">Class B tests have one or more errors that implementations 
+must identify. These tests are structured such that, normally, implementations 
+can report all included errors. Occasionally, an implementation will 
+fail to find all errors in a B-test because it encounters a limit (e.g., 
+error cascading, resulting in too many error reports) or is unable to 
+recover from an error. In such cases, a user may split a single B-test 
+into two or more tests. The resulting tests must contain all of the errors 
+included in the original test, and they must adhere as closely as possible 
+to the style and content of the original test. Very often, the only modification 
+needed is to comment out earlier errors so that later errors can be identified. 
+In some cases, code insertion will be required. An implementation <I>must</I> 
+be able to demonstrate that it can detect and report <I>all</I> intended 
+B-test errors.<A NAME="I1028"></A></div>
+<div class="Normal">Splits may also be required in executable tests, 
+if, for example, an implementation capacity limitation is encountered 
+(e.g., a number of generic instantiations too large for the implementation). 
+In very exceptional cases, tests may be modified by the addition of an 
+attribute definition clause (to alter the default size of a collection), 
+or by the addition of an elaboration Pragma (to force an elaboration 
+order).</div>
+<div class="Normal">Tests that use configuration pragmas (see <A HREF="UG-5555.HTM">5.5.5.5</A>) 
+may require modification since the method of processing configuration 
+pragmas is implementation dependent.</div>
+<div class="Normal">Some tests include foreign language code (Fortran, 
+C, or COBOL). While the features used should be acceptable to all Fortran, 
+C, and COBOL implementations, respectively, some implementations may 
+require modification to the non-Ada code. Modifications must, of course, 
+preserve the input-output semantics of the (foreign language) subprogram; 
+otherwise, the ACATS test will report a failure.</div>
+<div class="Normal">All splits and modifications must be approved in 
+advance by the ACAL (and, if necessary, the ACAA) before they are used 
+in a conformity assessment. It is the responsibility of the user to propose 
+a B-test split that satisfies the intention of the original test. Modified 
+tests should be named by appending an alphanumeric character to the name 
+of the original test. When possible, line numbers of the original test 
+should be preserved in the modification.</div>
+<div class="Normal">All tests must be submitted to the compiler as distributed 
+(and customized, if required). If a test is executable (class A, C, D, 
+E) and compiles successfully, then it must be run. Modified tests or 
+split tests may be processed next. Only the results of the modified tests 
+will be graded.</div>
+<div class="Normal">If the ACAA has issued an ACATS Modification List 
+(see Section <A HREF="UG-511.HTM">5.1.1</A>), then the modified versions 
+of tests with modifications <I>must</I> be used.<A NAME="I1029"></A> 
+Either the original version or the modified version of a test with an 
+allowed modification may be used.<A NAME="I1030"></A></div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-524.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-53.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>
