@@ -249,7 +249,7 @@
 				<module>iso8601</module>
 				<module>istc</module>
 				<module>itn</module>
-                                <module>ixml</module>
+                <module>ixml</module>
 				<module>jam</module>
 				<module>janus</module>
 				<module>java</module>
@@ -289,6 +289,7 @@
 				<module>metric</module>
 				<module>microc</module>
 				<module>miniscript</module>
+                <module>mizar</module>
 				<module>modelica</module>
 				<module>modula2pim4</module>
 				<module>molecule</module>
