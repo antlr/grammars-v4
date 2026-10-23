@@ -1,0 +1,35 @@
+< webApp
+
+    << app
+    name = "TaskTracker"
+    version = "1.3.2"
+    debug = false
+    environment = "production"
+
+    << server
+    host = "0.0.0.0"
+    port = 8080
+    use_https = true
+
+    << database
+    engine = "postgresql"
+    host = "db.internal"
+    port = 5432
+    user = "taskadmin"
+    password = "s3cr3t"
+    name = "tasktracker"
+
+    << features
+    enable_notifications = true
+    max_tasks_per_user = 100
+    default_due_days = 7
+
+    << messages
+    welcome = """
+        Welcome to TaskTracker!
+
+        Your productivity companion.
+    """
+    error = "Something went wrong. Please try again."
+
+/END // End of YINI doc in strict mode.

@@ -1,0 +1,277 @@
+-- CXC3007.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--     Check that if the actual parameter corresponding to the formal
+--     parameter New_Handler in a call to either of the procedures
+--     Ada.Interrupts.Attach_Handler or Ada.Interrupts.Exchange_Handler
+--     has one of the following values, the default treatment for the
+--     specified interrupt is restored:
+--    
+--        - The value null.
+--        - The value returned by the function Current_Handler when no
+--          user-defined handler is attached to the specified interrupt.
+--    
+-- TEST DESCRIPTION:
+--     For this test, the determination of whether the default treatment is
+--     restored is based on the value returned by Ada.Interrupts.Is_Attached.
+--     At points where it is expected that the default treatment has been
+--     restored, Attach_Handler should return False.
+--
+-- APPLICABILITY CRITERIA:
+--      This test is only applicable for implementations validating the
+--      Systems Programming Annex.
+--
+--
+-- CHANGE HISTORY:
+--      20 Jan 96   SAIC    Initial prerelease version.
+--      27 Feb 97   PWB.CTA Changed Impdef.Interrupt_To_Generate to
+--                          Impdef.Annex_C.Interrupt_To_Generate
+--!
+
+package CXC3007_0 is
+
+   protected Dynamic is
+      procedure Handler1;
+      pragma Interrupt_Handler ( Handler1 );
+
+      procedure Handler2;
+      pragma Interrupt_Handler ( Handler2 );
+   private
+      Was_Handled : Boolean := False;
+   end Dynamic;
+
+end CXC3007_0;
+
+
+     --==================================================================--
+
+
+package body CXC3007_0 is
+
+   protected body Dynamic is
+      procedure Handler1 is
+      begin
+         Was_Handled := True;
+      end Handler1;
+
+      procedure Handler2 is
+      begin
+         Was_Handled := True;
+      end Handler2;
+   end Dynamic;
+
+end CXC3007_0;
+
+
+     --==================================================================--
+
+
+with CXC3007_0;
+
+with Ada.Interrupts;
+
+with ImpDef.Annex_C;
+with Report;
+procedure CXC3007 is
+begin
+
+   Report.Test ("CXC3007", "Attach_Handler and Exchange_Handler: Check "  &
+                "that default treatment is restored if either is called " &
+                "with value null or with result of Current_Handler when " &
+                "no user-specified handler is attached");
+
+   declare
+      package AI renames Ada.Interrupts;
+
+      Default     : AI.Parameterless_Handler;
+      Old_Handler : AI.Parameterless_Handler;
+   begin
+
+      if AI.Is_Attached (Impdef.Annex_C.Interrupt_To_Generate) then
+         Report.Failed ("User-specified handler is attached at start-up");
+      else
+
+         -- Identify and record default treatment:
+         Default := AI.Current_Handler (Impdef.Annex_C.Interrupt_To_Generate);
+
+
+      -- ==============
+      -- Attach_Handler:
+      -- ==============
+
+         -- Attach a user handler:
+
+         AI.Attach_Handler (CXC3007_0.Dynamic.Handler1'Access,
+                            Impdef.Annex_C.Interrupt_To_Generate);
+
+         if not AI.Is_Attached (Impdef.Annex_C.Interrupt_To_Generate) then
+            Report.Failed ("Attach_Handler: nothing attached after 1 call");
+         end if;
+
+
+         -- Restore default treatment (using null):
+
+         AI.Attach_Handler (null, Impdef.Annex_C.Interrupt_To_Generate);
+
+         if AI.Is_Attached (Impdef.Annex_C.Interrupt_To_Generate) then
+            Report.Failed ("Attach_Handler: default treatment not restored " &
+                           "after call with null");
+         end if;
+
+
+         -- Attach a user handler twice:
+
+         AI.Attach_Handler (CXC3007_0.Dynamic.Handler1'Access,
+                            Impdef.Annex_C.Interrupt_To_Generate);
+
+         AI.Attach_Handler (CXC3007_0.Dynamic.Handler2'Access,
+                            Impdef.Annex_C.Interrupt_To_Generate);
+
+         if not AI.Is_Attached (Impdef.Annex_C.Interrupt_To_Generate) then
+            Report.Failed ("Attach_Handler: nothing attached after 2 calls");
+         end if;
+
+
+         -- Restore default treatment (using value obtained at start-up):
+
+         AI.Attach_Handler (Default, Impdef.Annex_C.Interrupt_To_Generate);
+
+         if AI.Is_Attached (Impdef.Annex_C.Interrupt_To_Generate) then
+            Report.Failed ("Attach_Handler: default treatment not restored " &
+                           "after call with start-up value");
+         end if;
+
+
+         -- Restore default treatment (using call to Current_Handler):
+
+         AI.Attach_Handler (AI.Current_Handler(Impdef.Annex_C.Interrupt_To_Generate),
+                            Impdef.Annex_C.Interrupt_To_Generate);
+
+         if AI.Is_Attached (Impdef.Annex_C.Interrupt_To_Generate) then
+            Report.Failed ("Attach_Handler: default treatment not restored " &
+                           "after call with Current_Handler");
+         end if;
+
+
+
+      -- ================
+      -- Exchange_Handler:
+      -- ================
+
+         -- Default treatment is in effect at this point.
+
+
+         -- Exchange for a user handler twice:
+
+         AI.Exchange_Handler (Old_Handler,
+                              CXC3007_0.Dynamic.Handler1'Access,
+                              Impdef.Annex_C.Interrupt_To_Generate);
+
+                              -- Old_Handler now points to default treatment.
+
+         AI.Exchange_Handler (Old_Handler,
+                              CXC3007_0.Dynamic.Handler2'Access,
+                              Impdef.Annex_C.Interrupt_To_Generate);
+
+                              -- Old_Handler now points to Handler1.
+
+         if not AI.Is_Attached (Impdef.Annex_C.Interrupt_To_Generate) then
+            Report.Failed ("Exchange_Handler: nothing attached after 2 calls");
+         end if;
+
+
+         -- Restore default treatment (using null):
+
+         AI.Exchange_Handler (Old_Handler,
+                              null,
+                              Impdef.Annex_C.Interrupt_To_Generate);
+
+                              -- Old_Handler now points to Handler2.
+
+         if AI.Is_Attached (Impdef.Annex_C.Interrupt_To_Generate) then
+            Report.Failed ("Exchange_Handler: default treatment not " &
+                           "restored after call with null");
+         end if;
+
+
+         -- Default treatment is again in effect at this point.
+
+
+         -- Exchange for a user handler:
+
+         AI.Exchange_Handler (Old_Handler,
+                              CXC3007_0.Dynamic.Handler1'Access,
+                              Impdef.Annex_C.Interrupt_To_Generate);
+
+                              -- Old_Handler now points to default treatment.
+
+         if not AI.Is_Attached (Impdef.Annex_C.Interrupt_To_Generate) then
+            Report.Failed ("Exchange_Handler: nothing attached after 1 call");
+         end if;
+
+
+         -- Restore default treatment (using current value of Old_Handler):
+
+         AI.Exchange_Handler (Old_Handler,
+                              Old_Handler,
+                              Impdef.Annex_C.Interrupt_To_Generate);
+
+                              -- Old_Handler now points to Handler1.
+
+         if AI.Is_Attached (Impdef.Annex_C.Interrupt_To_Generate) then
+            Report.Failed ("Exchange_Handler: default treatment not " &
+                           "restored after call with value of Old_Handler");
+         end if;
+
+
+         -- Default treatment is again in effect at this point.
+
+
+         -- Restore default treatment (using call to Current_Handler):
+
+         AI.Exchange_Handler (Old_Handler,
+                              AI.Current_Handler(Impdef.Annex_C.Interrupt_To_Generate),
+                              Impdef.Annex_C.Interrupt_To_Generate);
+
+                              -- Old_Handler now points to default treatment.
+
+         if AI.Is_Attached (Impdef.Annex_C.Interrupt_To_Generate) then
+            Report.Failed ("Exchange_Handler: default treatment not " &
+                           "restored after call with Current_Handler");
+         end if;
+
+
+      end if;
+
+   exception
+      when Program_Error =>
+         Report.Failed ("Unexpected Program_Error raised");
+   end;
+
+
+   Report.Result;
+
+end CXC3007;

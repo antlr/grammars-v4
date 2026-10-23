@@ -1,0 +1,117 @@
+-- BDC10030.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--     The ACAA has created and maintains the Ada Conformity Assessment Test
+--     Suite for the purpose of conformity assessments conducted in accordance
+--     with the International Standard ISO/IEC 18009 - Ada: Conformity
+--     assessment of a language processor. This test suite should not be used
+--     to make claims of conformance unless used in accordance with
+--     ISO/IEC 18009 and any applicable ACAA procedures.
+--
+--*
+--
+-- OBJECTIVE:
+--     Check that the restriction_parameter_argument of restriction
+--     No_Use_of_Pragma can be any identifier.
+--
+--     Check that a use of an pragma mentioned in a restriction
+--     No_Use_of_Pragma is detected.
+--
+--     Check that the restriction No_Use_of_Pragma only applies to the
+--     current compilation.
+--
+-- TEST DESCRIPTION:
+--     We follow the great tradition of the ACATS (see tests B28001A-B28001W),
+--     and use the names of ARG and WG 9 leaders as implementation-defined
+--     pragma names. We don't even want names that exist anyway, so the more
+--     unlikely the name, the better.
+--
+--     We try the obsolescent pragmas Pack and Inline as it doesn't make
+--     sense to use this restriction to prevent the use of a configuration
+--     pragma (such a pragma would have to be directly next to the restriction
+--     to be restricted, such pragmas can't be buried deep in other source
+--     code), and it seems useful to prevent an obsolescent form.
+--
+--     We try a second compilation in which we use the prohibited pragmas,
+--     in order to check that the restriction doesn't last too long.
+--
+-- TEST FILES:
+--      This test consists of the following files:
+--      -> BDC10030.A
+--         BDC10031.A
+--
+-- PASS/FAIL CRITERIA:
+--      File BDC10030.A contains errors. All errors in this file must be 
+--      detected to pass the test. Additionally, no errors may be detected in
+--      file BDC10031.A.
+
+-- CHANGE HISTORY:
+--      30 Sep 21   RLB     Created test.
+--
+--!
+pragma Restrictions (No_Use_of_Pragma => Pack);         -- OK. {0}
+
+pragma Restrictions (No_Use_of_Pragma => Inline);       -- OK. {0}
+
+pragma Restrictions (No_Use_of_Pragma => Erhard_Ploedereder); -- OK. {0}
+
+pragma Restrictions (No_Use_of_Pragma => Joyce_Tokar);  -- OK. {0}
+   -- Note: We allow any legal identifier here, not just Pragmas defined
+   -- by the current implementation, as we want to be able to
+   -- specify implementation-defined Pragmas for some other
+   -- implementation; these may be totally unknown to the implementation
+   -- that is processing the restriction pragma.
+
+   -- Note: Pragma Restrictions is a configuration pragma, and thus applies to
+   -- all of the units in a compilation, and has to be placed before any units
+   -- of a compilation (see 10.1.5(8)). This particular restriction only
+   -- applies to this compilation, not the entire partition.
+   -- Therefore, the permission 10.1.5(9/2) does not apply and a compiler
+   -- must accept the above and apply the restrictions to the following
+   -- compilation units (and no others).
+
+package BDC10030 is
+
+
+   type Str is array (1..10) of Character;
+   pragma Pack(Str);                                         -- ERROR: {4}
+
+
+   function Foo (I : in Integer) return Integer is (I*2);
+   pragma Inline(Foo);                                       -- ERROR: {4}
+
+
+   type OK_Str is array (1..10) of Character with Pack;      -- OK. {4}
+      -- The restriction only prevents using the pragma.
+      -- If you wanted to prevent packing any type, you
+      -- could have used restriction No_Specification_of_Aspect instead.
+
+   function Bar (I : in Integer) return Integer is (I*2)
+      with Inline;                                           -- OK. {1:4}
+
+
+end BDC10030;
+

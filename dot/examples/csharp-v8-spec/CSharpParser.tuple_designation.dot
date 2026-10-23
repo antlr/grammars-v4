@@ -1,0 +1,19 @@
+digraph ATN {
+rankdir=LR;
+s109[fontsize=11, label="109", shape=doublecircle, fixedsize=true, width=.6];
+s1062[fontsize=11,label="1062", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1063[fontsize=11,label="1063", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1064[fontsize=11,label="{&rarr;\n1064\nd=34|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1065[fontsize=11,label="&larr;\n1065", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1066[fontsize=11,label="1066", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1067[fontsize=11,label="1067", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s108[fontsize=11,label="108", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s108 -> s1062 [fontname="Times-Italic", label="&epsilon;"];
+s1062 -> s1064 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'('", arrowhead = normal];
+s1064:p0 -> s1063 [fontname="Times-Italic", label="&epsilon;"];
+s1064:p1 -> s1065 [fontname="Times-Italic", label="&epsilon;"];
+s1063 -> s1065 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<designations>", arrowhead = normal];
+s1065 -> s1066 [fontname="Times-Italic", label="&epsilon;"];
+s1066 -> s1067 [fontsize=11, fontname="Courier", arrowsize=.7, label = "')'", arrowhead = normal];
+s1067 -> s109 [fontname="Times-Italic", label="&epsilon;"];
+}

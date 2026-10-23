@@ -12,7 +12,7 @@ def fix(file_path):
     file_name = parts[-1]
 
     if file_name.lower() not in ["goparser.g4", "golexer.g4"]:
-        print("Could not determine which grammar you have specified, please specify either the Paarser or the Lexer")
+        print("Could not determine which grammar you have specified, please specify either the Parser or the Lexer")
         sys.exit(1)
 
     shutil.move(file_path, file_path + ".bak")

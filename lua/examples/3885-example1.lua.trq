@@ -1,0 +1,5 @@
+if (count(//functioncall) != 1)
+then "Miscount of 'functioncall' nodes."
+else if (count(//stat) != 1)
+then "Miscount of 'stat' nodes."
+else ""

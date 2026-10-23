@@ -1,0 +1,1496 @@
+MAINTENANCE:
+TITLE: A Syntax test for all the examples from the Arden Syntax standard;;
+MLMNAME: SyntaxTest;;
+ARDEN: version 3 ;;
+VERSION: 1.00;;
+INSTITUTION: Medexter GmbH;;
+AUTHOR: Christian Weich, B.Sc cgw@medexter.com;;
+SPECIALIST: Christian Weich, B.Sc cgw@medexter.com;;
+DATE: 2024-06-19T14:30:23.26475+01:00;;
+VALIDATION: testing;; 
+LIBRARY:
+PURPOSE: This mlm is used to test all the examples given in the document: Arden Syntax 
+for medical Logic Systems Version 3.0
+HL7 Arden_E3.0_STU_2023DEC
+Health Level Seven
+Arden Syntax
+Version 3.0;;
+EXPLANATION: In the standard are many different examples provided for all the operators. 
+To prevent inconsistency and mistakes between the written text and the bnf grammar almost
+all examples from the standard are in this mlm;;
+KEYWORDS: "testing", inconsistency, "mistakes", bnf, ebnf;;
+CITATIONS: 1. Refute "Arden Syntax for medical system 3.0";
+LINKS:
+URL 'HL7 confluence' "https://confluence.hl7.org/display/ARD/Arden+Syntax+v3.0";;
+KNOWLEDGE: 
+TYPE: data-driven;;
+DATA:
+
+var := 0;
+var := 345;
+var := 0.1;
+var := 34.5E34;
+var := 0.1e-4;
+var := .3;
+var := 3.;
+var := 3e10;
+var := "this is a string";
+var := "this string has one quotation mark: "" ";
+var := "this is a string with one space between 'with' and 'one'";
+var :="this is a string with
+
+one line break between 'with' and 'one'";
+var1 := null;
+this_is_a_variable := true;
+a := 345.4;
+var := "this is a string";
+var := 1991-05-01T23:12:23;
+var := 4 * cosine 5;
+var1 := 7;
+var := (4+3) * 73;
+
+/* explicit null */
+var := null;
+/* division by zero */
+var := 3/0;
+/* addition of Boolean */
+var := true + 3;
+
+Var := truth value 0;
+Var := false;
+Var := truth value 0.667;
+Var := truth value 1; 
+Var := true;
+
+TwotoThree := fuzzy set (2, truth value 0), (2, truth value 1), (2, truth value 1), (3, truth value 1), (3, truth value 0);
+TwotoThree := fuzzy set (2, truth value 0), (2, truth value 1), (3, truth value 1), (3, truth value 0);
+OnetoFour := fuzzy set (1, truth value 0), (2, truth value 1), (2, truth value 1), (3, truth value 1), (4, truth value 0);
+AfuzzyTime := today fuzzified by 1 day;
+simple := 2009-10-10 fuzzified by 12 hours;
+complex := fuzzy set (2009-10-10, truth value 0), (2009-10-11, truth value 1), (2009-11-10, truth value 1), (2009-11-11, truth value 0);
+simple := 14 days fuzzified by 1 day;
+complex := fuzzy set (2 days, truth value 0), (3 days, truth value 1), (14 days, truth value 1), (31 days, truth value 0);
+
+var := 4, 2;
+var := (4, "a"), null;
+var := , 3;
+var := data1 MERGE data2;
+var := (4, 3) MERGE (2, 1);
+
+var := SORT DATA data1;
+var := REVERSE (SORT DATA data1);
+var := SORT DATA (3, 1, 2, null);
+var := SORT DATA (3, "abc");
+var := SORT TIME ();
+var := SORT (1, 3, 2, 3);
+var := SORT TIME data1;
+var := SORT APPLICABILITY data1;
+var := REVERSE (SORT APPLICABILITY data1);
+var := SORT APPLICABILITY (3, 1, 2, null);
+var := SORT APPLICABILITY ();
+
+var := sort var using it; // for sorting by data
+var := sort var using time of it; // for sorting by time
+var := sort var using sin it; // for sorting the list by
+// the sin of each value
+var := sort var using abs it; // for sorting the list by
+// absolute values of the list elements
+var := sort var using extract month it; // for sorting the
+// list by month part of the list elements
+var := sort var using it.height; // for sorting the objects by
+// their field "height"
+var := sort var using time of it.value; // for sorting the objects by the primary time of their field "value"
+
+var := ADD 4 TO (1, 2, 3);
+var := ADD 4 TO (1, 2, 3) AT 1;
+var := ADD null TO (1, 2, 3);
+var := ADD 4 TO null;
+var := ADD 4 TO (1, 2, 3) AT 9;
+var := ADD 4 TO (1, 2, 3) AT (1, -1);
+var := ADD 2 TO (1, 3, 4) AT INDEX OF 3 FROM (1, 3, 4);
+var := ADD 4 TO (1, 2, 3) AT (1, 2);
+
+var := REMOVE 1 FROM (3, 2, 1);
+var := REMOVE (1,3,6) FROM ("one", "two", 3, 4, 5, 6 days);
+var := REMOVE null FROM (3, 2, 1);
+var := REMOVE 8 FROM (3, 2, 1);
+var := REMOVE (INDEX OF "3" FROM ("3", "3")) FROM ("3", "3");
+var := REMOVE 2 FROM null;
+var := REMOVE 1 FROM null;
+var := REMOVE () FROM (3, 2, 1);
+
+var := (10, 20, 30, 40) WHERE (true, false, true, 3);
+var := (7.34, 7.38, 7.4) WHERE time of it is within 20 minutes following time of VentChange;
+var := 1 WHERE true;
+var := (1, 2, 3) WHERE true;
+var := 1 WHERE (true, false, true);
+var := (1, 2, 3, 4) WHERE (true, false, true);
+var := queryResult where they are number;
+var := queryResult where time of it is present;
+post_prandial_blood_glucoses := bc_values where they occurred within 13:00:00 to 15:00:00;
+var := labResults where day of week of time of them is in (SATURDAY, SUNDAY);
+
+include_valueset := NEW Valueset WITH [system:="https://fhir.loinc.org/ValueSet", code:="LL770-1"];
+fhir_observation := READ AS Observation WHERE it.code.coding.code IS IN include_valueset;
+
+RectType := OBJECT [x, y, width, height];
+Rect := new RectType;
+var := Rect IS RectType;
+
+var := time of var IS NOT BEFORE 1990-03-05T11:11:11;
+var := var OCCURRED NOT BEFORE 1990-03-05T11:11:11;
+var := time of surgery IS WITHIN THE PAST 3 days;
+var := surgery OCCURRED WITHIN THE PAST 3 days;
+var := time(a) IS WITHIN 1990-03-05T11:11:11 TO time(b);
+var := a OCCURRED WITHIN 1990-03-05T11:11:11 TO time(b);
+
+var := query_result OCCURRED EQUAL 1990-03-01T00:00:00;
+var := query_result OCCURRED WITHIN 1990-03-01T00:00:00 TO 1990-03-11T00:00:00;
+var := query_result OCCURRED WITHIN 3 days PRECEDING 1990-03-10T00:00:00;
+var := query_result OCCURRED WITHIN 3 days FOLLOWING 1990-03-10T00:00:00;
+var := query_result OCCURRED WITHIN 3 days SURROUNDING 1990-03-10T00:00:00;
+var := request occurred within 2 hours surrounding 14:00;
+var := measurements occurred within 30 minutes surrounding 13:00;
+var := query_result OCCURRED WITHIN PAST 3 days;
+var := query_result OCCURRED WITHIN SAME DAY AS 1990-03-08T01:01:01;
+var := query_result OCCURRED WITHIN SAME DAY AS 01:01:01;
+var := query_result OCCURRED BEFORE 1990-03-08T01:01:01;
+var := query_result OCCURRED AFTER 1990-03-08T01:01:01;
+var := query_result OCCURRED AT 1990-03-01T00:00:00;
+
+var := 2 days AFTER 1990-03-13T00:00:00;
+var := 2 days BEFORE 1990-03-13T00:00:00;
+
+var := 2 days AGO;
+
+var := 2 days FROM 2000-09-11T00:08:00;
+
+var := TIME OF DAY OF 1990-01-03T14:23:17.3;
+var := TIME OF DAY OF "this is not a time";
+/* let time of data0 be 2006-01-01T12:00:00 */
+var := TIME OF DAY OF (TIME OF data0);
+var := TIME OF (TIME OF DAY OF (TIME OF data0));
+
+var := DAY OF WEEK OF 2006-05-26T13:20:00;
+var := DAY OF WEEK OF (TIME OF potassium);
+var := DAY OF WEEK OF now;
+var := DAY OF WEEK 15:30:00;
+var := DAY OF WEEK OF 2006-05-26T13:20:00 = FRIDAY;
+var := DAY OF WEEK OF TIME OF potassium IS IN (SATURDAY,SUNDAY);
+var := DAY OF WEEK OF now IS IN (SATURDAY, SUNDAY);
+weekend := DAY OF WEEK OF eventtime is in (SATURDAY, SUNDAY);
+// weekend is true if the event occurred on Saturday or Sunday
+weekday := ("Monday", "Tuesday", "Wednesday", "Sunday");
+last_k := last potassium;
+last_k_time := time last_k;
+msg := "The last potassium was collected on "
+|| weekday[DAY OF WEEK OF last_k_time];
+//"The last potassium was collected on Tuesday"
+
+var := EXTRACT YEAR 1990-01-03T14:23:17.3;
+var := EXTRACT YEAR (1 YEAR);
+var := EXTRACT YEAR 14:23:17.3
+;
+var := EXTRACT MONTH 1990-01-03T14:23:17.3;
+var := EXTRACT MONTH 1;
+var := EXTRACT MONTH 14:23:17.3;
+
+var := EXTRACT DAY 1990-01-03T14:23:17.3;
+var := EXTRACT DAY "this is not a time";
+var := EXTRACT DAY 14:23:17.3;
+
+var := EXTRACT HOUR 1990-01-03T14:23:17.3;
+var := EXTRACT HOUR (1 HOUR);
+var := EXTRACT HOUR 14:23:17.3;
+
+var := EXTRACT MINUTE 1990-01-03T14:23:17.3;
+var := EXTRACT MINUTE 1990-01-03;
+var := EXTRACT MINUTE 0000-00-00;
+var := EXTRACT MINUTE 14:23:17.3;
+
+var := EXTRACT SECOND 1990-01-03T14:23:17.3;
+var := EXTRACT SECOND (1 second);
+var := EXTRACT SECOND 14:23:17.3;
+
+var1 := 1990-03-15T15:00:00;
+var := REPLACE YEAR OF var1 WITH 2011;
+var := REPLACE YEAR OF var1 WITH (2011, 2010);
+var := REPLACE YEAR OF var1 WITH -10;
+var := REPLACE YEAR OF var1 WITH "7";
+var2 := 19:00:00;
+var := REPLACE YEAR OF var2 WITH 2011;
+var3 := (2010-09-21T16:30:00, 2010-03-15T15:00:00);
+var := REPLACE YEAR OF var3 WITH 2011;
+var3 := (2010-09-21T16:30:00, 2010-03-15T15:00:00);
+var := REPLACE YEAR OF var3 WITH (1999, 2000);
+var := REPLACE YEAR OF var3 WITH (1999, 2000, 2002);
+var1 := 1990-03-15T15:00:00;
+
+var := REPLACE MONTH OF var1 WITH 11;
+var := REPLACE MONTH OF var1 WITH (11, 10);
+var := REPLACE MONTH OF var1 WITH 14;
+var := REPLACE MONTH OF var1 WITH "7";
+var := REPLACE MONTH OF var1 WITH 7.45;
+var2 := (2010-09-21T16:30:00, 2010-03-15T15:00:00);
+var := REPLACE MONTH OF var2 WITH 12;
+var3 := (2010-09-21T16:30:00, 2010-03-15T15:00:00);
+var := REPLACE MONTH OF var3 WITH (6, 7);
+var := REPLACE MONTH OF var3 WITH (3, 4, 7);
+
+var1 := 1990-03-15T15:00:00;
+var := REPLACE DAY OF var1 WITH 11;
+var := REPLACE DAY OF var1 WITH (11, 10);
+var := REPLACE DAY OF var1 WITH 100;
+var := REPLACE DAY OF var1 WITH "7";
+var := REPLACE DAY OF var1 WITH 7.45;
+var := REPLACE DAY OF 1990-02-11T15:00:00 WITH 30;
+var := REPLACE DAY OF 1990-02-11T15:00:00 WITH 0.8;
+var := REPLACE DAY OF 1990-02-15T15:00:00 WITH 1.8;
+var2 := (2010-09-21T16:30:00, 2010-03-15T15:00:00);
+var := REPLACE DAY OF var2 WITH 7;
+var3 := (2010-09-21T16:30:00, 2010-03-15T15:00:00);
+var := REPLACE DAY OF var3 WITH (12, 23);
+var := REPLACE DAY OF var3 WITH (12, 23, 24);
+
+var1 := 1990-03-15T15:00:00;
+var := REPLACE HOUR OF var1 WITH 11;
+var := REPLACE HOUR OF var1 WITH (11, 10);
+var := REPLACE HOUR OF var1 WITH 100;
+var := REPLACE HOUR OF var1 WITH "7";
+var := REPLACE HOUR OF 18:00 WITH 10;
+var2 := (2010-09-21T16:30:00, 2010-03-15T15:00:00);
+var := REPLACE HOUR OF var2 WITH 20;
+var3 := (2010-09-21T16:30:00, 2010-03-15T15:00:00);
+var := REPLACE HOUR OF var3 WITH (7, 9);
+var := REPLACE HOUR OF var3 WITH (7, 9, 13);
+
+var1 := 1990-03-15T15:00:00;
+var := REPLACE MINUTE OF var1 WITH 11;
+var := REPLACE MINUTE OF var1 WITH (11, 10);
+var := REPLACE MINUTE OF var1 WITH 100;
+var := REPLACE MINUTE OF var1 WITH "7";
+var := REPLACE MINUTE OF 18:00 WITH 10;
+var2 := (2010-09-21T16:30:00, 2010-03-15T15:00:00);
+var := REPLACE MINUTE OF var2 WITH 15;
+var3 := (2010-09-21T16:30:00, 2010-03-15T15:00:00);
+var := REPLACE MINUTE OF var3 WITH (25, 23);
+var := REPLACE MINUTE OF var3 WITH (25, 23, 7);
+
+var1 := 1990-03-15T15:00:00;
+var := REPLACE SECOND OF var1 WITH 11;
+var := REPLACE SECOND OF var1 WITH (11, 10);
+var := REPLACE SECOND OF var1 WITH -100;
+var := REPLACE SECOND OF var1 WITH "7";
+var := REPLACE SECOND OF 18:00 WITH 10;
+var2 := (2010-09-21T16:30:00, 2010-03-15T15:00:00);
+var := REPLACE SECOND OF var2 WITH 33;
+var3 := (2010-09-21T16:30:00, 2010-03-15T15:00:00);
+var := REPLACE SECOND OF var3 WITH (23, 42);
+var := REPLACE SECOND OF var3 WITH (23, 42, 55);
+
+var := NEAREST (2 days ago) FROM datas;
+var := NEAREST (2 days ago) FROM (3, 4);
+var := NEAREST (2 days ago) FROM ();
+var := NEAREST 12:00 FROM datas;
+// the same as NEAREST 1990-03-18T12:00:00
+var := NEAREST 23:00 FROM datas;
+// the same as NEAREST 1990-03-18T23:00:00
+
+var := NEAREST 12:00 FROM query_result;
+
+var := NEAREST 12:30 FROM query_result;
+
+var := INDEX NEAREST (2 days ago) FROM datas;
+var := INDEX NEAREST (2 days ago) FROM (3, 4);
+
+var := INDEX OF 4 FROM (1, 2, 3, 4, "5", "six", 7);
+var := INDEX OF "5" FROM (1, 2, 3, 4, "5", "six", 7);
+var := INDEX OF 5 FROM (1, 2, 3, 4, "5", "six", 7);
+var := INDEX OF null FROM (1, 2, 3, 4, "5", "six", 7);
+var := INDEX OF 5 FROM null;
+var := INDEX OF null FROM null;
+var := INDEX OF 5 FROM 5;
+var := INDEX OF 1 FROM (1, 2, 1, 4, 1, "six", 7);
+var := INDEX OF null FROM (1, 2, null, 4, null, "six", 7);
+
+var := AT LEAST 1 IsTrue FROM (TRUE, TRUE, FALSE, FALSE);
+var := AT LEAST 2 AreTrue FROM (TRUE, TRUE, TRUE, FALSE);
+var := AT LEAST 2 FROM (TRUE, FALSE, FALSE, FALSE);
+var := AT LEAST 7 AreTrue FROM (TRUE, FALSE, FALSE);
+var := AT LEAST 2 YEARS FROM (TRUE, FALSE, FALSE);
+var := AT LEAST 2 FROM (TRUE, "true", FALSE);
+
+var := AT LEAST 2 OF (TRUE, truth value 0.7, truth value 0.1, FALSE);
+var := APPLICABILITY OF (AT LEAST 2 OF (TRUE, truth value 0.7, FALSE));
+var := AT LEAST 7 OF (TRUE, truth value 0.1,FALSE);
+var := AT LEAST 2 YEARS OF (TRUE, truth value 0.1,FALSE);
+var := AT LEAST 2 OF (TRUE, "true", truth value 0.1,FALSE);
+var := APPLICABILITY OF (AT LEAST 2 OF (TRUE, "true", truth value 0.1,FALSE));
+
+var := AT MOST 2 AreTrue FROM (TRUE, TRUE, FALSE, FALSE);
+var := AT MOST 1 IsTrue FROM (TRUE, TRUE, TRUE, FALSE);
+var := AT MOST 2 FROM (TRUE, FALSE, FALSE, FALSE);
+var := AT MOST 7 FROM (TRUE, FALSE, FALSE);
+var := AT MOST 2 YEARS FROM (TRUE, FALSE, FALSE);
+var := AT MOST 2 FROM (TRUE, "true", FALSE);
+
+var := AT MOST 2 OF (TRUE, truth value 0.4, truth value 0.7, FALSE);
+var := APPLICABILITY OF (AT MOST 2 OF (TRUE, truth value 0.5, truth value 0.7, truth value 0.1, FALSE));
+var := AT MOST 7 OF (TRUE, truth value 0.5, FALSE);
+var := AT MOST 2 YEARS OF (TRUE, 0.5, 0.7, 0.1, FALSE);
+var := AT MOST 2 OF (TRUE, "true", 0.7, 0.1, FALSE);
+var := APPLICABILITY OF (AT MOST 2 OF (TRUE, "true", 0.7, 0.1, FALSE));
+
+var := SLOPE datas;
+var := SLOPE (3, 4);
+
+var := TIME OF data0;
+var := TIME TIME data0;
+var := TIME (3, 4);
+
+var := time data2;
+
+LabResult := OBJECT [id, value];
+result := new LabResult;
+result.id := 123;
+time of result.id := 2004-01-16T00:00:00;
+result.value := 1.0;
+time of result.value := 2004-01-16T00:00:00;
+var := time of result; // all attributes have same primary time
+var := time of result.id;
+time of result.id := 2004-01-17T00:00:00;
+var := time of result; // primary times differ
+var := time of result.id;
+
+var := now ATTIME 15:00:00;
+var := TIME OF intuitive_new_millenium ATTIME 14:30:00;
+
+NameType := object [FirstName, LastName];
+/* Assume namelist contains a list of 2 NameType objects */
+var := namelist.FirstName;
+var := namelist.LastName;
+var := namelist[1].FirstName;
+var := namelist[1].Height;
+var := namelist.Height;
+
+chemistry_panel := object [albumin, calcium, phosphorus];
+/* assume patientResult is a single chemistry_panel object with albumin = 4.0
+mg/dL, calcium = 8.7 mg/dL and phosphorus = 3.0 mg/dL on 15 December 2004*/
+calciumPhosphorusProduct := patientResult.calcium * patientResult.phosphorus;
+var := calciumPhosphorusProduct;
+var := time of patientResult.calcium;
+
+PatientInfo := object [Name, Birthdate];
+/* Assume patient contains an object of type PatientInfo, and the Nameattribute contains an object of type NameType */
+var := patient.Name.FirstName;
+
+var := CLONE OF 1990-03-15T15:00:00;
+var := CLONE (1, 2, someObject);
+var := CLONE null;
+
+MedicationDose := OBJECT [Medication, Dose, Status];
+dose := NEW MedicationDose with "Ampicillin", "500mg", "Active";
+dose_attributes := extract attribute names dose;
+dose_attributes := ("Medication", "Dose", "Status");
+
+MedicationDose := OBJECT [Medication, Dose, Status];
+dose := NEW MedicationDose with "Ampicillin", "500mg", "Active";
+medication_name := attribute "Medication" from dose;
+medication_name := "Ampicillin";
+
+medication_name := dose.Medication;
+medication_name := "Ampicillin";
+dose_attributes := extract attribute names dose;
+medication_name := attribute dose_attributes[1] from dose;
+medication_name := "Ampicillin";
+
+LabResult := OBJECT [id, value];
+result := new LabResult;
+result.id := 123;
+APPLICABILITY of result.id := TRUTH VALUE 0.44;
+result.value := 1.0;
+APPLICABILITY of result.value := TRUTH VALUE 0.44;
+var := APPLICABILITY of result; // all attributes have same applicability
+var := APPLICABILITY of result.id;
+APPLICABILITY of result.id := TRUTH VALUE 0.5;
+var := APPLICABILITY of result; // applicabilities differ
+var := APPLICABILITY of result.id;
+
+Rectangle := Object [Bottom, Top, Width, Height];
+message_type := OBJECT [id, msg];
+my_collection_type := OBJECT [name, message_list];
+
+/* Define find_allergies MLM */
+find_allergies := MLM 'find_allergies';
+
+/* Define find_allergies external function*/
+find_allergies := INTERFACE {\\RuleServer\AllergyRules\my_institution\find_allergies.exe};
+
+MedicationDose := OBJECT [Medication, Dose, Status];
+
+obj_def := object [x, y, z];
+
+var1 := READ {select potassium from results where specimen = `serum`};
+var1 := READ last {select potassium from results};
+LET var1 BE READ {select potassium from results} WHERE it occurred within the
+past 1 week;
+var1 := READ first 3 from {select potassium from results} WHERE it occurred
+within the past 1 week;
+LET var1 BE READ {select potassium from results} WHERE it >= 3.4 AND it
+occurred within the past 1 week;
+birthdate := READ last {select birthdate from demographics};
+(Na, Cl, HCO3) := read last 3 from {select sodium, chloride, bicarb from electro};
+anion_gap := Na - (Cl + HCO3);
+MedicationDose := object [Medication, Dose, Status];
+med_doses := read as MedicationDose {select med, dosage, status from client where status != "inactive"};
+
+/* in this example the data to calculate three anion gaps are retrieved */
+(Na, Cl, HCO3) := read last 3 from {select sodium, chloride, bicarb from
+electro};
+/* using READ AS */
+AnionGap := Object [Na, Cl, HCO3];
+gaps := read as AnionGap last 3 from {select sodium, chloride, bicarb from
+electro};
+
+exam_valueset := NEW Valueset WITH [system:="https://fhir.loinc.org/ValueSet", code:= "LL1162-8"];
+fhir_observations := READ AS Observation WHERE it.code.coding.code IS IN exam_valueset;
+
+event1 := EVENT {storage of serum potassium};
+
+LET MLM1 BE MLM 'my_mlm1';
+mlm2 := MLM 'my_mlm2.mlm' FROM INSTITUTION "my institution";
+
+mlm1 := MLM 'mlm_to_be_called';
+mlm2 := MLM 'diagnosis_score' FROM INSTITUTION "LDS Hospital";
+
+var1 := CALL my_mlm WITH param1, (item1, item2);
+(arg1, list1) := ARGUMENT;
+
+message1 := MESSAGE {pneumonia~23 45 65};
+
+message_obj := OBJECT [subject, text];
+high_PTT_msg := MESSAGE AS message_obj {Elevated PTT};
+def_msg := MESSAGE AS message_obj; // default mapping clause
+
+destination1 := DESTINATION {email: user@cuasdf.bitnet};
+destination2 := DESTINATION {attending_physician(Pt_id)};
+destination3 := DESTINATION {"primary physician email"};
+
+dest_obj := object [dest_method, recip_name, recip_address];
+email_attending := DESTINATION AS dest_obj {Attending Phys Email};
+def_destination := DESTINATION AS dest_obj;
+
+/* Declares the third-party drug-drug interaction function */
+/* The implementation within the {}-braces shows that a string (char*)
+will be returned */
+/* when the third-party API (ThirdPartyAPI) is used to call */
+/* the drug-drug interaction function (DrugDrugInteraction) */
+/* The function expects that two medicaion strings (char*, char*) will be
+passed */
+func_drugint := INTERFACE {
+char* ThirdPartyAPI:DrugDrugInteraction (char*, char*)
+};
+
+/* Calls the drug-drug interaction function */
+alert_text := call func_drugint with "terfenadine", "erythromycin";
+
+MedicationDose := OBJECT [Medication, Dose, Status];
+
+RangeOfAge := linguistic variable [young, middleAge, old];
+Age := new RangeOfAge;
+Age.young := FUZZY SET (0 years, truth value 1), (25 year, truth value 1), (35 years, truth value 0);
+Age.middleAge := FUZZY SET(25 years, truth value 0), (35 years, truth value 1), (55 years, truth value 1), (65 years, truth value 0);
+Age.old := FUZZY SET (55 years, truth value 0), (65 years, truth value 1);
+
+mlm2 := MLM 'my_mlm2.mlm' FROM INSTITUTION "my institution";
+INCLUDE mlm2;
+
+penicillin_storage := event {store penicillin order};
+cephalosporin_storage := event {store cephalosporin order};
+
+;;
+PRIORITY: 50.0 ;;
+EVOKE:
+
+penicillin_storage;
+penicillin_storage OR cephalosporin_storage;
+ANY OF (penicillin_storage, cephalosporin_storage, aminoglycoside_storage);
+
+penicillin_storage OR cephalosporin_storage;
+
+TODAY ATTIME 15:00 AFTER TIME OF penicillin_storage;
+
+TOMORROW ATTIME 02:30 AFTER TIME OF penicillin_storage;
+
+MONDAY ATTIME 13:00 AFTER TIME OF penicillin_storage;
+
+MONDAY ATTIME 13:00 OR FRIDAY ATTIME 12:00 AFTER TIME OF penicillin_storage;
+
+3 days after time of penicillin_storage;
+1992-01-01T00:00:00 AFTER TIME OF penicillin_storage;
+TOMORROW ATTIME 02:00 AFTER TIME OF penicillin_storage;
+
+TOMORROW ATTIME 13:00 OR TOMORROW ATTIME 02:00 AFTER TIME OF penicillin_storage;
+
+TOMORROW ATTIME 02:30;
+
+20 hours;
+
+1992-01-01T00:00:00;
+3 days AFTER 2007-01-01;
+TOMORROW ATTIME 02:30;
+
+TODAY ATTIME 13:00 OR TOMORROW ATTIME 02:00;
+
+EVERY 1 day FOR 14 days STARTING time of event2;
+
+every 1 day for 14 days starting 1992-01-01T00:00:00 after time of event1;
+every 1 day for 14 days starting time of event2;
+every 2 hours for 1 day starting today attime 12:00 after time of event3;
+every 1 week for 1 month starting 3 days after time of event4 until last(serum_potassium) > 5.0;
+
+EVERY 1 DAY FOR 5 months STARTING 2008-10-01T06:30:00;
+
+every 1 day for 14 days starting 1992-01-01T00:00:00;
+every 2 hours for 1 day starting today attime 12:00;
+every 1 week for 1 month starting 3 days after 1992-01-01T00:00:00 until last(serum_potassium) > 5.0;
+
+;;
+LOGIC:
+/* this assigns 0 to variable "var1" */
+let var1 be 0;
+/* this causes the MLM named "hyperkalemia" to be executed */
+hyperkalemia_present := call hyperkalemia;
+/* this concludes "true" if the potassium is greater than 5 */
+if potassium > 5.0 then
+conclude true;
+endif;
+last_potas := last potas_list;
+if last_potas > 5.0 then
+conclude true;
+endif;
+
+if latest potas > 5.0 then
+conclude true;
+endif;
+
+if time of latest potas is within past 3 days then
+conclude true;
+endif;
+
+var := true OR false;
+var := false OR false;
+var := true OR null;
+var := false OR null;
+var := false OR 3.4;
+var := false OR (0.4 AS TRUTH VALUE); //see section 9.20.4 (as truth value)
+var := true OR (TRUTH VALUE 0.7); //see section 8.13 (truth values)
+var := (0.5 AS TRUTH VALUE) OR (0.4 AS TRUTH VALUE);
+var := (true, false) OR (false, true);
+var := () OR ();
+
+var := true AND false;
+var := true AND null;
+var := false AND (0.4 AS TRUTH VALUE); //see section 9.20.4 (as truth value);
+var := false AND (TRUTH VALUE 0.5); //see section 8.13 (truth values);
+var := (0.5 AS TRUTH VALUE) AND (0.4 AS TRUTH VALUE);
+var := false AND null;
+
+var := NOT false;
+var := NOT null;
+var := NOT (0.2 as TRUTH VALUE); //see section 9.20.4 (as truth value)
+var := NOT (TRUTH VALUE 0.2); //see section 8.13 (truth values)
+var := NOT (false, true);
+var := NOT ();
+
+var := 1 = 2;
+var := (1, 2, "a") = (null, 2, 3);
+var := (3/0) = (3/0);
+var := 5 = ();
+var := (1, 2, 3) = ();
+var := null = ();
+var := () = ();
+var := 5 = null;
+var := (1, 2, 3) = null;
+var := null = null;
+var := (1, 2, 3) = (1, 2, 4);
+var := 1979-02-25T08:20:00 = 08:20:00;
+
+var := 1 <> 2;
+var := (1, 2, "a") <> (null, 2, 3);
+var := (3/0) <> (3/0);
+var := 1979-02-25T08:20:00 <> 08:20:00;
+
+var := 1 < 2;
+var := 1990-03-02T00:00:00 < 1990-03-10T00:00:00;
+var := 1990-03-02T00:00:00 < 13:00:00;
+var := 13:00:00 < 14 hours;
+var := 2 days < 1 year;
+var := "aaa" < "aab";
+var := "aaa" < 1;
+
+var := 1 <= 2;
+var := 1990-03-02T00:00:00 <= 1990-03-10T00:00:00;
+var := 1990-03-02T00:00:00 <= 13:00:00;
+var := 2 days <= 1 year;
+var := "aaa" <= "aab";
+var := "aaa" <= 1;
+
+young := FUZZY SET (0, truth value 1),(15, truth value 1),(20, truth value 0);
+middle_aged := FUZZY SET (15, truth value 0),(20, truth value 1),(60, truth value 1), (70, truth value 0);
+var := 25 <= young;
+var := 25 <= middle_aged;
+var := 10 <= young;
+var := 10 <= middle_aged;
+var := 17.5 <= young;
+var := 17.5 <= middle_aged;
+
+var := 1 > 2;
+var := 1990-03-02T00:00:00 > 1990-03-10T00:00:00;
+var := 1990-03-02T00:00:00 > 13:00:00;
+var := 2 days > 1 year;
+var := "aaa" > "aab";
+var := "aaa" > 1;
+
+var := 1 >= 2;
+var := 1990-03-02T00:00:00 >= 1990-03-10T00:00:00;
+var := 1990-03-02T00:00:00 >= 13:00:00;
+var := 2 days >= 1 year;
+var := "aaa" >= "aab";
+var := "aaa" >= 1;
+
+young := FUZZY SET (0, truth value 1), (15, truth value 1), (20, truth value 0);
+middle_aged := FUZZY SET (15, truth value 0), (20, truth value 1), (60, truth value 1), (70, truth value 0);
+var := 25 >= young;
+var := 25 >= middle_aged;
+var := 10 >= young;
+var := 10 >= middle_aged;
+var := 17.5 >= middle_aged;
+var := 17.5 >= young;
+
+var := Fuzzy Set (0, truth value 0), (4, truth value 1), (5, truth value 0);
+crispVar := 2;
+var := 4 IS IN (5 fuzzified by 2);
+var := 2 IS IN (Fuzzy Set (0, truth value 0), (4, truth value 1),(5, truth value 0));
+
+var := null || 3;
+var := 4 || 5;
+var := 4.7 || "four";
+var := true || "";
+var := 3 days || " left";
+var := "on " || 1990-03-15T13:45:01;
+var := "list=" || (1, 2, 3);
+
+var := (1, 2, 3) formatted with "%2.2d::%2.2d::%2.2d";
+var := 10.60528 formatted with "The result was %.2f mg";
+var := 1998-01-10T17:25:00 formatted with "The date was %.2t";
+var := 1998-01-10T17:25:00 formatted with "The year was %.0t";
+/* longer example */
+a := "ten";
+b := "twenty";
+c := "thirty";
+f := "%s, %s, %s or more";
+var := (a, b, c) formatted with f;
+
+var := STRING ("a", "b", "c");
+var := STRING ("a", "bc");
+var := STRING ();
+var := STRING REVERSE EXTRACT CHARACTERS "abcde";
+
+var := "fatal heart attack" MATCHES PATTERN "%heart%";
+var := "fatal heart attack" MATCHES PATTERN "heart";
+var := "abnormal values" MATCHES PATTERN "%value_";
+var := "fatal pneumonia" MATCHES PATTERN "%pulmonary%";
+var := ("stunned myocardium", "myocardial infarction") MATCHES PATTERN "%myocardium";
+var := "5%" MATCHES PATTERN "_\%";
+
+var := LENGTH OF "Example";
+var := LENGTH "Example String";
+var := LENGTH "";
+var := LENGTH ();
+var := LENGTH OF null;
+var := LENGTH OF ("Negative", "Pos", 2);
+
+var := UPPERCASE "Example String";
+var := UPPERCASE "";
+var := UPPERCASE null;
+var := UPPERCASE ();
+var := uppercase ("5-Hiaa", "Pos", 2);
+
+var := LOWERCASE "Example String";
+var := LOWERCASE "";
+var := LOWERCASE 12.8;
+var := LOWERCASE null;
+var := LOWERCASE ("5-HIAA", "Pos", 2);
+
+var := TRIM " example ";
+var := TRIM "";
+var := TRIM ();
+var := TRIM LEFT " result: ";
+var := TRIM RIGHT " result: ";
+var := TRIM (" 5 N", "2 E ", 2);
+
+var := FIND "a" IN STRING "Example Here";
+var := FIND "ple" IN STRING "Example Here";
+var := FIND "s" IN STRING "Example Here";
+var := FIND 2 IN STRING "Example Here";
+var := FIND "a" STRING 510;
+var := FIND "t" STRING ("start", "meds", "halt");
+var := FIND "e" IN STRING "Example Here" STARTING AT 1;
+var := FIND "e" IN STRING LOWERCASE "Example Here" STARTING AT 1;
+var := FIND "e" IN STRING "Example Here" STARTING AT 8;
+var := FIND "e" IN STRING "Example Here" STARTING AT 10;
+var := FIND "e" IN STRING "Example Here" STARTING AT 11;
+var := FIND "e" IN STRING "Example Here" STARTING AT 13;
+var := FIND "e" IN STRING "Example Here" STARTING AT 1.5;
+var := FIND "e" IN STRING "Example Here" STARTING AT "x";
+var := FIND "e" IN STRING "Example Here" STARTING AT (10, 11);
+
+var := SUBSTRING 2 CHARACTERS FROM "abcdefg";
+var := SUBSTRING 100 CHARACTERS FROM "abcdefg";
+var := SUBSTRING 3 CHARACTERS STARTING AT 4 FROM "abcdefg";
+var := SUBSTRING 20 CHARACTERS STARTING AT 4 FROM "abcdefg";
+var := SUBSTRING 2.3 CHARACTERS FROM "abcdefg";
+var := SUBSTRING 2 CHARACTERS STARTING AT 4.7 FROM "abcdefg";
+var := SUBSTRING 3 CHARACTERS STARTING AT "c" FROM "abcdefg";
+var := SUBSTRING "b" CHARACTERS STARTING AT 4 FROM "abcdefg";
+var := SUBSTRING 3 CHARACTERS STARTING AT 4 FROM 281471;
+var := SUBSTRING 1 CHARACTERS STARTING AT 4 FROM "abcdefg";
+var := SUBSTRING -1 CHARACTERS STARTING AT 4 FROM "abcdefg";
+var := SUBSTRING -3 CHARACTERS STARTING AT 4 FROM "abcdefg";
+var := SUBSTRING 1 CHARACTERS FROM "abcdefg";
+var := SUBSTRING -1 CHARACTERS STARTING AT LENGTH OF "abcdefg" FROM "abcdefg";
+var := SUBSTRING 3 CHARACTERS FROM ("Positive", "Negative", 2);
+
+bp := "121/86";
+slash_pos := FIND "/" IN STRING bp;
+systolic := SUBSTRING (slash_pos - 1) CHARACTERS FROM bp;
+systolic := SUBSTRING -3 CHARACTERS STARTING AT (slash_pos - 1) FROM bp;
+diastolic := SUBSTRING 3 CHARACTERS STARTING AT (slash_pos + 1) FROM bp;
+diastolic := SUBSTRING (LENGTH of bp) CHARACTERS STARTING AT (slash_pos + 1) FROM bp;
+
+var := localized 'msg';
+var := creat formatted with localized 'creat';
+var := localized 'unknown';
+
+var := localized 'msg' by "en_US";
+var := creat formatted with localized 'creat' by lang_setting; /* lang_setting == "de" */
+
+var := 2 YEAR;
+
+var := MINIMUM 2 FROM (11, 14, 13, 12);
+var := MINIMUM 2 FROM 3;
+var := MINIMUM 2 FROM (3, "asdf");
+var := MINIMUM 2 FROM ();
+var := MINIMUM 0 FROM (2, 3);
+var := MINIMUM 3 FROM (3, 5, 1, 2, 4, 2);
+
+var := MAXIMUM 2 FROM (11, 14, 13, 12);
+var := MAXIMUM 2 FROM 3;
+var := MAXIMUM 2 FROM (3, "asdf");
+var := MAXIMUM 2 FROM ();
+var := MAXIMUM 0 FROM (1, 2, 3);
+var := MAXIMUM 3 FROM (1, 5, 2, 4, 1, 4);
+
+var := FIRST 2 FROM (11, 14, 13, 12);
+var := FIRST 2 FROM 3;
+var := FIRST 2 FROM (null, 1, 2, null);
+var := FIRST 2 FROM ();
+
+var := LAST 2 FROM (11, 14, 13, 12);
+var := LAST 2 FROM 3;
+var := LAST 2 FROM (null, 1, 2, null);
+var := LAST 2 FROM ();
+
+var := SUBLIST 2 ELEMENTS FROM (1, 2, 3, 4, 5);
+var := SUBLIST 100 ELEMENTS FROM (1, 2, 3, 4, 5);
+var := SUBLIST 3 ELEMENTS STARTING AT 4 FROM (1, 2, 3, 4, 5, 6, 7);
+var := SUBLIST 20 ELEMENTS STARTING AT 4 FROM (1, 2, 3, 4, 5, 6, 7);
+
+var := SUBLIST 2.3 ELEMENTS FROM (1, 2, 3, 4, 5, 6, 7);
+var := SUBLIST 2 ELEMENTS STARTING AT 4.7 FROM (1, 2, 3, 4, 5, 6, 7);
+var := SUBLIST 3 ELEMENTS STARTING AT "c" FROM (1, 2, 3, 4, 5, 6, 7);
+var := SUBLIST "b" ELEMENTS STARTING AT 4 FROM (1, 2, 3, 4, 5, 6, 7);
+var := SUBLIST 3 ELEMENTS STARTING AT 4 FROM 281471;
+var := SUBLIST 1 ELEMENTS STARTING AT 4 FROM (1, 2, 3, 4, 5, 6, 7);
+var := SUBLIST -1 ELEMENTS STARTING AT 4 FROM (1, 2, 3, 4, 5, 6, 7);
+var := SUBLIST -3 ELEMENTS STARTING AT 4 FROM (1, 2, 3, 4, 5, 6, 7);
+var := SUBLIST 1 ELEMENTS FROM (1, 2, 3, 4, 5, 6, 7);
+
+var := INCREASE (11, 15, 13, 12);
+var := INCREASE 3;
+var := INCREASE ();
+var := INCREASE (1990-03-01, 1990-03-02);
+var := INCREASE (13:00:00, 14:00:00);
+var := INCREASE (1 day, 2 days);
+var := DECREASE (11, 15, 13, 12);
+var := DECREASE 3;
+var := DECREASE ();
+var := DECREASE (1990-03-01, 1990-03-02);
+var := DECREASE (13:00:00, 14:00:00);
+var := DECREASE (1 day, 2 days);
+
+var := % INCREASE (11, 15, 13);
+var := % INCREASE 3;
+var := % INCREASE ();
+var := % INCREASE (1 day, 2 days);
+
+var := % DECREASE (11, 15, 13);
+var := % DECREASE 3;
+var := % DECREASE ();
+var := % DECREASE (1 day, 2 days);
+
+var := EARLIEST 2 FROM ();
+
+var := LATEST 2 FROM ();
+
+var := INDEX MINIMUM 2 FROM (11, 14, 13, 12);
+var := INDEX MINIMUM 3 FROM (3, 5, 1, 2, 4, 2);
+var := INDEX MIN 2 FROM (3, "asdf");
+var := INDEX MINIMUM 2 FROM 3;
+var := INDEX MINIMUM 0 FROM (2,3);
+
+var := INDEX MAXIMUM 2 FROM (11, 14, 13, 12);
+var := INDEX MAXIMUM 3 FROM (3, 5, 1, 2, 4, 2);
+
+var := INDEX MAXIMUM 2 FROM 3;
+var := INDEX MAXIMUM 0 FROM (2, 3);
+
+Var1 := fuzzy set (2, truth value 0), (3, truth value 1), (4, truth value 1), (5, truth value 0);
+Var2 := fuzzy set ((now - 2 days), truth value 0), (now, truth value 1), ((now + 1 day), truth value 0);
+Var3 := fuzzy set (2001-12-12, truth value 0), (2003-12-12, truth value 1), (2009-01-01, truth value 0);
+Var4 := fuzzy set (2 days, truth value 0), (3 days, truth value 1), (4 days, truth value 1), (5 days, truth value 0);
+
+Var1 := 7 fuzzified by 2;
+Var2 := now fuzzified by 2 days;
+Var3 := 7 days fuzzified by 2 hours;
+
+var := Defuzzified (7 fuzzified by 2);
+var := APPLICABILITY OF data0;
+var := APPLICABILITY APPLICABILITY data0;
+var := APPLICABILITY (3, 4);
+
+APPLICABILITY data1 := TRUTH VALUE 0.44;
+
+var1 := 1;
+var1 := 3;
+var2 := var1 + 2;
+
+
+rect := new Rectangle;
+// assign attributes
+rect.Bottom := 0;
+rect.Top := 0;
+rect.Width := 10;
+rect.Height := 20;
+// incorrect assignment
+rect.Depth := 30;
+var := rect.Depth;
+
+rect1 := new Rectangle;
+// assign attributes
+rect1.Bottom := 0;
+rect1.Top := 0;
+rect1.Width := 10;
+rect1.Height := 20;
+rect2 := rect1; // references the same Rectangle
+rect1.Width := 50;
+var := rect2.Width; // rect2.width reflects change to shared object
+
+//simple example using index
+my_list := 5, 10, 15;
+my_list[3] := 20; //contents of my_list are now 5, 10, 20
+//create one object with three nested objects
+message_list := ();
+for i in 1 seqto 3 do
+message_text := new message_type with i, "this is message " || i;
+message_list := message_list, message_text;
+enddo;
+my_obj := new my_collection_type with "Reminders", message_list;
+//traditional syntax
+n := 2;
+obj1 := my_obj.message_list[n];
+obj1.msg := "this is a replacement message";
+message2 := new message_type with 10, "this is message 10";
+my_obj.message_list := first (n-1) from my_obj.message_list,
+message2, last (count of my_obj.message_list - n) from
+my_obj.message_list;
+var1 := first (n-1) from my_obj.message_list;
+var2 := last (count of my_obj.message_list - n) from my_obj.message_list;
+//enhanced syntax
+n := 2;
+my_obj.message_list[n].msg := "this is a replacement message"; //modify nth item
+
+my_obj.message_list[n] := new message_type with 10, "this is message 10";
+//replace nth item
+//additional examples
+my_obj.message_list.msg := "This is a test"; //modifies message in all objects
+my_var := my_obj.message_list.msg; //contents of my_var are "This is a test", "This is a test", "This is a test"
+my_list[1] := my_var; //contents of my_list changed to "This is a test", "This is a test", "This is a test", 10, 20
+
+Var := 0;
+Con := truth value 0.2;
+If con then
+Var := Var + 1;
+Else
+Var := Var + 3;
+Endif;
+
+Var := 0;
+Bool_true := true;
+Con := truth value 0.2;
+con_second := truth value 0.3;
+IF Con THEN
+Var := Var + 1;
+IF con_second THEN
+Var := Var + 1;
+ELSE
+Var := Var + 3;
+ENDIF;
+ELSE
+Var := Var + 3;
+ENDIF;
+CONCLUDE TRUE;
+
+Var := 0;
+Bool_true := true;
+Con := truth value 0.2;
+IF Con THEN
+Var := Var + 1;
+CONCLUDE FALSE;
+ELSE
+Var := Var + 3;
+ENDIF;
+CONCLUDE TRUE;
+
+Var := 0;
+Bool_true := true;
+Con := truth value 0.2;
+IF Con THEN
+Var := Var + 1;
+ELSE
+Var := Var + 3;
+ENDIF AGGREGATE;
+CONCLUDE TRUE;
+
+IF var1 THEN
+var2 := 0;
+ELSE
+var2 := 45;
+ENDIF;
+IF not(var1) THEN
+var2 := 45;
+ELSE
+var2 := 0;
+ENDIF;
+
+IF var1 is Boolean THEN
+IF var1 THEN
+var2 := "var1 is true";
+ELSE
+var2 := "var1 is false";
+ENDIF;
+ELSE
+var2 := "var1 is null or some other type";
+ENDIF;
+
+IF any(Bool_list) THEN
+var2 := 0;
+ENDIF;
+
+switch inVal
+case 1
+returnVal := 7;
+case 2
+returnVal := 9;
+endswitch;
+
+age := 16;
+young := FUZZY SET (0, truth value 1), (15, truth value 1), (20, truth value 0);
+middle_aged := FUZZY SET (15, truth value 0), (20, truth value 1), (60, truth value 1), (70, truth value 0);
+dose := 0;
+switch age
+case young
+dose := 10;
+case middle_aged
+dose := 20;
+endswitch;
+
+switch inVal
+case 1
+returnVal := 7;
+case 2
+returnVal := 9;
+default
+returnVal := 0; //error state
+endswitch;
+
+age := 16;
+young := FUZZY SET (0, truth value 1), (15, truth value 1), (17, truth value 0);
+middle_aged := FUZZY SET (15, truth value 0), (20, truth value 1), (60, truth value 1), (70, truth value 0);
+dose := 0;
+switch age
+case young
+dose := 10;
+case middle_aged
+dose := 20;
+default
+dose := 15;
+endswitch;
+
+age := 16;
+young := FUZZY SET (0, truth value 1), (15, truth value 1), (17, truth value 0);
+middle_aged := FUZZY SET (15, truth value 0), (20, truth value 1), (60, truth value 1), (70, truth value 0);
+dose := 0;
+switch age
+case young
+dose := 10;
+case middle_aged
+dose := 20;
+default
+dose := 15;
+endswitch aggregate;
+
+CONCLUDE false;
+CONCLUDE potas > 5.0;
+
+x := CALL xxx with (a, b), (c merge d), e + f;
+y := CALL yyy WITH expr1, expr2;
+z := CALL zzz WITH (expr3, expr4);
+var1 := CALL my_mlm1 WITH param1, param2;
+(var2, var3, var4) := CALL my_mlm2 WITH param1, param2;
+var1 := CALL my_event WITH param1, param2;
+var1 := CALL my_interface_function1 WITH param1, param2;
+(var1, var2, var3) := CALL my_interface_function2 WITH param1, param2;
+
+/* Lists two medications and their allergens */
+med_orders:= ("PEN-G", "aspirin");
+med_allergens := ("penicillin", "aspirin");
+/* Lists three patient allergies and their reactions */
+patient_allergies := ("milk", "codeine", "penicillin");
+patient_reactions := ("hives", NULL, "anaphylaxis");
+/* Passes 4 arguments and receives 3 lists as values */
+(meds, allergens, reactions) := call find_allergies with med_orders, med_allergens, patient_allergies, patient_reactions;
+
+/* Lists two medications and their allergens */
+med_orders := ("PEN-G", "aspirin");
+med_allergens := ("penicillin", "aspirin");
+/* Lists three patient allergies and their reactions */
+patient_allergies := ("milk", "codeine", "penicillin");
+patient_reactions := ("hives", NULL, "anaphylaxis");
+/* Passes 4 arguments and receives 3 lists as values */
+(meds, allergens, reactions) := call find_allergies with med_orders, med_allergens, patient_allergies, patient_reactions;
+
+/* Initialize variables */
+a_list:= ();
+m_list:= ();
+r_list:= ();
+num:= 1;
+/* Checks each allergen in the medications to determine if the patient is
+allergic to it */
+while num <= (count med_allergen) do
+allergen:= last(first num from med_allergens);
+allergy_found:= (patient_allergies = allergen);
+reaction:= patient_reactions where allergy_found;
+medication:= med_orders where (med_allergens = allergen);
+/* Adds the allergen, medication, and reaction to variables that will */
+/* be returned to the calling MLM */
+If any allergy_found then
+a_list:= a_list, allergen;
+m_list:= m_list, medication;
+r_list:= r_list, reaction;
+endif;
+/* Increments the counter that is used to stop the while-loop */
+num:= num + 1 ;
+enddo;
+
+num:= 1;
+/* Checks each allergen in the medications and stops if patient is allergic
+to it */
+while num <= (count med_allergen) do
+allergen:= last(first num from med_allergens);
+allergy_found:= (patient_allergies = allergen);
+/* be returned to the calling MLM */
+If any allergy_found then
+breakloop; // execution of the while-loop will stop immediately
+endif;
+/* Increments the counter that is used to stop the while-loop */
+num:= num + 1 ;
+enddo;
+
+/* Initialize variables */
+a_list:= ();
+m_list:= ();
+r_list:= ();
+/* Checks each allergen in the medications to determine if the patient is
+allergic to it */
+for allergen in med_allergens do
+allergy_found:= (patient_allergies = allergen);
+reaction:= patient_reactions where allergy_found;
+medication:= med_orders where (med_allergens = allergen);
+/* Adds the allergen, medication, and reaction to variables that will */
+/* be returned to the calling MLM */
+If any allergy_found then
+a_list:= a_list, allergen;
+m_list:= m_list, medication;
+r_list:= r_list, reaction;
+endif;
+enddo;
+
+dose := NEW MedicationDose with "Ampicillin", "500mg", "Active";
+dose := NEW MedicationDose with "Ampicillin", ("500", "700"), "Active";
+testobj := NEW obj_def with [z:=10, y:="roger"];
+
+
+;;
+ACTION: 
+
+var := surgery_time WAS BEFORE discharge_time;
+var := surgery_time IS NOT AFTER discharge_time;
+var := 3 IS WITHIN 2 TO 5;
+var := 3 IS WITHIN 5 TO 2;
+var := 1990-03-10T00:00:00 IS WITHIN 1990-03-05T00:00:00 TO 1990-03-15T00:00:00;
+var := 3 days IS WITHIN 2 days TO 5 months;
+var := "ccc" IS WITHIN "a" TO "d";
+var := 1990-03-10T15:00:00 IS WITHIN 16:00:00 TO 17:00:00;
+
+var := 1990-03-10T15:00:00 IS WITHIN 17:00:00 TO 16:00:00;
+var := time of day of time of order IS WITHIN 22:00:00 to 02:00:00;
+var := DAY OF WEEK OF TIME OF measurement IS WITHIN MONDAY TO FRIDAY;
+var := measurement OCCURRED WITHIN MONDAY to FRIDAY;
+var := WEDNESDAY IS WITHIN TUESDAY TO FRIDAY;
+var := SATURDAY IS WITHIN FRIDAY TO SUNDAY;
+var := SATURDAY IS WITHIN FRIDAY TO MONDAY;
+
+var := 1990-03-08T00:00:00 IS WITHIN 3 days PRECEDING 1990-03-10T00:00:00;
+var := 1990-03-08T00:00:00 IS WITHIN 3 days FOLLOWING 1990-03-10T00:00:00;
+var := 1990-03-08T00:00:00 IS WITHIN 3 days SURROUNDING 1990-03-10T00:00:00;
+var := time of day of time of request is within 2 hours surrounding 14:00;
+var := time of day of time of measurements are within 30 minutes surrounding 13:00;
+var := 1990-03-08T00:00:00 IS WITHIN PAST 3 days;
+var := 12:00:00 IS WITHIN PAST 2 weeks;
+var := 1990-03-08T11:11:11 IS WITHIN SAME DAY AS 1990-03-08T01:01:01;
+var := 12:00:00 IS WITHIN SAME DAY AS 1990-03-08T01:01:01;
+var := 1990-03-08T00:00:00 IS BEFORE 1990-03-07T00:00:00;
+var := 1990-03-08T00:00:00 IS BEFORE 1990-03-08T00:00:00;
+var := 1990-03-08T00:00:00 IS AFTER 1990-03-07T00:00:00;
+var := now is after 18:00:00;
+var := 2 IS IN (4, 5, 6);
+var := (3, 4) IS IN (4, 5, 6);
+var := null is in (1/0, 2);
+var := day of week of (time of potassium) IS IN (SATURDAY, SUNDAY);
+
+var := 3 IS PRESENT;
+var := null IS PRESENT;
+var := (3, null) IS PRESENT;
+var := (3, null) IS NULL;
+var := false IS BOOLEAN;
+var := 3 IS NOT BOOLEAN;
+var := (null, false,3) IS BOOLEAN;
+var := TRUTH VALUE .44 IS TRUTH VALUE;
+var := 3 IS NOT TRUTH VALUE;
+var := (null, TRUTH VALUE .44, 3) IS TRUTH VALUE;
+var := RangeOfAge IS LINGUISTIC VARIABLE;
+var := 3 IS NOT LINGUISTIC VARIABLE;
+var := (null, RangeOfAge,3) IS LINGUISTIC VARIABLE;
+var := 3 IS NUMBER;
+var := null IS NUMBER;
+var := sum(serum_K where it IS NUMBER);
+var := "asdf" IS STRING;
+var := null IS STRING;
+var := 1991-03-12T00:00:00 IS TIME;
+var := null IS TIME;
+var := 23:20:00 IS TIME OF DAY;
+var := 23:20:00.12 IS TIME OF DAY;
+var := 1991-03-12T00:00:00 IS TIME OF DAY;
+var := null IS TIME OF DAY;
+var := (3 days) IS DURATION;
+var := null IS DURATION;
+var := (3, 2, 1) IS LIST;
+var := 5 IS LIST;
+var := null IS LIST;
+var := (3, 2, "asdf") IS LIST;
+var := (3, 2, "asdf") IS NUMBER;
+var := 2 IN (4, 5, 6);
+var := (3, 4) IN (4, 5, 6);
+var := null in (1/0, 2);
+var := 3 IS FUZZY;
+var := (FUZZY SET (0, truth value 0), (1, truth value 1)) IS FUZZY;
+var := (today fuzzified by 2 days) IS FUZZY;
+var := 3 IS CRISP;
+var := (FUZZY SET (0, truth value 0), (1, truth value 1)) IS CRISP;
+var := (today fuzzified by 2 days) IS CRISP;
+
+var := 4 + 2;
+var := 5 + ();
+var := (1,2,3) + ();
+var := null + ();
+var := 5 + null;
+var := (1, 2, 3) + null;
+var := null + null;
+var := 1 day + 2 days;
+var := 1990-03-13T00:00:00 + 2 days;
+var := 0000-00-00 + 1993 years + 5 months + 17 days;
+var := 2 days + 1990-03-13T00:00:00;
+
+var := + 2;
+var := + "asdf";
+var := + 2 days;
+var := 6 - 2;
+var := 3 days - 2 days;
+var := 1990-03-15T00:00:00 - 2 days;
+var := 1990-03-15T00:00:00 - 1990-03-13T00:00:00;
+var := - 2;
+var := - (2 days);
+var := 4 * 2;
+var := 3 * 2 days;
+var := 2 days * 3;
+var := 8 / 2;
+var := 6 days / 3;
+var := 2 minutes / 1 second;
+var := 3 years / 1 month;
+var := 3 ** 2;
+
+var := SUM a_list;
+var := SUM OF a_list;
+var := SUM(a_list);
+var := SUM OF(a_list);
+
+var := AVERAGE OF LAST 3 FROM a_list;
+
+var := COUNT (12, 13, 14, null);
+var := COUNT "asdf";
+var := COUNT ();
+var := COUNT null;
+
+var := EXIST (12, 13, 14);
+var := EXIST null;
+var := EXIST ();
+var := EXIST ("plugh", null);
+
+var := AVERAGE (12, 13, 17);
+var := AVERAGE 3;
+var := AVERAGE ();
+var := AVERAGE (1990-03-10T03:10:00, 1990-03-12T03:10:00);
+var := AVERAGE (03:10:00, 1990-03-12T03:10:00);
+var := AVERAGE (03:10:00, 05:10:00);
+var := AVERAGE (2 days, 3 days, 4 days);
+
+var := MEDIAN (12, 17, 13);
+var := MEDIAN 3;
+var := MEDIAN ();
+var := MEDIAN (1990-03-10T03:10:00, 1990-03-11T03:10:00, 1990-03-28T03:10:00);
+var := MEDIAN (03:10:00, 02:10:00, 23:10:00);
+var := MEDIAN (1 hour, 3 days, 4 years);
+
+var := SUM (12, 13, 14);
+var := SUM 3;
+var := SUM ();
+var := SUM (1 day, 6 days);
+
+var := STDDEV (12, 13, 14, 15, 16);
+var := STDDEV 3;
+var := STDDEV ();
+
+var := VARIANCE (12, 13, 14, 15, 16);
+var := VARIANCE 3;
+var := VARIANCE ();
+
+var := MINIMUM (12, 13, 14);
+var := MIN 3;
+var := MINIMUM ();
+var := MINIMUM (1, "abc");
+
+var := minimum (0, 30, 90, 180, 200, 300) using cosine of it;
+
+var := MAXIMUM (12, 13, 14);
+var := MAXIMUM 3;
+var := MAXIMUM ();
+var := MAXIMUM (1,"abc");
+
+var := maximum (0, 30, 90, 180, 200, 300) using sine of it;
+
+var := LAST (12, 13, 14);
+var := LAST 3;
+var := LAST ();
+
+var := FIRST (12, 13, 14);
+var := FIRST 3;
+var := FIRST ();
+
+var := ANY IsTrue (true, false, false);
+var := ANY false;
+var := ANY ();
+var := ANY (3, 5, "red");
+var := ANY (false, false);
+var := ANY (false, null);
+
+var := ALL AreTrue (true, false, false);
+var := ALL false;
+var := ALL ();
+var := ALL (3, 5, "red");
+var := ALL (true, null);
+
+var := NO IsTrue (true, false, false);
+var := NO false;
+var := NO ();
+var := NO (3, 5, "red");
+var := NO (false, null);
+
+var := LATEST ();
+var := LATEST ("penicillin", "ibuprofen", "pseudoephedrine HCL");
+
+var := EARLIEST ();
+var := EARLIEST ("penicillin", "ibuprofen", "pseudoephedrine HCL");
+
+var := (10, 20, 30, 40)[2];
+var := (10, 20)[()];
+var := (10, 20)[1.5, 2];
+var := (10, 20, 30, 40, 50)[1, 3, 5];
+var := (10, 20, 30, 40, 50)[1, (3, 5)];
+var := (10, 20, 30, 40, 50)[1 seqto 3];
+
+var := EXTRACT CHARACTERS "abc";
+var := EXTRACT CHARACTERS ("ab", "c");
+var := EXTRACT CHARACTERS ();
+var := EXTRACT CHARACTERS "";
+var := STRING REVERSE EXTRACT CHARACTERS "abcde";
+
+var := 2 SEQTO 4;
+var := 4 SEQTO 2;
+var := 4.5 SEQTO 2;
+var := 2 SEQTO 2;
+var := (-3) SEQTO (-1);
+var := 2 * (1 SEQTO 4);
+var := (1.5 seqto 5);
+
+var := reverse (1, 2, 3);
+var := reverse (1 seqto 6);
+var := reverse ();
+
+var := INDEX LATEST ();
+var := INDEX LATEST ("penicillin", "ibuprofen", "pseudophedrine HCL");
+
+var := INDEX EARLIEST ();
+var := INDEX EARLIEST ("penicillin", "ibuprofen", "pseudophedrine HCL");
+
+var := INDEX MINIMUM (12, 13, 14);
+var := INDEX MIN 3;
+var := INDEX MINIMUM ();
+var := INDEX MINIMUM (1, "abc");
+
+var := INDEX MAXIMUM (12, 13, 14);
+var := INDEX MAX 3;
+var := INDEX MAXIMUM ();
+var := INDEX MAXIMUM (1, "abc");
+
+var := INTERVAL datas;
+var := INTERVAL (3, 4);
+
+var := ARCCOS 1;
+
+var := ARCSIN 0;
+
+var := ARCTAN 0;
+
+var := COSINE 0;
+
+var := SINE 0;
+
+var := TANGENT 0;
+
+var := EXP 0;
+
+var := LOG 1;
+
+var := LOG10 10;
+
+var := INT (-1.5);
+var := INT (-2.0);
+var := INT (1.5);
+var := INT (-2.5);
+var := INT (-3.1);
+var := INT (-4);
+
+var := CEILING (-1.5);
+var := CEILING (-1.0);
+var := CEILING 1.5;
+var := CEILING (-2.5);
+var := CEILING (-3.9);
+
+var := TRUNCATE (-1.5);
+var := TRUNCATE (-1.0);
+var := TRUNCATE 1.5;
+
+var := ROUND 0.5;
+var := ROUND 3.4;
+var := ROUND 3.5;
+var := ROUND (-3.5);
+var := ROUND (-3.4);
+var := ROUND (-3.7);
+
+var := ABS (-1.5);
+
+var := SQRT 4;
+var := SQRT(-1);
+
+var := "5" AS NUMBER;
+var := "xyz" AS NUMBER;
+var := True AS NUMBER;
+var := False AS NUMBER;
+var := 6 AS NUMBER;
+var := ("7", 8, "2.3E+2", 4.1E+3, "ABC", Null, True, False, 1997-10-31T00:00:00, now, 3 days) AS NUMBER;
+var := () AS NUMBER;
+
+var := "1999-12-12" AS TIME;
+var := "xyz" AS TIME;
+var := ("1999-12-12", 1999-12-12, "ABC", Null, True, "1997-10-31T00:00:00", 3 days) AS TIME;
+var := () AS TIME;
+
+var := 5 AS STRING;
+var := null AS STRING;
+var := True AS STRING;
+var := False AS STRING;
+var := ("7", 8, 4.1E+3, "ABC", Null, True, False, 1997-10-31T00:00:00, 3 days) AS STRING;
+var := () AS STRING;
+
+var := 0.33 AS TRUTH VALUE;
+var := "xyz" AS TRUTH VALUE;
+var := 400 AS TRUTH VALUE;
+var := True AS TRUTH VALUE;
+var := False AS TRUTH VALUE;
+var := (0, 1, 4.1E+3, 0.33, Null, True, False, 1997-10-31T00:00:00, 3 days, "ABC") AS TRUTH VALUE;
+var := () AS TRUTH VALUE;
+
+WRITE Var;
+Applicability_of_action_slot:= conclude;
+
+WRITE "the patient's potassium is" || serum_pot;
+WRITE "this is an email alert" AT email_dest;
+WRITE a_message;
+
+WRITE "the patient's potassium is " || serum_pot;
+WRITE CK0023 || serum_pot;
+
+RETURN (diagnosis_score, diagnosis_name);
+RETURN diagnosis_score, diagnosis_name;
+
+CALL mlmx DELAY 3 days;
+
+
+;; 
+URGENCY: someIdentifier ;;
+RESOURCES: 
+DEFAULT: en;;
+language: en
+'msg': "Caution, the patient has the following allergy to penicillin
+documented: ";
+'creat': "The patient's calculated creatinine clearance is %f ml/min.";
+;;
+language: de
+'msg': "Vorsicht, zu diesem Patienten wurde die folgende Penicillinallergie
+dokumentiert: ";
+'creat': "Die berechnete Kreatinin-Clearance des Patienten beträgt %f
+ml/min.";
+;;
+END:

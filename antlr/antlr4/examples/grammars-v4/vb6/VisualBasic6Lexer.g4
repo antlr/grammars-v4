@@ -1,0 +1,471 @@
+// $antlr-format alignTrailingComments true, columnLimit 150, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine true, allowShortBlocksOnASingleLine true, minEmptyLines 0, alignSemicolons ownLine
+// $antlr-format alignColons trailing, singleLineOverrulesHangingColon true, alignLexerCommands true, alignLabels true, alignTrailers true
+
+lexer grammar VisualBasic6Lexer;
+
+options {
+    caseInsensitive = true;
+}
+
+// keywords
+
+ACCESS: 'ACCESS';
+
+ADDRESSOF: 'ADDRESSOF';
+
+ALIAS: 'ALIAS';
+
+AND: 'AND';
+
+ATTRIBUTE: 'ATTRIBUTE';
+
+APPACTIVATE: 'APPACTIVATE';
+
+APPEND: 'APPEND';
+
+AS: 'AS';
+
+BEEP: 'BEEP';
+
+BEGIN: 'BEGIN';
+
+BEGINPROPERTY: 'BEGINPROPERTY';
+
+BINARY: 'BINARY';
+
+BOOLEAN: 'BOOLEAN';
+
+BYVAL: 'BYVAL';
+
+BYREF: 'BYREF';
+
+BYTE: 'BYTE';
+
+CALL: 'CALL';
+
+CASE: 'CASE';
+
+CHDIR: 'CHDIR';
+
+CHDRIVE: 'CHDRIVE';
+
+CLASS: 'CLASS';
+
+CLOSE: 'CLOSE';
+
+COLLECTION: 'COLLECTION';
+
+CONST: 'CONST';
+
+DATE: 'DATE';
+
+DECLARE: 'DECLARE';
+
+DEFBOOL: 'DEFBOOL';
+
+DEFBYTE: 'DEFBYTE';
+
+DEFDATE: 'DEFDATE';
+
+DEFDBL: 'DEFDBL';
+
+DEFDEC: 'DEFDEC';
+
+DEFCUR: 'DEFCUR';
+
+DEFINT: 'DEFINT';
+
+DEFLNG: 'DEFLNG';
+
+DEFOBJ: 'DEFOBJ';
+
+DEFSNG: 'DEFSNG';
+
+DEFSTR: 'DEFSTR';
+
+DEFVAR: 'DEFVAR';
+
+DELETESETTING: 'DELETESETTING';
+
+DIM: 'DIM';
+
+DO: 'DO';
+
+DOUBLE: 'DOUBLE';
+
+EACH: 'EACH';
+
+ELSE: 'ELSE';
+
+ELSEIF: 'ELSEIF';
+
+END_ENUM: 'END ENUM';
+
+END_FUNCTION: 'END FUNCTION';
+
+END_IF: 'END IF';
+
+END_PROPERTY: 'END PROPERTY';
+
+END_SELECT: 'END SELECT';
+
+END_SUB: 'END SUB';
+
+END_TYPE: 'END TYPE';
+
+END_WITH: 'END WITH';
+
+END: 'END';
+
+ENDPROPERTY: 'ENDPROPERTY';
+
+ENUM: 'ENUM';
+
+EQV: 'EQV';
+
+ERASE: 'ERASE';
+
+ERROR: 'ERROR';
+
+EVENT: 'EVENT';
+
+EXIT_DO: 'EXIT DO';
+
+EXIT_FOR: 'EXIT FOR';
+
+EXIT_FUNCTION: 'EXIT FUNCTION';
+
+EXIT_PROPERTY: 'EXIT PROPERTY';
+
+EXIT_SUB: 'EXIT SUB';
+
+FALSE: 'FALSE';
+
+FILECOPY: 'FILECOPY';
+
+FRIEND: 'FRIEND';
+
+FOR: 'FOR';
+
+FUNCTION: 'FUNCTION';
+
+GET: 'GET';
+
+GLOBAL: 'GLOBAL';
+
+GOSUB: 'GOSUB';
+
+GOTO: 'GOTO';
+
+IF: 'IF';
+
+IMP: 'IMP';
+
+IMPLEMENTS: 'IMPLEMENTS';
+
+IN: 'IN';
+
+INPUT: 'INPUT';
+
+IS: 'IS';
+
+INTEGER: 'INTEGER';
+
+KILL: 'KILL';
+
+LOAD: 'LOAD';
+
+LOCK: 'LOCK';
+
+LONG: 'LONG';
+
+LOOP: 'LOOP';
+
+LEN: 'LEN';
+
+LET: 'LET';
+
+LIB: 'LIB';
+
+LIKE: 'LIKE';
+
+LINE_INPUT: 'LINE INPUT';
+
+LOCK_READ: 'LOCK READ';
+
+LOCK_WRITE: 'LOCK WRITE';
+
+LOCK_READ_WRITE: 'LOCK READ WRITE';
+
+LSET: 'LSET';
+
+MACRO_IF: HASH 'IF';
+
+MACRO_ELSEIF: HASH 'ELSEIF';
+
+MACRO_ELSE: HASH 'ELSE';
+
+MACRO_END_IF: HASH 'END IF';
+
+ME: 'ME';
+
+MID: 'MID';
+
+MKDIR: 'MKDIR';
+
+MOD: 'MOD';
+
+NAME: 'NAME';
+
+NEXT: 'NEXT';
+
+NEW: 'NEW';
+
+NOT: 'NOT';
+
+NOTHING: 'NOTHING';
+
+NULL_: 'NULL';
+
+OBJECT: 'OBJECT';
+
+ON: 'ON';
+
+ON_ERROR: 'ON ERROR';
+
+ON_LOCAL_ERROR: 'ON LOCAL ERROR';
+
+OPEN: 'OPEN';
+
+OPTIONAL: 'OPTIONAL';
+
+OPTION_BASE: 'OPTION BASE';
+
+OPTION_EXPLICIT: 'OPTION EXPLICIT';
+
+OPTION_COMPARE: 'OPTION COMPARE';
+
+OPTION_PRIVATE_MODULE: 'OPTION PRIVATE MODULE';
+
+OR: 'OR';
+
+OUTPUT: 'OUTPUT';
+
+PARAMARRAY: 'PARAMARRAY';
+
+PRESERVE: 'PRESERVE';
+
+PRINT: 'PRINT';
+
+PRIVATE: 'PRIVATE';
+
+PROPERTY_GET: 'PROPERTY GET';
+
+PROPERTY_LET: 'PROPERTY LET';
+
+PROPERTY_SET: 'PROPERTY SET';
+
+PUBLIC: 'PUBLIC';
+
+PUT: 'PUT';
+
+RANDOM: 'RANDOM';
+
+RANDOMIZE: 'RANDOMIZE';
+
+RAISEEVENT: 'RAISEEVENT';
+
+READ: 'READ';
+
+READ_WRITE: 'READ WRITE';
+
+REDIM: 'REDIM';
+
+REM: 'REM';
+
+RESET: 'RESET';
+
+RESUME: 'RESUME';
+
+RETURN: 'RETURN';
+
+RMDIR: 'RMDIR';
+
+RSET: 'RSET';
+
+SAVEPICTURE: 'SAVEPICTURE';
+
+SAVESETTING: 'SAVESETTING';
+
+SEEK: 'SEEK';
+
+SELECT: 'SELECT';
+
+SENDKEYS: 'SENDKEYS';
+
+SET: 'SET';
+
+SETATTR: 'SETATTR';
+
+SHARED: 'SHARED';
+
+SINGLE: 'SINGLE';
+
+SPC: 'SPC';
+
+STATIC: 'STATIC';
+
+STEP: 'STEP';
+
+STOP: 'STOP';
+
+STRING: 'STRING';
+
+SUB: 'SUB';
+
+TAB: 'TAB';
+
+TEXT: 'TEXT';
+
+THEN: 'THEN';
+
+TIME: 'TIME';
+
+TO: 'TO';
+
+TRUE: 'TRUE';
+
+TYPE: 'TYPE';
+
+TYPEOF: 'TYPEOF';
+
+UNLOAD: 'UNLOAD';
+
+UNLOCK: 'UNLOCK';
+
+UNTIL: 'UNTIL';
+
+VARIANT: 'VARIANT';
+
+VERSION: 'VERSION';
+
+WEND: 'WEND';
+
+WHILE: 'WHILE';
+
+WIDTH: 'WIDTH';
+
+WITH: 'WITH';
+
+WITHEVENTS: 'WITHEVENTS';
+
+WRITE: 'WRITE';
+
+XOR: 'XOR';
+
+// symbols
+
+AMPERSAND: '&';
+
+ASSIGN: ':=';
+
+AT: '@';
+
+COLON: ':';
+
+COMMA: ',';
+
+IDIV : '\\';
+DIV  : '/';
+
+DOLLAR: '$';
+
+DOT: '.';
+
+EQ: '=';
+
+EXCLAMATIONMARK: '!';
+
+GEQ: '>=';
+
+GT: '>';
+
+HASH: '#';
+
+LEQ: '<=';
+
+LBRACE: '{';
+
+LPAREN: '(';
+
+LT: '<';
+
+MINUS: '-';
+
+MINUS_EQ: '-=';
+
+MULT: '*';
+
+NEQ: '<>';
+
+PERCENT: '%';
+
+PLUS: '+';
+
+PLUS_EQ: '+=';
+
+POW: '^';
+
+RBRACE: '}';
+
+RPAREN: ')';
+
+SEMICOLON: ';';
+
+L_SQUARE_BRACKET: '[';
+
+R_SQUARE_BRACKET: ']';
+
+// literals
+
+STRINGLITERAL: '"' (~ ["\r\n] | '""')* '"';
+
+DATELITERAL: HASH (~ [#\r\n])* HASH;
+
+COLORLITERAL: '&H' [0-9A-F]+ AMPERSAND?;
+
+INTEGERLITERAL: [0-9]+ ('E' INTEGERLITERAL)* ( HASH | AMPERSAND | EXCLAMATIONMARK | AT)?;
+
+DOUBLELITERAL:
+    [0-9]* DOT [0-9]+ ('E' (PLUS | MINUS)? [0-9]+)* (HASH | AMPERSAND | EXCLAMATIONMARK | AT)?
+;
+
+FILENUMBER: HASH LETTERORDIGIT+;
+
+OCTALLITERAL: '&O' [0-7]+ AMPERSAND?;
+
+// misc
+FRX_OFFSET: COLON [0-9A-F]+;
+
+GUID: LBRACE [0-9A-F]+ MINUS [0-9A-F]+ MINUS [0-9A-F]+ MINUS [0-9A-F]+ MINUS [0-9A-F]+ RBRACE;
+
+// identifier
+
+IDENTIFIER: LETTER LETTERORDIGIT*;
+
+// whitespace, line breaks, comments, ...
+
+LINE_CONTINUATION: ' ' '_' '\r'? '\n' -> skip;
+
+NEWLINE: WS? ('\r'? '\n' | COLON ' ') WS?;
+
+COMMENT: WS? ('\'' | COLON? REM ' ') ( LINE_CONTINUATION | ~ ('\n' | '\r'))* -> skip;
+
+WS: [ \t]+;
+
+// letters
+
+fragment LETTER: [A-Z_ÄÖÜÁÉÍÓÚÂÊÎÔÛÀÈÌÒÙÃẼĨÕŨÇ];
+
+fragment LETTERORDIGIT: [A-Z0-9_ÄÖÜÁÉÍÓÚÂÊÎÔÛÀÈÌÒÙÃẼĨÕŨÇ];

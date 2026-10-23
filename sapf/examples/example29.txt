@@ -1,0 +1,3 @@
+;;;; sweepy noise
+(3c 2X white) ((4 60 xmousex 0 lfsaw) 1.2 + (2h 8k xmousey) *) 2m lag .1 rlpf aa .3 0 2 combn + play
+

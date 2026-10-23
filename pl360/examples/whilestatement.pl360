@@ -1,0 +1,4 @@
+BEGIN
+   R1 := 0;
+   WHILE R1 < 10 DO R1 := R1 + 1;
+END.
