@@ -1,0 +1,21 @@
+digraph ATN {
+rankdir=LR;
+s743[fontsize=11, label="743", shape=doublecircle, fixedsize=true, width=.6];
+s4069[fontsize=11,label="4069", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s742[fontsize=11,label="742", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s4070[fontsize=11,label="4070", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s4071[fontsize=11,label="{&rarr;\n4071\nd=442|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s4072[fontsize=11,label="&larr;\n4072", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s4073[fontsize=11,label="4073", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s4074[fontsize=11,label="4074", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s4075[fontsize=11,label="4075", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s742 -> s4069 [fontname="Times-Italic", label="&epsilon;"];
+s4069 -> s4071 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'['", arrowhead = normal];
+s4071:p0 -> s4070 [fontname="Times-Italic", label="&epsilon;"];
+s4071:p1 -> s4072 [fontname="Times-Italic", label="&epsilon;"];
+s4070 -> s4072 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<attribute_target_specifier>", arrowhead = normal];
+s4072 -> s4073 [fontname="Times-Italic", label="&epsilon;"];
+s4073 -> s4074 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<attribute_list>", arrowhead = normal];
+s4074 -> s4075 [fontsize=11, fontname="Courier", arrowsize=.7, label = "']'", arrowhead = normal];
+s4075 -> s743 [fontname="Times-Italic", label="&epsilon;"];
+}

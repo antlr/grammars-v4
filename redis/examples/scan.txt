@@ -1,0 +1,1 @@
+SCAN 0 MATCH * COUNT 1 TYPE string

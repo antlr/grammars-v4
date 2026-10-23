@@ -33,256 +33,301 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 * http://fms.komkon.org/comp/CPUs/8080.txt
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar asm8080;
 
+options {
+    caseInsensitive = true;
+}
+
 prog
-   : (line? EOL) +
-   ;
+    : EOL* ((line EOL+)* line EOL*)? EOF
+    ;
 
 line
-   : lbl? (instruction | directive)? comment?
-   ;
+    : lbl? (instruction | directive | macrocall) ('!' (instruction | directive | macrocall)?)* comment?
+    | lbl comment?
+    | comment
+    ;
 
 instruction
-   : opcode expressionlist?
-   ;
+    : opcode expressionlist?
+    ;
+
+macrocall
+    : name expressionlist?
+    ;
 
 opcode
-   : OPCODE
-   ;
+    : OPCODE
+    ;
 
 register_
-   : REGISTER
-   ;
+    : REGISTER
+    ;
 
 directive
-   : argument? assemblerdirective expressionlist
-   ;
+    : argument? assemblerdirective expressionlist?
+    ;
 
 assemblerdirective
-   : ASSEMBLER_DIRECTIVE
-   ;
+    : ASSEMBLER_DIRECTIVE
+    ;
 
 lbl
-   : label ':'?
-   ;
+    : label ':'?
+    ;
 
 expressionlist
-   : expression (',' expression)*
-   ;
+    : expression (',' expression)*
+    ;
 
 label
-   : name
-   ;
+    : name
+    | register_
+    | assemblerdirective
+    ;
 
 expression
-   : multiplyingExpression (('+' | '-') multiplyingExpression)*
-   ;
+    : orExpression (('=' | '<>' | '<' | '>' | '<=' | '>=' | OP_GT | OP_LT | OP_GE | OP_LE | OP_NE | OP_EQ) orExpression)?
+    ;
+
+orExpression
+    : xorExpression (OP_OR xorExpression)*
+    ;
+
+xorExpression
+    : andExpression (OP_XOR andExpression)*
+    ;
+
+andExpression
+    : addExpression (OP_AND addExpression)*
+    ;
+
+addExpression
+    : shiftExpression (('+' | '-') shiftExpression)*
+    ;
+
+shiftExpression
+    : modExpression ((OP_SHL | OP_SHR) modExpression)*
+    ;
+
+modExpression
+    : multiplyingExpression (OP_MOD multiplyingExpression)*
+    ;
 
 multiplyingExpression
-   : argument (('*' | '/') argument)*
-   ;
+    : unaryExpression (('*' | '/') unaryExpression)*
+    ;
+
+unaryExpression
+    : OP_NOT unaryExpression
+    | OP_HIGH unaryExpression
+    | OP_LOW unaryExpression
+    | '-' unaryExpression
+    | '+' unaryExpression
+    | argument
+    ;
 
 argument
-   : number
-   | register_
-   | dollar
-   | name
-   | string_
-   | ('(' expression ')')
-   ;
+    : number
+    | opcode
+    | register_
+    | dollar
+    | name
+    | string_
+    | '(' expression ')'
+    ;
 
 dollar
-   : '$'
-   ;
+    : '$'
+    ;
 
 string_
-   : STRING
-   ;
+    : STRING
+    ;
 
 name
-   : NAME
-   ;
+    : NAME
+    ;
 
 number
-   : NUMBER
-   ;
+    : NUMBER
+    ;
 
 comment
-   : COMMENT
-   ;
-
+    : COMMENT
+    ;
 
 ASSEMBLER_DIRECTIVE
-   : (O R G) | (E N D) | (E Q U) | (D B) | (D W) | (D S) | (I F) | (E N D I F) | (S E T)
-   ;
+    : 'ORG'
+    | 'END'
+    | 'EQU'
+    | 'DB'
+    | 'DW'
+    | 'DS'
+    | 'IF'
+    | 'ELSE'
+    | 'ENDIF'
+    | 'SET'
+    | 'TITLE'
+    | '$TITLE'
+    | 'NAME'
+    | 'CSEG'
+    | 'DSEG'
+    | 'ASEG'
+    | 'PUBLIC'
+    | 'EXTRN'
+    | 'MACRO'
+    | 'ENDM'
+    | 'EXITM'
+    | 'REPT'
+    | 'MACLIB'
+    ;
 
+// Expression operators — defined before NAME so keywords take precedence over identifiers.
+// Longest-match still ensures e.g. SHLD, ORI, ANA are lexed as OPCODE, not SHL+D, OR+I, etc.
+
+OP_NOT : 'NOT' ;
+OP_HIGH: 'HIGH';
+OP_LOW : 'LOW' ;
+OP_AND : 'AND' ;
+OP_OR  : 'OR'  ;
+OP_XOR : 'XOR' ;
+OP_SHL : 'SHL' ;
+OP_SHR : 'SHR' ;
+OP_MOD : 'MOD' ;
+OP_GT  : 'GT'  ;
+OP_LT  : 'LT'  ;
+OP_GE  : 'GE'  ;
+OP_LE  : 'LE'  ;
+OP_NE  : 'NE'  ;
+OP_EQ  : 'EQ'  ;
 
 REGISTER
-   : 'A' | 'B' | 'C' | 'D' | 'E' | 'H' | 'L' | 'PC' | 'SP'
-   ;
-
+    : 'A'
+    | 'B'
+    | 'C'
+    | 'D'
+    | 'E'
+    | 'H'
+    | 'L'
+    | 'PC'
+    | 'SP'
+    ;
 
 OPCODE
-   : (M O V) | (M V I) | (L D A) | (S T A) | (L D A X) | (S T A X) | (L H L D) | (S H L D) | (L X I) | (P U S H) | (P O P) | (X T H L) | (S P H L) | (P C H L) | (X C H G) | (A D D) | (S U B) | (I N R) | (D C R) | (C M P) | (A N A) | (O R A) | (X R A) | (A D I) | (S U I) | (C P I) | (A N I) | (O R I) | (X R I) | (D A A) | (A D C) | (A C I) | (S B B) | (S B I) | (D A D) | (I N X) | (D C X) | (J M P) | (C A L L) | (R E T) | (R A L) | (R A R) | (R L C) | (R R C) | (I N) | (O U T) | (C M C) | (S T C) | (C M A) | (H L T) | (N O P) | (D I) | (E I) | (R S T) | (J N Z) | (J Z) | (J N C) | (J C) | (J P O) | (J P E) | (J P) | (J M) | (C N Z) | (C Z) | (C N C) | (C C) | (C P O) | (C P E) | (C P) | (C M) | (R N Z) | (R Z) | (R N C) | (R C) | (R P O) | (R P E) | (R P) | (R M)
-   ;
+    : 'MOV'
+    | 'MVI'
+    | 'LDA'
+    | 'STA'
+    | 'LDAX'
+    | 'STAX'
+    | 'LHLD'
+    | 'SHLD'
+    | 'LXI'
+    | 'PUSH'
+    | 'POP'
+    | 'XTHL'
+    | 'SPHL'
+    | 'PCHL'
+    | 'XCHG'
+    | 'ADD'
+    | 'SUB'
+    | 'INR'
+    | 'DCR'
+    | 'CMP'
+    | 'ANA'
+    | 'ORA'
+    | 'XRA'
+    | 'ADI'
+    | 'SUI'
+    | 'CPI'
+    | 'ANI'
+    | 'ORI'
+    | 'XRI'
+    | 'DAA'
+    | 'ADC'
+    | 'ACI'
+    | 'SBB'
+    | 'SBI'
+    | 'DAD'
+    | 'INX'
+    | 'DCX'
+    | 'JMP'
+    | 'CALL'
+    | 'RET'
+    | 'RAL'
+    | 'RAR'
+    | 'RLC'
+    | 'RRC'
+    | 'IN'
+    | 'OUT'
+    | 'CMC'
+    | 'STC'
+    | 'CMA'
+    | 'HLT'
+    | 'NOP'
+    | 'DI'
+    | 'EI'
+    | 'RST'
+    | 'JNZ'
+    | 'JZ'
+    | 'JNC'
+    | 'JC'
+    | 'JPO'
+    | 'JPE'
+    | 'JP'
+    | 'JM'
+    | 'CNZ'
+    | 'CZ'
+    | 'CNC'
+    | 'CC'
+    | 'CPO'
+    | 'CPE'
+    | 'CP'
+    | 'CM'
+    | 'RNZ'
+    | 'RZ'
+    | 'RNC'
+    | 'RC'
+    | 'RPO'
+    | 'RPE'
+    | 'RP'
+    | 'RM'
+    ;
 
-
-fragment A
-   : ('a' | 'A')
-   ;
-
-
-fragment B
-   : ('b' | 'B')
-   ;
-
-
-fragment C
-   : ('c' | 'C')
-   ;
-
-
-fragment D
-   : ('d' | 'D')
-   ;
-
-
-fragment E
-   : ('e' | 'E')
-   ;
-
-
-fragment F
-   : ('f' | 'F')
-   ;
-
-
-fragment G
-   : ('g' | 'G')
-   ;
-
-
-fragment H
-   : ('h' | 'H')
-   ;
-
-
-fragment I
-   : ('i' | 'I')
-   ;
-
-
-fragment J
-   : ('j' | 'J')
-   ;
-
-
-fragment K
-   : ('k' | 'K')
-   ;
-
-
-fragment L
-   : ('l' | 'L')
-   ;
-
-
-fragment M
-   : ('m' | 'M')
-   ;
-
-
-fragment N
-   : ('n' | 'N')
-   ;
-
-
-fragment O
-   : ('o' | 'O')
-   ;
-
-
-fragment P
-   : ('p' | 'P')
-   ;
-
-
-fragment Q
-   : ('q' | 'Q')
-   ;
-
-
-fragment R
-   : ('r' | 'R')
-   ;
-
-
-fragment S
-   : ('s' | 'S')
-   ;
-
-
-fragment T
-   : ('t' | 'T')
-   ;
-
-
-fragment U
-   : ('u' | 'U')
-   ;
-
-
-fragment V
-   : ('v' | 'V')
-   ;
-
-
-fragment W
-   : ('w' | 'W')
-   ;
-
-
-fragment X
-   : ('x' | 'X')
-   ;
-
-
-fragment Y
-   : ('y' | 'Y')
-   ;
-
-
-fragment Z
-   : ('z' | 'Z')
-   ;
-
+// Names may start with a letter or '?' (for PL/I-style external symbols like ?bdos).
+// '$' is allowed internally (e.g. sta$ret, rsx$chain) but not as the first character,
+// which keeps standalone '$' (current-address) unambiguous.
 
 NAME
-   : [a-zA-Z] [a-zA-Z0-9."]*
-   ;
-
+    : [A-Z?@] [A-Z0-9.$?@"]*
+    ;
 
 NUMBER
-   : '$'? [0-9a-fA-F] + ('H' | 'h')?
-   ;
-
+    : '$'? [0-9A-F] [0-9A-F$]* 'H'?
+    ;
 
 COMMENT
-   : ';' ~ [\r\n]* -> skip
-   ;
-
+    : ';' ~ [\r\n]*
+    | '*' '*'+ ~ [\r\n]*
+    ;
 
 STRING
-   : '\u0027' ~'\u0027'* '\u0027'
-   ;
-
+    : '\u0027' ('\u0027\u0027' | ~'\u0027')* '\u0027'
+    ;
 
 EOL
-   : [\r\n] +
-   ;
-
+    : [\r\n]+
+    ;
 
 WS
-   : [ \t] -> skip
-   ;
+    : [ \t] -> skip
+    ;
+
+ARTIFACT
+    : [\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\uffff] -> skip
+    ;

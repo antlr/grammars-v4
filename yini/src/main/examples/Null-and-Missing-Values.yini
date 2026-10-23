@@ -1,0 +1,6 @@
+^ SettingsWithNulls
+
+AppMode = NULL
+Language =
+Timeout = 30
+MaxConnections = 100

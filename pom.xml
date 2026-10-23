@@ -8,11 +8,21 @@
 	<name>ANTLR4 grammars</name>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.target>1.7</maven.compiler.target>
-		<maven.compiler.source>1.7</maven.compiler.source>
-		<antlr.version>4.9.3</antlr.version>
-		<antlr4test-maven-plugin.version>1.19</antlr4test-maven-plugin.version>
+		<maven.compiler.target>11</maven.compiler.target>
+		<maven.compiler.source>11</maven.compiler.source>
+
+		<!-- The Antlr tool version is specified with
+		antlr.version. The Antlr runtime is tied to the
+		version of antlr4test-maven-plugin.version. When Antlr
+		is release, the plugin has to be updated. -->
+		<antlr4test-maven-plugin.version>1.22</antlr4test-maven-plugin.version>
+		<antlr.version>4.13.2</antlr.version>
+
 		<junit.version>4.13.2</junit.version>
+
+        <packageName>org.antlr.grammars.${project.artifactId}</packageName>
+        <packagePath>org/antlr/grammars/${project.artifactId}</packagePath>
+        <packageLine>package ${packageName};</packageLine>
 	</properties>
 	<prerequisites>
 		<maven>3.1.0</maven>
@@ -46,16 +56,63 @@
 			<version>${junit.version}</version>
 		</dependency>
 	</dependencies>
+
 	<build>
 		<pluginManagement>
 			<plugins>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.8.1</version>
+					<version>3.16.0</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
+        <plugins>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/generated-sources/copy/${packagePath}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/Java</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                            <delimiters>
+                                <delimiter>///{*}</delimiter>
+                            </delimiters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.6.2</version>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${basedir}/target/generated-sources/copy/${packagePath}</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
 	</build>
 	<profiles>
 		<profile>
@@ -65,74 +122,109 @@
 			<id>grammarv4</id>
 			<modules>
 				<module>abb</module>
+                <module>abc</module>
 				<module>abnf</module>
 				<module>acme</module>
-				<module>agc</module>
+                <module>action</module>
+				<module>ada</module>
 				<module>alef</module>
+                <module>alf</module>
 				<module>algol60</module>
 				<module>alloy</module>
 				<module>alpaca</module>
+                <module>alpherd</module>
+                <module>amazon-states-language</module>
+                <module>amazon-states-language-intrinsic-functions</module>
 				<module>angelscript</module>
 				<module>antlr</module>
 				<module>apex</module>
+                <module>apl</module>
 				<module>apt</module>
-                <module>argus</module>
+				<module>aql</module>
+                <module>arden</module>
+				<module>argus</module>
 				<module>arithmetic</module>
 				<module>asl</module>
 				<module>asm</module>
 				<module>asn</module>
 				<!-- AspectJ requires the Java grammar which is not on the AspectJ tree -->
 				<!-- <module>aspectj</module> -->
+                <module>aterm</module>
 				<module>atl</module>
+                <module>autocode</module>
 				<module>b</module>
 				<module>basic</module>
+				<module>bcl</module>
 				<module>bcpl</module>
-                <module>bdf</module>
+				<module>bdf</module>
+				<module>bencoding</module>
 				<module>bibcode</module>
+				<module>bicep</module>
+                <module>bison</module>
+                <module>bliss</module>
+                <module>blueprint</module>
+                <module>bms</module>
 				<module>bnf</module>
-				<module>brainfuck</module>
-				<module>brainflak</module>
 				<module>c</module>
 				<module>calculator</module>
 				<module>callable</module>
 				<module>capnproto</module>
+				<module>caql</module>
+				<module>cayenne</module>
+                <module>chip8</module>
+                <module>chip8octo</module>
 				<module>clf</module>
 				<module>clojure</module>
 				<module>clu</module>
 				<module>cmake</module>
 				<module>cobol85</module>
+				<module>codeql</module>
 				<module>cookie</module>
-				<module>cool</module>
+				<module>corundum</module>
 				<module>cpp</module>
 				<module>cql</module>
 				<module>cql3</module>
 				<module>creole</module>
-				<module>csharp</module>
+                <module>croc</module>
+				<module>csharp/v6</module>
+				<module>csharp/v7</module>
 				<module>css3</module>
 				<module>csv</module>
 				<module>ctl</module>
 				<module>cto</module>
+				<module>cypher</module>
+                <module>d2</module>
 				<module>dart2</module>
 				<module>databank</module>
+				<module>datalog</module>
 				<module>dcm</module>
-				<module>dgol</module>
 				<module>dice</module>
-                <module>dif</module>
+				<module>dif</module>
 				<module>doiurl</module>
 				<module>dot</module>
 				<module>edif300</module>
 				<module>edn</module>
+                                <module>eiffel</module>
+				<module>elixir</module>
 				<module>erlang</module>
+				<module>esolang</module>
+				<module>evm-bytecode</module>
+                <module>fantom</module>
 				<module>fasta</module>
+				<module>fdo91</module>
 				<module>fen</module>
 				<module>flatbuffers</module>
+				<module>flowmatic</module>
 				<module>focal</module>
 				<module>fol</module>
-				<module>fortran77</module>
+				<module>fortran</module>
 				<module>fusion-tables</module>
 				<module>gdscript</module>
 				<module>gedcom</module>
+                <module>geekcode</module>
 				<module>gff3</module>
+				<module>gql</module>
+				<module>glsl</module>
 				<module>gml</module>
 				<module>golang</module>
 				<module>graphql</module>
@@ -140,9 +232,12 @@
 				<module>gtin</module>
 				<module>guido</module>
 				<module>guitartab</module>
+                <module>hals</module>
 				<module>haskell</module>
+				<module>hexpat</module>
 				<module>html</module>
 				<module>http</module>
+                <module>hume</module>
 				<module>hypertalk</module>
 				<module>icalendar</module>
 				<module>icon</module>
@@ -153,9 +248,12 @@
 				<module>iri</module>
 				<module>iso8601</module>
 				<module>istc</module>
-                <module>itn</module>
+				<module>itn</module>
+                <module>ixml</module>
+				<module>jam</module>
 				<module>janus</module>
 				<module>java</module>
+				<module>javacc</module>
 				<module>javadoc</module>
 				<module>javascript</module>
 				<module>joss</module>
@@ -166,18 +264,23 @@
 				<module>kirikiri-tjs</module>
 				<module>kotlin</module>
 				<module>kuka</module>
+				<module>kquery</module>
 				<module>lambda</module>
 				<module>lark</module>
+                <module>lazyk</module>
 				<module>lcc</module>
 				<module>less</module>
+                <module>lil</module>
 				<module>limbo</module>
 				<module>lisa</module>
+                <module>lisp</module>
 				<module>logo</module>
-				<module>lolcode</module>
-				<module>loop</module>
 				<module>lpc</module>
+				<module>lrc</module>
 				<module>ltl</module>
 				<module>lua</module>
+				<module>lucene</module>
+				<module>maml</module>
 				<module>matlab</module>
 				<module>mckeeman-form</module>
 				<module>mdx</module>
@@ -185,56 +288,73 @@
 				<module>metamath</module>
 				<module>metric</module>
 				<module>microc</module>
+				<module>miniscript</module>
+                <module>miranda</module>
+                <module>mizar</module>
 				<module>modelica</module>
 				<module>modula2pim4</module>
 				<module>molecule</module>
 				<module>moo</module>
 				<module>morsecode</module>
-				<module>powerquery</module>
 				<module>mps</module>
 				<module>muddb</module>
 				<module>mumath</module>
 				<module>mumps</module>
 				<module>muparser</module>
-				<module>nanofuck</module>
 				<module>newick</module>
 				<module>oberon</module>
+                <module>odin</module>
+                <module>orc</module>
 				<!-- <module>objc</module> -->
 				<module>oncrpc</module>
+                <module>otc</module>
 				<module>orwell</module>
 				<module>p</module>
 				<module>parkingsign</module>
 				<module>pascal</module>
+				<module>pbm</module>
 				<module>pcre</module>
 				<module>pddl</module>
 				<module>pdn</module>
 				<module>peoplecode</module>
+				<module>pf</module>
+				<module>pegen</module>
 				<module>pgn</module>
 				<module>php</module>
 				<module>pii</module>
 				<!-- <module>pike</module> -->
+				<module>plantUML</module>
+                <module>plm</module>
 				<module>pl0</module>
+                <module>pl1</module>
+                <module>pl360</module>
 				<module>plucid</module>
+                <module>plus</module>
 				<module>ply</module>
 				<module>pmmn</module>
 				<module>postalcode</module>
 				<module>powerbuilder</module>
+				<module>powerquery</module>
 				<module>prolog</module>
 				<module>promql</module>
 				<module>propcalc</module>
 				<module>properties</module>
-				<module>protobuf3</module>
+				<module>protobuf</module>
 				<module>prov-n</module>
 				<module>python</module>
+				<module>qif</module>
 				<module>quakemap</module>
 				<module>r</module>
 				<module>racket-bsl</module>
 				<module>racket-isl</module>
+                <module>rapid</module>
 				<module>rcs</module>
+                <module>reaper</module>
 				<module>redcode</module>
 				<module>refal</module>
 				<module>rego</module>
 				<module>restructuredtext</module>
+				<module>rex</module>
 				<module>rexx</module>
 				<module>rfc822</module>
 				<module>rfc1035</module>
@@ -242,32 +362,44 @@
 				<module>rfc3080</module>
 				<module>robotwars</module>
 				<module>romannumerals</module>
+				<module>ron</module>
 				<module>rpn</module>
-				<module>ruby</module>
 				<module>rust</module>
-				<module>scala</module>
+                <module>sapf</module>
+                <module>sasl</module>
+                <module>scala/scala2</module>
+				<module>scala/scala3</module>
 				<module>scotty</module>
 				<module>scss</module>
+				<module>semver</module>
 				<module>sexpression</module>
 				<module>sgf</module>
 				<module>sharc</module>
 				<module>sici</module>
-				<module>sickbay</module>
 				<module>sieve</module>
+                <module>simula</module>
+                <module>small</module>
 				<module>smalltalk</module>
 				<module>smiles</module>
 				<module>smtlibv2</module>
 				<module>snobol</module>
-				<module>snowball</module>
 				<module>solidity</module>
 				<module>sparql</module>
-				<module>sql</module>
+				<module>spass</module>
+                <module>spk</module>
+                <module>spl</module>
+                <module>squeak</module>
+                <module>sql</module>
+                <module>squirrel</module>
 				<module>stacktrace</module>
+				<module>star</module>
 				<module>stellaris</module>
 				<module>stringtemplate</module>
 				<module>suokif</module>
 				<module>swift</module>
 				<module>swift-fin</module>
+				<module>sysml-v2</module>
+				<module>szf</module>
 				<module>tcpheader</module>
 				<module>telephone</module>
 				<module>terraform</module>
@@ -287,6 +419,8 @@
 				<module>turtle</module>
 				<module>turtle-doc</module>
 				<module>unicode</module>
+                <module>unlambda</module>
+                <module>unreal_angelscript</module>
 				<module>upnp</module>
 				<module>url</module>
 				<module>useragent</module>
@@ -295,19 +429,28 @@
 				<module>vba</module>
 				<module>velocity</module>
 				<module>verilog</module>
-				<module>vhdl</module>
+				<module>vhdl/vhdl</module>
+				<module>vhdl/vhdl2008</module>
 				<module>vmf</module>
 				<module>wat</module>
 				<module>wavefront</module>
 				<module>webidl</module>
 				<module>wkt</module>
+				<module>wkt-crs-v1</module>
 				<module>wln</module>
+				<module>wren</module>
 				<module>xml</module>
-				<module>xpath</module>
+				<module>xpath/xpath1</module>
+				<module>xpath/xpath20</module>
+				<module>xpath/xpath31</module>
+				<module>xpath/xpath4</module>
 				<module>xsd-regex</module>
+				<module>xyz</module>
+				<module>yara</module>
+				<module>yini</module>
 				<module>z</module>
-				<!-- testing repository -->
-				<!--<module>grammar-test</module> -->
+				<module>zig</module>
+				<module>xquery/xquery4</module>
 			</modules>
 		</profile>
 		<profile>
@@ -315,27 +458,9 @@
 			<build>
 				<plugins>
 					<plugin>
-						<artifactId>maven-assembly-plugin</artifactId>
-						<version>3.3.0</version>
-						<configuration>
-							<descriptors>
-								<descriptor>${maven.multiModuleProjectDirectory}/assembly.xml</descriptor>
-							</descriptors>
-						</configuration>
-						<executions>
-							<execution>
-								<id>make-assembly</id>
-								<phase>package</phase>
-								<goals>
-									<goal>single</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
 						<groupId>org.sonatype.plugins</groupId>
 						<artifactId>nexus-staging-maven-plugin</artifactId>
-						<version>1.6.8</version>
+						<version>1.7.0</version>
 						<extensions>true</extensions>
 						<configuration>
 							<serverId>ossrh</serverId>
@@ -346,7 +471,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-source-plugin</artifactId>
-						<version>3.2.1</version>
+						<version>3.4.0</version>
 						<executions>
 							<execution>
 								<id>attach-sources</id>
@@ -359,7 +484,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>3.3.1	</version>
+						<version>3.12.0</version>
 						<executions>
 							<execution>
 								<id>attach-javadocs</id>
@@ -375,7 +500,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-gpg-plugin</artifactId>
-						<version>3.0.1</version>
+						<version>3.2.8</version>
 						<executions>
 							<execution>
 								<id>sign-artifacts</id>
@@ -388,15 +513,6 @@
 					</plugin>
 				</plugins>
 			</build>
-		</profile>
-		<profile>
-			<id>test</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-			<modules>
-				<module>_grammar-test</module>
-			</modules>
 		</profile>
 	</profiles>
 	<distributionManagement>

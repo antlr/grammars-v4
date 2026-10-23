@@ -1,0 +1,128 @@
+-- BA140030.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--    The ACAA has created and maintains the Ada Conformity Assessment Test
+--    Suite for the purpose of conformity assessments conducted in accordance
+--    with the International Standard ISO/IEC 18009 - Ada: Conformity
+--    assessment of a language processor. This test suite should not be used
+--    to make claims of conformance unless used in accordance with
+--    ISO/IEC 18009 and any applicable ACAA procedures.
+--
+--*
+--
+-- OBJECTIVE:
+--    Check that a compilation unit is illegal if it semantically depends
+--    on two versions of the same unit.
+--    Case P1: The main subprogram cannot depend on two versions of a unit
+--    referenced through private withs on a library package
+--    specification and on the main subprogram.
+--
+-- TEST DESCRIPTION:
+--
+--    This test is intended to emulate the following development steps:
+--
+--    A package is built (BA14003_1), then used in the private part of
+--    another package (BA14003_2). These are compiled and used in a unit
+--    test (BA140032).
+--
+--    Later, the original package (BA14003_1) is modified, adding and removing
+--    declarations, and recompiled. Making modifications to the
+--    secondary package (BA14003_2) is forgotten. The unit test is updated
+--    for the modified package while still containing the tests for the second
+--    package. The unit test should fail to compile.
+--
+-- TEST FILES:
+--      This test consists of the following files:
+--      -> BA140030.A
+--         BA140031.A
+--         BA140032.AM
+--
+-- PASS/FAIL CRITERIA:
+--      Test file BA140032.AM contains an error. This error must be detected.
+--      Test files BA140030.A and BA140031.A must be compiled in sequence,
+--      and should not contain errors.
+--
+-- CHANGE HISTORY:
+--    15 Feb 2018  RLB  Created test based on ideas from the legacy test
+--                      BA3006B.
+--    14 Mar 2018  RLB  Fixed errors in Test Description.
+--
+--!
+
+package BA14003_1 is
+   Max_Size : constant Natural := 100;
+   Unused : constant Natural := 12;
+end BA14003_1;
+
+---
+
+private with BA14003_1;
+package BA14003_2 is
+   type Data is private;
+
+   No_Data : constant Data;
+
+   procedure Munge_Data (D : in out Data; I : Natural);
+
+   function Get_Data (D : in Data; I : Natural) return Natural;
+
+private
+   type Data is array (1..BA14003_1.Max_Size) of Natural;
+   No_Data : constant Data := (others => BA14003_1.Unused);
+end BA14003_2;
+
+---
+
+package body BA14003_2 is
+   procedure Munge_Data (D : in out Data; I : Natural) is
+   begin
+      D(I) := D(I) * 2 + 1;
+   end Munge_Data;
+
+   function Get_Data (D : in Data; I : Natural) return Natural is
+   begin
+      return D(I);
+   end Get_Data;
+end BA14003_2;
+
+---
+
+private with BA14003_1, BA14003_2;
+procedure BA140032 is
+   D : BA14003_2.Data;
+begin
+   for I in 1 .. BA14003_1.Max_Size loop
+      if BA14003_2.Get_Data(D, I) /= BA14003_1.Unused then
+          null; -- Failed message goes here.
+      end if;
+   end loop;
+   BA14003_2.Munge_Data(D, 4);
+   BA14003_2.Munge_Data(D, 4);
+   if BA14003_2.Get_Data(D, 4) /= 3 then
+      null; -- Failed message goes here.
+   end if;
+end BA140032;
+

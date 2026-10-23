@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>asm6502</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com 6502 ASM grammar</name>
+	<name>ASM 6502 grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>asmparent</artifactId>
@@ -40,7 +40,6 @@
 					<showTree>false</showTree>
 					<entryPoint>prog</entryPoint>
 					<grammarName>asm6502</grammarName>
-					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
 				<executions>

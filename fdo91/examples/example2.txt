@@ -1,0 +1,23 @@
+atom$uni_start_stream
+
+atom$man_set_context_globalid <GID>
+
+atom$man_is_rendered
+
+atom$if_last_return_true_then 1
+
+atom$man_clear_relative <RID> #RID is the relative ID of the field.
+
+atom$uni_sync_skip 1
+
+atom$man_set_context_relative <RID>
+
+# Anything the server needs to do to prep the fields goes here.
+
+atom$man_append_data
+
+atom$man_end_context
+
+atom$man_end_context
+
+atom$uni_end_stream
