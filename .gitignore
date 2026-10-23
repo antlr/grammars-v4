@@ -4,6 +4,7 @@
 /**/.settings/
 /**/target
 /**/bin
+/**/*.bak?
 
 # Visual Studio Generated
 .antlr
