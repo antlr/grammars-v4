@@ -44,7 +44,7 @@ macro
    ;
 
 procedure
-   : 'procedure' name '(' (pVarDecl (',' pVarDecl)*)? ')' pVarDecls? compoundStmt ';'?
+   : 'procedure' name '(' (pVarDecl (',' pVarDecl)*)? ')' localVarDecls? compoundStmt ';'?
    ;
 
 process
@@ -59,7 +59,7 @@ varDecl
    : variable ((EQ | IN) expr)? (';' | ',')
    ;
 
-pVarDecls
+localVarDecls
    : ('variable' | 'variables') (pVarDecl (';' | ','))+
    ;
 
@@ -157,7 +157,7 @@ expr
    ;
 
 atom
-   : bool
+   : boolLiteral
    | numb
    | name
    ;
@@ -166,7 +166,7 @@ numb
    : DIGIT+
    ;
 
-bool
+boolLiteral
    : 'TRUE'
    | 'FALSE'
    ;
