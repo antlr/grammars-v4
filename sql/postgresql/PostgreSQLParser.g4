@@ -5461,9 +5461,9 @@ any_identifier
     ;
 
 identifier
-    : Identifier uescape_?
+    : Identifier
     | QuotedIdentifier
-    | UnicodeQuotedIdentifier
+    | UnicodeQuotedIdentifier uescape_?
     | PLSQLVARIABLENAME
     ;
 

@@ -17,7 +17,7 @@ jobs:
       mymatrix: ${{ steps.step1.outputs.myoutput }}
     steps:
     - name: Checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         fetch-depth: 0
     - name: Test Dotnet
@@ -60,7 +60,7 @@ jobs:
         if [ -f /proc/cpuinfo ]; then cat /proc/cpuinfo; fi
         export
     - name: Checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         fetch-depth: 0
     - name: Test Dotnet
@@ -70,7 +70,7 @@ jobs:
         dotnet --list-runtimes
         dotnet --list-sdks
     - name: Install Java
-      uses: actions/setup-java@v5
+      uses: actions/setup-java@v6.1.0
       with:
         java-version: '11'
         distribution: 'zulu'
@@ -81,14 +81,14 @@ jobs:
         javac --version
     - name: Install Dart
       if: ${{ matrix.language == 'Dart' }}
-      uses: dart-lang/setup-dart@v1
+      uses: dart-lang/setup-dart@v1.8.1
     - name: Test Dart
       if: ${{ matrix.language == 'Dart' }}
       run: |
         dart --version
     - name: Install Go
       if: ${{ matrix.language == 'Go' }}
-      uses: actions/setup-go@v6
+      uses: actions/setup-go@v7
       with:
         go-version: '^1.21.0'
         cache: false
@@ -97,7 +97,7 @@ jobs:
       run: |
         go version
     - name: Install Python
-      uses: actions/setup-python@v6.2.0
+      uses: actions/setup-python@v7.0.0
       with:
         python-version: '3.10'
     - name: Test Python
@@ -111,9 +111,10 @@ jobs:
         pip --version
     - name: Install Antlr tool
       run: |
-         pip install antlr4-tools
+         pip install _scripts/antlr4-tools
+         pip show antlr4-tools
     - name: Install JavaScript
-      uses: actions/setup-node@v6.2.0
+      uses: actions/setup-node@v7.1.0
       with:
         node-version: '22.12.0'
     - name: Test JavaScript
@@ -139,7 +140,7 @@ jobs:
     - name: Test Trash install
       shell: bash
       run: |
-        dotnet trgen --help
+        dotnet trash --help
     - name: Install Antlr-ng
       shell: pwsh
       run: |
@@ -152,6 +153,17 @@ jobs:
         npm run build
     - name: Test Rust
       run: rustup --version
+    - name: Cache antlr4-rust-gen
+      id: cache-antlr4-rust-gen
+      uses: actions/cache@v6
+      with:
+        path: ~/.cargo/bin/antlr4-rust-gen
+        key: antlr4-rust-gen-v0.33.1-${{ runner.os }}-${{ runner.arch }}
+    - name: Install antlr4-rust-gen
+      if: steps.cache-antlr4-rust-gen.outputs.cache-hit != 'true'
+      run: |
+        git clone --depth 1 --branch v0.33.1 https://github.com/ophi-dev/antlr-rust-runtime /tmp/antlr-rust-runtime
+        cargo install --locked --path /tmp/antlr-rust-runtime/crates/antlr-rust-codegen --bin antlr4-rust-gen
     - name: Test
       shell: pwsh
       run: |
@@ -175,7 +187,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         fetch-depth: 0
     - name: Check for stale links
@@ -206,7 +218,7 @@ jobs:
         uname -a
         if [ -f /proc/cpuinfo ]; then cat /proc/cpuinfo; fi
     - name: Checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         fetch-depth: 0
     - name: Test Dotnet
@@ -216,7 +228,7 @@ jobs:
         dotnet --list-runtimes
         dotnet --list-sdks
     - name: Install Java
-      uses: actions/setup-java@v5
+      uses: actions/setup-java@v6.1.0
       with:
         java-version: '11'
         distribution: 'zulu'
@@ -226,7 +238,7 @@ jobs:
         java --version
         javac --version
     - name: Install Python
-      uses: actions/setup-python@v6.2.0
+      uses: actions/setup-python@v7.0.0
       with:
         python-version: '3.10'
     - name: Test Python
@@ -240,7 +252,8 @@ jobs:
         pip --version
     - name: Install Antlr tool
       run: |
-         pip install antlr4-tools
+         pip install _scripts/antlr4-tools
+         pip show antlr4-tools
     - name: Install Trash
       shell: bash
       run: |
@@ -248,9 +261,7 @@ jobs:
     - name: Test Trash install
       shell: bash
       run: |
-        dotnet trgen --help
-    - name: Test Rust
-      run: rustup --version
+        dotnet trash --help
     - name: Test
       shell: bash
       run: |
@@ -270,11 +281,11 @@ jobs:
       matrix:
         os: [ ubuntu-latest]
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
       with:
         fetch-depth: 0
     - name: Set up JDK
-      uses: actions/setup-java@v5
+      uses: actions/setup-java@v6.1.0
       with:
         distribution: 'zulu'
         java-version: '17'

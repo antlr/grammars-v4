@@ -1,4 +1,4 @@
-# An ANTLR4 grammar for Cockroach Database
+# CockroachDB Grammar
 
 https://www.cockroachlabs.com/docs/stable/sql-grammar
 

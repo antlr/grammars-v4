@@ -80,10 +80,28 @@ Alignof
     | '__alignof'
     ;
 
-Asm
+Maxof
+    : '_Maxof' //GNU
+    ;
+
+Minof
+    : '_Minof' //GNU
+    ;
+
+Countof
+    : '_Countof' //GNU
+    ;
+
+Asm_1
     : 'asm'
-    | '__asm'
-    | '__asm__'
+    ;
+
+Asm_2
+    : '__asm'
+    ;
+
+Asm_3
+    : '__asm__'
     ;
 
 Auto
@@ -147,7 +165,7 @@ Extern
     : 'extern'
     ;
 
-False
+False_
     : 'false'
     ;
 
@@ -185,7 +203,7 @@ Long
     : 'long'
     ;
 
-Nulptr
+Nullptr_
     : 'nullptr'
     ;
 
@@ -231,7 +249,7 @@ Switch
     : 'switch'
     ;
 
-True
+True_
     : 'true'
     ;
 
@@ -246,8 +264,8 @@ Typeof
     ;
 
 Typeof_unqual
-    : 'typeof_unequal'
-    | '__typeof_unequal__' //GNU
+    : 'typeof_unqual'
+    | '__typeof_unqual__' //GNU
     ;
 
 Union
@@ -262,9 +280,12 @@ Void
     : 'void'
     ;
 
-Volatile
+Volatile_1
     : 'volatile'
-    | '__volatile__'
+    ;
+
+Volatile_2
+    : '__volatile__'
     ;
 
 While

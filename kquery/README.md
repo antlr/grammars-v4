@@ -1,4 +1,4 @@
-## KLEE KQuery Grammar
+# KLEE KQuery Grammar
 
 ANTLRv4 Grammar file for KLEE KQuery expressions.
 

@@ -76,8 +76,18 @@ alter_table_stmt
             TO_ new_table_name = table_name
             | COLUMN_? old_column_name = column_name TO_ new_column_name = column_name
         )
-        | ADD_ COLUMN_? column_def
-        | DROP_ COLUMN_? column_name
+        | ADD_ (
+        	COLUMN_? column_def
+       		| (CONSTRAINT_ name)? CHECK_ (expr) conflict_clause?
+        )
+        | DROP_ (
+        	COLUMN_? column_name
+        	| CONSTRAINT_ name
+        )
+        | ALTER_ COLUMN_? column_name (
+        	(SET_ NOT_ NULL_ conflict_clause?)
+        	| (DROP_ NOT_ NULL_)
+       	)
     )
 ;
 
@@ -238,7 +248,8 @@ drop_stmt
 expr
     : literal_value
     | BIND_PARAMETER
-    | ((schema_name DOT)? table_name DOT)? column_name
+    | (schema_name DOT)? table_name DOT column_name
+    | column_name_excluding_string
     | (MINUS | PLUS | TILDE) expr
     | expr COLLATE_ collation_name
     | expr (PIPE2 | JPTR | JPTR2) expr
@@ -254,31 +265,22 @@ expr
         | (schema_name DOT)? table_name
         | (schema_name DOT)? table_function_name OPEN_PAR (expr (COMMA expr)*)? CLOSE_PAR
     )
-    | expr NOT_? ((LIKE_ expr (ESCAPE_ expr)?) | (GLOB_ | REGEXP_ | MATCH_) expr)
+    | expr NOT_? (LIKE_ expr (ESCAPE_ expr)? | (GLOB_ | REGEXP_ | MATCH_) expr)
     | expr (ISNULL_ | NOTNULL_ | NOT_ NULL_)
     | NOT_ expr
     | expr AND_ expr
     | expr OR_ expr
-    | function_name OPEN_PAR ((DISTINCT_? expr (COMMA expr)* order_clause?) | STAR)? CLOSE_PAR filter_clause? over_clause?
+    | function_name OPEN_PAR (DISTINCT_? expr (COMMA expr)* order_clause? | STAR)? CLOSE_PAR percentile_clause? filter_clause? over_clause?
     | OPEN_PAR expr (COMMA expr)* CLOSE_PAR
     | CAST_ OPEN_PAR expr AS_ type_name CLOSE_PAR
-    | ((NOT_)? EXISTS_)? OPEN_PAR select_stmt CLOSE_PAR
+    | (NOT_? EXISTS_)? OPEN_PAR select_stmt CLOSE_PAR
     | CASE_ expr? (WHEN_ expr THEN_ expr)+ (ELSE_ expr)? END_
     | raise_function
 ;
 */
 
 expr
-    : expr_recursive
-;
-
-expr_recursive
-    : function_name OPEN_PAR (DISTINCT_? expr (COMMA expr)* order_clause? | STAR)? CLOSE_PAR percentile_clause? filter_clause?
-        over_clause?
-    | OPEN_PAR expr (COMMA expr)* CLOSE_PAR
-    | CAST_ OPEN_PAR expr AS_ type_name CLOSE_PAR
-    | CASE_ expr? (WHEN_ expr THEN_ expr)+ (ELSE_ expr)? END_
-    | expr_or
+    : expr_or
 ;
 
 expr_or
@@ -350,6 +352,15 @@ expr_base
     | column_name_excluding_string
     | (NOT_? EXISTS_)? OPEN_PAR select_stmt CLOSE_PAR
     | raise_function
+    | expr_recursive
+;
+
+expr_recursive
+    : function_name OPEN_PAR (DISTINCT_? expr (COMMA expr)* order_clause? | STAR)? CLOSE_PAR percentile_clause? filter_clause?
+        over_clause?
+    | OPEN_PAR expr (COMMA expr)* CLOSE_PAR
+    | CAST_ OPEN_PAR expr AS_ type_name CLOSE_PAR
+    | CASE_ expr? (WHEN_ expr THEN_ expr)+ (ELSE_ expr)? END_
 ;
 
 raise_function

@@ -18,8 +18,8 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
-					   <include>EiffelParser.g4</include>
-					   <include>EiffelLexer.g4</include>
+						<include>EiffelParser.g4</include>
+						<include>EiffelLexer.g4</include>
 					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
@@ -43,6 +43,7 @@
 					<grammarName>Eiffel</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
+					<testFileExtension>.e</testFileExtension>
 				</configuration>
 				<executions>
 					<execution>

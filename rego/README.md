@@ -1,4 +1,4 @@
-#Rego Grammar
+# Rego Grammar
 
 Dual licensed under 3-Clause BSD, and MIT.
 

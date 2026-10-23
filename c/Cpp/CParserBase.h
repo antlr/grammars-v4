@@ -19,25 +19,30 @@ public:
     CParserBase(antlr4::TokenStream *input);
 
     // Semantic predicate methods called from grammar actions
-    bool IsAlignmentSpecifier();
-    bool IsAtomicTypeSpecifier();
+    bool IsAlignmentSpecifier(int k = 1);
+    bool IsAtomicTypeSpecifier(int k = 1);
     bool IsAttributeDeclaration();
     bool IsAttributeSpecifier();
     bool IsAttributeSpecifierSequence();
     bool IsDeclaration();
     bool IsDeclarationSpecifier();
-    bool IsTypeSpecifierQualifier();
+    bool IsTypeSpecifierQualifier(int k = 1);
     bool IsDeclarationSpecifiers();
-    bool IsEnumSpecifier();
+    bool IsEnumSpecifier(int k = 1);
     bool IsFunctionSpecifier();
+    bool IsGnuAttributeBeforeDeclarator(int k = 1);
     bool IsStatement();
     bool IsStaticAssertDeclaration();
     bool IsStorageClassSpecifier();
-    bool IsStructOrUnionSpecifier();
-    bool IsTypedefName();
-    bool IsTypeofSpecifier();
-    bool IsTypeQualifier();
-    bool IsTypeSpecifier();
+    bool IsStructOrUnionSpecifier(int k = 1);
+    bool IsTypedefName(int k = 1);
+    bool IsTypeofSpecifier(int k = 1);
+    bool IsTypeQualifier(int k = 1);
+    bool IsTypeSpecifier(int k = 1);
+    bool IsInitDeclaratorList();
+    bool IsSomethingOfTypeName();
+    bool IsTypeName(int k = 1);
+    bool IsSpecifierQualifierList(int k = 1);
     bool IsCast();
     bool IsNullStructDeclarationListExtension();
 

@@ -1,0 +1,21 @@
+digraph ATN {
+rankdir=LR;
+s277[fontsize=11, label="277", shape=doublecircle, fixedsize=true, width=.6];
+s276[fontsize=11,label="276", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1881[fontsize=11,label="1881", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1882[fontsize=11,label="1882", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1883[fontsize=11,label="{&rarr;\n1883\nd=147|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1884[fontsize=11,label="&larr;\n1884", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1885[fontsize=11,label="1885", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1886[fontsize=11,label="1886", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1887[fontsize=11,label="1887", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s276 -> s1881 [fontname="Times-Italic", label="&epsilon;"];
+s1881 -> s1883 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<pattern>", arrowhead = normal];
+s1883:p0 -> s1882 [fontname="Times-Italic", label="&epsilon;"];
+s1883:p1 -> s1884 [fontname="Times-Italic", label="&epsilon;"];
+s1882 -> s1884 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<case_guard>", arrowhead = normal];
+s1884 -> s1885 [fontname="Times-Italic", label="&epsilon;"];
+s1885 -> s1886 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'=>'", arrowhead = normal];
+s1886 -> s1887 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<switch_expression_arm_expression>", arrowhead = normal];
+s1887 -> s277 [fontname="Times-Italic", label="&epsilon;"];
+}

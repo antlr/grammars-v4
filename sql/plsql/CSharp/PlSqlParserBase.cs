@@ -10,6 +10,8 @@ public abstract class PlSqlParserBase : Parser
     private bool _isVersion11 = true;
     private bool _isVersion12 = true;
 
+    private bool _lastUnitWasPlsql = false;
+
     protected PlSqlParserBase(ITokenStream input)
         : base(input)
     {
@@ -17,6 +19,37 @@ public abstract class PlSqlParserBase : Parser
 
     public PlSqlParserBase(ITokenStream input, TextWriter output, TextWriter errorOutput) : this(input)
     {
+    }
+
+    public override void Reset()
+    {
+        _lastUnitWasPlsql = false;
+        base.Reset();
+    }
+
+    public void setLastUnitPlsql() { _lastUnitWasPlsql = true; }
+    public void setLastUnitSql()   { _lastUnitWasPlsql = false; }
+    public bool isLastUnitSql()    { return !_lastUnitWasPlsql; }
+    public bool isLastUnitPlsql()  { return _lastUnitWasPlsql; }
+
+    public bool isSolidusSeparator()
+    {
+        var stream = (CommonTokenStream)InputStream;
+        var solidus = stream.LT(1);
+        if (solidus == null || solidus.Type != PlSqlParser.SOLIDUS)
+            return false;
+
+        int solidusLine = solidus.Line;
+
+        var prev = stream.LT(-1);
+        if (prev != null && prev.Type != TokenConstants.EOF && prev.Line == solidusLine)
+            return false;
+
+        var next = stream.LT(2);
+        if (next != null && next.Type != TokenConstants.EOF && next.Line == solidusLine)
+            return false;
+
+        return true;
     }
 
     public bool isVersion10() => _isVersion10;
@@ -30,4 +63,33 @@ public abstract class PlSqlParserBase : Parser
     public bool setVersion11(bool value) => _isVersion11 = value;
 
     public bool setVersion12(bool value) => _isVersion12 = value;
+
+    public bool IsNotNumericFunction() {
+	    var lt1 = (this.InputStream as CommonTokenStream).LT(1);
+	    var lt2 = (this.InputStream as CommonTokenStream).LT(2);
+	    if ( (lt1.Type == PlSqlParser.SUM ||
+		lt1.Type == PlSqlParser.COUNT ||
+		lt1.Type == PlSqlParser.AVG ||
+		lt1.Type == PlSqlParser.MIN ||
+		lt1.Type == PlSqlParser.MAX ||
+		lt1.Type == PlSqlParser.ROUND ||
+		lt1.Type == PlSqlParser.LEAST ||
+		  lt1.Type == PlSqlParser.GREATEST) && lt2.Type == PlSqlParser.LEFT_PAREN)
+		    return false;
+	    return true;
+    }
+
+    public bool isNotStartOfJoin() {
+        var lt1 = (this.InputStream as CommonTokenStream).LT(1);
+        if (lt1.Type == PlSqlParser.INNER ||
+            lt1.Type == PlSqlParser.CROSS ||
+            lt1.Type == PlSqlParser.NATURAL ||
+            lt1.Type == PlSqlParser.PARTITION ||
+            lt1.Type == PlSqlParser.FULL ||
+            lt1.Type == PlSqlParser.LEFT ||
+            lt1.Type == PlSqlParser.RIGHT ||
+            lt1.Type == PlSqlParser.OUTER)
+            return false;
+        return true;
+    }
 }

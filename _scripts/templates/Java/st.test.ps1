@@ -3,8 +3,7 @@
 $workingDirectory = Get-Location
 $filePath = "$workingDirectory/tests.txt"
 
-$Tests = "<if(os_win)>../<example_files_win><else>../<example_files_unix><endif>"
-Write-Host "Test cases here: $Tests"
+Write-Host "Test cases: <glob_args_win>"
 
 # Get a list of test files from the test directory. Do not include any
 # .errors or .tree files. Pay close attention to remove only file names
@@ -14,7 +13,7 @@ if (Test-Path -Path "$filePath" -PathType Leaf) {
 }
 
 $files = New-Object System.Collections.Generic.List[string]
-$allFiles = $(& dotnet trglob "$Tests" ; $last = $LASTEXITCODE )
+$allFiles = $(& dotnet trash glob <glob_args_win> ; $last = $LASTEXITCODE )
 foreach ($file in $allFiles) {
     $ext = $file | Split-Path -Extension
     if (Test-Path $file -PathType Container) {
@@ -56,11 +55,11 @@ $version = Select-String -Path "build.sh" -Pattern "version=" | ForEach-Object {
 $JAR = python -c "import os; from pathlib import Path; print(os.path.join(Path.home(), '.m2', 'repository', 'org', 'antlr', 'antlr4', '$version', ('antlr4-' + '$version' + '-complete.jar')))"
 <if(individual_parsing)>
 # Individual parsing.
-Get-Content "$filePath" | ForEach-Object { dotnet trwdog java -cp "$JAR<if(path_sep_semi)>;<else>:<endif>." Test -q -tee -tree *>> parse.txt }
+Get-Content "$filePath" | ForEach-Object { dotnet trash wdog java -cp "$JAR<if(path_sep_semi)>;<else>:<endif>." Test -q -tee -tree *>> parse.txt }
 $status = $LASTEXITCODE
 <else>
 # Group parsing.
-get-content "$filePath" | dotnet trwdog java -cp "${JAR}<if(path_sep_semi)>;<else>:<endif>." Test -q -x -tee -tree *> parse.txt
+get-content "$filePath" | dotnet trash wdog java -cp "${JAR}<if(path_sep_semi)>;<else>:<endif>." Test -q -x -tee -tree *> parse.txt
 $status = $LASTEXITCODE
 <endif>
 

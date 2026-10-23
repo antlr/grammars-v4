@@ -1,4 +1,4 @@
-# A grammar for reStructuredText language written in ANTLR v4
+# reStructuredText Grammar
 
 ## Source
 

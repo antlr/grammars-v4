@@ -2735,7 +2735,7 @@ sql_routine_statement
     ;
 
 common_table_expression
-    : table_name column_name_list_paren? AS '(' (WITH common_table_expression)? ')'
+    : table_name column_name_list_paren? AS '(' (WITH common_table_expression_list)? fullselect ')'
     ;
 
 create_alias_statement
@@ -4657,7 +4657,10 @@ from_clause
     ;
 
 table_reference
-    : singles_table_reference
+    : table_reference (INNER | outer)? JOIN table_reference (ON join_condition | USING '(' column_name_list ')')
+    | table_reference CROSS JOIN table_reference
+    | '(' table_reference ')'
+    | singles_table_reference
     | single_view_reference
     | single_nickname_reference
     | only_table_reference
@@ -4668,7 +4671,6 @@ table_reference
     | table_function_reference
     | collection_derived_table
     | xmltable_expression
-    //| joined_table
     | external_table_reference
     ;
 
@@ -4794,12 +4796,6 @@ xmltable_expression
 
 xmltable_function
     : todo
-    ;
-
-joined_table
-    : table_reference (INNER | outer)? JOIN table_reference (ON join_condition | USING '(' column_name_list ')')
-    | table_reference CROSS JOIN table_reference
-    | '(' joined_table ')'
     ;
 
 join_condition
@@ -5218,7 +5214,7 @@ expression
     ;
 
 function_invocation
-    : function_name '(' all_distinct? arg_list ')'
+    : function_name '(' all_distinct? arg_list? ')'
     ;
 
 all_distinct

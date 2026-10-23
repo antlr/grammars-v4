@@ -44,7 +44,7 @@ Grammar supports the following list of ECMAScript 6 features taken from
 * Map/Set& WeakMap/WeakSet
 * Meta-Programming
 * Modules
-* New Build-In Methods
+* New Built-In Methods
 * Promises
 * Scoping
 * Strict Functions
@@ -59,7 +59,7 @@ See [examples](examples) directory with test data files.
 
 * HashBang Comment
 * `**` and `**=`
-* Numeric Literal Seprator (`1_23`)
+* Numeric Literal Separator (`1_23`)
 * BigInt (`123456n`)
 * Async Await 
 * Async Iteration (`for await`)

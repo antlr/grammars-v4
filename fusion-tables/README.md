@@ -1,4 +1,4 @@
-# Google Fusion Tables Sql
+# Google Fusion Tables Grammar
 
 Parses Google fusion tables sql as defined in the
 [Row and Query SQL Reference](https://developers.google.com/fusiontables/docs/v2/sql-reference)

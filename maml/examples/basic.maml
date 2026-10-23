@@ -1,0 +1,13 @@
+# A basic MAML document
+{
+  project: "MAML"
+  tags: ["minimal", "readable"]  # comma-separated
+  langs: [                       # or newline-separated, no commas
+    "json"
+    "maml"
+  ]
+  count: 42
+  enabled: true
+  disabled: false
+  nothing: null
+}

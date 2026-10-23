@@ -47,7 +47,7 @@ export class BinaryCharStream {
     }
 
     getSourceName(): string {
-        return "<unknown>";
+        return "\<unknown>";
     }
 
     getTextFromRange(start: number, stop: number): string {

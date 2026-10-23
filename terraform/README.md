@@ -1,4 +1,4 @@
-# Terraform
+# Terraform Grammar
 
 An Antlr4 grammar for [Terraform](https://www.terraform.io/).
 

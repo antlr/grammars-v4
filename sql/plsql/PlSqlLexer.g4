@@ -291,7 +291,9 @@ COMPOUND                       : 'COMPOUND';
 COMPRESS                       : 'COMPRESS';
 COMPRESSION                    : 'COMPRESSION';
 COMPUTE                        : 'COMPUTE';
+COMPUTATION                    : 'COMPUTATION';
 CONCAT                         : 'CONCAT';
+CONCURRENT                     : 'CONCURRENT';
 CON_DBID_TO_ID                 : 'CON_DBID_TO_ID';
 CONDITIONAL                    : 'CONDITIONAL';
 CONDITION                      : 'CONDITION';
@@ -1162,6 +1164,7 @@ NO_NATIVE_FULL_OUTER_JOIN      : 'NO_NATIVE_FULL_OUTER_JOIN';
 NONBLOCKING                    : 'NONBLOCKING';
 NONEDITIONABLE                 : 'NONEDITIONABLE';
 NONE                           : 'NONE';
+NONPARTITIONED                 : 'NONPARTITIONED';
 NONULLIF                       : 'NONULLIF';
 NO_NLJ_BATCHING                : 'NO_NLJ_BATCHING';
 NO_NLJ_PREFETCH                : 'NO_NLJ_PREFETCH';
@@ -1751,7 +1754,7 @@ SQLDATA                        : 'SQLDATA';
 SQLERROR                       : 'SQLERROR';
 SQLLDR                         : 'SQLLDR';
 SQL                            : 'SQL';
-FILE_EXT                       : 'PKB' | 'PKS';
+FILE_EXT                       : 'FNC' | 'PKB' | 'PKS' | 'PRC' | 'TRG' | 'VW';
 SQL_MACRO                      : 'SQL_MACRO';
 SQL_TRACE                      : 'SQL_TRACE';
 SQL_TRANSLATION_PROFILE        : 'SQL_TRANSLATION_PROFILE';
@@ -2512,33 +2515,7 @@ APPROXIMATE_NUM_LIT : FLOAT_FRAGMENT ('E' ('+' | '-')? (FLOAT_FRAGMENT | [0-9]+)
 CHAR_STRING: '\'' (~('\'' | '\r' | '\n') | '\'' '\'' | NEWLINE)* '\'';
 
 // See https://livesql.oracle.com/apex/livesql/file/content_CIREYU9EA54EOKQ7LAMZKRF6P.html
-// TODO: context sensitive string quotes (any characted after quote)
-CHAR_STRING_PERL:
-    'Q' '\'' (
-        QS_ANGLE
-        | QS_BRACE
-        | QS_BRACK
-        | QS_PAREN
-        | QS_EXCLAM
-        | QS_SHARP
-        | QS_QUOTE
-        | QS_DQUOTE
-        | QS_TILDA
-        | QS_SOLIDUS
-        | QS_RSOLIDUS
-    ) '\'' -> type(CHAR_STRING)
-;
-fragment QS_ANGLE    : '<' .*? '>';
-fragment QS_BRACE    : '{' .*? '}';
-fragment QS_BRACK    : '[' .*? ']';
-fragment QS_PAREN    : '(' .*? ')';
-fragment QS_EXCLAM   : '!' .*? '!';
-fragment QS_SHARP    : '#' .*? '#';
-fragment QS_QUOTE    : '\'' .*? '\'';
-fragment QS_DQUOTE   : '"' .*? '"';
-fragment QS_TILDA    : '~' .*? '~';
-fragment QS_SOLIDUS  : '/' .*? '/';
-fragment QS_RSOLIDUS : '\\' .*? '\\';
+CHAR_STRING_PERL: 'Q' '\'' ~[ \t\r\n] .*? . '\'' {this.IsQQuoteDelimiter()}? -> type(CHAR_STRING);
 
 DELIMITED_ID: '"' (~ [\u0000"] | '"' '"')+ '"';
 
@@ -2552,6 +2529,7 @@ PLUS_SIGN       : '+';
 MINUS_SIGN      : '-';
 COMMA           : ',';
 SOLIDUS         : '/';
+RSOLIDUS        : '\\';
 AT_SIGN         : '@';
 ASSIGN_OP       : ':=';
 HASH_OP         : '#';
@@ -2597,16 +2575,11 @@ REMARK_COMMENT:
 // https://docs.oracle.com/cd/E11882_01/server.112/e16604/ch_twelve032.htm#SQPUG052
 PROMPT_MESSAGE: 'PRO' {this.IsNewlineAtPos(-4)}? 'MPT'? (' ' ~('\r' | '\n')*)? NEWLINE_EOF;
 
-// TODO: should starts with newline
-START_CMD: // https://docs.oracle.com/cd/B19306_01/server.102/b14357/ch12002.htm
-    '@' '@'?
-; // https://docs.oracle.com/cd/B19306_01/server.102/b14357/ch12003.htm
-
 REGULAR_ID: SIMPLE_LETTER (SIMPLE_LETTER | '$' | '_' | '#' | [0-9])*;
 
 INQUIRY_DIRECTIVE: '$$' (SIMPLE_LETTER | '_')+;
 
-SPACES: [ \t\r\n]+ -> channel(HIDDEN);
+SPACES: [ \t\r\n\u3000]+ -> channel(HIDDEN);
 
 // Fragment rules
 

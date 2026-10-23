@@ -34,12 +34,14 @@
 
 parser grammar JavaParser;
 
+// Insert here @header.
+
 options {
     tokenVocab = JavaLexer;
     superClass = JavaParserBase;
 }
 
-compilationUnit
+compilationunit
     : packageDeclaration? (importDeclaration | ';')* (typeDeclaration | ';')* EOF
     | modularCompulationUnit EOF
     ;

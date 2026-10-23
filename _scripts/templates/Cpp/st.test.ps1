@@ -3,8 +3,7 @@
 $workingDirectory = Get-Location
 $filePath = "$workingDirectory/tests.txt"
 
-$Tests = "<if(os_win)>../<example_files_win><else>../<example_files_unix><endif>"
-Write-Host "Test cases here: $Tests"
+Write-Host "Test cases: <glob_args_win>"
 
 # Get a list of test files from the test directory. Do not include any
 # .errors or .tree files. Pay close attention to remove only file names
@@ -14,7 +13,7 @@ if (Test-Path -Path "$filePath" -PathType Leaf) {
 }
 
 $files = New-Object System.Collections.Generic.List[string]
-$allFiles = $(& dotnet trglob "$Tests" ; $last = $LASTEXITCODE )
+$allFiles = $(& dotnet trash glob <glob_args_win> ; $last = $LASTEXITCODE )
 foreach ($file in $allFiles) {
     $ext = $file | Split-Path -Extension
     if (Test-Path $file -PathType Container) {
@@ -54,11 +53,11 @@ git clean -f ..\\<example_dir_unix>
 # Parse all input files.
 <if(individual_parsing)>
 # Individual parsing.
-Get-Content "$filePath" | ForEach-Object { dotnet trwdog ./build/<if(os_win)>Release/<endif><exec_name> -q -tee -tree $_ *>> parse.txt }
+Get-Content "$filePath" | ForEach-Object { dotnet trash wdog ./build/<if(os_win)>Release/<endif><exec_name> -q -tee -tree $_ *>> parse.txt }
 $status = $LASTEXITCODE
 <else>
 # Group parsing.
-get-content "$filePath" | dotnet trwdog ./build/<if(os_win)>Release/<endif><exec_name> -q -x -tee -tree *> parse.txt
+get-content "$filePath" | dotnet trash wdog ./build/<if(os_win)>Release/<endif><exec_name> -q -x -tee -tree *> parse.txt
 $status = $LASTEXITCODE
 <endif>
 
@@ -132,7 +131,6 @@ foreach ($s in $new_errors3_txt) {
     if ( [String]::IsNullOrWhiteSpace($s) ) {
         continue
     }
-    $ext = $item.Extension
     if (! $s.EndsWith(".errors")) {
         continue
     }
@@ -140,8 +138,8 @@ foreach ($s in $new_errors3_txt) {
     $size = (Get-Item -Path $file).Length
     if ( $size -eq 0 ) {
     } else {
-        $new_errors_txt.Add($item)
-        Add-Content -Path "$old/new_errors.txt" -Value "$item"
+        $new_errors_txt.Add($file)
+        Add-Content -Path "$old/new_errors.txt" -Value "$file"
         ((Get-Content $file) -join "`n") + "`n" | Add-Content -Path "$old/new_errors.txt"
     }
 }

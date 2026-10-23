@@ -1,4 +1,4 @@
-# ABB RAPID grammar
+# ABB RAPID Grammar
 
 ## Authors
 

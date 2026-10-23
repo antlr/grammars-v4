@@ -26,6 +26,7 @@ export default abstract class GoParserBase extends Parser {
     protected closingBracket(): boolean {
         const stream = this.inputStream as BufferedTokenStream;
         const la = stream.LT(1);
+        if (la === null) return false;
         return la.type === GoParser.R_CURLY || la.type === GoParser.R_PAREN || la.type === Token.EOF;
     }
 
@@ -33,6 +34,7 @@ export default abstract class GoParserBase extends Parser {
     {
         const stream = this.inputStream as BufferedTokenStream;
         const la = stream.LT(2);
+        if (la === null) return true;
         return la.type !== GoParser.RECEIVE;
     }
 
@@ -100,17 +102,18 @@ export default abstract class GoParserBase extends Parser {
     {
         const stream = this.inputStream as BufferedTokenStream;
         const la = stream.LT(1);
+        if (la === null) return true;
         if (la.text === "err") return true;
         var result = true;
         if (la.type !== GoParser.IDENTIFIER) {
             if (this.debug) console.log("isOperand Returning " + result + " for " + la);
             return result;
         }
-        result = this.table.has(la.text);
+        result = this.table.has(la.text ?? "");
         var la2 = stream.LT(2);
         // If it's not followed by a '.', then it really should be
         // considered as operand.
-        if (la2.type !== GoParser.DOT) {
+        if (la2 === null || la2.type !== GoParser.DOT) {
             result = true;
             if (this.debug) console.log("isOperand Returning " + result + " for " + la);
             return result;
@@ -118,7 +121,7 @@ export default abstract class GoParserBase extends Parser {
         // If it's followed by '.', and then followed by '(', then
         // it is a typeAssertion, and so la must be an operand.
         var la3 = stream.LT(3);
-        if (la3.type === GoParser.L_PAREN)
+        if (la3 !== null && la3.type === GoParser.L_PAREN)
         {
             result = true;
             if (this.debug) console.log("isOperand Returning " + result + " for " + la);
@@ -132,6 +135,7 @@ export default abstract class GoParserBase extends Parser {
     {
         const stream = this.inputStream as BufferedTokenStream;
         const la = stream.LT(1);
+        if (la === null) return false;
         var result = la.type !== GoParser.IDENTIFIER;
         if (this.debug) console.log("isConversion Returning " + result + " for " + la);
         return result;
@@ -141,6 +145,7 @@ export default abstract class GoParserBase extends Parser {
     {
         const stream = this.inputStream as BufferedTokenStream;
         const la = stream.LT(1);
+        if (la === null) return false;
         var result = true;
         // See if it looks like a method expr.
         if (la.type === GoParser.STAR) {
@@ -152,7 +157,7 @@ export default abstract class GoParserBase extends Parser {
             if (this.debug) console.log("isMethodExpr Returning " + result + " for " + la);
             return result;
         }
-        result = ! this.table.has(la.text);
+        result = ! this.table.has(la.text ?? "");
         if (this.debug) console.log("isMethodExpr Returning " + result + " for " + la);
         return result;
     }
@@ -171,7 +176,7 @@ export default abstract class GoParserBase extends Parser {
             if (this.debug) console.log("isTypeArgument Returning false - no identifier before (");
             return false;
         }
-        const result = GoParserBase.BUILTIN_TYPE_FUNCTIONS.has(funcToken.text);
+        const result = GoParserBase.BUILTIN_TYPE_FUNCTIONS.has(funcToken.text ?? "");
         if (this.debug) console.log("isTypeArgument Returning " + result + " for " + funcToken.text);
         return result;
     }

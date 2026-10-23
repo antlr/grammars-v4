@@ -1,0 +1,3 @@
+total = sum
+        where
+        sum = 1 + 2

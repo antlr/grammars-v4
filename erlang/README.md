@@ -14,7 +14,7 @@ It is merely extracted from the [official non-standard grammar from Erlang/OTP s
 It is meant for students and people who work on Erlang's syntax.
 
 
-## Requierements
+## Requirements
 
 * Erlang's **erlc** for preprocessing purposes.
 

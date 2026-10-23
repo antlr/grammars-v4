@@ -1,0 +1,295 @@
+-- B830006.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--     The ACAA has created and maintains the Ada Conformity Assessment Test
+--     Suite for the purpose of conformity assessments conducted in accordance
+--     with the International Standard isO/IEC 18009 - Ada: Conformity
+--     assessment of a language processor. This test suite should not be used
+--     to make claims of conformance unless used in accordance with
+--     isO/IEC 18010 and any applicable ACAA procedures.
+--*
+--
+-- OBJECTIVE:
+--     Check that homographs of expression functions are forbidden in any of 
+--     these combinations of parts of a generic package: Visible-Visible; 
+--     Visible-Private; Private-Private; Visible-Body; Private-Body;
+--     Body-Body.
+--
+-- TEST DESCRIPTION:
+--     This test was created from the set of tests B830003 through B830005.
+--     As with those tests, this test includes completions for all declarations
+--     that need them.
+--
+-- CHANGE HISTORY:
+--      30 Apr 2021   RLB     Created test from parts of ACATS tests B830003,
+--                            B830004, and B830005.
+--!
+procedure B830006 is
+begin
+
+-- Check Visible-Visible.
+
+   declare
+      generic
+      package GPack1 is
+         type H1 is range 1 .. 10;
+
+         type Enum1 is (H2, Enum2);
+         
+         function H3 (A : Integer) return Boolean is (True);
+
+         -- The homographs.
+
+         function H1 return Integer is (0);                 -- ERROR: {10;1}
+
+         function H2 return Enum1 is (Enum2);               -- ERROR: {10;1}
+         
+         function H3 (A : Natural) return Boolean;          -- ERROR: {10;1}
+         
+      end GPack1;
+
+      package body GPack1 is
+         function H3 (A : Natural) return Boolean is -- OPTIONAL ERROR: {10}
+         begin                             --  Body of illegal homograph.
+            return False;
+         end H3;
+        
+      end GPack1;
+   begin
+      null;
+   end;
+
+-- Check Visible-Private.
+
+   declare
+      generic
+      package GPack2 is
+         function H1 return Boolean is (False);
+         
+         function H2 (P1 : Integer; P2 : out String) 
+            return Boolean is (P1 = 0);
+
+      private
+         -- The homographs.
+
+         H1 : Boolean := False;                               -- ERROR: {10;1}
+            procedure Lock (A : Boolean);
+         
+         function H2 (P1 : Natural; P2 : String) 
+            return Boolean is (P2 /= "");                    -- ERROR: {1:10;1}
+                                                           
+      end GPack2;
+
+   begin
+       null;
+   end;
+
+-- Check Private-Private.
+
+   declare
+      generic
+      package GPack3 is
+      private
+         H1 : exception;
+         
+         function H2 (A : Integer) return Integer is (A - 1);
+
+         -- The homographs.
+
+         function H1 (A : Boolean) return Boolean is (not A);-- ERROR: {10;1}
+
+         generic                            
+            function H2 return Boolean;                      -- ERROR: {1:10;1}
+      end GPack3;
+
+      package body GPack3 is
+         procedure H2 is                            -- OPTIONAL ERROR: {10}
+         begin                                  --  Body of illegal homograph.
+            null;
+         end H2;
+      end GPack3;
+   begin
+      null;
+   end;
+
+-- Check Visible-Body.
+   declare
+      generic
+      package GPack4 is
+      
+         protected Prot is
+            procedure Lock (A : Boolean);
+         private
+            L : Boolean;
+         end Prot;
+      
+         function Func1 (A : Boolean) return Boolean is (not A);
+         
+         function EF1 (X : in Natural) return Integer is (X / 2);
+         
+      end GPack4;
+      
+      package body GPack4 is
+      
+         -- Completions for declarations in the specification:
+      
+         protected body Prot is                     -- OPTIONAL ERROR: {10}
+                                    -- Body for entity with illegal homograph.
+            procedure Lock (A : Boolean) is
+            begin
+               L := A;
+            end Lock;
+         end Prot;
+
+         -- Homographs:
+      
+         function Prot (A : in Natural) 
+                             return Boolean is (A > 0);      -- ERROR: {1:10;1}
+      
+         Func1 : exception;                                  -- ERROR: {10;1}
+         
+         function EF1 (A : in out Integer) return Integer;   -- ERROR: {10;1}
+      
+         -- Completions for declarations here:
+      
+         function EF1 (A : in out Integer) 
+                                  return Integer is -- OPTIONAL ERROR: {10}
+         begin                                   -- Body of illegal homograph.
+            return A * 2;
+         end EF1;
+      
+      end GPack4;
+   begin
+      null;
+   end;
+
+-- Check Private-Body.
+   declare
+      generic
+      package GPack5 is
+         type Int2 is private;
+      private
+         Var2 : Integer := 2;
+         
+         generic
+         function Fun2 return Integer;
+      
+         function Func2 (A : Natural) return Boolean;
+         
+         function EF2 (X : in Natural) return Integer is (X / 3);
+         
+         type Int2 is range 0 .. 234;
+         
+      end GPack5;
+      
+      package body GPack5 is
+      
+         -- Completions for declarations in the specification:
+
+         function Func2 (A : Natural) return Boolean is -- OPTIONAL ERROR: {10}
+         begin                     -- Body for entity with illegal homograph.
+            return A <= 99;
+         end  Func2;
+    
+         function Fun2 return Integer is                -- OPTIONAL ERROR: {10}
+         begin                      -- Body for entity with illegal homograph.
+            return 1;
+         end Fun2;
+      
+         -- Homographs:
+         
+         function Var2 (A : in Integer) 
+                                  return Natural is (abs A); -- ERROR: {1:10;1}
+      
+         function Fun2 (A : in Natural) 
+                      return Positive is (A + 1);            -- ERROR: {1:10;1}
+      
+         task Func2;                                         -- ERROR: {10;1}
+      
+         type EF2 is range 0 .. 55;                          -- ERROR: {10;1}
+         
+         -- Completions for declarations here:
+      
+         task body Func2 is                             -- OPTIONAL ERROR: {10}
+         begin                                   -- Body of illegal homograph.
+            null;
+         end Func2;
+      
+      end GPack5;
+   
+   begin
+      null;
+   end;
+
+-- Check Body-Body.
+   declare
+      generic
+         type Funny_Type is private;
+      package GPack6 is
+         New_Var : Boolean;
+      
+         function Funny (A : Funny_Type) return Funny_Type;
+      
+      end GPack6;
+      
+      package body GPack6 is
+      
+         -- Local declarations:
+         
+         Con3 : constant String := "HELLO";
+
+         package P3 is
+            Z : Integer := 0;
+         end P3;
+      
+         function EF3 (X : in Natural) return Integer is (X ** 2);
+        
+         -- Homographs:
+
+         function Con3 (A : in Integer) 
+                                return Boolean is (A <= 0);  -- ERROR: {1:10;1}
+      
+         function P3 (A : in Positive) 
+                                return Positive is (A + 3);  -- ERROR: {1:10;1}
+      
+         function EF3 (A : in Integer) 
+                                 return Integer is (A * 2);  -- ERROR: {1:10;1}
+      
+         
+         -- Completions for declarations in the specification:
+      
+         function Funny (A : Funny_Type) return Funny_Type is
+         begin
+             return A;
+         end Funny;
+      
+      end GPack6;
+
+   begin
+      null;
+   end;
+
+end B830006;
