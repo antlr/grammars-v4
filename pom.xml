@@ -325,6 +325,7 @@
 				<module>pii</module>
 				<!-- <module>pike</module> -->
 				<module>plantUML</module>
+                <module>plexil</module>
                 <module>plm</module>
 				<module>pl0</module>
                 <module>pl1</module>
