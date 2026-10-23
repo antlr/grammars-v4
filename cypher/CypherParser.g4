@@ -25,9 +25,15 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar CypherParser;
 
-options { tokenVocab=CypherLexer; }
+options {
+    tokenVocab = CypherLexer;
+}
 
 script
     : query SEMI? EOF
@@ -49,7 +55,7 @@ singleQuery
     ;
 
 standaloneCall
-    : CALL invocationName parenExpressionChain? (YIELD (MULT | yieldItems ))?
+    : CALL invocationName parenExpressionChain? (YIELD (MULT | yieldItems))?
     ;
 
 returnSt
@@ -93,9 +99,8 @@ singlePartQ
     ;
 
 multiPartQ
-    : readingStatement* (updatingStatement* withSt)+ singlePartQ
+    : readingStatement* ((readingStatement | updatingStatement)* withSt)+ singlePartQ
     ;
-
 
 matchSt
     : OPTIONAL? MATCH patternWhere
@@ -123,7 +128,6 @@ deleteSt
     : DETACH? DELETE expressionChain
     ;
 
-
 removeSt
     : REMOVE removeItem (COMMA removeItem)*
     ;
@@ -144,6 +148,7 @@ parenExpressionChain
 yieldItems
     : yieldItem (COMMA yieldItem)* where?
     ;
+
 yieldItem
     : (symbol AS)? symbol
     ;
@@ -185,6 +190,7 @@ where
 pattern
     : patternPart (COMMA patternPart)*
     ;
+
 expression
     : xorExpression (OR xorExpression)*
     ;
@@ -198,11 +204,11 @@ andExpression
     ;
 
 notExpression
-    : NOT? comparisonExpression
+    : NOT* comparisonExpression
     ;
 
 comparisonExpression
-    : addSubExpression ( comparisonSigns addSubExpression)*
+    : stringListNullExpression (comparisonSigns stringListNullExpression)*
     ;
 
 comparisonSigns
@@ -212,6 +218,14 @@ comparisonSigns
     | GT
     | LT
     | NOT_EQUAL
+    ;
+
+stringListNullExpression
+    : addSubExpression (stringExpression | inExpression | nullExpression)?
+    ;
+
+inExpression
+    : IN addSubExpression
     ;
 
 addSubExpression
@@ -231,16 +245,15 @@ unaryAddSubExpression
     ;
 
 atomicExpression
-    : propertyOrLabelExpression (stringExpression | listExpression | nullExpression)*
+    : propertyOrLabelExpression (listExpression)*
     ;
 
 listExpression
-    : IN propertyOrLabelExpression
-    | LBRACK (expression? RANGE expression? | expression) RBRACK
+    : LBRACK (expression? RANGE expression? | expression) RBRACK
     ;
 
 stringExpression
-    : stringExpPrefix propertyOrLabelExpression
+    : stringExpPrefix addSubExpression
     ;
 
 stringExpPrefix
@@ -264,13 +277,33 @@ propertyExpression
 patternPart
     : (symbol ASSIGN)? patternElem
     ;
+
 patternElem
-    : nodePattern patternElemChain*
-    | LPAREN patternElem RPAREN
+    : nodePattern (patternElemChain | qppElemChain)*
+    | LPAREN patternElem RPAREN qppQuantifier?
     ;
 
 patternElemChain
     : relationshipPattern nodePattern
+    ;
+
+qppElemChain
+    : LPAREN patternElem RPAREN qppQuantifier nodePattern
+    ;
+
+qppQuantifier
+    : LBRACE qppInt COMMA qppInt RBRACE
+    | LBRACE qppInt RBRACE
+    | LBRACE qppInt COMMA RBRACE
+    | LBRACE COMMA qppInt RBRACE
+    | LBRACE COMMA RBRACE
+    | PLUS
+    | MULT
+    ;
+
+qppInt
+    : DIGIT
+    | ID
     ;
 
 properties
@@ -283,11 +316,11 @@ nodePattern
     ;
 
 atom
-    : literal
+    : listComprehension
+    | literal
     | parameter
     | caseExpression
     | countAll
-    | listComprehension
     | patternComprehension
     | filterWith
     | relationshipsChainPattern
@@ -327,11 +360,11 @@ invocationName
     ;
 
 functionInvocation
-    : invocationName LPAREN DISTINCT? (expressionChain)? RPAREN
+    : invocationName LPAREN DISTINCT? expressionChain? RPAREN
     ;
 
 parenthesizedExpression
-    : LPAREN  expression RPAREN
+    : LPAREN expression RPAREN
     ;
 
 filterWith
@@ -358,7 +391,6 @@ countAll
     : COUNT LPAREN MULT RPAREN
     ;
 
-
 expressionChain
     : expression (COMMA expression)*
     ;
@@ -383,7 +415,7 @@ literal
     ;
 
 rangeLit
-    : MULT numLit? (RANGE  numLit?)?
+    : MULT numLit? (RANGE numLit?)?
     ;
 
 boolLit
@@ -394,14 +426,17 @@ boolLit
 numLit
     : DIGIT
     ;
+
 stringLit
     : STRING_LITERAL
     ;
+
 charLit
     : CHAR_LITERAL
     ;
+
 listLit
-    : LBRACK (expressionChain)? RBRACK
+    : LBRACK expressionChain? RBRACK
     ;
 
 mapLit
@@ -427,8 +462,8 @@ symbol
     | ANY
     | NONE
     | SINGLE
+    | END
     ;
-
 
 reservedWord
     : ALL
@@ -478,7 +513,6 @@ reservedWord
     | WHEN
     | THEN
     | ELSE
-    | END
     | MANDATORY
     | SCALAR
     | OF

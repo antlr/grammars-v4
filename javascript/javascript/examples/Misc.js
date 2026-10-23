@@ -38,3 +38,6 @@ function f([asdfg]=12345){}
 /* TODO:
 function async (proc, ...params) {}
 var async = 1;*/
+
+const a = { duration: 50 };
+a.duration ??= 10;

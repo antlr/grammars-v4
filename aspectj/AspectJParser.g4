@@ -1,4 +1,3 @@
-	
 /*
  [The "BSD licence"]
  Copyright (c) 2015 Adam Taylor
@@ -33,543 +32,518 @@
    https://eclipse.org/aspectj/doc/next/progguide/starting.html
    https://eclipse.org/aspectj/doc/next/adk15notebook/grammar.html
  */
- 
- /*
+
+/*
   	This grammar builds on top of the ANTLR4 Java grammar, but it uses 
   	lexical modes to lex the annotation form of AspectJ; hence in order to use it
   	you need to break Java.g4 into Separate Lexer (JavaLexer.g4) and Parser (JavaParser.g4) grammars.
   */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
 
 parser grammar AspectJParser;
 
-options { tokenVocab=AspectJLexer; }
+options {
+    tokenVocab = AspectJLexer;
+}
 
 import JavaParser;
 
 typeDeclaration
-    :   classOrInterfaceModifier* classDeclaration
-    |   classOrInterfaceModifier* enumDeclaration
-    |   classOrInterfaceModifier* interfaceDeclaration
-    |   classOrInterfaceModifier* annotationTypeDeclaration
-    |	classOrInterfaceModifier* aspectDeclaration
-    |   ';'
+    : classOrInterfaceModifier* classDeclaration
+    | classOrInterfaceModifier* enumDeclaration
+    | classOrInterfaceModifier* interfaceDeclaration
+    | classOrInterfaceModifier* annotationTypeDeclaration
+    | classOrInterfaceModifier* aspectDeclaration
+    | ';'
     ;
-    
+
 aspectBody
-	:	'{' aspectBodyDeclaration* '}'
-	;
+    : '{' aspectBodyDeclaration* '}'
+    ;
 
 classBodyDeclaration
-    :   ';'
-    |   'static'? block
-    |   modifier* memberDeclaration
-    |	'static' aspectDeclaration 
+    : ';'
+    | 'static'? block
+    | modifier* memberDeclaration
+    | 'static' aspectDeclaration
     ;
-    
+
 aspectBodyDeclaration
-	:	classBodyDeclaration
-	|	advice
-	|	interTypeMemberDeclaration
-    |	interTypeDeclaration
-	;
+    : classBodyDeclaration
+    | advice
+    | interTypeMemberDeclaration
+    | interTypeDeclaration
+    ;
 
 memberDeclaration
-    :   methodDeclaration
-    |   genericMethodDeclaration
-    |   fieldDeclaration
-    |   constructorDeclaration
-    |   genericConstructorDeclaration
-    |   interfaceDeclaration
-    |   annotationTypeDeclaration
-    |   classDeclaration
-    |   enumDeclaration
-    |	pointcutDeclaration
+    : methodDeclaration
+    | genericMethodDeclaration
+    | fieldDeclaration
+    | constructorDeclaration
+    | genericConstructorDeclaration
+    | interfaceDeclaration
+    | annotationTypeDeclaration
+    | classDeclaration
+    | enumDeclaration
+    | pointcutDeclaration
     ;
-    
+
 // ANNOTATIONS
 
 annotation
-    :	'@' annotationName ( '(' ( elementValuePairs | elementValue )? ')' )?
-    |	'@' 'After' '(' '"' pointcutExpression '"' ')'
-    |	'@' 'AfterReturning' '(' '"' pointcutExpression '"' ')'
-    |	'@' 'AfterReturning' '(' 'pointcut' '=' '"' pointcutExpression '"' ',' 'returning' '=' '"' id '"' ')'
-    |	'@' 'AfterThrowing' '(' '"' pointcutExpression '"' ')'
-    |	'@' 'Around' '(' '"' pointcutExpression '"' ')'
-	|	'@' 'Aspect' ( '(' '"' perClause  '"' ')' )?
-    |	'@' 'Before' '(' '"' pointcutExpression '"' ')'
-    |	'@' 'DeclareError' '(' '"' pointcutExpression '"' ')'
-    |	'@' 'DeclareMixin' '(' 'value' '=' '"' typePattern '"' ',' 'interfaces' '=' '{' classPatternList '}' ')'
-    |	'@' 'DeclareParents' '(' '"' typePattern '"' ')'
-    |	'@' 'DeclareParents' '(' 'value' '=' '"' typePattern '"' ',' 'defaultImpl' '=' classPattern ')'
-    |	'@' 'DeclarePrecedence'  '(' '"' typePatternList '"' ')'
-    |	'@' 'DeclareWarning' '(' '"' pointcutExpression '"' ')'
-    |	'@' 'Pointcut' '(' '"' pointcutExpression? '"' ')'
+    : '@' annotationName ('(' ( elementValuePairs | elementValue)? ')')?
+    | '@' 'After' '(' '"' pointcutExpression '"' ')'
+    | '@' 'AfterReturning' '(' '"' pointcutExpression '"' ')'
+    | '@' 'AfterReturning' '(' 'pointcut' '=' '"' pointcutExpression '"' ',' 'returning' '=' '"' id '"' ')'
+    | '@' 'AfterThrowing' '(' '"' pointcutExpression '"' ')'
+    | '@' 'Around' '(' '"' pointcutExpression '"' ')'
+    | '@' 'Aspect' ( '(' '"' perClause '"' ')')?
+    | '@' 'Before' '(' '"' pointcutExpression '"' ')'
+    | '@' 'DeclareError' '(' '"' pointcutExpression '"' ')'
+    | '@' 'DeclareMixin' '(' 'value' '=' '"' typePattern '"' ',' 'interfaces' '=' '{' classPatternList '}' ')'
+    | '@' 'DeclareParents' '(' '"' typePattern '"' ')'
+    | '@' 'DeclareParents' '(' 'value' '=' '"' typePattern '"' ',' 'defaultImpl' '=' classPattern ')'
+    | '@' 'DeclarePrecedence' '(' '"' typePatternList '"' ')'
+    | '@' 'DeclareWarning' '(' '"' pointcutExpression '"' ')'
+    | '@' 'Pointcut' '(' '"' pointcutExpression? '"' ')'
     ;
-    	
+
 classPattern
-	:	id ('.' id)* '.' 'class'
-	;
+    : id ('.' id)* '.' 'class'
+    ;
 
 classPatternList
-	:	classPattern (',' classPattern)*
-	;
-	
-    
+    : classPattern (',' classPattern)*
+    ;
+
 aspectDeclaration
-	:	'privileged'? modifier* 'aspect' id 
-		('extends' type)? 
-		('implements' typeList)? 
-		perClause? 
-		aspectBody
-	;
-	
+    : 'privileged'? modifier* 'aspect' id ('extends' type)? ('implements' typeList)? perClause? aspectBody
+    ;
+
 advice
-	:	'strictfp'? adviceSpec ('throws' typeList)? ':' pointcutExpression methodBody
-	;
+    : 'strictfp'? adviceSpec ('throws' typeList)? ':' pointcutExpression methodBody
+    ;
 
 adviceSpec
-	:	'before' formalParameters
-	|	'after' formalParameters
-	|	'after' formalParameters 'returning' ('(' formalParameter? ')')? 
-	|	'after' formalParameters 'throwing' ('(' formalParameter? ')')? 
-	|	(type | 'void') 'around' formalParameters
-	;
+    : 'before' formalParameters
+    | 'after' formalParameters
+    | 'after' formalParameters 'returning' ('(' formalParameter? ')')?
+    | 'after' formalParameters 'throwing' ('(' formalParameter? ')')?
+    | (type | 'void') 'around' formalParameters
+    ;
 
 perClause
-	:	'pertarget' '(' pointcutExpression ')'
-	|	'perthis' '(' pointcutExpression ')'
-	|	'percflow' '(' pointcutExpression ')' 
-	|	'percflowbelow' '(' pointcutExpression ')' 
-	|	'pertypewithin' '(' typePattern ')' 
-	|	'issingleton' '(' ')'
-	;
-	
+    : 'pertarget' '(' pointcutExpression ')'
+    | 'perthis' '(' pointcutExpression ')'
+    | 'percflow' '(' pointcutExpression ')'
+    | 'percflowbelow' '(' pointcutExpression ')'
+    | 'pertypewithin' '(' typePattern ')'
+    | 'issingleton' '(' ')'
+    ;
+
 pointcutDeclaration
-	:	'abstract' modifier* 'pointcut' id formalParameters ';'
-	|	modifier* 'pointcut' id formalParameters ':' pointcutExpression ';'
- 	;
-	
+    : 'abstract' modifier* 'pointcut' id formalParameters ';'
+    | modifier* 'pointcut' id formalParameters ':' pointcutExpression ';'
+    ;
+
 pointcutExpression
-	:	(pointcutPrimitive | referencePointcut)
-	|	'!' pointcutExpression
-	|	'(' pointcutExpression ')'
-	|	pointcutExpression '&&' pointcutExpression
-	|	pointcutExpression '||' pointcutExpression 
-	;
-	
+    : (pointcutPrimitive | referencePointcut)
+    | '!' pointcutExpression
+    | '(' pointcutExpression ')'
+    | pointcutExpression '&&' pointcutExpression
+    | pointcutExpression '||' pointcutExpression
+    ;
+
 pointcutPrimitive
-	:	'call' '(' methodOrConstructorPattern ')'					#CallPointcut
-	|	'execution' '(' methodOrConstructorPattern ')'			#ExecutionPointcut
-	|	'initialization' '(' constructorPattern ')'					#InitializationPointcut
-	|	'preinitialization' '(' constructorPattern ')'              	#PreInitializationPointcut
-	|	'staticinitialization' '(' optionalParensTypePattern ')'		#StaticInitializationPointcut
-	|	'get' '(' fieldPattern ')'									#GetPointcut
-	|	'set' '(' fieldPattern ')'										#SetPointcut
-	|	'handler' '(' optionalParensTypePattern ')'					#HandlerPointcut
-	|	'adviceexecution' '(' ')'									#AdviceExecutionPointcut
-	|	'within' '(' optionalParensTypePattern ')'					#WithinPointcut
-	|	'withincode' '(' methodOrConstructorPattern ')'			#WithinCodePointcut
-	|	'cflow' '(' pointcutExpression ')'							#CFlowPointcut
-	|	'cflowbelow' '(' pointcutExpression ')'						#CFlowBelowPointcut
-	|	'if' '(' expression? ')'										#IfPointcut
-	|	'this' '(' typeOrIdentifier ')'								#ThisPointcutPointcut
-	|	'target' '(' typeOrIdentifier ')'								#TargetPointcut
-	|	'args' '(' argsPatternList ')'								#ArgsPointcut
-	|	'@' 'this' '(' annotationOrIdentifer ')'						#AnnotationThisPointcut
-	|	'@' 'target' '(' annotationOrIdentifer ')'					#AnnotationTargetPointcut
-	|	'@' 'args' '(' annotationsOrIdentifiersPattern ')'			#AnnotationArgsPointcut
-	|	'@' 'within' '(' annotationOrIdentifer ')'					#AnnotationWithinPointcut
-	|	'@' 'withincode' '(' annotationOrIdentifer ')'				#AnnotationWithinCodePointcut
-	|	'@' 'annotation' '(' annotationOrIdentifer ')'				#AnnotationPointcut
-	;
+    : 'call' '(' methodOrConstructorPattern ')'                # CallPointcut
+    | 'execution' '(' methodOrConstructorPattern ')'           # ExecutionPointcut
+    | 'initialization' '(' constructorPattern ')'              # InitializationPointcut
+    | 'preinitialization' '(' constructorPattern ')'           # PreInitializationPointcut
+    | 'staticinitialization' '(' optionalParensTypePattern ')' # StaticInitializationPointcut
+    | 'get' '(' fieldPattern ')'                               # GetPointcut
+    | 'set' '(' fieldPattern ')'                               # SetPointcut
+    | 'handler' '(' optionalParensTypePattern ')'              # HandlerPointcut
+    | 'adviceexecution' '(' ')'                                # AdviceExecutionPointcut
+    | 'within' '(' optionalParensTypePattern ')'               # WithinPointcut
+    | 'withincode' '(' methodOrConstructorPattern ')'          # WithinCodePointcut
+    | 'cflow' '(' pointcutExpression ')'                       # CFlowPointcut
+    | 'cflowbelow' '(' pointcutExpression ')'                  # CFlowBelowPointcut
+    | 'if' '(' expression? ')'                                 # IfPointcut
+    | 'this' '(' typeOrIdentifier ')'                          # ThisPointcutPointcut
+    | 'target' '(' typeOrIdentifier ')'                        # TargetPointcut
+    | 'args' '(' argsPatternList ')'                           # ArgsPointcut
+    | '@' 'this' '(' annotationOrIdentifer ')'                 # AnnotationThisPointcut
+    | '@' 'target' '(' annotationOrIdentifer ')'               # AnnotationTargetPointcut
+    | '@' 'args' '(' annotationsOrIdentifiersPattern ')'       # AnnotationArgsPointcut
+    | '@' 'within' '(' annotationOrIdentifer ')'               # AnnotationWithinPointcut
+    | '@' 'withincode' '(' annotationOrIdentifer ')'           # AnnotationWithinCodePointcut
+    | '@' 'annotation' '(' annotationOrIdentifer ')'           # AnnotationPointcut
+    ;
 
 referencePointcut
-	:	(typePattern '.')? id formalParametersPattern
-	;
-	
+    : (typePattern '.')? id formalParametersPattern
+    ;
+
 interTypeMemberDeclaration
-	:	modifier* (type|'void') type '.' id formalParameters ('throws' typeList)? methodBody
-	|	modifier* 'abstract' modifier* (type|'void') type '.' id formalParameters ('throws' typeList)? ';'
-	|	modifier* type '.' 'new' formalParameters ('throws' typeList)? methodBody
-	|	modifier* (type|'void') type '.' id ('=' expression)? ';'
-	;
+    : modifier* (type | 'void') type '.' id formalParameters ('throws' typeList)? methodBody
+    | modifier* 'abstract' modifier* (type | 'void') type '.' id formalParameters (
+        'throws' typeList
+    )? ';'
+    | modifier* type '.' 'new' formalParameters ('throws' typeList)? methodBody
+    | modifier* (type | 'void') type '.' id ('=' expression)? ';'
+    ;
 
 interTypeDeclaration
-	:	'declare' 'parents' ':' typePattern 'extends' type ';'
-	|	'declare' 'parents' ':' typePattern 'implements' typeList ';' 
-	|	'declare' 'warning' ':' pointcutExpression ':' StringLiteral ';'
-	|	'declare' 'error' ':' pointcutExpression ':' StringLiteral ';'
-	|	'declare' 'soft' ':' type ':' pointcutExpression ';'
-	|	'declare' 'precedence' ':' typePatternList ';'
-	|	'declare' '@' 'type' ':' typePattern ':' annotation ';'
-	|	'declare' '@' 'method' ':' methodPattern ':' annotation ';' 
-	|	'declare' '@' 'constructor' ':' constructorPattern ':' annotation ';' 
-	|	'declare' '@' 'field' ':' fieldPattern ':' annotation ';'
-	;
+    : 'declare' 'parents' ':' typePattern 'extends' type ';'
+    | 'declare' 'parents' ':' typePattern 'implements' typeList ';'
+    | 'declare' 'warning' ':' pointcutExpression ':' StringLiteral ';'
+    | 'declare' 'error' ':' pointcutExpression ':' StringLiteral ';'
+    | 'declare' 'soft' ':' type ':' pointcutExpression ';'
+    | 'declare' 'precedence' ':' typePatternList ';'
+    | 'declare' '@' 'type' ':' typePattern ':' annotation ';'
+    | 'declare' '@' 'method' ':' methodPattern ':' annotation ';'
+    | 'declare' '@' 'constructor' ':' constructorPattern ':' annotation ';'
+    | 'declare' '@' 'field' ':' fieldPattern ':' annotation ';'
+    ;
 
 typePattern
-	:	simpleTypePattern
-	|	'!' typePattern 
-	|	'(' annotationPattern? typePattern ')'
-	|	typePattern '&&' typePattern 
-  	|	typePattern '||' typePattern
-  	;
-  	  	
+    : simpleTypePattern
+    | '!' typePattern
+    | '(' annotationPattern? typePattern ')'
+    | typePattern '&&' typePattern
+    | typePattern '||' typePattern
+    ;
+
 simpleTypePattern
-	:	dottedNamePattern '+'? ('[' ']')*
-  	;
-  	
+    : dottedNamePattern '+'? ('[' ']')*
+    ;
+
 dottedNamePattern
-	:	(type | id | '*' | '.' | '..')+
-	|	'void'
-	;    
+    : (type | id | '*' | '.' | '..')+
+    | 'void'
+    ;
 
 optionalParensTypePattern
-	:	'(' annotationPattern? typePattern ')'
-	|	annotationPattern? typePattern
-	;
-	
-	
+    : '(' annotationPattern? typePattern ')'
+    | annotationPattern? typePattern
+    ;
+
 fieldPattern
-	:	annotationPattern? fieldModifiersPattern? typePattern (typePattern dotOrDotDot)? simpleNamePattern 
-	;
-	
+    : annotationPattern? fieldModifiersPattern? typePattern (typePattern dotOrDotDot)? simpleNamePattern
+    ;
+
 fieldModifiersPattern
-	:	'!'? fieldModifier fieldModifiersPattern*
-	;
-	
+    : '!'? fieldModifier fieldModifiersPattern*
+    ;
+
 fieldModifier
-	:	(	'public' 
-		|	'private' 
-		|	'protected' 
-		|	'static' 
-		|	'transient'
-		|	'final' 
-		)
-	;
-	
+    : ('public' | 'private' | 'protected' | 'static' | 'transient' | 'final')
+    ;
+
 dotOrDotDot
-	:	'.'
-	|	'..'
-	;		            		      
-		            		      		            			
+    : '.'
+    | '..'
+    ;
+
 simpleNamePattern
-	:	id ('*' id)* '*'?
-	|	'*' (id '*')* id?
-	;
-      
+    : id ('*' id)* '*'?
+    | '*' (id '*')* id?
+    ;
+
 methodOrConstructorPattern
-	:	methodPattern
-	|	constructorPattern
-	;
-	
+    : methodPattern
+    | constructorPattern
+    ;
+
 methodPattern
-	:	annotationPattern? methodModifiersPattern? typePattern (typePattern dotOrDotDot)? simpleNamePattern formalParametersPattern throwsPattern?
-	;
-	
-	
+    : annotationPattern? methodModifiersPattern? typePattern (typePattern dotOrDotDot)? simpleNamePattern formalParametersPattern throwsPattern?
+    ;
+
 methodModifiersPattern
-	:	'!'? methodModifier methodModifiersPattern*
-	;
-		
+    : '!'? methodModifier methodModifiersPattern*
+    ;
+
 methodModifier
-	:	(	'public'
-		|	'private'
-		|	'protected'
-		|	'static'
-		|	'synchronized'
-		|	'final'
-		)
-	;
-		            		      
+    : ('public' | 'private' | 'protected' | 'static' | 'synchronized' | 'final')
+    ;
+
 formalsPattern
-	:	'..' (',' formalsPatternAfterDotDot)* 
-	|	optionalParensTypePattern (',' formalsPattern)* 
-	|	typePattern '...'
-	;
-	              
+    : '..' (',' formalsPatternAfterDotDot)*
+    | optionalParensTypePattern (',' formalsPattern)*
+    | typePattern '...'
+    ;
+
 formalsPatternAfterDotDot
-	:	optionalParensTypePattern (',' formalsPatternAfterDotDot)* 
-	|	typePattern '...'
-	;
-	                              		                  
+    : optionalParensTypePattern (',' formalsPatternAfterDotDot)*
+    | typePattern '...'
+    ;
+
 throwsPattern
-	:	'throws' typePatternList
-	;
-		
+    : 'throws' typePatternList
+    ;
+
 typePatternList
-	:	typePattern (',' typePattern)*
-	;
+    : typePattern (',' typePattern)*
+    ;
 
-		
 constructorPattern
-	:	annotationPattern? constructorModifiersPattern? (typePattern dotOrDotDot)? 'new' formalParametersPattern throwsPattern?
-	;
-	
-constructorModifiersPattern
-	:	'!'? constructorModifier constructorModifiersPattern*
-	;
-		
-constructorModifier
-	:	('public' | 'private' | 'protected')
-	;
+    : annotationPattern? constructorModifiersPattern? (typePattern dotOrDotDot)? 'new' formalParametersPattern throwsPattern?
+    ;
 
-	
+constructorModifiersPattern
+    : '!'? constructorModifier constructorModifiersPattern*
+    ;
+
+constructorModifier
+    : ('public' | 'private' | 'protected')
+    ;
+
 annotationPattern
-	:	'!'? '@' annotationTypePattern annotationPattern* 
-	;
+    : '!'? '@' annotationTypePattern annotationPattern*
+    ;
 
 annotationTypePattern
-	:	qualifiedName 
-	|	'(' typePattern ')'
-	;
-	
+    : qualifiedName
+    | '(' typePattern ')'
+    ;
+
 formalParametersPattern
-	:	'(' formalsPattern? ')'
-	;
+    : '(' formalsPattern? ')'
+    ;
 
 typeOrIdentifier
-	:	type
-	|	variableDeclaratorId
-	;
-	
+    : type
+    | variableDeclaratorId
+    ;
+
 annotationOrIdentifer
-	:	qualifiedName | id
-	;
+    : qualifiedName
+    | id
+    ;
 
 annotationsOrIdentifiersPattern
-	:	'..' (',' annotationsOrIdentifiersPatternAfterDotDot)?
-	|	annotationOrIdentifer (',' annotationsOrIdentifiersPattern)*
-	|	'*' (',' annotationsOrIdentifiersPattern)*
-	;
-	                  
-annotationsOrIdentifiersPatternAfterDotDot
-	:	annotationOrIdentifer (',' annotationsOrIdentifiersPatternAfterDotDot)*
-	|	'*' (',' annotationsOrIdentifiersPatternAfterDotDot)*
-	;
-	
-argsPattern
-	:	typeOrIdentifier 
-	|	('*' | '..')
-	;
-	
-argsPatternList
-	:	argsPattern (',' argsPattern)* 
-	;
+    : '..' (',' annotationsOrIdentifiersPatternAfterDotDot)?
+    | annotationOrIdentifer (',' annotationsOrIdentifiersPattern)*
+    | '*' (',' annotationsOrIdentifiersPattern)*
+    ;
 
+annotationsOrIdentifiersPatternAfterDotDot
+    : annotationOrIdentifer (',' annotationsOrIdentifiersPatternAfterDotDot)*
+    | '*' (',' annotationsOrIdentifiersPatternAfterDotDot)*
+    ;
+
+argsPattern
+    : typeOrIdentifier
+    | ('*' | '..')
+    ;
+
+argsPatternList
+    : argsPattern (',' argsPattern)*
+    ;
 
 // all of the following rules are only necessary to change rules in the original Java grammar from 'Identifier' to 'id'
 
 id
-	:	(	ARGS 
-		|	AFTER 
-		|	AROUND 
-		|	ASPECT
-		|	BEFORE
-		|	CALL
-		|	CFLOW
-		|	CFLOWBELOW
-		|	DECLARE
-		|	ERROR
-		|	EXECUTION
-		|	GET
-		|	HANDLER
-		|	INITIALIZATION
-		|	ISSINGLETON
-		|	PARENTS
-		|	PERCFLOW
-		|	PERCFLOWBELOW
-		|	PERTARGET
-		|	PERTHIS
-		|	PERTYPEWITHIN
-		|	POINTCUT
-		|	PRECEDENCE
-		|	PREINITIALIZATION
-		|	PRIVILEGED
-		|	RETURNING
-		|	SET
-		|	SOFT
-		|	STATICINITIALIZATION
-		|	TARGET
-		|	THROWING
-		|	WARNING
-		|	WITHIN
-		|	WITHINCODE
-		)
-	|	Identifier
-	;
-	
-	
+    : (
+        ARGS
+        | AFTER
+        | AROUND
+        | ASPECT
+        | BEFORE
+        | CALL
+        | CFLOW
+        | CFLOWBELOW
+        | DECLARE
+        | ERROR
+        | EXECUTION
+        | GET
+        | HANDLER
+        | INITIALIZATION
+        | ISSINGLETON
+        | PARENTS
+        | PERCFLOW
+        | PERCFLOWBELOW
+        | PERTARGET
+        | PERTHIS
+        | PERTYPEWITHIN
+        | POINTCUT
+        | PRECEDENCE
+        | PREINITIALIZATION
+        | PRIVILEGED
+        | RETURNING
+        | SET
+        | SOFT
+        | STATICINITIALIZATION
+        | TARGET
+        | THROWING
+        | WARNING
+        | WITHIN
+        | WITHINCODE
+    )
+    | Identifier
+    ;
+
 classDeclaration
-    :   'class' id typeParameters?
-        ('extends' type)?
-        ('implements' typeList)?
-        classBody
+    : 'class' id typeParameters? ('extends' type)? ('implements' typeList)? classBody
     ;
-    
+
 typeParameter
-    :   id ('extends' typeBound)?
+    : id ('extends' typeBound)?
     ;
-    
+
 enumDeclaration
-    :   ENUM id ('implements' typeList)?
-        '{' enumConstants? ','? enumBodyDeclarations? '}'
+    : ENUM id ('implements' typeList)? '{' enumConstants? ','? enumBodyDeclarations? '}'
     ;
 
 enumConstant
-    :   annotation* id arguments? classBody?
+    : annotation* id arguments? classBody?
     ;
-    
+
 interfaceDeclaration
-    :   'interface' id typeParameters? ('extends' typeList)? interfaceBody
+    : 'interface' id typeParameters? ('extends' typeList)? interfaceBody
     ;
-    
+
 methodDeclaration
-    :   (type|'void') id formalParameters ('[' ']')*
-        ('throws' qualifiedNameList)?
-        (   methodBody
-        |   ';'
-        )
+    : (type | 'void') id formalParameters ('[' ']')* ('throws' qualifiedNameList)? (
+        methodBody
+        | ';'
+    )
     ;
 
 constructorDeclaration
-    :   id formalParameters ('throws' qualifiedNameList)?
-        constructorBody
+    : id formalParameters ('throws' qualifiedNameList)? constructorBody
     ;
-    
+
 constantDeclarator
-    :   id ('[' ']')* '=' variableInitializer
+    : id ('[' ']')* '=' variableInitializer
     ;
-    
+
 interfaceMethodDeclaration
-    :   (type|'void') id formalParameters ('[' ']')*
-        ('throws' qualifiedNameList)?
-        ';'
+    : (type | 'void') id formalParameters ('[' ']')* ('throws' qualifiedNameList)? ';'
     ;
-    
+
 variableDeclaratorId
-    :   id ('[' ']')*
+    : id ('[' ']')*
     ;
-    
+
 enumConstantName
-    :   id
+    : id
     ;
-    
+
 classOrInterfaceType
-    :   id typeArguments? ('.' id typeArguments? )*
+    : id typeArguments? ('.' id typeArguments?)*
     ;
 
 qualifiedName
-    :   id ('.' id)*
+    : id ('.' id)*
     ;
-    
+
 elementValuePair
-    :   id '=' elementValue
+    : id '=' elementValue
     ;
-    
+
 annotationTypeDeclaration
-    :   '@' 'interface' id annotationTypeBody
+    : '@' 'interface' id annotationTypeBody
     ;
-    
+
 annotationMethodRest
-    :   id '(' ')' defaultValue?
+    : id '(' ')' defaultValue?
     ;
-    
+
 statement
-    :   block
-    |   ASSERT expression (':' expression)? ';'
-    |   'if' parExpression statement ('else' statement)?
-    |   'for' '(' forControl ')' statement
-    |   'while' parExpression statement
-    |   'do' statement 'while' parExpression ';'
-    |   'try' block (catchClause+ finallyBlock? | finallyBlock)
-    |   'try' resourceSpecification block catchClause* finallyBlock?
-    |   'switch' parExpression '{' switchBlockStatementGroup* switchLabel* '}'
-    |   'synchronized' parExpression block
-    |   'return' expression? ';'
-    |   'throw' expression ';'
-    |   'break' id? ';'
-    |   'continue' id? ';'
-    |   ';'
-    |   statementExpression ';'
-    |   id ':' statement
+    : block
+    | ASSERT expression (':' expression)? ';'
+    | 'if' parExpression statement ('else' statement)?
+    | 'for' '(' forControl ')' statement
+    | 'while' parExpression statement
+    | 'do' statement 'while' parExpression ';'
+    | 'try' block (catchClause+ finallyBlock? | finallyBlock)
+    | 'try' resourceSpecification block catchClause* finallyBlock?
+    | 'switch' parExpression '{' switchBlockStatementGroup* switchLabel* '}'
+    | 'synchronized' parExpression block
+    | 'return' expression? ';'
+    | 'throw' expression ';'
+    | 'break' id? ';'
+    | 'continue' id? ';'
+    | ';'
+    | statementExpression ';'
+    | id ':' statement
     ;
-    
+
 catchClause
-    :   'catch' '(' variableModifier* catchType id ')' block
+    : 'catch' '(' variableModifier* catchType id ')' block
     ;
-    
+
 expression
-    :   primary
-    |   expression '.' id
-    |   expression '.' 'this'
-    |   expression '.' 'new' nonWildcardTypeArguments? innerCreator
-    |   expression '.' 'super' superSuffix
-    |   expression '.' explicitGenericInvocation
-    |   expression '[' expression ']'
-    |   expression '(' expressionList? ')'
-    |   'new' creator
-    |   '(' type ')' expression
-    |   expression ('++' | '--')
-    |   ('+'|'-'|'++'|'--') expression
-    |   ('~'|'!') expression
-    |   expression ('*'|'/'|'%') expression
-    |   expression ('+'|'-') expression
-    |   expression ('<' '<' | '>' '>' '>' | '>' '>') expression
-    |   expression ('<=' | '>=' | '>' | '<') expression
-    |   expression 'instanceof' type
-    |   expression ('==' | '!=') expression
-    |   expression '&' expression
-    |   expression '^' expression
-    |   expression '|' expression
-    |   expression '&&' expression
-    |   expression '||' expression
-    |   expression '?' expression ':' expression
-    |   /*<assoc=right>*/ expression
-        (   '='
-        |   '+='
-        |   '-='
-        |   '*='
-        |   '/='
-        |   '&='
-        |   '|='
-        |   '^='
-        |   '>>='
-        |   '>>>='
-        |   '<<='
-        |   '%='
-        )
-        expression
+    : primary
+    | expression '.' id
+    | expression '.' 'this'
+    | expression '.' 'new' nonWildcardTypeArguments? innerCreator
+    | expression '.' 'super' superSuffix
+    | expression '.' explicitGenericInvocation
+    | expression '[' expression ']'
+    | expression '(' expressionList? ')'
+    | 'new' creator
+    | '(' type ')' expression
+    | expression ('++' | '--')
+    | ('+' | '-' | '++' | '--') expression
+    | ('~' | '!') expression
+    | expression ('*' | '/' | '%') expression
+    | expression ('+' | '-') expression
+    | expression ('<' '<' | '>' '>' '>' | '>' '>') expression
+    | expression ('<=' | '>=' | '>' | '<') expression
+    | expression 'instanceof' type
+    | expression ('==' | '!=') expression
+    | expression '&' expression
+    | expression '^' expression
+    | expression '|' expression
+    | expression '&&' expression
+    | expression '||' expression
+    | expression '?' expression ':' expression
+    | /*<assoc=right>*/ expression (
+        '='
+        | '+='
+        | '-='
+        | '*='
+        | '/='
+        | '&='
+        | '|='
+        | '^='
+        | '>>='
+        | '>>>='
+        | '<<='
+        | '%='
+    ) expression
     ;
 
 primary
-    :   '(' expression ')'
-    |   'this'
-    |   'super'
-    |   literal
-    |   id
-    |   type '.' 'class'
-    |   'void' '.' 'class'
-    |   nonWildcardTypeArguments (explicitGenericInvocationSuffix | 'this' arguments)
+    : '(' expression ')'
+    | 'this'
+    | 'super'
+    | literal
+    | id
+    | type '.' 'class'
+    | 'void' '.' 'class'
+    | nonWildcardTypeArguments (explicitGenericInvocationSuffix | 'this' arguments)
     ;
-    
+
 createdName
-    :   id typeArgumentsOrDiamond? ('.' id typeArgumentsOrDiamond?)*
-    |   primitiveType
+    : id typeArgumentsOrDiamond? ('.' id typeArgumentsOrDiamond?)*
+    | primitiveType
     ;
 
 innerCreator
-    :   id nonWildcardTypeArgumentsOrDiamond? classCreatorRest
+    : id nonWildcardTypeArgumentsOrDiamond? classCreatorRest
     ;
-    
+
 superSuffix
-    :   arguments
-    |   '.' id arguments?
+    : arguments
+    | '.' id arguments?
     ;
-    
+
 explicitGenericInvocationSuffix
-    :   'super' superSuffix
-    |   id arguments
+    : 'super' superSuffix
+    | id arguments
     ;
-    

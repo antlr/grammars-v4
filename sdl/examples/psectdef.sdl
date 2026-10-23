@@ -1,0 +1,60 @@
+	module $defpst;
+/*
+/*  Copyright © 1996, Digital Equipment Corporation.
+/*
+/* Modifications:
+/*
+/*	003D	Ayub Khan	 5-Jan-1987	<367 SVCG D>
+/*
+/*		Added definition of the GPS$V_UNMOD flag.
+/*
+/*	002	Keith Knowles	 5-Nov-1985	(119 SVCG D)
+/*
+/*		Define constants relating to code psect alignment.
+/*
+/*	001	Tom Benson	13-Feb-1984	(003 VCG)
+/*
+/*		Added modification history.
+/*
+/*
+
+/*
+/* define alignment of the code psect.  code-binder will align some labels
+/* accordingly.
+/*
+CONSTANT pst_k_code_psect_alignment EQUALS 2;	{ A002D longword alignment
+/*
+/* define psect descriptor data base
+/*
+AGGREGATE vcg_psect_descr STRUCTURE;
+
+	pst_l_curofs	LONGWORD;		{ Current offset into section
+	pst_w_secnum	WORD;			{ Program section number
+	pst_u_flags	UNION;			{ Section flags
+		pst_w_flags	WORD;
+		pst_r_flags STRUCTURE PREFIX "pst_";
+			pic	BITFIELD MASK;	{ Position independent 
+			lib	BITFIELD MASK;	{ From a shareable image 
+			ovr	BITFIELD MASK;	{ Overlaid memory allocation 
+		        rel	BITFIELD MASK;	{ Relocatable 
+	        	gbl	BITFIELD MASK;	{ Global scope 
+	        	shr	BITFIELD MASK;	{ Shareable 
+	        	exe	BITFIELD MASK;	{ Executable 
+	        	rd	BITFIELD MASK;	{ Readable 
+	        	wrt	BITFIELD MASK;	{ Writeable 
+	        	vec	BITFIELD MASK;	{ Vector psect
+			unmod	BITFIELD MASK;	{ A003D Psect unmodified 
+			pst_spare_flags BITFIELD LENGTH 16-^;{ M003D
+			END;
+		END;
+	pst_b_align	BYTE;			{ Section alignment
+	pst_vt_name	CHARACTER LENGTH 32 VARYING;{ Name of the section
+#pst_length = .;
+	END;
+/*
+/* Define the length of a psect descriptor
+/*
+CONSTANT pst_k_length EQUALS (#pst_length);
+/*
+/*
+END_MODULE;

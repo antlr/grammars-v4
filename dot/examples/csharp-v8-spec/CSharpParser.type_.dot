@@ -1,0 +1,27 @@
+digraph ATN {
+rankdir=LR;
+s39[fontsize=11, label="39", shape=doublecircle, fixedsize=true, width=.6];
+s898[fontsize=11,label="898", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s899[fontsize=11,label="899", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s900[fontsize=11,label="900", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s901[fontsize=11,label="901", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s38[fontsize=11,label="38", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s902[fontsize=11,label="902", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s903[fontsize=11,label="903", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s904[fontsize=11,label="904", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s905[fontsize=11,label="{&rarr;\n905\nd=13|{<p0>|<p1>|<p2>|<p3>}}", shape=record, fixedsize=false, peripheries=1];
+s906[fontsize=11,label="&larr;\n906", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s38 -> s905 [fontname="Times-Italic", label="&epsilon;"];
+s905:p0 -> s898 [fontname="Times-Italic", label="&epsilon;"];
+s905:p1 -> s900 [fontname="Times-Italic", label="&epsilon;"];
+s905:p2 -> s902 [fontname="Times-Italic", label="&epsilon;"];
+s905:p3 -> s904 [fontname="Times-Italic", label="&epsilon;"];
+s898 -> s899 [fontsize=11, fontname="Courier", arrowsize=.7, label = "pred_19:0", arrowhead = normal];
+s900 -> s901 [fontsize=11, fontname="Courier", arrowsize=.7, label = "pred_19:1", arrowhead = normal];
+s902 -> s903 [fontsize=11, fontname="Courier", arrowsize=.7, label = "pred_19:2", arrowhead = normal];
+s904 -> s906 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<pointer_type>", arrowhead = normal];
+s899 -> s906 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<type_parameter>", arrowhead = normal];
+s901 -> s906 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<value_type>", arrowhead = normal];
+s903 -> s906 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<reference_type>", arrowhead = normal];
+s906 -> s39 [fontname="Times-Italic", label="&epsilon;"];
+}
