@@ -805,7 +805,7 @@ declare_element
    ;
 
 replace_stmt
-   : REPLACE replace_head BY text ';'
+   : REPLACE replace_head BY text_ ';'
    ;
 
 replace_head
@@ -818,7 +818,7 @@ arg_list
    | arg_list ',' identifier
    ;
 
-text
+text_
    : expression
    ;
 
