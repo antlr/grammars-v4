@@ -1,7 +1,7 @@
 \<!-- Generated from trgen <version> -->
 \<Project Sdk="Microsoft.NET.Sdk" >
   \<PropertyGroup>
-    \<TargetFramework>net8.0\</TargetFramework>
+    \<TargetFramework>net10.0\</TargetFramework>
     \<OutputType>Exe\</OutputType>
   \</PropertyGroup>
   \<ItemGroup>
@@ -28,14 +28,14 @@
     -->
     \<MyTester>\<![CDATA[
 err=0
-for g in `dotnet trglob -- '../<example_files_unix>' | grep -v '.errors$' | grep -v '.tree$'`
+for g in `dotnet trash glob -- <glob_args_unix> | grep -v '.errors$' | grep -v '.tree$'`
 do
   file=$g
   x1="${g##*.}"
   if [ "$x1" != "errors" ]
   then
     echo $file
-    cat $file | bin/Debug/net8.0/Test
+    cat $file | bin/Debug/net10.0/Test
     status="$?"
     if [ -f "$file".errors ]
     then
@@ -71,7 +71,7 @@ for %%G in (..\\<example_files_win>\*) do (
   set X3=%%~pG
   if !X1! neq .errors (
     echo !FILE!
-    cat !FILE! | bin\Debug\net8.0\Test.exe
+    cat !FILE! | bin\Debug\net10.0\Test.exe
     if not exist !FILE!.errors (
       if ERRORLEVEL 1 set ERR=1
     ) else (

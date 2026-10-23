@@ -1,0 +1,120 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>Grading Tool Reference</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    DIV.Examples {font-family: "Courier New", monospace; font-size: 90%; line-height: 122%; margin-left: 2.2em; margin-bottom: 0.6em}
+    DIV.Indented3MediumHanging-Body {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 6.0em; margin-top: 0em; margin-bottom: 0.6em}
+    DIV.Indented3MediumHanging-Term {float: left; font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 2.0em; margin-top: 0em; margin-bottom: 0em}
+    DIV.Indented4MediumHanging-Body {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 8.0em; margin-top: 0em; margin-bottom: 0.6em}
+    DIV.Indented4MediumHanging-Term {float: left; font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 4.0em; margin-top: 0em; margin-bottom: 0em}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-613.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-615.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>6.1.4 Grading Tool Reference</H1>
+<div class="Normal" style="margin-bottom: 0.4em">The command line for 
+the Grading Tool is:</div>
+<div class="Examples">&nbsp;&nbsp;Grade&nbsp;&lt;Event_Trace_File_Name&gt;&nbsp;&lt;Summary_of_Tests_File_Name&gt;&nbsp;&lt;Manual_Grading_Request_Name&gt;&nbsp;&lt;Quoted&nbsp;Report&nbsp;Title&gt;&nbsp;[options]</div>
+<div class="Indented3MediumHanging-Term">&lt;Event_Trace_File_Name&gt;</div><div class="Indented3MediumHanging-Body"><br clear="left">
+The name of an event trace file (see <A HREF="UG-62.HTM">6.2</A>). This 
+can use any file name acceptable to the implementation that compiled 
+the tool (in particular, full paths may be used on most implementations). 
+The event trace should contain traces of the processing of at least the 
+tests to be graded; it is acceptable to include traces for additional 
+tests that are not being graded.</div>
+<div class="Indented3MediumHanging-Term">&lt;Summary_of_Tests_File_Name&gt;</div><div class="Indented3MediumHanging-Body"><br clear="left">
+The name of a test summary file (see <A HREF="UG-63.HTM">6.3</A>). This 
+can use any file name acceptable to the implementation that compiled 
+the tool (in particular, full paths may be used on most implementations). 
+The test summary file should contain the summaries of exactly the tests 
+that need to be graded; all of the tests summarized in the file will 
+be graded regardless of the contents of the event trace. If the event 
+trace does not include a test that is in the summary file, the test will 
+be graded &quot;Failed - Compile Missing&quot;.</div>
+<div class="Indented3MediumHanging-Term">&lt;Manual_Grading_Request_Name&gt;</div><div class="Indented3MediumHanging-Body"><br clear="left">
+The name of a manual grading request file (see <A HREF="UG-64.HTM">6.4</A>). 
+This can use any file name acceptable to the implementation that compiled 
+the tool (in particular, full paths may be used on most implementations). 
+ This file may include names of tests not included in the test summary 
+file; such names will have no effect on grading.</div>
+<div class="Indented3MediumHanging-Term">&lt;Quoted Report Title&gt;</div><div class="Indented3MediumHanging-Body"><br clear="left">
+A double quoted string containing the name of the test report. This is 
+primarily intended so that similar-looking reports can be differentiated.</div>
+<div class="Indented3MediumHanging-Term">[options]</div><div class="Indented3MediumHanging-Body">
+Zero or more optional setting flags for the Grading Tool. These are case-insensitive, 
+and can be:&nbsp;</div>
+<div class="Indented4MediumHanging-Term">-Specs_Optional</div><div class="Indented4MediumHanging-Body"><br clear="left">
+Compiling of specifications is optional. Use for source-based compilers 
+(such as the commonly used GNAT compiler) that don't compile specifications 
+in normal operation. Compilation of bodies, instances, and so on are 
+checked.</div>
+<div class="Indented4MediumHanging-Term">-Check_All_Compiles</div><div class="Indented4MediumHanging-Body"><br clear="left">
+All compilations are checked and must be present (unless processing the 
+unit is marked as optional). This is the default.</div>
+<div class="Indented4MediumHanging-Term">-No_Compile_Checks</div><div class="Indented4MediumHanging-Body"><br clear="left">
+No compilation checks are made. This option is not allowed for formal 
+conformity assessments.</div>
+<div class="Indented4MediumHanging-Term">-Use_Time_Stamps</div><div class="Indented4MediumHanging-Body"><br clear="left">
+Check event trace time stamp information as part of checking, specifically, 
+enforce that all units of a test are compiled and run in an appropriate 
+order and reasonably close in time. This is the default.</div>
+<div class="Indented4MediumHanging-Term">-No_Time_Stamps</div><div class="Indented4MediumHanging-Body"><br clear="left">
+Do not make any check of event trace time stamps. Use this option only 
+if there is no meaningful timestamps in the event trace. This option 
+is not allowed for formal conformity assessments.</div>
+<div class="Indented4MediumHanging-Term">-Use_Positions</div><div class="Indented4MediumHanging-Body"><br clear="left">
+Use position information when checking whether errors are appropriately 
+detected. This is the default.</div>
+<div class="Indented4MediumHanging-Term">-No_Positions</div><div class="Indented4MediumHanging-Body"><br clear="left">
+Use only line information when checking whether errors are appropriately 
+detected. Use this option if the event trace doesn't have position information. 
+It is acceptable to use this option for formal conformity assessments.</div>
+<div class="Indented4MediumHanging-Term">-Quiet</div><div class="Indented4MediumHanging-Body">
+Produce minimal information: a list of failed tests and the summary report.</div>
+<div class="Indented4MediumHanging-Term">-Verbose</div><div class="Indented4MediumHanging-Body">
+Produce information about every test processed (including passed tests), 
+along with the summary report. In this mode, the grading tool also produces 
+a warning for multiple messages for one error tag.</div>
+<div class="Indented4MediumHanging-Term">-Normal</div><div class="Indented4MediumHanging-Body">
+Produce details about each failed test, along with the summary report. 
+This is the default.&nbsp;</div>
+<div class="Normal">Only one of the options -Specs_Optional, -Check_All_Compiles, 
+or -No_Compile_Checks can be given. Only one of the options -Use_Positions 
+or -No_Positions can be given. Only one of the options -Quiet, -Verbose, 
+or -Normal can be given. Only one of the options -Use_Time_Stamps or 
+-No_Time_Stamps can be given.</div>
+<div class="Normal">An annotated example using the grading tool is given 
+in subclause <A HREF="UG-612.HTM">6.1.2</A>, &ldquo;<A HREF="UG-612.HTM">Annotated 
+Grading Tool Example</A>&rdquo;. That example explains the output of 
+the grading tool.</div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-613.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-615.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>

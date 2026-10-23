@@ -1,0 +1,16 @@
+
+/* file info record for SDIR - note if this structure changes in size  */
+/* the multXX: routine in the sort.plm module must also change         */
+
+declare
+        f$info$structure lit 'structure(
+            usr byte, name (8) byte, type (3) byte, onekblocks address,
+            kbytes address, recs$lword address, recs$hbyte byte,
+            hash$link address, x$i$adr address)';
+declare
+        x$info$structure lit 'structure (
+            create (4) byte,
+            update (4) byte,
+            passmode byte)';
+
+

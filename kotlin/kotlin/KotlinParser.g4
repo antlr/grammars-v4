@@ -2,12 +2,13 @@
  * Kotlin Grammar for ANTLR v4
  *
  * Based on:
- * http://jetbrains.github.io/kotlin-spec/#_grammars_and_parsing
+ * jetbrains.github.io/kotlin-spec/#_grammars_and_parsing
  * and
- * http://kotlinlang.org/docs/reference/grammar.html
+ * kotlinlang.org/docs/reference/grammar.html
  *
  * Tested on
- * https://github.com/JetBrains/kotlin/tree/master/compiler/testData/psi
+ * github.com/JetBrains/kotlin/tree/master/compiler/testData/psi
+ * (stale link)
  */
 
 // $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
@@ -36,7 +37,7 @@ fileAnnotations
     ;
 
 fileAnnotation
-    : (FILE COLON (LSQUARE unescapedAnnotation+ RSQUARE | unescapedAnnotation) semi?)+
+    : (FILE_SITE COLON (LSQUARE unescapedAnnotation+ RSQUARE | unescapedAnnotation) semi?)+
     ;
 
 packageHeader
@@ -147,7 +148,7 @@ enumEntry
     ;
 
 functionDeclaration
-    : modifierList? FUN (NL* type NL* DOT)? (NL* typeParameters)? (NL* receiverType NL* DOT)? (
+    : functionModifierList? FUN (NL* type NL* DOT)? (NL* typeParameters)? (NL* receiverType NL* DOT)? (
         NL* identifier
     )? NL* functionValueParameters (NL* COLON NL* type)? (NL* typeConstraints)? (NL* functionBody)?
     ;
@@ -189,9 +190,14 @@ propertyDeclaration
     : modifierList? (VAL | VAR) (NL* typeParameters)? (NL* type NL* DOT)? (
         NL* (multiVariableDeclaration | variableDeclaration)
     ) (NL* typeConstraints)? (NL* (BY | ASSIGNMENT) NL* expression)? (
-        NL* getter (semi setter)?
-        | NL* setter (semi getter)?
+        (NL* getter (semi setter)?
+        | NL* setter (semi getter)?)
+        | NL* explicitBackingField
     )?
+    ;
+
+explicitBackingField
+    : FIELD COLON type ASSIGNMENT NL* expression
     ;
 
 multiVariableDeclaration
@@ -659,6 +665,19 @@ modifierList
     : (annotations | modifier)+
     ;
 
+functionModifierList
+    : (annotations | modifier | contextModifier)+
+    ;
+
+contextParameters
+    : LPAREN (parameter (COMMA parameter)* COMMA?)? RPAREN
+    ;
+
+contextModifier
+    : CONTEXT
+    contextParameters
+    ;
+
 modifier
     : (
         classModifier
@@ -746,15 +765,15 @@ annotationList
     ;
 
 annotationUseSiteTarget
-    : FIELD
-    | FILE
-    | PROPERTY
-    | GET
-    | SET
-    | RECEIVER
-    | PARAM
-    | SETPARAM
-    | DELEGATE
+    : FIELD_SITE
+    | FILE_SITE
+    | PROPERTY_SITE
+    | GET_SITE
+    | SET_SITE
+    | RECEIVER_SITE
+    | PARAM_SITE
+    | SETPARAM_SITE
+    | DELEGATE_SITE
     ;
 
 unescapedAnnotation
@@ -772,6 +791,7 @@ simpleIdentifier
     | ANNOTATION
     | BY
     | CATCH
+    | CONTEXT
     | COMPANION
     | CONSTRUCTOR
     | CROSSINLINE
@@ -779,6 +799,7 @@ simpleIdentifier
     | DYNAMIC
     | ENUM
     | EXTERNAL
+    | FIELD
     | FINAL
     | FINALLY
     | GETTER

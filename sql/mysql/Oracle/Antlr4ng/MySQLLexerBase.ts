@@ -22,7 +22,7 @@ export abstract class MySQLLexerBase extends Lexer {
     protected inVersionComment = false;
 
     private pendingTokens: Token[] = [];
-    private justEmittedDot: boolean;
+    private justEmittedDot: boolean = false;
 
     static #longString = "2147483647";
     static #longLength = 10;

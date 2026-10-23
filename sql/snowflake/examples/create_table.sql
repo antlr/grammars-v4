@@ -1,5 +1,5 @@
 --Keyword tester
-CREATE TABLE TESTKEYWORD(IFNULL int, NVL int, GET int, LEFT int,RIGHT int, DATE_PART int,TO_DATE int,DATE int,SPLIT int,NULLIF int,EQUAL_NULL int );
+CREATE TABLE TESTKEYWORD(IFNULL int, NVL int, GET int, LEFT int,RIGHT int, DATE_PART int,TO_DATE int,DATE int,SPLIT int,NULLIF int,EQUAL_NULL int, LOCATION int );
 create table TestK (NVL2 string, FIRST_VALUE string, RESTRICT int, NVL int, RESPECT int);
 
 create temporary table t(i int);
@@ -113,3 +113,12 @@ CREATE TABLE T (C1 int,C2 int,C3 int as hash(C1,C2));
 
 --Create or alter
 create or alter table T (C1 INT);
+
+create table tv1(v vector(int, 1));
+create table tv2(v vector(float, 2), v2 vector(float4, 2), v3 vector(float8, 2));
+
+CREATE OR REPLACE HYBRID TABLE ht1pk (COL1 NUMBER(38,0) NOT NULL COMMENT 'Primary key', CONSTRAINT PKEY_1 PRIMARY KEY (COL1));
+CREATE HYBRID TABLE IF NOT EXISTS TEST_HTABLE COMMENT = 'TEST' (C INT PRIMARY KEY) WITH ROW ACCESS POLICY RLS ON (C) WITH TAG (CONF='C2');
+CREATE HYBRID TABLE TEST_HTABLE (C INT PRIMARY KEY) COMMENT = 'TEST'  WITH TAG (CONF='C2') WITH ROW ACCESS POLICY RLS ON (C);
+
+

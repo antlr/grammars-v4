@@ -1,4 +1,5 @@
 #!/usr/bin/bash
+# set -x
 
 myrealpath ()                                                                                                                                                                                   
 {                                                                                                                                                                                             
@@ -93,6 +94,31 @@ popd > /dev/null 2>&1
 
 rm -rf `find . -name 'Generated*' -type d`
 
+# Pre-process long options not handled by getopts.
+antlr_version=""
+_args=()
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --antlr-version)
+            if [[ -z "${2:-}" || "$2" == -* ]]; then
+                echo "Error: --antlr-version requires a non-option value." >&2
+                exit 2
+            fi
+            antlr_version="$2"
+            shift 2
+            ;;
+        --antlr-version=*)
+            antlr_version="${1#*=}"
+            shift
+            ;;
+        *)
+            _args+=("$1")
+            shift
+            ;;
+    esac
+done
+set -- "${_args[@]}"
+
 # Parse args, and update computation to perform.
 order="grammars"
 additional=()
@@ -155,6 +181,11 @@ OPTIONS
            Specifies the targets to test. Possible targets are
            "CSharp", "Cpp", "Dart", "Go", "Java", "JavaScript", "Python3".
            All targets are tested by default.
+
+       --antlr-version
+           Specifies the ANTLR4 tool and runtime version to use (e.g. "4.13.1"),
+           or "dev" to clone and build from the ANTLR4 dev branch. Passed
+           directly to trgen. If omitted, trgen's default version is used.
 
 EOF
             exit 0
@@ -268,7 +299,7 @@ fi
 
 if [ "$targets" == "" ]
 then
-    targets=( Antlr4ng CSharp Cpp Dart Go Java JavaScript Python3 TypeScript )
+    targets=( Antlr4ng CSharp Cpp Dart Go Java JavaScript OphiRust Python3 Rust TypeScript )
 fi
 
 echo grammars = ${grammars[@]}
@@ -305,13 +336,15 @@ do
     if [ ! -f desc.xml ]
     then
         echo No desc.xml for $testname
+        failed+=( "$testname/$target" )
         popd > /dev/null
         continue
     fi
-    desc_targets=`dotnet trxml2 desc.xml | grep '/desc/targets'`
+    desc_targets=`dotnet trash xml2 desc.xml | grep '/desc/targets'`
     if [ "${PIPESTATUS[0]}" -ne 0 ]
     then
         echo "The desc.xml for $testname is malformed. Skipping."
+        failed+=( "$testname/$target" )
         popd > /dev/null
         continue
     fi
@@ -336,7 +369,7 @@ do
     if [ "$filter" == "agnostic" ]
     then
         # Test whether the grammars have actions.
-        count=`dotnet trparse -t ANTLRv4 *.g4 2> /dev/null | dotnet trxgrep ' //(actionBlock | argActionBlock)' | dotnet trtext -c`
+        count=`dotnet trash parse -t ANTLRv4 *.g4 2> /dev/null | dotnet trash xpath ' //(actionBlock | argActionBlock)' | dotnet trash text -c`
         if [ "$count" == "0" ]
         then
             echo "no actions => skipping $testname."
@@ -348,23 +381,47 @@ do
     # Generate driver source code.
 
     if [ $quiet != "true" ]; then echo "Generating driver for $testname."; fi
-    bad=`dotnet trgen -t "$target" --template-sources-directory "$full_path_templates" --antlr-tool-path $antlr4jar 2> /dev/null`
-    for i in $bad; do failed+=( "$testname/$target" ); done
+    build_start=$(date +"%s")
+    trgen_opts=(-t "$target" --template-sources-directory "$full_path_templates" --antlr-tool-path "$antlr4jar")
+    [[ -n "$antlr_version" ]] && trgen_opts+=(--antlr-version "$antlr_version")
+    gen_output=$(dotnet trash gen "${trgen_opts[@]}" 2>&1)
+    gen_status=$?
+    if [ "$gen_status" -ne 0 ]; then
+        echo " Build: $(thetime $(($(date +"%s") - build_start)))"
+        echo ========
+        echo "Generation of $testname for $target failed (exit $gen_status)."
+        printf '%s\n' "$gen_output"
+        echo ========
+        failed+=( "$testname/$target" )
+        popd > /dev/null
+        continue
+    fi
 
-    for d in `echo Generated-$target-* Generated-$target`
-    do
-        if [ ! -d $d ]; then continue; fi
-        if [ ! -f $d/build.sh ]; then echo " no build.sh"; continue; fi
+    generated_dirs=()
+    for d in Generated-$target-* Generated-$target; do
+        if [ -d "$d" ]; then generated_dirs+=( "$d" ); fi
+    done
+    if [ "${#generated_dirs[@]}" -eq 0 ]; then
+        echo " Build: $(thetime $(($(date +"%s") - build_start)))"
+        echo "Generation of $testname for $target produced no driver directory."
+        failed+=( "$testname/$target" )
+        popd > /dev/null
+        continue
+    fi
+
+    built_dirs=()
+    for d in "${generated_dirs[@]}"; do
+        if [ ! -f "$d/build.sh" ]; then
+            echo "No build.sh in $d."
+            failed+=( "$testname/$target" )
+            continue
+        fi
 
         # Build driver code.
         if [ $quiet != "true" ]; then echo "Building."; fi
-        pushd $d > /dev/null
-        date1=$(date +"%s")
+        pushd "$d" > /dev/null
         bash build.sh > output.txt 2>&1
         status="$?"
-        date2=$(date +"%s")
-        DIFF=$(($date2-$date1))
-        length=" Build "`thetime $DIFF`
         if [ "$status" != "0" ]
         then
             echo ""
@@ -373,14 +430,17 @@ do
             cat output.txt
             failed+=( "$testname/$target" )
             echo ========
-            popd > /dev/null
-            continue
         else
-            echo "$length"
+            built_dirs+=( "$d" )
         fi
+        popd > /dev/null
+    done
+    echo " Build: $(thetime $(($(date +"%s") - build_start)))"
 
+    for d in "${built_dirs[@]}"; do
         # Test generated parser on examples.
         if [ $quiet != "true" ]; then echo "Parsing."; fi
+        pushd "$d" > /dev/null
         date1=$(date +"%s")
         bash test.sh > output.txt 2>&1
         status="$?"
@@ -406,7 +466,7 @@ do
     popd > /dev/null
 done
 
-if [[ "$failed" == "" ]]
+if [ "${#failed[@]}" -eq 0 ]
 then
     exit 0
 else
