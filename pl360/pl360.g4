@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2022, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -30,303 +30,445 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// Transcribed from the "PL360 Syntactic Grammar" (Appendix I of the Stanford
+// PL360 Reference Manual): https://www.slac.stanford.edu/spires/explain/manuals/PL360TXT.HTML#:I
+//
+// That appendix is a "precedence grammar" written for a 1970s single-pass,
+// operator-precedence compiler: most of its productions are long chains of
+// tiny one-token "builder" rules (e.g. FUNC-DC1 through FUNC-DC7 together
+// just spell out `FUNCTION id ( number , number )`, one symbol at a time).
+// Those chains are collapsed here into ordinary EBNF (`?`, `*`, `+`, and
+// comma/paren-separated lists) rather than transcribed rule-for-rule, since a
+// literal transcription both reads poorly top-down and is riddled with
+// indirect left recursion that ANTLR4 cannot auto-resolve (it only rewrites
+// *direct* self-recursion within a single rule). A handful of rarely-used,
+// purely decorative constructs from the reference (statement sequences
+// threaded in front of the IF/WHILE keywords themselves, used by the
+// original precedence parser to admit stray comment-like statements between
+// tokens) are intentionally dropped, since BEGIN...END blocks already give
+// every statement position a way to hold more than one statement.
 grammar pl360;
-<ADR OP>     : @@
-               | @;
-<ALPHA>      : A | B | C | D | E | F | G | H | I | J | K | L | M
-               | N | O | P | Q | R | S | T | U | V | W | X | Y | Z;
-<ALPHA NUM>  : <ALPHA>
-               | <DIGIT>;
-<ARITH OP>   : '--'
-               | '++'
-               | '-'
-               | '+'
-               | '*'
-               | '/'
-               | '=:';
-<ASS STEP>   : <K REG ASS> 'STEP' <T NUMBER>;
-<BLOCKBODY>  : <BLOCKBODY> <LABEL DEF>
-               | <BLOCKBODY> <STATEMENT> ';'
-               | <BLOCKHEAD>;
-<BLOCKHEAD>  : <BLOCKHEAD> <DECL> ';'
-               | 'BEGIN';
-<BRINDX OP>  : 'GT'
-               | 'LE';
-<BYTE NUM>   : <INTEGER> 'X';
-<CASE HEAD>  : <CASE HEAD> <DECL> ';'
-               | 'CASE' <K REG> 'OF' 'BEGIN';
-<CASE SEQ>   : <CASE HEAD>
-               | <CASE SEQ> <LABEL DEF>
-               | <CASE SEQ> <STATEMENT> ;
-<CELL ST>    : <CELL ST> <LOG OP> <STRING>
-               | <CELL ST> <LOG OP> <T CELL>
-               | <CELL ST> <LOG OP> <T NUMBER>
-               | <T CELL> ':=' <K REG>
-               | <T CELL> ':=' <STRING>
-               | <T CELL> ':=' <T CELL>
-               | <T CELL> ':=' <T NUMBER>;
-<CHARS>      : <CHARS> <CHAR1>
-               | <CHAR1>;
-<CHAR1>      : Any character except "
-               | ""
-<COMP AOR>   : <COMP AOR> <STATEMENT> ';'
-               | <COMP COND> 'AND'
-               | <COMP COND> 'OR';
-<COMP COND>  : <COMP AOR> <COND>
-               | <CONDITION>;
-<COND DO>    : <COMP COND> 'DO';
-<COND THEN>  : <COMP COND> 'THEN';
-<COND>       : <CONDITION>;
-<CONDITION>  : <K REG> <BRINDX OP> <K REG>
-               | <K REG> <REL OP> <K REG>
-               | <K REG> <REL OP> <STRING>
-               | <K REG> <REL OP> <T CELL>
-               | <K REG> <REL OP> <T NUMBER>
-               | <REL OP>
-               | <RP> <PRIM COND> )
-               | <T CELL>
-               | <T CELL> <REL OP> <STRING>
-               | <T CELL> <REL OP> <T CELL>
-               | <T CELL> <REL OP> <T NUMBER>
-               | <T NUMBER>
-               | <UNARY REG>
-               | '~' <T CELL>
-               | '~' <T NUMBER>
-               | '~' <UNARY REG>;
-<DECL>       : <DSEG TYPE> 'BASE' <K REG>
-               | <EQU SYN2>
-               | <FUNC DC7>
-               | <PROC HD7> <STATEMENT*>
-               | <PROC SYN> <PROC ID>
-               | <SYN DC2>
-               | <T DECL4>
-               | 'CLOSE' 'BASE';
-<DIGIT>      : 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
-<DO>         : 'DO';
-<DSEG TYPE>  : 'COMMON'
-               | 'COMMON' 'DATA' <ID>
-               | 'DUMMY'
-               | 'EXTERNAL' 'DATA' <ID>
-               | 'GLOBAL' 'DATA' <ID>
-               | 'SEGMENT';
-<EQU SYN1>   : <EQUATE> <ID> 'SYN';
-<EQU SYN2>   : <EQU SYN1> <K REG>
-               | <EQU SYN1> <STRING>
-               | <EQU SYN1> <T NUMBER>
-               | <EQU SYN1> <UNARY NUM>
-               | <EQU SYN2> <ARITH OP> <STRING>
-               | <EQU SYN2> <ARITH OP> <T NUMBER>
-               | <EQU SYN2> <LOG OP> <STRING>
-               | <EQU SYN2> <LOG OP> <T NUMBER>
-               | <EQU SYN2> <SHIFT OP> <T NUMBER>
-               | <EQU SYN3> <ARITH OP> <T CELL>;
-<EQU SYN3>   : <EQU SYN1> <T CELL>'
-<EQUATE>     : <EQU SYN2> ','
-               | EQUATE
-               | SHORT EQUATE;
-<FILL>       : <ADR OP> <PROC ID>
-               | <ADR OP> <T CELL>
-               | <REP LIST2> )
-               | <STRING>
-               | <T NUMBER>
-<FRAC NUM>   : <FRAC NUM> <DIGIT>
-               | <INTEGER> .
-<FORUNTIL>   : UNTIL
-<FUNC DC1>   : <FUNC DC7> ,
-               | FUNCTION
-<FUNC DC2>   : <FUNC DC1> <ID>
-<FUNC DC3>   : <FUNC DC2> (
-<FUNC DC4>   : <FUNC DC3> <T NUMBER>
-<FUNC DC5>   : <FUNC DC4> ,
-<FUNC DC6>   : <FUNC DC5> <T NUMBER>
-<FUNC DC7>   : <FUNC DC6> )
-<FUNC ID>    : <ID>
-<FUNC1>      : <FUNC2> <FUNC3>
-               | <FUNC2> <K REG>
-               | <FUNC2> <STRING>
-               | <FUNC2> <T CELL>
-               | <FUNC2> <T NUMBER>
-<FUNC2>      : <FUNC ID> (
-               | <FUNC1> ,
-<FUNC3>      : <FUNC1> )
-<GLOB HD>    : <GLOB HD1>
-               | <GLOB HD1> BASE <K REG>
-<GLOB HD1>   : GLOBAL <PROC HD4>
-<GOTO ST*>   : GOTO <ID>
-<GOTO ST>    : <GOTO ST*>
-<HEX DIGIT>  : <DIGIT> | A | B | C | D | E | F
-<HEX VAL>    : <HEX VAL> <HEX DIGIT>
-               | # <HEX DIGIT>
-<ID>         : <ID> <ALPHA NUM>
-               | <ALPHA>
-<IF>         : <IF> <STATEMENT> ';'
-               | IF
-<INT NUM>    : <HEX VAL>
-               | <INTEGER>
-<INTEGER>    : <INTEGER> <DIGIT>
-               | <DIGIT>
-<K REG ASS>  : <K REG ASS> <ARITH OP> <K REG>
-               | <K REG ASS> <ARITH OP> <STRING>
-               | <K REG ASS> <ARITH OP> <T CELL>
-               | <K REG ASS> <ARITH OP> <T NUMBER>
-               | <K REG ASS> <LOG OP> <K REG>
-               | <K REG ASS> <LOG OP> <STRING>
-               | <K REG ASS> <LOG OP> <T CELL>
-               | <K REG ASS> <LOG OP> <T NUMBER>
-               | <K REG ASS> <SHIFT OP> <K REG>
-               | <K REG ASS> <SHIFT OP> <T NUMBER>
-               | <K REG>
-               | <K REG> := <ADR OP> <PROC ID>
-               | <K REG> := <ADR OP> <T CELL>
-               | <K REG> := <K REG>
-               | <K REG> := <STRING>
-               | <K REG> := <T CELL>
-               | <K REG> := <T NUMBER>
-               | <K REG> := <UNARY CELL>
-               | <K REG> := <UNARY NUM>
-               | <K REG> := <UNARY REG>
-<K REG>      : <ID>
-<LABEL DEF>  : <ID> :
-<LIMIT>      : <FORUNTIL> <K REG>
-               | <FORUNTIL> <T CELL>
-               | <FORUNTIL> <T NUMBER>
-<LOG OP>     : AND
-               | OR
-               | XOR
-<LONG NUM>   : <INT NUM> L
-               | <FRAC NUM> ' <SCALE> L
-               | <INTEGER> ' <SCALE> L
-               | <FRAC NUM> L
-<NUMBER>     : <LONG NUM>
-               | <REAL NUM>
-               | <SHORT NUM>
-               | <BYTE NUM>
-               | <INT NUM>
-<PRIM COND>  : <COMP COND>
-<PROC HD1>   : PROCEDURE <ID>
-<PROC HD2>   : <PROC HD1> (
-<PROC HD3>   : <PROC HD2> <K REG>
-<PROC HD4>   : <PROC HD3> )
-<PROC HD5>   : EXTERNAL <PROC HD4>
-               | GLOBAL <PROC HD4>
-               | SEGMENT <PROC HD4>
-<PROC HD6>   : <PROC HD4>
-               | <PROC HD5>
-               | <PROC HD5> BASE <K REG>
-               | COMMON <PROC HD4>
-<PROC HD7>   : <PROC HD6> ';'
-<PROC ID>    : <ID>
-<PROC SYN>   : PROCEDURE <ID> SYN
-<PROC1>      : <PROC ID> (
-<PROC2>      : <PROC1> <K REG>
-<PROGRAM*>   : <PROGRAM+> <STATEMENT*>
-<PROGRAM+>   : .
-               | . <GLOB HD> ';'
-<PROGRAM>    : <PROGRAM*> .
-<REAL NUM>   : <INT NUM> R
-               | <FRAC NUM> ' <SCALE>
-               | <INTEGER> ' <SCALE>
-               | <FRAC NUM>
-<REL OP>     : =
-               | ~=
-               | >=
-               | <=
-               | >
-               | <
-<REP LIST1>  : <REP LIST2> ,
-               | <T NUMBER> (
-               | (
-<REP LIST2>  : <REP LIST1> <FILL>
-<SCALE>      : _ <INTEGER>
-               | <INTEGER>
-<SHIFT OP>   : SHLA
-               | SHLL
-               | SHRA
-               | SHRL
-<SHORT NUM>  : <INT NUM> S
-<REPEAT>     : <REPEAT> <LABEL DEF>
-               | <REPEAT> <STATEMENT> ';'
-               | REPEAT
-<REPUNTIL>   : UNTIL
-<RP>         : <RP> <STATEMENT> ';'
-               | (
-<SI T TYPE>  : BYTE
-               | CHARACTER
-               | INTEGER
-               | LOGICAL
-               | LONG REAL
-               | REAL
-               | SHORT INTEGER
-<SIMPLE ST>  : <BLOCKBODY> END
-               | <CASE SEQ> END
-               | <CELL ST>
-               | <FUNC ID>
-               | <FUNC3>
-               | <K REG ASS>
-               | <PROC ID>
-               | <PROC2> )
-               | NULL
-<STATEMENT*> : <GOTO ST>
-               | <STATEMENT+>
-<STATEMENT+> : <IF> <COND THEN> <GOTO ST>
-               | <IF> <COND THEN> <STATEMENT+>
-               | <IF> <COND THEN> <TRUE PART> <GOTO ST>
-               | <IF> <COND THEN> <TRUE PART> <STATEMENT+>
-               | <REPEAT> <REPUNTIL> <PRIM COND>
-               | <SIMPLE ST>
-               | <WHILE> <COND DO> <STATEMENT*>
-               | FOR <ASS STEP> <LIMIT> <DO> <STATEMENT*>
-<STATEMENT>  : <STATEMENT*>
-<STRING>     : <HEX VAL> X
-               | " <CHARS> "
-<SYN DC1>    : <SI T TYPE> REGISTER <ID> SYN
-               | <SYN DC3> <ID> SYN
-               | <T TYPE> <ID> SYN
-<SYN DC2>    : <SYN DC1> <K REG>
-               | <SYN DC1> <T CELL>
-               | <SYN DC1> <T NUMBER>
-<SYN DC3>    : <SYN DC2> ,
-<T CELL ID>  : <ID>
-<T CELL>     : <T CELL ID>
-               | <T CELL1> )
-               | <T CELL2> )
-<T CELL1>    : <T CELL1> <ARITH OP> <STRING>
-               | <T CELL1> <ARITH OP> <T NUMBER>
-               | <T CELL2> <ARITH OP> <K REG>
-               | <T CELL2> <ARITH OP> <T NUMBER>
-               | <T CELL3> <STRING>
-               | <T CELL3> <T NUMBER>
-<T CELL2>    : <T CELL3> <K REG>
-<T CELL3>    : <T CELL ID> (
-<T DECL1>    : <T DECL2>
-               | <T DECL2> <ID>
-               | <T TYPE>
-               | <T TYPE> <ID>
-<T DECL2>    : <T DECL4> ,
-<T DECL3>    : <T DECL1> =
-<T DECL4>    : <T DECL1>
-               | <T DECL3> <FILL>
-<T NUMBER>   : <ID>
-               | _ <NUMBER>
-               | <NUMBER>
-<T TYPE>     : <SI T TYPE>
-               | ARRAY <T NUMBER> <SI T TYPE>
-<TRUE PART>  : <GOTO ST*> ELSE
-               | <SIMPLE ST> ELSE
-<UNARY CELL> : <UNARY OP> <T CELL>
-               | <UNARY OP> <UNARY CELL>
-<UNARY NUM>  : <UNARY OP> <T NUMBER>
-               | <UNARY OP> <UNARY NUM>
-<UNARY OP>   : ABS
-               | DEC
-               | HALF
-               | NEG
-<UNARY REG>  : <UNARY OP> <K REG>
-               | <UNARY OP> <UNARY REG>
-<WHILE>      : <WHILE> <STATEMENT> ';'
-               | WHILE
 
+program
+   : (globHd ';')? statement '.' EOF
+   ;
+
+globHd
+   : 'GLOBAL' 'PROCEDURE' identifier '(' kReg ')' ('BASE' kReg)?
+   ;
+
+// A PL360 "statement" (the reference's STATEMENT / STATEMENT+ / STATEMENT*,
+// which are all just aliases of the same thing once the decorative
+// statement-threading noted above is dropped).
+statement
+   : gotoStatement
+   | 'IF' condThen statement
+   | 'IF' condThen truePart statement
+   | repeatBlock 'UNTIL' primCond
+   | simpleStatement
+   | 'WHILE' condDo statement
+   | 'FOR' assStep limit 'DO' statement
+   ;
+
+gotoStatement
+   : 'GOTO' identifier
+   ;
+
+truePart
+   : (gotoStatement | simpleStatement) 'ELSE'
+   ;
+
+// REPEAT really does carry a statement list of its own (the loop body),
+// unlike IF/WHILE above.
+repeatBlock
+   : 'REPEAT' (labelDef | statement ';')*
+   ;
+
+simpleStatement
+   : block
+   | caseStatement
+   | cellAssignment
+   | functionCall
+   | procedureCall
+   | kRegAss
+   | identifier
+   | 'NULL'
+   ;
+
+block
+   : blockBody 'END'
+   ;
+
+blockBody
+   : blockHead (labelDef | statement ';')*
+   ;
+
+blockHead
+   : 'BEGIN' (decl ';')*
+   ;
+
+caseStatement
+   : caseSeq 'END'
+   ;
+
+caseSeq
+   : caseHead (labelDef | statement ';')*
+   ;
+
+caseHead
+   : 'CASE' kReg 'OF' 'BEGIN' (decl ';')*
+   ;
+
+labelDef
+   : identifier ':'
+   ;
+
+// Declarations, allowed at the head of a block/case/procedure body.
+decl
+   : dsegType 'BASE' kReg
+   | equateDeclaration
+   | functionDecl
+   | procedureDecl
+   | procSynDecl
+   | synDecl
+   | tDecl
+   | 'CLOSE' 'BASE'
+   ;
+
+dsegType
+   : 'COMMON'
+   | 'COMMON' 'DATA' identifier
+   | 'DUMMY'
+   | 'EXTERNAL' 'DATA' identifier
+   | 'GLOBAL' 'DATA' identifier
+   | 'SEGMENT'
+   ;
+
+functionDecl
+   : 'FUNCTION' functionDeclItem (',' functionDeclItem)*
+   ;
+
+functionDeclItem
+   : identifier '(' tNumber ',' tNumber ')'
+   ;
+
+procedureDecl
+   : procedureHeader statement
+   ;
+
+procedureHeader
+   : ('EXTERNAL' | 'GLOBAL' | 'SEGMENT' | 'COMMON')? 'PROCEDURE' identifier '(' kReg ')' ('BASE' kReg)? ';'
+   ;
+
+procSynDecl
+   : 'PROCEDURE' identifier 'SYN' identifier
+   ;
+
+equateDeclaration
+   : ('EQUATE' | 'SHORT' 'EQUATE') equSynItem (',' equSynItem)*
+   ;
+
+equSynItem
+   : identifier 'SYN' equSynValue (equSynOp equSynOperand)*
+   ;
+
+equSynValue
+   : kReg
+   | STRING
+   | tNumber
+   | unaryNum
+   | tCell
+   ;
+
+equSynOp
+   : arithOp
+   | logOp
+   | shiftOp
+   ;
+
+equSynOperand
+   : kReg
+   | STRING
+   | tNumber
+   | tCell
+   ;
+
+synDecl
+   : synDeclHead (',' identifier 'SYN' synDeclValue)*
+   ;
+
+synDeclHead
+   : (siType 'REGISTER' | tType) identifier 'SYN' synDeclValue
+   ;
+
+synDeclValue
+   : kReg
+   | tCell
+   | tNumber
+   ;
+
+tDecl
+   : tDeclItem (',' tDeclItem)*
+   ;
+
+tDeclItem
+   : tType identifier? ('=' fill)?
+   | identifier ('=' fill)?
+   ;
+
+// A replicated/initializer "fill" value; the parenthesized form can itself
+// hold a comma-separated, optionally count-prefixed list of fills (e.g.
+// `111(" ")`, a 111-fold repeated space string, from the reference manual's
+// sample program).
+fill
+   : adrOp (identifier | tCell)
+   | (tNumber)? '(' fill (',' fill)* ')'
+   | STRING
+   | tNumber
+   ;
+
+// Assignment to a register.
+kRegAss
+   : kReg (':=' kRegAssRhs)? (kRegAssOp kRegAssOperand)*
+   ;
+
+kRegAssRhs
+   : adrOp (identifier | tCell)
+   | kReg
+   | STRING
+   | tCell
+   | tNumber
+   | unaryCell
+   | unaryNum
+   | unaryReg
+   ;
+
+kRegAssOp
+   : arithOp
+   | logOp
+   | shiftOp
+   ;
+
+kRegAssOperand
+   : kReg
+   | STRING
+   | tCell
+   | tNumber
+   ;
+
+// Assignment to a memory cell.
+cellAssignment
+   : tCell ':=' cellAssignmentRhs (logOp cellAssignmentOperand)*
+   ;
+
+cellAssignmentRhs
+   : kReg
+   | STRING
+   | tCell
+   | tNumber
+   ;
+
+cellAssignmentOperand
+   : STRING
+   | tCell
+   | tNumber
+   ;
+
+functionCall
+   : identifier '(' functionArg (',' functionArg)* ')'
+   ;
+
+functionArg
+   : functionCall
+   | kReg
+   | STRING
+   | tCell
+   | tNumber
+   ;
+
+procedureCall
+   : identifier '(' kReg ')'
+   ;
+
+assStep
+   : kRegAss 'STEP' tNumber
+   ;
+
+limit
+   : 'UNTIL' (kReg | tCell | tNumber)
+   ;
+
+// Conditions.
+condThen
+   : compoundCondition 'THEN'
+   ;
+
+condDo
+   : compoundCondition 'DO'
+   ;
+
+primCond
+   : compoundCondition
+   ;
+
+compoundCondition
+   : (statement ';')* conditionPrimary (('AND' | 'OR') (statement ';')* conditionPrimary)*
+   ;
+
+conditionPrimary
+   : kReg brindxOp kReg
+   | kReg relOp (kReg | STRING | tCell | tNumber)
+   | tCell relOp (STRING | tCell | tNumber)
+   | tCell
+   | tNumber
+   | unaryReg
+   | relOp
+   | '~' (tCell | tNumber | unaryReg)
+   | '(' (statement ';')* compoundCondition ')'
+   ;
+
+// Operators.
+adrOp
+   : '@@'
+   | '@'
+   ;
+
+arithOp
+   : '--'
+   | '++'
+   | '-'
+   | '+'
+   | '*'
+   | '/'
+   | '=:'
+   ;
+
+brindxOp
+   : 'GT'
+   | 'LE'
+   ;
+
+logOp
+   : 'AND'
+   | 'OR'
+   | 'XOR'
+   ;
+
+relOp
+   : '='
+   | '~='
+   | '>='
+   | '<='
+   | '>'
+   | '<'
+   ;
+
+shiftOp
+   : 'SHLA'
+   | 'SHLL'
+   | 'SHRA'
+   | 'SHRL'
+   ;
+
+unaryOp
+   : 'ABS'
+   | 'DEC'
+   | 'HALF'
+   | 'NEG'
+   ;
+
+unaryCell
+   : unaryOp+ tCell
+   ;
+
+unaryNum
+   : unaryOp+ tNumber
+   ;
+
+unaryReg
+   : unaryOp+ kReg
+   ;
+
+// Types.
+siType
+   : 'BYTE'
+   | 'CHARACTER'
+   | 'INTEGER'
+   | 'LOGICAL'
+   | 'LONG' 'REAL'
+   | 'REAL'
+   | 'SHORT' 'INTEGER'
+   ;
+
+tType
+   : siType
+   | 'ARRAY' tNumber siType
+   ;
+
+// Cells, registers and numbers.
+kReg
+   : identifier
+   ;
+
+tCell
+   : identifier
+   | identifier '(' cellIndex ')'
+   ;
+
+cellIndex
+   : kReg (arithOp (kReg | tNumber))?
+   | (STRING | tNumber) (arithOp (STRING | tNumber))*
+   ;
+
+tNumber
+   : identifier
+   | '_' NUMBER
+   | NUMBER
+   ;
+
+identifier
+   : IDENTIFIER
+   ;
+
+// Lexer.
+
+// Reserved words and operator-like keywords (kept ahead of IDENTIFIER below
+// only by file order of first use above -- ANTLR resolves equal-length
+// lexical ties by the literal's first point of definition in the grammar
+// file, and every quoted keyword above textually precedes IDENTIFIER).
+
+STRING
+   : '"' (~'"' | '""')* '"'
+   ;
+
+NUMBER
+   : (HEXVAL | DIGITS ('.' DIGITS?)?) ('\'' '_'? DIGITS)? [LRSX]?
+   ;
+
+fragment HEXVAL
+   : '#' HEXDIGIT+
+   ;
+
+fragment HEXDIGIT
+   : [0-9A-F]
+   ;
+
+fragment DIGITS
+   : [0-9]+
+   ;
+
+IDENTIFIER
+   : [A-Z] [A-Z0-9]*
+   ;
+
+COMMENT1
+   : 'COMMENT' .*? ';' -> skip
+   ;
+
+COMMENT2
+   : '|' ~'|'* '|' -> skip
+   ;
 
 WS
-   : [ \r\n\t] + -> skip
+   : [ \r\n\t]+ -> skip
    ;
