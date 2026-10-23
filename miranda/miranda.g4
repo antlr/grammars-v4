@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2021, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -48,7 +48,7 @@ simple_rhs
    ;
 
 cases
-   : alt ';'? '=' cases
+   : alt ';'? INFIX1 cases
    | lastcase ';'?
    ;
 
@@ -64,8 +64,8 @@ alt
    ;
 
 def
-   : fnform '=' rhs
-   | pat '=' rhs
+   : fnform INFIX1 rhs
+   | pat INFIX1 rhs
    ;
 
 lastcase
@@ -79,7 +79,7 @@ lastalt
 
 tdef
    : tform '==' type ';'?
-   | tform '::' constructs ';'?
+   | tform '::=' constructs ';'?
    | 'abstype' tform_list 'with' sig ';'?
    ;
 
@@ -99,6 +99,7 @@ sig
 exp
    : e1
    | PREFIX1
+   | INFIX1
    | INFIX
    ;
 
@@ -113,14 +114,15 @@ constructs
 
 e1
    : simple simple*
-   | PREFOX e1
-   | e1 INFIX e1
+   | PREFIX1 e1
+   | INFIX e1
+   | e1 (INFIX1 | INFIX) e1
    ;
 
 construct
    : constructor argtype*
    | type '$' constructor type
-   | (construct) argtype*
+   | '(' construct ')' argtype*
    ;
 
 simple
@@ -130,13 +132,12 @@ simple
    | 'readvals'
    | 'show'
    | '(' INFIX1 e1 ')'
-   | '(' e1 INFIX ')'
+   | '(' e1 (INFIX1 | INFIX) ')'
    | '(' exp_list? ')'
    | '[' exp_list? ']'
-   | '[' exp+ ']'
-   | '[' exp (',' exp)* ']'
-   | '[' exp
-   | qualifs ']'
+   | '[' exp ('..' exp?)? ']'
+   | '[' exp ',' exp '..' exp? ']'
+   | '[' exp '|' qualifs ']'
    | '[' exp '//' qualifs ']'
    ;
 
@@ -159,7 +160,7 @@ argtype
    ;
 
 tform
-   : typename TYPEVAR '*'
+   : typename TYPEVAR*
    | TYPEVAR '$' typename TYPEVAR
    ;
 
@@ -173,9 +174,9 @@ qualifs
    ;
 
 fnform
-   : var formal '*'
+   : var formal*
    | pat '$' var pat
-   | '(' fnform ')' formal '*'
+   | '(' fnform ')' formal*
    ;
 
 qualifier
@@ -185,11 +186,11 @@ qualifier
 
 generator
    : pat_list '<-' exp
-   | pat '<-' exp (',' exp)*
+   | pat '<-' exp ',' exp '..'
    ;
 
 var
-   : IDENTIFIER
+   : IDENTIFIER_LC
    ;
 
 var_list
@@ -198,12 +199,12 @@ var_list
 
 pat
    : formal
-   | '-' numeral
-   | constructor formal '*'
-   | pat ':' pat
-   | pat '+' NAT
+   | INFIX numeral
+   | constructor formal*
+   | pat INFIX1 pat
+   | pat INFIX1 NAT
    | pat '$' constructor pat
-   | '(' pat ')' formal '*'
+   | '(' pat ')' formal*
    ;
 
 pat_list
@@ -215,7 +216,7 @@ constructor
    ;
 
 typename
-   : IDENTIFIER
+   : IDENTIFIER_LC
    ;
 
 formal
@@ -238,25 +239,18 @@ literal
    ;
 
 literal1
-   : literal '-' FLOAT
+   : literal INFIX FLOAT
    ;
 
 IDENTIFIER_LC
-   : [a-z] [a-zA-Z0-9_']* '-' DELIMITER
-   ;
-
-DELIMITER
-   : '-'
-   | PREFIX1
-   | INFIX1
-   | OTHER
+   : [a-z] ([a-zA-Z0-9_'] | '-' [a-zA-Z])*
    ;
 
 INFIX1
    : '++'
    | '--'
    | ':'
-   | '\/'
+   | '\\/'
    | '&'
    | '>'
    | '>='
@@ -286,54 +280,6 @@ PREFIX1
    | '#'
    ;
 
-PREFIX
-   : PREFIX1
-   | '-'
-   ;
-
-fragment OTHER
-   : 'abstype'
-   | 'if'
-   | 'otherwise'
-   | 'readvals'
-   | 'show'
-   | 'type'
-   | 'where'
-   | 'with'
-   | '%export'
-   | '%free'
-   | '%include'
-   | '%insert'
-   | '%list'
-   | '%nolist'
-   | '='
-   | '=='
-   | '::='
-   | '::'
-   | '=>'
-   | VERTICAL_BAR
-   | '//'
-   | '->'
-   | ';'
-   | ','
-   | '('
-   | ')'
-   | '['
-   | ']'
-   | '{'
-   | '}'
-   | '<-'
-   | '..'
-   | '$$'
-   | '$-'
-   | '$+'
-   | '$*'
-   ;
-
-VERTICAL_BAR
-   : '|'
-   ;
-
 FLOAT
    : [0-9]* [.] NAT EPART?
    | NAT EPART
@@ -347,11 +293,11 @@ fragment EPART
    : 'e'? ('+' | '-')? NAT
    ;
 
-fragment CHARCONST
+CHARCONST
    : '\'' ~ '\''* '\''
    ;
 
-fragment STRINGCONST
+STRINGCONST
    : '"' ~ '"'* '"'
    ;
 
