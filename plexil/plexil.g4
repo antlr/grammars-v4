@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2022, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 grammar plexil;
 
-plexilPlan
+plan
    : node
    ;
 
@@ -40,7 +40,7 @@ node
    ;
 
 nodeId
-   : String
+   : STRING
    ;
 
 nodeBody
@@ -60,7 +60,7 @@ nodeAttributes
    ;
 
 priority
-   : 'priority' ':' NONNEGATIVEINTEGER ';'
+   : 'priority' ':' INTEGER ';'
    ;
 
 startCondition
@@ -90,15 +90,15 @@ endCondition
 interface
    : /* here the xml schema specifies any order */
 
-   in? inOut?
+   inClause? inOut?
    ;
 
-in
+inClause
    : 'In' ':' '{' (declaredVariable ';')* '}'
    ;
 
 inOut
-   : 'InOut' ':' (declaredVariable ';')* '}'
+   : 'InOut' ':' '{' (declaredVariable ';')* '}'
    ;
 
 declaredVariable
@@ -110,23 +110,23 @@ declaredVariable
    ;
 
 integerVariable
-   : NCName
+   : STRING
    ;
 
 realVariable
-   : NCName
+   : STRING
    ;
 
 booleanVariable
-   : NCName
+   : STRING
    ;
 
 stringVariable
-   : NCName
+   : STRING
    ;
 
 pointerVariable
-   : NCName
+   : STRING
    ;
 
 variableDeclarations
@@ -206,30 +206,36 @@ numericRHS
    ;
 
 booleanExpression
-   : or
-   | and
-   | not
+   : orExpr
+   | andExpr
+   | notExpr
    | gt
    | ge
    | lt
    | le
-   | eq
- //  | ne
    | booleanVariable
    | booleanValue
    | lookup
    | '(' booleanExpression ')'
+   | booleanExpression '==' booleanExpression
+   | booleanExpression '!=' booleanExpression
+   | numericExpression '==' numericExpression
+   | numericExpression '!=' numericExpression
+   | nodeState '==' nodeState
+   | nodeState '!=' nodeState
+   | nodeOutcome '==' nodeOutcome
+   | nodeOutcome '!=' nodeOutcome
    ;
 
-or
+orExpr
    : 'OR' (booleanExpression)+
    ;
 
-and
+andExpr
    : 'AND' (booleanExpression)+
    ;
 
-not
+notExpr
    : 'NOT' booleanExpression
    ;
 
@@ -247,44 +253,6 @@ lt
 
 le
    : numericExpression '<=' numericExpression
-   ;
-
-eq
-   : eqBoolean
-   | eqNumeric
-   | eqInternal
-   ;
-
-eqBoolean
-   : booleanExpression '==' booleanExpression
-   ;
-
-eqNumeric
-   : numericExpression '==' numericExpression
-   ;
-
-eqInternal
-   : nodeState '==' nodeState
-   | nodeOutcome '==' nodeOutcome
-   ;
-
-neExpression
-   : neBoolean
-   | neNumeric
-   | neInternal
-   ;
-
-neBoolean
-   : booleanExpression '!=' booleanExpression
-   ;
-
-neNumeric
-   : numericExpression '!=' numericExpression
-   ;
-
-neInternal
-   : nodeState '!=' nodeState
-   | nodeOutcome '!=' nodeOutcome
    ;
 
 nodeState
@@ -325,11 +293,7 @@ nodeTimepointValue
    ;
 
 numericExpression
-   : add
-   | sub
-   | mul
-   | div
-   | integerVariable
+   : integerVariable
    | realVariable
    | integerValue
    | realValue
@@ -338,22 +302,10 @@ numericExpression
    | PLUSINFINITY
    | MINUSINFINITY
    | '(' numericExpression ')'
-   ;
-
-add
-   : numericExpression '+' numericExpression
-   ;
-
-sub
-   : numericExpression '-' numericExpression
-   ;
-
-mul
-   : numericExpression '*' numericExpression
-   ;
-
-div
-   : numericExpression '/' numericExpression
+   | numericExpression '*' numericExpression
+   | numericExpression '/' numericExpression
+   | numericExpression '+' numericExpression
+   | numericExpression '-' numericExpression
    ;
 
 lookup
@@ -380,7 +332,7 @@ lookupOnChange
    ;
 
 tolerance
-   : Value
+   : realValue
    | declaredVariable
    ;
 
@@ -392,11 +344,13 @@ parameter
    : STRING
    ;
 
-STRING
-   : [a-zA-Z]+
-   ;
-
-NONNEGATIVEINTEGER
+// NONNEGATIVEINTEGER is a fragment (rather than its own token) so that
+// a plain unsigned number always lexes as INTEGER; if it were its own
+// token, a bare "0" would tie in length with INTEGER's match of "0"
+// and, by rule-order tie-breaking, always lex as NONNEGATIVEINTEGER
+// instead, which integerValue (and other rules expecting INTEGER)
+// could then never match.
+fragment NONNEGATIVEINTEGER
    : [0-9]+
    ;
 
@@ -408,6 +362,11 @@ DOUBLE
    : [0-9]+ '.' [0-9]+
    ;
 
+// BOOLEAN, TIMEPOINT and PLUSINFINITY must be declared before STRING:
+// ANTLR breaks a same-length lexer tie in favor of whichever rule is
+// declared first, so if STRING ([a-zA-Z]+) came first, plain-letter
+// words like "true", "START" or "INF" would always lex as STRING
+// instead of the keyword they are meant to be.
 BOOLEAN
    : 'true'
    | 'false'
@@ -424,6 +383,10 @@ PLUSINFINITY
 
 MINUSINFINITY
    : '-INF'
+   ;
+
+STRING
+   : [a-zA-Z]+
    ;
 
 WS
