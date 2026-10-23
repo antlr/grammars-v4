@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2020, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -40,11 +40,11 @@ program
    ;
 
 statements
-   : ('(' (condition_prefix ',')+ ')' ':')* (label_prefix ':')* statement_body? ';'
+   : ('(' (condition_prefix ',')+ ')' ':')* (label_prefix ':')* (statement_body | ';')
    ;
 
 percent_statements
-   : '%' (label_prefix ':')* statement_body ';'
+   : (label_prefix ':')* statement_body
    ;
 
 attribute
@@ -157,7 +157,7 @@ builtin_attribute
    ;
 
 reducible_attribute
-   : ('IRREDUCIBLE' | 'REDUCIBLE')?
+   : ('IRREDUCIBLE' | 'REDUCIBLE')
    ;
 
 returns_attribute
@@ -277,7 +277,8 @@ picture_attribute
    ;
 
 constant
-   : character_constant
+   : arithmetic_constant
+   | character_constant
    | hex_constant
    | binary_constant
    | hex2_constant
@@ -295,7 +296,7 @@ hex_constant
    ;
 
 binary_constant
-   : '\'' (('0' | '1'))* '\'B'
+   : '\'' INTEGER_LITERAL? '\'B'
    ;
 
 hex2_constant
@@ -339,11 +340,7 @@ expression_elementary_expression
    ;
 
 expression_reference
-   : expression_locator_qualifier? expression_basic_reference ('(' expression_subscript_list ')')? ('(' expression_argument_list? ')')?
-   ;
-
-expression_locator_qualifier
-   : expression_reference '->'
+   : (expression_basic_reference '->')* expression_basic_reference ('(' expression_subscript_list ')')? ('(' expression_argument_list? ')')?
    ;
 
 expression_subscript_list
@@ -355,16 +352,12 @@ expression_argument_list
    ;
 
 expression_basic_reference
-   : expression_structure_qualification? name
-   ;
-
-expression_structure_qualification
-   : expression_basic_reference ('(' expression_subscript_list ')')?
+   : name ('(' expression_subscript_list ')')? ('.' name ('(' expression_subscript_list ')')?)*
    ;
 
 statement
    : fetch_statement
-   | fetch_statement
+   | assign2_statement
    | note_statement
    | if_statement
    | goto_statement
@@ -556,15 +549,15 @@ delete_statement
    ;
 
 locate_statement
-   : 'LOCATE' based_variable ('FILE' '(' file_reference ')' | 'SET' '(' pointer_reference | 'KEYFROM' '(' expression ')') ';'
+   : 'LOCATE' based_variable 'FILE' '(' file_reference ')' ('SET' '(' pointer_reference ')')? ('KEYFROM' '(' expression ')')? ';'
    ;
 
 rewritefile_statement
-   : 'REWRITE_FILE' '(' file_reference ')' ('FROM' '(' reference ')')? ('KEY' '(' expression ')')? ('EVENT' '(' event_reference)? ';'
+   : 'REWRITE_FILE' '(' file_reference ')' ('FROM' '(' reference ')')? ('KEY' '(' expression ')')? ('EVENT' '(' event_reference ')')? ';'
    ;
 
 writefile_statement
-   : 'WRITE' 'FILE' '(' file_reference ')' 'FROM' '(' reference ')' (('KEYFROM' '(' expression ')' | 'KEYTO' '(' reference ')'))? ('EVENT' '(' event_reference)? ';'
+   : 'WRITE' 'FILE' '(' file_reference ')' 'FROM' '(' reference ')' (('KEYFROM' '(' expression ')' | 'KEYTO' '(' reference ')'))? ('EVENT' '(' event_reference ')')? ';'
    ;
 
 readfile_statement
@@ -572,11 +565,11 @@ readfile_statement
    ;
 
 close_statement
-   : 'CLOSE' ('FILE' '(' file_reference ')' ('ENVIRONMENT' '(' ('LEAVE' | 'REREAD') ')')? ',')+ ';'
+   : 'CLOSE' ('FILE' '(' file_reference ')' ('ENVIRONMENT' '(' ('LEAVE' | 'REREAD') ')')?) (',' 'FILE' '(' file_reference ')' ('ENVIRONMENT' '(' ('LEAVE' | 'REREAD') ')')?)* ';'
    ;
 
 open_statement
-   : 'OPEN' (statement_options_group ',')+ ';'
+   : 'OPEN' statement_options_group (',' statement_options_group)* ';'
    ;
 
 return2_statement
@@ -584,7 +577,7 @@ return2_statement
    ;
 
 call_statement
-   : 'CALL' (entry_reference | generic_name | built_in_name) ('(' (argument ',')* ')')? ('TASK' ('(' task_reference ')')?)? ('EVENT' '(' event_reference ')')? ('PRIORITY' '(' expression ')')? ';'
+   : 'CALL' (entry_reference | generic_name | built_in_name) ('(' (argument (',' argument)*)? ')')? ('TASK' ('(' task_reference ')')?)? ('EVENT' '(' event_reference ')')? ('PRIORITY' '(' expression ')')? ';'
    ;
 
 cobol_statement
@@ -612,7 +605,7 @@ stop_statement
    ;
 
 select_statement
-   : 'SELECT' ('(' exp1 ')')? ';' ('WHEN' '(' (exp2 ',')+ ')' unit)* ('OTHERWISE' unit)?
+   : 'SELECT' ('(' exp1 ')')? ';' ('WHEN' '(' exp2 (',' exp2)* ')' unit)* ('OTHERWISE' unit)?
    ;
 
 null_statement
@@ -636,7 +629,7 @@ end2_statement
    ;
 
 do3_statement
-   : 'DO' reference '=' (specification ',')+ ';'
+   : 'DO' reference '=' specification (',' specification)* ';'
    ;
 
 do4_statement
@@ -660,7 +653,7 @@ delay_statement
    ;
 
 assign2_statement
-   : (reference ',')+ '=' expression (',' 'BY' 'NAME')? ';'
+   : reference (',' reference)* '=' expression (',' 'BY' 'NAME')? ';'
    ;
 
 free_statement
@@ -688,7 +681,7 @@ begin_statement
    ;
 
 declare2_statement
-   : 'DECLARE' (level? variable attribute* 'SYSTEM'? ',')+ ';'
+   : 'DECLARE' (level? variable attribute* 'SYSTEM'?) (',' level? variable attribute* 'SYSTEM'?)* ';'
    ;
 
 default_statement
@@ -712,15 +705,11 @@ statement_value_specification
    ;
 
 statement_additional_options
-   : (('REAL' | 'COMPLEX'))? (('FIXED' | 'FLOAT'))? (('BINARY' | 'DECIMAL'))? ('(' precision (',' scaling_factor)? ')')?
-   ;
-
-statement_additional_options
-   : ('NOMAP' ('(' parameter_list ')')?)? ('NOMAPIN' ('(' parameter_list ')')?)? ('NOMAPOUT' ('(' parameter_list ')')?)?
+   : (('REAL' | 'COMPLEX'))? (('FIXED' | 'FLOAT'))? (('BINARY' | 'DECIMAL'))? ('(' precision (',' scaling_factor)? ')')? ('NOMAP' ('(' parameter_list ')')?)? ('NOMAPIN' ('(' parameter_list ')')?)? ('NOMAPOUT' ('(' parameter_list ')')?)?
    ;
 
 statement_attribute
-   : (dimension | 'CHARACTER' '(' length | 'BIT' '(' length ')' | 'GRAPHIC' '(' length ')' | 'AREA' '(' size ')' | 'INITIAL' '(' ('ITEM' ',')+ ')' | initial_call_entry_reference ('(' (argument ',')+ ')')?)
+   : (dimension | 'CHARACTER' '(' length ')' | 'BIT' '(' length ')' | 'GRAPHIC' '(' length ')' | 'AREA' '(' size ')' | 'INITIAL' '(' (item ',')+ ')' | initial_call_entry_reference ('(' (argument ',')+ ')')?)
    ;
 
 locator_qualification
@@ -787,7 +776,7 @@ entry_data1
    ;
 
 entry_data2
-   : 'ENTRY' ('(' attribute_parameter_descriptor_list ')')? 'VARIABLE'? ('RETURNS' '(' attribute_list ')')? ('OPTIONS' '(' attribute_characteristic_list ')')? (('IRREDUCIBLE' | 'REDUCIBLE'))? scope_attribute? storage_attribute? alignment_attribute?? parameter? 'DEFINED' 'INITIAL'?
+   : 'ENTRY' ('(' attribute_parameter_descriptor_list ')')? 'VARIABLE'? ('RETURNS' '(' attribute_list ')')? ('OPTIONS' '(' attribute_characteristic_list ')')? (('IRREDUCIBLE' | 'REDUCIBLE'))? scope_attribute? storage_attribute? alignment_attribute? parameter? 'DEFINED' 'INITIAL'?
    ;
 
 attribute_parameter_descriptor_list
@@ -799,7 +788,7 @@ attribute_parameter_descriptor
    ;
 
 attribute_structure_parameter_descriptor
-   : '1' attribute* ',' (level attribute* ',')+
+   : level attribute* ',' (level attribute* ',')+
    ;
 
 attribute_characteristic_list
@@ -1458,7 +1447,7 @@ data_specification
    ;
 
 data_specification_data_list
-   : ((data_list_item ',')+ | ('(' data_list_item_type_3_do ')')+)
+   : (data_list_item (',' data_list_item)* | ('(' data_list_item_type_3_do ')')+)
    ;
 
 data_specification_format_list
@@ -1683,6 +1672,406 @@ statement_preprocessor_do_specification
 */
 
 
+statement_body
+   : statement
+   ;
+
+label_prefix
+   : identifier
+   ;
+
+condition_prefix
+   : expression
+   ;
+
+characteristic_list
+   : (attribute ',')* attribute
+   ;
+
+generic_name
+   : identifier
+   ;
+
+entry_reference
+   : identifier
+   ;
+
+generic_descriptor
+   : attribute+
+   ;
+
+item
+   : constant
+   | reference
+   ;
+
+reference
+   : expression_reference
+   ;
+
+area_variable
+   : identifier
+   ;
+
+area_reference
+   : identifier
+   ;
+
+locator_reference
+   : identifier
+   ;
+
+locator_qualifier
+   : identifier
+   ;
+
+structure_variable
+   : identifier
+   ;
+
+label_constant
+   : identifier
+   ;
+
+scaling_factor
+   : ('+' | '-')? integer
+   ;
+
+integer
+   : INTEGER_LITERAL
+   ;
+
+picture_specification
+   : picture_character*
+   ;
+
+picture_character
+   : ~'\''
+   ;
+
+character
+   : IDENTIFIER
+   | HEX_DIGIT
+   | INTEGER_LITERAL
+   ;
+
+graphic_symbol
+   : identifier
+   ;
+
+infix_operator
+   : '+' | '-' | '*' | '/' | '**' | '||' | '=' | '<' | '>' | '<=' | '>='
+   ;
+
+prefix_operator
+   : '+' | '-'
+   ;
+
+isub6
+   : 'ISUB' ('(' expression ')')?
+   ;
+
+name
+   : identifier
+   ;
+
+entry_constant
+   : identifier
+   ;
+
+message
+   : expression
+   ;
+
+code
+   : expression
+   ;
+
+preprocessor_expression
+   : expression
+   ;
+
+preprocessor_unit1
+   : statement
+   ;
+
+preprocessor_unit2
+   : statement
+   ;
+
+preprocessor_variable
+   : identifier
+   ;
+
+preprocessor_exp1
+   : preprocessor_expression
+   ;
+
+preprocessor_exp2
+   : preprocessor_expression
+   ;
+
+preprocessor_exp3
+   : preprocessor_expression
+   ;
+
+entry_name
+   : identifier
+   ;
+
+parameter
+   : identifier attribute*
+   ;
+
+parameter_list
+   : (identifier ',')* identifier
+   ;
+
+dataset
+   : identifier
+   ;
+
+member_name
+   : identifier
+   ;
+
+on_unit
+   : statement
+   ;
+
+format_list
+   : (format_item ',')* format_item
+   ;
+
+character_reference
+   : identifier
+   ;
+
+event_reference
+   : identifier
+   ;
+
+based_variable
+   : identifier
+   ;
+
+based_reference
+   : identifier
+   ;
+
+based_locator_reference
+   : identifier
+   ;
+
+pointer_reference
+   : identifier
+   ;
+
+ref
+   : identifier
+   ;
+
+pointer_ref
+   : identifier
+   ;
+
+task_reference
+   : identifier
+   ;
+
+built_in_name
+   : identifier
+   ;
+
+exp1
+   : expression
+   ;
+
+exp2
+   : expression
+   ;
+
+exp3
+   : expression
+   ;
+
+exp4
+   : expression
+   ;
+
+exp5
+   : expression
+   ;
+
+exp6
+   : expression
+   ;
+
+unit
+   : statement
+   ;
+
+unit1
+   : statement
+   ;
+
+unit2
+   : statement
+   ;
+
+label_reference
+   : identifier
+   ;
+
+statement_label
+   : identifier
+   ;
+
+specification
+   : expression (('TO' expression ('BY' expression)? | 'BY' expression ('TO' expression)?))?
+   ;
+
+reply
+   : 'REPLY'
+   ;
+
+controlled_variable
+   : identifier
+   ;
+
+level
+   : INTEGER_LITERAL
+   ;
+
+alignment_attribute
+   : aligned_attribute
+   ;
+
+scope_attribute
+   : internal_attribute
+   ;
+
+storage_attribute
+   : automatic_attribute
+   | static_attribute
+   | controlled_attribute
+   | based_attribute
+   ;
+
+attribute_list
+   : attribute+
+   ;
+
+argi
+   : argument
+   ;
+
+arithmetic_constant
+   : INTEGER_LITERAL
+   | FLOAT_LITERAL
+   ;
+
+real_constant
+   : INTEGER_LITERAL
+   | FLOAT_LITERAL
+   ;
+
+imaginary_constant
+   : real_constant 'I'
+   ;
+
+bit_constant
+   : binary_constant
+   ;
+
+file_constant
+   : identifier
+   ;
+
+character_position
+   : expression
+   ;
+
+command_list
+   : (identifier ',')* identifier
+   ;
+
+data_list
+   : (data_list_item ',')* data_list_item
+   ;
+
+data_list_item
+   : expression
+   ;
+
+data_list_item_type_3_do
+   : expression
+   ;
+
+data_value
+   : expression
+   ;
+
+dimension
+   : '(' (attribute_bound ',')* attribute_bound ')'
+   ;
+
+element_variable
+   : identifier
+   ;
+
+fractional_digits
+   : integer
+   ;
+
+significant_digits
+   : integer
+   ;
+
+precision
+   : integer
+   ;
+
+size
+   : expression
+   ;
+
+initial_call_entry_reference
+   : identifier
+   ;
+
+initial_constant
+   : constant
+   ;
+
+iteration_factor
+   : expression
+   ;
+
+letter
+   : IDENTIFIER
+   ;
+
+line_number
+   : expression
+   ;
+
+n
+   : integer
+   ;
+
+n_format_item
+   : n '(' format_list ')'
+   ;
+
+real_format_item
+   : format_item
+   ;
+
+return_code
+   : expression
+   ;
+
 file_reference
    : identifier
    ;
@@ -1725,6 +2114,14 @@ identifier
 
 hex_digit
    : HEX_DIGIT
+   ;
+
+INTEGER_LITERAL
+   : [0-9]+
+   ;
+
+FLOAT_LITERAL
+   : [0-9]+ '.' [0-9]+
    ;
 
 HEX_DIGIT

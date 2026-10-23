@@ -324,6 +324,7 @@
 				<module>plantUML</module>
                 <module>plm</module>
 				<module>pl0</module>
+                <module>pl1</module>
                 <module>pl360</module>
 				<module>plucid</module>
                 <module>plus</module>
