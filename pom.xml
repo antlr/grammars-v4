@@ -232,6 +232,7 @@
 				<module>gtin</module>
 				<module>guido</module>
 				<module>guitartab</module>
+                <module>hals</module>
 				<module>haskell</module>
 				<module>hexpat</module>
 				<module>html</module>
