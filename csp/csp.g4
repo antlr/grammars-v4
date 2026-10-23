@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2021, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -30,33 +30,120 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+/*
+* CSP: Hoare's "Communicating Sequential Processes" process algebra.
+* Both the traditional mathematical notation (using the Unicode
+* operators -> (U+2192), [] i.e. square-cap-box (U+25A1), |~| (U+2293)
+* and mu (U+03BC)) and the plain-ASCII spellings used by machine-
+* readable tools such as CSPM/FDR (->, [], |~|, mu) are accepted, since
+* both conventions are common in the literature and in practice.
+*/
 grammar csp;
 
-proc
-   : (line? EOL) + line?
+prog
+   : definition+ EOF
    ;
 
+definition
+   : NAME ('(' paramList ')')? '=' process
+   ;
 
+paramList
+   : NAME (',' NAME)*
+   ;
+
+process
+   : STOP                                        # stopProcess
+   | SKIP_                                       # skipProcess
+   | evt ARROW process                           # prefixProcess
+   | process BOX process                         # externalChoiceProcess
+   | process SQCAP process                       # internalChoiceProcess
+   | process PARALLEL process                    # parallelProcess
+   | process SEMI process                        # sequentialProcess
+   | process BACKSLASH eventSet                  # hidingProcess
+   | MU NAME DOT process                          # recursiveProcess
+   | NAME ('(' argList ')')?                      # callProcess
+   | '(' process ')'                             # parenProcess
+   ;
+
+evt
+   : evtPart ('.' evtPart)*
+   ;
+
+evtPart
+   : NAME
+   | NUMBER
+   ;
+
+eventSet
+   : '{' (evt (',' evt)*)? '}'
+   | NAME
+   ;
+
+argList
+   : arg (',' arg)*
+   ;
+
+arg
+   : NAME
+   | NUMBER
+   ;
 
 STOP
-    : 'STOP'
-    ;
+   : 'STOP'
+   ;
 
-SKIP
-    : 'SKIP'
-    ;
+SKIP_
+   : 'SKIP'
+   ;
+
+MU
+   : 'μ'
+   | 'mu'
+   ;
 
 ARROW
-    : '\u8594'
-    ;
+   : '→'
+   | '->'
+   ;
 
-BOX: '\u9633';
+BOX
+   : '□'
+   | '[]'
+   ;
 
-EXTERNALCHOICE
-    : '[]'
-    ;
+SQCAP
+   : '⊓'
+   | '|~|'
+   ;
 
+PARALLEL
+   : '||'
+   ;
 
+SEMI
+   : ';'
+   ;
+
+BACKSLASH
+   : '\\'
+   ;
+
+DOT
+   : '.'
+   ;
+
+NUMBER
+   : [0-9]+
+   ;
+
+NAME
+   : [a-zA-Z_] [a-zA-Z0-9_]*
+   ;
+
+COMMENT
+   : '--' ~ [\r\n]* -> skip
+   ;
 
 WS
    : [ \t\r\n] -> skip

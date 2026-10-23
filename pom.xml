@@ -188,6 +188,7 @@
                 <module>croc</module>
 				<module>csharp/v6</module>
 				<module>csharp/v7</module>
+                <module>csp</module>
 				<module>css3</module>
 				<module>csv</module>
 				<module>ctl</module>
