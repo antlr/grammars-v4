@@ -1,0 +1,35 @@
+digraph ATN {
+rankdir=LR;
+s345[fontsize=11, label="345", shape=doublecircle, fixedsize=true, width=.6];
+s2180[fontsize=11,label="2180", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2181[fontsize=11,label="2181", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2182[fontsize=11,label="{&rarr;\n2182\nd=183|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s2183[fontsize=11,label="&larr;\n2183", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2184[fontsize=11,label="2184", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2185[fontsize=11,label="2185", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2186[fontsize=11,label="2186", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2187[fontsize=11,label="2187", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2188[fontsize=11,label="2188", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2189[fontsize=11,label="2189", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2190[fontsize=11,label="2190", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2191[fontsize=11,label="2191", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2192[fontsize=11,label="2192", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2193[fontsize=11,label="2193", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s344[fontsize=11,label="344", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s344 -> s2180 [fontname="Times-Italic", label="&epsilon;"];
+s2180 -> s2182 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'join'", arrowhead = normal];
+s2182:p0 -> s2181 [fontname="Times-Italic", label="&epsilon;"];
+s2182:p1 -> s2183 [fontname="Times-Italic", label="&epsilon;"];
+s2181 -> s2183 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<type_>", arrowhead = normal];
+s2183 -> s2184 [fontname="Times-Italic", label="&epsilon;"];
+s2184 -> s2185 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<identifier>", arrowhead = normal];
+s2185 -> s2186 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'in'", arrowhead = normal];
+s2186 -> s2187 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<expression>", arrowhead = normal];
+s2187 -> s2188 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'on'", arrowhead = normal];
+s2188 -> s2189 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<expression>", arrowhead = normal];
+s2189 -> s2190 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'equals'", arrowhead = normal];
+s2190 -> s2191 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<expression>", arrowhead = normal];
+s2191 -> s2192 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'into'", arrowhead = normal];
+s2192 -> s2193 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<identifier>", arrowhead = normal];
+s2193 -> s345 [fontname="Times-Italic", label="&epsilon;"];
+}

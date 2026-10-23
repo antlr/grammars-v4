@@ -1,0 +1,71 @@
+#
+# Example and test for the 'watch' function that can be used to call some
+# code whenever a variable is modified.
+#
+
+# Print the value of foo or bar whenever foo or bar is modified
+watch foo { print foo is now `${foo}` }
+watch bar { print bar is now `${bar}` }
+
+# Print the value of both moo and coo whenever either of them is modified
+watch moo coo { print moo and coo are `${moo}` and `${coo}` }
+
+# Modify the variables
+set foo 32
+set bar blah
+set moo globalmoo
+set coo test
+set coo second
+set foo $bar
+
+# Works in a loop too
+foreach foo {one two three} {}
+
+# Local variables in functions and function arguments are separate
+# variables so they are not affected
+func functest {foo bar} {
+    # This is a local variable, it wont be reported
+    local moo
+    set moo infunction
+    # coo, however, is a global one
+    set coo fromwithin
+    # The local var can be watched too
+    watch moo { print local moo is $moo }
+    set moo inside1
+    # Other local vars are also accessible
+    local zoo
+    set zoo whoknows
+    watch moo { print local moo is $moo and zoo is $zoo }
+    set moo inside2
+    # Global is still a separate watch
+    set global moo theglobal
+}
+
+# Test local watches
+functest foofoo barbar
+
+# Test global watches again
+set coo last-coo-set moo last-moo-set
+
+# Remove the watches and test again
+watch foo bar moo coo {}
+set foo 0 bar 1 coo real-last-coo-set moo real-last-moo-set
+
+#
+# Expected output:
+# foo is now `32`
+# bar is now `blah`
+# moo and coo are `globalmoo` and ``
+# moo and coo are `globalmoo` and `test`
+# moo and coo are `globalmoo` and `second`
+# foo is now `blah`
+# foo is now `one`
+# foo is now `two`
+# foo is now `three`
+# moo and coo are `globalmoo` and `fromwithin`
+# local moo is inside1
+# local moo is inside2 and zoo is whoknows
+# moo and coo are `theglobal` and `fromwithin`
+# moo and coo are `theglobal` and `last-coo-set`
+# moo and coo are `last-moo-set` and `last-coo-set`
+#

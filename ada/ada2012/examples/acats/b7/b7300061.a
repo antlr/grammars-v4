@@ -1,0 +1,63 @@
+-- B7300061.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making
+--     this public release, the Government intends to confer upon all
+--     recipients unlimited rights  equal to those held by the Government.
+--     These rights include rights to use, duplicate, release or disclose the
+--     released technical data and computer software in whole or in part, in
+--     any manner and for any purpose whatsoever, and to have or permit others
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      See B7300060.A.
+--
+-- TEST DESCRIPTION:
+--      See B7300060.A.
+--
+-- TEST FILES:
+--      This test consists of the following files:
+--         B7300060.A
+--      -> B7300061.A
+--         B7300062.A
+--         B7300063.AM
+--
+-- PASS/FAIL CRITERIA:
+--      See B7300060.A.
+--
+-- CHANGE HISTORY:
+--      14 Sep 99   RLB     Created test.
+--      02 Feb 17   RLB     Fixed case of error tags, add location indicators.
+--!
+
+package body B730006_0.Child2 is
+   procedure Create (Bay : in out Dock) is
+   begin
+      B730006_0.Child1.Create (B730006_0.Child1.Bar(Bay)); -- OK. {32;2}
+      Bay.C := 1.0;                 -- OK. {7;8}
+      if Bay.B then                 -- ERROR: Component not visible. {10;5}
+         null;
+      end if;
+      if Bay.I = 2 then             -- ERROR: Component not visible. {10;9}
+                                    -- (Hidden view in between).
+         null;
+      end if;
+      B730006_0.Root(Bay).I := 3;   -- OK. {7;6}   (Root's components are
+      B730006_0.Root(Bay).C := 'A'; -- OK. {7;8}    visible here.)
+   end Create;
+end B730006_0.Child2;
+

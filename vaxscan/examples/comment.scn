@@ -1,0 +1,33 @@
+MODULE recognize_comment;
+
+!+
+!    This module recognizes PL/I or C style comments of the form:
+!
+!		/* anything_but_star_slash...  */
+!-
+
+    SET NON_star ( NOT '*' );
+    SET NON_star_or_slash ( NOT ( '*' OR '/' ) );
+
+    TOKEN comment { '/*'
+		    [ NON_star | '*'... NON_star_or_slash ]... 
+		    '*'... '/' };
+    
+    MACRO do_comment TRIGGER { r : comment};
+	WRITE 'The comment is: ', r;
+	END MACRO;
+    
+    PROCEDURE main_routine MAIN (  );
+
+    !+
+    !    Specify the DATA STACK clause so we can recognize longer comments,
+    !    since they can span multiple lines.
+    !-
+
+	START SCAN
+		DATA STACK 4096
+		OUTPUT FILE 'NL:';
+	    
+	END PROCEDURE;
+
+END MODULE;
