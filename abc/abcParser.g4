@@ -2,7 +2,6 @@
 Parser grammar for ABC music notation.
 References:
  - https://en.wikipedia.org/wiki/ABC_notation
- - https://abcnotation.com/
 */
 parser grammar abcParser;
 

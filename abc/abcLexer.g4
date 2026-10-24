@@ -2,7 +2,7 @@
 Lexer grammar for ABC music notation.
 References:
  - https://en.wikipedia.org/wiki/ABC_notation
- - https://abcnotation.com/
+
 */
 lexer grammar abcLexer;
 
