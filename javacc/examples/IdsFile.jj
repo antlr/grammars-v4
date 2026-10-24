@@ -1,0 +1,196 @@
+/* Copyright (c) 2006, Sun Microsystems, Inc.
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ *     * Redistributions of source code must retain the above copyright notice,
+ *       this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the Sun Microsystems, Inc. nor the names of its
+ *       contributors may be used to endorse or promote products derived from
+ *       this software without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+ * THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+
+options {
+  JAVA_UNICODE_ESCAPE = true;
+  STATIC = false;
+}
+
+PARSER_BEGIN(IdsFile)
+
+import java.util.*;
+
+public class IdsFile {
+}
+
+PARSER_END(IdsFile)
+
+/*
+ * Following is the only production in this grammar.  This describes the grammar
+ * of the nochangeidsfile and useidsfile, which are simply lists of identifiers.
+ * The actions here insert these identifiers into the appropriate Hashtable's
+ * in Globals.java.
+ */
+
+void input(boolean noChangeIds, String fileName) :
+	{
+	  Token t;
+	  Object obj;
+	  Hashtable symtab = noChangeIds ? Globals.noChangeIds : Globals.useIds;
+	}
+{
+  (
+    t=<IDENTIFIER>
+	{
+	  if (!noChangeIds) {
+            // truncate size just to be safe on machines like Macs
+            if (t.image.length() > 24) {
+	      t.image = t.image.substring(0,24);
+	    }
+          }
+	  if (!noChangeIds && Globals.mapTargets.get(t.image) != null) {
+	    System.out.println("Warning: Identifier " + t.image + " from <useidsfile> already mapped.");
+	  } else {
+	    obj = symtab.put(t.image, "");
+	    if (obj != null) {
+	      System.out.println("Warning: Multiple occurrence of identifier " + t.image + " in " + fileName);
+	    } else if (noChangeIds) {
+	      Globals.mappings.put(t.image, t.image);
+	      Globals.mapTargets.put(t.image, "");
+	    }
+	  }
+	}
+  )*
+  <EOF>
+}
+
+// Lexical specifications follow (copied from the Java 1.1 grammar)
+
+SKIP : /* WHITE SPACE */
+{
+  " "
+| "\t"
+| "\n"
+| "\r"
+| "\f"
+}
+
+SKIP : /* COMMENTS */
+{
+  <SINGLE_LINE_COMMENT: "//" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>
+| <FORMAL_COMMENT: "/**" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
+| <MULTI_LINE_COMMENT: "/*" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
+}
+
+TOKEN : /* RESERVED WORDS */
+{
+  < ABSTRACT: "abstract" >
+| < BOOLEAN: "boolean" >
+| < BREAK: "break" >
+| < BYTE: "byte" >
+| < CASE: "case" >
+| < CATCH: "catch" >
+| < CHAR: "char" >
+| < CLASS: "class" >
+| < CONST: "const" >
+| < CONTINUE: "continue" >
+| < _DEFAULT: "default" >
+| < DO: "do" >
+| < DOUBLE: "double" >
+| < ELSE: "else" >
+| < EXTENDS: "extends" >
+| < FALSE: "false" >
+| < FINAL: "final" >
+| < FINALLY: "finally" >
+| < FLOAT: "float" >
+| < FOR: "for" >
+| < GOTO: "goto" >
+| < IF: "if" >
+| < IMPLEMENTS: "implements" >
+| < IMPORT: "import" >
+| < INSTANCEOF: "instanceof" >
+| < INT: "int" >
+| < INTERFACE: "interface" >
+| < LONG: "long" >
+| < NATIVE: "native" >
+| < NEW: "new" >
+| < NULL: "null" >
+| < PACKAGE: "package">
+| < PRIVATE: "private" >
+| < PROTECTED: "protected" >
+| < PUBLIC: "public" >
+| < RETURN: "return" >
+| < SHORT: "short" >
+| < STATIC: "static" >
+| < SUPER: "super" >
+| < SWITCH: "switch" >
+| < SYNCHRONIZED: "synchronized" >
+| < THIS: "this" >
+| < THROW: "throw" >
+| < THROWS: "throws" >
+| < TRANSIENT: "transient" >
+| < TRUE: "true" >
+| < TRY: "try" >
+| < VOID: "void" >
+| < VOLATILE: "volatile" >
+| < WHILE: "while" >
+}
+
+TOKEN : /* IDENTIFIERS */
+{
+  < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>)* >
+|
+  < #LETTER:
+      [
+       "\u0024",
+       "\u0041"-"\u005a",
+       "\u005f",
+       "\u0061"-"\u007a",
+       "\u00c0"-"\u00d6",
+       "\u00d8"-"\u00f6",
+       "\u00f8"-"\u00ff",
+       "\u0100"-"\u1fff",
+       "\u3040"-"\u318f",
+       "\u3300"-"\u337f",
+       "\u3400"-"\u3d2d",
+       "\u4e00"-"\u9fff",
+       "\uf900"-"\ufaff"
+      ]
+  >
+|
+  < #DIGIT:
+      [
+       "\u0030"-"\u0039",
+       "\u0660"-"\u0669",
+       "\u06f0"-"\u06f9",
+       "\u0966"-"\u096f",
+       "\u09e6"-"\u09ef",
+       "\u0a66"-"\u0a6f",
+       "\u0ae6"-"\u0aef",
+       "\u0b66"-"\u0b6f",
+       "\u0be7"-"\u0bef",
+       "\u0c66"-"\u0c6f",
+       "\u0ce6"-"\u0cef",
+       "\u0d66"-"\u0d6f",
+       "\u0e50"-"\u0e59",
+       "\u0ed0"-"\u0ed9",
+       "\u1040"-"\u1049"
+      ]
+  >
+}

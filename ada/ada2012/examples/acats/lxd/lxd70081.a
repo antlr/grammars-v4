@@ -1,0 +1,98 @@
+-- LXD70081.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making
+--     this public release, the Government intends to confer upon all
+--     recipients unlimited rights  equal to those held by the Government.
+--     These rights include rights to use, duplicate, release or disclose the
+--     released technical data and computer software in whole or in part, in
+--     any manner and for any purpose whatsoever, and to have or permit others
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      See LXD70082.AM.
+--
+-- TEST FILES:
+--      This test consists of the following files:
+--          LXD70080.A     A text file with the Restrictions pragma.
+--       => LXD70081.A     A package which has calls to
+--                         Asynchronous_Task_Control.
+--          LXD70082.AM    The main program.
+--
+-- CHANGE HISTORY:
+--      06 Dec 94   SAIC    ACVC 2.0
+--      30 Sep 96   SAIC    Multi-file prolog convention fix.
+--      02 Feb 17   RLB     Added missing error tag (and location indicator).
+--
+--!
+
+package  LXD70081 is
+
+   task Stats_Collector is
+      entry start;
+   end Stats_Collector;
+   task Controller is
+      entry DSA_Critical;
+   end Controller;
+
+end  LXD70081;
+
+
+-- The following isn't allowed when restriction No_Asynchronous_Control is
+-- in force.
+with Ada.Asynchronous_Task_Control;                  -- OPTIONAL ERROR: {1}
+with Ada.Task_Identification;
+with ImpDef;
+package body  LXD70081 is
+
+   package AATC renames Ada.Asynchronous_Task_Control;
+   package ATI  renames Ada.Task_Identification;
+
+   Stats_Collector_ID : ATI.Task_Id;   -- ID for the "hold" call
+
+
+   task body Stats_Collector is
+   begin
+      Stats_Collector_ID := ATI.Current_Task;
+      accept Start;
+      loop
+         null;  -- Application code
+         delay ImpDef.Minimum_Task_Switch;
+      end loop;
+   end Stats_Collector;
+
+   task body Controller is
+   begin
+      Stats_Collector.Start;
+      loop
+         accept DSA_Critical do
+            -- Dynamic Storage Area has reached critical condition, close
+            -- down statistics collection
+            AATC.Hold (Stats_Collector_ID);
+            -- here would be code to close others
+         end DSA_Critical;
+         -- etc. here would be other application code including the
+         -- appropriate "continue"s
+         delay ImpDef.Minimum_Task_Switch;
+      end loop;
+   end Controller;
+
+begin -- LXD70081
+
+   null;
+
+end LXD70081;

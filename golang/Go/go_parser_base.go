@@ -1,90 +1,224 @@
-package GoParseTree
+package parser
 
 import (
-	"strings"
-
-	"github.com/antlr/antlr4/runtime/Go/antlr"
+        "github.com/antlr4-go/antlr/v4"
+        "fmt"
+        "os"
+        "strings"
 )
 
 // GoParserBase implementation.
 type GoParserBase struct {
-	*antlr.BaseParser
+        *antlr.BaseParser
+        debug   bool
+        table   map[string]bool
 }
 
-// Returns true if on the current index of the parser's
-// token stream a token exists on the Hidden channel which
-// either is a line terminator, or is a multi line comment that
-// contains a line terminator.
-func (p *GoParserBase) lineTerminatorAhead() bool {
-	// Get the token ahead of the current index.
-	possibleIndexEosToken := p.GetCurrentToken().GetTokenIndex() - 1
-	ahead := p.GetTokenStream().Get(possibleIndexEosToken)
-
-	if ahead.GetChannel() != antlr.LexerHidden {
-		// We're only interested in tokens on the HIDDEN channel.
-		return true
-	}
-
-	if ahead.GetTokenType() == GoParserTERMINATOR {
-		// There is definitely a line terminator ahead.
-		return true
-	}
-
-	if ahead.GetTokenType() == GoParserWS {
-		// Get the token ahead of the current whitespaces.
-		possibleIndexEosToken = p.GetCurrentToken().GetTokenIndex() - 2
-		ahead = p.GetTokenStream().Get(possibleIndexEosToken)
-	}
-
-	// Get the token's text and type.
-	text := ahead.GetText()
-	_type := ahead.GetTokenType()
-
-	// Check if the token is, or contains a line terminator.
-	return (_type == GoParserCOMMENT && (strings.Contains(text, "\r") || strings.Contains(text, "\n"))) ||
-		(_type == GoParserTERMINATOR)
+func hasArg(args []string, arg string) bool {
+    argLower := strings.ToLower(arg)
+    for _, a := range args {
+        if strings.Contains(strings.ToLower(a), argLower) {
+            return true
+        }
+    }
+    return false
 }
 
-func (p *GoParserBase) noTerminatorBetween(tokenOffset int) bool {
-	var s antlr.TokenStream
-	s = p.GetTokenStream()
-	stream := s.(*antlr.CommonTokenStream)
-	tokens := stream.GetHiddenTokensToLeft(stream.LT(tokenOffset).GetTokenIndex(), -1)
-	if tokens == nil {
-		return true
-	}
-
-	for _, token := range tokens {
-		if strings.Contains(token.GetText(), "\n") {
-			return false
-		}
-	}
-	return true
+func NewGoParserBase(input antlr.TokenStream) *GoParserBase {
+    p := &GoParserBase{
+        table: make(map[string]bool),
+    }
+    p.debug = hasArg(os.Args, "--debug")
+    if p.debug {
+        fmt.Println("debug =", p.debug)
+    }
+    return p
 }
 
-func (p *GoParserBase) noTerminatorAfterParams(tokenOffset int) bool {
-	stream := p.GetTokenStream()
-	leftParams := 1
-	rightParams := 0
-	var tokenType int
-
-	if stream.LT(tokenOffset).GetTokenType() == GoParserL_PAREN {
-		for leftParams != rightParams {
-			tokenOffset++
-			tokenType = stream.LT(tokenOffset).GetTokenType()
-			if tokenType == GoParserL_PAREN {
-				leftParams++
-			} else if tokenType == GoParserR_PAREN {
-				rightParams++
-			}
-		}
-		tokenOffset++
-		return p.noTerminatorBetween(tokenOffset)
-	}
-	return true
+func (p *GoParserBase) myreset() {
+    p.table = make(map[string]bool)
 }
 
-func (p *GoParserBase) checkPreviousTokenText(text string) bool {
-	stream := p.GetTokenStream()
-	return stream.LT(1).GetText() == text
+func (p *GoParserBase) closingBracket() bool {
+    stream := p.GetTokenStream()
+    la := stream.LT(1)
+    return la.GetTokenType() == GoParserR_PAREN || la.GetTokenType() == GoParserR_CURLY || la.GetTokenType() == antlr.TokenEOF;
+}
+
+func (p *GoParserBase) isNotReceive() bool {
+    stream := p.GetTokenStream()
+    la := stream.LT(2)
+    return la.GetTokenType() != GoParserRECEIVE;
+}
+
+func (p *GoParserBase) addImportSpec() {
+    // Initialize table if nil (can happen if myreset() wasn't called)
+    if p.table == nil {
+        p.table = make(map[string]bool)
+    }
+    ctx := p.GetParserRuleContext()
+    importSpec, ok := ctx.(IImportSpecContext)
+    if !ok || importSpec == nil {
+        return
+    }
+    packageName := importSpec.PackageName()
+    if packageName != nil {
+        name := packageName.GetText()
+        if p.debug {
+            fmt.Println("Entering " + name)
+        }
+        p.table[name] = true
+        return
+    }
+    importPath := importSpec.ImportPath()
+    if importPath == nil {
+        return
+    }
+    name := importPath.GetText()
+    if p.debug {
+        fmt.Println("import path " + name)
+    }
+    name = strings.ReplaceAll(name, "\"", "")
+    if len(name) == 0 {
+        return
+    }
+    name = strings.ReplaceAll(name, "\\", "/")
+    pathArr := strings.Split(name, "/")
+    if len(pathArr) == 0 {
+        return
+    }
+    lastComponent := pathArr[len(pathArr)-1]
+    if len(lastComponent) == 0 {
+        return
+    }
+    // Handle special cases like "." and ".."
+    if lastComponent == "." || lastComponent == ".." {
+        return
+    }
+    fileArr := strings.Split(lastComponent, ".")
+    // Guard against empty array (can happen if lastComponent is all dots)
+    if len(fileArr) == 0 {
+        p.table[lastComponent] = true
+        if p.debug {
+            fmt.Println("Entering " + lastComponent)
+        }
+        return
+    }
+    fileName := fileArr[len(fileArr)-1]
+    if len(fileName) == 0 {
+        // Fall back to lastComponent if split resulted in empty string
+        fileName = lastComponent
+    }
+    if p.debug {
+        fmt.Println("Entering " + fileName)
+    }
+    p.table[fileName] = true
+}
+
+func (p *GoParserBase) isOperand() bool {
+    stream := p.GetTokenStream()
+    la := stream.LT(1)
+    result := true
+    if la.GetText() == "err" {
+        return true
+    }
+    if la.GetTokenType() != GoParserIDENTIFIER {
+        if p.debug {
+            fmt.Println("isOperand Returning ", result, " for ", la)
+        }
+        return result
+    }
+    result, _ = p.table[la.GetText()]
+    la2 := stream.LT(2)
+    if la2.GetTokenType() != GoParserDOT {
+        result = true
+        if p.debug {
+            fmt.Println("isOperand Returning ", result, " for ", la)
+        }
+        return result
+    }
+    la3 := stream.LT(3)
+    if la3.GetTokenType() == GoParserL_PAREN {
+        result = true
+        if p.debug {
+            fmt.Println("isOperand Returning ", result, " for ", la)
+        }
+        return result
+    }
+    if p.debug {
+        fmt.Println("isOperand Returning ", result, " for ", la)
+    }
+    return result
+}
+
+func (p *GoParserBase) isConversion() bool {
+    stream := p.GetTokenStream()
+    la := stream.LT(1)
+    result := la.GetTokenType() != GoParserIDENTIFIER;
+    if p.debug {
+        fmt.Println("isConversion Returning ", result, " for ", la)
+    }
+    return result
+}
+
+func (p *GoParserBase) isMethodExpr() bool {
+    stream := p.GetTokenStream()
+    la := stream.LT(1)
+    result := true
+    if la.GetTokenType() == GoParserSTAR {
+        if p.debug {
+            fmt.Println("isMethodExpr Returning ", result, " for ", la)
+        }
+        return result
+    }
+    if la.GetTokenType() != GoParserIDENTIFIER {
+        result = false
+        if p.debug {
+            fmt.Println("isMethodExpr Returning ", result, " for ", la)
+        }
+        return result
+    }
+    _, found := p.table[la.GetText()]
+    if ! found {
+        result = true
+    }
+    if p.debug {
+        fmt.Println("isMethodExpr Returning ", result, " for ", la)
+    }
+    return result
+}
+
+// Built-in functions that take a type as first argument
+var builtinTypeFunctions = map[string]bool{
+    "make": true,
+    "new":  true,
+}
+
+// Check if we're in a call to a built-in function that takes a type as first argument.
+// Called after L_PAREN has been matched in the arguments rule.
+func (p *GoParserBase) isTypeArgument() bool {
+    stream := p.GetTokenStream()
+    // After matching L_PAREN, LT(-1) is '(' and LT(-2) is the token before it
+    funcToken := stream.LT(-2)
+    if funcToken == nil || funcToken.GetTokenType() != GoParserIDENTIFIER {
+        if p.debug {
+            fmt.Println("isTypeArgument Returning false - no identifier before (")
+        }
+        return false
+    }
+    _, result := builtinTypeFunctions[funcToken.GetText()]
+    if p.debug {
+        fmt.Println("isTypeArgument Returning ", result, " for ", funcToken.GetText())
+    }
+    return result
+}
+
+// Check if we're NOT in a call to a built-in function that takes a type.
+// This is the inverse of isTypeArgument for the expressionList alternative.
+func (p *GoParserBase) isExpressionArgument() bool {
+    result := !p.isTypeArgument()
+    if p.debug {
+        fmt.Println("isExpressionArgument Returning ", result)
+    }
+    return result
 }

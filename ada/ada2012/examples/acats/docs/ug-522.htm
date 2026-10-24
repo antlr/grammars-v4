@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>Macro Defs Customization</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    DIV.Indented1 {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 2.0em; margin-bottom: 0.6em}
+    DIV.Enumerated-Body {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 2.0em; margin-right: 2.0em; margin-top: 0em; margin-bottom: 0.5em}
+    DIV.Enumerated-Term {float: left; font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 0.5em; margin-top: 0em; margin-bottom: 0em}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-521.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-523.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>5.2.2 Macro Defs Customization</H1>
+<div class="Indented1"><SPAN STYLE="color: rgb(153,0,0)"><I>There was 
+no change to the&nbsp;</I></SPAN><TT><SPAN STYLE="color: rgb(153,0,0)"><I>macro.dfs</I></SPAN></TT><SPAN STYLE="color: rgb(153,0,0)"><I>&nbsp;file from ACATS 4.1 to ACATS 4.2. A version of&nbsp;</I></SPAN><TT><SPAN STYLE="color: rgb(153,0,0)"><I>macro.dfs</I></SPAN></TT><SPAN STYLE="color: rgb(153,0,0)"><I>&nbsp;that was tailored for ACATS 4.1 should be valid for ACATS 4.2 unless 
+some implementation characteristics have changed.</I></SPAN>&nbsp;</div>
+<div class="Normal">Tests in files with the extension <TT>.tst</TT> contain 
+symbols that represent implementation dependent values. The symbols are 
+identifiers with a initial dollar sign ('$'). Each symbol must be replaced 
+with an appropriate textual value to make the tests compilable. This 
+process is sometime known as <I>macro substitution</I>.<A NAME="I1027"></A></div>
+<div class="Normal">The Macrosub program distributed with the ACATS can 
+automatically perform the required substitutions. This program reads 
+the replacement values for the symbols from the file <TT>macro.dfs</TT> 
+and edits all the <TT>.tst</TT> tests in the suite to make the needed 
+changes. It writes the resulting, compilable programs into files with 
+the same name as the original but with the extension <TT>.adt</TT>. A 
+sample <TT>macro.dfs</TT> is included with the ACATS; it contains descriptions 
+of all the symbols used in the test suite.</div>
+<div class="Normal" style="margin-bottom: 0.4em">Substitutions using 
+the Macrosub program may be made as follows:&nbsp;</div>
+<div class="Enumerated-Term">1.</div><div class="Enumerated-Body">
+Edit the file <TT>macro.dfs</TT> using values appropriate for the implementation. 
+Symbols that use the value of MAX_IN_LEN are calculated automatically 
+and need not be entered.</div>
+<div class="Enumerated-Term">2.</div><div class="Enumerated-Body">
+Create a file called <TT>tsttests.dat</TT> that includes all of the <TT>.tst</TT> 
+test file names, and their directory locations if necessary. A version 
+of this file (without directory information) is supplied.</div>
+<div class="Enumerated-Term">3.</div><div class="Enumerated-Body">
+Compile and bind MacroSub.</div>
+<div class="Enumerated-Term">4.</div><div class="Enumerated-Body">
+Run MacroSub.&nbsp;</div>
+<div class="Normal">The program will replace all symbols in the <TT>.tst</TT> 
+files with values from <TT>macro.dfs</TT>. Test files with the original 
+test name but the extension <TT>.adt</TT> will contain the processable 
+tests. The original <TT>.tst</TT> files will not be modified.</div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-521.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-523.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>

@@ -29,214 +29,260 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar terraform;
 
-file
-   : (local | module | output | provider | variable | data | resource)+
-   ;
+file_
+    : (local | module | output | provider | variable | data | resource | terraform)+ EOF
+    ;
+
+terraform
+    : 'terraform' blockbody
+    ;
 
 resource
-   : 'resource' resourcetype name blockbody
-   ;
+    : 'resource' resourcetype name blockbody
+    ;
 
 data
-   : 'data' resourcetype name blockbody
-   ;
+    : 'data' resourcetype name blockbody
+    ;
 
 provider
-  : 'provider' resourcetype blockbody
-  ;
+    : PROVIDER resourcetype blockbody
+    ;
 
 output
-  : 'output' name blockbody
-  ;
+    : 'output' name blockbody
+    ;
 
 local
-  : 'locals' blockbody
-  ;
+    : 'locals' blockbody
+    ;
 
 module
-  : 'module' name blockbody
-  ;
+    : 'module' name blockbody
+    ;
 
 variable
-   : 'variable' name blockbody
-   ;
+    : VARIABLE name blockbody
+    ;
 
 block
-   : blocktype label* blockbody
-   ;
+    : blocktype label* blockbody
+    ;
 
 blocktype
-   : IDENTIFIER
-   ;
+    : IDENTIFIER
+    ;
 
 resourcetype
-   : STRING
-   ;
+    : STRING
+    ;
 
 name
-   : STRING
-   ;
+    : STRING
+    ;
 
 label
-   : STRING
-   ;
+    : STRING
+    ;
 
 blockbody
-   : '{' (argument | block)* '}'
-   ;
+    : LCURL (argument | block)* RCURL
+    ;
 
 argument
-   : identifier '=' expression
-   ;
+    : identifier '=' expression
+    ;
 
 identifier
-   : IDENTIFIER
-   ;
+    : (('local' | 'data' | 'var' | 'module') DOT)? identifierchain
+    ;
+
+identifierchain
+    : (IDENTIFIER | IN | VARIABLE | PROVIDER) index? (DOT identifierchain)*
+    | STAR (DOT identifierchain)*
+    | inline_index (DOT identifierchain)*
+    ;
+
+inline_index
+    : NATURAL_NUMBER
+    ;
 
 expression
-   : RESOURCEREFERENCE
-   | section
-   | expression OPERATOR expression
-   | LPAREN expression RPAREN
-   ;
+    : section
+    | expression operator_ expression
+    | LPAREN expression RPAREN
+    | expression '?' expression ':' expression
+    | forloop
+    ;
 
-RESOURCEREFERENCE
-   : [a-zA-Z] [a-zA-Z0-9_-]* RESOURCEINDEX? '.' ([a-zA-Z0-9_.-] RESOURCEINDEX?)+ 
-   ;
-
-RESOURCEINDEX
-   : '[' [0-9]+ ']'
-   ;
+forloop
+    : 'for' identifier IN expression ':' expression
+    ;
 
 section
-   : list
-   | map
-   | val
-   ;
+    : list_
+    | map_
+    | val
+    ;
 
 val
-   : NULL
-   | SIGNED_NUMBER
-   | string
-   | BOOL
-   | IDENTIFIER index?
-   | DESCRIPTION
-   | filedecl
-   | functioncall
-   | EOF_
-   ;
+    : NULL_
+    | signed_number
+    | string
+    | identifier
+    | BOOL
+    | DESCRIPTION
+    | filedecl
+    | functioncall
+    | EOF_
+    ;
 
 functioncall
-   : functionname LPAREN functionarguments RPAREN
-   ;
+    : functionname LPAREN functionarguments RPAREN
+    | 'jsonencode' LPAREN (.)*? RPAREN
+    ;
 
 functionname
-   : IDENTIFIER
-   ;
+    : IDENTIFIER
+    ;
 
 functionarguments
-   : //no arguments
-   | expression (',' expression)*
-   ;
+    : //no arguments
+    | expression (',' expression)*
+    ;
 
 index
-   : '[' expression ']'
-   ;
+    : '[' expression ']'
+    ;
 
 filedecl
-   : 'file' '(' expression ')'
-   ;
+    : 'file' '(' expression ')'
+    ;
 
-list
-   : '[' expression (',' expression)* ','? ']'
-   ;
+list_
+    : '[' (expression (',' expression)* ','?)? ']'
+    ;
 
-map
-   : '{' argument* '}'
-   ;
+map_
+    : LCURL (argument ','?)* RCURL
+    ;
 
 string
-   : STRING
-   | MULTILINESTRING
-   ;
+    : STRING
+    | MULTILINESTRING
+    ;
 
 fragment DIGIT
-   : [0-9]
-   ;
+    : [0-9]
+    ;
 
-SIGNED_NUMBER
-   : '+' NUMBER
-   | '-' NUMBER
-   | NUMBER
-   ;
+signed_number
+    : ('+' | '-')? number
+    ;
 
-OPERATOR
-   : '*'
-   | '/'
-   | '%'
-   | '+'
-   | '-'
-   | '>'
-   | '>='
-   | '<'
-   | '<='
-   | '=='
-   | '!='
-   | '&&'
-   | '||'
-   ;
+VARIABLE
+    : 'variable'
+    ;
+
+PROVIDER
+    : 'provider'
+    ;
+
+IN
+    : 'in'
+    ;
+
+STAR
+    : '*'
+    ;
+
+DOT
+    : '.'
+    ;
+
+operator_
+    : '/'
+    | STAR
+    | '%'
+    | '+'
+    | '-'
+    | '>'
+    | '>='
+    | '<'
+    | '<='
+    | '=='
+    | '!='
+    | '&&'
+    | '||'
+    ;
+
+LCURL
+    : '{'
+    ;
+
+RCURL
+    : '}'
+    ;
 
 LPAREN
-   : '('
-   ;
+    : '('
+    ;
 
 RPAREN
-   : ')'
-   ;
+    : ')'
+    ;
 
 EOF_
-   : '<<EOF' .*? 'EOF'
-   ;
+    : '<<EOF' .*? 'EOF'
+    ;
 
-NULL
-   : 'nul'
-   ;
+NULL_
+    : 'nul'
+    ;
 
-NUMBER
-   : DIGIT+ ('.' DIGIT+)?
-   ;
+NATURAL_NUMBER
+    : DIGIT+
+    ;
+
+number
+    : NATURAL_NUMBER (DOT NATURAL_NUMBER)?
+    ;
 
 BOOL
-   : 'true'
-   | 'false'
-   ;
+    : 'true'
+    | 'false'
+    ;
 
 DESCRIPTION
-   : '<<DESCRIPTION' .*? 'DESCRIPTION'
-   ;
+    : '<<DESCRIPTION' .*? 'DESCRIPTION'
+    ;
 
 MULTILINESTRING
-   : '<<-EOF' .*? 'EOF'
-   ;
+    : '<<-EOF' .*? 'EOF'
+    ;
 
 STRING
-   : '"' (~ [\r\n"] | '""')* '"'
-   ;
+    : '"' ('\\"' | ~["\r\n])* '"'
+    ;
 
 IDENTIFIER
-   : [a-zA-Z] ([a-zA-Z0-9_-])*
-   ;
+    : [a-zA-Z] ([a-zA-Z0-9_-])*
+    ;
 
 COMMENT
-  : ('#' | '//') ~ [\r\n]* -> channel(HIDDEN)
-  ;
+    : ('#' | '//') ~ [\r\n]* -> channel(HIDDEN)
+    ;
 
 BLOCKCOMMENT
-  : '/*' .*? '*/' -> channel(HIDDEN)
-  ;
+    : '/*' .*? '*/' -> channel(HIDDEN)
+    ;
 
 WS
-   : [ \r\n\t]+ -> skip
-   ;
+    : [ \r\n\t]+ -> skip
+    ;

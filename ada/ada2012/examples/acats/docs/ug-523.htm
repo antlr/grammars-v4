@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>Packages SPPRT13 and FCNDECL</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    DIV.Indented1 {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 2.0em; margin-bottom: 0.6em}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-522.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-524.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>5.2.3 Packages SPPRT13 and FCNDECL</H1>
+<div class="Normal">Package SPPRT13 declares six constants of type System.Address 
+that are primarily used by tests of Clause 13 features. It is in the 
+file <TT>spprt13s.tst</TT>. As distributed, the package uses macro symbols 
+that must be replaced. In most cases, the substitution can be accomplished 
+by the macro substitution described in the preceding section. If appropriate 
+literals, constants, or predefined function calls can be used to initialize 
+these constants, they should be supplied in <TT>macro.dfs</TT>. Otherwise, 
+the package FCNDECL must be modified.</div>
+<div class="Indented1"><SPAN STYLE="color: rgb(153,0,0)"><I>All implementations 
+should verify that package SPPRT13 can be properly customized using the 
+macro substitution technique. Note that a body for SPPRT13 is illegal, 
+nor is it allowed to add declarations to package SPPRT13.</I></SPAN> 
+</div>
+<div class="Normal">The specification for package FCNDECL is in the file 
+<TT>fcndecl.ada</TT>. SPPRT13 depends on FCNDECL (in a context clause 
+that both <B>with</B>s it and <B>use</B>s it). As supplied with the ACATS, 
+FCNDECL is an empty package specification. If appropriate literals, constants, 
+or predefined function calls cannot be used to customize the constants 
+declared in SPPRT13, the implementer must declare appropriate functions 
+in the specification of FCNDECL and provide bodies for them in a package 
+body or with a pragma Import.</div>
+<div class="Normal">Modifications to FCNDECL must receive advance approval 
+from the ACAL (and, if necessary, the ACAA) before use in a conformity 
+assessment.</div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-522.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-524.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>

@@ -1,0 +1,6 @@
+(* a procedure that adds its formal parameter to x *)
+begin new x; new addx;
+x <- 10;
+addx <- 'formal y; x+y';
+out addx(5)
+end

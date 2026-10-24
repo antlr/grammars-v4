@@ -1,0 +1,1 @@
+CALL test.proc() YIELD a AS v RETURN *

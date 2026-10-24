@@ -1,0 +1,26 @@
+begin_problem(Pelletier57).
+
+list_of_descriptions.
+name({* Pelletier's Problem No. 57 *}).
+author({* Christoph Weidenbach *}).
+status(unsatisfiable).
+description({* Problem taken in revised form from the "Pelletier Collection",
+Journal of Automated Reasoning, Vol. 2, No. 2, pages 191-216 *}).
+end_of_list.
+
+list_of_symbols.
+functions[(f,2), (a,0), (b,0), (c,0)].
+predicates[(F,2)].
+end_of_list.
+
+list_of_formulae(axioms).
+formula(F(f(a,b),f(b,c))).
+formula(F(f(b,c),f(a,c))).
+formula(forall([U,V,W],implies(and(F(U,V),F(V,W)),F(U,W)))).
+end_of_list.
+
+list_of_formulae(conjectures).
+formula(F(f(a,b),f(a,c))).
+end_of_list.
+
+end_problem.

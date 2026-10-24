@@ -16,4 +16,5 @@ locals {
   o = true || false || b
   p = -6
   q = (7 + 5) * c
+  r = a ? 1 : 5
 }

@@ -1,0 +1,42 @@
+MODULE hanoi;
+
+    !+
+    !   This program is designed to show that SCAN is also a conventional
+    !   programming language.  This program solves the classical tower
+    !   of Hanoi problem.
+    !-
+	
+    CONSTANT disks = 'SDI';    
+
+    PROCEDURE hanoi ( number: value integer, 
+		      begin : value integer,
+		      dest  : value integer,
+		      inter : value integer );
+	
+	IF number = 0
+	THEN
+	    RETURN;
+	END IF;
+    
+    	call hanoi( number-1, begin, inter, dest );
+
+	WRITE ' move ', number, 
+    	      ' from ', disks[ begin ],
+    	      ' to   ', disks[ dest ];
+    
+    	call hanoi( number-1, inter, dest, begin );
+	
+    END PROCEDURE;
+
+    PROCEDURE main MAIN (  );
+    
+        DECLARE number: integer;
+
+	WRITE 'depth:';
+	READ number;
+    
+	CALL hanoi( number, 1, 2, 3 );
+	
+    END PROCEDURE;
+
+END MODULE;

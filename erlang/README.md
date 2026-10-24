@@ -14,9 +14,8 @@ It is merely extracted from the [official non-standard grammar from Erlang/OTP s
 It is meant for students and people who work on Erlang's syntax.
 
 
-## Requierements
+## Requirements
 
-* [antlr4](http://www.antlr.org/wiki/display/ANTLR4/Getting+Started+with+ANTLR+v4)
 * Erlang's **erlc** for preprocessing purposes.
 
 ## Usage
@@ -37,9 +36,20 @@ make debug
 ^D
 ```
 
+Preprocess files in src/ and check Erlang.g4 against preprocessed files in examples/:
+
+```
+:::bash
+./check.sh src examples
+```
+
 Check Erlang.g4 against the whole Erlang/OTP's `.erl` sources:
 
 ```
 :::bash
 make check
 ```
+
+## Reference
+* [pldb](http://pldb.info/concepts/erlang)
+

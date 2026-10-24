@@ -1,0 +1,11 @@
+# An example robot
+{
+This is the beginning of a comment.
+It continues on the next line.
+{This comment is nested within the outer one
+} The previous comment is closed.
+
+main: # this is not a label definition; it is enclosed in a comment
+}
+main: # this is a valid label definition
+main jump

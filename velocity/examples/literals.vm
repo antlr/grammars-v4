@@ -1,0 +1,15 @@
+#set( $directoryRoot = "www" )
+#set( $templateName = "index.vm" )
+#set( $template = "$directoryRoot/$templateName" )
+$template
+
+#set( $foo = "bar" )
+$foo
+#set( $blargh = '$foo' )
+$blargh
+
+#[[
+#foreach ($woogie in $boogie)
+nothing will happen to $woogie
+#end
+]]#

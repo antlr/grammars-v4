@@ -1,0 +1,6 @@
+BEGIN
+   R1 := 0;
+   REPEAT
+      R1 := R1 + 1;
+   UNTIL R1 > 10;
+END.
