@@ -1,0 +1,331 @@
+-- CXE5003.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making
+--     this public release, the Government intends to confer upon all
+--     recipients unlimited rights  equal to those held by the Government.
+--     These rights include rights to use, duplicate, release or disclose the
+--     released technical data and computer software in whole or in part, in
+--     any manner and for any purpose whatsoever, and to have or permit others
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that System.RPC.Establish_RPC_Receiver is called once
+--      after elaborating the library units of a partition and prior
+--      to invoking the main procedure for the partition.
+--
+-- TEST DESCRIPTION:
+--      This test is composed of the following compilation units:
+--          system.rpc (body)
+--          CXE5003_A       - main procedure for partition A
+--          CXE5003_Part_A1 - RCI unit
+--          CXE5003_Part_A2 - RCI unit
+--          CXE5003_Check   - normal package
+--          CXE5003_Normal  - normal package
+--          CXE5003_B       - main procedure for partition B
+--          CXE5003_Part_B  - RCI unit
+--      This test runs as a single partition as no real communication
+--      between partitions occur.  The body of System.RPC that is
+--      included in this test is the key element of this test.
+--      Since an RCI unit is included in partition A, the following
+--      sequence of operations is required:  elaborate all packages in
+--      the partition, call System.RPC.Establish_RPC_Receiver, invoke
+--      the main procedure for the partition.  This sequence is checked
+--      by this test by recording the occurrence of each event in the
+--      package CXE5003_Check.
+--
+-- SPECIAL REQUIREMENTS:
+--      Compile the compilation units in this file.
+--      Create the two partitions (A and B) with the following contents:
+--        Partition A contains:
+--           CXE5003_A  (main procedure)
+--           CXE5003_Part_A1  (RCI package)
+--           CXE5003_Part_A2  (RCI package)
+--           System.RPC (body of this package included with this test)
+--           and all other normal and pure packages with'ed by these units.
+--        Partition B contains:
+--           CXE5003_B  (main procedure)
+--           CXE5003_Part_B  (RCI package)
+--           and all normal and pure packages with'ed by these units.
+--      Note that a body for package System.RPC is included in this test
+--      and replaces any implementation provided version of that package
+--      body.
+--
+--      Only CXE5003_A need be run as no actual communication between
+--      the partitions occurs.  Partition B need not be built unless the
+--      implementation requires it.
+--
+--      IMPORTANT:  Be sure to remove the body of System.RPC that is
+--      compiled as part of this test from the library before continuing
+--      with any other test as the other tests may require the
+--      implementation provided version of System.RPC.
+--
+-- APPLICABILITY CRITERIA:
+--      This test applies only to implementations:
+--         supporting the Distribution Annex,
+--         supporting the Remote_Call_Interface pragma, and
+--         supporting the language-defined System.RPC interface
+--            rather than an alternative declaration as allowed by E.5(27.1/2).
+--
+-- PASS/FAIL CRITERIA:
+--      This test passes if and only if CXE5003_A prints a message
+--      reporting that the test passed.
+--
+--
+-- CHANGE HISTORY:
+--     19 APR 95   SAIC    Initial version
+--     02 JUN 98   EDS     Fixed the Read procedure to assign to parameter Last
+--     08 JUL 99   RLB     Revised the applicability criteria to require
+--                         support for the recompilation of the body of
+--                         System.RPC (AI95-00082).
+--     21 DEC 07   RLB     Revised the applicability criteria to make
+--                         the test inapplicable if an alternative definition
+--                         of System.RPC is used.
+--
+--!
+
+
+-----------------------------------------------------------------------------
+
+package CXE5003_Part_A1 is
+  pragma Remote_Call_Interface;
+  pragma All_Calls_Remote;
+
+  procedure A_Remote_Procedure;
+end CXE5003_Part_A1;
+
+-----------------------------------------------------------------------------
+
+package CXE5003_Part_A2 is
+  pragma Remote_Call_Interface;
+
+  procedure A_Remote_Procedure;
+end CXE5003_Part_A2;
+
+-----------------------------------------------------------------------------
+
+package CXE5003_Part_B is
+  pragma Remote_Call_Interface;
+
+  procedure A_Remote_Procedure;
+end CXE5003_Part_B;
+
+-----------------------------------------------------------------------------
+
+package CXE5003_Check is
+--
+-- This package contains state information that is communicated between the
+-- library unit elaboration and the body of System.RPC.  The purpose of the
+-- state information is to inform System.RPC as to what elaborations have
+-- occurred.
+  Part_A1   : Boolean := False;
+  Part_A2   : Boolean := False;
+  Normal    : Boolean := False;
+  RPC       : Boolean := False;
+  Main      : Boolean := False;
+  Establish : Boolean := False;
+end CXE5003_Check;
+
+-----------------------------------------------------------------------------
+
+package CXE5003_Normal is
+  procedure Dummy;
+end CXE5003_Normal;
+
+with CXE5003_Check;
+package body CXE5003_Normal is
+  procedure Dummy is begin null; end Dummy;
+begin
+  CXE5003_Check.Normal := True;
+end CXE5003_Normal;
+
+-----------------------------------------------------------------------------
+--
+-- main procedure for optional partition B
+--
+
+with CXE5003_Part_B;
+procedure CXE5003_B is
+begin
+  null;
+end CXE5003_B;
+
+-----------------------------------------------------------------------------
+--
+-- main procedure for partition A (and the test)
+--
+
+with CXE5003_Part_A1;
+with CXE5003_Part_A2;
+with CXE5003_Part_B;
+with CXE5003_Check;
+with CXE5003_Normal;
+with Report;
+procedure CXE5003_A is
+begin
+  CXE5003_Check.Main := True;
+
+  -- Note that the expected behavior is for all the elaboration to take
+  -- place first, System.RPC.Establish_RPC_Receiver to be called, and then
+  -- this main procedure to be called.  Report.Test is called in the
+  -- Establish_RPC_Receiver routine.
+
+  if not CXE5003_Check.Establish then
+    Report.Test ("CXE5003", "Partition Communication System elaboration " &
+                            "and initialization");
+    Report.Failed ("System.RPC.Establish_RPC_Receiver was not called");
+  end if;
+
+  -- finish up
+  Report.Result;
+end CXE5003_A;
+
+-----------------------------------------------------------------------------
+
+with CXE5003_Check;
+package body CXE5003_Part_A1 is
+  procedure A_Remote_Procedure is
+  begin
+    null;
+  end A_Remote_Procedure;
+begin
+  CXE5003_Check.Part_A1 := True;
+end CXE5003_Part_A1;
+
+-----------------------------------------------------------------------------
+
+with CXE5003_Check;
+package body CXE5003_Part_A2 is
+  procedure A_Remote_Procedure is
+  begin
+    null;
+  end A_Remote_Procedure;
+begin
+  CXE5003_Check.Part_A2 := True;
+end CXE5003_Part_A2;
+
+-----------------------------------------------------------------------------
+
+package body CXE5003_Part_B is
+  procedure A_Remote_Procedure is
+  begin
+    null;
+  end A_Remote_Procedure;
+end CXE5003_Part_B;
+
+-----------------------------------------------------------------------------
+
+with Report;
+with CXE5003_Check;
+package body System.RPC is
+  procedure Read (
+      Stream : in out Params_Stream_Type;
+      Item : out Ada.Streams.Stream_Element_Array;
+      Last : out Ada.Streams.Stream_Element_Offset) is
+  begin
+    Last := Item'First;
+    Report.Comment ("System.RPC.Read called unexpectedly");
+  end Read;
+
+
+  procedure Write (
+      Stream : in out Params_Stream_Type;
+      Item : in Ada.Streams.Stream_Element_Array) is
+  begin
+    Report.Comment ("System.RPC.Write called unexpectedly");
+  end Write;
+
+
+  procedure Do_RPC (
+      Partition : in Partition_ID;
+      Params    : access Params_Stream_Type;
+      Result    : access Params_Stream_Type) is
+  begin
+    Report.Comment ("System.RPC.Do_RPC called unexpectedly");
+  end Do_RPC;
+
+
+  procedure Do_APC (
+      Partition : in Partition_ID;
+      Params    : access Params_Stream_Type) is
+  begin
+    Report.Comment ("System.RPC.Do_APC called unexpectedly");
+  end Do_APC;
+
+
+  procedure Establish_RPC_Receiver (
+      Partition : in Partition_ID;
+      Receiver  : in RPC_Receiver) is
+  begin
+    Report.Test ("CXE5003", "Partition Communication System elaboration and " &
+                            "initialization");
+
+    -- make sure the other packages have been elaborated
+
+    if CXE5003_Check.RPC then
+      null;
+      -- Report.Comment ("System.RPC was elaborated");
+    else
+      Report.Failed ("Establish_RPC_Receiver called before System.RPC " &
+                     "elaborated");
+    end if;
+
+    if CXE5003_Check.Part_A1 then
+      null;
+      -- Report.Comment ("Part_A1 was elaborated");
+    else
+      Report.Failed ("Establish_RPC_Receiver called before Part_A1 " &
+                     "elaborated");
+    end if;
+
+    if CXE5003_Check.Part_A2 then
+      null;
+      -- Report.Comment ("Part_A2 was elaborated");
+    else
+      Report.Failed ("Establish_RPC_Receiver called before Part_A2 " &
+                     "elaborated");
+    end if;
+
+    if CXE5003_Check.Normal then
+      null;
+      -- Report.Comment ("Normal was elaborated");
+    else
+      Report.Failed ("Establish_RPC_Receiver called before Normal elaborated");
+    end if;
+
+    -- make sure the main procedure has not been called yet
+    if CXE5003_Check.Main then
+      Report.Failed ("main called before Establish_RPC_Receiver");
+    else
+      null;
+      -- Report.Comment ("Establish_RPC_Receiver called before main");
+    end if;
+
+    -- make sure we were not called twice
+    if CXE5003_Check.Establish then
+      Report.Failed ("Establish_RPC_Receiver called twice");
+    else
+      null;
+      -- Report.Comment ("Establish_RPC_Receiver called");
+    end if;
+
+    CXE5003_Check.Establish := True;
+  end Establish_RPC_Receiver;
+
+begin
+  CXE5003_Check.RPC := True;
+end System.RPC;

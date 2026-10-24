@@ -1,4 +1,4 @@
-# Kirikiri TJS2 ANTLR4 grammar
+# Kirikiri TJS2 Grammar
 
 Kirikiri TJS2 is a Javascript-like script language for Kirikiri2 game engine.
 
@@ -14,3 +14,6 @@ Known issue:
 - Now consider `¥`(`\u00a5`,japanese yen) as UnexpectedCharacter insteadof Backslash(`\`,`\u005c`).
 - TJS2 bytecode also use *.tjs extension, this script can't parse them.
 - Need an preprocessor (`preprocessor.js`) to handle preprocess command.
+
+## Reference
+

@@ -9,3 +9,7 @@ Created for the [Dice Notation Tools for Java](https://github.com/Bernardo-MG/di
 The dice notation is widely used by tabletop game, mainly RPGs.
 
 It defines a set of dice to be used for generating random values through a description such as 2d6+3.
+
+## Reference
+* [pldb](http://pldb.info/concepts/dice)
+

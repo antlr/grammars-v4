@@ -1,0 +1,37 @@
+json     ::= value eof
+object   ::= '{' ( pair ( ',' pair )* )? '}'
+pair     ::= string ':' value
+array    ::= '[' ( value ( ',' value )* )? ']'
+value    ::= string
+           | number
+           | object
+           | array
+           | 'true'
+           | 'false'
+           | 'null'
+whitespace
+         ::= whitespace^token
+          /* ws: definition */
+
+<?TOKENS?>
+
+eof      ::= $
+string   ::= '"' ( anyUnicodeCharacterExceptQuoteOrBackslashOrControlCharacter | '\"' | '\\' | '\/' | '\b' | '\f' | '\n' | '\r' | '\t' | '\u' fourHexadecimalDigits )* '"'
+anyUnicodeCharacterExceptQuoteOrBackslashOrControlCharacter
+         ::= alphabet - ["#x005C]
+alphabet ::= #x0009
+           | #x000A
+           | #x000D
+           | [#x0020-#xD7FF]
+           | [#xE000-#xFFFD]
+           | [#x10000-#x10FFFF]
+hexadecimalDigit
+         ::= [0-9A-Fa-f]
+fourHexadecimalDigits
+         ::= hexadecimalDigit hexadecimalDigit hexadecimalDigit hexadecimalDigit
+number   ::= '-'? ( '0' | digitOneThroughNine digit* ) ( '.' digit+ )? ( ( 'e' | 'E' ) ( '+' | '-' )? digit+ )?
+digit    ::= [0-9]
+digitOneThroughNine
+         ::= digit - '0'
+whitespace
+         ::= [#x0009#x000A#x000D#x0020]+

@@ -1,0 +1,29 @@
+digraph ATN {
+rankdir=LR;
+s83[fontsize=11, label="83", shape=doublecircle, fixedsize=true, width=.6];
+s1004[fontsize=11,label="1004", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1005[fontsize=11,label="1005", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1006[fontsize=11,label="1006", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1007[fontsize=11,label="1007", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1008[fontsize=11,label="&rarr;\n1008*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1009[fontsize=11,label="&larr;\n1009", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s82[fontsize=11,label="82", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1010[fontsize=11,label="{1010*\nd=27|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1011[fontsize=11,label="1011", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1012[fontsize=11,label="1012*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1013[fontsize=11,label="1013", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1014[fontsize=11,label="1014", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s82 -> s1004 [fontname="Times-Italic", label="&epsilon;"];
+s1004 -> s1005 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'<'", arrowhead = normal];
+s1005 -> s1010 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<type_argument>", arrowhead = normal];
+s1010:p0 -> s1008 [fontname="Times-Italic", label="&epsilon;"];
+s1010:p1 -> s1011 [fontname="Times-Italic", label="&epsilon;"];
+s1008 -> s1006 [fontname="Times-Italic", label="&epsilon;"];
+s1011 -> s1013 [fontname="Times-Italic", label="&epsilon;"];
+s1006 -> s1007 [fontsize=11, fontname="Courier", arrowsize=.7, label = "','", arrowhead = normal];
+s1013 -> s1014 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'>'", arrowhead = normal];
+s1007 -> s1009 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<type_argument>", arrowhead = normal];
+s1014 -> s83 [fontname="Times-Italic", label="&epsilon;"];
+s1009 -> s1012 [fontname="Times-Italic", label="&epsilon;"];
+s1012 -> s1010 [fontname="Times-Italic", label="&epsilon;", style="dashed"];
+}

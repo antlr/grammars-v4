@@ -1,0 +1,71 @@
+MODULE $vcgmsgrec;
+/*
+/*  Copyright © 1996, Digital Equipment Corporation.
+/*
+/* Modifications:
+/*
+/*	002	Ian Stocks	27-Jun-1985	(021 SVCG M)
+/*
+/*		Make VCG$K_LINE_SIZE an internal, rather than a global,
+/*		constant, to avoid conflict with the corresponding definition
+/*		in VCGGLOBALS.SDL
+/*
+/*	001	Tom Benson	13-Feb-1984	(003 VCG)
+/*
+/*		Added modification history.
+/*
+/*
+/*
+/* message control flags
+/*
+AGGREGATE msg_flags STRUCTURE GLOBAL;
+	text_cluster	BITFIELD;
+	bit_spare	BITFIELD LENGTH 7 FILL;	    { M002
+	hold_status	BYTE;
+	END;
+/*
+/* message types
+/*
+CONSTANT ( cluster , text , title , sbttl , more_src , append_blank )
+			EQUALS 0 INCREMENT 1 PREFIX msg_typ_;	
+/*
+/*
+CONSTANT no_locator EQUALS 255;
+    #vcg$k_line_size = 132;		{ M002
+					{ THIS LOCAL CONSTANT MUST HAVE THE
+					{ SAME VALUE AS THE GLOBAL CONSTANT OF
+					{ THE SAME NAME IN VCGGLOBAL.SDL
+					{ IT IS HERE SOLELY TO ALLOW A STRING
+					{ OF THIS LENGTH TO BE DECLARED AS
+					{ A RECORD COMPONENT
+
+/*
+/* definition of a message record
+/*
+AGGREGATE msg_record STRUCTURE PREFIX msg_ ;
+	next_message		ADDRESS;
+	listing_line 		LONGWORD;
+	column_nbr		BYTE UNSIGNED;
+	type			BYTE;
+	flags		STRUCTURE;
+	   append_blank		BITFIELD ;
+	   spare_bits		BITFIELD LENGTH 7 FILL;	    { M002
+	   END;
+	spare_byte		BYTE FILL;		    { M002
+#const_size =.;
+	msg_type	UNION;
+	   msg_cluster 	STRUCTURE;
+		cluster_start		ADDRESS;
+		cluster_end		ADDRESS;
+		END;
+	   text		CHARACTER LENGTH ( #vcg$k_line_size ) varying ;
+	   END;
+	END;
+/*
+/* sizes of the message record
+/*
+CONSTANT msg_record_cluster_size_byte EQUALS #const_size + 8;
+/*
+CONSTANT msg_record_text_size_byte EQUALS #const_size + 2;
+
+END_MODULE;

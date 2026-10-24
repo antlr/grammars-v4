@@ -1,4 +1,4 @@
-# Summary
+# Objective-C Grammar
 
 Objective-C 2.0 grammars with preprocessor support can be used in 2 different modes:
 
@@ -29,6 +29,13 @@ during parsing of the ordinary Objective-C code.
 `ObjectiveCParser` is shared by both one-step and two-step processing.
 
 # Testing
+
+You should use Maven to test Objective-C grammar.
+
+1. Clone grammars-v4. `git clone https://github.com/antlr/grammars-v4.git`
+2. Make sure you have Maven installed. [See the documentation](https://maven.apache.org/).
+3. `cd grammars-v4/objc`.
+4. Execute `mvn clean test`.
 
 ## One-step processing
 
@@ -63,3 +70,7 @@ More than 95% correctly parsed **.m** files from these projects:
 # License
 
 ObjectiveC grammars and helper files are licensed under [MIT](https://opensource.org/licenses/MIT).
+
+## Reference
+* [pldb](http://pldb.info/concepts/objective-c)
+

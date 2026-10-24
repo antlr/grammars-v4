@@ -1,0 +1,1 @@
+class Foo4391 { void bar () { boolean; } }

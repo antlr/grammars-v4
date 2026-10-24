@@ -1,0 +1,13 @@
+BEG_G {
+  char* larr[int];
+  int i;
+  if (!isAttr($,"G","layers")) return;
+  if (isAttr($,"G","layersep"))
+    tokens($.layers,larr,$.layersep);
+  else
+    tokens($.layers,larr," :\t");
+  for (larr[i]) {
+    if (i>0) printf(" %s",larr[i]);
+    else printf("%s",larr[i]);
+  }
+}
