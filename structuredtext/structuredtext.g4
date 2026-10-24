@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2022, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -31,8 +31,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 grammar structuredtext;
 
+structuredtextfile
+   : (statementlist | expression_) EOF
+   ;
+
 expression_
-   : xor_expression ('OR' xor_expression)* EOF
+   : xor_expression ('OR' xor_expression)*
    ;
 
 xor_expression
@@ -52,11 +56,11 @@ equexpression
    ;
 
 add_expression
-   : term (ADDOPERATOR term)*
+   : term (('+' | '-') term)*
    ;
 
 term
-   : powerexpression (MULTIPLYOPERATOR PowerExpowerexpressionression)*
+   : powerexpression (MULTIPLYOPERATOR powerexpression)*
    ;
 
 powerexpression
@@ -64,7 +68,7 @@ powerexpression
    ;
 
 unaryexpression
-   : UNARYOPERATOR? primaryexpression
+   : ('-' | 'NOT')? primaryexpression
    ;
 
 primaryexpression
@@ -72,6 +76,13 @@ primaryexpression
    | variablename
    | '(' expression_ ')'
    | functionname '(' functioninputs? ')'
+   ;
+
+constant
+   : INTEGER
+   | REAL
+   | BOOLEAN
+   | STRING
    ;
 
 functioninputs
@@ -87,7 +98,7 @@ statementlist
    ;
 
 statement
-   : NIL
+   : /* empty statement */
    | assignmentstatement
    | subprogramcontrolstatement
    | selectionstatement
@@ -104,11 +115,7 @@ subprogramcontrolstatement
    ;
 
 invocation
-   : name '(' (inputassignment (',' inputassignment)*)? ')'
-   ;
-
-inputassignment
-   : variablename ':=' expression_
+   : name '(' functioninputs? ')'
    ;
 
 selectionstatement
@@ -121,7 +128,7 @@ ifstatement
    ;
 
 casestatement
-   : 'CASE' expression_ 'OF' CaseElement caseelement* ('ELSE' statementlist)? 'END_CASE'
+   : 'CASE' expression_ 'OF' caseelement+ ('ELSE' statementlist)? 'END_CASE'
    ;
 
 caseelement
@@ -137,6 +144,14 @@ caselistelement
    | signedinteger
    ;
 
+subrange
+   : signedinteger '..' signedinteger
+   ;
+
+signedinteger
+   : ('+' | '-')? INTEGER
+   ;
+
 iterationstatement
    : forstatement
    | whilestatement
@@ -145,7 +160,7 @@ iterationstatement
    ;
 
 forstatement
-   : 'FOR' controlvariable ':=' ForList 'DO' statementlist 'END_FOR'
+   : 'FOR' controlvariable ':=' forlist 'DO' statementlist 'END_FOR'
    ;
 
 controlvariable
@@ -184,6 +199,23 @@ name
    : IDENTIFIER
    ;
 
+BOOLEAN
+   : 'TRUE'
+   | 'FALSE'
+   ;
+
+REAL
+   : [0-9]+ '.' [0-9]+
+   ;
+
+INTEGER
+   : [0-9]+
+   ;
+
+STRING
+   : '\'' ~['\r\n]* '\''
+   ;
+
 IDENTIFIER
    : [a-zA-Z] [a-zA-Z0-9]*
    ;
@@ -192,16 +224,6 @@ MULTIPLYOPERATOR
    : '*'
    | '/'
    | 'MOD'
-   ;
-
-UNARYOPERATOR
-   : '-'
-   | 'NOT'
-   ;
-
-ADDOPERATOR
-   : '+'
-   | '-'
    ;
 
 COMPARISONOPERATOR

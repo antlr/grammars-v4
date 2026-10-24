@@ -400,6 +400,7 @@
 				<module>star</module>
 				<module>stellaris</module>
 				<module>stringtemplate</module>
+				<module>structuredtext</module>
 				<module>suokif</module>
 				<module>swift</module>
 				<module>swift-fin</module>
