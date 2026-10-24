@@ -1,0 +1,1 @@
+<postalcode> ::= <letter> <number> <letter> <number> <letter> <number>

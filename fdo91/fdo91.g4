@@ -22,61 +22,64 @@
  IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar fdo91;
 
 file_
-   : atom* EOF
-   ;
+    : atom* EOF
+    ;
 
 atom
-   : 'atom$'? command (literal_args | arglist)?
-   ;
+    : 'atom$'? command (literal_args | arglist)?
+    ;
 
 arglist
-   : '<' arg (',' arg)* '>'
-   ;
+    : '<' arg (',' arg)* '>'
+    ;
 
 arg
-   : literal
-   | atom+
-   ;
+    : literal
+    | atom+
+    ;
 
 literal_args
-   : literal+
-   ;
+    : literal+
+    ;
 
 literal
-   : ID
-   | NUMBER
-   | STRING
-   | GID
-   ;
+    : ID
+    | NUMBER
+    | STRING
+    | GID
+    ;
 
 command
-   : ID
-   ;
+    : ID
+    ;
 
 ID
-   : [a-zA-Z_]+
-   ;
+    : [a-zA-Z_]+
+    ;
 
 GID
-   : NUMBER '-' NUMBER ('-' NUMBER)?
-   ;
+    : NUMBER '-' NUMBER ('-' NUMBER)?
+    ;
 
 NUMBER
-   : [0-9]+
-   ;
+    : [0-9]+
+    ;
 
 STRING
-   : '"' ~ ["\r\n]* '"'
-   ;
+    : '"' ~ ["\r\n]* '"'
+    ;
 
 COMMENT
-   : '#' ~ [\r\n]* -> skip
-   ;
+    : '#' ~ [\r\n]* -> skip
+    ;
 
 WS
-   : [ \r\n\t]+ -> skip
-   ;
-
+    : [ \r\n\t]+ -> skip
+    ;

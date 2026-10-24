@@ -30,168 +30,164 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar guido;
 
 prog
-   : ((segment +) | sequencelist) EOF
-   ;
+    : ((segment+) | sequencelist) EOF
+    ;
 
 segment
-   : '{' sequencelist + '}'
-   ;
+    : '{' sequencelist+ '}'
+    ;
 
 sequencelist
-   : sequence (',' sequence)*
-   ;
+    : sequence (',' sequence)*
+    ;
 
 sequence
-   : '[' (tag | note | chord) + ']'
-   ;
+    : '[' (tag | note | chord)+ ']'
+    ;
 
 tag
-   : TAGSTART tagname parameters? notes?
-   ;
+    : TAGSTART tagname parameters? notes?
+    ;
 
 tagname
-   : title
-   | tempo
-   | clef
-   | meter
-   | slur
-   | key
-   | barformat
-   | staff
-   | t
-   | repeatEnd
-   ;
+    : title
+    | tempo
+    | clef
+    | meter
+    | slur
+    | key
+    | barformat
+    | staff
+    | t
+    | repeatEnd
+    ;
 
 parameters
-   : '<' parameter (',' parameter)* '>'
-   ;
+    : '<' parameter (',' parameter)* '>'
+    ;
 
 parameter
-   : STRINGLITERAL
-   | number
-   | kvpair
-   ;
+    : STRINGLITERAL
+    | number
+    | kvpair
+    ;
 
 kvpair
-   : STRING '=' (STRING | NUMBER) +
-   ;
+    : STRING '=' (STRING | NUMBER)+
+    ;
 
 notes
-   : '(' (note | chord) + ')'
-   ;
+    : '(' (note | chord)+ ')'
+    ;
 
 note
-   : notename accidental? octave? duration? dotting?
-   ;
+    : notename accidental? octave? duration? dotting?
+    ;
 
 chord
-   : '{' note (',' note)* '}'
-   ;
+    : '{' note (',' note)* '}'
+    ;
 
 notename
-   : STRING
-   | REST
-   ;
+    : STRING
+    | REST
+    ;
 
 accidental
-   : '#'
-   | '&'
-   ;
+    : '#'
+    | '&'
+    ;
 
 number
-   : ('-' | '+')? NUMBER
-   ;
+    : ('-' | '+')? NUMBER
+    ;
 
 octave
-   : number
-   ;
+    : number
+    ;
 
 fraction
-   : number? ('/' number)?
-   ;
+    : number? ('/' number)?
+    ;
 
 duration
-   : '*'? fraction
-   ;
+    : '*'? fraction
+    ;
 
 dotting
-   : '.' +
-   ;
+    : '.'+
+    ;
 
 title
-   : 'title'
-   ;
+    : 'title'
+    ;
 
 tempo
-   : 'tempo'
-   ;
+    : 'tempo'
+    ;
 
 clef
-   : 'clef'
-   ;
+    : 'clef'
+    ;
 
 meter
-   : 'meter'
-   ;
+    : 'meter'
+    ;
 
 slur
-   : 'slur'
-   ;
+    : 'slur'
+    ;
 
 key
-   : 'key'
-   ;
+    : 'key'
+    ;
 
 barformat
-   : 'barFormat'
-   ;
+    : 'barFormat'
+    ;
 
 staff
-   : 'staff'
-   ;
+    : 'staff'
+    ;
 
 repeatEnd
-   : 'repeatEnd'
-   ;
+    : 'repeatEnd'
+    ;
 
 t
-   : 't'
-   ;
-
+    : 't'
+    ;
 
 TAGSTART
-   : '\\'
-   ;
-
+    : '\\'
+    ;
 
 REST
-   : '_'
-   ;
-
+    : '_'
+    ;
 
 NUMBER
-   : [0-9] +
-   ;
-
+    : [0-9]+
+    ;
 
 STRING
-   : [a-zA-Z] +
-   ;
-
+    : [a-zA-Z]+
+    ;
 
 STRINGLITERAL
-   : '"' ~'"'* '"'
-   ;
-
+    : '"' ~'"'* '"'
+    ;
 
 COMMENT
-   : '%' ~ [\r\n]* -> skip
-   ;
-
+    : '%' ~ [\r\n]* -> skip
+    ;
 
 WS
-   : [ \t\r\n] -> skip
-   ;
+    : [ \t\r\n] -> skip
+    ;

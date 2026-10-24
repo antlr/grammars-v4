@@ -30,594 +30,409 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar asm6502;
 
+options {
+    caseInsensitive = true;
+}
+
 prog
-   : line* EOF
-   ;
+    : line* EOF
+    ;
 
 line
-   : (instruction | assemblerinstruction | lbl)? EOL
-   ;
+    : (instruction | assemblerinstruction | lbl)? EOL
+    ;
 
 instruction
-   : label? opcode argumentlist?
-   ;
+    : label? opcode argumentlist?
+    ;
 
 assemblerinstruction
-   : argument? assembleropcode argumentlist?
-   ;
+    : argument? assembleropcode argumentlist?
+    ;
 
 assembleropcode
-   : ASSEMBLER_INSTRUCTION
-   ;
+    : ASSEMBLER_INSTRUCTION
+    ;
 
 lbl
-   : label ':'
-   ;
+    : label ':'
+    ;
 
 argumentlist
-   : argument (',' argumentlist)?
-   ;
+    : argument (',' argumentlist)?
+    ;
 
 label
-   : name
-   ;
+    : name
+    ;
 
 argument
-   : prefix_? (number | name | string_ | '*') (('+' | '-') number)?
-   | '(' argument ')'
-   ;
+    : prefix_? (number | name | string_ | '*') (('+' | '-') number)?
+    | '(' argument ')'
+    ;
 
 prefix_
-   : '#'
-   ;
+    : '#'
+    ;
 
 string_
-   : STRING
-   ;
+    : STRING
+    ;
 
 name
-   : NAME
-   ;
+    : NAME
+    ;
 
 number
-   : NUMBER
-   ;
+    : NUMBER
+    ;
 
 opcode
-   : ADC
-   | AND
-   | ASL
-   | BCC
-   | BCS
-   | BEQ
-   | BIT
-   | BMI
-   | BNE
-   | BPL
-   | BRA
-   | BRK
-   | BVC
-   | BVS
-   | CLC
-   | CLD
-   | CLI
-   | CLV
-   | CMP
-   | CPX
-   | CPY
-   | DEC
-   | DEX
-   | DEY
-   | EOR
-   | INC
-   | INX
-   | INY
-   | JMP
-   | JSR
-   | LDA
-   | LDY
-   | LDX
-   | LSR
-   | NOP
-   | ORA
-   | PHA
-   | PHX
-   | PHY
-   | PHP
-   | PLA
-   | PLP
-   | PLY
-   | ROL
-   | ROR
-   | RTI
-   | RTS
-   | SBC
-   | SEC
-   | SED
-   | SEI
-   | STA
-   | STX
-   | STY
-   | STZ
-   | TAX
-   | TAY
-   | TSX
-   | TXA
-   | TXS
-   | TYA
-   ;
-
+    : ADC
+    | AND
+    | ASL
+    | BCC
+    | BCS
+    | BEQ
+    | BIT
+    | BMI
+    | BNE
+    | BPL
+    | BRA
+    | BRK
+    | BVC
+    | BVS
+    | CLC
+    | CLD
+    | CLI
+    | CLV
+    | CMP
+    | CPX
+    | CPY
+    | DEC
+    | DEX
+    | DEY
+    | EOR
+    | INC
+    | INX
+    | INY
+    | JMP
+    | JSR
+    | LDA
+    | LDY
+    | LDX
+    | LSR
+    | NOP
+    | ORA
+    | PHA
+    | PHX
+    | PHY
+    | PHP
+    | PLA
+    | PLP
+    | PLY
+    | ROL
+    | ROR
+    | RTI
+    | RTS
+    | SBC
+    | SEC
+    | SED
+    | SEI
+    | STA
+    | STX
+    | STY
+    | STZ
+    | TAX
+    | TAY
+    | TSX
+    | TXA
+    | TXS
+    | TYA
+    ;
 
 ASSEMBLER_INSTRUCTION
-   : 'ORG' | 'EQU' | 'ASC' | 'DS' | 'DFC' | '='
-   ;
-
-
-fragment A
-   : ('a' | 'A')
-   ;
-
-
-fragment B
-   : ('b' | 'B')
-   ;
-
-
-fragment C
-   : ('c' | 'C')
-   ;
-
-
-fragment D
-   : ('d' | 'D')
-   ;
-
-
-fragment E
-   : ('e' | 'E')
-   ;
-
-
-fragment F
-   : ('f' | 'F')
-   ;
-
-
-fragment G
-   : ('g' | 'G')
-   ;
-
-
-fragment H
-   : ('h' | 'H')
-   ;
-
-
-fragment I
-   : ('i' | 'I')
-   ;
-
-
-fragment J
-   : ('j' | 'J')
-   ;
-
-
-fragment K
-   : ('k' | 'K')
-   ;
-
-
-fragment L
-   : ('l' | 'L')
-   ;
-
-
-fragment M
-   : ('m' | 'M')
-   ;
-
-
-fragment N
-   : ('n' | 'N')
-   ;
-
-
-fragment O
-   : ('o' | 'O')
-   ;
-
-
-fragment P
-   : ('p' | 'P')
-   ;
-
-
-fragment Q
-   : ('q' | 'Q')
-   ;
-
-
-fragment R
-   : ('r' | 'R')
-   ;
-
-
-fragment S
-   : ('s' | 'S')
-   ;
-
-
-fragment T
-   : ('t' | 'T')
-   ;
-
-
-fragment U
-   : ('u' | 'U')
-   ;
-
-
-fragment V
-   : ('v' | 'V')
-   ;
-
-
-fragment W
-   : ('w' | 'W')
-   ;
-
-
-fragment X
-   : ('x' | 'X')
-   ;
-
-
-fragment Y
-   : ('y' | 'Y')
-   ;
-
-
-fragment Z
-   : ('z' | 'Z')
-   ;
+    : 'ORG'
+    | 'EQU'
+    | 'ASC'
+    | 'DS'
+    | 'DFC'
+    | '='
+    ;
 
 /*
 * opcodes
 */
 
 ADC
-   : A D C
-   ;
-
+    : 'ADC'
+    ;
 
 AND
-   : A N D
-   ;
-
+    : 'AND'
+    ;
 
 ASL
-   : A S L
-   ;
-
+    : 'ASL'
+    ;
 
 BCC
-   : B C C
-   ;
-
+    : 'BCC'
+    ;
 
 BCS
-   : B C S
-   ;
-
+    : 'BCS'
+    ;
 
 BEQ
-   : B E Q
-   ;
-
+    : 'BEQ'
+    ;
 
 BIT
-   : B I T
-   ;
-
+    : 'BIT'
+    ;
 
 BMI
-   : B M I
-   ;
-
+    : 'BMI'
+    ;
 
 BNE
-   : B N E
-   ;
-
+    : 'BNE'
+    ;
 
 BPL
-   : B P L
-   ;
-
+    : 'BPL'
+    ;
 
 BRA
-   : B R A
-   ;
-
+    : 'BRA'
+    ;
 
 BRK
-   : B R K
-   ;
-
+    : 'BRK'
+    ;
 
 BVC
-   : B V C
-   ;
-
+    : 'BVC'
+    ;
 
 BVS
-   : B V S
-   ;
-
+    : 'BVS'
+    ;
 
 CLC
-   : C L C
-   ;
-
+    : 'CLC'
+    ;
 
 CLD
-   : C L D
-   ;
-
+    : 'CLD'
+    ;
 
 CLI
-   : C L I
-   ;
-
+    : 'CLI'
+    ;
 
 CLV
-   : C L V
-   ;
-
+    : 'CLV'
+    ;
 
 CMP
-   : C M P
-   ;
-
+    : 'CMP'
+    ;
 
 CPX
-   : C P X
-   ;
-
+    : 'CPX'
+    ;
 
 CPY
-   : C P Y
-   ;
-
+    : 'CPY'
+    ;
 
 DEC
-   : D E C
-   ;
-
+    : 'DEC'
+    ;
 
 DEX
-   : D E X
-   ;
-
+    : 'DEX'
+    ;
 
 DEY
-   : D E Y
-   ;
-
+    : 'DEY'
+    ;
 
 EOR
-   : E O R
-   ;
-
+    : 'EOR'
+    ;
 
 INC
-   : I N C
-   ;
-
+    : 'INC'
+    ;
 
 INX
-   : I N X
-   ;
-
+    : 'INX'
+    ;
 
 INY
-   : I N Y
-   ;
-
+    : 'INY'
+    ;
 
 JMP
-   : J M P
-   ;
-
+    : 'JMP'
+    ;
 
 JSR
-   : J S R
-   ;
-
+    : 'JSR'
+    ;
 
 LDA
-   : L D A
-   ;
-
+    : 'LDA'
+    ;
 
 LDY
-   : L D Y
-   ;
-
+    : 'LDY'
+    ;
 
 LDX
-   : L D X
-   ;
-
+    : 'LDX'
+    ;
 
 LSR
-   : L S R
-   ;
-
+    : 'LSR'
+    ;
 
 NOP
-   : N O P
-   ;
-
+    : 'NOP'
+    ;
 
 ORA
-   : O R A
-   ;
-
+    : 'ORA'
+    ;
 
 PHA
-   : P H A
-   ;
-
+    : 'PHA'
+    ;
 
 PHX
-   : P H X
-   ;
-
+    : 'PHX'
+    ;
 
 PHY
-   : P H Y
-   ;
-
+    : 'PHY'
+    ;
 
 PHP
-   : P H P
-   ;
-
+    : 'PHP'
+    ;
 
 PLA
-   : P L A
-   ;
-
+    : 'PLA'
+    ;
 
 PLP
-   : P L P
-   ;
-
+    : 'PLP'
+    ;
 
 PLY
-   : P L Y
-   ;
-
+    : 'PLY'
+    ;
 
 ROL
-   : R O L
-   ;
-
+    : 'ROL'
+    ;
 
 ROR
-   : R O R
-   ;
-
+    : 'ROR'
+    ;
 
 RTI
-   : R T I
-   ;
-
+    : 'RTI'
+    ;
 
 RTS
-   : R T S
-   ;
-
+    : 'RTS'
+    ;
 
 SBC
-   : S B C
-   ;
-
+    : 'SBC'
+    ;
 
 SEC
-   : S E C
-   ;
-
+    : 'SEC'
+    ;
 
 SED
-   : S E D
-   ;
-
+    : 'SED'
+    ;
 
 SEI
-   : S E I
-   ;
-
+    : 'SEI'
+    ;
 
 STA
-   : S T A
-   ;
-
+    : 'STA'
+    ;
 
 STX
-   : S T X
-   ;
-
+    : 'STX'
+    ;
 
 STY
-   : S T Y
-   ;
-
+    : 'STY'
+    ;
 
 STZ
-   : S T Z
-   ;
-
+    : 'STZ'
+    ;
 
 TAX
-   : T A X
-   ;
-
+    : 'TAX'
+    ;
 
 TAY
-   : T A Y
-   ;
-
+    : 'TAY'
+    ;
 
 TSX
-   : T S X
-   ;
-
+    : 'TSX'
+    ;
 
 TXA
-   : T X A
-   ;
-
+    : 'TXA'
+    ;
 
 TXS
-   : T X S
-   ;
-
+    : 'TXS'
+    ;
 
 TYA
-   : T Y A
-   ;
-
+    : 'TYA'
+    ;
 
 NAME
-   : [a-zA-Z] [a-zA-Z0-9."]*
-   ;
-
+    : [A-Z] [A-Z0-9."]*
+    ;
 
 NUMBER
-   : '$'? [0-9a-fA-F] +
-   ;
-
+    : '$'? [0-9A-F]+
+    ;
 
 COMMENT
-   : ';' ~ [\r\n]* -> skip
-   ;
-
+    : ';' ~ [\r\n]* -> skip
+    ;
 
 STRING
-   : '"' ~ ["]* '"'
-   ;
-
+    : '"' ~ ["]* '"'
+    ;
 
 EOL
-   : [\r\n] +
-   ;
-
+    : [\r\n]+
+    ;
 
 WS
-   : [ \t] -> skip
-   ;
+    : [ \t] -> skip
+    ;

@@ -29,50 +29,55 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar PMMN;
 
-file_ : commandlist EOF;
+file_
+    : commandlist EOF
+    ;
 
 commandlist
-   : command
-   | commandlist command
-   ;
+    : command
+    | commandlist command
+    ;
 
 block
-   : '{' commandlist '}'
-   ;
+    : '{' commandlist '}'
+    ;
 
 command
-   : 'inc' '(' counter ')' ';'
-   | test ';'
-   | 'if' '(' test ')' block
-   | 'if' '(' test ')' block 'else' block
-   | 'while' '(' test ')' block
-   ;
+    : 'inc' '(' counter ')' ';'
+    | test ';'
+    | 'if' '(' test ')' block
+    | 'if' '(' test ')' block 'else' block
+    | 'while' '(' test ')' block
+    ;
 
 test
-   : 'dec' '(' counter ')'
-   ;
+    : 'dec' '(' counter ')'
+    ;
 
 counter
-   : DIGIT
-   | counter DIGIT
-   ;
+    : DIGIT
+    | counter DIGIT
+    ;
 
 DIGIT
-   : '0'
-   | '1'
-   | '2'
-   | '3'
-   | '4'
-   | '5'
-   | '6'
-   | '7'
-   | '8'
-   | '9'
-   ;
+    : '0'
+    | '1'
+    | '2'
+    | '3'
+    | '4'
+    | '5'
+    | '6'
+    | '7'
+    | '8'
+    | '9'
+    ;
 
 WS
-   : [ \r\n\t]+ -> skip
-   ;
-
+    : [ \r\n\t]+ -> skip
+    ;

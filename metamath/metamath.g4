@@ -29,138 +29,142 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar metamath;
 
 database
-   : outermostscopestmt* EOF
-   ;
+    : outermostscopestmt* EOF
+    ;
 
 outermostscopestmt
-   : includestmt
-   | constantstmt
-   | stmt
-   ;
+    : includestmt
+    | constantstmt
+    | stmt
+    ;
 
 includestmt
-   : '$[' filename '$]'
-   ;
+    : '$[' filename '$]'
+    ;
 
 constantstmt
-   : '$c' constant+ '$.'
-   ;
+    : '$c' constant+ '$.'
+    ;
 
 stmt
-   : block
-   | variablestmt
-   | disjointstmt
-   | hypothesisstmt
-   | assertstmt
-   ;
+    : block
+    | variablestmt
+    | disjointstmt
+    | hypothesisstmt
+    | assertstmt
+    ;
 
 block
-   : '${' stmt* '$}'
-   ;
+    : '${' stmt* '$}'
+    ;
 
 variablestmt
-   : '$v' variable+ '$.'
-   ;
+    : '$v' variable+ '$.'
+    ;
 
 disjointstmt
-   : '$d' variable variable variable* '$.'
-   ;
+    : '$d' variable variable variable* '$.'
+    ;
 
 hypothesisstmt
-   : floatingstmt
-   | essentialstmt
-   ;
+    : floatingstmt
+    | essentialstmt
+    ;
 
 floatingstmt
-   : LABEL '$f' typecode variable '$.'
-   ;
+    : LABEL '$f' typecode variable '$.'
+    ;
 
 essentialstmt
-   : LABEL '$e' typecode mathsymbol* '$.'
-   ;
+    : LABEL '$e' typecode mathsymbol* '$.'
+    ;
 
 assertstmt
-   : axiomstmt
-   | provablestmt
-   ;
+    : axiomstmt
+    | provablestmt
+    ;
 
 axiomstmt
-   : LABEL '$a' typecode mathsymbol* '$.'
-   ;
+    : LABEL '$a' typecode mathsymbol* '$.'
+    ;
 
 provablestmt
-   : LABEL '$p' typecode mathsymbol* '$=' proof '$.'
-   ;
+    : LABEL '$p' typecode mathsymbol* '$=' proof '$.'
+    ;
 
 proof
-   : uncompressedproof
-   | compressedproof
-   ;
+    : uncompressedproof
+    | compressedproof
+    ;
 
 uncompressedproof
-   : (LABEL | '?')+
-   ;
+    : (LABEL | '?')+
+    ;
 
 compressedproof
-   : '(' LABEL* ')' COMPRESSEDPROOFBLOCK+
-   ;
+    : '(' LABEL* ')' COMPRESSEDPROOFBLOCK+
+    ;
 
 typecode
-   : constant
-   ;
+    : constant
+    ;
 
 mathsymbol
-   : (printablecharacter | LPAREN | RPAREN)+
-   ;
+    : (printablecharacter | LPAREN | RPAREN)+
+    ;
 
 printablecharacter
-   : PRINTABLECHARACTER | LABEL
-   ;
+    : PRINTABLECHARACTER
+    | LABEL
+    ;
 
 filename
-   : mathsymbol
-   ;
+    : mathsymbol
+    ;
 
 constant
-   : mathsymbol
-   ;
+    : mathsymbol
+    ;
 
 variable
-   : mathsymbol
-   ;
+    : mathsymbol
+    ;
 
 LPAREN
-   : '('
-   ;
+    : '('
+    ;
 
 RPAREN
-   : ')'
-   ;
+    : ')'
+    ;
 
 LABEL
-   : (LETTERORDIGIT | '.' | '-' | '_')+
-   ;
+    : (LETTERORDIGIT | '.' | '-' | '_')+
+    ;
 
 PRINTABLECHARACTER
-   : [\u0021-\u007e]+
-   ;
+    : [\u0021-\u007e]+
+    ;
 
 fragment LETTERORDIGIT
-   : [A-Za-z0-9]
-   ;
+    : [A-Za-z0-9]
+    ;
 
 COMPRESSEDPROOFBLOCK
-   : ([A-Z] | '?')+
-   ;
+    : ([A-Z] | '?')+
+    ;
 
 BLOCK_COMMENT
-   : '$(' .*? '$)' -> skip
-   ;
+    : '$(' .*? '$)' -> skip
+    ;
 
 WS
-   : [ \r\n\t\f]+ -> skip
-   ;
-
+    : [ \r\n\t\f]+ -> skip
+    ;

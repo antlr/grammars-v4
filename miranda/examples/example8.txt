@@ -1,0 +1,1 @@
+squares = [x * x | x <- doubled]

@@ -1,0 +1,107 @@
+;
+; COPYSYS Generation
+;
+device conout=crt
+vax $$as\sd mason.cpm30.sources\ar
+vax copysys.asm $$stran
+device conout=crt,lpt
+mac copysys
+xref copysys
+zero
+hexcom copysys
+device conout=crt
+vax $$as\sd mason.cpm30.listing\ar
+vax copysys.xrf $$stran
+device conout=crt,lpt
+era *.prn
+<y
+era *.hex
+<y
+era *.sym
+<y
+;
+; DUMP Generation
+;
+device conout=crt
+vax $$as\sd mason.cpm30.sources\ar
+vax dump.asm $$stran
+device conout=crt,lpt
+mac dump
+xref dump
+zero
+hexcom dump
+device conout=crt
+vax $$as\sd mason.cpm30.listing\ar
+vax dump.xrf $$stran
+device conout=crt,lpt
+era *.prn
+<y
+era *.hex
+<y
+era *.sym
+<y
+;
+; HEXCOM Generation
+;
+device conout=crt
+vax $$as\sd mason.cpm30.sources\ar
+vax hexcom.asm $$stran
+device conout=crt,lpt
+mac hexcom
+xref hexcom
+zero
+hexcom hexcom
+device conout=crt
+vax $$as\sd mason.cpm30.listing\ar
+vax hexcom.xrf $$stran
+device conout=crt,lpt
+era *.prn
+<y
+era *.hex
+<y
+era *.sym
+<y
+;
+; PATCH Generation
+;
+device conout=crt
+vax $$as\sd mason.cpm30.sources\ar
+vax patch.asm $$stran
+device conout=crt,lpt
+mac patch
+xref patch
+zero
+hexcom patch
+device conout=crt
+vax $$as\sd mason.cpm30.listing\ar
+vax patch.xrf $$stran
+device conout=crt,lpt
+era *.prn
+<y
+era *.hex
+<y
+era *.sym
+<y
+;
+; SAVE Generation
+;
+device conout=crt
+vax $$as\sd mason.cpm30.sources\ar
+vax save.asm $$stran
+device conout=crt,lpt
+rmac save
+link save.rsx=save[op]
+gencom save [null]
+xref save
+device conout=crt
+vax $$as\sd mason.cpm30.listing\ar
+vax save.xrf $$stran
+device conout=crt,lpt
+era *.prn
+<y
+era *.hex
+<y
+era *.sym
+<y
+cpm3asm2
+

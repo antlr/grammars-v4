@@ -1,0 +1,16 @@
+digraph ATN {
+rankdir=LR;
+s342[fontsize=11, label="342", shape=doublecircle, fixedsize=true, width=.6];
+s341[fontsize=11,label="341", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1446[fontsize=11,label="1446", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1447[fontsize=11,label="&rarr;\n1447\nd=12", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1448[fontsize=11,label="&larr;\n1448", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1449[fontsize=11,label="1449", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1450[fontsize=11,label="1450", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s341 -> s1447 [fontname="Times-Italic", label="&epsilon;"];
+s1447 -> s1446 [fontname="Times-Italic", label="&epsilon;"];
+s1446 -> s1448 [fontsize=11, fontname="Courier", arrowsize=.7, label = "{'	', ''..'', ' ', ' ', ' ', ' '..' ', ' ', ' ', '　'}", arrowhead = normal];
+s1448 -> s1449 [fontname="Times-Italic", label="&epsilon;"];
+s1449 -> s1450 [fontsize=11, fontname="Courier", arrowsize=.7, label = "action_168:2", arrowhead = normal];
+s1450 -> s342 [fontname="Times-Italic", label="&epsilon;"];
+}

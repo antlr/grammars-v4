@@ -1,0 +1,1 @@
+export type Cache_WriteOptions<TResult = any, TVariables = any> = Omit_id_from_DataProxy_Query<TVariables, TResult> & Omit_data_from_DataProxy_WriteOptions<TResult> & { dataId: string?, result: TResult }

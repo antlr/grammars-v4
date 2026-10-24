@@ -1,0 +1,1878 @@
+$ TITLE('CP/M 3.0 --- SHOW 3.1')
+/*
+   Revised:
+        Oct 82 by Phillip Balma
+     14 Sept 81 by Doug Huskey
+*/
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+
+                       * * *  SHOW  * * *
+
+
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+
+show:
+do;
+declare
+    mpm        literally '30h';
+
+declare plm     label public;
+
+declare copyright(*) byte data 
+    (' Copyright (c) 1982, Digital Research ');
+
+declare verdate(*)      byte data('10/27/82'),
+        version(*)      byte data('Show 3.1');
+
+
+/*
+            copyright(c) 1975, 1976, 1977, 1978, 1979, 1980, 1981,1982
+            digital research
+            box 579
+            pacific grove, ca
+            93950
+
+  */
+
+/* modified 10/30/78 to fix the space computation */
+/* modified 01/28/79 to remove despool dependencies */
+/* modified 07/26/79 to operate under cp/m 2.0 */
+/* modified 01/20/80 by Thomas Rolander */
+/* show created 05/19/81 */
+/* modified 7/82 to add new options parser, # dir FCB's left, new DISK option,
+   # of files           by Phillip Balma */
+/* added paging, # SFCB's  Phillip Balma*/
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+
+                  * * *  DISK INTERFACE * * *
+
+
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+
+declare         dcnt            byte,
+                anything        byte,
+                dirbuf(128)     byte;
+
+declare 
+                line$page       byte,
+                line$out        byte,
+                drives(16)      byte,
+                drive           byte,
+                all             byte initial(0),
+                once$only       byte initial(0),
+                done$drive(16)  byte initial(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0),
+
+                PAGE            byte initial(0),
+                NONBANK         byte initial(0),
+
+                user(16)        byte,           /* any files in user i? */
+                used(16)        address,        /* # files in user i */
+                free$dir        address,        /* # free directories */
+                nSFCB           address,        /* # SFCB's */
+
+                SCBPB           structure(
+                 where          byte,
+                 set            byte,
+                 value          address) initial(0,0,0),
+
+                ERRORM(*)       byte data('ERROR: ',0),
+                input(*)        byte data('INPUT: ',0),
+                eoption(*)      byte data('OPTION: ',0),
+                dirdrive(*)     byte data('DRIVE: ',0),
+
+                err$unrecopt(*) byte data('Unrecognized Option.',0),
+                err$unrecd(*)   byte data('Unrecognized drive.',0),
+                err$version(*)  byte data('Requires CP/M 3 or higher.',0),
+                err$nolabel(*)  byte 
+                                data('No directory label exists on drive ',0),
+                err$input(*)    byte data('Unrecognized input.',0),
+
+                opt$dir         byte data(1),
+                opt$drive       byte data(2),
+                opt$label       byte data(3),
+                opt$space       byte data(0),
+                opt$user        byte data(4),
+                opt$page        byte data(6),          /*rel to 1 */
+                opt$nopage      byte data(7);
+
+        declare
+
+                dirs(*) byte data
+                             ('A:0B:0C:0D:0E:0F:0G:0H:0I:0J:0K:0L:0M:0N:0',
+                              'O:0P:',0ffh),
+                options(*) byte data('SPACE0DIRECTORY0DRIVES0LABEL0USERS0',
+                                      'PAGE0NOPAGE',0ffh),
+
+                off$dirs(*) byte data(0,3,6,9,12,15,18,21,24,27,30,33,36,39,42,
+                                     45,47),
+                off$opt(*) byte data(0,6,16,23,29,35,40,46),
+
+                end$list        byte data (0ffh),
+                end$of$string   byte data (0),
+
+                delimiters(*) byte data (0,'[]=, :;<>%\|"()/#!@&+-*?',0,0ffh),
+                SPACE           byte data(5),   /* index into delim to space */
+                EOS             byte data(25),
+                COMMA           byte data(4),
+                COLON           byte data(6),
+                LBRACKET        byte data(1),
+                RBRACKET        byte data(2),
+
+                opt$map(21)     structure ( option(5) byte),
+
+                j               byte initial(0),
+                buf$ptr         address,
+                opt$index       byte,
+                endbuf          byte,
+                delimiter       byte;
+$ eject
+
+declare
+        maxb            address external,       /* addr field of jmp BDOS */
+        fcb(33)         byte external,          /* default fcb */
+        buff(128)       byte external,          /* default buffer */
+        fcba            literally '.fcb',       /* default fcb */
+        dolla           literally '.fcb(6dh-5ch)',      /* $ position */
+        rreca           literally '.fcb(7dh-5ch)',      /* ran rcd 7d,7e,7f */
+        rreco           literally '.fcb(7fh-5ch)',      /* ran overflow */
+        sectorlen       literally '128',                /* sector length */
+        rrec            address at(rreca),      /* random record address */
+        rovf            byte at(rreco),         /* overflow on getfile */
+        doll            byte at(dolla),         /* dollar parameter */
+        user$code       byte,                   /* current user code */
+        cversion        address,                /* BDOS version # */
+        cdisk           byte,                   /* current disk  */
+
+/* function call 32 returns the address of the disk parameter
+block for the currently selected disk, which consists of:
+        scptrk      (2 by) number of sectors per track
+        blkshf      (1 by) log2 of blocksize (2**blkshf=blksize)
+        blkmsk      (1 by) 2**blkshf-1
+        extmsk      (1 by) logical/physical extents
+        maxall      (2 by) max alloc number
+        dirmax      (2 by) size of directory-1
+        alloc       (2 by) reservation bits for directory
+        chksiz      (2 by) size of checksum vector
+        offset      (2 by) offset for operating system
+        psh         (1 by) log2 of physical record size(2**psh * 128 = size)
+        psm         (1 by) 2**psh - 1 
+*/
+
+        dpba            address,         /* disk parameter block address */
+        dpb             based dpba structure(
+                spt     address, 
+                bls     byte, 
+                bms     byte, 
+                exm     byte, 
+                mxa     address,
+                dmx     address, 
+                dbl     address, 
+                cks     address, 
+                ofs     address,
+                psh     byte,
+                psm     byte),
+
+        scptrk  literally 'dpb.spt',
+        blkshf  literally 'dpb.bls',
+        blkmsk  literally 'dpb.bms',
+        extmsk  literally 'dpb.exm',
+        maxall  literally 'dpb.mxa',
+        dirmax  literally 'dpb.dmx',
+        dirblk  literally 'dpb.dbl',
+        chksiz  literally 'dpb.cks',
+        offset  literally 'dpb.ofs',
+        physhf  literally 'dpb.psh',
+        phymsk  literally 'dpb.psm';
+
+
+boot: procedure external;
+    /* reboot */
+    end boot;
+
+mon1: procedure(f,a) external;
+    declare f byte, a address;
+    end mon1;
+
+mon2: procedure(f,a) byte external;
+    declare f byte, a address;
+    end mon2;
+
+declare mon3 literally 'mon2a';
+
+mon3: procedure(f,a) address external;
+    declare f byte, a address;
+    end mon3;
+
+declare alloca address,
+    /* alloca is the address of the disk allocation vector */
+    alloc based alloca (1024) byte;  /* allocation vector */
+
+declare
+    true        literally '1',
+    false       literally '0',
+    forever     literally 'while true',
+    lit         literally 'literally',
+    proc        literally 'procedure',
+    dcl         literally 'declare',
+    addr        literally 'address',
+    ctlc        literally '3',
+    cr          literally '13',
+    lf          literally '10';
+
+
+printchar: procedure(char);
+    declare char byte;
+    call mon1(2,char);
+end printchar;
+
+printb: procedure;
+                        /* print blank character */
+    call printchar(' ');
+end printb;
+
+printx: procedure(a);
+    declare a address;
+    declare s based a byte;
+
+        do while s <> 0;
+                call printchar(s);
+                a = a + 1;
+        end;
+
+end printx;
+
+break: procedure byte;
+    return mon2(11,0);          /* console ready */
+end break;
+
+
+crlf2: procedure;
+
+        call printchar(cr);
+        call printchar(lf);
+
+end crlf2;
+
+
+terminate: procedure;
+        call crlf2;
+        call mon1 (0,0);                                /* system reset */
+end terminate;
+
+
+
+crlf: procedure;
+
+    if PAGE then do;
+                line$out = line$out + 1;
+                if line$out + 2 > line$page then do;
+
+                        call crlf2;
+                        call crlf2;
+
+                        call printx(.('Press RETURN to continue.',0));
+
+                        do while not break;     /* wait until a console break*/
+                        end;
+                        if mon2(1,0) = ctlc then call terminate;
+                        line$out = 1;
+                        call crlf2;
+                end;
+    end;
+
+        call crlf2;
+
+end crlf;
+
+
+print: procedure(a);
+    declare a address;
+                        /* print the string starting at address a until the
+                           next 0 is encountered */
+    call crlf;
+    call printx(a);
+
+end print;
+
+
+get$version: procedure byte;
+                                /* returns current cp/m version # */
+    return mon3(12,0);
+end get$version;
+
+select: procedure(d);
+    declare d byte;
+
+    call mon1(14,d);
+end select;
+
+check$user: procedure;
+    do forever;
+        if anything then return;
+        if dcnt = 0ffh then return;
+        if dirbuf(ror (dcnt,3) and 110$0000b) = user$code then return;
+
+        dcnt = mon2(18,0);
+
+    end;
+end check$user;
+
+search: procedure(fcb);
+    declare fcb address;
+    declare fcb0 based fcb byte;
+
+    anything = (fcb0 = '?');
+    dcnt = mon2(17,fcb);
+    call check$user;
+end search;
+
+searchn: procedure;
+    dcnt = mon2(18,0);
+    call check$user;
+end searchn;
+
+cselect: procedure byte;
+                                        /* return current disk number */
+    return mon2(25,0);
+end cselect;
+
+setdma: procedure(dma);
+    declare dma address;
+
+    call mon1(26,dma);
+end setdma;
+
+getalloca: procedure address;
+                                        /* get base address of alloc vector */
+    return mon3(27,0);
+end getalloca;
+
+getlogin: procedure address;
+                                        /* get the login vector */
+    return mon3(24,0);
+end getlogin;
+
+getpage: procedure byte;                /* get the conole page length */
+
+        SCBPB.where = 01ch;
+        return mon2(49,.SCBPB);
+
+end getpage;
+
+getpagemode: procedure byte;
+
+        SCBPB.where = 02ch;
+        return mon2(49,.SCBPB);
+
+end getpagemode;
+
+getNB: procedure byte;
+       SCBPB.where = 05dh;
+       return high(mon3(49,.SCBPB));
+end getNB;
+
+getrodisk: procedure address;
+                                        /* get the read-only disk vector */
+    return mon3(29,0);
+end getrodisk;
+
+/*setind: procedure;
+    call mon1(30,fcba);
+end setind;
+*/
+
+set$dpb: procedure;
+                                        /* set disk parameter block values */
+    dpba = mon3(31,0);                  /* base of dpb */
+end set$dpb;
+
+getuser: procedure byte;
+                                        /* return current user number */
+    return mon2(32,0ffh);
+end getuser;
+
+/*setuser: procedure(user);
+    declare user byte;
+
+    call mon1(32,user);
+end setuser;
+*/
+
+getfreesp: procedure(d);
+    declare d byte;
+
+    call mon1(46,d);
+end getfreesp;
+
+getlbl: procedure(d) byte;
+    declare d byte;
+
+    return mon2(101,d);
+end getlbl;
+
+e$print: procedure(msg);
+        declare msg     address;
+
+        call print(.ERRORM);
+        call printx(msg);
+
+end e$print;
+
+
+/*****************************************************
+
+          Time & Date ASCII Conversion Code
+
+ *****************************************************/
+
+declare tod$adr address;
+declare tod based tod$adr structure (
+  opcode byte,
+  date address,
+  hrs byte,
+  min byte,
+  sec byte,
+  ASCII (21) byte );
+
+declare string$adr address;
+declare string based string$adr (1) byte;
+declare index byte;
+
+emitchar: procedure(c);
+    declare c byte;
+    string(index := index + 1) = c;
+    end emitchar;
+
+emitn: procedure(a);
+    declare a address;
+    declare c based a byte;
+    do while c <> '$';
+      string(index := index + 1) = c;
+      a = a + 1;
+    end;
+    end emitn;
+
+
+emit$bcd: procedure(b);
+    declare b byte;
+    call emitchar('0'+b);
+    end emit$bcd;
+
+emit$bcd$pair: procedure(b);
+    declare b byte;
+    call emit$bcd(shr(b,4));
+    call emit$bcd(b and 0fh);
+    end emit$bcd$pair;
+
+emit$colon: procedure(b);
+    declare b byte;
+    call emit$bcd$pair(b);
+    call emitchar(':');
+    end emit$colon;
+
+emit$bin$pair: procedure(b);
+    declare b byte;
+    call emit$bcd(b/10);        /* makes garbage if not < 10 */
+    call emit$bcd(b mod 10);
+    end emit$bin$pair;
+
+emit$slant: procedure(b);
+    declare b byte;
+    call emit$bin$pair(b);
+    call emitchar('/');
+    end emit$slant;
+
+declare chr byte;
+
+gnc: procedure;
+    /* get next command byte */
+    if chr = 0 then return;
+    if index = 20 then
+    do;
+      chr = 0;
+      return;
+    end;
+    chr = string(index := index + 1);
+    end gnc;
+
+deblank: procedure;
+        do while chr = ' ';
+        call gnc;
+        end;
+    end deblank;
+
+numeric: procedure byte;
+    /* test for numeric */
+    return (chr - '0') < 10;
+    end numeric;
+
+scan$numeric: procedure(lb,ub) byte;
+    declare (lb,ub) byte;
+    declare b byte;
+    b = 0;
+    call deblank;
+    if not numeric then call terminate;
+        do while numeric;
+        if (b and 1110$0000b) <> 0 then call terminate;
+        b = shl(b,3) + shl(b,1); /* b = b * 10 */
+        if carry then call terminate;
+        b = b + (chr - '0');
+        if carry then call terminate;
+        call gnc;
+        end;
+    if (b < lb) or (b > ub) then call terminate;
+    return b;
+    end scan$numeric;
+
+scan$delimiter: procedure(d,lb,ub) byte;
+    declare (d,lb,ub) byte;
+    call deblank;
+    if chr <> d then call terminate;
+    call gnc;
+    return scan$numeric(lb,ub);
+    end scan$delimiter;
+
+declare
+    base$year lit '78',   /* base year for computations */
+    base$day  lit '0',    /* starting day for base$year 0..6 */
+    month$size (*) byte data
+    /* jan feb mar apr may jun jul aug sep oct nov dec */
+    (   31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31),
+    month$days (*) address data
+    /* jan feb mar apr may jun jul aug sep oct nov dec */
+    (  000,031,059,090,120,151,181,212,243,273,304,334);
+
+leap$days: procedure(y,m) byte;
+    declare (y,m) byte;
+    /* compute days accumulated by leap years */
+    declare yp byte;
+    yp = shr(y,2); /* yp = y/4 */
+    if (y and 11b) = 0 and month$days(m) < 59 then
+        /* y not 00, y mod 4 = 0, before march, so not leap yr */
+        return yp - 1;
+    /* otherwise, yp is the number of accumulated leap days */
+    return yp;
+    end leap$days;
+
+declare word$value address;
+
+bcd:
+  procedure (val) byte;
+    declare val byte;
+    return shl((val/10),4) + val mod 10;
+  end bcd;
+
+declare (month, day, year, hrs, min, sec) byte;
+
+ set$date$time: procedure;
+    declare
+        (i, leap$flag) byte; /* temporaries */
+    month = scan$numeric(1,12) - 1;
+    /* may be feb 29 */
+    if (leap$flag := month = 1) then i = 29;
+        else i = month$size(month);
+    day   = scan$delimiter('/',1,i);
+    year  = scan$delimiter('/',base$year,99);
+    /* ensure that feb 29 is in a leap year */
+    if leap$flag and day = 29 and (year and 11b) <> 0 then
+        /* feb 29 of non-leap year */ call terminate;
+    /* compute total days */
+    tod.date = month$days(month)
+                + 365 * (year - base$year)
+                + day
+                - leap$days(base$year,0)
+                + leap$days(year,month);
+
+    tod.hrs   = bcd (scan$numeric(0,23));
+    tod.min   = bcd (scan$delimiter(':',0,59));
+    if tod.opcode = 2 then
+    /* date, hours and minutes only */
+    do;
+      if chr = ':'
+        then i = scan$delimiter (':',0,59);
+      tod.sec = 0;
+    end;
+    /* include seconds */
+    else tod.sec   = bcd (scan$delimiter(':',0,59));
+
+    end set$date$time;
+
+bcd$pair: procedure(a,b) byte;
+    declare (a,b) byte;
+    return shl(a,4) or b;
+    end bcd$pair;
+
+
+compute$year: procedure;
+    /* compute year from number of days in word$value */
+    declare year$length address;
+    year = base$year;
+        do forever;
+        year$length = 365;
+        if (year and 11b) = 0 then /* leap year */
+            year$length = 366;
+        if word$value <= year$length then
+            return;
+        word$value = word$value - year$length;
+        year = year + 1;
+        end;
+    end compute$year;
+
+declare
+    week$day  byte, /* day of week 0 ... 6 */
+    day$list (*) byte data
+    ('Sun$Mon$Tue$Wed$Thu$Fri$Sat$'),
+    leap$bias byte; /* bias for feb 29 */
+
+compute$month: procedure;
+    month = 12;
+        do while month > 0;
+        if (month := month - 1) < 2 then /* jan or feb */
+            leapbias = 0;
+        if month$days(month) + leap$bias < word$value then return;
+        end;
+    end compute$month;
+
+get$date$time: procedure;
+    /* get date and time */
+    hrs = tod.hrs;
+    min = tod.min;
+    sec = tod.sec;
+    word$value = tod.date;
+    /* word$value contains total number of days */
+    week$day = (word$value + base$day - 1) mod 7;
+    call compute$year;
+    /* year has been set, word$value is remainder */
+    leap$bias = 0;
+    if (year and 11b) = 0 and word$value > 59 then
+        /* after feb 29 on leap year */ leap$bias = 1;
+    call compute$month;
+    day = word$value - (month$days(month) + leap$bias);
+    month = month + 1;
+    end get$date$time;
+
+emit$date$time: procedure;
+    if tod.opcode = 0 then
+      do;
+      call emitn(.day$list(shl(week$day,2)));
+      call emitchar(' ');
+      end;
+    call emit$slant(month);
+    call emit$slant(day);
+    call emit$bin$pair(year);
+    call emitchar(' ');
+    call emit$colon(hrs);
+    call emit$colon(min);
+    if tod.opcode = 0 then
+      call emit$bcd$pair(sec);
+    end emit$date$time;
+
+tod$ASCII:
+  procedure (parameter);
+    declare parameter address;
+    declare ret address;
+
+    ret = 0;
+    tod$adr = parameter;
+    string$adr = .tod.ASCII;
+    if  (tod.opcode = 0) or
+        (tod.opcode = 3) then
+    do;
+      call get$date$time;
+      index = -1;
+      call emit$date$time;
+    end;
+    else
+    do;
+      if (tod.opcode = 1) or
+         (tod.opcode = 2) then
+      do;
+        chr = string(index:=0);
+        call set$date$time;
+        ret = .string(index);
+      end;
+      else
+      do;
+        call terminate;
+      end;
+    end;
+  end tod$ASCII;
+
+/********************************************************
+
+
+                  TOD INTERFACE TO SHOW
+
+
+ ********************************************************/
+
+
+  declare lcltod structure (
+    opcode byte,
+    date address,
+    hrs byte,
+    min byte,
+    sec byte,
+    ASCII (21) byte );
+
+/*  declare extrnl$todadr address;
+  declare extrnl$tod based extrnl$todadr structure (
+    date address,
+    hrs byte,
+    min byte,
+    sec byte );
+*/
+
+  declare ret address;
+
+/*  display$tod:
+    procedure;
+      lcltod.opcode = 0; 
+      call move (5,.extrnl$tod.date,.lcltod.date);
+      call tod$ASCII (.lcltod);
+      call write$console (0dh);
+      do i = 0 to 20;
+        call write$console (lcltod.ASCII(i));
+      end;
+    end display$tod; */
+
+  display$ts:
+     procedure (tsadr);
+     dcl i byte;
+     dcl tsadr address;
+     lcltod.opcode = 3;         /* display time and date stamp, no seconds */
+     call move (4,tsadr,.lcltod.date);  /* don't copy seconds */
+     call tod$ASCII (.lcltod);
+     do i = 0 to 13;
+       call printchar (lcltod.ASCII(i));
+     end;       
+  end display$ts;
+
+/******** End TOD Code ********/
+
+
+
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+
+                       * * *  BASIC ROUTINES * * *
+
+
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+
+declare
+    fcbmax literally '512'; /* max fcb count */
+
+declare bpb address; /* bytes per block */
+
+
+set$bpb: procedure;
+
+    call set$dpb;                               /* disk parameters set */
+    bpb = shl(double(1),blkshf) * sectorlen;
+
+end set$bpb;
+
+
+select$disk: procedure(d);
+    declare d byte;
+                                                /* select disk and set bpb */
+    call select(cdisk:=d);
+    call set$bpb;                               /* bytes per block */
+
+end select$disk;
+
+
+getalloc: procedure(i) byte;    /* return the ith bit of the alloc vector */
+    declare i address;
+
+    return
+    rol(alloc(shr(i,3)), (i and 111b) + 1);
+    end getalloc;
+
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+
+                  /* fill string @ s for c bytes with f */
+fill:   proc(s,f,c);
+    dcl s addr,
+        (f,c) byte,
+        a based s byte;
+
+        do while (c:=c-1)<>255;
+        a = f;
+        s = s+1;
+        end;
+    end fill;
+
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+
+                   * * *  PRINT A NUMBER  * * *
+
+
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+
+declare
+    val (7) byte initial(0,0,0,0,0,0,0),   /* BCD digits    */
+    fac (7) byte initial(0,0,0,0,0,0,0),   /* hibyte factor */
+    f0  (7) byte initial(6,3,5,5,6,0,0),   /*    65,536     */
+    f1  (7) byte initial(2,7,0,1,3,1,0),   /*   131,072     */
+    f2  (7) byte initial(4,4,1,2,6,2,0),   /*   262,144     */
+    f3  (7) byte initial(8,8,2,4,2,5,0),   /*   524,288     */
+    f4  (7) byte initial(6,7,5,8,4,0,1),   /* 1,048,576     */
+    f5  (7) byte initial(2,5,1,7,9,0,2),   /* 2,097,152     */
+    f6  (7) byte initial(4,0,3,4,9,1,4),   /* 4,194,304     */
+    ptr (7) address initial(.f0,.f1,.f2,.f3,.f4,.f5,.f6);
+
+
+
+                  /* print decimal value of address v */
+pdecimal: procedure(v,prec,zerosup);
+    /* print value v with precision prec (1,10,100,1000,10000)
+    with leading zero suppression if zerosup = true */
+    declare
+        v address,    /* value to print */
+        prec address, /* precision */
+        zerosup byte, /* zero suppression flag */
+        d byte;       /* current decimal digit */
+
+        do while prec <> 0;
+                d = v / prec;           /* get next digit */
+                v = v mod prec;         /* get remainder back to v */
+                prec = prec/10;         /* ready for next digit */
+
+                if prec = 0 then go to pd0;
+                if d <> 0 then go to pd0;
+                if zerosup then do;
+                        call printb;
+                        go to pd1;
+                end;
+pd0:                    zerosup = false;
+                        call printchar('0'+d);
+pd1:    end;
+
+end pdecimal;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+
+                  /* BCD - convert 16 bit binary to 
+                     7 one byte BCD digits */
+getbcd: procedure(value);
+    declare
+        (value,prec) address,
+        i byte;
+
+    prec = 10000;
+    i = 5;                            /* digits: 4,3,2,1,0 */
+        do while prec <> 0;
+        val(i:=i-1) = value / prec;   /* get next digit */
+        value = value mod prec;       /* remainder in value */
+        prec = prec / 10;
+        end;
+    end getbcd;
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+
+                  /* print BCD number in val array */
+printbcd: procedure;
+   declare 
+       (zerosup, i) byte;
+
+   pchar: procedure(c);
+       declare c byte;
+       if val(i) = 0 then
+           if zerosup then 
+               if i <> 0 then do;
+                   call printb;
+                   return;
+                   end;
+       /* else */
+       call printchar(c);
+       zerosup = false;
+   end pchar;
+
+   zerosup = true;
+   i = 7;
+       do while (i:=i-1) <> -1;
+       call pchar('0'+val(i));
+       if i = 6 or i = 3 then 
+           call pchar(',');
+       end;
+   end printbcd;
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+
+                  /* add two BCD numbers result in second */
+add: procedure(ap,bp);
+    declare
+        (ap,bp)        address,
+        a based ap (7) byte,
+        b based bp (7) byte,
+        (c,i)          byte;
+
+    c = 0;                               /* carry   */
+        do i = 0 to 6;                   /* 0 = LSB */
+        b(i) = a(i) + b(i) + c;
+        c = b(i) / 10;
+        b(i) = b(i) mod 10;
+        end;
+    end add;
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+
+                  /* print 3 byte value based at byte3adr */
+p3byte: procedure(byte3adr);
+   declare
+      i         byte,  
+      high$byte byte,
+      byte3adr  address,
+      b3 based  byte3adr structure (
+          lword address,
+          hbyte byte);
+
+    call fill(.val,0,7);
+    call fill(.fac,0,7);
+    call getbcd(b3.lword);         /* put 16 bit value in val */
+    high$byte = b3.hbyte;
+        do i = 0 to 6;                 /* factor for bit i */
+        if high$byte then              /* LSB is 1 */
+            call add(ptr(i),.fac);     /* add in factor */
+        high$byte = shr(high$byte,1);  /* get next bit  */
+        end;
+    call add(.fac,.val);              /* add factor to value */
+    call printbcd;                    /* print value */
+    end p3byte;
+
+
+        /* divide 3 byte value by 8 */
+shr3byte: procedure(byte3adr);
+      dcl byte3adr address,
+          b3 based byte3adr structure (
+          lword address,
+          hbyte byte),
+          temp1 based byte3adr (2) byte,
+          temp2 byte;
+
+        temp2  = ror(b3.hbyte,3) and 11100000b;  /* get 3 bits */
+        b3.hbyte = shr(b3.hbyte,3);
+        b3.lword = shr(b3.lword,3);
+        temp1(1) = temp1(1) or temp2;   /* or in 3 bits from hbyte */
+        end shr3byte;
+
+
+        /* multiply 3 byte value by #records per block */
+shl3byte: procedure(byte3adr);
+      dcl byte3adr address,
+          b3 based byte3adr structure (
+          lword address,
+          hbyte byte),
+          temp1 based byte3adr (2) byte;
+
+        b3.hbyte = (rol(temp1(1),blkshf) and blkmsk) or shl(b3.hbyte,blkshf);
+        b3.lword = shl(b3.lword,blkshf);
+        end shl3byte;
+
+
+show$drive: procedure;
+
+        call printchar(cdisk+'A');
+        call printx(.(': ',0));
+
+end show$drive;
+
+
+
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+
+                * * *  CALCULATE SIZE  * * *
+
+
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+
+add$block: procedure(ak,ab);
+    declare (ak, ab) address;
+    /* add one block to the kilobyte accumulator */
+    declare kaccum based ak address; /* kilobyte accum */
+    declare baccum based ab address; /* byte accum */
+    baccum = baccum + bpb;
+        do while baccum >= 1024;
+        baccum = baccum - 1024;
+        kaccum = kaccum + 1;
+        end;
+    end add$block;
+
+count: procedure(mode) address;
+    declare mode byte; /* true if counting 0's */
+    /* count kb remaining, kaccum set upon exit */
+    declare
+        ka  address,  /* kb accumulator */
+        ba  address,  /* byte accumulator */
+        i   address,  /* local index */
+        bit byte;     /* always 1 if mode = false */
+    ka, ba = 0;
+    bit = 0;
+        do i = 0 to maxall;
+        if mode then bit = getalloc(i);
+        if not bit then call add$block(.ka,.ba);
+        end;
+    return ka;
+    end count;
+
+
+
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+
+                 * * *  STATUS ROUTINES  * * *
+
+
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+
+
+                                  /* characteristics of current drive */
+drivestatus: procedure;
+      dcl b3a address,
+          b3 based b3a structure (
+             lword address,
+             hbyte byte),
+
+          psize address;
+
+
+                                 /* print 3 byte value */
+    pv3: procedure;
+         call crlf;
+         call p3byte(.dirbuf);
+         call printchar(':');
+         call printb;
+    end pv3;
+
+                                 /* print address value v */
+     pv: procedure(v);
+         dcl v address;
+         b3.hbyte = 0;
+         b3.lword = v;
+         call pv3;
+     end pv;
+
+    /* print the characteristics of the currently selected drive */
+
+    b3a = .dirbuf;
+    call print(.('        ',0));
+    call show$drive;
+    call printx(.('Drive Characteristics',0));
+    b3.hbyte = 0;
+    b3.lword = maxall + 1;       /* = # blocks */
+    call shl3byte(.dirbuf);        /* # blocks * records/block */
+    call pv3;
+    call printx(.('128 Byte Record Capacity',0));
+    call shr3byte(.dirbuf);        /* divide by 8 */
+    call pv3;
+    call printx(.('Kilobyte Drive  Capacity',0));
+    call pv(dirmax+1);
+    call printx(.('32 Byte  Directory Entries',0));
+    call pv(shl(chksiz,2));
+    call printx(.('Checked  Directory Entries',0));
+    call pv((extmsk+1) * 128);
+    call printx(.('Records / Directory Entry',0));
+    call pv(shl(double(1),blkshf));
+    call printx(.('Records / Block',0));
+    call pv(scptrk);
+    call printx(.('Sectors / Track',0));
+    call pv(offset);
+    call printx(.('Reserved  Tracks',0));
+
+        psize = 128;            /* 2**psh * 128 */
+        if physhf > 0 then psize = shl(psize,physhf);
+
+        call pv(psize);
+        call printx(.('Bytes / Physical Record',0));
+        call crlf;
+
+    end drivestatus;
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+
+                       * * *  DISK STATUS  * * *
+
+
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+
+pvalue: procedure(v);
+    declare (d,zero) byte,
+        (k,v) address;
+    k = 10000;
+    zero = false;
+        do while k <> 0;
+        d = low(v/k); v = v mod k;
+        k = k / 10;
+        if zero or k = 0 or d <> 0 then
+             do; zero = true; call printchar('0'+d);
+             end;
+        end;
+    end pvalue;
+
+
+prcount: procedure;
+
+    /* print the actual byte count */
+    if cversion < mpm then do;
+        alloca = getalloca;
+        call pvalue(count(true));
+        end;
+    else do;
+        call setdma(.dirbuf);
+        call getfreesp(cdisk);
+        call shr3byte(.dirbuf);
+        call p3byte(.dirbuf);
+        end; 
+    call printchar('k');
+    end prcount;
+
+stat: procedure(rodisk);
+        declare rodisk address;
+
+        call crlf;
+        call show$drive;
+        call printchar('R');
+        if low(rodisk) then
+            call printchar('O'); else
+            call printchar('W');
+        call printx(.(', Space: ',0));
+        call prcount;
+        end stat;
+
+prstatus: procedure;            /* print the status of the disk system */
+    declare (login, rodisk) address;
+    declare (d,save) byte;
+
+        if once$only then return;               /* only execute this once if 
+                                                   all was specified > 1 */
+
+        save = cdisk;
+        login = getlogin;                       /* login vector set */
+        rodisk = getrodisk;                     /* read only disk vector set */
+
+        d = 0;
+        do while login <> 0;
+                if low(login) then do; 
+                        if not all then do;     /* do specified disk */
+                           if d = save then call stat(rodisk);
+                        end;
+
+                        else do;
+                                call select$disk(d);    /* do all disks */
+                                call stat(rodisk);              
+                        end;
+                end;
+
+                login = shr(login,1); rodisk = shr(rodisk,1);
+                d = d + 1;
+        end;
+
+        if all then once$only = true;
+        call crlf;
+
+    end prstatus;
+
+
+
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+
+                * * *  USER STATUS * * *
+
+
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+
+prdir: procedure;
+
+        call crlf;
+        call crlf;
+        call show$drive;
+
+        if nSFCB > 0 then do;
+                call printx(.('Number of time/date directory entries: ',0));
+                call pdecimal(nSFCB,1000,true);
+                call crlf;
+                call show$drive;
+        end;
+
+        call printx(.('Number of free directory entries:      ',0));
+        call pdecimal(free$dir,1000,true);
+        call crlf;
+
+end prdir;
+
+
+get$usr$files: procedure;
+        declare ufcb(*) byte data ('????????????',0,0,0),
+                (i,j)   byte,
+                nfcbs   address,
+                extptr  address,
+                modptr  address,
+                fmod    based modptr byte,
+                fext    based extptr byte;
+
+        do i = 0 to 15;
+                user(i),used(i) = 0;
+        end;
+        nSFCB = 0;
+
+        call setdma(.dirbuf);
+        call search(.ufcb);
+        nfcbs = 0;
+
+        do while dcnt <> 255;
+                j = shl(dcnt,5);                /* which fcb in dirbuf */
+
+ge0:            if (i := dirbuf(j)) <> 0e5h then do;
+                  if i <> 33 then do;           /* SFCB ? */
+                        extptr = .dirbuf(j + 12);
+                        modptr = extptr + 2;
+                        nfcbs = nfcbs + 1;
+                        j = i;                  /* save for xfcb test */
+                        user(i := i and 0fh) = true;
+
+                        if j > 15 then go to ge2;
+                        if fext > extmsk then go to ge2;
+                        if fmod = 0 then used(i) = used(i) + 1;
+                  end;
+                  else nSFCB = nSFCB + 1;
+                end;
+
+ge2:            call searchn;
+        end;
+
+        done$drive(cdisk) = true;
+        if nSFCB > 0 then nSFCB = shr(dirmax+1,2);      /* because search ends
+                                                           at high water mark*/
+        free$dir = ((dirmax + 1) - nSFCB) - nfcbs;
+
+end get$usr$files;
+
+
+userstatus: procedure;          /* display active user numbers */
+    declare i byte;
+
+        call crlf;
+        call show$drive;
+        call printx(.('Active User : ',0));
+        call pdecimal(getuser,1000,true);
+        call crlf;
+        call show$drive;
+        call printx(.('Active Files: ',0));
+
+        if not done$drive(cdisk) then call get$usr$files;
+
+        do i = 0 to last(user);
+                if user(i) then call pdecimal(i,1000,true);
+        end;
+
+        call crlf;
+        call show$drive;
+        call printx(.('# of files  : ',0));
+        do i = 0 to last(user);
+                if user(i) then call pdecimal(used(i),1000,true);
+        end;
+
+        call prdir;
+
+end userstatus;
+
+
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+
+            * * *  DISK & FILE STATUS * * *
+
+
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+
+
+directory: procedure;
+
+        if not done$drive(cdisk) then call get$usr$files;
+        call prdir;
+
+end directory;
+
+/*******************************************************
+
+                L A B E L   S T A T U S
+
+********************************************************/
+
+readlbl: proc(relog);
+        declare relog   byte,
+                d       byte data('?');
+
+    call setdma(.dirbuf);
+    call search(.d);
+    if relog > 0 then return;
+
+    do while dcnt <> 0ffH;
+        if dirbuf(ror(dcnt,3) and 110$0000b)=20H then return;
+        call searchn;
+    end;
+
+end readlbl;
+
+/* HEADER */
+
+dcl label1 (*) byte data (
+'Directory     Passwds  Stamp   Stamp',0);
+dcl label2 (*) byte data (
+'Label         Reqd     ',0);
+dcl label3 (*) byte data (
+                                    '  Update  Label Created   Label Updated',0)
+
+;
+dcl label4 (*) byte data (
+'------------  -------  ------  ------  --------------  --------------',0
+
+);
+
+
+labelstatus: procedure;
+    dcl lbl             byte;
+    dcl fnam lit '11';
+    dcl ftyp lit '9';
+    dcl fcbp address;
+    dcl fcbv based fcbp (32) byte;      /* template over dirbuf */
+
+  printfn: proc;                        /* print file name */
+        declare k byte;
+
+        do k = 1 to fnam;
+                if k = ftyp then 
+                    call printchar('.');
+                call printchar(fcbv(k) and 7fh);
+        end;
+  end printfn;
+
+
+    lbl = getlbl(cdisk);
+    if lbl > 0 then do;
+        call readlbl(0);
+        fcbp = shl(dcnt,5) + .dirbuf;
+
+        call print(.('Label for drive ',0));    /* print heading */
+        call show$drive;
+        call crlf;
+        call print(.label1);
+        call print(.label2);
+        if (lbl and 40h) = 40h then
+            call printx(.('Access',0));
+        else
+            call printx(.('Create',0));
+        call printx(.label3);
+        call print(.label4);
+        call crlf;
+        call printfn;
+        if not NONBANK and ((lbl and 80h) = 80h) then
+            call printx(.('    on   ',0));
+        else
+            call printx(.('    off  ',0));
+
+        if (lbl and 40h) = 40h then
+            call printx(.('   on   ',0));
+        else if(lbl and 10h) = 10h then
+            call printx(.('   on   ',0));
+        else call printx(.('   off  ',0));
+
+        if (lbl and 20h) = 20h then
+            call printx(.('   on ',0));
+        else
+            call printx(.('   off',0));
+
+        call printx(.('    ',0));
+        call display$ts(.fcbv(24));
+        call printx(.('  ',0));
+        call display$ts(.fcbv(28));
+        end;
+    else do;
+        call e$print(.err$nolabel);
+        call printchar(cdisk+'A');
+    end;
+
+    call crlf;
+
+end labelstatus;
+
+
+$eject
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+
+                    * * *  Option scanner  * * *
+
+
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+
+separator: procedure(character) byte;
+
+                                        /* determines if character is a 
+                                           delimiter and which one */
+        declare k       byte,
+                character       byte;
+
+        k = 1;
+loop:   if delimiters(k) = end$list then return(0);
+        if delimiters(k) = character then return(k);    /* null = 25 */
+                k = k + 1;
+                go to loop;
+
+end separator;
+
+opt$scanner:    procedure(list$ptr,off$ptr) byte;
+                                        /* scans the list pointed at by idxptr
+                                           for any strings that are in the 
+                                           list pointed at by list$ptr.
+                                           Offptr points at an array that 
+                                           contains the indices for the known
+                                           list. Idxptr points at the index 
+                                           into the list. If the input string
+                                           is unrecognizable then the index is
+                                           0, otherwise > 0.
+
+                                        First, find the string in the known
+                                        list that starts with the same first 
+                                        character.  Compare up until the next
+                                        delimiter on the input. if every input
+                                        character matches then check for 
+                                        uniqueness.  Otherwise try to find 
+                                        another known string that has its first
+                                        character match, and repeat.  If none
+                                        can be found then return invalid.
+
+                                        To test for uniqueness, start at the 
+                                        next string in the knwon list and try
+                                        to get another match with the input.
+                                        If there is a match then return invalid.
+
+                                        else move pointer past delimiter and 
+                                        return.
+
+                                P.Balma         */
+
+        declare
+                buff            based buf$ptr (1) byte,
+                off$ptr         address,
+                list$ptr        address;
+
+        declare
+                i               byte,
+                j               byte,
+                list            based list$ptr (1) byte,
+                offsets         based off$ptr (1) byte,
+                wrd$pos         byte,
+                character       byte,
+                letter$in$word  byte,
+                found$first     byte,
+                start           byte,
+                index           byte,
+                save$index      byte,
+                (len$new,len$found)     byte,
+                valid           byte;
+
+/*****************************************************************************/
+/*                      internal subroutines                                 */
+/*****************************************************************************/
+
+check$in$list: procedure;
+                                /* find known string that has a match with 
+                                   input on the first character.  Set index
+                                   = invalid if none found.   */
+                        
+        declare i       byte;
+
+        i = start;
+        wrd$pos = offsets(i);
+        do while list(wrd$pos) <> end$list;
+                i = i + 1;
+                index = i;
+                if list(wrd$pos) = character then return;
+                wrd$pos = offsets(i);
+        end;
+                        /* could not find character */
+        index = 0;
+        return;
+end check$in$list;
+
+setup:  procedure;
+        character = buff(0);
+        call check$in$list;
+        letter$in$word = wrd$pos;
+                        /* even though no match may have occurred, position
+                           to next input character.  */
+        i = 1;
+        character = buff(1);
+end setup;
+
+test$letter:    procedure;
+                        /* test each letter in input and known string */
+
+        letter$in$word = letter$in$word + 1;
+
+                                        /* too many chars input? 0 means
+                                           past end of known string */
+        if list(letter$in$word) = end$of$string then valid = false;
+        else
+        if list(letter$in$word) <> character then valid = false;
+
+        i = i + 1;
+        character = buff(i);
+
+end test$letter;
+
+skip:   procedure;
+                                        /* scan past the offending string;
+                                           position buf$ptr to next string...
+                                           skip entire offending string;
+                                           ie., falseopt=mod, [note: comma or
+                                           space is considered to be group 
+                                           delimiter] */
+        character = buff(i);
+        delimiter = separator(character);
+        do while ((delimiter <> 2) and (delimiter <> 4) and (delimiter <> 5)
+                   and (delimiter <> 25));
+                i = i + 1;
+                character = buff(i);
+                delimiter = separator(character);
+        end;
+        endbuf = i;
+        buf$ptr = buf$ptr + endbuf + 1;
+        return;
+end skip;
+
+eat$blanks: procedure;
+
+        declare charac  based buf$ptr byte;
+
+
+        do while(delimiter := separator(charac)) = SPACE;
+                bufptr = buf$ptr + 1;
+        end;
+
+end eat$blanks;
+
+/*****************************************************************************/
+/*                      end of internals                                     */
+/*****************************************************************************/
+
+
+                                        /* start of procedure */
+        call eat$blanks;
+        start = 0;
+        call setup;
+
+                                        /* match each character with the option
+                                           for as many chars as input 
+                                           Please note that due to the array
+                                           indices being relative to 0 and the
+                                           use of index both as a validity flag
+                                           and as a index into the option/mods
+                                           list, index is forced to be +1 as an
+                                           index into array and 0 as a flag*/
+
+        do while index <> 0;
+                start = index;
+                delimiter = separator(character);
+
+                                        /* check up to input delimiter */
+
+                valid = true;           /* test$letter resets this */
+                do while delimiter = 0;
+                        call test$letter;
+                        if not valid then go to exit1;
+                        delimiter = separator(character);
+                end;
+
+                go to good;
+
+                                        /* input ~= this known string;
+                                           get next known string that 
+                                           matches */
+exit1:          call setup;
+        end;
+                                        /* fell through from above, did
+                                           not find a good match*/
+        endbuf = i;                     /* skip over string & return*/
+        call skip;
+        return(index);
+
+                                        /* is it a unique match in options
+                                           list? */
+good:   endbuf = i;
+        len$found = endbuf;
+        save$index = index;
+        valid = false;
+next$opt:
+                start = index;
+                call setup;
+                if index = 0 then go to finished;
+
+                                        /* look at other options and check
+                                           uniqueness */
+
+                len$new = offsets(index + 1) - offsets(index) - 1;
+                if len$new = len$found then do;
+                        valid = true;
+                        do j = 1 to len$found;
+                                call test$letter;
+                                if not valid then go to next$opt;
+                        end;
+                end;
+                else go to nextopt;
+                                        /* fell through...found another valid
+                                           match --> ambiguous reference */
+        index = 0;
+        call skip;              /* skip input field to next delimiter*/
+        return(0);
+
+finished:                       /* unambiguous reference */
+        index = save$index;
+        buf$ptr = buf$ptr + endbuf;
+        call eat$blanks;
+        if delimiter <> 0 then  buf$ptr = buf$ptr + 1;
+        else delimiter = SPACE;
+        return(index);
+
+end opt$scanner;
+
+error$prt:      procedure;
+        declare i       byte,
+                t       address,
+                char    based t byte;
+
+        t = buf$ptr - endbuf - 1;
+        do i = 1 to endbuf;
+                call printchar(char);
+                t = t + 1;
+        end;
+
+end error$prt;
+
+$eject
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+
+                    * * *  EXECUTE * * *
+
+
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+do$option: procedure(i);
+        declare i       byte;
+
+
+                if opt$map(i).option(opt$space) <> 0 then call prstatus;
+                if opt$map(i).option(opt$label) <> 0 then call labelstatus;
+                if opt$map(i).option(opt$drive) <> 0 then call drivestatus;
+                if opt$map(i).option(opt$user) <> 0 then call userstatus;
+                if opt$map(i).option(opt$dir) <> 0 then call directory;
+
+end do$option;
+
+$eject
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+
+                    * * *  PARSING  * * *
+
+
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+declare         character       based buf$ptr byte;
+
+setdef$drive: procedure;
+
+        if drive = 0ffh then do;
+                drive = cdisk;
+                drives(drive) = drive;
+        end;
+
+        return;
+
+end setdef$drive;
+
+
+parseoptions: procedure byte;
+                                /* find all options within [...] */
+
+        buf$ptr = buf$ptr + 1;
+        delimiter = separator(character);
+        call setdef$drive;
+
+        if delimiter = 0 then go to preloop;
+        if delimiter <> RBRACKET then 
+           if delimiter <> EOS then go to preloop;
+
+                                                        /* [], turn on space */
+        opt$map(drive).option(opt$space) = 1;
+        buf$ptr = buf$ptr + 1;
+        return(2);
+
+preloop:
+        if opt$map(drive).option(opt$space) = 0ffh then /* reset forced space*/
+                opt$map(drive).option(opt$space) = 0;
+
+loop:   if (opt$index := optscanner(.options,.off$opt)) = 0 then go to error;
+
+        if opt$index = opt$page then PAGE = true;
+        else if opt$index = opt$nopage then PAGE = false;
+        else opt$map(drive).option(opt$index - 1) = 1;
+
+        go to looptest;
+
+error:  call e$print(.err$unrecopt);
+        call print(.eoption);
+        call error$prt;
+
+looptest:
+        if delimiter = EOS then return(25);
+        if delimiter = RBRACKET then return(2);
+
+        go to loop;
+
+end parseoptions;
+
+parsedir: procedure;
+
+        declare dirindex        byte;
+
+        if (dir$index := optscanner(.dirs,.off$dirs)) = 0 then go to error1;
+
+                drive = dir$index - 1;
+                drives(drive) = drive;
+                opt$map(drive).option(opt$space) = 0ffh;/* only drive:,reset
+                                                           if other options and
+                                                           not space picked */
+                if delimiter <> COLON then buf$ptr = buf$ptr - 1;
+
+        return;
+
+error1: call e$print(.err$unrecd);
+dprint: call print(.dirdrive);
+        call error$prt;
+        call terminate;
+
+end parsedir;
+
+
+parser: procedure;
+
+        drive = 0ffh;
+
+        if (delimiter := separator(character)) = EOS then do;
+                call setdef$drive;
+                opt$map(drive).option(opt$space) = 1;           /* default*/
+                all = true;
+                return;
+        end;
+
+loop:   if delimiter = LBRACKET then delimiter = parseoptions;
+        else if delimiter = 0 then call parsedir;
+
+        else do;
+                if delimiter <> COMMA then
+                if delimiter <> SPACE then go to error;
+
+                drive = 0ffh;
+                buf$ptr = buf$ptr + 1;
+        end;
+
+
+looptest:
+        if delimiter <> EOS then
+           if (delimiter := separator(character)) <> EOS then go to loop;
+
+        return;
+
+error:  call e$print(.err$input);
+        call print(.input);
+        call error$prt;
+        call terminate;
+
+end parser;
+
+$eject
+/*************************************************************************
+
+
+                        ***  MAIN PROGRAM  ***
+
+
+**************************************************************************/
+
+        declare
+                i       byte initial(1);
+
+        plm:
+                cversion = get$version;
+                if cversion < mpm then call e$print(.err$version);
+                else do;
+
+                        do while buff(i) = ' ';
+                                i = i + 1;
+                        end;
+                        buf$ptr = .buff(i);
+
+                        cdisk = cselect;
+                        user$code = getuser;
+
+                        do i = 0 to 15;
+                                drives(i) = 0ffh;
+                        end;
+
+                        if getpagemode = 0 then PAGE = true;
+                        line$page = getpage;
+                        line$out = 0;
+                        if getNB = 0 then NONBANK = true;
+
+                        call parser;
+
+                        do i = 0 to 15;
+                                if (drive := drives(i)) <> 0ffh then do;
+                                        call select$disk(drives(i));
+                                        call readlbl(1); /* force login
+                                                            by wild card drive
+                                                            search.  */
+                                        call do$option(i);
+                                end;
+                        end;
+
+                end;
+                call terminate;
+
+end;
+

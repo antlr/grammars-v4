@@ -1,0 +1,13 @@
+MODULE MainModule
+    PROC CheckValue()
+        VAR num x;
+        x := 5;
+        IF x > 10 THEN
+            TPWrite "big";
+        ELSEIF x > 0 THEN
+            TPWrite "positive";
+        ELSE
+            TPWrite "non-positive";
+        ENDIF
+    ENDPROC
+ENDMODULE

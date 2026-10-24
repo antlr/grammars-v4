@@ -1,0 +1,123 @@
+	.version 2.1
+	.target sm_20
+	// compiled with C:\CUDA\bin/../open64/lib//be.exe
+	// nvopencc 3.1 built on 2010-06-08
+
+	//-----------------------------------------------------------
+	// Compiling simpleTemplates.compute_20.cpp3.i (C:/Users/Ken/AppData/Local/Temp/ccBI#.a04360)
+	//-----------------------------------------------------------
+
+	//-----------------------------------------------------------
+	// Options:
+	//-----------------------------------------------------------
+	//  Target:ptx, ISA:sm_20, Endian:little, Pointer Size:32
+	//  -O3	(Optimization level)
+	//  -g0	(Debug level)
+	//  -m2	(Report advisories)
+	//-----------------------------------------------------------
+
+	.file	1	"simpleTemplates.compute_20.cudafe2.gpu"
+	.file	2	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\crtdefs.h"
+	.file	3	"C:\CUDA\include\crt/device_runtime.h"
+	.file	4	"C:\CUDA\include\host_defines.h"
+	.file	5	"C:\CUDA\include\builtin_types.h"
+	.file	6	"c:\cuda\include\device_types.h"
+	.file	7	"c:\cuda\include\driver_types.h"
+	.file	8	"c:\cuda\include\surface_types.h"
+	.file	9	"c:\cuda\include\texture_types.h"
+	.file	10	"c:\cuda\include\vector_types.h"
+	.file	11	"c:\cuda\include\builtin_types.h"
+	.file	12	"c:\cuda\include\host_defines.h"
+	.file	13	"C:\CUDA\include\device_launch_parameters.h"
+	.file	14	"c:\cuda\include\crt\storage_class.h"
+	.file	15	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\time.h"
+	.file	16	"c:\programdata\nvidia corporation\nvidia gpu computing sdk\c\src\simpletemplates\sharedmem.cuh"
+	.file	17	"c:\programdata\nvidia corporation\nvidia gpu computing sdk\c\src\simpletemplates\simpleTemplates_kernel.cu"
+	.file	18	"C:\CUDA\include\common_functions.h"
+	.file	19	"c:\cuda\include\math_functions.h"
+	.file	20	"c:\cuda\include\math_constants.h"
+	.file	21	"c:\cuda\include\device_functions.h"
+	.file	22	"c:\cuda\include\sm_11_atomic_functions.h"
+	.file	23	"c:\cuda\include\sm_12_atomic_functions.h"
+	.file	24	"c:\cuda\include\sm_13_double_functions.h"
+	.file	25	"c:\cuda\include\sm_20_atomic_functions.h"
+	.file	26	"c:\cuda\include\sm_20_intrinsics.h"
+	.file	27	"c:\cuda\include\surface_functions.h"
+	.file	28	"c:\cuda\include\texture_fetch_functions.h"
+	.file	29	"c:\cuda\include\math_functions_dbl_ptx3.h"
+
+	.extern	.shared .align 4 .b8 s_int[];
+	.extern	.shared .align 4 .b8 s_float[];
+
+	.entry _Z10testKernelIfEvPT_S1_ (
+		.param .u32 __cudaparm__Z10testKernelIfEvPT_S1__g_idata,
+		.param .u32 __cudaparm__Z10testKernelIfEvPT_S1__g_odata)
+	{
+	.reg .u32 %r<11>;
+	.reg .f32 %f<7>;
+	.loc	17	36	0
+$LDWbegin__Z10testKernelIfEvPT_S1_:
+	.loc	17	50	0
+	mov.u32 	%r1, %tid.x;
+	mul.lo.u32 	%r2, %r1, 4;
+	mov.u32 	%r3, s_float;
+	add.u32 	%r4, %r2, %r3;
+	ld.param.u32 	%r5, [__cudaparm__Z10testKernelIfEvPT_S1__g_idata];
+	add.u32 	%r6, %r5, %r2;
+	ld.global.f32 	%f1, [%r6+0];
+	st.shared.f32 	[%r4+0], %f1;
+	.loc	17	51	0
+	bar.sync 	0;
+	.loc	17	54	0
+	mov.u32 	%r7, %ntid.x;
+	cvt.rn.f32.u32 	%f2, %r7;
+	ld.shared.f32 	%f3, [%r4+0];
+	mul.f32 	%f4, %f2, %f3;
+	st.shared.f32 	[%r4+0], %f4;
+	.loc	17	55	0
+	bar.sync 	0;
+	.loc	17	58	0
+	ld.shared.f32 	%f5, [%r4+0];
+	ld.param.u32 	%r8, [__cudaparm__Z10testKernelIfEvPT_S1__g_odata];
+	add.u32 	%r9, %r8, %r2;
+	st.global.f32 	[%r9+0], %f5;
+	.loc	17	59	0
+	exit;
+$LDWend__Z10testKernelIfEvPT_S1_:
+	} // _Z10testKernelIfEvPT_S1_
+
+	.entry _Z10testKernelIiEvPT_S1_ (
+		.param .u32 __cudaparm__Z10testKernelIiEvPT_S1__g_idata,
+		.param .u32 __cudaparm__Z10testKernelIiEvPT_S1__g_odata)
+	{
+	.reg .u32 %r<15>;
+	.loc	17	36	0
+$LDWbegin__Z10testKernelIiEvPT_S1_:
+	.loc	17	50	0
+	mov.u32 	%r1, %tid.x;
+	mul.lo.u32 	%r2, %r1, 4;
+	mov.u32 	%r3, s_int;
+	add.u32 	%r4, %r2, %r3;
+	ld.param.u32 	%r5, [__cudaparm__Z10testKernelIiEvPT_S1__g_idata];
+	add.u32 	%r6, %r5, %r2;
+	ld.global.s32 	%r7, [%r6+0];
+	st.shared.s32 	[%r4+0], %r7;
+	.loc	17	51	0
+	bar.sync 	0;
+	.loc	17	54	0
+	ld.shared.s32 	%r8, [%r4+0];
+	mov.u32 	%r9, %ntid.x;
+	mul.lo.s32 	%r10, %r8, %r9;
+	st.shared.s32 	[%r4+0], %r10;
+	.loc	17	55	0
+	bar.sync 	0;
+	.loc	17	58	0
+	ld.shared.s32 	%r11, [%r4+0];
+	ld.param.u32 	%r12, [__cudaparm__Z10testKernelIiEvPT_S1__g_odata];
+	add.u32 	%r13, %r12, %r2;
+	st.global.s32 	[%r13+0], %r11;
+	.loc	17	59	0
+	exit;
+$LDWend__Z10testKernelIiEvPT_S1_:
+	} // _Z10testKernelIiEvPT_S1_
+

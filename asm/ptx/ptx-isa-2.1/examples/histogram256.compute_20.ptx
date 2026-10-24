@@ -1,0 +1,310 @@
+	.version 2.1
+	.target sm_20
+	// compiled with C:\CUDA\bin/../open64/lib//be.exe
+	// nvopencc 3.1 built on 2010-06-08
+
+	//-----------------------------------------------------------
+	// Compiling histogram256.compute_20.cpp3.i (C:/Users/Ken/AppData/Local/Temp/ccBI#.a08116)
+	//-----------------------------------------------------------
+
+	//-----------------------------------------------------------
+	// Options:
+	//-----------------------------------------------------------
+	//  Target:ptx, ISA:sm_20, Endian:little, Pointer Size:32
+	//  -O3	(Optimization level)
+	//  -g0	(Debug level)
+	//  -m2	(Report advisories)
+	//-----------------------------------------------------------
+
+	.file	1	"histogram256.compute_20.cudafe2.gpu"
+	.file	2	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\crtdefs.h"
+	.file	3	"C:\CUDA\include\crt/device_runtime.h"
+	.file	4	"C:\CUDA\include\host_defines.h"
+	.file	5	"C:\CUDA\include\builtin_types.h"
+	.file	6	"c:\cuda\include\device_types.h"
+	.file	7	"c:\cuda\include\driver_types.h"
+	.file	8	"c:\cuda\include\surface_types.h"
+	.file	9	"c:\cuda\include\texture_types.h"
+	.file	10	"c:\cuda\include\vector_types.h"
+	.file	11	"c:\cuda\include\builtin_types.h"
+	.file	12	"c:\cuda\include\host_defines.h"
+	.file	13	"C:\CUDA\include\device_launch_parameters.h"
+	.file	14	"c:\cuda\include\crt\storage_class.h"
+	.file	15	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\time.h"
+	.file	16	"c:\programdata\nvidia corporation\nvidia gpu computing sdk\c\src\histogram\histogram_common.h"
+	.file	17	"c:\cuda\include\texture_fetch_functions.h"
+	.file	18	"c:/ProgramData/NVIDIA Corporation/NVIDIA GPU Computing SDK/C/src/histogram/histogram256.cu"
+	.file	19	"C:\CUDA\include\common_functions.h"
+	.file	20	"c:\cuda\include\math_functions.h"
+	.file	21	"c:\cuda\include\math_constants.h"
+	.file	22	"c:\cuda\include\device_functions.h"
+	.file	23	"c:\cuda\include\sm_11_atomic_functions.h"
+	.file	24	"c:\cuda\include\sm_12_atomic_functions.h"
+	.file	25	"c:\cuda\include\sm_13_double_functions.h"
+	.file	26	"c:\cuda\include\sm_20_atomic_functions.h"
+	.file	27	"c:\cuda\include\sm_20_intrinsics.h"
+	.file	28	"c:\cuda\include\surface_functions.h"
+	.file	29	"c:\cuda\include\math_functions_dbl_ptx3.h"
+
+
+	.entry _Z18histogram256KernelPjS_j (
+		.param .u32 __cudaparm__Z18histogram256KernelPjS_j_d_PartialHistograms,
+		.param .u32 __cudaparm__Z18histogram256KernelPjS_j_d_Data,
+		.param .u32 __cudaparm__Z18histogram256KernelPjS_j_dataCount)
+	{
+	.reg .u32 %r<99>;
+	.reg .pred %p<11>;
+	.shared .align 4 .b8 __cuda___cuda_local_var_287956_33_s_Hist12[6144];
+	.loc	18	57	0
+$LDWbegin__Z18histogram256KernelPjS_j:
+	mov.u32 	%r1, __cuda___cuda_local_var_287956_33_s_Hist12;
+	.loc	18	65	0
+	mov.u32 	%r2, %tid.x;
+	mul.lo.u32 	%r3, %r2, 4;
+	add.u32 	%r4, %r3, %r1;
+	mov.u32 	%r5, 0;
+	st.shared.u32 	[%r4+0], %r5;
+	mov.u32 	%r6, 0;
+	st.shared.u32 	[%r4+768], %r6;
+	mov.u32 	%r7, 0;
+	st.shared.u32 	[%r4+1536], %r7;
+	mov.u32 	%r8, 0;
+	st.shared.u32 	[%r4+2304], %r8;
+	mov.u32 	%r9, 0;
+	st.shared.u32 	[%r4+3072], %r9;
+	mov.u32 	%r10, 0;
+	st.shared.u32 	[%r4+3840], %r10;
+	mov.u32 	%r11, 0;
+	st.shared.u32 	[%r4+4608], %r11;
+	mov.u32 	%r12, 0;
+	st.shared.u32 	[%r4+5376], %r12;
+	.loc	18	74	0
+	bar.sync 	0;
+	.loc	18	75	0
+	mov.u32 	%r13, %ntid.x;
+	mov.u32 	%r14, %ctaid.x;
+	mul.lo.u32 	%r15, %r13, %r14;
+	add.u32 	%r16, %r15, %r2;
+	ld.param.u32 	%r17, [__cudaparm__Z18histogram256KernelPjS_j_dataCount];
+	setp.ge.u32 	%p1, %r16, %r17;
+	@%p1 bra 	$Lt_0_7426;
+	mul.lo.u32 	%r18, %r16, 4;
+	mul.lo.u32 	%r19, %r17, 4;
+	shr.u32 	%r20, %r2, 5;
+	shl.b32 	%r21, %r2, 27;
+	mov.u32 	%r22, %nctaid.x;
+	mul.lo.u32 	%r23, %r22, %r13;
+	ld.param.u32 	%r24, [__cudaparm__Z18histogram256KernelPjS_j_d_Data];
+	add.u32 	%r25, %r18, %r24;
+	mul.lo.u32 	%r26, %r23, 4;
+	add.u32 	%r27, %r19, %r24;
+	mul.lo.u32 	%r28, %r20, 1024;
+	add.u32 	%r29, %r28, %r1;
+$Lt_0_7938:
+ //<loop> Loop body line 75, nesting depth: 1, estimated iterations: unknown
+	.loc	18	76	0
+	ld.global.u32 	%r30, [%r25+0];
+	and.b32 	%r31, %r30, 255;
+	mul.lo.u32 	%r32, %r31, 4;
+	add.u32 	%r33, %r32, %r29;
+$Lt_0_8450:
+ //<loop> Loop body line 77
+	.loc	18	77	0
+	ld.volatile.shared.u32 	%r34, [%r33+0];
+	and.b32 	%r35, %r34, 134217727;
+	add.u32 	%r36, %r35, 1;
+	or.b32 	%r37, %r21, %r36;
+	st.volatile.shared.u32 	[%r33+0], %r37;
+	ld.volatile.shared.u32 	%r38, [%r33+0];
+	setp.ne.u32 	%p2, %r38, %r37;
+	@%p2 bra 	$Lt_0_8450;
+ //<loop> Part of loop body line 75, head labeled $Lt_0_7938
+	shl.b32 	%r39, %r30, 16;
+	shr.u32 	%r40, %r39, 24;
+	mul.lo.u32 	%r41, %r40, 4;
+	add.u32 	%r42, %r41, %r29;
+$Lt_0_9218:
+ //<loop> Loop body line 77
+	ld.volatile.shared.u32 	%r43, [%r42+0];
+	and.b32 	%r44, %r43, 134217727;
+	add.u32 	%r45, %r44, 1;
+	or.b32 	%r46, %r21, %r45;
+	st.volatile.shared.u32 	[%r42+0], %r46;
+	ld.volatile.shared.u32 	%r47, [%r42+0];
+	setp.ne.u32 	%p3, %r47, %r46;
+	@%p3 bra 	$Lt_0_9218;
+ //<loop> Part of loop body line 75, head labeled $Lt_0_7938
+	shl.b32 	%r48, %r30, 8;
+	shr.u32 	%r49, %r48, 24;
+	mul.lo.u32 	%r50, %r49, 4;
+	add.u32 	%r51, %r50, %r29;
+$Lt_0_9986:
+ //<loop> Loop body line 77
+	ld.volatile.shared.u32 	%r52, [%r51+0];
+	and.b32 	%r53, %r52, 134217727;
+	add.u32 	%r54, %r53, 1;
+	or.b32 	%r55, %r21, %r54;
+	st.volatile.shared.u32 	[%r51+0], %r55;
+	ld.volatile.shared.u32 	%r56, [%r51+0];
+	setp.ne.u32 	%p4, %r56, %r55;
+	@%p4 bra 	$Lt_0_9986;
+ //<loop> Part of loop body line 75, head labeled $Lt_0_7938
+	shr.u32 	%r57, %r30, 24;
+	mul.lo.u32 	%r58, %r57, 4;
+	add.u32 	%r59, %r58, %r29;
+$Lt_0_10754:
+ //<loop> Loop body line 77
+	ld.volatile.shared.u32 	%r60, [%r59+0];
+	and.b32 	%r61, %r60, 134217727;
+	add.u32 	%r62, %r61, 1;
+	or.b32 	%r63, %r21, %r62;
+	st.volatile.shared.u32 	[%r59+0], %r63;
+	ld.volatile.shared.u32 	%r64, [%r59+0];
+	setp.ne.u32 	%p5, %r64, %r63;
+	@%p5 bra 	$Lt_0_10754;
+ //<loop> Part of loop body line 75, head labeled $Lt_0_7938
+	add.u32 	%r25, %r25, %r26;
+	setp.lt.u32 	%p6, %r25, %r27;
+	@%p6 bra 	$Lt_0_7938;
+$Lt_0_7426:
+	.loc	18	81	0
+	bar.sync 	0;
+	mov.u32 	%r65, 255;
+	setp.gt.u32 	%p7, %r2, %r65;
+	@%p7 bra 	$Lt_0_11522;
+	mov.u32 	%r66, 447;
+	sub.u32 	%r67, %r66, %r2;
+	mov.s32 	%r68, -1431655765;
+	mov.s32 	%r69, 0;
+	setp.lt.s32 	%p8, %r67, %r69;
+	abs.s32 	%r70, %r67;
+	mul.hi.u32 	%r71, %r70, %r68;
+	shr.s32 	%r72, %r71, 7;
+	@%p8 sub.s32 	%r72, %r69, %r72;
+	mov.s32 	%r73, %r72;
+	mul.lo.u32 	%r74, %r14, 1024;
+	mov.s32 	%r75, %r4;
+	add.u32 	%r76, %r1, 1020;
+	ld.param.u32 	%r77, [__cudaparm__Z18histogram256KernelPjS_j_d_PartialHistograms];
+	add.s32 	%r78, %r77, %r74;
+	add.s32 	%r79, %r78, %r3;
+	mov.s32 	%r80, %r73;
+$Lt_0_12034:
+ //<loop> Loop body line 81, nesting depth: 1, estimated iterations: unknown
+	.loc	18	88	0
+	ld.shared.u32 	%r81, [%r75+0];
+	and.b32 	%r82, %r81, 134217727;
+	ld.shared.u32 	%r83, [%r75+1024];
+	and.b32 	%r84, %r83, 134217727;
+	add.u32 	%r85, %r82, %r84;
+	ld.shared.u32 	%r86, [%r75+2048];
+	and.b32 	%r87, %r86, 134217727;
+	ld.shared.u32 	%r88, [%r75+3072];
+	and.b32 	%r89, %r88, 134217727;
+	add.u32 	%r90, %r87, %r89;
+	add.u32 	%r91, %r85, %r90;
+	ld.shared.u32 	%r92, [%r75+4096];
+	and.b32 	%r93, %r92, 134217727;
+	ld.shared.u32 	%r94, [%r75+5120];
+	and.b32 	%r95, %r94, 134217727;
+	add.u32 	%r96, %r93, %r95;
+	add.u32 	%r97, %r91, %r96;
+	st.global.u32 	[%r79+0], %r97;
+	add.s32 	%r79, %r79, 768;
+	add.u32 	%r75, %r75, 768;
+	setp.le.u32 	%p9, %r75, %r76;
+	@%p9 bra 	$Lt_0_12034;
+$Lt_0_11522:
+	.loc	18	90	0
+	exit;
+$LDWend__Z18histogram256KernelPjS_j:
+	} // _Z18histogram256KernelPjS_j
+
+	.entry _Z23mergeHistogram256KernelPjS_j (
+		.param .u32 __cudaparm__Z23mergeHistogram256KernelPjS_j_d_Histogram,
+		.param .u32 __cudaparm__Z23mergeHistogram256KernelPjS_j_d_PartialHistograms,
+		.param .u32 __cudaparm__Z23mergeHistogram256KernelPjS_j_histogramCount)
+	{
+	.reg .u32 %r<39>;
+	.reg .pred %p<7>;
+	.shared .align 4 .b8 __cuda___cuda_local_var_288006_33_data6168[1024];
+	.loc	18	103	0
+$LDWbegin__Z23mergeHistogram256KernelPjS_j:
+	.loc	18	106	0
+	mov.u32 	%r1, %tid.x;
+	ld.param.u32 	%r2, [__cudaparm__Z23mergeHistogram256KernelPjS_j_histogramCount];
+	setp.ge.u32 	%p1, %r1, %r2;
+	@%p1 bra 	$Lt_1_6914;
+	sub.u32 	%r3, %r2, %r1;
+	add.u32 	%r4, %r3, 255;
+	shr.s32 	%r5, %r4, 31;
+	mov.s32 	%r6, 255;
+	and.b32 	%r7, %r5, %r6;
+	add.s32 	%r8, %r7, %r4;
+	shr.s32 	%r9, %r8, 8;
+	mov.u32 	%r10, %ctaid.x;
+	mul.lo.u32 	%r11, %r10, 4;
+	mul.lo.u32 	%r12, %r1, 1024;
+	mul.lo.u32 	%r13, %r2, 1024;
+	ld.param.u32 	%r14, [__cudaparm__Z23mergeHistogram256KernelPjS_j_d_PartialHistograms];
+	add.s32 	%r15, %r14, %r11;
+	add.s32 	%r16, %r15, %r12;
+	add.s32 	%r17, %r15, %r13;
+	mov.u32 	%r18, 0;
+	mov.s32 	%r19, %r9;
+$Lt_1_4354:
+ //<loop> Loop body line 106, nesting depth: 1, estimated iterations: unknown
+	.loc	18	107	0
+	ld.global.u32 	%r20, [%r16+0];
+	add.u32 	%r18, %r20, %r18;
+	add.s32 	%r16, %r16, 262144;
+	setp.lt.u32 	%p2, %r16, %r17;
+	@%p2 bra 	$Lt_1_4354;
+	bra.uni 	$Lt_1_3842;
+$Lt_1_6914:
+	mov.u32 	%r18, 0;
+$Lt_1_3842:
+	mov.u32 	%r21, __cuda___cuda_local_var_288006_33_data6168;
+	.loc	18	110	0
+	mul.lo.u32 	%r22, %r1, 4;
+	add.u32 	%r23, %r22, %r21;
+	st.shared.u32 	[%r23+0], %r18;
+	mov.u32 	%r24, 128;
+$Lt_1_5378:
+ //<loop> Loop body line 110, nesting depth: 1, estimated iterations: unknown
+	.loc	18	113	0
+	bar.sync 	0;
+	setp.ge.u32 	%p3, %r1, %r24;
+	@%p3 bra 	$Lt_1_5634;
+ //<loop> Part of loop body line 110, head labeled $Lt_1_5378
+	.loc	18	115	0
+	ld.shared.u32 	%r25, [%r23+0];
+	add.u32 	%r26, %r1, %r24;
+	mul.lo.u32 	%r27, %r26, 4;
+	add.u32 	%r28, %r21, %r27;
+	ld.shared.u32 	%r29, [%r28+0];
+	add.u32 	%r30, %r25, %r29;
+	st.shared.u32 	[%r23+0], %r30;
+$Lt_1_5634:
+ //<loop> Part of loop body line 110, head labeled $Lt_1_5378
+	.loc	18	112	0
+	shr.u32 	%r24, %r24, 1;
+	mov.u32 	%r31, 0;
+	setp.ne.u32 	%p4, %r24, %r31;
+	@%p4 bra 	$Lt_1_5378;
+	mov.u32 	%r32, 0;
+	setp.ne.u32 	%p5, %r1, %r32;
+	@%p5 bra 	$Lt_1_6402;
+	.loc	18	119	0
+	ld.shared.u32 	%r33, [__cuda___cuda_local_var_288006_33_data6168+0];
+	ld.param.u32 	%r34, [__cudaparm__Z23mergeHistogram256KernelPjS_j_d_Histogram];
+	mov.u32 	%r35, %ctaid.x;
+	mul.lo.u32 	%r36, %r35, 4;
+	add.u32 	%r37, %r34, %r36;
+	st.global.u32 	[%r37+0], %r33;
+$Lt_1_6402:
+	.loc	18	120	0
+	exit;
+$LDWend__Z23mergeHistogram256KernelPjS_j:
+	} // _Z23mergeHistogram256KernelPjS_j
+
