@@ -1,0 +1,529 @@
+MODULE $MACHDEF;
+
+/*IDENT = 'X-5'
+/*
+/*			  COPYRIGHT © 1985, 1996 BY
+/*	      DIGITAL EQUIPMENT CORPORATION, MAYNARD, MASS.
+/*
+/* THIS SOFTWARE IS FURNISHED UNDER A LICENSE AND MAY BE USED AND  COPIED
+/* ONLY  IN  ACCORDANCE  WITH  THE  TERMS  OF  SUCH  LICENSE AND WITH THE
+/* INCLUSION OF THE ABOVE COPYRIGHT NOTICE.  THIS SOFTWARE OR  ANY  OTHER
+/* COPIES  THEREOF MAY NOT BE PROVIDED OR OTHERWISE MADE AVAILABLE TO ANY
+/* OTHER PERSON.  NO TITLE TO AND OWNERSHIP OF  THE  SOFTWARE  IS  HEREBY
+/* TRANSFERRED.
+/*
+/* THE INFORMATION IN THIS SOFTWARE IS SUBJECT TO CHANGE  WITHOUT  NOTICE
+/* AND  SHOULD  NOT  BE  CONSTRUED  AS  A COMMITMENT BY DIGITAL EQUIPMENT
+/* CORPORATION.
+/*
+/* DIGITAL ASSUMES NO RESPONSIBILITY FOR THE USE OR  RELIABILITY  OF  ITS
+/* SOFTWARE ON EQUIPMENT WHICH IS NOT SUPPLIED BY DIGITAL.
+/*
+
+/*
+/*
+/* FACILITY:
+/*
+/*   VAX-11 SCAN Runtime Library Support
+/*
+/* ABSTRACT:
+/*
+/*   This require file holds common definitions for the SCAN RTL 
+/*   picture matching machine.  This file is used by both the SCAN RTL 
+/*   and the SCAN compiler for describing the structure of the runtime 
+/*   picture matching machine.
+/*
+/* ENVIRONMENT:
+/*
+/*   VAX-11 user mode.
+/*
+/* AUTHOR: S.R.Greenwood, CREATION DATE: 13-May-83
+/*
+/* MODIFIED BY:
+/*
+/*	   S.R.Greenwood, 13-May-83: VERSION E1.0
+/* 000 -   Original creation of REQUIRE file.
+/*
+/*	   S.R.Greenwood, 13-May-85: VERSION V4.2
+/* 001 -   Changed name of triggering bit in the picture stack
+/*
+/*	   S.R.Greenwood, 12-Aug-85: VERSION V4.3
+/* 002 -   Added macro picture match type PIC_K_MATCH_TSMAC
+/*
+/*	   S.R.Greenwood, 25-Aug-85: VERSION V4.3
+/* 003 -   Added GSB_V_FIXED_STRING and GSB_W_FIXED_STRING_POS
+/*
+/*	   S.R.Greenwood, 1-Oct-85: VERSION V4.4
+/* 004 -   Move PREFIX inside _global_state_block and _picture_stack_frame
+/*	   so that the field set names do not exceed 31 characters
+/*
+/*	   S. Walker, 14-Sep-89: VERSION 5.3+/SCAN V1.2 (004 SCNRTL D)
+/* 005 -   Added 25 frames to gsk_k_picture_stack_size, to account for
+/*	   an extra frame being pushed on (temporarily, until after macro
+/*	   invocation) for each trigger macro.  This should be generous.
+/*
+
+/*
+/*   Description of the global state block.
+/*   The global state block describes the state of SCAN picture processing.
+/*   It contains descriptions of:
+/*	input and output streams
+/*	tokens
+/*	macros
+/*	storage used by the picture matching process (stacks and heap)
+/*
+
+AGGREGATE
+    _global_state_block STRUCTURE;
+      gsb STRUCTURE prefix "gsb_";            	/* To avoid long fieldset names
+	"tag" BYTE UNSIGNED;			/* Identifying tag
+	level BYTE UNSIGNED;			/* Level of processor that created block
+	max_token WORD UNSIGNED;		/* Max token number
+	$code ADDRESS;				/* Address of the base of $CODE psect
+	$token ADDRESS;				/* Address of the base of $TOKEN psect
+	$macro ADDRESS;				/* Address of the base of $MACRO psect
+	init_token_instr WORD UNSIGNED;		/* Offset of initial token instruction in token table
+	max_lookahead_token WORD UNSIGNED;	/* Max lookahead token number
+	input_spec STRUCTURE;			/* Specification for the input stream
+	    input_type BYTE UNSIGNED;		/* Source of input (file, string, routine, etc.)
+	    input_status BYTE UNSIGNED;		/* Status of input stream
+	    input_buffer_size WORD UNSIGNED;	/* Size of the input buffer
+	    input_designator UNION;
+		input_file_name ADDRESS;	/* Address of input file name descriptor 
+	        input_string ADDRESS;     	/* Address of descriptor for input string
+	    	input_routine ADDRESS;		/* Input routine address
+		END;
+	    input_buffer ADDRESS;		/* Address of the input buffer
+	    input_rab ADDRESS;			/* Address of rab for input file
+	    first_primary_desc ADDRESS;		/* Address of the first primary input stream descriptor
+	    last_primary_desc ADDRESS;		/* Address of the last primary input stream descriptor
+	    answer_desc ADDRESS;		/* Address of the first answer input stream descriptor
+	    END;
+	output_spec STRUCTURE;			/* Specification for the output stream
+	    output_type BYTE UNSIGNED;		/* Source of output (file, string, routine, etc.)
+	    output_status BYTE UNSIGNED;	/* Status of output stream
+	    output_buffer_size WORD UNSIGNED;	/* Size of the output buffer
+	    output_designator UNION;
+		output_file_name ADDRESS;	/* Address of output file name descriptor 
+	        output_string ADDRESS;    	/* Address of descriptor for output string
+	    	output_routine ADDRESS;		/* Output routine address
+		END;
+	    output_buffer ADDRESS;		/* Address of the output buffer
+	    output_longword UNION;
+	        output_rab ADDRESS;		/* Address of rab for output file
+		fixed_string_info STRUCTURE;	
+		    fixed_string_pos WORD;	/* End of data for fixed string output
+		    fixed_string BITFIELD;	/* Is output string a fixed string
+	            END;
+		END;
+	    output_pos WORD UNSIGNED;		/* Current length of text in the output buffer
+	    token_pos WORD UNSIGNED;		/* Position in the token buffer
+	    END;
+	token_block ADDRESS;			/* Address of the token block
+	picture_stack_base ADDRESS;		/* Address of the picture stack base
+	picture_stack_top ADDRESS;		/* Top of the picture stack
+	picture_stack_limit UNION;
+	    picture_stack_size LONGWORD;	/* Size of the picture stack
+	    picture_stack_extent ADDRESS;	/* Extent of the picture stack
+	    END;
+	data_stack_base ADDRESS;		/* Address of the data stack base
+	data_stack_size WORD UNSIGNED;		/* Size of the data stack
+	spare1 WORD UNSIGNED;
+	sos BYTE UNSIGNED;			/* The sos character
+	eos BYTE UNSIGNED;			/* The eos character
+	eol BYTE UNSIGNED;			/* The eol character
+	eos_count BYTE UNSIGNED;		/* Number of consecutive eos chars;
+        char_table ADDRESS;			/* The address of the char table
+	trigger_table ADDRESS;			/* Base of the trigger table
+	lookahead_vector ADDRESS;		/* Base of the lookahead vector
+	character_count LONGWORD;		/* Number of characters read
+	record_count LONGWORD;			/* Number of record read
+	start_answer_desc ADDRESS;		/* Start of text answered by macro
+	end_answer_desc ADDRESS;		/* End of text answered by macro
+	#gsb_size = .;
+ 	END;
+      END;
+	
+CONSTANT gsb_k_tag EQUALS 1;			/* GSB tag
+CONSTANT gsb_k_level EQUALS 1;			/* Current gsb level
+CONSTANT gsb_k_size EQUALS #gsb_size;		/* Size of global state table in bytes
+
+/*
+/*   Description of a token state block.
+/*   A token state block describes a position in the input stream.
+/*   It is the primary vehicle for describing to the token generator
+/*   where to start building the next token.
+/*
+
+
+AGGREGATE
+    _token_state_block STRUCTURE PREFIX "tsb_";
+
+	"tag" BYTE UNSIGNED;			/* Identifying tag
+	flags STRUCTURE;			/* Misc bits
+	    triggering_enabled BITFIELD MASK;	/* Is triggering enabled?
+	    END;
+	text_len WORD UNSIGNED;			/* Size of the token generated in bytes
+	input_point STRUCTURE;
+	    input_desc ADDRESS;			/* Address of the input stream desc
+	    input_pos WORD UNSIGNED;		/* Position in the input stream
+	    text_pos WORD UNSIGNED;		/* Next avail char in data stack
+	    END;
+	macro_stack ADDRESS;			/* Current macro stack
+	#tsb_size = .;
+	END;
+	
+CONSTANT tsb_k_tag EQUALS 2;			/* TSB tag                 
+CONSTANT tsb_k_size EQUALS #tsb_size;		/* Size of token state block in bytes
+
+/*
+/*   Size of the various runtime stacks
+/*
+
+CONSTANT gsb_k_picture_stack_size EQUALS 125;	/* Frames in the picture stack
+CONSTANT gsb_k_data_stack_size EQUALS 2048;	/* Bytes in the data stack
+
+/*
+/*   Stream types
+/*
+
+CONSTANT scn_k_stream_type_min	EQUALS 0;
+CONSTANT scn_k_stream_file	EQUALS 0;
+CONSTANT scn_k_stream_string	EQUALS 1;
+CONSTANT scn_k_stream_routine	EQUALS 2;
+CONSTANT scn_k_stream_type_max	EQUALS 2;
+
+/*
+/*   Stream status
+/*
+
+CONSTANT scn_k_stream_closed	EQUALS 0;
+CONSTANT scn_k_stream_open	EQUALS 1;
+
+/*
+/*   Format of input stream descriptor.
+/*   An input stream descriptor describes a segment of the input stream.
+/*
+
+AGGREGATE
+    _input_stream_desc STRUCTURE PREFIX "isd_";
+	"tag" BYTE UNSIGNED;			/* Identifying tag
+	flags STRUCTURE;			/* Input stream flags
+	    trigger BITFIELD MASK;		/* This text can cause triggering
+	    segment BITFIELD MASK;		/* This is a segment of another descriptor
+	    primary BITFIELD MASK;		/* This text is primary input text
+	    END;
+	"length" WORD UNSIGNED;			/* Length of the text in bytes
+	text ADDRESS;				/* Address of the text
+	next_desc ADDRESS;			/* Address of the next descriptor
+        union1 UNION;
+	    answer_chain ADDRESS;		/* If primary NOT set - links descriptors
+	    line_number LONGWORD;		/* If primary set, line number of the line
+	    END;
+	#isd_size = .;
+	base_desc ADDRESS;			/* If segment - base desc for segment
+	#isd_segment_size = .;
+	END;
+
+CONSTANT isd_k_tag EQUALS 3;			/* ISD tag
+CONSTANT isd_k_size EQUALS #isd_size;		/* Size of a standard input stream descriptor in bytes
+CONSTANT isd_k_segment_size EQUALS #isd_segment_size;
+						/* Size of a segment input stream descriptor in bytes
+CONSTANT isd_k_max_input_len EQUALS 65535 - #isd_size;
+    						/* Max size of input stream descriptor text
+/*
+/*   Masks used on the char table.
+/*   The char table is created by the compiler for doing SCANC instructions.
+/*   Its address is in the GSB.
+/*
+
+CONSTANT scn_m_start_token EQUALS 1;		/* Chars that can start a token
+CONSTANT scn_m_special_char EQUALS 2;		/* s'eol', s'eos', s'sos'
+
+
+/*
+/*   Format of SCAN token instructions.
+/*   Token patterns are described using several primitive instructions.
+/*   These instructions describe a deterministic finite automaton.
+/*
+
+/*
+/*   Define the contents of a token instruction
+/*
+
+/*   Types of token instructions
+
+CONSTANT    red_k_type_min 		EQUALS 1;
+CONSTANT    red_k_char			EQUALS 1;	/* Match a character
+CONSTANT    red_k_set			EQUALS 2;	/* Match a set
+CONSTANT    red_k_fail			EQUALS 3;	/* No token can be built 
+CONSTANT    red_k_lookahead		EQUALS 4;	/* Start lookahead for token
+							/* Ignore has low bit set
+CONSTANT    red_k_final			EQUALS 5;	/* Final state for token
+CONSTANT    red_k_ignore		EQUALS 6;	/* Final state for ignore token
+CONSTANT    red_k_finallook		EQUALS 7;	/* Final state for lookahead token
+CONSTANT    red_k_ignorelook		EQUALS 8;	/* Final state for ignore lookahead token
+CONSTANT    red_k_type_max		EQUALS 8;
+
+AGGREGATE
+    _token_instr STRUCTURE PREFIX "tok_";
+	first_word UNION;
+	    instr_type BITFIELD LENGTH 4;	/* Type of token instruction
+	    char_instr STRUCTURE;
+   	        fill1 BITFIELD LENGTH 4;
+   	    	char BYTE UNSIGNED;		/* Match character for char instruction
+	    	END;
+	    token_instr STRUCTURE;
+   	        fill2 BITFIELD LENGTH 4;
+	    	token BITFIELD LENGTH 12;	/* Token found for final and lookahead instruction
+	    	END;
+	    END;
+	#base_size = .;
+   	next_instr WORD UNSIGNED;		/* Next instruction on successful match
+	#char_size = .;
+   	set WORD UNSIGNED;			/* Match set for set instruction
+	#set_size = .;
+	END;
+
+/*   Size of token instructions in bytes
+
+CONSTANT    red_k_char_size		EQUALS #char_size;
+CONSTANT    red_k_set_size		EQUALS #set_size;
+CONSTANT    red_k_final_size		EQUALS #base_size;
+CONSTANT    red_k_fail_size		EQUALS #base_size;
+CONSTANT    red_k_lookahead_size	EQUALS #base_size;
+CONSTANT    red_k_finallook_size	EQUALS #base_size;
+
+/*
+/*   2 special tokens for the universal token and an ignored token
+/*
+    
+CONSTANT    tok_k_universal_token	EQUALS -2;	/* The universal token
+CONSTANT    tok_k_ignore_token		EQUALS -1;	/* Ignored token
+
+    
+
+
+/*
+/*   Format of SCAN picture instructions.
+/*   A macro picture consists of a sequence of primitive picture instructions.
+/*   These instructions describe a push-down deterministic finite automaton.
+/*
+
+/*
+/*   Define the contents of a picture instruction
+/*
+
+CONSTANT    pic_k_min_instr 		EQUALS 1;
+CONSTANT    pic_k_match_instr		EQUALS 1;	/* Match a token, group or macro
+CONSTANT    pic_k_push_instr		EQUALS 2;	/* Push a new frame on picture stack
+CONSTANT    pic_k_push_rep_instr	EQUALS 3;	/* Push a new frame on picture stack (repeated context)
+CONSTANT    pic_k_update_instr		EQUALS 4;	/* Update repeat count and branch
+CONSTANT    pic_k_succeed_instr		EQUALS 5;	/* Picture successfully matched
+CONSTANT    pic_k_fail_instr		EQUALS 6;	/* Picture failed to match
+CONSTANT    pic_k_max_instr		EQUALS 6;
+
+CONSTANT    pic_k_match_error		EQUALS 0;	/* Picture operand was in error - will not occur at runtime
+CONSTANT    pic_k_match_min_type	EQUALS 1;
+CONSTANT    pic_k_match_token		EQUALS 1;	/* Match a token
+CONSTANT    pic_k_match_group		EQUALS 2;	/* Match a group
+CONSTANT    pic_k_match_macro		EQUALS 3;	/* Match a macro
+CONSTANT    pic_k_match_builtin		EQUALS 4;	/* Match a builtin
+CONSTANT    pic_k_match_tsmac		EQUALS 5;	/* Syntax macro in trigger
+CONSTANT    pic_k_match_unknown		EQUALS 6;	/* Used for forward refs -- will not occur at runtime
+CONSTANT    pic_k_match_max_type	EQUALS 6;
+    
+AGGREGATE
+    _macro_instr STRUCTURE PREFIX "mac_";
+	instr_type BYTE UNSIGNED;		/* Type of picture instruction
+	union1 UNION;
+   	    match_type BYTE UNSIGNED;		/* Type of object to match - match only
+	    count BYTE UNSIGNED;		/* Count of variables in the prune list - pushes only
+	    END;
+	#base_size = .;
+	union2 UNION;
+   	    next_instr WORD UNSIGNED;		/* Next instruction - update only
+   	    success_branch WORD UNSIGNED;	/* Success branch - match and pushes only
+	    END;
+	#update_size = .;
+	union3 UNION;
+   	    failure_branch WORD UNSIGNED;	/* Failure branch - match and pushes only
+   	    error_context WORD UNSIGNED;	/* Offset of error context - match and pushes only
+	    END;
+	var_info STRUCTURE;			/* Match and pushes only
+	    "optional" BITFIELD MASK;		/* Is the instruction optional
+	    text_variable BITFIELD MASK; 	/* Set if text variable is present
+	    line_variable BITFIELD MASK;	/* Set if line variable is present
+	    column_variable BITFIELD MASK;	/* Set if column variable is present
+	    error_context BITFIELD MASK;	/* Set if a error context exists
+	    error_procedure BITFIELD MASK;	/* Set if a error procedure exists
+	    error_enable BITFIELD MASK;		/* Set if error context includes macro refs
+	    trigger_macro_push BITFIELD MASK;	/* Set if push for activating a trigger macro
+	    END;
+	level BYTE UNSIGNED;			/* Repetition level of instruction
+	union4 UNION;
+	    push_info STRUCTURE;		/* Pushes only
+	        prune_list WORD UNSIGNED;	/* Offset of the prune list in $CODE
+		first_instr WORD UNSIGNED;	/* Offset of the first instruction
+		END;
+	    match_item LONGWORD;		/* Match only
+						/* Object to be matched by a match instruction.
+						/* For token it is the internal token number.
+						/* For group it is the offset of the group in $CODE psect.
+						/* For macro it is the offset of the entry mask for the macro.
+						/* For builtin it is the offset of a procedure in $CODE.
+	    END;
+	#push_size = .;
+	#match_size = .;
+	variables STRUCTURE;			/* Base address of the picture variables
+	    var1 WORD UNSIGNED;			/* First variable
+	    var2 WORD UNSIGNED;			/* Second variable
+	    var3 WORD UNSIGNED;			/* Third variable
+	    END;
+	END;
+
+/*
+/*    Runtime sizes of instructions in bytes.
+/*    These are the minumum sizes.  Match and push instructions may be longer
+/*    if they contain picture variables.
+/*
+
+CONSTANT    pic_k_min_match_size	EQUALS #match_size;
+CONSTANT    pic_k_min_push_size		EQUALS #push_size;
+CONSTANT    pic_k_min_push_rep_size	EQUALS #push_size;
+CONSTANT    pic_k_min_update_size	EQUALS #update_size;
+CONSTANT    pic_k_min_error_size	EQUALS 0;
+CONSTANT    pic_k_min_succeed_size	EQUALS #base_size;
+CONSTANT    pic_k_min_fail_size		EQUALS #base_size;
+CONSTANT    pic_k_offset_limit		EQUALS 65535;
+
+/*
+/*   Format of a frame in the picture stack
+/*   Macro pictures use a push-down stack - this is one frame in the stack.
+/*
+
+AGGREGATE
+    _picture_stack_frame STRUCTURE;
+      psf STRUCTURE PREFIX "psf_";      /* To avoid long fieldset names
+	input_point STRUCTURE;
+	    input_desc ADDRESS;		/* Address of the input stream desc
+	    input_pos WORD UNSIGNED;	/* Position in the input stream
+	    text_pos WORD UNSIGNED;	/* Next avail char in data stack
+	    END;
+	instr ADDRESS;			/* Address of instr that pushed frame
+	count WORD UNSIGNED;		/* Number of repetitions
+	flags STRUCTURE;
+	    save_text BITFIELD MASK;	/* Save token text
+	    repeat BITFIELD MASK;	/* This is a repeat frame
+	    triggering_enabled BITFIELD MASK;
+					/* This frame starts with triggering enabled
+	    error_context BITFIELD MASK;/* This frame has an error context
+	    END;
+	spare1 BYTE;
+	start_input_point STRUCTURE;
+	    start_input_desc ADDRESS;	/* Input desc at push time
+	    start_input_pos WORD UNSIGNED;
+					/* Position in input stream at push time
+	    start_text_pos WORD UNSIGNED;
+	    END;			/* Next avail char at push time
+	#frame_size = .;
+	END;
+      END;
+
+CONSTANT    psf_k_frame_size	EQUALS #frame_size;
+
+
+
+/*
+/*   Format of SCAN prune lists
+/*   Each macro push instruction contains a list of picture variables
+/*   that need to be removed if the push instruction fails.
+/*   This list is called a prune list.
+/*
+
+/*
+/*   Define the contents of a prune list item
+/*
+
+AGGREGATE
+    _prune_item STRUCTURE PREFIX "pru_";
+	var_offset WORD UNSIGNED;		/* Offset of the variable in the stack
+   	max_level BYTE UNSIGNED;		/* Max depth of the tree - 0 for scalars
+	dtype BYTE UNSIGNED;			/* Datatype of variable
+	#prune_size = .;
+	END;
+
+CONSTANT    pru_k_item_size		EQUALS #prune_size;
+	
+
+
+/*
+/*   Format of SCAN macro stack
+/*   A macro stack is a data structure created by the SCAN compiler that
+/*   describes various attributes of a macro such as whether it has the
+/*   EXPOSE or TRIGGER attribute and the macros that can be triggered 
+/*   when it is active.
+/*
+
+/*
+/*   Define the contents of a macro stack
+/*
+
+AGGREGATE
+    _macro_stack STRUCTURE PREFIX "mbs_";
+	first_instr WORD UNSIGNED;		/* Offset of the first picture instruction in $MACRO psect
+   	max_level BYTE;				/* Depth of the block stack
+	flags STRUCTURE;
+	    expose BITFIELD MASK;		/* EXPOSE attribute
+	    trigger BITFIELD MASK;		/* TRIGGER attribute
+	    picture_variables BITFIELD MASK;	/* Macro has picture variables
+	    error_context BITFIELD MASK;	/* Macro contains error contexts
+	    END;
+	macro_address ADDRESS;			/* Address of macro
+	#mac_stack_size = .;
+	block_stack WORD UNSIGNED;		/* Base of the nodes of the block stack
+	END;
+
+CONSTANT mbs_k_min_macro_stack_size EQUALS #mac_stack_size;
+    
+
+/*
+/*   Format of a SCAN trigger table and trigger packets
+/*   Triggering is accomplished using a table that has one slot per token.
+/*   This is the trigger table.  Linked from this table are lists of trigger
+/*   packets that specify the tokens that can be triggered by that token.
+/*
+
+/*
+/*   Define the contents of a trigger table
+/*
+
+AGGREGATE
+    _trigger_table STRUCTURE DIMENSION 0:0 PREFIX "trt_";
+	trigger_info STRUCTURE;
+	    first_packet WORD UNSIGNED;	/* Offset in $CODE psect of first packet
+     	    packet_count WORD UNSIGNED;	/* Number of packets
+	    END;
+	name_length  WORD UNSIGNED;	/* Number of characters in token name
+	name_offset  WORD UNSIGNED;	/* Offset of characters in token name
+	#table_item_size = .;
+	END;
+
+CONSTANT    trt_k_trigger_table_item_size	EQUALS #table_item_size;
+
+/*
+/*   Define the contents of a trigger packet
+/*
+
+AGGREGATE
+    _trigger_packet STRUCTURE PREFIX "tpk_";
+	block WORD UNSIGNED;		/* Node associated with the trigger macro
+   	level BYTE UNSIGNED;		/* Nesting depth of the trigger macro
+	spare0 BYTE UNSIGNED;
+	macro ADDRESS;			/* Offset of the macro entry mask in $MACRO
+	#packet_size = .;
+	END;
+
+CONSTANT    tpk_k_trigger_packet_size		EQUALS #packet_size;
+
+END_MODULE;

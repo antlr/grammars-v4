@@ -647,6 +647,31 @@ GO
 SELECT NEXT VALUE FOR [dbo].[sequenceName]
 GO
 
+-- NEXT VALUE FOR OVER into variable
+DECLARE @T BIGINT;
+
+SELECT @T = NEXT VALUE FOR dbo.sequenceName OVER (ORDER BY SOME_COLUMN ASC)
+FROM (SELECT SOME_COLUMN = 1) AS T
+
+GO
+
+-- NEXT VALUE FOR OVER into variable
+DECLARE @T BIGINT;
+
+SELECT @T = NEXT VALUE FOR dbo.sequenceName OVER (ORDER BY SOME_COLUMN, SOME_OTHER_COLUMN DESC)
+FROM (SELECT SOME_COLUMN = 1) AS T
+
+GO
+
+-- NEXT VALUE FOR OVER without variable
+SELECT NEXT VALUE FOR dbo.sequenceName OVER (ORDER BY SOME_COLUMN ASC)
+FROM (SELECT SOME_COLUMN = 1) AS T
+GO
+
+SELECT NEXT VALUE FOR dbo.sequenceName OVER (ORDER BY SOME_COLUMN, SOME_OTHER_COLUMN DESC)
+FROM (SELECT SOME_COLUMN = 1) AS T
+GO
+
 --Select with linked server
 SELECT * FROM [linkedServerName]..[schema].[table] tbl
 GO
@@ -761,4 +786,23 @@ FROM   OPENXML (@idoc, '/ROOT/Customer/Order/OrderDetail',2)
                CustomerID  varchar(10) '../@CustomerID',   
                OrderDate   datetime    '../@OrderDate',   
                ProdID      int         '@ProductID',   
-               Qty         int         '@Quantity');  
+               Qty         int         '@Quantity');
+
+
+select distinct t.a_field_1 f1, t.a_field_2 f2 from a_table t
+where f2 = ""
+
+select distinct t.a_field_1 f1 from a_table t noholdlock
+where t.a_field_2 = t.a_field_3
+
+select t.a_field_1 f1 from a_table t, another_table t2
+where t.a_field_2 *= t2.field_we_do_a_left_outer_join_on
+
+select distinct t.a_field_1 f1 from a_table t
+where t.a_field_2 <= current_date()
+
+with
+	t as (select 1 as x),
+	u as (select 1 as y),
+	v as (select 1 as z)
+select x from t join u join v on u.y = v.z on t.x = v.z

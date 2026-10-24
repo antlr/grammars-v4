@@ -32,147 +32,141 @@
  *	-- use imported standard fragments
  */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar STParser;
 
 options {
-	language=Java;
-	tokenVocab=STLexer;
+    language = Java;
+    tokenVocab = STLexer;
 }
 
 template_
-	: elements EOF
-	;
+    : elements EOF
+    ;
 
 elements
-	: element*
-	;
+    : element*
+    ;
 
 element
-	: singleElement
-	| compoundElement
-	;
+    : singleElement
+    | compoundElement
+    ;
 
 singleElement
-	: exprTag
-	| TEXT+
-	;
+    : exprTag
+    | TEXT+
+    ;
 
 compoundElement
-	: ifstat
-	| region
-	;
+    : ifstat
+    | region
+    ;
 
 exprTag
-	: LDELIM mapExpr ( SEMI exprOptions )? RDELIM
-	;
+    : LDELIM mapExpr (SEMI exprOptions)? RDELIM
+    ;
 
 region
-	: LDELIM AT ID RDELIM
-	  elements
-	  LDELIM END RDELIM
-	;
+    : LDELIM AT ID RDELIM elements LDELIM END RDELIM
+    ;
 
 subtemplate
-	: LBRACE ( ID ( COMMA  ID )* PIPE )? elements RBRACE
-	;
+    : LBRACE (ID ( COMMA ID)* PIPE)? elements RBRACE
+    ;
 
 ifstat
-	: LDELIM IF LPAREN conditional RPAREN RDELIM
-	  elements
-	  ( LDELIM ELSEIF LPAREN conditional RPAREN RDELIM elements )*
-	  ( LDELIM ELSE RDELIM elements )?
-	  LDELIM ENDIF RDELIM
-	;
+    : LDELIM IF LPAREN conditional RPAREN RDELIM elements (
+        LDELIM ELSEIF LPAREN conditional RPAREN RDELIM elements
+    )* (LDELIM ELSE RDELIM elements)? LDELIM ENDIF RDELIM
+    ;
 
 conditional
-	: andConditional ( OR andConditional )*
-	;
+    : andConditional (OR andConditional)*
+    ;
 
 andConditional
-	: notConditional ( AND notConditional )*
-	;
+    : notConditional (AND notConditional)*
+    ;
 
 notConditional
-	: BANG notConditional
-	| memberExpr
-	;
+    : BANG notConditional
+    | memberExpr
+    ;
 
 notConditionalExpr
-	: ID	( DOT  ID
-			| DOT LPAREN mapExpr RPAREN
-			)*
-	;
+    : ID (DOT ID | DOT LPAREN mapExpr RPAREN)*
+    ;
 
 exprOptions
-	: option ( COMMA option )*
-	;
+    : option (COMMA option)*
+    ;
 
 option
-	: ID ( EQUALS expr )?
-	;
+    : ID (EQUALS expr)?
+    ;
 
 expr
-	: memberExpr ( COLON mapTemplateRef )?
-	;
+    : memberExpr (COLON mapTemplateRef)?
+    ;
 
 // more complicated than necessary to avoid backtracking,
 // which ruins error handling
 mapExpr
-	: memberExpr ( ( COMMA memberExpr )+  COLON mapTemplateRef )?
-	  ( COLON  mapTemplateRef ( COMMA mapTemplateRef )*  )*
-	;
+    : memberExpr (( COMMA memberExpr)+ COLON mapTemplateRef)? (
+        COLON mapTemplateRef ( COMMA mapTemplateRef)*
+    )*
+    ;
 
 memberExpr
-	: includeExpr
-		( DOT ID
-		| DOT LPAREN mapExpr RPAREN
-		)*
-	;
+    : includeExpr (DOT ID | DOT LPAREN mapExpr RPAREN)*
+    ;
 
 // expr:template(args) apply template to expr
 // expr:{arg | ...} apply subtemplate to expr
 // expr:(e)(args) convert e to a string template name and apply to expr
 mapTemplateRef
-	: ID LPAREN args? RPAREN
-	| subtemplate
-	| LPAREN mapExpr RPAREN LPAREN argExprList? RPAREN
-	;
+    : ID LPAREN args? RPAREN
+    | subtemplate
+    | LPAREN mapExpr RPAREN LPAREN argExprList? RPAREN
+    ;
 
 includeExpr
-	: ID LPAREN mapExpr? RPAREN
-	| SUPER DOT ID LPAREN args? RPAREN
-	| ID LPAREN args? RPAREN
-	| AT SUPER DOT ID LPAREN  RPAREN
-	| AT ID LPAREN  RPAREN
-	| primary
-	;
+    : ID LPAREN mapExpr? RPAREN
+    | SUPER DOT ID LPAREN args? RPAREN
+    | ID LPAREN args? RPAREN
+    | AT SUPER DOT ID LPAREN RPAREN
+    | AT ID LPAREN RPAREN
+    | primary
+    ;
 
 primary
-	: ID
-	| STRING
-	| TRUE
-	| FALSE
-	| subtemplate
-	| list_
-	| LPAREN conditional RPAREN
-	| LPAREN mapExpr RPAREN ( LPAREN argExprList? RPAREN )?
-	;
+    : ID
+    | STRING
+    | TRUE
+    | FALSE
+    | subtemplate
+    | list_
+    | LPAREN conditional RPAREN
+    | LPAREN mapExpr RPAREN ( LPAREN argExprList? RPAREN)?
+    ;
 
 list_
-	: LBRACK argExprList? RBRACK
-	;
+    : LBRACK argExprList? RBRACK
+    ;
 
 args
-	: argExprList
-	| namedArg ( COMMA namedArg )* ( COMMA ELLIPSIS )?
-	| ELLIPSIS
-	;
+    : argExprList
+    | namedArg ( COMMA namedArg)* ( COMMA ELLIPSIS)?
+    | ELLIPSIS
+    ;
 
 argExprList
-	: expr ( COMMA expr )*
-	;
+    : expr (COMMA expr)*
+    ;
 
 namedArg
-	: ID EQUALS expr
-	;
-
+    : ID EQUALS expr
+    ;

@@ -1,0 +1,3 @@
+SetFlag : {
+   assignment : done = true ;
+}

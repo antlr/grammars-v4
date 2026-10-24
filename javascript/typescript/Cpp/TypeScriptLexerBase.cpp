@@ -1,5 +1,5 @@
 #include "TypeScriptLexerBase.h"
-
+#include "TypeScriptLexer.h"
 using namespace antlr4;
 
 TypeScriptLexerBase::TypeScriptLexerBase(CharStream *input) : Lexer(input)
@@ -38,12 +38,15 @@ std::unique_ptr<antlr4::Token> TypeScriptLexerBase::nextToken()
 
 void TypeScriptLexerBase::ProcessOpenBrace()
 {
+    bracesDepth++;
     useStrictCurrent = scopeStrictModes.size() > 0 && scopeStrictModes.top() ? true : useStrictDefault;
     scopeStrictModes.push(useStrictCurrent);
 }
 
 void TypeScriptLexerBase::ProcessCloseBrace()
 {
+    bracesDepth--;
+
     if (scopeStrictModes.size() > 0)
     {
         useStrictCurrent = scopeStrictModes.top();
@@ -101,7 +104,9 @@ bool TypeScriptLexerBase::IsRegexPossible()
     }
 }
 
-bool TypeScriptLexerBase::IsInTemplateString() { return templateDepth > 0; }
+void TypeScriptLexerBase::StartTemplateString() { bracesDepth = 0; }
+
+bool TypeScriptLexerBase::IsInTemplateString() { return templateDepth > 0 && bracesDepth == 0; }
 
 void TypeScriptLexerBase::IncreaseTemplateDepth() { ++templateDepth; }
 

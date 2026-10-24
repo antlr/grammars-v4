@@ -1,7 +1,7 @@
-
 import org.antlr.v4.runtime.*;
 
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 /**
  * All lexer methods that used in grammar (IsStrictMode)
@@ -13,7 +13,7 @@ public abstract class JavaScriptLexerBase extends Lexer
      * Stores values of nested modes. By default mode is strict or
      * defined externally (useStrictDefault)
      */
-    private Stack<Boolean> scopeStrictModes = new Stack<Boolean>();
+    private final Deque<Boolean> scopeStrictModes = new ArrayDeque<>();
 
     private Token lastToken = null;
     /**
@@ -146,6 +146,34 @@ public abstract class JavaScriptLexerBase extends Lexer
             default:
                 // In all other cases, a regex literal _is_ possible.
                 return true;
+        }
+    }
+
+    /**
+     * Returns {@code true} if the lexer can match a JSX opening element.
+     */
+    protected boolean IsJsxPossible() {
+        
+        if (this.lastToken == null) {
+            return false;
+        }
+        
+        switch (this.lastToken.getType()) {
+            case JavaScriptLexer.Assign:
+            case JavaScriptLexer.Colon:
+            case JavaScriptLexer.Comma:                
+            case JavaScriptLexer.Default:                
+            case JavaScriptLexer.QuestionMark:                
+            case JavaScriptLexer.Return:
+            case JavaScriptLexer.OpenBrace:
+            case JavaScriptLexer.OpenParen:
+            case JavaScriptLexer.JsxOpeningElementOpenBrace:
+            case JavaScriptLexer.JsxChildrenOpenBrace:
+            case JavaScriptLexer.Yield:
+            case JavaScriptLexer.ARROW:
+                return true;
+            default:
+                return false;
         }
     }
 }

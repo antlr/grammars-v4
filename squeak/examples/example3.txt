@@ -1,0 +1,5 @@
+proc counter(n) =
+    < increment?m . counter(n+m)
+    :: tellContents!n . counter(n) >
+
+main = counter(0)
