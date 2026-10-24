@@ -1,4 +1,3 @@
-
 /*
  * The Apache Software License, Version 1.1
  *
@@ -58,266 +57,226 @@
 //----------------------------------------------------------------------------
 // The JRCS parser
 //----------------------------------------------------------------------------
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar RCS;
 
 rcstext
-   : admin deltalist desc deltatextlist EOF
-   ;
+    : admin deltalist desc deltatextlist EOF
+    ;
 
 rcsheader
-   : admin
-   ;
+    : admin
+    ;
 
 rcsrevisions
-   : admin deltalist
-   ;
+    : admin deltalist
+    ;
 
 admin
-   : head ( branch )? access symbols ( locks )? ( strict )? ( comment )? ( expand )? ( newphrase )*
-   ;
+    : head (branch)? access symbols (locks)? (strict)? (comment)? (expand)? (newphrase)*
+    ;
 
 head
-   : LITERAL_HEAD REVISION SEMI
-   ;
+    : LITERAL_HEAD REVISION SEMI
+    ;
 
 branch
-   : LITERAL_BRANCH BRANCH SEMI
-   ;
+    : LITERAL_BRANCH REVISION SEMI
+    ;
 
 access
-   : LITERAL_ACCESS ( IDENT )* SEMI
-   ;
+    : LITERAL_ACCESS (IDENT)* SEMI
+    ;
 
 symbols
-   : LITERAL_SYMBOLS ( tags )* SEMI
-   ;
+    : LITERAL_SYMBOLS (tags)* SEMI
+    ;
 
 tags
-   : IDENT COLON REVISION
-   ;
+    : IDENT COLON REVISION
+    ;
 
 locks
-   : LITERAL_LOCKS ( IDENT )* SEMI
-   ;
+    : LITERAL_LOCKS (IDENT)* SEMI
+    ;
 
 strict
-   : LITERAL_STRICT SEMI
-   ;
+    : LITERAL_STRICT SEMI
+    ;
 
 comment
-   : LITERAL_COMMENT ( STRING )? SEMI
-   ;
+    : LITERAL_COMMENT (STRING)? SEMI
+    ;
 
 expand
-   : LITERAL_EXPAND ( STRING )? SEMI
-   ;
+    : LITERAL_EXPAND (STRING)? SEMI
+    ;
 
 deltalist
-   : ( delta )*
-   ;
+    : (delta)*
+    ;
 
 delta
-   : REVISION delta_date delta_author delta_state delta_branches delta_next ( newphrase )*
-   ;
+    : REVISION delta_date delta_author delta_state delta_branches delta_next (newphrase)*
+    ;
 
 delta_date
-   : LITERAL_DATE REVISION SEMI
-   ;
+    : LITERAL_DATE REVISION SEMI
+    ;
 
 delta_author
-   : LITERAL_AUTHOR IDENT SEMI
-   ;
+    : LITERAL_AUTHOR IDENT SEMI
+    ;
 
 delta_state
-   : LITERAL_STATE IDENT SEMI
-   ;
+    : LITERAL_STATE IDENT SEMI
+    ;
 
 delta_branches
-   : LITERAL_BRANCHES ( REVISION )* SEMI
-   ;
+    : LITERAL_BRANCHES (REVISION)* SEMI
+    ;
 
 delta_next
-   : LITERAL_NEXT ( REVISION )? SEMI
-   ;
+    : LITERAL_NEXT (REVISION)? SEMI
+    ;
 
 desc
-   : LITERAL_DESC STRING
-   ;
+    : LITERAL_DESC STRING
+    ;
 
 deltatextlist
-   : ( deltatext )*
-   ;
+    : (deltatext)*
+    ;
 
 deltatext
-   : REVISION deltatext_log ( newphrase )* deltatext_text
-   ;
+    : REVISION deltatext_log (newphrase)* deltatext_text
+    ;
 
 deltatext_log
-   : LITERAL_LOG STRING
-   ;
+    : LITERAL_LOG STRING
+    ;
 
 deltatext_text
-   : LITERAL_TEXT STRING
-   ;
+    : LITERAL_TEXT STRING
+    ;
 
 newphrase
-   : ( IDENT )+ SEMI
-   ;
-
+    : (IDENT)+ SEMI
+    ;
 
 COMMA
-   : 'COMMA'
-   ;
-
-
-BRANCH
-   : 'BRANCH'
-   ;
-
+    : 'COMMA'
+    ;
 
 LOGS
-   : 'LOGS'
-   ;
-
+    : 'LOGS'
+    ;
 
 ADMIN
-   : 'ADMIN'
-   ;
-
+    : 'ADMIN'
+    ;
 
 DELTAS
-   : 'DELTAS'
-   ;
-
+    : 'DELTAS'
+    ;
 
 LITERAL_HEAD
-   : 'head'
-   ;
-
+    : 'head'
+    ;
 
 LITERAL_BRANCH
-   : 'branch'
-   ;
-
+    : 'branch'
+    ;
 
 LITERAL_ACCESS
-   : 'access'
-   ;
-
+    : 'access'
+    ;
 
 LITERAL_SYMBOLS
-   : 'symbols'
-   ;
-
+    : 'symbols'
+    ;
 
 LITERAL_LOCKS
-   : 'locks'
-   ;
-
+    : 'locks'
+    ;
 
 LITERAL_STRICT
-   : 'strict'
-   ;
-
+    : 'strict'
+    ;
 
 LITERAL_COMMENT
-   : 'comment'
-   ;
-
+    : 'comment'
+    ;
 
 LITERAL_EXPAND
-   : 'expand'
-   ;
-
+    : 'expand'
+    ;
 
 LITERAL_DATE
-   : 'date'
-   ;
-
+    : 'date'
+    ;
 
 LITERAL_AUTHOR
-   : 'author'
-   ;
-
+    : 'author'
+    ;
 
 LITERAL_STATE
-   : 'state'
-   ;
-
+    : 'state'
+    ;
 
 LITERAL_BRANCHES
-   : 'branches'
-   ;
-
+    : 'branches'
+    ;
 
 LITERAL_NEXT
-   : 'next'
-   ;
-
+    : 'next'
+    ;
 
 LITERAL_DESC
-   : 'desc'
-   ;
-
+    : 'desc'
+    ;
 
 LITERAL_LOG
-   : 'log'
-   ;
-
+    : 'log'
+    ;
 
 LITERAL_TEXT
-   : 'text'
-   ;
+    : 'text'
+    ;
 
 // an identifier.  Note that testLiterals is set to true!  This means
 // that after we match the rule, we look in the literals table to see
 // if it's a literal or really an identifer
 
 IDENT
-   : ( ~ ( '$' | ',' | '.' | ':' | ';' | '@' | ' ' | '\t' | '\n' | '\r' | '\f' ) )+
-   ;
-
+    : (~ ( '$' | ',' | '.' | ':' | ';' | '@' | ' ' | '\t' | '\n' | '\r' | '\f'))+
+    ;
 
 INT
-   : ( '0' .. '9' )+
-   ;
-
+    : ('0' .. '9')+
+    ;
 
 REVISION
-   : INT '.' INT ( '.' INT '.' INT )*
-   ;
-
-// string literals
+    : INT ('.' INT)*
+    ;
 
 STRING
-   : '@' (
-   /*	'\r' '\n' can be matched in one alternative or by matching
-				'\r' in one iteration and '\n' in another.  I am trying to
-				handle any flavor of newline that comes in, but the language
-				that allows both "\r\n" and "\r" and "\n" to all be valid
-				newline is ambiguous.  Consequently, the resulting grammar
-				must be ambiguous.  I'm shutting this warning off.
-			 */
-   /*			options {
-				generateAmbigWarnings=false;
-			}
-		:*/
-   //{ LA(2)!='@' }?  '@' '@' | ( '\r\n' | '\r' | '\n' ) | ~ ( '@' | '\n' | '\r' ) )* '@'
-   )
-   ;
-
+    : '@' (~[@] | '@@')* '@'
+    ;
 
 SEMI
-   : ';'
-   ;
-
+    : ';'
+    ;
 
 COLON
-   : ':'
-   ;
+    : ':'
+    ;
 
 // Whitespace -- ignored
 
 WS
-   : ( ' ' | '\t' | '\f' | ( '\r\n' | '\r' | '\n' ) )+ -> skip
-   ;
+    : (' ' | '\t' | '\f' | ( '\r\n' | '\r' | '\n'))+ -> skip
+    ;

@@ -1,0 +1,29 @@
+syntax = "proto3";
+package statustest;
+
+import "envoyproxy/protoc-gen-validate/validate/validate.proto";
+import "google/rpc/status.proto";
+
+package helloworld;
+
+// The greeter service definition.
+service Greeter {
+  // Sends a greeting
+  rpc SayHello (HelloRequest) returns (HelloReply) {
+    option (google.api.http) = {
+        post: "/service/hello"
+        body: "*"
+    };
+  }
+}
+
+// The request message containing the user's name.
+message HelloRequest {
+  string name = 1  [(validate.rules).string.pattern = "^\\w+( +\\w+)*$"]; // Required. Allows multiple words with spaces in between, as it can contain both first and last name;
+}
+
+// The response message containing the greetings
+message HelloReply {
+  string message = 1;
+  google.rpc.Status status = 2;
+}

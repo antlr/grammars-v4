@@ -1,0 +1,20 @@
+digraph ATN {
+rankdir=LR;
+s777[fontsize=11, label="777", shape=doublecircle, fixedsize=true, width=.6];
+s776[fontsize=11,label="776", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s4168[fontsize=11,label="4168", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s4169[fontsize=11,label="4169", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s4170[fontsize=11,label="4170", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s4171[fontsize=11,label="4171", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s4172[fontsize=11,label="4172", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s4173[fontsize=11,label="4173", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s4174[fontsize=11,label="4174", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s776 -> s4168 [fontname="Times-Italic", label="&epsilon;"];
+s4168 -> s4169 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'fixed'", arrowhead = normal];
+s4169 -> s4170 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'('", arrowhead = normal];
+s4170 -> s4171 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<pointer_type>", arrowhead = normal];
+s4171 -> s4172 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<fixed_pointer_declarators>", arrowhead = normal];
+s4172 -> s4173 [fontsize=11, fontname="Courier", arrowsize=.7, label = "')'", arrowhead = normal];
+s4173 -> s4174 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<embedded_statement>", arrowhead = normal];
+s4174 -> s777 [fontname="Times-Italic", label="&epsilon;"];
+}

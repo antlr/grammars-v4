@@ -1,0 +1,13 @@
+uni_start_stream
+	man_start_object <ind_group, "Test - Lesson2 b">
+		mat_orientation <vff>
+		mat_position <top_center>
+		mat_bool_resize_vertical <yes>
+		mat_color_face <0, 102, 153>
+		mat_bool_background_flood <yes>
+		mat_precise_width <400>
+		mat_precise_height <100>
+		mat_bool_precise <yes>
+      man_end_object
+    man_update_display
+uni_end_stream

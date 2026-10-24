@@ -1,0 +1,28 @@
+/*
+   Indentation doesn't matter, it's just for readability, you can indent however you want.
+*/
+
+@yini
+
+^ MyPrefs
+
+	^^ General
+	IsDarkMode = YES
+	Buffers = 10
+	Dirs: "C:\Users\", "D:\Work\Temp\", "E:\Data\Temp\"
+
+	^^ Menu 
+	Id = "FILE"
+	Value = "File"
+
+		^^^ MenuItem
+		Value = "New"
+		OnClick = "CreateDoc()"
+
+		^^^ MenuItem
+		Value = "Open"
+		OnClick = "OpenDoc()"
+
+		^^^ MenuItem
+		Value = "Save"
+		OnClick = "SaveDoc()"

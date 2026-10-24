@@ -1,0 +1,56 @@
+EUTRA-RRC-Definitions DEFINITIONS AUTOMATIC TAGS ::=
+
+BEGIN
+
+CounterCheck-v8a0-IEs ::= SEQUENCE {
+	lateNonCriticalExtension			OCTET STRING						OPTIONAL,
+	nonCriticalExtension				CounterCheck-v1530-IEs				OPTIONAL
+}
+
+CounterCheck-v1530-IEs ::= SEQUENCE {
+	drb-CountMSB-InfoListExt-r15		DRB-CountMSB-InfoListExt-r15		OPTIONAL,	 -- Need ON
+	nonCriticalExtension				SEQUENCE {}							OPTIONAL
+}
+
+DLInformationTransfer-r15-IEs ::=	SEQUENCE {
+	dedicatedInfoType-r15				CHOICE {
+		dedicatedInfoNAS-r15				DedicatedInfoNAS,
+		dedicatedInfoCDMA2000-1XRTT-r15		DedicatedInfoCDMA2000,
+		dedicatedInfoCDMA2000-HRPD-r15		DedicatedInfoCDMA2000
+	}																		OPTIONAL,	 -- Need ON
+	timeReferenceInfo-r15				TimeReferenceInfo-r15				OPTIONAL,	 -- Need ON
+	nonCriticalExtension				DLInformationTransfer-v8a0-IEs		OPTIONAL
+}
+
+HandoverFromEUTRAPreparationRequest-r8-IEs ::= SEQUENCE {
+	cdma2000-Type					CDMA2000-Type,
+	rand							RAND-CDMA2000				OPTIONAL,	 -- Cond cdma2000-Type
+	mobilityParameters				MobilityParametersCDMA2000	OPTIONAL,	 -- Cond cdma2000-Type
+	nonCriticalExtension			HandoverFromEUTRAPreparationRequest-v890-IEs	OPTIONAL
+}
+
+CellChangeOrder ::=				SEQUENCE {
+	t304								ENUMERATED {
+											ms100, ms200, ms500, ms1000,
+											ms2000, ms4000, ms8000, ms10000-v1310},
+	targetRAT-Type						CHOICE {
+			geran							SEQUENCE {
+				physCellId						PhysCellIdGERAN,
+				carrierFreq						CarrierFreqGERAN,
+				networkControlOrder				BIT STRING (SIZE (2))		OPTIONAL,	 -- Need OP
+				systemInformation				SI-OrPSI-GERAN				OPTIONAL	 -- Need OP
+			},
+			...
+	}
+}
+
+E-CSFB-r9 ::=						SEQUENCE {
+	messageContCDMA2000-1XRTT-r9		OCTET STRING		OPTIONAL,	 -- Need ON
+	mobilityCDMA2000-HRPD-r9			ENUMERATED {
+											handover, redirection
+										}					OPTIONAL,	 -- Need OP
+	messageContCDMA2000-HRPD-r9		OCTET STRING			OPTIONAL,	 -- Cond concHO
+	redirectCarrierCDMA2000-HRPD-r9	CarrierFreqCDMA2000		OPTIONAL	 -- Cond concRedir
+}
+
+END

@@ -1,0 +1,14 @@
+// random branching example
+#TITLE Random Branch Demo
+#ARTIST Example
+#BPM 130
+#WAV01 1.wav
+#WAV02 2.wav
+
+#RANDOM 2
+#IF 1
+#00111:31313131
+#ENDIF
+#IF 2
+#00111:32323232
+#ENDIF

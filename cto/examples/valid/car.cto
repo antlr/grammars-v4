@@ -1,0 +1,25 @@
+/*
+ * model file sample
+ */
+namespace org.sample.car
+
+import org.sample.owner.Owner
+
+enum CarType {
+  o VAN
+  o CONVERTIBLE
+}
+
+asset Vehicle identified by id {
+  o String id default = '0815'
+  o Integer [] wheels
+  o Boolean damaged default=false
+  --> Owner owner
+}
+
+// asset
+asset Car extends Vehicle {
+  o String model //any
+  o CarType type
+  o Integer year range=[1990,] 
+}

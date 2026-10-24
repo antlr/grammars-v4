@@ -1,0 +1,12 @@
+
+-- some comments
+
+put 1 into x
+
+-- more comments
+repeat for 10
+    do something  -- comment inline
+end repeat
+
+-- extra whitespace and comments
+

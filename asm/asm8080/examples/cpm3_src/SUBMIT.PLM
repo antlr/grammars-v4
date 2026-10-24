@@ -1,0 +1,294 @@
+sub:
+do;
+/* modified 7/26/79 to work with cpm 2.0, module number not zero */
+declare
+    wboot literally '0000h',  /* warm start entry point */
+    bdos  literally '0005h',  /* jmp bdos */
+    dfcba literally '005ch',  /* default fcb address */
+    dbuff literally '0080h';  /* default buffer address */
+
+declare jump byte data(0c3h); /* c3 = jmp */
+declare jadr address data(.submit);
+/* jmp to submit is placed at the beginning of the module */
+
+boot: procedure external;
+    /* system reboot */
+    end boot;
+
+mon1: procedure(f,a) external;
+    declare f byte, a address;
+    /* bdos interface, no returned value */
+    end mon1;
+
+mon2: procedure(f,a) byte external;
+    declare f byte, a address;
+    /* bdos interface, return byte value */
+    end mon2;
+
+
+declare
+    copyright(*) byte data
+        (' copyright(c) 1977, digital research ');
+
+declare
+    ln(5) byte initial('001 $'),
+    ln1 byte at(.ln(0)),
+    ln2 byte at(.ln(1)),
+    ln3 byte at(.ln(2)),
+    dfcb(33) byte initial(0,'$$$     SUB',0,0,0),
+    drec byte at(.dfcb(32)),  /* current record */
+    buff(128) byte at(dbuff),   /* default buffer */
+    sfcb(33)  byte at(dfcba);   /* default fcb */
+
+submit: procedure;
+
+    /*  t h e    c p /  m   's u b m i t'   f u n c t i o n
+
+        copyright (c) 1976, 1977, 1978
+        digital research
+        box 579
+        pacific grove, ca.
+        93950
+    */
+declare lit literally 'literally',
+    dcl lit 'declare',
+    proc lit 'procedure',
+    addr lit 'address',
+    ctll lit '0ch',
+    lca  lit '110$0001b',  /* lower case a */
+    lcz  lit '111$1010b',  /* lower case z */
+    endfile lit '1ah';    /* cp/m end of file */
+
+declare
+    true literally '1',
+    false literally '0',
+    forever literally 'while true',
+    cr literally '13',
+    lf literally '10',
+    what literally '63';
+
+print: procedure(a);
+    declare a address;
+    /* print the string starting at address a until the
+    next dollar sign is encountered */
+    call mon1(9,a);
+    end print;
+
+
+declare dcnt byte;
+
+open: procedure(fcb);
+    declare fcb address;
+    dcnt = mon2(15,fcb);
+    end open;
+
+close: procedure(fcb);
+    declare fcb address;
+    dcnt = mon2(16,fcb);
+    end close;
+
+delete: procedure(fcb);
+    declare fcb address;
+    call mon1(19,fcb);
+    end delete;
+
+diskread: procedure(fcb) byte;
+    declare fcb address;
+    return mon2(20,fcb);
+    end diskread;
+
+diskwrite: procedure(fcb) byte;
+    declare fcb address;
+    return mon2(21,fcb);
+    end diskwrite;
+
+make: procedure(fcb);
+    declare fcb address;
+    dcnt = mon2(22,fcb);
+    end make;
+
+move: procedure(s,d,n);
+    declare (s,d) address, n byte;
+    declare a based s byte, b based d byte;
+        do while (n := n - 1) <> 255;
+        b = a; s = s + 1; d = d + 1;
+        end;
+    end move;
+
+declare oldsp address;   /* calling program's stack pointer */
+
+error: procedure(a);
+    declare a address;
+    call print(.(cr,lf,'$'));
+    call print(.('Error On Line $'));
+    call print(.ln1);
+    call print(a);
+    stackptr = oldsp;
+    /* return to ccp */
+    end error;
+
+declare sstring(128) byte, /* substitute string */
+    sbp byte;             /* source buffer pointer (0-128) */
+
+
+setup: procedure;
+    /* move buffer to substitute string */
+    call move(.buff(1),.sstring(0),127);
+    sstring(buff(0))=0; /* mark end of string */
+    call move(.('SUB'),.sfcb(9),3); /* set file type to sub */
+    call open(.sfcb(0));
+    if dcnt = 255 then
+        call error(.('No ''SUB'' File Present$'));
+    /* otherwise file is open - read subsequent data */
+    sbp = 128; /* causes read below */
+
+    end setup;
+
+
+getsource: procedure byte;
+    /* read the next source character */
+    declare b byte;
+    if sbp > 127 then
+        do; if diskread(.sfcb(0)) <> 0 then
+            return endfile;
+        sbp = 0;
+        end;
+    if (b := buff((sbp:=sbp+1)-1)) = cr then
+        do; /* increment line */
+        if (ln3 := ln3 + 1) > '9' then
+            do; ln3 = '0';
+            if (ln2 := ln2 + 1) > '9' then
+                do; ln2 = '0';
+                ln1 = ln1 + 1;
+                end;
+            end;
+        end;
+    /* translate to upper case */
+    if (b-61h) < 26 then /* lower case alpha */
+        b = b and 5fh; /* change to upper case */
+    return b;
+    end getsource;
+
+writebuff: procedure;
+    /* write the contents of the buffer to disk */
+    if diskwrite(.dfcb) <> 0 then /* error */
+        call error(.('Disk Write Error$'));
+    end writebuff;
+
+declare rbuff(2048) byte, /* jcl buffer */
+    rbp address,      /* jcl buffer pointer */
+    rlen byte;     /* length of current command */
+
+fillrbuff: procedure;
+    declare (s,ssbp) byte;  /* sub string buffer pointer */
+
+    notend: procedure byte;
+        /* look at next character in sstring, return
+        true if not at the end of the string - char passed
+        back in 's' */
+        if not ((s := sstring(ssbp)) = ' ' or s = 0) then
+            do;
+            ssbp = ssbp + 1;
+            return true;
+            end;
+        return false;
+        end notend;
+
+    deblankparm: procedure;
+        /* clear to next non blank substitute string */
+            do while sstring(ssbp) = ' ';
+            ssbp = ssbp + 1;
+            end;
+        end deblankparm;
+
+    putrbuff: procedure(b);
+       declare b byte;
+        if (rbp := rbp + 1) > last(rbuff) then
+            call error(.('Command Buffer Overflow$'));
+        rbuff(rbp) = b;
+        /* len: c1 ... c125 :00:$ = 128 chars */
+        if (rlen := rlen + 1) > 125 then
+            call error(.('Command Too Long$'));
+        end putrbuff;
+
+    declare (reading,b) byte;
+    /* fill the jcl buffer */
+    rbuff(0),rbp = 0;
+    reading = true;
+        do while reading;
+        rlen = 0; /* reset command length */
+            do while (b:=getsource) <> endfile and b <> cr;
+            if b <> lf then
+                do; if b = '$' then /* copy substitute string */
+                   do; if (b:=getsource) = '$' then
+                       /* $$ replaced by $ */
+                       call putrbuff(b); else
+                   if (b := b - '0') > 9 then
+                       call error(.('Parameter Error$')); else
+                       do; /* find string 'b' in sstring */
+                       ssbp = 0; call deblankparm; /* ready to scan sstring */
+                            do while b <> 0; b = b - 1;
+                            /* clear next parameter */
+                                do while notend;
+                                end;
+                            call deblankparm;
+                            end;
+                       /* ready to copy substitute string from position ssbp */
+                            do while notend;
+                            call putrbuff(s);
+                            end;
+                       end;
+                   end; else /* not a '$' */
+                if b = '^' then /* control character */
+                    do; /* must be ^a ... ^z */
+                    if (b:=getsource - 'a') > 25 then
+                        call error(.('Invalid Control Character$'));
+                    else
+                         call putrbuff(b+1);
+                    end; else /* not $ or ^ */
+                call putrbuff(b);
+                end;
+            end; /* of line or input file - compute length */
+        reading = b = cr;
+        call putrbuff(rlen); /* store length */
+        end;
+    /* entire file has been read and processed */
+    end fillrbuff;
+
+makefile: procedure;
+    /* write resulting command file */
+    declare i byte;
+    getrbuff: procedure byte;
+        return rbuff(rbp := rbp - 1);
+        end getrbuff;
+
+    call delete(.dfcb);
+    drec = 0; /* zero the next record to write */
+    call make(.dfcb);
+    if dcnt = 255 then call error(.('Directory Full$'));
+        do while (i := getrbuff) <> 0;
+        /* copy i characters to buffer */
+        /* 00 $ at end of line gives 1.3 & 1.4 compatibility */
+        buff(0) = i; buff(i+1) = 00; buff(i+2) = '$';
+            do while i > 0;
+            buff(i) = getrbuff; i=i-1;
+            end;
+        /* buffer filled to $ */
+        call writebuff;
+        end;
+    call close(.dfcb);
+    if dcnt = 255 then call error(.('Cannot Close, Read/Only?$'));
+    end makefile;
+
+ /* enter here from the ccp with the fcb set */
+declare stack(10) address;  /* working stack */
+    oldsp = stackptr;
+    stackptr = .stack(length(stack));
+
+    call setup;
+    call fillrbuff;
+    call makefile;
+    call boot; /* reboot causes commands to be executed */
+    end submit;
+end;
+

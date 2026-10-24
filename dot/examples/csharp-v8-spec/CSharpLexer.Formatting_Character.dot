@@ -1,0 +1,15 @@
+digraph ATN {
+rankdir=LR;
+s368[fontsize=11, label="368", shape=doublecircle, fixedsize=true, width=.6];
+s1537[fontsize=11,label="1537", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1538[fontsize=11,label="1538", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1539[fontsize=11,label="{&rarr;\n1539\nd=23|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1540[fontsize=11,label="&larr;\n1540", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s367[fontsize=11,label="367", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s367 -> s1539 [fontname="Times-Italic", label="&epsilon;"];
+s1539:p0 -> s1537 [fontname="Times-Italic", label="&epsilon;"];
+s1539:p1 -> s1538 [fontname="Times-Italic", label="&epsilon;"];
+s1537 -> s1540 [fontsize=11, fontname="Courier", arrowsize=.7, label = "{'­', '؀'..'؅', '؜', '۝', '܏', '࢐'..'࢑', '࣢', '᠎', '​'..'‏', '‪'..'‮', '⁠'..'⁤', '⁦'..'⁯', '﻿', '￹'..'￻', '𑂽', '𑃍', '𓐰'..'𓐿', '𛲠'..'𛲣', '𝅳'..'𝅺', '󠀁', '󠀠'..'󠁿'}", arrowhead = normal];
+s1538 -> s1540 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<Unicode_Escape_Sequence>", arrowhead = normal];
+s1540 -> s368 [fontname="Times-Italic", label="&epsilon;"];
+}

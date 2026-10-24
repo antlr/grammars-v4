@@ -1,0 +1,4 @@
+Grouped (a (b c))
+    Print a
+    Print b
+    Print c

@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>Creating an Event Trace directly by the implementation</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    DIV.Enumerated-Body {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 2.0em; margin-right: 2.0em; margin-top: 0em; margin-bottom: 0.5em}
+    DIV.Enumerated-Term {float: left; font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 0.5em; margin-top: 0em; margin-bottom: 0em}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-621.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-623.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>6.2.2 Creating an Event Trace directly by the implementation</H1>
+<div class="Normal">Creating an event trace for a particular implementation 
+is a problem for the ACATS user and their implementer (the ACATS user 
+need not be an implementer, of course). We can only give general guidance 
+on approaching this problem.</div>
+<div class="Normal">One approach is the for implementer to directly add 
+event trace creation to their tools. In this approach, options would 
+be added to the compiler and binder that would write events to an event 
+trace file. The ACATS user would set the Generate_Event_Trace_File constant 
+in Report.A to True. The user would use this new compiler and binder 
+option to write events to ETrace.csv, as will the Report package. At 
+strategic times, the ETrace.csv file could be copied to a new name in 
+order to keep its size manageable.</div>
+<div class="Normal">This approach is likely to be the easiest, as all 
+of the information needed to create an event is likely to be available 
+in a compiler error handler. Moreover, writing an event is an easy operation 
+in Ada (see Report.Put_Event_Trace) and likely most other languages. 
+And by directly including this capability in the compiler, it is available 
+to all users and likely needs little modification even if the compiler 
+error handling is changed significantly. The effort needed is small and 
+one-time.</div>
+<div class="Normal" style="margin-bottom: 0.4em">However, this approach 
+may not work in some cases:</div>
+<div class="Enumerated-Term">1.</div><div class="Enumerated-Body">
+The ACATS user is not the implementer, so modifying the compiler is not 
+possible;</div>
+<div class="Enumerated-Term">2.</div><div class="Enumerated-Body">
+An important part of the compiler or binder is a third party tool, so 
+adding an option is not feasible;</div>
+<div class="Enumerated-Term">3.</div><div class="Enumerated-Body">
+The ACATS testing target does not have a file system, so having Report 
+write an event trace is not possible.&nbsp;</div>
+<div class="Normal">In each of these cases, the technique outlined in 
+the next section is preferable.</div>
+<div class="Normal">Note that in case 2, not all parts of an Ada compilation 
+system need to be able to generate an event trace. Any part that can 
+fail only in the case of a bug elsewhere in the system (that is, does 
+not diagnose errors in the Ada code) can be ignored for the purposes 
+of an event trace. For instance, the use of a system-provided linker 
+after the completion of the bind step need not be reflected in an event 
+trace, as it has no role in the enforcement of Ada Post-Compilation Rules. 
+For more on this topic, see <A HREF="UG-621.HTM">6.2.1</A>.</div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-621.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-623.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>

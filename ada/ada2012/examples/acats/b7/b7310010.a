@@ -1,0 +1,273 @@
+-- B7310010.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE
+--     Check the requirements of 7.3.1 for inheritance of characteristics and
+--     primitive operations, including characteristics and operations that
+--     become available later in the declarative part.
+--     The test cases here are inspired by the AARM examples given
+--     in AARM-7.3.1(7.a-7.v).
+--
+-- TEST DESCRIPTION
+--     See AARM-7.3.1.
+--     Never mind that many of the calls here would raise Program_Error
+--     if they were executed, because the function body has not yet been
+--     elaborated.
+--
+-- TEST FILES:
+--      This test consists of the following files:
+--      -> B7310010.A
+--         B7310011.A
+--         B7310012.A
+--         B7310013.A
+--         B7310014.A
+--         B7310015.A
+--         B7310016.AM
+--
+-- PASS/FAIL CRITERIA:
+--      Files B7310011.A, B7310012.A, B7310013.A, B7310014.A, and B7310015.A
+--      contain errors. All errors in these files must be detected to pass the
+--      test.
+--
+-- CHANGE HISTORY:
+--      29 JUN 1999   RAD   Initial Version.
+--      16 DEC 1999   RLB   Revised to insure that units don't depend on other
+--                          units containing errors.
+--!
+
+package B7310016_1 is
+    -- Root package for the whole test.
+    pragma Pure;
+
+    type Enum is (Just_One_Literal);
+    function Bool_Op(B: Boolean) return Enum;
+
+private
+    type Another_Enum is (Just_One_Literal);
+    function Bool_Op(B: Boolean) return Another_Enum;
+end B7310016_1;
+
+package body B7310016_1 is
+
+    function Bool_Op(B: Boolean) return Enum is
+    begin
+        return Enum'Last;
+    end Bool_Op;
+
+    function Bool_Op(B: Boolean) return Another_Enum is
+    begin
+        return Another_Enum'First;
+    end Bool_Op;
+
+end B7310016_1;
+
+----------------------------------------------------------------
+-- This part comes from AARM-7.3.1(7.d-7.q):
+
+package B7310016_1.Parent is
+    type Root is tagged null record;
+    procedure Op1(X : Root);
+
+    type My_Int is range 1..10;
+private
+    procedure Op2(X : Root);
+
+    type Another_Int is new My_Int;
+    procedure Int_Op(X : My_Int);
+end B7310016_1.Parent;
+
+with B7310016_1.Parent; use B7310016_1.Parent;
+package B7310016_1.Unrelated is
+    type T2 is new Root with null record;
+    procedure Op2(X : T2);
+    T2_Var: T2;
+end B7310016_1.Unrelated;
+
+package body B7310016_1.Unrelated is
+    procedure Op2(X : T2) is
+    begin
+        null;
+    end Op2;
+begin
+    Op1(T2_Var); -- OK -- inherited from Root.  See AARM-7.3.1(7.m).
+    Op2(T2_Var); -- OK -- unrelated to inherited one.
+end B7310016_1.Unrelated;
+
+package B7310016_1.Parent.Child is
+    pragma Elaborate_Body; -- So we can have one.
+
+    -- See B7310016_1.Parent.Child_2 for the error cases.
+
+    type T3 is new Root with null record;
+    -- Op1(T3) implicitly declared here.
+    type Op_Type is access procedure(X: T3);
+    Op1_Ptr: constant Op_Type := Op1'Access; -- OK
+
+    package Nested is
+        type T4 is new Root with null record;
+        type Op_Type is access procedure(X: T4);
+        Op1_Ptr: constant Op_Type := Op1'Access; -- OK
+    end Nested;
+private
+    OK_Op2_Ptr: constant Op_Type := Op2'Access; -- OK
+    -- Op2(T3) implicitly declared here.
+    -- ...
+end B7310016_1.Parent.Child;
+
+with B7310016_1.Unrelated; use B7310016_1.Unrelated;
+package body B7310016_1.Parent.Child is
+    package body Nested is
+        -- Op2(T4) implicitly declared here.
+        T4_Obj: T4;
+    begin
+        Op2(T4_Obj); -- OK
+    end Nested;
+
+    type T5 is new T2 with null record;
+    T5_Obj: T5;
+    T3_Obj: T3;
+begin
+    Op2(T3_Obj); -- OK
+    Op1(T5_Obj); -- OK
+    Op2(T5_Obj); -- OK
+end B7310016_1.Parent.Child;
+
+private package B7310016_1.Parent.Private_Child is
+    pragma Elaborate_Body; -- So we can have one.
+
+    type T3 is new Root with null record;
+    -- Op1(T3) implicitly declared here.
+    -- And Op2, also -- see AARM-7.3.1(7.n).
+    type Op1_Type is access procedure(X: T3);
+    Op1_Ptr: constant Op1_Type := Op1'Access; -- OK
+    type Op2_Type is access procedure(X: T3);
+    Op2_Ptr: constant Op2_Type := Op2'Access; -- OK
+
+    package Nested is
+        type T4 is new Root with null record;
+    private
+        Op2_Ptr: constant Op2_Type := Op2'Access; -- OK
+        -- ...
+    end Nested;
+private
+    OK_Op2_Ptr: constant Op2_Type := Op2'Access; -- OK
+    -- Op2(T3) implicitly declared here.
+    -- ...
+end B7310016_1.Parent.Private_Child;
+
+with B7310016_1.Unrelated; use B7310016_1.Unrelated;
+package body B7310016_1.Parent.Private_Child is
+    package body Nested is
+        -- Op2(T4) implicitly declared here.
+    end Nested;
+
+    type T5 is new T2 with null record;
+    T3_Obj: T3;
+begin
+    Op2(T3_Obj); -- OK
+end B7310016_1.Parent.Private_Child;
+
+----------------------------------------------------------------
+-- This part comes from AARM-7.3.1(7.s-7.v), which illustrates
+-- various "characteristics" being revealed at different places.
+-- We test limitedness (assignment allowed?), existence of operators
+-- "=" and "xor", existence of conversion to Boolean, and existence
+-- of the 'Image attribute.
+
+package B7310016_1.Places is
+    pragma Pure;
+end B7310016_1.Places;
+
+package B7310016_1.Places.P is
+    type Comp1 is private;
+private
+    type Comp1 is new Boolean;
+end B7310016_1.Places.P;
+
+package B7310016_1.Places.P.Q is
+    -- For specification errors, see B7310016_1.Places.P.R.
+    package R is
+        type Comp2 is limited private;
+        type A is array(Integer range <>) of Comp2;
+        function A_Func_1 return A;
+        function A_Func_2 return A;
+    private
+
+        type Comp2 is new Comp1;
+        -- A becomes nonlimited here.
+        -- "="(A, A) return Boolean is implicitly declared here.
+
+        A1: A := A_Func_1; -- OK
+        B3: Boolean := A_Func_1 = A_Func_2; -- OK
+        B4: Boolean := A_Func_1 /= A_Func_2; -- OK
+    end R;
+private
+    -- Now we find out what Comp1 really is, which reveals
+    -- more information about Comp2, but we're not within
+    -- the immediate scope of Comp2, so we don't do anything
+    -- about it yet.
+    A3: R.A(1..10); -- OK
+end B7310016_1.Places.P.Q;
+
+-- See file B7310013 for the package body B7310016_1.Places.P.Q
+
+----------------------------------------------------------------
+-- Check visibility in private packages and their children.
+
+private package B7310016_1.Mother is
+    type Root is tagged null record;
+    function Op1(X: Root) return String;
+private
+    function Op2(X: Root) return String;
+end B7310016_1.Mother;
+
+private package B7310016_1.Mother.Daughter is
+    Root_Obj: Root;
+    Root_Class_Obj: Root'Class := Root_Obj;
+    X: String := Op1(Root_Obj); -- OK
+    Y: String := Op1(Root_Class_Obj); -- OK
+    XX: String := Op2(Root_Obj); -- OK
+    YY: String := Op2(Root_Class_Obj); -- OK
+private
+    XXX: String := Op1(Root_Obj); -- OK
+    YYY: String := Op1(Root_Class_Obj); -- OK
+    XXXX: String := Op2(Root_Obj); -- OK
+    YYYY: String := Op2(Root_Class_Obj); -- OK
+end B7310016_1.Mother.Daughter;
+
+with B7310016_1.Mother.Daughter; -- Just to be sure it's included.
+package body B7310016_1.Mother is
+    function Op1(X: Root) return String is
+    begin
+        return "";
+    end Op1;
+    function Op2(X: Root) return String is
+    begin
+        return "";
+    end Op2;
+end B7310016_1.Mother;
+
+-- See file B7310014 for the non-private package B7310016_1.Mother.Son
+

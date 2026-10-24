@@ -1,0 +1,1 @@
+RETURN 1 + 2 IS NOT NULL AS a, 3 IN [1, 2, 3][0..2] AS b

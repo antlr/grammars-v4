@@ -1,0 +1,221 @@
+;"Author:     Rob Myers <rob@robmyers.org> 2012"
+;"License:    http://creativecommons.org/publicdomain/zero/1.0/"
+;"Many thanks to Dreyannah, Yib, and Fox-in-Sox"
+;"-----------------------------------------------------------------------------"
+
+@create $thing called "Aquarium"
+@addalias fish, fishes to "Aquarium"
+
+@describe Aquarium as "A large aquarium well stocked with happy, healthy fish."
+
+;@property Aquarium.help_msg "" rc
+;@notedit Aquarium.help_msg
+;delete
+;enter
+;The fish in the aquarium.
+;You can look at them or feed them.
+;Don't tap the tank though.
+;If they get too much you can @disable their messages (and @enable them later).
+;.
+;save
+;done
+
+
+;"-----------------------------------------------------------------------------"
+;"Description constants"
+;"Declare and set separately so we can copy & paste more easily in development"
+;"Properties default to rc"
+
+@property Aquarium.fish_quantities
+@set Aquarium.fish_quantities to {"a", "a pair of", "a few", "some", "a shoal of"}
+
+@property Aquarium.fish_personalities
+@set Aquarium.fish_personalities to {"careless", "cheeky", "cheerful", "nervous", "playful", "snooty", "over-enthusiastic", "calm", "serene", "friendly", "fast-moving", "slow-moving"}
+
+@property Aquarium.fish_shapes
+@set Aquarium.fish_shapes to {"tiny", "spindly", "streamlined", "plump", "spiky", "toothsome", "big-eyed", "flat", "scaly", "smooth", "nondescript", "cute", "small", "round", "triangular"}
+
+@property Aquarium.fish_qualities
+@set Aquarium.fish_qualities to {"iridescent", "sparkling", "mottled", "dull", "shiny", "striped", "spotty", "plain", "matt", "soft"}
+
+@property Aquarium.fish_hues
+@set Aquarium.fish_hues to {"red", "orange", "yellow", "green", "blue", "purple", "pink", "silver", "gold", "black", "white", "brown", "turquoise", "cyan", "magenta"}
+
+@property Aquarium.fish_types
+@set Aquarium.fish_types to {"seahorse", "clownfish", "starfish", "baby sea turtle", "suckerfish"}
+
+@property Aquarium.fish_actions
+@set Aquarium.fish_actions to {"%<blows> bubbles at you from the aquarium.", "%<swims> lazily around the aquarium.", "%<swims> betwen the plants in the aquarium.", "%<floats> close to the glass at the front of the aquarium.", "%<swims> around the aquarium.", "%<bobs> up and down near the surface of the water in the aquarium.", "%<swims> around the edges of the aquarium.", "%<swims> toward the front of the aquarium", "%<swims> away from the front of the aquarium", "%<nibbles> at the plants in the aquarium."}
+
+
+@property Aquarium.events
+@set Aquarium.events to {"a trail of bubbles snakes up through the water of the aquarium.", "the plants in the aquarium sway gently.", "the fish in the aquarium seem to all change the direction they are swimming in at once.", "light from the aquarium dances on the floor.", "you notice that all the fish in the aquarium seem to have vanished, although when you look closer they are just hiding behind the rocks and plants.", "a single large bubble works its way up through the water of the aquarium.", "there is a sudden flurry of motion in the aquarium.", "the fish in the aquarium swim to and fro.", "the anenomes in the aquarium sway gently in the current.", "two seahorses in the aquarium look like they are kissing."}
+
+@property Aquarium.tap_messages
+@set Aquarium.tap_messages to {"Don't do that.", "The fish flee from the tapping.", "The fish ignore the tapping.", "A particularly dangerous looking fish swims over and looks hungrily at some tasty-looking fingers.", "Some of the fish closest to the glass flee the tapping.", "One of the fish blows bubbles at you."}
+
+@property Aquarium.feed_messages
+@set Aquarium.feed_messages to {"Omnomnom...", "There is a brief feeding frenzy.", "Some fish swim up to the food and nibble.", "The fish feed happily.", "Fishy foody time!", "Nomnomnom.", "The larger fish push to the surface to feed, the smaller fish pick off the scraps that float down into the water.", "The fish quickly remove any trace of food from the water."}
+
+@property Aquarium.fed_messages
+@set Aquarium.fed_messages to {"They don't need any more just now.", "They are full at the moment.", "They've already been fed."}
+
+@property Aquarium.fish_interactions
+@set Aquarium.fish_interactions to {"swim lazily together", "spar over a piece of food", "eye each other warily", "chase each other around the tank", "circle each other", "appear to kiss", ""}
+
+@property Aquarium.look_prefixes
+@set Aquarium.look_prefixes to {"as you look at it", "when you look at it", "inside it"}
+
+@property Aquarium.response_odds
+@set Aquarium.response_odds to 5
+
+@property Aquarium.response_delay
+@set Aquarium.response_delay to 20
+
+@property Aquarium.response_spacing
+@set Aquarium.response_spacing to 60
+
+@property Aquarium.feed_time_delay
+@set Aquarium.feed_time_delay to 120
+
+
+;"-----------------------------------------------------------------------------"
+;"State variables"
+;"Declare with defaults so we don't overwrite them during development"
+
+@property Aquarium.current_fish ""
+;"We set this so we can pronoun_sub for plurality easily and hackily."
+;"Set it to neuter or plural then set who=this in pronoun_sub."
+@property Aquarium.gender "neuter"
+
+@property Aquarium.last_response_at 0
+@property Aquarium.active 1 rc
+
+@property Aquarium.last_fed_at 0
+
+@property Aquarium.fish1 ""
+@property Aquarium.fish2 ""
+
+
+;"-----------------------------------------------------------------------------"
+;"Turn messages on and off"
+
+@verb Aquarium:@enable any any any rxd
+@program Aquarium:@enable
+this.active = 1;
+caller:tell($string_utils:pronoun_sub("%t messages enabled."));
+.
+
+@verb Aquarium:@disable any any any rxd
+@program Aquarium:@disable
+this.active = 0;
+caller:tell($string_utils:pronoun_sub("%t messages disabled."));
+.
+
+
+;"-----------------------------------------------------------------------------"
+;"Verbs for generating descriptions"
+
+@verb Aquarium:generate_current_fish tnt rxd
+@program Aquarium:generate_current_fish
+quantity_index = random(length(this.fish_quantities));
+;"Set this so we can use pronoun_sub to pluralise for us.";
+if (quantity_index == 1)
+  this.gender = "neuter";
+else
+  this.gender = "plural";
+endif
+quantity = this.fish_quantities[quantity_index];
+personality = this.fish_personalities[random($)];
+shape = this.fish_shapes[random($)];
+quality = this.fish_qualities[random($)];
+hue = this.fish_hues[random($)];
+this.current_fish = $string_utils:from_list({quantity, personality, shape, quality, hue, "fish"}, " ");
+.
+
+@verb Aquarium:generate_fish_action tnt rxd
+@program Aquarium:generate_fish_action
+this:generate_current_fish();
+action = this.current_fish + " " + this.fish_actions[random($)];
+return $string_utils:pronoun_sub(action, who=this);
+.
+
+@verb Aquarium:generate_event tnt rxd
+@program Aquarium:generate_event
+return this.events[random($)];
+.
+
+@verb Aquarium:generate_descriptive_text tnt rxd
+@program Aquarium:generate_descriptive_text
+action = random(2);
+if (action == 1)
+  message = this:generate_fish_action();
+elseif (action == 2)
+  message = this:generate_event();
+endif
+return message;
+.
+
+@verb Aquarium:description tnt rxd
+@program aquarium:description
+base_description = pass(@args);
+descriptive_text = this:generate_descriptive_text();
+return base_description + " As you look at it " + descriptive_text;
+.
+
+
+;"-----------------------------------------------------------------------------"
+;"Verbs for interacting with the aquarium"
+
+;"Only post messages when something is happening in the room."
+
+@verb Aquarium:tell tnt rxd
+@program Aquarium:tell
+;"If we're active";
+if (this.active)
+  now = time();
+  delta = now - this.last_response_at;
+  "And we haven't posted a message recently";
+  if (delta > this.response_spacing)
+    "And the message isn't from this object, and we should post this time";
+    if ((!(this in $list_utils:slice(callers())))
+      && (random(this.response_odds) == 1))
+      "Choose which kind of message to post";
+      action = random(2);
+      if (action == 1)
+	message = this:generate_fish_action();
+      elseif (action == 2)
+	message = this:generate_event();
+      endif
+      "Post the message after a random delay";
+      message = $string_utils:capitalize(message);
+      fork (random(this.response_delay))
+	this.location:announce_all_but({this}, message);
+      endfork
+      "Not strictly true, but good enough";
+      this.last_response_at = now;
+    endif
+  endif
+endif
+.
+
+@verb Aquarium:tap any any any rxd
+@program Aquarium:tap
+player.location:announce($string_utils:pronoun_sub("%N %<taps> the glass of the aquarium."));
+player:tell("You tap the glass of the aquarium.");
+player:tell(this.tap_messages[random($)]);
+.
+
+@verb Aquarium:feed any any any rxd
+@program Aquarium:feed
+now = time();
+delta = now - this.last_fed_at;
+if(delta > this.feed_time_delay)
+  player.location:announce($string_utils:pronoun_sub("%N %<feeds> the fish in the aquarium."));
+  player:tell("You feed the fish in the aquarium.");
+  player.location:announce_all(this.feed_messages[random($)]);
+  this.last_fed_at = now;
+else
+  player:tell(this.fed_messages[random($)]);
+endif
+.

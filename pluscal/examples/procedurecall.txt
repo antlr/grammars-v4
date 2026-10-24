@@ -1,0 +1,14 @@
+--algorithm ProcedureCall {
+  variables result = 0;
+  procedure square(n)
+    variable sq = 0;
+  {
+    s1: sq := n * n;
+    s2: result := sq;
+    s3: return;
+  }
+  {
+    c1: call square(4);
+    c2: print result;
+  }
+}

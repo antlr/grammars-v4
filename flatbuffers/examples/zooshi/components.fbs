@@ -1,0 +1,343 @@
+// Copyright 2015 Google Inc. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include "attributes.fbs";
+include "bullet_def.fbs";
+include "common.fbs";
+include "library_components.fbs";
+include "editor_components.fbs";
+include "motive.fbs";
+include "unlockables.fbs";
+
+namespace fpl;
+
+table TimeLimitDef {
+  timelimit:float;
+}
+
+table RailDenizenDef {
+  start_time:float;
+  initial_playback_rate:float;
+  rail_name:string;
+  rail_offset:fplbase.Vec3; // Additional offset from the rail position
+  rail_orientation:fplbase.Vec3; // Rotation to apply to the rail
+  rail_scale:fplbase.Vec3; // Scale to apply to the rail
+  // Rate of convergence towards the target orientation.
+  // 0 = no convergence otherwise the time to converge in seconds is roughly
+  // 1 / log(0.5 + convergence_rate) (i.e 1 = 4s, 2 = 2s, 3 = 1.2s, ...)
+  orientation_convergence_rate:float = 0;
+  update_orientation:bool = true;
+  inherit_transform_data:bool = false;
+  enabled:bool = true;
+  // Percentage of when a lap ends. Values outside of (0,1] are treated as 1.
+  lap_end:float = 1.0;
+}
+
+table MotivatorObjectDef {
+  data:motive.OvershootParameters;
+}
+
+table SoundDef {
+  sound:string;
+}
+
+enum AnimObject : byte {
+  HungryHippo,
+  DapperCroc,
+  LadyMandrill,
+  LovelyGiraffette,
+  BankerBird,
+  FernShort,
+  FernMid,
+  FernTall,
+  Heart,
+  Scenery,
+  Gate,
+}
+
+enum PatronAction : byte {
+  GetUp,
+  Idle,
+  Eat,
+  Satisfied,
+  Fall,
+}
+
+enum ShaderIndex : ubyte {
+  Lit,
+  Depth,
+  Count
+}
+
+table SimpleMovementDef {
+  velocity:fplbase.Vec3;
+}
+
+table PatronEvent {
+  // Animation to play.
+  action:PatronAction;
+
+  // Time to start event.
+  // -1 means start as soon as previous event completes.
+  time:int = -1;
+}
+
+// Precondition: start_time < end_time.
+// When time <= start_time, return start_value.
+// When time >= end_time, return end_value.
+// else return Lerp(start_value, end_value,
+//                  (time - start_time) / (end_time - start_time))
+table InterpolantsDef {
+  start_time:float;
+  end_time:float;
+  start_value:float;
+  end_value:float;
+}
+
+table PatronDef {
+  // The type of patron being animated.
+  anim_object:AnimObject;
+
+  // Each time the raft makes a lap around the river, it's lap counter is
+  // incremented.  Patrons will only stand up when the lap counter is in the
+  // range [min_lap, max_lap].
+  min_lap:float = -1.0;
+  max_lap:float = -1.0;
+
+  // Time the patron is willing to wait while being ignored (i.e. not passed
+  // a sushi that comes close enough to chase after).
+  // In InterpolantsDef, x is lap. y is time, in seconds.
+  patience:InterpolantsDef;
+
+  // Sequence of animations to play when StartEvent() is called.
+  events:[PatronEvent];
+
+  // If the raft is within the pop in radius, this patron will stand up.
+  // In InterpolantsDef, x is lap. y is distance, in game units.
+  pop_in_radius:InterpolantsDef;
+
+  // If the raft is outside the pop out radius, this patron will fall down.
+  pop_out_radius:float;
+
+  // The tag of the physics body that needs to be hit to trigger a fall.
+  // An empty name uses all bodies.
+  target_tag:string;
+
+  // The maximum distance the patron will move when trying to catch sushi.
+  max_catch_distance:float = 5.0;
+
+  // The maximum distance the patron will move when trying to catch sushi.
+  max_catch_distance_for_search:float = 12.0;
+
+  // The maximum angle off of the vector to the raft that the patron with turn
+  // to face when trying to catch sushi. Note that 180 fully encompasses it.
+  max_catch_angle:float = 90.0;
+
+  // When looking at sushi to catch, consider the sushi's trajectory over
+  // this time range. In seconds.
+  min_catch_time_for_search:float = 0.01;
+  max_catch_time_for_search:float = 2.5;
+
+  // When actually moving to catch a sushi, make sure you get to the target
+  // position within this time. Ensures we don't react too quickly or slowly.
+  // Better to smoothly move to a close position in 200ms than to jerk to it
+  // in 10ms (we'll probably catch the sushi either way since our hit region
+  // is large). Likewise, better to move to the target position in 2.5s and
+  // wait, than to take 5s to move there and look like we're not responding.
+  // In seconds.
+  min_catch_time:float = 0.2;
+  max_catch_time:float = 2.5;
+
+  // Average speed at which to travel towards the sushi catch position.
+  min_catch_speed:float = 1.0;
+  max_catch_speed:float = 5.0;
+
+  // When moving towards a sushi, wait this amount of time before adjusting
+  // the search for another sushi.
+  time_between_catch_searches:float = 0.3;
+
+  // Time to return to the last idle position, after we're done trying to
+  // catch sushi.
+  return_time:float = 1.0;
+
+  // Time to accelerate onto the rails, if the patron is traveling along rails.
+  rail_accelerate_time:float = 0.5;
+
+  // The height above the patron at which to spawn the happy-indicator.
+  point_display_height:float = 10.0;
+
+  // The angle beyond which the patron should turn to face the raft, in degrees.
+  // This is the maximum we allow the patron to face away from the raft.
+  max_face_angle_away_from_raft:float = 90.0;
+
+  // The time to take turning to face the raft, in seconds.
+  time_to_face_raft:float = 0.2;
+
+  // After being ignored for a while, the patron will get exasperated and idle
+  // at a faster playback rate. If still no sushi is thrown at the patron,
+  // the patron will disappear. This is the amount of time before disappearing
+  // that the patron will be exasperated. Time in seconds.
+  time_exasperated_before_disappearing:float = 1.0;
+
+  // When exasperated, we play the idle animation faster. Therefore, this
+  // number should be > 1.
+  exasperated_playback_rate:float = 2.0;
+
+  // If true: when fed play eat, satisfied, disappear animations.
+  // If false: when fed play satisfied, disappear animations.
+  play_eating_animation:bool;
+}
+
+table PlayerDef {}
+
+table PlayerProjectileDef {}
+
+// A spline node for a rail.
+table RailNodeDef {
+  // The nodes are put in ascending order to define the rail spline.
+  // If you don't specify an ordering, the node entities will be given a
+  // default ordering matching the order they were defined in the entity file.
+  // This ordering will be preserved when you save out the entity list, even
+  // if the order has changed on export.
+  ordering:float;
+
+  // The name of the rail we're part of. You'll query RailNodeComponent by
+  // rail_name to get a list of rail points in the correct order.
+  rail_name:string;
+
+  // Total time for this rail. Only the first rail spline node (lowest ordering) for
+  // each rail should have this set.
+  total_time:float;
+
+  // Reliable distance for this rail. Only the first rail spline node (lowest
+  // ordering) for each rail should have this set.
+  reliable_distance:float;
+
+  // Does the rail wrap and restart at the end, or does it stop.
+  wraps:bool = true;
+}
+
+table RiverDef {
+  // Which rail to base the river on?
+  rail_name:string;
+
+  // Generating the banks of the river involves some random elements.
+  // Explicitly set the seed so that the banks are generated the same
+  // every time.
+  random_seed:uint;
+}
+
+// Component to hide and show the entity, based on the lap number of the raft
+// as it goes around the course.
+table LapDependentDef {
+  // The minimum lap amount to be visible for.
+  min_lap:float;
+  // The maximum lap amount to be visible for.
+  max_lap:float;
+}
+
+table SceneryDef {
+  // The type of scenery being animated.
+  anim_object:AnimObject;
+
+  // Whether scenery should rotate to face raft.
+  faces_raft:bool=false;
+}
+
+table LightDef {
+  // Intensity of shadows. 1.0 = solid black, 0.0 = invisible shadows.
+  shadow_intensity:float;
+
+  // Variables used in the Phong lighting model.
+  diffuse_color:fplbase.ColorRGBA;
+  ambient_color:fplbase.ColorRGBA;
+  specular_color:fplbase.ColorRGBA;
+  specular_exponent:float;
+
+  // Intensity for different lighting variables. Essentially a multiplier which
+  // will make the colors whiter.
+  diffuse_intensity:float;
+  ambient_intensity:float;
+  specular_intensity:float;
+}
+
+// No data, (never loaded from raw data) but we need it to be a thing so that it
+// ends up in the enum.
+table ListenerDef {}
+table AttributesDef {}
+table ServicesDef {}
+table ShadowControllerDef {}
+
+table Render3dTextDef {
+  animation_bone:int;
+  canvas_size:int;
+  font:string;
+  label_size:float;
+  translation:fplbase.Vec3;
+  rotation:fplbase.Vec3; // Degrees
+  scale:fplbase.Vec3;
+  text:string;
+}
+
+//-----------------------------------
+// Data for defining the entities themselves:
+// Union containing every component data type.
+union ComponentDataUnion {
+  corgi.CommonServicesDef,
+  SimpleMovementDef,
+  corgi.GraphDef,
+  ServicesDef,
+  corgi.MetaDef,
+  RailDenizenDef,
+  ShadowControllerDef,
+  LapDependentDef,
+  PlayerDef,
+  PatronDef,
+  PlayerProjectileDef,
+  corgi.PhysicsDef,
+  TimeLimitDef,
+  corgi.RenderMeshDef,
+  ListenerDef,
+  Render3dTextDef,
+  RiverDef,
+  SoundDef,
+  AttributesDef,
+  RailNodeDef,
+  SceneryDef,
+  LightDef,
+  corgi.TransformDef,
+  scene_lab.EditOptionsDef,
+  corgi.AnimationDef,
+}
+
+// Actual definition for each component.  Wrapped in a table because
+// you can't make arrays of raw unions.
+table ComponentDefInstance {
+  data:ComponentDataUnion;
+}
+
+// An entity is just a list of what components it has, and what their
+// starting values should be.
+table EntityDef {
+  component_list:[ComponentDefInstance];
+}
+
+// A list of entities.
+table EntityListDef {
+  entity_list:[EntityDef];
+}
+
+root_type EntityListDef;
+file_identifier "ENTI";
+file_extension "zooentity";

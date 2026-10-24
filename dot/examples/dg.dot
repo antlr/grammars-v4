@@ -1,0 +1,14 @@
+digraph g {
+	node [shape=plaintext];
+	A1 -> B1;
+	A2 -> B2;
+	A3 -> B3;
+	
+	A1 -> A2 [label=f];
+	A2 -> A3 [label=g];
+	B2 -> B3 [label="g'"];
+	B1 -> B3 [label="(g o f)'" tailport=s headport=s];
+
+	{ rank=same; A1 A2 A3 }
+	{ rank=same; B1 B2 B3 } 
+}

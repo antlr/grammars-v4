@@ -1,0 +1,227 @@
+-- B660002.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making
+--     this public release, the Government intends to confer upon all
+--     recipients unlimited rights  equal to those held by the Government.
+--     These rights include rights to use, duplicate, release or disclose the
+--     released technical data and computer software in whole or in part, in
+--     any manner and for any purpose whatsoever, and to have or permit others
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that the "=" operator may be overloaded for non-limited types.
+--      Check that explicit overloadings of "/=" may not have a Boolean
+--      result.
+--      Check that the result of an explicitly declared "=" operator may be
+--      other than Boolean.  Check that an equality operator may rename a
+--      function other than an equality operator.  Check that a declaration of
+--      "=" whose result type is not Boolean does not implicitly declare a
+--      "/=" operation that gives the complementary result.
+--
+-- TEST DESCRIPTION:
+--      Define "/=" operations on non-limited types, returning Boolean
+--      and other type results.  Define tri-state logic with "=" and
+--      "/=" operators that return values NL_True, NL_False and Unknown.
+--      Define an "=" operation on an array type, returning an array of
+--      Booleans.
+--
+--      In another package, verify that errors are issued for an explicit
+--      declaration of "/=" that returns a Boolean result.  Verify that errors
+--      are issued for rename of "/= that returns a Boolean result.
+--      Also verify that errors are issued for statements which attempt to
+--      use an implicit operator "/=" that was from a declaration of "="
+--      whose result type is not boolean.
+--
+--
+-- CHANGE HISTORY:
+--      06 Oct 95   SAIC    Initial prerelease version.
+--      19 Nov 19   RLB     Added error location indicators.
+--!
+
+package B660002_0 is
+
+   type NonLimited is range 1 .. 10;
+   type Enumeration_Type is (Unknown, NL_True, NL_False);
+   type Arr_Of_Booleans is array (1 .. 2) of Boolean;
+
+   type Record_Type is
+     record
+        C : Integer;
+     end record;
+
+   type Access_To_Proc is access procedure (I1, I2 : in NonLimited);
+   Do_Something_Access : Access_To_Proc;
+
+   procedure Do_Something (I1, I2 : in NonLimited);
+
+   function Not_Equal_AccToProc (I1 : NonLimited;
+                                 I2 : Arr_Of_Booleans) return Access_To_Proc;
+
+   function Not_Equal_Boolean   (I1, I2 : NonLimited) return Boolean;
+
+   function Equal_Integer       (I1, I2 : NonLimited) return Integer;
+
+end B660002_0;
+
+     --==================================================================--
+
+with B660002_0;
+use  B660002_0;
+
+procedure B660002 is
+
+   -- "/=" may be overloaded for non-limited types.
+
+   function "/=" (I1, I2 : NonLimited) return Float is          -- OK.    {4}
+   begin
+      return ( Float (I1) - Float (I2) );
+   end "/=";
+
+   -------------------------------------------------------------
+   function "/=" (I1, I2 : Arr_Of_Booleans)
+     return Arr_Of_Booleans is                                  -- OK.    {1:4}
+   begin
+      return ( I1(1) /= I2(1),
+               I2(2) /= I2(2) );
+   end "/=";
+
+   -------------------------------------------------------------
+   function "/=" (I1, I2 : NonLimited) return Access_To_Proc is -- OK.    {4}
+   begin
+      return Do_Something_Access;
+   end "/=";
+
+   -------------------------------------------------------------
+   -- "/=" may not have a Boolean result.
+
+   function "/=" (I1, I2 : Arr_Of_Booleans)
+     return Boolean is                                          -- ERROR: {1:4}
+                                                    -- Result type is Boolean.
+   begin
+      if ( I1(1) /= I2(1) and I2(2) /= I2(2) ) then
+         return True;
+      else
+         return False;
+      end if;
+   end "/=";
+
+   -------------------------------------------------------------
+   function "/=" (I1 : NonLimited; I2 : Arr_Of_Booleans)
+     return Access_To_Proc renames Not_Equal_AccToProc;         -- OK.    {1:4}
+
+   -------------------------------------------------------------
+   function "/=" (I1, I2 : NonLimited)
+     return Boolean renames Not_Equal_Boolean;                  -- ERROR: {1:4}
+                                                    -- Result type is Boolean.
+
+   -------------------------------------------------------------
+   -- "=" may have a result other than Boolean.
+
+   function "=" (I1, I2 : NonLimited) return Enumeration_Type is -- OK.   {4}
+   begin
+      if ( Integer (I1) = Integer (I2) ) then
+         return NL_True;
+      else
+         return NL_False;
+      end if;
+   end "=";
+
+   -------------------------------------------------------------
+   function "=" (I1, I2 : NonLimited)
+     return Arr_Of_Booleans is                                  -- OK.    {1:4}
+      Arr : Arr_Of_Booleans;
+   begin
+      if ( Integer (I1) = Integer (I2) ) then
+         Arr := (True, False);
+      else
+         Arr := (False, True);
+      end if;
+      return Arr;
+   end "=";
+
+   --------------------------------------------------------------------------
+   function "=" (I1, I2 : Record_Type)
+     return Record_Type is                                      -- OK.    {1:4}
+   begin
+      if (I1.C = I2.C ) then
+         return I1;
+      else
+         return I2;
+      end if;
+   end "=";
+
+   --------------------------------------------------------------------------
+   -- "/=" may have a result other than Boolean.
+
+   function "/=" (I1, I2 : Integer) return Integer is           -- OK.    {4}
+   begin
+      if (I1 = I2 ) then
+         return I1;
+      else
+         return I2;
+      end if;
+   end "/=";
+
+   --------------------------------------------------------------------------
+   function "/=" (I1, I2 : NonLimited)
+     return Integer renames Equal_Integer;                      -- OK.    {1:4}
+
+   --------------------------------------------------------------------------
+   generic
+
+      -- "/=" may have a result other than Boolean.
+
+      with function "/=" (I1, I2 : NonLimited)
+        return Integer;                                         -- OK.    {1:4}
+
+      -- "/=" may not have a Boolean result.
+
+      with function "/=" (I1, I2 : NonLimited)
+        return Boolean;                                         -- ERROR: {1:4}
+                                                    -- Result type is Boolean.
+
+      with function "/=" (I1, I2 : Arr_Of_Booleans)
+        return Boolean;                                         -- ERROR: {1:4}
+                                                    -- Result type is Boolean.
+
+   package Gen_Pck is end;
+
+   --------------------------------------------------------------------------
+   NL1, NL2   : NonLimited;
+   I1,  I2    : Integer;
+   R1,  R2    : Record_Type;
+   Enu_Result : Enumeration_Type;
+   Int_Result : Integer;
+   Rec_Result : Record_Type;
+   Arr_Result : Arr_Of_Booleans;
+
+begin
+
+   Enu_Result := NL1 /= NL2;                                    -- ERROR: {4}
+                                  -- "/=" return Enumeration_Type not defined.
+
+   Int_Result := I1  /= I2;                                     -- OK.    {4}
+                                            -- "/=" return Integer is defined.
+
+   Rec_Result := R1 /= R2;                                      -- ERROR: {4}
+                                          -- "/=" return Rec_Type not defined.
+
+   Arr_Result := NL1 /= NL2;                                    -- ERROR: {4}
+                                   -- "/=" return Arr_Or_Booleans not defined.
+
+end B660002;

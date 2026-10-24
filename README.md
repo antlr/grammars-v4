@@ -1,33 +1,21 @@
-[![Travis Status](https://api.travis-ci.org/antlr/grammars-v4.png)](https://travis-ci.org/antlr/grammars-v4)
+Last PR merge build: [![CI](https://github.com/antlr/grammars-v4/actions/workflows/main.yml/badge.svg)](https://github.com/antlr/grammars-v4/actions/workflows/main.yml?query=branch%3Amaster)
+Weekly .jar build: [![Weekly JAR](https://github.com/antlr/grammars-v4/actions/workflows/weekly-jar.yml/badge.svg)](https://github.com/antlr/grammars-v4/actions/workflows/weekly-jar.yml?query=branch%3Amaster)
+Weekly dev build: [![Weekly Dev](https://github.com/antlr/grammars-v4/actions/workflows/weekly-dev.yml/badge.svg)](https://github.com/antlr/grammars-v4/actions/workflows/weekly-dev.yml?query=branch%3Amaster)
 
-# grammars-v4
+# Grammars-v4
 
-Grammars written for [ANTLR v4](https://github.com/antlr/antlr4)
+This repository is a collection of formal grammars written for [ANTLR v4](https://github.com/antlr/antlr4).
 
-This repository is a collection of Antlr4 grammars.   
+The root directory name is the all-lowercase name of the language or file format parsed by the grammar. For example, java, cpp, csharp, c, etc.
 
-The root directory name is the all-lowercase name of the language parsed by the grammar. For example, java, cpp, csharp, c, etc...
+## Performance
 
-## Examples
+[Grammar performance table](https://htmlpreview.github.io/?https://github.com/antlr/grammars-v4/blob/master/performance.html) (sortable by column header).
 
-* [Java Example](https://github.com/teverett/antlr4example)
-* [C++ Example](https://github.com/teverett/antlr4-cpp-example)
+## FAQ
 
-## Contributing
+Please refer to the [grammars-v4 Wiki](https://github.com/antlr/grammars-v4/wiki)
 
-The grammars-v4 tree uses Travis in conjunction with [antlr4test-maven-plugin](https://github.com/antlr/antlr4test-maven-plugin) to test all grammars against example inputs. This ensures that all grammars on the tree parse, compile and work with the example inputs.
+## Code of Conduct
 
-Therefore:
-
-* Pull requests which cause test failures will be rejected
-* Pull requests which include additional examples to be used as test cases are strongly preferred
-
-## License
-
-Beware of the licenses on the individual grammars. There is no common license. When in doubt or you don't know what you're doing, please use the BSD or MIT license.
-
-## Testing the Grammars
-
-```
-mvn clean test
-```
+Please refer to [House Rules](https://github.com/antlr/grammars-v4/blob/master/House_Rules.md)

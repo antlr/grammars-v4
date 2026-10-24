@@ -1,0 +1,16 @@
+% 99 bottles of beer in CLU by dcurtis@lcs.mit.edu
+
+start_up = proc()
+   own po: stream := stream$primary_output()
+   for i: int in int$from_to_by(99, 1, -1) do
+      if i = 1 then
+         stream$putl(po, int$unparse(i) || " bottle of beer on the wall")
+         stream$putl(po, int$unparse(i) || " bottle of beer...")
+      else
+         stream$putl(po, int$unparse(i) || " bottles of beer on the wall")
+         stream$putl(po, int$unparse(i) || " bottles of beer...")
+      end
+      stream$putl(po, "Take one down, pass it around...")
+      end
+   stream$putl(po, "\nTime to get more beer!")
+   end start_up

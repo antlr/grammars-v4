@@ -1,0 +1,507 @@
+	title	'LDCOPY Ver 1.1 Oct 81'
+
+vers	equ	10
+
+	; Copyright, (C) 1981
+	; Digital Research, Inc.
+	; P.O. Box 579
+	; Pacific Grove, CA  93950
+
+
+; LDCOPY is used to generate and propagate bootable CP/M-86 systems.
+
+; It copies a CP/M-86 Loader image (either from a disk file, or from
+; the system tracks of an existing CP/M-86 system diskette) to a new
+; diskette.
+
+; The following equates will require modification for different
+; diskette formats.  For convienence, they are only referenced
+; by a pair of data bytes near the end of the data segment.
+; In addition, the skew table in the data area will need modification.
+
+sdspt	equ	26              ; number of sectors per track
+sdlt	equ	2        	;   "    of tracks for loader
+ 
+
+
+;	**************************
+;	*
+;	*	global equates
+;	*
+;	**************************
+
+bdosint	equ	224	;BDOS interrupt number
+
+false	equ	0
+true	equ	not false
+cr	equ	0dh	        ;carriage return
+lf	equ	0ah	        ;line feed
+
+
+sdndisks equ	16		; maximum number of drives
+sdsecsiz equ	128		; size of each sector
+
+tpa	equ	100h
+fcbaddr	equ	5ch
+fcbname equ	fcbaddr + 1	;1st char of file name
+fcbtype equ	fcbaddr + 9	;file type
+fcbcr	equ	fcbaddr + 32	;current record
+
+	cseg
+
+	jmp	start
+	db	' COPYRIGHT (C) 1981, DIGITAL RESEARCH '
+
+	Rs	100H		; Emergency patch area
+
+;	***********************
+;	*	
+;	*	program begins here
+;	*
+;	***********************
+
+start:
+	mov	ax,ds
+	mov	es,ax
+
+	mov	dx,offset signon
+	call	outmsg
+	cmp	byte ptr .fcbname,' '
+	jz	gl		;check for file given on command line
+	call	getfile		;read ldr from file
+	jmp	ps		
+gl:	call	getldr		;read ldr from 1st 2 tracks
+ps:	call	putldr		;put ldr on 	"  "   "
+	jmp 	reboot
+
+;	***************************
+;	*
+;	*	getfile: get the file specified in command tail into ram
+;	*
+;	***************************
+
+getfile:
+	cmp	byte ptr .fcbtype,' '
+	jnz	opn
+	mov	byte ptr .fcbtype,    'C'	
+	mov	byte ptr .fcbtype + 1,'M'
+	mov	byte ptr .fcbtype + 2,'D'
+opn:
+	mov	dx,fcbaddr	;try to open it
+	call	open
+	inc	al		;255 becomes 00
+	jnz	rdok		;ok to read if not 255
+
+	mov	dx,offset nofile
+	call	crmsg		;file not present, error and reboot
+	jmp	reboot
+rdok:
+	mov	byte ptr .fcbcr,0	;current record = 0
+	mov	dx,offset loadp	;base of buffer
+	mov	cx,maxsecs	;sector count
+rdinp:
+	push	cx
+	push	dx		;ready for dma
+	call	bdma		;bdos dma function
+	mov	dx,fcbaddr	;ready for read
+	call	dread
+	pop	dx		;recall dma address
+	pop	cx		;recall sector count
+	cmp	al,1		;check for eof
+	jz	don
+	dec	cx		;don't read to far
+	jz	don
+	or	al,al		;0 if read ok
+	jnz	badrd
+	add	dx,secsiz       ;inc dma by sector size
+	jmp	rdinp
+don:
+	ret
+badrd:				;read error encountered in input file
+	mov	dx,offset badfile
+	call	crmsg
+	jmp	reboot
+
+;	**************************
+;	*
+;	*	getldr: get CP/M loader from 1st N tracks
+;	*
+;	**************************
+
+getldr:
+	mov	dx,offset askget
+	call	crmsg		;which drive is source on ?
+	call	getchar		;must get from disk - not from memory
+ 	mov	ah,al		;save ascii char	
+	sub	al,'A'		;normalize drive number
+	cmp	al,ndisks	;valid drive?
+	jb	getc		;skip to getc if so
+	call	baddisk		;invalid drive number
+	jmp	getldr		;to try again
+getc:
+	mov	gdisk,ah	;ascii drive letter for message
+	call	sel		;to select the drive in al
+	call	crlf
+	mov	dx,offset getmsg
+	call	outmsg		;make sure right drive
+	call	getchar
+	cmp	al,cr		;user mistake, no cr
+	jnz	gboot
+	call	crlf
+	mov	rewr,0		;set to read for getput
+	call	getput
+	mov	dx,offset done
+	call	outmsg
+	ret
+gboot:	jmp	reboot 		;back to cp/m
+
+;	*******************************
+;	*	
+;	*	putldr: put CP/M loader on 1st N tracks
+;	*
+;	*******************************
+
+putldr:
+	mov	dx,offset askput
+	call	crmsg		;what drive to put ldr
+	call	getchar
+	cmp	al,cr		;all done if cr
+	jz	pboot		;this is normal program exit point
+	mov	ah,al		;save ascii drive letter
+	sub	al,'A'		;make it a number
+	cmp	al,ndisks		
+	jb	putc
+	call	baddisk		;invalid drive name
+	jmp	putldr		;to try again
+putc:
+	mov	pdisk,ah	;drive letter in message
+	call	sel		;select dest drive in al
+	mov	dx,offset putmsg
+	call	crmsg		;check with user for ok
+	call	getchar
+	cmp	al,cr		;user mistake if not cr, reboot
+	jnz	pboot
+	call	crlf
+	mov	rewr,1		;set to write for getput
+	call	getput		;to put loader back on diskette
+	mov	dx,offset done
+	call	outmsg
+	jmp	putldr		;for another put operation
+pboot:	jmp	reboot		;back to cp/m
+	
+;	***********************
+;	*
+;	*	getput: get or put loader (rewr=0 for read, 1 for write)
+;	*		disk is already selected
+;	*
+;	***********************
+
+getput:
+	mov	bx,offset loadp	;load point in ram for cp/m during LDCOPY
+	mov	dmaddr,bx
+				;clear track to 00
+	mov	track,-1	;start with track equal -1
+rwtrk:				;read or write next track
+	inc	track		;track = track + 1
+	mov	cx,track
+	cmp	cx,nlt		;number of loader tracks = current track ?
+	jnz	nxttrk		;end of this routine > 128 bytes
+	jmp	endrw		;end of read or write
+				;otherwise notdone, go to next track
+nxttrk:
+	mov	cx,track	
+	call	trk		;to set track
+	mov	sector,-1	;counts 0, 1, 2, . . . 25
+				;sector incremented before read or write
+rwsec:				;read or write sector
+	inc	sector		;to next sector
+	mov	bx,sector	;current sector
+	cmp	bx,spt		;sectors per track
+	jz 	endtrk
+				;read or write sector to or from
+l_5:				;current dma address
+	mov	si,offset tran
+	add	bx,bx		; double sector number
+	mov	cx,[bx+si]	;xlate to physical sector
+	push	si
+	push	cx
+	call	sec		;set up sector number
+	pop	cx
+	pop	si
+	mov	bx,[si]
+	sub	cx,bx		;tran(sector)-tran(0)
+        call	multsec		;cx * sector size	
+	add	cx,dmaddr 	;base of dma for this track
+                                ;+(tran(sector)-tran(0))*secsiz
+	call	dma		;dma address set from cx
+				;dma address set, clear retry count
+trysec:				;try to read or write current sector
+	Mov	Cl, 00
+	Mov	Ax, Track
+	Inc	Ax
+	Cmp	Ax, Nlt
+	Jne	Normal_Write
+
+	Mov	Ax, Sector
+	Inc	Ax
+	Cmp	Ax, Spt
+	Jne	Normal_Write
+	Mov	Cl, 01
+Normal_Write:
+	or	rewr,0		;read or write?
+	jz	tryread
+				;must be write
+	call	write
+	jmp	chkrw		;check for error returns
+tryread:
+	call	read
+chkrw:
+	or	al,al
+	jz	rwsec
+
+	mov	dx,offset errmsg
+	call	outmsg
+	call	getchar
+	cmp	al,cr
+	jne	reboot1		;local jmp then to reboot, >128
+				;typed a cr, ok to ignore
+	call	crlf
+	jmp	rwsec
+
+endtrk:				;end of track
+	mov	cx,spt		;sectors per track
+	call	multsec		;*secsiz
+	mov	bx,dmaddr	;base dma for this track
+	add	bx,cx
+                                ;+ spt * secsiz
+	mov	dmaddr,bx	;ready for next track
+	jmp	rwtrk		;for another track
+
+endrw:				;end of read or write, return to caller
+	ret
+
+reboot1:jmp	reboot		;farther than 128 bytes	
+
+;	*****************************************
+;	*
+;	*	utility subroutines
+;	*
+;	****************************************
+;
+;*****
+multsec:			;cx * sector size
+	push	dx		;return value in cx
+	mov	ax,secsiz
+	mul	cx
+	mov	cx,ax
+	pop	dx
+	ret
+;*****
+baddisk:
+	mov	dx,offset qdisk	;bad disk name
+	call	crmsg
+	ret
+
+;	**********************
+;	*
+;	*	bdos subroutines
+;	*	
+;	**********************
+
+bdos:	int	bdosint
+	ret
+				;function numbers in cl
+
+reset	equ	0		;warm boot
+coni	equ	1		;console input
+cono	equ	2		;console output
+prstr	equ	9		;print string
+rconb	equ	10		;read console buffer 
+self	equ	14		;select disk
+openf	equ	15		;disk open
+setdmaf	equ	26		;where data will go
+dreadf	equ	20		;disk read 
+biosf	equ	50		;bios call 
+
+reboot:
+	mov	al,0
+	call	sel
+	call	crlf
+	mov	cl,reset
+	mov	dl,0		; release memory
+	jmp	bdos
+;****
+getchar:			;get an upper case char into al 
+	call	getbuf		;use buffered console read
+	cmp	conbuf+1,0	;just a crlf?
+	mov	al,cr
+	jz	ex	
+	mov	al,conbuf+2	;first char read
+	cmp	al,'a'		;translate to upper case if lower
+	jb	ex
+	cmp	al,'z'
+	ja	ex
+	and	al,5fh		;it is lower, make upper
+ex:	ret
+;****
+getbuf:
+				;read console buffer
+	mov	cl,rconb
+	mov	dx,offset conbuf
+	jmp 	bdos
+;****
+putchar:
+				;write character from al to console
+	mov	dl,al
+	mov	cl,cono
+	jmp	bdos
+;****
+crlf:				;send carriage return, line feed
+	mov	al,cr
+	call	putchar
+	mov	al,lf
+	call	putchar
+	ret
+;****
+crmsg:				;print message addressed by dx til zero
+				;with leading crlf
+	push	dx
+	call	crlf
+	pop	dx		;drop thru to outmsg0
+;****
+outmsg:
+	mov	cl,prstr
+	jmp	bdos		;dx has string addr
+;****
+bdma:				;dx has address
+	mov	cl,setdmaf
+	jmp	bdos
+;****
+dread:				;disk read function
+	mov	cl,dreadf
+	jmp	bdos 
+;****
+open:				;file open function
+	mov	cl,openf
+	jmp	bdos
+;****
+bios:
+	mov	fnum,al		;bios function number
+	mov	bcx,cx
+	mov	bdx,dx
+	mov	dx,offset(bds)
+	mov	cl,biosf
+	jmp	bdos
+
+;	****************************
+;	*
+;	* bios utilities
+;	*
+;	****************************
+
+seldsk	equ	9		;wboot+24 for disk select
+settrk	equ	10		;wboot+27 for set track function
+setsec	equ	11		;wboot+30 for set sector function
+setdma	equ	12		;wboot+33 for set dma address
+readf	equ	13		;wboot+36 for read function
+writf	equ	14		;wboot+39 for write function
+
+sel:
+				;select disk given by register a
+	mov	cl,al
+	mov	al,seldsk
+	jmp	bios
+;****
+trk:				;set up track
+	mov	al,settrk	;offset for settrk entry
+	jmp	bios		;gone to settrk
+;****
+sec:				;set up sector number
+	mov	al,setsec
+	jmp	bios
+;****
+dma:				;set dma address to value of cx
+	mov	al,setdma
+	jmp	bios 
+;****
+read:				;perform read operation
+	mov	al,readf
+	jmp	bios
+;****
+write:				;perform write operaton
+	mov	al,writf
+	jmp	bios
+
+;	**************************
+;	*
+;	* data areas
+;	*
+;	**************************
+
+
+	dseg
+	org	0100h	; skip past page zero
+				;messages
+
+signon	db	'LDCOPY VERS '
+	db	vers/10+'0','.',vers mod 10+'0','$'
+askget	db	'Source Drive Name $'
+getmsg	db	'Source On '
+gdisk	rs	1			;filled in at get function
+	db	', Then Type Return$'
+askput	db	'Destination Drive Name (Or Return To Reboot) $'
+putmsg	db	'Destination On '
+pdisk	rs	1			;filled in at put function
+	db	', Then Type Return$'
+errmsg	db	'Permanent Error, Type Return To Ignore$'
+done	db	'Function Complete$'
+qdisk	db	'Invalid Drive Name$'
+nofile	db	'No Source File On Disk$'
+badfile	db	'Source File Read Error$'
+
+				;translate table	
+
+tran	dw	1,3,5,7,9,11,13,15,17,19,21,23,25
+	dw	2,4,6,8,10,12,14,16,18,20,22,24,26
+
+				;leave room for double density
+	dw	0,0,0,0,0,0,0,0
+	dw	0,0,0,0,0,0,0,0
+	dw	0,0,0,0,0,0,0,0
+	dw	0,0,0,0,0,0,0,0	; (64 extra bytes reserved)
+
+
+;	*************************
+;	*
+;	* variables
+;	*
+;	************************
+
+
+bds:				;bios data structure
+fnum	rb	1		;storage for bios parameters
+bcx	rw	1		;the bdos bios func puts these
+bdx	rw	1		;in registers before jumping to bios 
+
+
+nlt	dw	sdlt		;number of loader tracks	
+spt	dw	sdspt		;sectors per track
+
+ndisks  db	sdndisks	;number of disks
+secsiz	dw	sdsecsiz	;sector size		
+maxsecs	dw	sdlt * sdspt	;maximum sectors to read from file
+sdisk	rb	1		;selected disk for current operation
+track	rw	1		;current track
+rewr	rb	1		;read if 0,write if 1
+sector	rw	1		;current sector
+dmaddr	dw	0		;current dma address
+retry	rb	1		;number of tries on this sector
+conbuf	db	30
+	rb	32		;console buffer
+				;make stack on even address
+
+loadp	rs	sdsecsiz*sdspt*sdlt
+
+	db	0		; force out last data segement byte
+
+	end	

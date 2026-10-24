@@ -1,0 +1,149 @@
+//
+// $Id$
+//
+
+
+/**----------------------------------------------------------------------
+ * ステータスバー
+ ----------------------------------------------------------------------*/
+class KStatusBar extends KWidget
+{
+  var _defaultLabel;
+  var _label;
+  var _attachToWindow;
+
+  /*------------------------------
+   * コンストラクタ
+   *
+   * @param win ウィンドウ
+   * @param name 名前
+   ------------------------------*/
+  function KStatusBar(win, name = "") {
+    // 親クラス呼び出し
+    super.KWidget(win, name);
+    _label = "";
+    _defaultLabel = "";
+    _attachToWindow = true;
+    maxWidth = 1000;
+    invalidateLayout();
+  }
+  
+  /**------------------------------
+   * デフォルトラベルの値
+   *
+   * @return デフォルトラベルの値
+   * @param v 新規のデフォルトラベルの値
+   ------------------------------*/
+  property defaultLabel {
+    getter {
+      return _defaultLabel;
+    }
+
+    setter(v) {
+      // 内容が更新されている時だけ処理
+      if (_defaultLabel == v)
+        return;
+      // 値を更新
+      _defaultLabel = v;
+      // 再描画
+      drawContent();
+    }
+  }
+
+  /**------------------------------
+   * ラベルの値
+   *
+   * @return ラベルの値
+   * @param v 新規のラベルの値
+   ------------------------------*/
+  property label {
+    getter {
+      return _label;
+    }
+
+    setter(v) {
+      // 内容が更新されている時だけ処理
+      if (_label == v)
+        return;
+      // 値を更新
+      _label = v;
+      // 再描画
+      drawContent();
+    }
+  }
+
+  /**------------------------------
+   * ウィンドウにアタッチするかどうか
+   ------------------------------*/
+  property attachToWindow {
+    getter {
+      return _attachToWindow;
+    }
+    setter(v) {
+      if (_attachToWindow == v)
+        return;
+      _attachToWindow = v;
+      if (_attachToWindow
+          && window._statusBar === void)
+        window_statusBar = this;
+      if (! _attachToWindow
+          && window._statusBar === this)
+        window._statusBar = void;
+    }
+  }
+
+  // レイアウトやり直し
+  function invalidateLayout {
+    setMinMaxSize(1, fontHeight, maxWidth, fontHeight);
+  }
+
+  // 再描画
+  function drawContent {
+    // 透明に塗りつぶし
+    fillRect(0, 0, width, height, 0);
+    // 黒でテキスト描画
+    drawText(0, 0, _label.length ? _label : _defaultLabel, fontColor, 255);
+  }
+
+  // フォントカラーが変更されたら再描画
+  function onFontColorModified {
+    drawContent();
+  }
+
+  // フォントフェイスが変更されたら再描画
+  function onFontFaceModified {
+    drawContent();
+  }
+
+  // フォントヘイトが変更されたらレイアウトやり直し
+  function onFontHeightModified {
+    invalidateLayout();
+    drawContent();
+  }
+
+  // サイズが変わったら再描画
+  function onSizeModified {
+    drawContent();
+  }
+
+  // enabled==trueならそのまま表示
+  function onNodeEnabled {
+    opacity = 255;
+  }
+
+  // enabled=falseなら半透明で表示
+  function onNodeDisabled {
+    opacity = 64;
+  }
+
+  function onParentModified(parent) {
+    if (parent !== void) {
+      if (_attachToWindow
+          && window._statusBar === void)
+        window._statusBar = this;
+    } else {
+      if (window._statusBar === this)
+        window._statusBar = void;
+    }
+  }
+}

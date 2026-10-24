@@ -1,0 +1,37 @@
+version: 2
+updates:
+  # Java
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    labels:
+      - "infrastructure"
+      - "dependencies"
+      - "target:java"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    labels:
+      - "infrastructure"
+      - "dependencies"
+  # Go
+  - package-ecosystem: "gomod"
+    directory: "/_scripts/templates/Go"
+    schedule:
+      interval: "daily"
+    allow:
+      - dependency-type: "all"
+    labels:
+      - "infrastructure"
+      - "dependencies"
+  # PHP
+  - package-ecosystem: "composer"
+    directory: "/_scripts/templates/PHP"
+    schedule:
+      interval: "daily"
+    labels:
+      - "infrastructure"
+      - "dependencies"
+      - "target:php"

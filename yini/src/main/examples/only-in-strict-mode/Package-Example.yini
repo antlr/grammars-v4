@@ -1,0 +1,43 @@
+// package.json-like structure in YINI format
+
+^ Package
+
+^^ General
+Name = "MyNodeApp"
+Version = "1.0.0"
+Description = "A Node.js application that does amazing things!"
+Main = "index.js"
+
+^^ Scripts
+`start` = "node index.js"
+`test` = """echo \"Error: no test specified\" && exit 1"""
+
+^^ Dependencies
+`express` = "^4.17.1"
+`lodash` = "^4.17.21"
+`nodemon` = "^1.14.12"
+
+^^ DevDependencies
+`mocha` = "^8.2.1"
+`chai` = "^4.2.0"
+
+Keywords: "node", "express", "web", "app", "backend"
+
+Author = "Jane Doe"
+License = "MIT"
+
+    ^^ Repository
+    `type` = "git"
+    `url` = "https://github.com/janedoe/my-node-app"
+
+    ^^ `Custom Configuration`
+    ^^^ Configurations
+    `port` = 3000
+    `debug` = YES
+    `enableCors` = YES
+
+    ^^ AppSettings
+    `VersionString` = "v1.0.0"
+    `HomePageURL` = "https://myapp.example.com"
+
+/END

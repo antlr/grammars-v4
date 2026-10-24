@@ -1,0 +1,20 @@
+@media print {}
+@media screen, print {}
+@media (hover: hover) {}
+@media (max-width: 12450px) {}
+@media (color) {}
+@media (min-width: 30em) and (orientation: landscape) {}
+@media screen and (min-width: 30em) and (orientation: landscape) {}
+@media (min-height: 680px), screen and (orientation: portrait) {}
+@media not all and (monochrome) {}
+@media not screen and (color), print and (color) {}
+@media only screen and (color) {}
+
+@media (hover: hover) {
+  .button:hover {
+    border: 2px solid black;
+    @media (color) {
+      border-color: #036;
+    }
+  }
+}
