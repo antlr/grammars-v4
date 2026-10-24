@@ -12,7 +12,7 @@ export default abstract class bnfParserBase extends Parser {
     {
         var i = 1;
         var c = this.inputStream.LT(i);
-        var v = c.type != bnfParser.NL;
+        var v = c != null && c.type != bnfParser.NL;
         return v;
     }
 }

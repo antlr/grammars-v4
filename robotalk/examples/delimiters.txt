@@ -1,0 +1,9 @@
+# Same program as shotbot, but written with commas, semicolons and
+# tabs as delimiters instead of spaces and newlines, to show that
+# RoboTalk does not care which delimiters are used where.
+Main:,Range;0 >;FireSub
+RotateSub,IFE,Main;JUMP;FireSub:;;;20 fire'
+
+5 AIM + ,AIM' STORE;RETURN
+
+STORE,RETURN,RotateSub:

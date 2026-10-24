@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar doiurl;
 
 doiuri
-    : scheme ':' encodeddoi ('?' query)? ('#' fragment_)? EOF?
+    : scheme ':' encodeddoi ('?' query)? ('#' fragment_)? EOF
     ;
 
 scheme

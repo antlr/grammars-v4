@@ -1,0 +1,11 @@
+module nats.
+    export 0, s, +, < .
+    datatype nat = { 0 ; s(nat) }.
+    func + : nat, nat -> nat infixleft 500.
+    pred < : nat, nat infix.
+rules.
+    N + 0 = N.
+    N + s(M) = s(N + M).
+    0 < s(M).
+    s(N) < s(M) :- N < M.
+end nats.

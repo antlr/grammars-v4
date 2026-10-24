@@ -28,7 +28,10 @@ parser grammar AdaParser;
 
 options {
     tokenVocab = AdaLexer;
+    superClass = AdaParserBase;
 }
+
+// Insert here @header for parser.
 
 /*
 2 - Lexical Elements
@@ -82,7 +85,7 @@ type_declaration
     ;
 
 full_type_declaration
-    : TYPE defining_identifier known_discriminant_part? IS type_definition aspect_specification? SEMI
+    : TYPE defining_identifier known_discriminant_part? IS type_definition aspect_specification? SEMI {this.EnterDeclaration();}
     | task_type_declaration
     | protected_type_declaration
     ;
@@ -99,7 +102,7 @@ type_definition
     ;
 
 subtype_declaration
-    : SUBTYPE defining_identifier IS subtype_indication aspect_specification?
+    : SUBTYPE defining_identifier IS subtype_indication aspect_specification? SEMI {this.EnterDeclaration();}
     ;
 
 subtype_indication
@@ -107,7 +110,7 @@ subtype_indication
     ;
 
 subtype_mark
-    : identifier
+    : identifier (DOT identifier)*
     ;
 
 constraint
@@ -127,9 +130,9 @@ composite_constraint
     ;
 
 object_declaration
-    : defining_identifier_list COLON ALIASED? CONSTANT? subtype_indication (ASSIGN expression)? aspect_specification? SEMI
-    | defining_identifier_list COLON ALIASED? CONSTANT? access_definition (ASSIGN expression)? aspect_specification? SEMI
-    | defining_identifier_list COLON ALIASED? CONSTANT? array_type_definition (ASSIGN expression)? aspect_specification? SEMI
+    : defining_identifier_list COLON ALIASED? CONSTANT? subtype_indication (ASSIGN expression)? aspect_specification? SEMI {this.EnterDeclaration();}
+    | defining_identifier_list COLON ALIASED? CONSTANT? access_definition (ASSIGN expression)? aspect_specification? SEMI {this.EnterDeclaration();}
+    | defining_identifier_list COLON ALIASED? CONSTANT? array_type_definition (ASSIGN expression)? aspect_specification? SEMI {this.EnterDeclaration();}
     | single_task_declaration
     | single_protected_declaration
     ;
@@ -139,7 +142,7 @@ defining_identifier_list
     ;
 
 number_declaration
-    : defining_identifier_list COLON CONSTANT ASSIGN expression
+    : defining_identifier_list COLON CONSTANT ASSIGN expression SEMI {this.EnterDeclaration();}
     ;
 
 derived_type_definition
@@ -160,7 +163,7 @@ enumeration_type_definition
     ;
 
 enumeration_literal_specification
-    : defining_identifier
+    : defining_identifier {this.EnterDeclaration();}
     | character_literal
     ;
 
@@ -253,12 +256,12 @@ unknown_discriminant_part
     ;
 
 known_discriminant_part
-    : '(' discriminant_specification (SEMI discriminant_specification)* ')'
+    : '(' {this.EnterScope();} discriminant_specification (SEMI discriminant_specification)* ')' {this.ExitScope();}
     ;
 
 discriminant_specification
-    : defining_identifier_list COLON null_exclusion? subtype_mark (ASSIGN expression)?
-    | defining_identifier_list COLON access_definition (ASSIGN expression)?
+    : defining_identifier_list COLON null_exclusion? subtype_mark (ASSIGN expression)? {this.EnterDeclaration();}
+    | defining_identifier_list COLON access_definition (ASSIGN expression)? {this.EnterDeclaration();}
     ;
 
 default_expression
@@ -278,7 +281,7 @@ record_type_definition
     ;
 
 record_definition
-    : RECORD component_list END RECORD
+    : RECORD {this.EnterScope();} component_list END RECORD {this.ExitScope();}
     | NULL_ RECORD
     ;
 
@@ -294,7 +297,7 @@ component_item
     ;
 
 component_declaration
-    : defining_identifier_list COLON component_definition (ASSIGN default_expression)? aspect_specification? SEMI
+    : defining_identifier_list COLON component_definition (ASSIGN default_expression)? aspect_specification? SEMI {this.EnterDeclaration();}
     ;
 
 variant_part
@@ -321,7 +324,7 @@ record_extension_part
     ;
 
 abstract_subprogram_declaration
-    : overriding_indicator? subprogram_specification IS ABSTRACT aspect_specification?
+    : overriding_indicator? subprogram_specification IS ABSTRACT aspect_specification? SEMI
     ;
 
 interface_type_definition
@@ -362,7 +365,7 @@ access_definition
     ;
 
 incomplete_type_declaration
-    : TYPE defining_identifier discriminant_part? (IS TAGGED)? SEMI
+    : TYPE defining_identifier discriminant_part? (IS TAGGED)? SEMI {this.EnterDeclaration();}
     ;
 
 declarative_part
@@ -404,10 +407,10 @@ name
     | name '(' discrete_range ')'               //slice
     | name DOT selector_name                    //selected_component
     | name SQ attribute_designator              //attribute_reference
-    | type_conversion
+    | {this.IsTypeName()}? type_conversion
     | name actual_parameter_part //function_call
     | character_literal
-    | qualified_expression
+    | {this.IsTypeName()}? qualified_expression
     //| name                       //generalized_reference
     | name actual_parameter_part //generalized_indexing
     ;
@@ -429,6 +432,10 @@ attribute_designator
     | DELTA__
     | DIGITS__
     | MOD__
+    | ACCESS
+    | DELTA
+    | DIGITS
+    | MOD
     ;
 
 range_attribute_reference
@@ -517,6 +524,7 @@ choice_relation
 relation
     : simple_expression (relational_operator simple_expression)?
     | simple_expression NOT? IN membership_choice_list
+    | raise_expression
     ;
 
 membership_choice_list
@@ -524,12 +532,16 @@ membership_choice_list
     ;
 
 membership_choice
-    : choice_expression
+    : choice_simple_expression
     | range
     | subtype_mark
     ;
 
 simple_expression
+    : unary_adding_operator? term (binary_adding_operator term)*
+    ;
+
+choice_simple_expression
     : unary_adding_operator? term (binary_adding_operator term)*
     ;
 
@@ -547,7 +559,7 @@ primary
     : numeric_literal
     | NULL_
     | string_literal
-    | aggregate
+    | {this.IsAggregate()}? aggregate
     | name
     | allocator
     | '(' expression ')'
@@ -564,7 +576,7 @@ logical_operator
 relational_operator
     : EQ
     | NE
-    | LE
+    | LT
     | GT
     | LE
     | GE
@@ -597,6 +609,10 @@ highest_precedence_operator
 conditional_expression
     : if_expression
     | case_expression
+    ;
+
+raise_expression
+    : RAISE name (WITH simple_expression)?
     ;
 
 if_expression
@@ -636,7 +652,7 @@ type_conversion
 
 qualified_expression
     : subtype_mark SQ '(' expression ')'
-    | subtype_mark SQ '(' aggregate ')'
+    | subtype_mark SQ aggregate
     ;
 
 allocator
@@ -691,7 +707,7 @@ null_statement
     ;
 
 label
-    : direct_name
+    : LLB direct_name RLB
     ;
 
 assignment_statement
@@ -723,16 +739,16 @@ iteration_scheme
     ;
 
 loop_parameter_specification
-    : defining_identifier IN REVERSE? discrete_subtype_definition
+    : defining_identifier IN REVERSE? discrete_subtype_definition {this.EnterDeclaration();}
     ;
 
 iterator_specification
-    : defining_identifier IN REVERSE? name
-    | defining_identifier COLON subtype_indication OF REVERSE? name
+    : defining_identifier IN REVERSE? name {this.EnterDeclaration();}
+    | defining_identifier COLON subtype_indication OF REVERSE? name {this.EnterDeclaration();}
     ;
 
 block_statement
-    : (direct_name COLON)? (DECLARE declarative_part)? BEGIN handled_sequence_of_statements END identifier? SEMI
+    : (direct_name COLON)? {this.EnterScope();} (DECLARE declarative_part)? BEGIN handled_sequence_of_statements END identifier? SEMI {this.ExitScope();}
     ;
 
 exit_statement
@@ -740,7 +756,7 @@ exit_statement
     ;
 
 goto_statement
-    : GOTO name
+    : GOTO name SEMI
     ;
 
 /*
@@ -748,7 +764,7 @@ goto_statement
 */
 
 subprogram_declaration
-    : overriding_indicator? subprogram_specification aspect_specification? SEMI
+    : overriding_indicator? subprogram_specification aspect_specification? SEMI {this.EnterDeclaration();}
     ;
 
 subprogram_specification
@@ -792,14 +808,14 @@ parameter_and_result_profile
     ;
 
 formal_part
-    : '(' parameter_specification (SEMI parameter_specification)* ')'
+    : '(' {this.EnterScope();} parameter_specification (SEMI parameter_specification)* ')' {this.ExitScope();}
     ;
 
 parameter_specification
     : defining_identifier_list COLON ALIASED? mode_ null_exclusion? subtype_mark (
         ASSIGN default_expression
-    )?
-    | defining_identifier_list COLON access_definition (ASSIGN default_expression)?
+    )? {this.EnterDeclaration();}
+    | defining_identifier_list COLON access_definition (ASSIGN default_expression)? {this.EnterDeclaration();}
     ;
 
 mode_
@@ -807,12 +823,12 @@ mode_
     ;
 
 subprogram_body
-    : overriding_indicator? subprogram_specification aspect_specification? IS declarative_part BEGIN handled_sequence_of_statements END designator?
-        SEMI
+    : overriding_indicator? subprogram_specification aspect_specification? IS {this.EnterDeclaration(); this.EnterScope();} declarative_part BEGIN handled_sequence_of_statements END designator?
+        SEMI {this.ExitScope();}
     ;
 
 procedure_call_statement
-    : name
+    : name SEMI
     | name actual_parameter_part SEMI
     ;
 
@@ -834,7 +850,7 @@ simple_return_statement
     ;
 
 extended_return_object_declaration
-    : defining_identifier COLON ALIASED? CONSTANT? return_subtype_indication (ASSIGN expression)?
+    : defining_identifier COLON ALIASED? CONSTANT? return_subtype_indication (ASSIGN expression)? {this.EnterDeclaration();}
     ;
 
 extended_return_statement
@@ -859,7 +875,7 @@ expression_function_declaration
 */
 
 package_declaration
-    : package_specification SEMI
+    : package_specification SEMI {this.EnterDeclaration();}
     ;
 
 package_specification
@@ -869,19 +885,19 @@ package_specification
     ;
 
 package_body
-    : PACKAGE BODY_ defining_program_unit_name aspect_specification? IS declarative_part (
+    : PACKAGE BODY_ defining_program_unit_name aspect_specification? IS {this.EnterDeclaration(); this.EnterScope();} declarative_part (
         BEGIN handled_sequence_of_statements
-    )? END ((name DOT)? identifier)? SEMI
+    )? END ((name DOT)? identifier)? SEMI {this.ExitScope();}
     ;
 
 private_type_declaration
-    : TYPE defining_identifier discriminant_part? IS (ABSTRACT? TAGGED)? LIMITED? PRIVATE aspect_specification? SEMI
+    : TYPE defining_identifier discriminant_part? IS (ABSTRACT? TAGGED)? LIMITED? PRIVATE aspect_specification? SEMI {this.EnterDeclaration();}
     ;
 
 private_extension_declaration
     : TYPE defining_identifier discriminant_part? IS ABSTRACT? (LIMITED | SYNCHRONIZED) NEW subtype_indication (
         AND interface_list
-    )? WITH PRIVATE aspect_specification? SEMI
+    )? WITH PRIVATE aspect_specification? SEMI {this.EnterDeclaration();}
     ;
 
 /*
@@ -914,16 +930,16 @@ renaming_declaration
     ;
 
 object_renaming_declaration
-    : defining_identifier COLON null_exclusion? subtype_mark RENAMES name aspect_specification? SEMI
-    | defining_identifier COLON access_definition RENAMES name aspect_specification? SEMI
+    : defining_identifier COLON null_exclusion? subtype_mark RENAMES name aspect_specification? SEMI {this.EnterDeclaration();}
+    | defining_identifier COLON access_definition RENAMES name aspect_specification? SEMI {this.EnterDeclaration();}
     ;
 
 exception_renaming_declaration
-    : defining_identifier COLON EXCEPTION RENAMES name aspect_specification? SEMI
+    : defining_identifier COLON EXCEPTION RENAMES name aspect_specification? SEMI {this.EnterDeclaration();}
     ;
 
 package_renaming_declaration
-    : PACKAGE defining_program_unit_name RENAMES name aspect_specification? SEMI
+    : PACKAGE defining_program_unit_name RENAMES name aspect_specification? SEMI {this.EnterDeclaration();}
     ;
 
 subprogram_renaming_declaration
@@ -943,13 +959,13 @@ generic_renaming_declaration
 task_type_declaration
     : TASK TYPE defining_identifier known_discriminant_part? aspect_specification? (
         IS (NEW interface_list WITH)? task_definition
-    )? SEMI
+    )? SEMI {this.EnterDeclaration();}
     ;
 
 single_task_declaration
     : TASK defining_identifier aspect_specification? (
         IS (NEW interface_list WITH)? task_definition
-    )? SEMI
+    )? SEMI {this.EnterDeclaration();}
     ;
 
 task_definition
@@ -962,17 +978,17 @@ task_item
     ;
 
 task_body
-    : TASK BODY_ defining_identifier aspect_specification? IS declarative_part BEGIN handled_sequence_of_statements END identifier? SEMI
+    : TASK BODY_ defining_identifier aspect_specification? IS {this.EnterDeclaration(); this.EnterScope();} declarative_part BEGIN handled_sequence_of_statements END identifier? SEMI {this.ExitScope();}
     ;
 
 protected_type_declaration
     : PROTECTED TYPE defining_identifier known_discriminant_part? aspect_specification? IS (
         NEW interface_list WITH
-    )? protected_definition SEMI
+    )? protected_definition SEMI {this.EnterDeclaration();}
     ;
 
 single_protected_declaration
-    : PROTECTED defining_identifier aspect_specification? IS (NEW interface_list WITH)? protected_definition SEMI
+    : PROTECTED defining_identifier aspect_specification? IS (NEW interface_list WITH)? protected_definition SEMI {this.EnterDeclaration();}
     ;
 
 protected_definition
@@ -991,7 +1007,7 @@ protected_element_declaration
     ;
 
 protected_body
-    : PROTECTED BODY_ defining_identifier aspect_specification? IS protected_operation_item* END identifier? SEMI
+    : PROTECTED BODY_ defining_identifier aspect_specification? IS {this.EnterDeclaration(); this.EnterScope();} protected_operation_item* END identifier? SEMI {this.ExitScope();}
     ;
 
 protected_operation_item
@@ -1003,12 +1019,12 @@ protected_operation_item
 
 entry_declaration
     : overriding_indicator? ENTRY defining_identifier ('(' discrete_subtype_definition ')')? formal_part? //parameter_profile
-    aspect_specification? SEMI
+    aspect_specification? SEMI {this.EnterDeclaration();}
     ;
 
 accept_statement
     : ACCEPT_ entry_direct_name ('(' entry_index ')')? formal_part? /*parameter_profile*/ (
-        DO handled_sequence_of_statements END entry_identifier?
+        DO {this.EnterScope();} handled_sequence_of_statements END {this.ExitScope();} entry_identifier?
     )? SEMI
     ;
 
@@ -1021,8 +1037,8 @@ entry_index
     ;
 
 entry_body
-    : ENTRY defining_identifier entry_body_formal_part entry_barrier IS declarative_part BEGIN handled_sequence_of_statements END entry_identifier?
-        SEMI
+    : ENTRY defining_identifier entry_body_formal_part entry_barrier IS {this.EnterDeclaration(); this.EnterScope();} declarative_part BEGIN handled_sequence_of_statements END entry_identifier?
+        SEMI {this.ExitScope();}
     ;
 
 entry_identifier
@@ -1038,7 +1054,7 @@ entry_barrier
     ;
 
 entry_index_specification
-    : FOR defining_identifier IN discrete_subtype_definition
+    : FOR defining_identifier IN discrete_subtype_definition {this.EnterDeclaration();}
     ;
 
 entry_call_statement
@@ -1055,11 +1071,11 @@ delay_statement
     ;
 
 delay_until_statement
-    : DELAY UNTIL delay_expression
+    : DELAY UNTIL delay_expression SEMI
     ;
 
 delay_relative_statement
-    : DELAY delay_expression
+    : DELAY delay_expression SEMI
     ;
 
 delay_expression
@@ -1136,7 +1152,7 @@ abortable_part
     ;
 
 abort_statement
-    : ABORT name (',' name)*
+    : ABORT name (',' name)* SEMI
     ;
 
 /*
@@ -1144,7 +1160,7 @@ abort_statement
 */
 
 compilation
-    : compilation_unit* EOF
+    : compilation_unit* {this.ParsePragmas(); this.OutputSymbolTable();} EOF
     ;
 
 compilation_unit
@@ -1186,11 +1202,11 @@ with_clause
     ;
 
 limited_with_clause
-    : LIMITED PRIVATE? WITH name (',' name)* SEMI
+    : LIMITED PRIVATE? WITH name (',' name)* SEMI {this.ImportWithClause();}
     ;
 
 nonlimited_with_clause
-    : PRIVATE? WITH name (',' name)* SEMI
+    : PRIVATE? WITH name (',' name)* SEMI {this.ImportWithClause();}
     ;
 
 body_stub
@@ -1225,7 +1241,7 @@ subunit
 */
 
 exception_declaration
-    : defining_identifier_list COLON EXCEPTION aspect_specification? SEMI
+    : defining_identifier_list COLON EXCEPTION aspect_specification? SEMI {this.EnterDeclaration();}
     ;
 
 handled_sequence_of_statements
@@ -1237,7 +1253,7 @@ exception_handler
     ;
 
 choice_parameter_specification
-    : defining_identifier
+    : defining_identifier {this.EnterDeclaration();}
     ;
 
 exception_choice
@@ -1279,9 +1295,9 @@ generic_formal_parameter_declaration
     ;
 
 generic_instantiation
-    : PACKAGE defining_program_unit_name IS NEW name generic_actual_part? aspect_specification?
-    | overriding_indicator? PROCEDURE defining_program_unit_name IS NEW name generic_actual_part? aspect_specification?
-    | overriding_indicator? FUNCTION defining_designator IS NEW name generic_actual_part? aspect_specification?
+    : PACKAGE defining_program_unit_name IS NEW name generic_actual_part? aspect_specification? SEMI {this.EnterDeclaration();}
+    | overriding_indicator? PROCEDURE defining_program_unit_name IS NEW name generic_actual_part? aspect_specification? SEMI {this.EnterDeclaration();}
+    | overriding_indicator? FUNCTION defining_designator IS NEW name generic_actual_part? aspect_specification? SEMI {this.EnterDeclaration();}
     ;
 
 generic_actual_part
@@ -1299,8 +1315,8 @@ explicit_generic_actual_parameter
     ;
 
 formal_object_declaration
-    : defining_identifier_list COLON mode_ null_exclusion? subtype_mark (ASSIGN default_expression)? aspect_specification? SEMI
-    | defining_identifier_list COLON mode_ access_definition (ASSIGN default_expression)? aspect_specification?
+    : defining_identifier_list COLON mode_ null_exclusion? subtype_mark (ASSIGN default_expression)? aspect_specification? SEMI {this.EnterDeclaration();}
+    | defining_identifier_list COLON mode_ access_definition (ASSIGN default_expression)? aspect_specification? SEMI {this.EnterDeclaration();}
     ;
 
 formal_type_declaration
@@ -1309,11 +1325,11 @@ formal_type_declaration
     ;
 
 formal_complete_type_declaration
-    : TYPE defining_identifier discriminant_part? IS formal_type_definition aspect_specification? SEMI
+    : TYPE defining_identifier discriminant_part? IS formal_type_definition aspect_specification? SEMI {this.EnterDeclaration();}
     ;
 
 formal_incomplete_type_declaration
-    : TYPE defining_identifier discriminant_part? (IS TAGGED)? SEMI
+    : TYPE defining_identifier discriminant_part? (IS TAGGED)? SEMI {this.EnterDeclaration();}
     ;
 
 formal_type_definition
@@ -1343,7 +1359,7 @@ formal_discrete_type_definition
     ;
 
 formal_signed_integer_type_definition
-    : range BOX
+    : RANGE_ BOX
     ;
 
 formal_modular_type_definition
@@ -1394,7 +1410,7 @@ subprogram_default
     ;
 
 formal_package_declaration
-    : WITH PACKAGE defining_identifier IS NEW name formal_package_actual_part aspect_specification? SEMI
+    : WITH PACKAGE defining_identifier IS NEW name formal_package_actual_part aspect_specification? SEMI {this.EnterDeclaration();}
     ;
 
 formal_package_actual_part
@@ -1457,7 +1473,7 @@ enumeration_aggregate
     ;
 
 record_representation_clause
-    : FOR local_name USE RECORD mod_clause? component_clause* END RECORD?
+    : FOR local_name USE RECORD mod_clause? component_clause* END RECORD SEMI
     ;
 
 component_clause
@@ -1485,7 +1501,7 @@ J.*
 */
 
 delta_constraint
-    : DELTA expression range_constraint?
+    : DELTA simple_expression range_constraint?
     ;
 
 at_clause
@@ -1494,4 +1510,17 @@ at_clause
 
 mod_clause
     : AT MOD expression SEMI
+    ;
+
+/*
+2.8 - Pragmas
+*/
+
+pragmaRule
+    : PRAGMA identifier (LP pragma_argument_association (COMMA pragma_argument_association)* RP)? SEMI EOF
+    ;
+
+pragma_argument_association
+    : (identifier ARROW)? expression
+    | name
     ;

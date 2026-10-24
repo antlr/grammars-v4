@@ -30,7 +30,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 /*
-* http://www2.iath.virginia.edu/courses/moo/ProgrammersManual.texinfo_4.html
+* https://web.archive.org/web/20230405181340/http://www2.iath.virginia.edu/courses/moo/ProgrammersManual.texinfo_4.html
 */
 /*
 * https://www.hayseed.net/MOO/manuals/ProgrammersManual.html

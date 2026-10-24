@@ -1,19 +1,18 @@
-# Rust ANTLR 4 grammar
+# Rust Grammar
 
-This grammar is based on official language reference.
+This grammar is based on official language reference
+at https://doc.rust-lang.org/reference/.
 
-Licensed under MIT
+## Reference
+* [pldb](http://pldb.info/concepts/rust)
 
-Entry rule is `crate`.
 
-Last updated for rust v1.60.0
+## License
+MIT
 
-## Maven build
+## Comments
+Last updated for rust v1.60.0.
 
-Install the parser into the local Maven repository with `mvn install`.
-
-## Known limitation
-
+## Known limitations
 - Only v2018+ stable feature is implemented.
-- Checks about isolated `\r` is not implemented. 
-- Python version uses different language files due to semantic predicates.
+- Checks about isolated `\r` are not implemented. 

@@ -157,6 +157,10 @@ variableDeclarationList
     : varModifier variableDeclaration (',' variableDeclaration)*
     ;
 
+singleVariableDeclaration
+    : varModifier variableDeclaration
+    ;
+
 variableDeclaration
     : assignable ('=' singleExpression)? // ECMAScript 6: Array & Object Matching
     ;
@@ -177,8 +181,8 @@ iterationStatement
     : Do statement While '(' expressionSequence ')' eos                                                                     # DoStatement
     | While '(' expressionSequence ')' statement                                                                            # WhileStatement
     | For '(' (expressionSequence | variableDeclarationList)? ';' expressionSequence? ';' expressionSequence? ')' statement # ForStatement
-    | For '(' (singleExpression | variableDeclarationList) In expressionSequence ')' statement                              # ForInStatement
-    | For Await? '(' (singleExpression | variableDeclarationList) Of expressionSequence ')' statement                       # ForOfStatement
+    | For '(' (singleExpression | singleVariableDeclaration) In expressionSequence ')' statement                            # ForInStatement
+    | For Await? '(' (singleExpression | singleVariableDeclaration) Of expressionSequence ')' statement                     # ForOfStatement
     ;
 
 varModifier // let, const - ECMAScript 6
@@ -352,16 +356,15 @@ expressionSequence
     ;
 
 singleExpression
-    : anonymousFunction                                 # FunctionExpression
-    | Class identifier? classTail                       # ClassExpression
-    | singleExpression '?.' singleExpression            # OptionalChainExpression
-    | singleExpression '?.'? '[' expressionSequence ']' # MemberIndexExpression
-    | singleExpression '?'? '.' '#'? identifierName     # MemberDotExpression
+    : anonymousFunction                                                    # FunctionExpression
+    | Class identifier? classTail                                          # ClassExpression
+    | singleExpression '?.'? '[' expressionSequence ']'                    # MemberIndexExpression
+    | singleExpression ('?.' | '.') '#'? identifierName                    # MemberDotExpression
     // Split to try `new Date()` first, then `new Date`.
     | New identifier arguments                                             # NewExpression
     | New singleExpression arguments                                       # NewExpression
     | New singleExpression                                                 # NewExpression
-    | singleExpression arguments                                           # ArgumentsExpression
+    | singleExpression '?.'? arguments                                     # ArgumentsExpression
     | New '.' identifier                                                   # MetaExpression // new.target
     | singleExpression {this.notLineTerminator()}? '++'                    # PostIncrementExpression
     | singleExpression {this.notLineTerminator()}? '--'                    # PostDecreaseExpression
@@ -559,7 +562,7 @@ keyword
     | Protected
     | Static
     | Yield
-    | YieldStar    
+    | YieldStar
     | Async
     | Await
     | From

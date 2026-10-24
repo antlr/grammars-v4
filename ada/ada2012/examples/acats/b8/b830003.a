@@ -1,0 +1,174 @@
+-- B830003.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--     The ACAA has created and maintains the Ada Conformity Assessment Test
+--     Suite for the purpose of conformity assessments conducted in accordance
+--     with the International Standard isO/IEC 18009 - Ada: Conformity
+--     assessment of a language processor. This test suite should not be used
+--     to make claims of conformance unless used in accordance with
+--     isO/IEC 18010 and any applicable ACAA procedures.
+--*
+--
+-- OBJECTIVE:
+--     Check that homographs are forbidden in any of these combinations
+--     of parts of a generic package: Visible-Visible; Visible-Private;
+--     Private-Private.
+--
+-- TEST DESCRIPTION:
+--     This test was created from the ACVC test B83004A (there also were
+--     the sibling tests with related objectives). The original test
+--     caused many spurious errors by not having completions for many
+--     declarations that require completions. It also did not test newer
+--     constructs like protected types and null procedures. The original test
+--     set also treated separate compilation as a special case rather than the
+--     normal state of programs, thus trying many cases multiple times. We
+--     eliminate the body cases from the original test, testing them in the
+--     next test of this set.
+--
+--     This rewrite of the test includes completions for all declarations that
+--     need them.
+--
+-- CHANGE HISTORY:
+--      28 Apr 2021   RLB     Created test from part of ACVC test B83004A.
+--!
+procedure B830003 is
+begin
+
+-- Check Visible-Visible.
+
+   declare
+      generic
+      package GPack1 is
+         type H1 is range 1 .. 10;
+
+         type Enum1 is (H2, Enum2);
+         
+         H3 : Natural := 0;
+
+         -- The homographs.
+
+         subtype H1 is String(1 .. 5);                      -- ERROR: {10;1}
+
+         package H1 is end H1;                              -- ERROR: {10;1}
+
+         function H2 return Enum1;                          -- ERROR: {10;1}
+         
+         protected H3 is                                    -- ERROR: {10}
+             procedure Lock (A : Boolean);
+         private
+             L : Boolean;
+         end H3;
+         
+      end GPack1;
+
+      package body GPack1 is
+         function H2 return Enum1 is               -- OPTIONAL ERROR: {10}
+         begin                             --  Body of an invalid function.
+            return Enum2;
+         end H2;
+         
+         protected body H3 is                      -- OPTIONAL ERROR: {10}
+                                     --  Body of an invalid protected unit.
+             procedure Lock (A : Boolean) is
+             begin
+                 null;
+             end Lock;
+         end H3;
+      end GPack1;
+   begin
+      null;
+   end;
+
+-- Check Visible-Private.
+
+   declare
+      generic
+      package GPack2 is
+         subtype H1 is Integer range 1 .. 10;
+
+         procedure H2 is null;
+         
+         procedure H3 (P1 : Integer; P2 : out String);
+
+      private
+         -- The homographs.
+
+         type H1 is digits 5 range -1.0 .. 1.0;              -- ERROR: {10;1}
+
+         task H2;                                            -- ERROR: {10;1}
+
+         procedure H3 (P3 : Integer; P4 : String) is null;   -- ERROR: {10;1}
+                                                           
+      end GPack2;
+
+      package body GPack2 is
+         task body H2 is                            -- OPTIONAL ERROR: {10}
+                                       -- Body of an invalid task.
+         begin
+            null;
+         end H2;
+         
+         procedure H3 (P1 : Integer; 
+                       P2 : out String) is          -- OPTIONAL ERROR: {1:10}
+                                  -- Body of procedure with illegal homograph.
+         begin
+            P2 := Integer'Image(P1);
+         end H3;
+
+      end GPack2;
+   begin
+       null;
+   end;
+
+-- Check Private-Private.
+
+   declare
+      generic
+      package GPack3 is
+      private
+         H1 : constant Boolean := True;
+
+         H2 : exception;
+         
+         -- The homographs.
+
+         H1 : constant := 8.0;                               -- ERROR: {10;1}
+
+         generic                            
+            procedure H2;                                    -- ERROR: {1:10;1}
+      end GPack3;
+
+      package body GPack3 is
+         procedure H2 is                            -- OPTIONAL ERROR: {10}
+         begin                                  --  Body of an invalid
+            null;                               --  generic procedure.
+         end H2;
+      end GPack3;
+   begin
+      null;
+   end;
+
+end B830003;

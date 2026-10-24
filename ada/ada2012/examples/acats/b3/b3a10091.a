@@ -1,0 +1,203 @@
+-- B3A10091.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--    The ACAA has created and maintains the Ada Conformity Assessment Test
+--    Suite for the purpose of conformity assessments conducted in accordance
+--    with the International Standard ISO/IEC 18009 - Ada: Conformity
+--    assessment of a language processor. This test suite should not be used
+--    to make claims of conformance unless used in accordance with
+--    ISO/IEC 18009 and any applicable ACAA procedures.
+--*
+--
+-- OBJECTIVE:
+--     See B3A10090.A.
+--
+-- TEST DESCRIPTION
+--     See B3A10090.A.
+--
+-- TEST FILES:
+--     This test consists of the following files:
+--         B3A10090.A
+--      -> B3A10091.A
+--
+-- PASS/FAIL CRITERIA:
+--     See B3A10090.A.
+--
+-- CHANGE HISTORY:
+--     13 Jan 2015  RLB  Created test.
+--     13 Mar 2015  RLB  Eliminated overlong lines.
+--!
+
+limited with B3A1009_A;
+package B3A1009 is
+
+   type Acc_A_Rec is access constant B3A1009_A.A_Rec;
+   O1 : Acc_A_Rec;
+
+   type Acc_A_Rec_w_Disc is access constant B3A1009_A.A_Rec_w_Disc;
+   O2 : Acc_A_Rec_w_Disc;
+
+   type Acc_A_Priv_Tagged_w_Disc is
+                          access constant B3A1009_A.A_Priv_Tagged_w_Disc;
+   O3 : Acc_A_Priv_Tagged_w_Disc;
+
+   type Acc_An_Interf_Class is access constant B3A1009_A.An_Interf'Class;
+   O4 : Acc_An_Interf_Class;
+
+   procedure Test1 (P : access B3A1009_A.An_Array);
+
+   procedure Test2 (P : access B3A1009_A.A_Rec);
+
+   procedure Test3 (P : access B3A1009_A.A_Rec_w_Disc);
+
+   procedure Test4 (P : access B3A1009_A.A_Tagged_w_Disc);
+
+   procedure Test5 (P : access B3A1009_A.An_Interf'Class);
+
+
+   procedure Test10 (Obj : B3A1009_A.A_Tagged);
+
+   procedure Test11 (Obj : B3A1009_A.A_Tagged_w_Disc);
+
+   procedure Test12 (Obj : B3A1009_A.A_Priv_Tagged_w_Disc);
+
+   procedure Test13 (Obj : B3A1009_A.An_Interf'Class);
+
+end B3A1009;
+
+
+with System;
+package body B3A1009 is
+
+   procedure Test1 (P : access B3A1009_A.An_Array) is
+      I : Integer;
+   begin
+      I := P.all(1);                                       -- ERROR:
+      I := P.all'Size;                                     -- ERROR:
+      I := P(5);                                           -- ERROR:
+      I := P(1..5)(I);                                     -- ERROR:
+      I := P.all'Size;                                     -- ERROR:
+      I := P.all'Alignment;                                -- ERROR:
+   end Test1;
+
+   procedure Test2 (P : access B3A1009_A.A_Rec) is
+      Q : Acc_A_Rec;
+   begin
+      loop
+         exit when P /= null;                              -- OK.
+         exit when P.all'Size /= 10;                       -- ERROR:
+         exit when O1.all'Alignment /= 1;                  -- ERROR:
+         exit when O1.all.C /= 'G';                        -- ERROR:
+         exit when P.C /= 'B';                             -- ERROR:
+      end loop;
+      Q := Acc_A_Rec(P);                                   -- OK.
+      Q := P.all'Access;                                   -- ERROR:
+   end Test2;
+
+   procedure Test3 (P : access B3A1009_A.A_Rec_w_Disc) is
+   begin
+      loop
+         exit when P /= O2;                                -- OK.
+         exit when P.all'Size /= 5;                        -- ERROR:
+         exit when P.all.D;                                -- ERROR:
+         exit when P.D;                                    -- ERROR:
+         exit when O2.all'Alignment /= 2;                  -- ERROR:
+         exit when P.all.N /= 5;                           -- ERROR:
+         exit when O2.N /= 7;                              -- ERROR:
+      end loop;
+   end Test3;
+
+   procedure Test4 (P : access B3A1009_A.A_Tagged_w_Disc) is
+      A : System.Address;
+   begin
+      loop
+         exit when P.all'Size /= 12;                       -- ERROR:
+         exit when P.all.D;                                -- ERROR:
+         exit when P.D;                                    -- ERROR:
+         exit when O3.all'Alignment /= 2;                  -- ERROR:
+         exit when P.all.F /= 2.5;                         -- ERROR:
+         exit when O3.F /= 2.25;                           -- ERROR:
+      end loop;
+      A := P'Address;                                      -- OK.
+      A := P.all'Address;                                  -- ERROR:
+   end Test4;
+
+   procedure Test5 (P : access B3A1009_A.An_Interf'Class) is
+   begin
+      loop
+         exit when P /= null;                              -- OK.
+         exit when P.all'Size /= 12;                       -- ERROR:
+         exit when O4.all'Alignment /= 2;                  -- ERROR:
+      end loop;
+   end Test5;
+
+
+   procedure Test10 (Obj : B3A1009_A.A_Tagged) is
+   begin
+      loop
+         exit when Obj'Size /= 52;                         -- ERROR:
+         exit when Obj'Alignment = 4;                      -- ERROR:
+         exit when Obj.D;                                  -- ERROR:
+         exit when Obj.W /= 'W';                           -- ERROR:
+      end loop;
+   end Test10;
+
+   procedure Test11 (Obj : B3A1009_A.A_Tagged_w_Disc) is
+      A : System.Address;
+   begin
+      loop
+         exit when Obj'Size /= 52;                         -- ERROR:
+         exit when Obj.D;                                  -- ERROR:
+         exit when Obj.F /= 5.5;                           -- ERROR:
+      end loop;
+      A := Obj'Address;                                    -- ERROR:
+   end Test11;
+
+   procedure Test12 (Obj : B3A1009_A.A_Priv_Tagged_w_Disc) is
+   begin
+      loop
+         exit when Obj'Size /= 12;                         -- ERROR:
+         exit when Obj.D;                                  -- ERROR:
+      end loop;
+      if O3 /= null then
+         Test12 (Obj);                                     -- OK.
+         O3 := Obj'Unchecked_Access;                       -- ERROR:
+      end if;
+   end Test12;
+
+   procedure Test13 (Obj : B3A1009_A.An_Interf'Class) is
+   begin
+      loop
+         exit when Obj'Size /= 12;                         -- ERROR:
+         exit when Obj'Alignment /= 2;                     -- ERROR:
+      end loop;
+      if O4 /= null then
+         Test13 (Obj);                                     -- OK.
+         O4 := Obj'Unchecked_Access;                       -- ERROR:
+      end if;
+   end Test13;
+
+end B3A1009;

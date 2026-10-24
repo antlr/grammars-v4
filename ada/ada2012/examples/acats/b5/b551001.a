@@ -1,0 +1,949 @@
+--  B551001.A
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--     The ACAA has created and maintains the Ada Conformity Assessment Test
+--     Suite for the purpose of conformity assessments conducted in accordance
+--     with the International Standard ISO/IEC 18009 - Ada: Conformity
+--     assessment of a language processor. This test suite should not be used
+--     to make claims of conformance unless used in accordance with
+--     ISO/IEC 18009 and any applicable ACAA procedures.
+--*
+--  OBJECTIVE:
+--     Check Legality Rules for the Default_Iterator aspect:
+--
+--     (A) Check that a Default_Iterator aspect cannot be specified on an
+--         untagged type nor on a type that does not have one of the indexing
+--         aspects.
+--
+--     (B) Check that name of a Default_Iterator aspect cannot denote an entity
+--         other than a function declared in the same declaration list as the
+--         type declaration.
+--
+--     (C) Check that the name specified by a Default_Iterator aspect cannot
+--         denote a function with zero parameters.
+--
+--     (D) Check that the name specified by a Default_Iterator aspect cannot
+--         denote a function whose first parameter has a type other than T or
+--         T'Class or an access-to-constant designating T or T'Class.
+--
+--     (E) Check that the name specified by a Default_Iterator aspect cannot
+--         denote a function whose other parameters are not defaulted.
+--
+--     (F) Check that the name specified by a Default_Iterator aspect cannot
+--         denote a function whose result type is other than an iterator type.
+--
+--     (G) Check that the name specified by a Default_Iterator aspect cannot
+--         denote multiple functions that meet the requirements.
+--
+--  CHANGE HISTORY:
+--     10 Feb 2015  BM   Initial Version.
+--     19 Mar 2015  RLB  Split into several smaller tests with fewer
+--                       objectives.
+--     26 Apr 2021  RLB  Added error location indicators; moved error tags
+--                       that were in the wrong location.
+--!
+
+with Ada.Iterator_Interfaces;
+
+procedure B551001 is
+
+   Total : Integer := 0;
+
+
+begin
+
+   Objective_A :
+   --  Check that a Default_Iterator aspect cannot be specified on an
+   --  untagged type nor on a type that does not have one of the indexing
+   --  aspects.
+   --
+   declare
+
+      package Pkg_A is
+
+         function Has_Element (Index : Natural)
+            return Boolean is (Index <= 10);
+
+         package Some_Iterator is new Ada.Iterator_Interfaces (
+            Cursor      => Natural,
+            Has_Element => Has_Element);
+
+         type T1 is tagged null record with                          
+            Constant_Indexing => Cnst_Index1,
+            Default_Iterator  => Iterate;                    -- OK. {2:10;1}
+
+         function Cnst_Index1 (Container : T1; Ind : Natural) return Natural;
+
+         function Iterate (Container : T1)
+            return Some_Iterator.Forward_Iterator'Class;
+
+         function Cnst_Index1 (Container : T1; Ind : Natural)
+            return Natural is (Ind);
+
+         -- Untagged type.
+         type T2 is null record with
+            Constant_Indexing => Cnst_Index2,
+            Default_Iterator  => Iterate;                    -- ERROR: {2:10;1}
+            -- Note: Constant_Indexing is also illegal here;
+            -- either or both errors can be reported.
+
+         function Cnst_Index2 (Container : T2; Ind : Natural) return Natural;
+
+         function Iterate (Container : T2)
+            return Some_Iterator.Forward_Iterator'Class;
+
+         function Cnst_Index2 (Container : T2; Ind : Natural)
+            return Natural is (Ind);
+
+         -- Missing Indexing aspect.
+         type T3 is tagged null record with                          
+            Default_Iterator  => Iterate;                    -- ERROR: {1:10;1}
+
+         function Iterate (Container : T3)
+            return Some_Iterator.Forward_Iterator'Class;
+
+
+         -- Untagged type with missing indexing aspect.
+         type T4 is null record with
+            Default_Iterator  => Iterate;                    -- ERROR: {1:10;1}
+
+         function Iterate (Container : T4)
+            return Some_Iterator.Forward_Iterator'Class;
+
+         -- Untagged type.
+         type T5 is private with
+            Constant_Indexing => Cnst_Index5,
+            Default_Iterator  => Iterate;                    -- ERROR: {2:10;1}
+            -- Note: Constant_Indexing is also illegal here; 
+            -- either or both errors can be reported.
+
+         function Cnst_Index5 (Container : T5; Ind : Natural) return Natural;
+
+         function Iterate (Container : T5)
+            return Some_Iterator.Forward_Iterator'Class;
+
+         function Cnst_Index5 (Container : T5; Ind : Natural)
+            return Natural is (Ind);
+
+         -- Missing Indexing aspect.
+         type T6 is tagged private with
+            Default_Iterator  => Iterate;                    -- ERROR: {1:10;1}
+
+         function Iterate (Container : T6)
+            return Some_Iterator.Forward_Iterator'Class;
+
+
+         -- Untagged type with missing indexing aspect.
+         type T7 is private with
+            Default_Iterator  => Iterate;                    -- ERROR: {1:10;1}
+
+         function Iterate (Container : T7)
+            return Some_Iterator.Forward_Iterator'Class;
+
+      private
+
+         type T5 is tagged null record;
+
+         type T6 is tagged null record;
+
+         type T7 is tagged null record;
+
+      end Pkg_A;
+
+      package body Pkg_A is
+
+         type Some_Concrete_Iterator is new Some_Iterator.Forward_Iterator
+            with null record;
+
+         overriding
+         function First (Object : Some_Concrete_Iterator) return Natural is
+            (1);
+         overriding
+         function Next (Object : Some_Concrete_Iterator; Position : Natural)
+            return Natural is (Position + 1);
+
+         function Iterate (Container : T1)
+            return Some_Iterator.Forward_Iterator'Class is
+         begin
+            return Some_Concrete_Iterator'(Some_Iterator.Forward_Iterator
+                      with null record);
+         end Iterate;
+
+         function Iterate (Container : T2)
+            return Some_Iterator.Forward_Iterator'Class is
+         begin
+            return Some_Concrete_Iterator'(Some_Iterator.Forward_Iterator
+                      with null record);
+         end Iterate;
+
+         function Iterate (Container : T3)
+            return Some_Iterator.Forward_Iterator'Class is
+         begin
+            return Some_Concrete_Iterator'(Some_Iterator.Forward_Iterator
+                      with null record);
+         end Iterate;
+
+         function Iterate (Container : T4)
+            return Some_Iterator.Forward_Iterator'Class is
+         begin
+            return Some_Concrete_Iterator'(Some_Iterator.Forward_Iterator
+                      with null record);
+         end Iterate;
+
+         function Iterate (Container : T5)
+            return Some_Iterator.Forward_Iterator'Class is
+         begin
+            return Some_Concrete_Iterator'(Some_Iterator.Forward_Iterator
+                      with null record);
+         end Iterate;
+
+         function Iterate (Container : T6)
+            return Some_Iterator.Forward_Iterator'Class is
+         begin
+            return Some_Concrete_Iterator'(Some_Iterator.Forward_Iterator
+                      with null record);
+         end Iterate;
+
+         function Iterate (Container : T7)
+            return Some_Iterator.Forward_Iterator'Class is
+         begin
+            return Some_Concrete_Iterator'(Some_Iterator.Forward_Iterator
+                      with null record);
+         end Iterate;
+
+      end Pkg_A;
+
+
+   begin -- Objective_A
+      null;
+   end Objective_A;
+
+   ----------------------------------------------------------------
+
+   Objective_B :
+   --  Check that name of a Default_Iterator aspect cannot denote an entity
+   --  other than a function declared in the same declaration list as the
+   --  type declaration.
+
+   declare
+
+      function Has_Element (Index : Natural) return Boolean is (Index <= 10);
+
+      package Some_Iterator is new Ada.Iterator_Interfaces (
+         Cursor      => Natural,
+         Has_Element => Has_Element);
+
+      type Some_Concrete_Iterator is new Some_Iterator.Forward_Iterator
+         with null record;
+
+      overriding
+      function First (Object : Some_Concrete_Iterator) return Natural is
+         (1);
+      overriding
+      function Next (Object : Some_Concrete_Iterator; Position : Natural)
+         return Natural is (Position + 1);
+
+      function Non_Local_Iterate (Index : Natural)
+         return Some_Iterator.Forward_Iterator'Class is
+      begin
+         return Some_Concrete_Iterator'(Some_Iterator.Forward_Iterator
+                   with null record);
+      end Non_Local_Iterate;
+
+
+      package Pkg_B is
+
+         type T1 is tagged null record with
+            Constant_Indexing => Cnst_Index1,
+            Default_Iterator  => Iterate;                    -- ERROR: {2:10;1}
+                                           -- Procedure, not a function.
+
+         function Cnst_Index1 (Container : T1; Ind : Natural) return Natural;
+
+         procedure Iterate (Container : T1) is null;
+         function Cnst_Index1 (Container : T1; Ind : Natural)
+            return Natural is (Ind);
+
+         type T2 is tagged null record with
+            Constant_Indexing => Cnst_Index2,
+            Default_Iterator  => Iterate_Obj;                -- ERROR: {2:10;1}
+                                          -- Object, not a function.
+
+         function Cnst_Index2 (Container : T2; Ind : Natural) return Natural;
+         function Cnst_Index2 (Container : T2; Ind : Natural)
+            return Natural is (Ind);
+
+         Iterate_Obj : Some_Concrete_Iterator;
+
+         type T3 is tagged null record with
+            Constant_Indexing => Cnst_Index3,
+            Default_Iterator  => Non_Local_Iterate;          -- ERROR: {2:10;1}
+                           -- Non-local function (also wrong parameter type).
+
+         function Cnst_Index3 (Container : T3; Ind : Natural) return Natural;
+         function Cnst_Index3 (Container : T3; Ind : Natural)
+            return Natural is (Ind);
+
+         type T4 is tagged private with
+            Constant_Indexing => Cnst_Index4,
+            Default_Iterator  => Inner.Iterate;              -- ERROR: {2:10;1}
+                                                       -- Non-local function.
+
+         function Cnst_Index4 (Container : T4; Ind : Natural) return Natural;
+         function Cnst_Index4 (Container : T4; Ind : Natural)
+            return Natural is (Ind);
+
+         package Inner is
+            function Iterate (Container : T4)
+               return Some_Iterator.Forward_Iterator'Class;
+         end Inner;
+
+         type T5 is tagged private with
+            Constant_Indexing => Cnst_Index5,
+            Default_Iterator  => Iterate;                    -- OK. {2:10;1}
+
+         function Cnst_Index5 (Container : T5; Ind : Natural) return Natural;
+
+         function Iterate (Container : T5)
+            return Some_Iterator.Forward_Iterator'Class;
+         procedure Iterate (Container : T5) is null;
+              -- It's OK to have other routines, so long as one has the
+              -- required properties.
+
+         function Cnst_Index5 (Container : T5; Ind : Natural)
+            return Natural is (Ind);
+
+      private
+         type T4 is tagged null record;
+
+         type T5 is tagged null record;
+      end Pkg_B;
+
+      package body Pkg_B is
+         package body Inner is
+            function Iterate (Container : T4)
+               return Some_Iterator.Forward_Iterator'Class is
+            begin
+               return Some_Concrete_Iterator'(Some_Iterator.Forward_Iterator
+                         with null record);
+            end Iterate;
+         end Inner;
+
+         function Iterate (Container : T5)
+            return Some_Iterator.Forward_Iterator'Class is
+         begin
+            return Some_Concrete_Iterator'(Some_Iterator.Forward_Iterator
+                      with null record);
+         end Iterate;
+      end Pkg_B;
+
+   begin
+      null;
+   end Objective_B;
+
+   --------------------------------------------------------------
+
+   Objective_C :
+   --  Check that the name specified by a Default_Iterator aspect cannot
+   --  denote a function with zero parameters.
+
+   declare -- Objective_C
+      function Has_Element (Index : Natural) return Boolean is (Index <= 10);
+
+      package Some_Iterator is new Ada.Iterator_Interfaces (
+         Cursor      => Natural,
+         Has_Element => Has_Element);
+
+      type Some_Concrete_Iterator is new Some_Iterator.Forward_Iterator
+         with null record;
+
+      overriding
+      function First (Object : Some_Concrete_Iterator) return Natural is
+         (1);
+      overriding
+      function Next (Object : Some_Concrete_Iterator; Position : Natural)
+         return Natural is (Position + 1);
+
+      type T1 is tagged null record with
+        Constant_Indexing => Cnst_Index1,
+        Default_Iterator  => Iterate;                        -- ERROR: {2:10;1}
+
+      function Cnst_Index1 (Container : T1; Ind : Natural) return Natural;
+      function Cnst_Index1 (Container : T1; Ind : Natural)
+         return Natural is (Ind);
+
+      function Iterate return Some_Concrete_Iterator;
+      function Iterate return Some_Concrete_Iterator
+         is (Some_Concrete_Iterator'(Some_Iterator.Forward_Iterator
+              with null record));
+   begin
+      null;
+   end Objective_C;
+
+   ---------------------------------------------------------------
+
+   Objective_D :
+   --  Check that the name specified by a Default_Iterator aspect cannot
+   --  denote a function whose first parameter has a type other than T or
+   --  T'Class or an access-to-constant designating T or T'Class.
+   declare
+
+      package Objective_D_Pkg is
+         function Has_Element (Index : Natural)
+            return Boolean is (Index <= 10);
+
+         package Some_Iterator is new Ada.Iterator_Interfaces (
+            Cursor      => Natural,
+            Has_Element => Has_Element);
+
+         type T1 is tagged null record with
+            Constant_Indexing => Cnst_Index1,
+            Default_Iterator  => Iterate1;                   -- ERROR: {2:10;1}
+
+         function Cnst_Index1 (Container : T1; Ind : Natural)
+            return Natural is (Ind);
+
+         function Iterate1 (Container : Integer)
+            return Some_Iterator.Forward_Iterator'Class;
+
+         type T2 is tagged null record with
+            Constant_Indexing => Cnst_Index2,
+            Default_Iterator  => Iterate2;                   -- ERROR: {2:10;1}
+
+         function Iterate2 (X : Integer; Container : T2)
+            return Some_Iterator.Forward_Iterator'Class;
+         function Cnst_Index2 (Container : T2; Ind : Natural)
+            return Natural is (Ind);
+
+         type T3 is tagged null record with
+            Constant_Indexing => Cnst_Index3,
+            Default_Iterator  => Iterate3;                   -- ERROR: {2:10;1}
+
+         function Cnst_Index3 (Container : T3; Ind : Natural)
+            return Natural is (Ind);
+
+         function Iterate3 (X : Integer := 1; Container : T3'Class)
+            return Some_Iterator.Forward_Iterator'Class;
+         function Iterate3 (C : Character) return Boolean is (True);
+
+         type T4 is tagged null record with
+            Constant_Indexing => Cnst_Index4,
+            Default_Iterator  => Iterate4;                   -- OK. {2:10;1}
+
+         function Iterate4 (Container : access constant T4'Class)
+            return Some_Iterator.Forward_Iterator'Class;
+
+         function Cnst_Index4 (Container : T4; Ind : Natural)
+            return Natural is (Ind);
+
+         type T5 is tagged private with
+            Constant_Indexing => Cnst_Index5,
+            Default_Iterator  => Iterate4;                   -- ERROR: {2:10;1}
+
+         function Cnst_Index5 (Container : T5; Ind : Natural)
+            return Natural is (Ind);
+
+         type T6 is tagged null record with
+            Constant_Indexing => Cnst_Index6,
+            Default_Iterator  => Iterate6;                   -- OK. {2:10;1}
+
+         function Iterate6 (Container : access T6)
+            return Some_Iterator.Forward_Iterator'Class;
+
+         function Cnst_Index6 (Container : T6; Ind : Natural)
+            return Natural is (Ind);
+
+         type T7 is tagged null record with
+            Constant_Indexing => Cnst_Index7,
+            Default_Iterator  => Iterate7;                   -- OK. {2:10;1}
+
+         function Iterate7 (Container : access constant T7)
+            return Some_Iterator.Forward_Iterator'Class;
+
+         function Cnst_Index7 (Container : T7; Ind : Natural)
+            return Natural is (Ind);
+
+         type T8 is tagged null record with
+            Constant_Indexing => Cnst_Index8,
+            Default_Iterator  => Iterate8;                   -- ERROR: {2:10;1}
+
+         function Iterate8 return T8;
+
+         function Cnst_Index8 (Container : T8; Ind : Natural)
+            return Natural is (Ind);
+
+         type T9 is tagged private with
+            Constant_Indexing => Cnst_Index9,
+            Default_Iterator  => Iterate9;                   -- OK. {2:10;1}
+
+         function Cnst_Index9 (Container : T9; Ind : Natural)
+            return Natural is (Ind);
+
+         function Iterate9 (Container : in out T9'Class)
+            return Some_Iterator.Forward_Iterator'Class;
+
+         type TA is tagged private with
+            Constant_Indexing => Cnst_IndexA,
+            Default_Iterator  => IterateA;                   -- OK. {2:10;1}
+
+         function Cnst_IndexA (Container : TA; Ind : Natural)
+            return Natural is (Ind);
+
+         function IterateA (Container : access TA; X : Integer := 1)
+            return Some_Iterator.Forward_Iterator'Class;
+         function IterateA (Container : TA)
+            return Natural is (0);
+            -- Doesn't matter what else is declared, so long as there is one
+            -- match.
+
+      private
+         type T5 is tagged null record;
+
+         type T9 is tagged null record;
+
+         type TA is tagged null record;
+
+      end Objective_D_Pkg;
+
+      package body Objective_D_Pkg is
+         type Some_Concrete_Iterator is new Some_Iterator.Forward_Iterator
+            with null record;
+
+         overriding
+         function First (Object : Some_Concrete_Iterator) return Natural is
+            (1);
+         overriding
+         function Next (Object : Some_Concrete_Iterator; Position : Natural)
+            return Natural is (Position + 1);
+
+         function Iterate1 (Container : Integer)
+            return Some_Iterator.Forward_Iterator'Class is
+         begin
+            return Some_Concrete_Iterator'(Some_Iterator.Forward_Iterator
+                      with null record);
+         end Iterate1;
+
+         function Iterate2 (X : Integer; Container : T2)
+            return Some_Iterator.Forward_Iterator'Class is
+         begin
+            return Some_Concrete_Iterator'(Some_Iterator.Forward_Iterator
+                      with null record);
+         end Iterate2;
+
+         function Iterate3 (X : Integer := 1; Container : T3'Class)
+            return Some_Iterator.Forward_Iterator'Class is
+         begin
+            return Some_Concrete_Iterator'(Some_Iterator.Forward_Iterator
+                      with null record);
+         end Iterate3;
+
+         function Iterate4 (Container : access constant T4'Class)
+            return Some_Iterator.Forward_Iterator'Class is
+         begin
+            return Some_Concrete_Iterator'(Some_Iterator.Forward_Iterator
+                      with null record);
+         end Iterate4;
+
+         function Iterate6 (Container : access T6)
+            return Some_Iterator.Forward_Iterator'Class is
+         begin
+            return Some_Concrete_Iterator'(Some_Iterator.Forward_Iterator
+                      with null record);
+         end Iterate6;
+
+         function Iterate7 (Container : access constant T7)
+            return Some_Iterator.Forward_Iterator'Class is
+         begin
+            return Some_Concrete_Iterator'(Some_Iterator.Forward_Iterator
+                      with null record);
+         end Iterate7;
+
+         function Iterate8 return T8 is
+            Result : T8;
+         begin
+            return Result;
+         end Iterate8;
+
+         function Iterate9 (Container : in out T9'Class)
+            return Some_Iterator.Forward_Iterator'Class is
+         begin
+            return Some_Concrete_Iterator'(Some_Iterator.Forward_Iterator
+                      with null record);
+         end Iterate9;
+
+         function IterateA (Container : access TA; X : Integer := 1)
+            return Some_Iterator.Forward_Iterator'Class is
+         begin
+            return Some_Concrete_Iterator'(Some_Iterator.Forward_Iterator
+                      with null record);
+         end IterateA;
+
+      end Objective_D_Pkg;
+
+   begin
+      null;
+   end Objective_D;
+
+
+   Objective_E :
+   --  Check that the name specified by a Default_Iterator aspect cannot
+   --  denote a function whose other parameters are not defaulted.
+   declare -- Objective_E
+
+      package Objective_E_Pkg is
+         function Has_Element (Index : Natural)
+            return Boolean is (Index <= 10);
+
+         package Some_Iterator is new Ada.Iterator_Interfaces (
+            Cursor      => Natural,
+            Has_Element => Has_Element);
+
+         type T1 is tagged null record with
+            Constant_Indexing => Cnst_Index1,
+            Default_Iterator  => Iterate1;                   -- ERROR: {2:10;1}
+
+         function Cnst_Index1 (Container : T1; Ind : Natural)
+            return Natural is (Ind);
+
+         function Iterate1 (Container : T1; Count : Natural)
+            return Some_Iterator.Forward_Iterator'Class;
+
+         type T2 is tagged private with
+            Constant_Indexing => Cnst_Index2,
+            Default_Iterator  => Iterate2;                   -- ERROR: {2:10;1}
+
+         function Iterate2 (Container : T2; Count : Natural)
+            return Some_Iterator.Forward_Iterator'Class;
+         function Iterate2 (Container : T2; Name : String)
+            return Some_Iterator.Forward_Iterator'Class;
+         function Cnst_Index2 (Container : T2; Ind : Natural)
+            return Natural is (Ind);
+
+         type T3 is tagged null record with
+            Constant_Indexing => Cnst_Index3,
+            Default_Iterator  => Iterate3;                   -- OK. {2:10;1}
+
+         function Cnst_Index3 (Container : T3; Ind : Natural)
+            return Natural is (Ind);
+
+         function Iterate3 (Container : T3'Class; Start : Natural := 1)
+            return Some_Iterator.Forward_Iterator'Class;
+
+         type T4 is tagged private with
+            Constant_Indexing => Cnst_Index4,
+            Default_Iterator  => Iterate4;                   -- OK. {2:10;1}
+
+         function Iterate4 (Container : access T4; Start : Natural := 1)
+            return Some_Iterator.Forward_Iterator'Class;
+
+         function Cnst_Index4 (Container : T4; Ind : Natural)
+            return Natural is (Ind);
+
+      private
+         type T2 is tagged null record;
+
+         type T4 is tagged null record;
+
+      end Objective_E_Pkg;
+
+      package body Objective_E_Pkg is
+         type Some_Concrete_Iterator is new Some_Iterator.Forward_Iterator
+            with null record;
+
+         overriding
+         function First (Object : Some_Concrete_Iterator) return Natural is
+            (1);
+         overriding
+         function Next (Object : Some_Concrete_Iterator; Position : Natural)
+            return Natural is (Position + 1);
+
+         function Iterate1 (Container : T1; Count : Natural)
+            return Some_Iterator.Forward_Iterator'Class is
+         begin
+            return Some_Concrete_Iterator'(Some_Iterator.Forward_Iterator
+                      with null record);
+         end Iterate1;
+
+         function Iterate2 (Container : T2; Count : Natural)
+            return Some_Iterator.Forward_Iterator'Class is
+         begin
+            return Some_Concrete_Iterator'(Some_Iterator.Forward_Iterator
+                      with null record);
+         end Iterate2;
+
+         function Iterate2 (Container : T2; Name : String)
+            return Some_Iterator.Forward_Iterator'Class is
+         begin
+            return Some_Concrete_Iterator'(Some_Iterator.Forward_Iterator
+                      with null record);
+         end Iterate2;
+
+         function Iterate3 (Container : T3'Class; Start : Natural := 1)
+            return Some_Iterator.Forward_Iterator'Class is
+         begin
+            return Some_Concrete_Iterator'(Some_Iterator.Forward_Iterator
+                      with null record);
+         end Iterate3;
+
+         function Iterate4 (Container : access T4; Start : Natural := 1)
+            return Some_Iterator.Forward_Iterator'Class is
+         begin
+            return Some_Concrete_Iterator'(Some_Iterator.Forward_Iterator
+                      with null record);
+         end Iterate4;
+
+      end Objective_E_Pkg;
+
+   begin
+      null;
+   end Objective_E;
+
+   Objective_F :
+   --  Check that the name specified by a Default_Iterator aspect cannot
+   --  denote a function whose result type is other than an iterator type.
+   declare -- Objective_F
+
+      package Objective_F_Pkg is
+         function Has_Element (Index : Natural)
+            return Boolean is (Index <= 10);
+
+         package Some_Iterator is new Ada.Iterator_Interfaces (
+            Cursor      => Natural,
+            Has_Element => Has_Element);
+
+         type T1 is tagged null record with
+            Constant_Indexing => Cnst_Index1,
+            Default_Iterator  => Iterate1;                   -- ERROR: {2:10;1}
+
+         function Cnst_Index1 (Container : T1; Ind : Natural)
+            return Natural is (Ind);
+
+         function Iterate1 (Container : T1) return Natural is (1);
+
+         type T2 is tagged private with
+            Constant_Indexing => Cnst_Index2,
+            Default_Iterator  => Iterate2;                   -- ERROR: {2:10;1}
+
+         -- Neither of the following works:
+         function Iterate2 (Container : T2; Start : Natural := 1)
+            return Natural is (Start);
+         function Iterate2 (Container : T2; Name : String)
+            return Some_Iterator.Forward_Iterator'Class; -- Violates (E)
+
+         function Cnst_Index2 (Container : T2; Ind : Natural)
+            return Natural is (Ind);
+
+         type T3 is tagged null record with
+            Constant_Indexing => Cnst_Index3,
+            Default_Iterator  => Iterate3;                   -- ERROR: {2:10;1}
+
+         function Cnst_Index3 (Container : T3; Ind : Natural)
+            return Natural is (Ind);
+
+         function Iterate3 (Container : T3'Class) return Natural is (42);
+
+         type T4 is tagged private with
+            Constant_Indexing => Cnst_Index4,
+            Default_Iterator  => Iterate4;                   -- ERROR: {2:10;1}
+
+         function Iterate4 (Container : access T4) return Character is ('A');
+
+         function Cnst_Index4 (Container : T4; Ind : Natural)
+            return Natural is (Ind);
+
+      private
+         type T2 is tagged null record;
+
+         type T4 is tagged null record;
+
+      end Objective_F_Pkg;
+
+      package body Objective_F_Pkg is
+         type Some_Concrete_Iterator is new Some_Iterator.Forward_Iterator
+            with null record;
+
+         overriding
+         function First (Object : Some_Concrete_Iterator) return Natural is
+            (1);
+         overriding
+         function Next (Object : Some_Concrete_Iterator; Position : Natural)
+            return Natural is (Position + 1);
+
+         function Iterate2 (Container : T2; Name : String)
+            return Some_Iterator.Forward_Iterator'Class is
+         begin
+            return Some_Concrete_Iterator'(Some_Iterator.Forward_Iterator
+                      with null record);
+         end Iterate2;
+
+      end Objective_F_Pkg;
+
+   begin
+      null;
+   end Objective_F;
+
+
+   Objective_G :
+   --  Check that the name specified by a Default_Iterator aspect cannot
+   --  denote multiple functions that meet the requirements.
+   declare -- Objective_G
+
+      package Objective_G_Pkg is
+         function Has_Element (Index : Natural)
+            return Boolean is (Index <= 10);
+
+         package Some_Iterator is new Ada.Iterator_Interfaces (
+            Cursor      => Natural,
+            Has_Element => Has_Element);
+
+         type Some_Concrete_Iterator is new Some_Iterator.Forward_Iterator
+            with null record;
+
+         overriding
+         function First (Object : Some_Concrete_Iterator) return Natural is
+            (1);
+         overriding
+         function Next (Object : Some_Concrete_Iterator; Position : Natural)
+            return Natural is (Position + 1);
+
+         type T1 is tagged null record with
+            Constant_Indexing => Cnst_Index1,
+            Default_Iterator  => Iterate1;                   -- ERROR: {2:10;1}
+
+         function Cnst_Index1 (Container : T1; Ind : Natural)
+            return Natural is (Ind);
+
+         function Iterate1 (Container : T1)
+            return Some_Iterator.Forward_Iterator'Class;
+         function Iterate1 (Container : T1)
+            return Some_Concrete_Iterator'Class;
+
+         type T2 is tagged private with
+            Constant_Indexing => Cnst_Index2,
+            Default_Iterator  => Iterate2;                   -- ERROR: {2:10;1}
+
+         function Iterate2 (Container : T2)
+            return Some_Iterator.Forward_Iterator'Class;
+         function Iterate2 (Container : access constant T2)
+            return Some_Iterator.Forward_Iterator'Class;
+         function Cnst_Index2 (Container : T2; Ind : Natural)
+            return Natural is (Ind);
+
+         type T3 is tagged private with
+            Constant_Indexing => Cnst_Index3,
+            Default_Iterator  => Iterate3;                   -- ERROR: {2:10;1}
+
+         function Cnst_Index3 (Container : T3; Ind : Natural)
+            return Natural is (Ind);
+
+         function Iterate3 (Container : T3)
+            return Some_Iterator.Forward_Iterator'Class;
+         function Iterate3 (Container : T3; X : Integer := 1)
+            return Some_Iterator.Forward_Iterator'Class;
+
+         type T4 is tagged private with
+            Constant_Indexing => Cnst_Index4,
+            Default_Iterator  => Iterate4;                   -- OK. {2:10;1}
+
+         function Cnst_Index4 (Container : T4; Ind : Natural)
+            return Natural is (Ind);
+
+         function Iterate4 (Container : T4)
+            return Some_Iterator.Forward_Iterator'Class;
+         function Iterate4 (Container : T4; X : Integer)
+            return Some_Iterator.Forward_Iterator'Class;
+
+      private
+         type T2 is tagged null record;
+
+         type T3 is tagged null record;
+
+         type T4 is tagged null record;
+      end Objective_G_Pkg;
+
+      package body Objective_G_Pkg is
+         function Iterate1 (Container : T1)
+            return Some_Iterator.Forward_Iterator'Class is
+         begin
+            return Some_Concrete_Iterator'(Some_Iterator.Forward_Iterator
+                      with null record);
+         end Iterate1;
+
+         function Iterate1 (Container : T1)
+            return Some_Concrete_Iterator'Class is
+         begin
+            return Some_Concrete_Iterator'(Some_Iterator.Forward_Iterator
+                      with null record);
+         end Iterate1;
+
+         function Iterate2 (Container : T2)
+            return Some_Iterator.Forward_Iterator'Class is
+         begin
+            return Some_Concrete_Iterator'(Some_Iterator.Forward_Iterator
+                      with null record);
+         end Iterate2;
+
+         function Iterate2 (Container : access constant T2)
+            return Some_Iterator.Forward_Iterator'Class is
+         begin
+            return Some_Concrete_Iterator'(Some_Iterator.Forward_Iterator
+                      with null record);
+         end Iterate2;
+
+         function Iterate3 (Container : T3)
+            return Some_Iterator.Forward_Iterator'Class is
+         begin
+            return Some_Concrete_Iterator'(Some_Iterator.Forward_Iterator
+                      with null record);
+         end Iterate3;
+
+         function Iterate3 (Container : T3; X : Integer := 1)
+            return Some_Iterator.Forward_Iterator'Class is
+         begin
+            return Some_Concrete_Iterator'(Some_Iterator.Forward_Iterator
+                      with null record);
+         end Iterate3;
+
+         function Iterate4 (Container : T4)
+            return Some_Iterator.Forward_Iterator'Class is
+         begin
+            return Some_Concrete_Iterator'(Some_Iterator.Forward_Iterator
+                      with null record);
+         end Iterate4;
+
+         function Iterate4 (Container : T4; X : Integer)
+            return Some_Iterator.Forward_Iterator'Class is
+         begin
+            return Some_Concrete_Iterator'(Some_Iterator.Forward_Iterator
+                      with null record);
+         end Iterate4;
+
+      end Objective_G_Pkg;
+
+   begin
+      null;
+   end Objective_G;
+
+end B551001;

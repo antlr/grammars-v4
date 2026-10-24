@@ -148,10 +148,9 @@ PN_PREFIX
     : PN_CHARS_BASE ((PN_CHARS | '.')* PN_CHARS)?
     ;
 
-//IRIREF	        :	'<' (~(['\u0000'..'\u0020']|'<'|'>'|'"'|'{'|'}'|'|'|'^'|'`'|'\\') | UCHAR)* '>'; /* \u00=NULL #01-\u1F=control codes \u20=space */
-
+// \u0000=NULL \u0001-\u001F=control codes \u0020=space
 IRIREF
-    : '<' (PN_CHARS | '.' | ':' | '/' | '\\' | '#' | '@' | '%' | '&' | UCHAR)* '>'
+    : '<' (~[\u0000-\u0020<>"{}|^`\\] | UCHAR)* '>'
     ;
 
 PNAME_NS

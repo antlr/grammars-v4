@@ -1,0 +1,25 @@
+digraph ATN {
+rankdir=LR;
+s37[fontsize=11, label="37", shape=doublecircle, fixedsize=true, width=.6];
+s36[fontsize=11,label="36", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s471[fontsize=11,label="471", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s472[fontsize=11,label="472", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s473[fontsize=11,label="&rarr;\n473*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s474[fontsize=11,label="&larr;\n474", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s475[fontsize=11,label="{475*\nd=37|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s476[fontsize=11,label="476", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s477[fontsize=11,label="477*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s478[fontsize=11,label="478", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s479[fontsize=11,label="479", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s36 -> s471 [fontname="Times-Italic", label="&epsilon;"];
+s471 -> s475 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'{'", arrowhead = normal];
+s475:p0 -> s473 [fontname="Times-Italic", label="&epsilon;"];
+s475:p1 -> s476 [fontname="Times-Italic", label="&epsilon;"];
+s473 -> s472 [fontname="Times-Italic", label="&epsilon;"];
+s476 -> s478 [fontname="Times-Italic", label="&epsilon;"];
+s472 -> s474 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<interfaceBodyDeclaration>", arrowhead = normal];
+s478 -> s479 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'}'", arrowhead = normal];
+s474 -> s477 [fontname="Times-Italic", label="&epsilon;"];
+s479 -> s37 [fontname="Times-Italic", label="&epsilon;"];
+s477 -> s475 [fontname="Times-Italic", label="&epsilon;", style="dashed"];
+}

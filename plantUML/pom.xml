@@ -18,7 +18,8 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
-					   <include>PlantUML.g4</include>
+					   <include>PlantUMLLexer.g4</include>
+					   <include>PlantUMLParser.g4</include>
 					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
@@ -38,7 +39,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>classDiagram</entryPoint>
+					<entryPoint>entry_</entryPoint>
 					<grammarName>PlantUML</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
