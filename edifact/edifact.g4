@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2020, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -32,42 +32,105 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar edifact;
 
 edifact
-   : interchange
+   : interchange+ EOF
    ;
 
 interchange
-   : functionalgroup
+   : serviceStringAdvice? interchangeHeader (functionalGroup | message)* interchangeTrailer
    ;
 
-functionalgroup
-   : messageheader
+serviceStringAdvice
+   : UNA (COMPONENT_SEP | ELEMENT_SEP | VALUE)+ SEGMENT_TERM
    ;
 
-messageheader
-   : userdata+
+interchangeHeader
+   : UNB (ELEMENT_SEP element)* SEGMENT_TERM
    ;
 
-number
-   : NUMBER
+interchangeTrailer
+   : UNZ (ELEMENT_SEP element)* SEGMENT_TERM
    ;
 
-STRINGLITERAL
-   : '"' STRING
+functionalGroup
+   : groupHeader message+ groupTrailer
    ;
 
-STRING
-   : [a-zA-Z] [a-zA-Z0-9_]*
+groupHeader
+   : UNG (ELEMENT_SEP element)* SEGMENT_TERM
    ;
 
-NUMBER
-   : [0-9]+
+groupTrailer
+   : UNE (ELEMENT_SEP element)* SEGMENT_TERM
    ;
 
-COMMENT
-   : ';' ~ [\r\n]* ->skip
+message
+   : messageHeader segment* messageTrailer
    ;
 
-WS
-   : [ \t\r\n] -> skip
+messageHeader
+   : UNH (ELEMENT_SEP element)* SEGMENT_TERM
    ;
 
+messageTrailer
+   : UNT (ELEMENT_SEP element)* SEGMENT_TERM
+   ;
+
+segment
+   : VALUE (ELEMENT_SEP element)* SEGMENT_TERM
+   ;
+
+element
+   : component (COMPONENT_SEP component)*
+   ;
+
+component
+   : VALUE?
+   ;
+
+UNA
+   : 'UNA'
+   ;
+
+UNB
+   : 'UNB'
+   ;
+
+UNH
+   : 'UNH'
+   ;
+
+UNT
+   : 'UNT'
+   ;
+
+UNZ
+   : 'UNZ'
+   ;
+
+UNG
+   : 'UNG'
+   ;
+
+UNE
+   : 'UNE'
+   ;
+
+SEGMENT_TERM
+   : '\''
+   ;
+
+ELEMENT_SEP
+   : '+'
+   ;
+
+COMPONENT_SEP
+   : ':'
+   ;
+
+VALUE
+   : ~[:+'\r\n]+
+   ;
+
+NEWLINE
+   : [\r\n]+ -> skip
+   ;
