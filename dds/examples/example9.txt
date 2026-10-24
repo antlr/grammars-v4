@@ -1,0 +1,9 @@
+     A*
+     A* Logical file over EMPLOYEE, keyed by department
+     A*
+     A          R EMPREC                    PFILE(EMPLOYEE)
+     A            EMPNO
+     A            DEPTNO
+     A            EMPNAME
+     A          K DEPTNO
+     A          K EMPNO
