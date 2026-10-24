@@ -205,6 +205,7 @@
 				<module>databank</module>
 				<module>datalog</module>
 				<module>dcm</module>
+				<module>dds</module>
 				<module>dice</module>
 				<module>dif</module>
 				<module>doiurl</module>

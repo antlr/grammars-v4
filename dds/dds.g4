@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2019, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -30,65 +30,55 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// DDS (Data Description Specifications) source is traditionally a fixed
+// column format (sequence number in columns 1-5, form type in column 6,
+// and so on), but the meaning of the remaining columns differs by DDS
+// type (physical/logical file, display file, printer file). Rather than
+// enforce one of those column layouts, this grammar treats each line as
+// a free sequence of items -- bare words (names, lengths, row/column
+// numbers, usage codes), keyword calls such as COLHDG('A' 'B'), and
+// quoted string literals. A DDS quoted string may be continued onto the
+// next physical line (ending the line with '-' just before the implicit
+// line break), so QUOTEDSTRING is allowed to span a newline.
+
 grammar dds;
 
 dds
-   : line+
+   : line* EOF
    ;
 
 line
-   : sequencenumber formtype (comment | displaydata)
+   : item* EOL
+   | item+
    ;
 
-comment
-    : LINECOMMENT
-    ;
+item
+   : QUOTEDSTRING
+   | call
+   | WORD
+   ;
 
-// position 7-16
-displaydata
-    : ' ' condition EOL
-    ;
+call
+   : WORD '(' arg+ ')'
+   ;
 
-condition
-    : conditionid conditionnumber
-    ;
+arg
+   : QUOTEDSTRING
+   | WORD
+   ;
 
-// NOT, OR, AND
-conditionid
-    : 'N' | 'O' | 'A'
-    ;
+QUOTEDSTRING
+   : '\'' ('\'\'' | ~['])* '\''
+   ;
 
-conditionnumber
-    : DIGIT DIGIT
-    ;
-
-// position 1-5
-sequencenumber
-    : digitorspace digitorspace digitorspace digitorspace digitorspace
-    ;
-    
-// position 6
-formtype
-    : 'A'
-    ;
-
-digitorspace
-    : DIGIT | ' '
-    ;
-
-// posiiton 7
-LINECOMMENT
-    : '*' ~[\r\n]* EOL
-    ;
-
-DIGIT
-    : [0-9]
-    ;
-
-SPACE
-    : ' '
-    ;
+WORD
+   : ~[ \t\r\n'()]+
+   ;
 
 EOL
-   : [\r\n']
+   : [\r\n]+
+   ;
+
+WS
+   : [ \t]+ -> skip
    ;
