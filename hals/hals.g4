@@ -41,8 +41,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar hals;
 
 compilation
-   : compile_list '_'
-   | '_'
+   : (compile_list '_'
+   | '_') EOF
    ;
 
 compile_list

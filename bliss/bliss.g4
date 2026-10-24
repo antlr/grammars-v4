@@ -25,7 +25,7 @@
 grammar bliss;
 
 module_
-   : 'MODULE' name '(' parameters? ')' '=' e 'ELUDOM'
+   : 'MODULE' name '(' parameters? ')' '=' e 'ELUDOM' EOF
    ;
 
 parameters

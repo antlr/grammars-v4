@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE;
 grammar mizar;
 
 article
-   : environmentDeclaration textProper '.'
+   : environmentDeclaration textProper '.' EOF
    ;
 
 environmentDeclaration

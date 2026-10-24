@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar spk;
 
 prog
-   : identifier ':' 'PROCEDURE' 'OPTIONS' '(' identifier ')' ';' declaration* definition* statement* 'END' ';'
+   : identifier ':' 'PROCEDURE' 'OPTIONS' '(' identifier ')' ';' declaration* definition* statement* 'END' ';' EOF
    ;
 
 declaration

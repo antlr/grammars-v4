@@ -130,7 +130,7 @@ hCharSequence
 	;
 
 hChar
-	: ~ (Newline | Greater) 
+	: ~ (Newline | Greater)
 	// any member of the source character set except new-line and >
 	;
 
@@ -139,7 +139,7 @@ qCharSequence
 	;
 
 qChar
-	:  ~ (Newline | '"') 
+	:  ~ (Newline | '"')
 	// any member of the source character set except new-line and "
 	;
 
@@ -157,8 +157,8 @@ literal
 /* A.4 Basics */
 
 translationUnit
-	: declarationseq? /* EOF */
-	| globalModuleFragment? moduleDeclaration declarationseq? privateModuleFragment?
+	: (declarationseq?
+	| globalModuleFragment? moduleDeclaration declarationseq? privateModuleFragment?)
 	;
 
 
@@ -298,11 +298,11 @@ simpleRequirement
 typeRequirement
 	: Typename_ nestedNameSpecifier? theTypeName Semi
 	;
-	
+
 compoundRequirement
 	: LeftBrace expression RightBrace Noexcept? returnTypeRequirement? Semi
 	;
-	
+
 returnTypeRequirement
 	: Arrow typeConstraint
 	;
@@ -403,7 +403,7 @@ additiveExpression
     ;
 
 shiftExpression
-    : additiveExpression 
+    : additiveExpression
 	| shiftExpression (Less Less | Greater Greater) additiveExpression
     ;
 
@@ -418,7 +418,7 @@ relationalExpression
     ;
 
 equalityExpression
-    : relationalExpression 
+    : relationalExpression
 	| equalityExpression (Equal | NotEqual) relationalExpression
     ;
 
@@ -438,7 +438,7 @@ inclusiveOrExpression
     ;
 
 logicalAndExpression
-    : inclusiveOrExpression 
+    : inclusiveOrExpression
 	| logicalAndExpression AndAnd inclusiveOrExpression
     ;
 
@@ -461,7 +461,7 @@ throwExpression
 
 assignmentExpression
     : conditionalExpression
-	| yieldExpression	
+	| yieldExpression
 	| throwExpression
     | logicalOrExpression assignmentOperator initializerClause
     ;
@@ -578,11 +578,11 @@ nameDeclaration
 	| nodeclspecFunctionDeclaration
     | functionDefinition
     | templateDeclaration
-	| deductionGuide	
+	| deductionGuide
     | linkageSpecification
-    | namespaceDefinition	
-    | emptyDeclaration_	
-    | attributeDeclaration	
+    | namespaceDefinition
+    | emptyDeclaration_
+    | attributeDeclaration
 	| moduleImportDeclaration
     ;
 
@@ -704,7 +704,7 @@ simpleTypeSpecifier
     | Int
     | Long
     | Signed
-    | Unsigned	
+    | Unsigned
     | Float
     | Double
     | Void
@@ -720,7 +720,7 @@ elaboratedTypeSpecifier
 	: classKey (attributeSpecifierSeq? nestedNameSpecifier? Identifier | simpleTemplateId | nestedNameSpecifier Template? simpleTemplateId)
 	| elaboratedEnumSpecifier
 	;
-	
+
 elaboratedEnumSpecifier
 	: Enum nestedNameSpecifier? Identifier
 	;
@@ -1048,7 +1048,7 @@ attributeToken
 attributeScopedToken
 	: attributeNamespace Doublecolon Identifier
 	;
-	
+
 attributeNamespace
     : Identifier
     ;
@@ -1150,7 +1150,7 @@ memberdeclaration
 	| explicitSpecialization
     | deductionGuide
     | aliasDeclaration
-	| opaqueEnumDeclaration	
+	| opaqueEnumDeclaration
     | emptyDeclaration_
     ;
 
@@ -1248,7 +1248,7 @@ theOperator
 	| Arrow
 	| ArrowStar
 	| Tilde
-    | Not	
+    | Not
     | Plus
     | Minus
     | Star
@@ -1445,7 +1445,7 @@ group
 	: groupPart
 	| group groupPart
 	;
-	
+
 groupPart
 	: controlLine
 	| ifSection
@@ -1531,7 +1531,7 @@ hPreprocessingToken
 	: ~ ('>')
 	// any preprocessing-token other than >
 	;
-	
+
 hppTokens
 	: hPreprocessingToken
 	| hppTokens hPreprocessingToken
