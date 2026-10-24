@@ -1,2 +1,1 @@
 line 4:0 mismatched input '<EOF>' expecting {'lexer', 'parser', 'grammar'}
-

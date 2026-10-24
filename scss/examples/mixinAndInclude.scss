@@ -1,0 +1,120 @@
+@mixin reset-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@mixin horizontal-list {
+  @include reset-list;
+
+  li {
+    display: inline-block;
+    margin: {
+      left: -2px;
+      right: 2em;
+    }
+  }
+}
+nav ul {
+  @include horizontal-list;
+}
+
+@mixin rtl($property, $ltr-value, $rtl-value) {
+  #{$property}: $ltr-value;
+
+  [dir=rtl] & {
+    #{$property}: $rtl-value;
+  }
+}
+
+.sidebar {
+  @include rtl(float, left, right);
+}
+
+@mixin replace-text($image, $x: 50%, $y: 50%) {
+  text-indent: -99999em;
+  overflow: hidden;
+  text-align: left;
+
+  background: {
+    image: $image;
+    repeat: no-repeat;
+    position: $x $y;
+  }
+}
+
+.mail-icon {
+  @include replace-text(url("/images/mail.svg"), 0);
+}
+
+@mixin square($size, $radius: 0) {
+  width: $size;
+  height: $size;
+
+  @if $radius != 0 {
+    border-radius: $radius;
+  }
+}
+
+.avatar {
+  @include square(100px, $radius: 4px);
+}
+
+@mixin order($height, $selectors...) {
+  @for $i from 0 to length($selectors) {
+    #{nth($selectors, $i + 1)} {
+      position: absolute;
+      height: $height;
+      margin-top: $i * $height;
+    }
+  }
+}
+
+@include order(150px, "input.name", "input.address", "input.zip");
+@mixin syntax-colors($args...) {
+  @each $name, $color in keywords($args) {
+    pre span.stx-#{$name} {
+      color: $color;
+    }
+  }
+}
+
+@include syntax-colors(
+  $string: #080,
+  $comment: #800,
+  $variable: #60b,
+)
+
+$form-selectors: "input.name", "input.address", "input.zip" !default;
+
+@include order(150px, $form-selectors...);
+
+@mixin hover {
+  &:not([disabled]):hover {
+    @content;
+  }
+}
+
+.button {
+  border: 1px solid black;
+  @include hover {
+    border-width: 2px;
+  }
+}
+
+@mixin media($types...) {
+  @each $type in $types {
+    @media #{$type} {
+      @content($type);
+    }
+  }
+}
+
+@include media(screen, print) using ($type) {
+  h1 {
+    font-size: 40px;
+    @if $type == print {
+      font-family: Calluna;
+    }
+  }
+}

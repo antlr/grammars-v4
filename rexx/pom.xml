@@ -41,8 +41,9 @@
 					<showTree>false</showTree>
 					<entryPoint>file_</entryPoint>
 					<grammarName>Rexx</grammarName>
-					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
+					<testFileExtension></testFileExtension>
+					<packageName></packageName>
 				</configuration>
 				<executions>
 					<execution>

@@ -1,0 +1,12 @@
+-- add successive numbers from file
+
+stream input from "vecs.txt";
+stream output to "std_out";
+
+box simple
+in (x::int 64,y::int 64)
+out (x'::(int 64,int 64,string),y'::int 64)
+match
+ (x,y) -> let xy = x+y in ((x,xy,"\n"),xy);
+
+wire simple (input,simple.y' initially 0) (output,simple.y);

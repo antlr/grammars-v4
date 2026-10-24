@@ -1,0 +1,245 @@
+-- BXC6001.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that the name referenced in pragmas Atomic and Volatile may
+--      only be an object, a non-inherited component or a full type.
+--      Check that the name referenced in Atomic_Components or
+--      Volatile_Components must be an array type or an object of an
+--      anonymous array type.
+--
+-- TEST DESCRIPTION:
+--      This test defines protected objects with various interfaces and
+--      uses them to determine the correct recognition of pragmas Atomic,
+--      Volatile, Atomic_Components and Volatile_Components.
+--
+--
+-- APPLICABILITY CRITERIA:
+--      This test is only applicable for a compiler attempting validation
+--      for the Systems Programming Annex.
+--
+-- ACCEPTANCE CRITERIA:
+--      An implementation which cannot support the indivisible reads and
+--      updates required by the Atomic pragma may report the
+--      otherwise legal pragmas as illegal. If all such pragmas are
+--      rejected, then the test should be graded as Not Applicable.
+--
+--
+-- CHANGE HISTORY:
+--      06 Dec 94   SAIC    ACVC 2.0
+--      15 Dec 94   SAIC    Reduced size expectations for Atomic objects
+--      10 Nov 95   SAIC    Reordered components for ACVC 2.0.1
+--      11 Oct 96   SAIC    Improved wording of Acceptance Criteria.
+--      26 Jun 98   EDS     Clarified Acceptance Criteria and marked
+--                          applications of pragma Atomic to composite
+--                          types as possible errors
+--!
+
+------------------------------------------------------------------ BXC6001
+
+procedure BXC6001 is
+  Kitchen_Table : array(1..6) of Natural;
+  pragma Volatile_Components( Kitchen_Table );                    -- OK
+
+  Dining_Table  : array(1..6) of Float;
+  pragma Atomic_Components( Dining_Table );                       -- OK
+
+begin  -- Main test procedure.
+  null;
+end BXC6001;
+
+---------------------------------------------------------------- BXC6001_0
+
+package BXC6001_0 is
+
+  type Array_Type is array(Positive range 1..2) of Character;
+
+  type Root_Tagged is tagged record
+    Inheritable_Component : Array_Type;
+  end record;
+
+end BXC6001_0;
+
+---------------------------------------------------------------- BXC6001_1
+
+with BXC6001_0;
+package BXC6001_1 is
+
+  type Plain_Record_Type is record
+    Element_One   : Boolean;
+    Element_Two   : Character;
+  end record;
+
+  A_Record_Object : Plain_Record_Type;
+  pragma Volatile( A_Record_Object );                             -- OK
+
+  type Atomic_Record_Type is record
+    Element_One   : Boolean;
+    Element_Two   : Character;
+  end record;
+  pragma Atomic( Atomic_Record_Type );                      -- Optional Error
+
+  type Non_Atomic_Record_Type is record
+    Element_One   : Boolean;
+    Element_Two   : Character;
+  end record;
+
+  Atomic_Object_Of_Non_Atomic_Record_Type : Non_Atomic_Record_Type;
+  pragma Atomic( Atomic_Object_Of_Non_Atomic_Record_Type ); -- Optional Error
+
+  type Intermediate_Tagged is new BXC6001_0.Root_Tagged with record
+    Additional_Component : Plain_Record_Type;
+    pragma Volatile( Additional_Component );                      -- OK
+  end record;
+
+  type Non_Volatile_Array is new BXC6001_0.Array_Type;
+
+  type Atomic_Array is new BXC6001_0.Array_Type;
+  pragma Atomic( Atomic_Array );                            -- Optional Error
+
+  type Atomic_Component_Array is new BXC6001_0.Array_Type;
+  pragma Atomic_Components( Atomic_Component_Array );             -- OK
+
+  type Volatile_Array is new BXC6001_0.Array_Type;
+  pragma Volatile( Volatile_Array );                              -- OK
+
+  type Volatile_Component_Array is new BXC6001_0.Array_Type;
+  pragma Volatile_Components( Volatile_Component_Array );         -- OK
+
+  ACVC_Team : Volatile_Component_Array;
+
+  ACVC_Reviewers : Atomic_Array;
+
+end BXC6001_1;
+
+---------------------------------------------------------------- BXC6001_2
+
+with BXC6001_0;
+with BXC6001_1;
+package BXC6001_2 is
+
+  Array_1 : BXC6001_1.Non_Volatile_Array;
+  pragma Volatile_Components( Array_1 );                          -- ERROR:
+           -- for objects, may only apply to object of anonymous array type
+
+  Array_2 : BXC6001_1.Non_Volatile_Array;
+  pragma Atomic_Components( Array_2 );                            -- ERROR:
+           -- for objects, may only apply to object of anonymous array type
+
+  type Whole_Array_Volatile is array(1..10) of Integer;
+  pragma Volatile( Whole_Array_Volatile );                        -- OK
+
+  type End_Product_Tagged is new BXC6001_1.Intermediate_Tagged with record
+    Simple_Component : Natural;
+    pragma Volatile( Inheritable_Component );                     -- ERROR:
+                                 -- may not apply to an inherited component
+  end record;
+
+   type Consumer_Tagged is new BXC6001_1.Intermediate_Tagged with record
+    Simple_Component : Natural;
+    pragma Volatile( Simple_Component );                         -- OK
+  end record;
+
+ type Private_Record is private;
+
+  type Subatomic_Tagged is new BXC6001_0.Root_Tagged with record
+    Additional_Component : BXC6001_1.Plain_Record_Type;
+    pragma Atomic( Additional_Component );                  -- Optional Error
+  end record;
+
+  type Nuclear_Tagged is new BXC6001_0.Root_Tagged with record
+    Simple_Component : Natural;
+    pragma Atomic( Inheritable_Component );                       -- ERROR:
+                                 -- may not apply to an inherited component
+  end record;
+
+  type Private_Atomic_Type is private;
+  pragma Atomic( Private_Atomic_Type );                           -- ERROR:
+                                     -- must apply to full_type_declaration
+
+  type Private_Volatile_Type is private;
+  pragma Volatile( Private_Volatile_Type );                       -- ERROR:
+                                     -- must apply to full_type_declaration
+
+  type Incomplete_Atomic;
+  pragma Atomic( Incomplete_Atomic );                             -- ERROR:
+                                     -- must apply to full_type_declaration
+
+  type IndirectA is access Incomplete_Atomic;
+
+  type Incomplete_Atomic is record I,J: IndirectA; end record;
+  pragma Atomic( Incomplete_Atomic );                       -- Optional Error
+
+  type Incomplete_Volatile;
+  pragma Volatile( Incomplete_Volatile );                         -- ERROR:
+                                     -- must apply to full_type_declaration
+
+  type IndirectV is access Incomplete_Volatile;
+
+  type Incomplete_Volatile is record I,J: IndirectV; end record;
+  pragma Volatile( Incomplete_Volatile );                         -- OK
+
+  type Atomic_Record_Components is record
+    F1, F2, F3 : Natural;
+  end record;
+  pragma Atomic_Components( Atomic_Record_Components );           -- ERROR:
+                                            -- may not apply to record type
+
+  type Volatile_Record_Components is record
+    F1, F2, F3 : Natural;
+  end record;
+  pragma Volatile_Components( Volatile_Record_Components );       -- ERROR:
+                                            -- may not apply to record type
+
+  I_Take : exception;
+
+  pragma Atomic( I_Take );                                        -- ERROR:
+                                           -- may not apply to an exception
+
+  pragma Volatile( I_Take );                                      -- ERROR:
+                                           -- may not apply to an exception
+
+  package Store is
+    Whine : constant := -1;
+  end Store;
+
+  pragma Atomic( Store );                                         -- ERROR:
+                                              -- may not apply to a package
+
+  pragma Volatile( Store );                                       -- ERROR:
+                                              -- may not apply to a package
+
+private
+  type Private_Record is record
+     X,Y,Z: Natural;
+  end record;
+
+  type Private_Atomic_Type is range -2**8 .. 0;
+  pragma Atomic( Private_Atomic_Type );                           -- OK
+
+  type Private_Volatile_Type is range -8**2 .. 0;
+  pragma Volatile( Private_Volatile_Type );                       -- OK
+
+end BXC6001_2;
