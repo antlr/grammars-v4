@@ -127,10 +127,12 @@
 				<module>acme</module>
                 <module>action</module>
 				<module>ada</module>
+				<module>agc</module>
 				<module>alef</module>
                 <module>alf</module>
 				<module>algol60</module>
 				<module>alloy</module>
+				<module>alm</module>
 				<module>alpaca</module>
                 <module>alpherd</module>
                 <module>amazon-states-language</module>
@@ -152,6 +154,7 @@
                 <module>aterm</module>
 				<module>atl</module>
                 <module>autocode</module>
+				<module>awk</module>
 				<module>b</module>
 				<module>basic</module>
 				<module>bcl</module>
@@ -159,6 +162,7 @@
 				<module>bdf</module>
 				<module>bencoding</module>
 				<module>bibcode</module>
+				<module>bibtex</module>
 				<module>bicep</module>
                 <module>bison</module>
                 <module>bliss</module>
@@ -174,6 +178,7 @@
                 <module>chip8</module>
                 <module>chip8octo</module>
 				<module>clf</module>
+				<module>clif</module>
 				<module>clojure</module>
 				<module>clu</module>
 				<module>cmake</module>
@@ -203,12 +208,14 @@
 				<module>dif</module>
 				<module>doiurl</module>
 				<module>dot</module>
+				<module>ebnf</module>
 				<module>edif300</module>
 				<module>edn</module>
                                 <module>eiffel</module>
 				<module>elixir</module>
 				<module>erlang</module>
 				<module>esolang</module>
+				<module>euler</module>
 				<module>evm-bytecode</module>
                 <module>fantom</module>
 				<module>fasta</module>
@@ -275,6 +282,7 @@
 				<module>limbo</module>
 				<module>lisa</module>
                 <module>lisp</module>
+				<module>llvm-ir</module>
 				<module>logo</module>
 				<module>lpc</module>
 				<module>lrc</module>
@@ -304,6 +312,7 @@
 				<module>muparser</module>
 				<module>newick</module>
 				<module>oberon</module>
+				<module>ocl</module>
                 <module>odin</module>
                 <module>orc</module>
 				<!-- <module>objc</module> -->
@@ -337,6 +346,7 @@
 				<module>pmmn</module>
 				<module>postalcode</module>
 				<module>powerbuilder</module>
+				<module>powerbuilderdw</module>
 				<module>powerquery</module>
 				<module>prolog</module>
 				<module>promql</module>
@@ -353,6 +363,7 @@
                 <module>rapid</module>
 				<module>rcs</module>
                 <module>reaper</module>
+				<module>recfile</module>
 				<module>redcode</module>
 				<module>refal</module>
 				<module>rego</module>
@@ -368,6 +379,7 @@
 				<module>romannumerals</module>
 				<module>ron</module>
 				<module>rpn</module>
+				<module>ruleworks</module>
 				<module>rust</module>
                 <module>sapf</module>
                 <module>sasl</module>
@@ -375,6 +387,7 @@
 				<module>scala/scala3</module>
 				<module>scotty</module>
 				<module>scss</module>
+				<module>sdl</module>
 				<module>semver</module>
 				<module>sexpression</module>
 				<module>sgf</module>
@@ -395,16 +408,20 @@
                 <module>squeak</module>
                 <module>sql</module>
                 <module>squirrel</module>
+				<module>srt</module>
 				<module>stacktrace</module>
 				<module>star</module>
 				<module>stellaris</module>
+				<module>stl</module>
 				<module>stringtemplate</module>
 				<module>suokif</module>
+				<module>supercollider</module>
 				<module>swift</module>
 				<module>swift-fin</module>
 				<module>sysml-v2</module>
 				<module>szf</module>
 				<module>tcpheader</module>
+				<module>teal</module>
 				<module>telephone</module>
 				<module>terraform</module>
 				<module>thrift</module>
@@ -429,6 +446,7 @@
 				<module>url</module>
 				<module>useragent</module>
 				<module>v</module>
+				<module>vaxscan</module>
 				<module>vb6</module>
 				<module>vba</module>
 				<module>velocity</module>
