@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2022, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -30,14 +30,106 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-grammar transactonlogic;
+// Transaction Logic (Tr), per Bonner & Kifer, extends classical logic with
+// connectives for describing transactions (state-changing executions):
+// serial conjunction (the characteristic connective), serial disjunction,
+// parallel conjunction (from Concurrent Transaction Logic), and the
+// possibility modality <> for hypothetical execution. See
+// https://en.wikipedia.org/wiki/Transaction_logic
+//
+//   colorNode <- node(N) (x) -colored(N,_) (x) color(C) (x)
+//                -(adjacent(N,N2) /\ colored(N2,C)) (x) tinsert(colored(N,C)).
+//
+// ASCII spellings are used here in place of the mathematical symbols, since
+// program source is plain text:
+//   (x)   serial conjunction      (math: the tensor symbol)
+//   (+)   serial disjunction      (math: the oplus symbol)
+//   ||    parallel conjunction    (Concurrent Transaction Logic)
+//   /\    classical conjunction
+//   \/    classical disjunction
+//   -     classical negation
+//   <>    possibility modality (hypothetical execution)
 
-expression_ : equation* EOF;
+grammar transactionlogic;
 
-SERIAL_CONJUCTION:
+program
+   : clause* EOF
+   ;
 
-SERIAL_DISJUNCTION:
+clause
+   : formula ('<-' formula)? '.'
+   ;
+
+formula
+   : serialdisjunction
+   ;
+
+serialdisjunction
+   : serialconjunction ('(+)' serialconjunction)*
+   ;
+
+serialconjunction
+   : parallelconjunction ('(x)' parallelconjunction)*
+   ;
+
+parallelconjunction
+   : disjunction ('||' disjunction)*
+   ;
+
+disjunction
+   : conjunction ('\\/' conjunction)*
+   ;
+
+conjunction
+   : unary ('/\\' unary)*
+   ;
+
+unary
+   : '-' unary
+   | '<>' unary
+   | primary
+   ;
+
+primary
+   : '(' formula ')'
+   | atom
+   ;
+
+atom
+   : NAME ('(' termlist? ')')?
+   ;
+
+termlist
+   : term (',' term)*
+   ;
+
+term
+   : atom
+   | NUMBER
+   | VARIABLE
+   | ANON
+   ;
+
+NAME
+   : [a-z] [a-zA-Z0-9_]*
+   ;
+
+VARIABLE
+   : [A-Z] [a-zA-Z0-9_]*
+   ;
+
+ANON
+   : '_'
+   ;
+
+NUMBER
+   : [0-9]+
+   ;
+
+COMMENT
+   : '%' ~[\r\n]* -> skip
+   ;
 
 WS
-   : [ \r\n\t] + -> skip
+   : [ \r\n\t]+ -> skip
    ;
