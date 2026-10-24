@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2022, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -30,12 +30,39 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// An ASCII DXF file is a flat stream of (group code, value) pairs, each
+// occupying its own line. The group code is always the first line of a
+// pair, and the value is the next line. Higher level structure (sections,
+// tables, blocks, entities, objects) is encoded purely in terms of these
+// pairs (e.g. group code 0 with value "SECTION"/"ENDSEC"), rather than
+// being enforced by this grammar.
+
 grammar dxf;
 
-dxf : equation* EOF;
+dxf
+   : pair* EOF
+   ;
 
+pair
+   : groupcode NL value NL?
+   ;
 
+groupcode
+   : LINE
+   ;
+
+value
+   : LINE
+   ;
+
+LINE
+   : ~[\r\n]+
+   ;
+
+NL
+   : [\r\n]+
+   ;
 
 WS
-   : [ \r\n\t] + -> skip
+   : [ \t]+ -> skip
    ;
