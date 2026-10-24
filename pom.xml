@@ -251,6 +251,7 @@
 				<module>iso8601</module>
 				<module>istc</module>
 				<module>itn</module>
+				<module>iupac-inorganic</module>
                 <module>ixml</module>
 				<module>jam</module>
 				<module>janus</module>

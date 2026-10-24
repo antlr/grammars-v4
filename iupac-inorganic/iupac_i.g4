@@ -32,8 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 grammar iupac_i;
 
-compoound
-   : part ('·' part)*
+compound
+   : part ('·' part)* EOF
    ;
 
 part
