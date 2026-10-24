@@ -176,6 +176,7 @@
 				<module>capnproto</module>
 				<module>caql</module>
 				<module>cayenne</module>
+				<module>cerbac</module>
                 <module>chip8</module>
                 <module>chip8octo</module>
 				<module>clf</module>

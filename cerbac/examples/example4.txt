@@ -1,0 +1,9 @@
+PolicyStatement : [
+{
+  "Id" : "Policy2",
+  "Type": "O-",
+  "Who": "Guest",
+  "Action": ["READ"],
+  "What" : {"Resource": "Files"}
+}
+]

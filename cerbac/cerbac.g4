@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2019, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -53,7 +53,7 @@ decl
     | typedecl
     | actiondecl
     | whatdecl
-    | whodecl 
+    | whodecl
     | triggerdecl
     | whydecl
     | howdecl
@@ -66,7 +66,7 @@ iddecl
     ;
 
 typedecl
-    : '"Type"' ':'  ('"A+"'| '"A-"'| '"O+"'| '"O-"'|)
+    : '"Type"' ':'  ('"A+"'| '"A-"'| '"O+"'| '"O-"')
     ;
 
 whodecl
@@ -126,7 +126,7 @@ timetype
     ;
 
 QUOTEDSTRING
-    : '"' ~'"'* '"' 
+    : '"' ~'"'* '"'
     ;
 
 WS
