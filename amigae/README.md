@@ -1,3 +1,3 @@
 # AmigaE Grammar
 
-A simple ANTLR4 grammar for AmigaE.  
+An ANTLR4 grammar for AmigaE.  

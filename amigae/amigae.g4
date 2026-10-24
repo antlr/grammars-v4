@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2021, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -30,12 +30,10 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// http://cshandley.co.uk/amigae/ch_18a.html
-
 grammar amigae;
 
 program
-   : opts globalpart localpart
+   : opts globalpart localpart EOF
    ;
 
 globalpart
@@ -47,7 +45,7 @@ localpart
    ;
 
 modulestat
-   : 'MODULE' (STRINGCONST ',')+ EOL
+   : 'MODULE' STRINGCONST (',' STRINGCONST)* EOL
    ;
 
 defstat
@@ -59,25 +57,25 @@ objdecl
    ;
 
 constdecl
-   : 'CONST' ((CONSTANT '=' constexp) ',')+
-   | 'ENUM' ((CONSTANT | CONSTANT '=' constexp) ',')+
-   | 'SET' (CONSTANT ',')+
+   : 'CONST' (CONSTANT '=' constexp) (',' (CONSTANT '=' constexp))* EOL
+   | 'ENUM' (CONSTANT | CONSTANT '=' constexp) (',' (CONSTANT | CONSTANT '=' constexp))* EOL
+   | 'SET' CONSTANT (',' CONSTANT)* EOL
    ;
 
 procdecl
-   : 'EXPORT'? 'PROC' IDENT '(' argdecllist ')' ('OF' IDENT)? 'HANDLE'? (('RETURN' | 'IS') (exp ',')* | EOL defstat* stats ('EXCEPT' EOL stats)? 'ENDPROC' (exp ',')* EOL)
+   : 'EXPORT'? 'PROC' IDENT '(' argdecllist? ')' ('OF' IDENT)? 'HANDLE'? (('RETURN' | 'IS') explist? EOL | EOL defstat* stats ('EXCEPT' EOL stats)? 'ENDPROC' explist? EOL)
    ;
 
 raisedecl
-   : 'RAISE' ((CONSTANT 'IF' BUILTIN '()' compop NUM) ',')+
+   : 'RAISE' (CONSTANT 'IF' BUILTIN '(' ')' compop NUM) (',' (CONSTANT 'IF' BUILTIN '(' ')' compop NUM))*
    ;
 
 opts
-   : ('OPT' (setting ',')+)*
+   : ('OPT' setting (',' setting)*)*
    ;
 
 vardecllist
-   : (vardecl ',')+
+   : vardecl (',' vardecl)*
    ;
 
 vardecl
@@ -87,7 +85,7 @@ vardecl
    ;
 
 argdecllist
-   : (argdecl ',')+
+   : argdecl (',' argdecl)*
    ;
 
 argdecl
@@ -116,22 +114,22 @@ stats
 onelinestat
    : exp
    | lval ':=' exp
-   | (var ',')+ ':=' exp
-   | 'IF' exp 'THEN' onelinestat 'ELSE' onelinestat
+   | var (',' var)+ ':=' exp
+   | 'IF' exp 'THEN' onelinestat ('ELSE' onelinestat)?
    | 'FOR' var ':=' exp 'TO' exp ('STEP' NUM)? 'DO' onelinestat
    | 'WHILE' exp 'DO' onelinestat
-   | 'RETURN' (exp ',')*
+   | 'RETURN' explist?
    | 'JUMP' IDENT
    | ('INC' | 'DEC') var
-   | asm_mnemonic (operand ',')*
+   | asm_mnemonic (operand (',' operand)*)?
    | 'INCBIN' STRINGCONST
-   | simpletype (NUM ',')+
+   | simpletype NUM (',' NUM)*
    | 'VOID' exp
    ;
 
 multlinestat
    : 'IF' exp EOL stats (('ELSEIF' exp EOL stats)*)? ('ELSE' EOL stats)? 'ENDIF'
-   | 'FOR' var ':=' exp 'TO' exp ('STEP' NUM)? EOL stats 'ENDPROC'
+   | 'FOR' var ':=' exp 'TO' exp ('STEP' NUM)? EOL stats 'ENDFOR'
    | 'WHILE' exp EOL stats 'ENDWHILE'
    | 'REPEAT' EOL stats 'UNTIL' exp
    | 'SELECT' var EOL ('CASE' exp EOL stats)+ ('DEFAULT' EOL stats)? 'ENDSELECT'
@@ -139,17 +137,18 @@ multlinestat
    ;
 
 explist
-   : (exp ',')+
+   : exp (',' exp)*
    ;
 
 exp
-   : '-'? (item binop)+
+   : '-'? item (binop item)*
    | exp 'BUT' exp
    ;
 
 item
    : NUM
    | FNUM
+   | CONSTANT
    | lval
    | STRINGCONST
    | CHARCONST
@@ -191,7 +190,7 @@ logop
    ;
 
 constexp
-   : '-'? (NUM ('+' | '-' | '*' | '/'))+
+   : '-'? NUM (('+' | '-' | '*' | '/') NUM)*
    ;
 
 lval
@@ -252,7 +251,7 @@ CHARCONST
    ;
 
 EOL
-   : [\r\n]
+   : [\r\n]+
    ;
 
 WS
