@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2021, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -65,12 +65,13 @@ window_data
    ;
 
 array_data
-   : 'A' FLOAT+
+   : 'A' num+
    ;
 
 num
    : INT
    | FLOAT
+   | BOOL
    ;
 
 name
@@ -81,10 +82,6 @@ BOOL
    : [0-1]
    ;
 
-NAME
-   : [a-zA-Z] [a-zA-Z0-9]+
-   ;
-
 FLOAT
    : '-'? [0-9]+ '.' [0-9]*
    ;
@@ -93,8 +90,8 @@ INT
    : '-'? [0-9]+
    ;
 
-COMMENT
-   : '<<' ~ ';'* -> skip
+NAME
+   : ~ [ \t\r\n;#]+
    ;
 
 WS
