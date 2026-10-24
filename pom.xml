@@ -433,6 +433,7 @@
 				<module>tinyc</module>
 				<module>tinymud</module>
 				<module>tl</module>
+				<module>tmg</module>
 				<module>tnsnames</module>
 				<module>tnt</module>
 				<module>toml</module>
