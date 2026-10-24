@@ -188,6 +188,7 @@
                 <module>croc</module>
 				<module>csharp/v6</module>
 				<module>csharp/v7</module>
+                <module>csp</module>
 				<module>css3</module>
 				<module>csv</module>
 				<module>ctl</module>
@@ -232,6 +233,7 @@
 				<module>gtin</module>
 				<module>guido</module>
 				<module>guitartab</module>
+                <module>hals</module>
 				<module>haskell</module>
 				<module>hexpat</module>
 				<module>html</module>
@@ -248,7 +250,7 @@
 				<module>iso8601</module>
 				<module>istc</module>
 				<module>itn</module>
-                                <module>ixml</module>
+                <module>ixml</module>
 				<module>jam</module>
 				<module>janus</module>
 				<module>java</module>
@@ -288,6 +290,8 @@
 				<module>metric</module>
 				<module>microc</module>
 				<module>miniscript</module>
+                <module>miranda</module>
+                <module>mizar</module>
 				<module>modelica</module>
 				<module>modula2pim4</module>
 				<module>molecule</module>
@@ -321,10 +325,14 @@
 				<module>pii</module>
 				<!-- <module>pike</module> -->
 				<module>plantUML</module>
+                <module>plexil</module>
                 <module>plm</module>
 				<module>pl0</module>
+                <module>pl1</module>
+                <module>pl360</module>
 				<module>plucid</module>
                 <module>plus</module>
+                <module>pluscal</module>
 				<module>ply</module>
 				<module>pmmn</module>
 				<module>postalcode</module>
@@ -342,7 +350,9 @@
 				<module>r</module>
 				<module>racket-bsl</module>
 				<module>racket-isl</module>
+                <module>rapid</module>
 				<module>rcs</module>
+                <module>reaper</module>
 				<module>redcode</module>
 				<module>refal</module>
 				<module>rego</module>
@@ -354,6 +364,7 @@
 				<module>rfc1960</module>
 				<module>rfc3080</module>
 				<module>robotwars</module>
+                <module>robotalk</module>
 				<module>romannumerals</module>
 				<module>ron</module>
 				<module>rpn</module>

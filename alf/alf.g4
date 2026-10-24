@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar alf;
 
 program
-   : module+ goal*
+   : module+ goal* EOF
    ;
 
 goal

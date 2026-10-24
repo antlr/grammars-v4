@@ -783,7 +783,7 @@ constant_element
    ;
 
 simula_source_module
-   : external_head? (program | procedure_declaration | class_declaration)
+   : external_head? (program | procedure_declaration | class_declaration) EOF
    ;
 
 external_head

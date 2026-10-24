@@ -1,0 +1,2 @@
+-- A process that terminates successfully.
+P = SKIP

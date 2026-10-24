@@ -25,8 +25,8 @@
 grammar alpherd;
 
 compilation_unit
-   : ('begin' block 'end')
-   | exec_decl_list
+   : ('begin' block 'end'
+   | exec_decl_list) EOF
    ;
 
 block
