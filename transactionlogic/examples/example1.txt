@@ -1,0 +1,2 @@
+colorNode <- node(N) (x) -colored(N,_) (x) color(C) (x)
+             -(adjacent(N,N2) /\ colored(N2,C)) (x) tinsert(colored(N,C)).

@@ -444,6 +444,7 @@
 				<module>tnt</module>
 				<module>toml</module>
 				<module>trac</module>
+				<module>transactionlogic</module>
 				<module>tsv</module>
 				<module>ttm</module>
 				<module>turing</module>
