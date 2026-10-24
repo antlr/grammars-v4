@@ -1,0 +1,27 @@
+digraph ATN {
+rankdir=LR;
+s21[fontsize=11, label="21", shape=doublecircle, fixedsize=true, width=.6];
+s848[fontsize=11,label="848", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s849[fontsize=11,label="849", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s850[fontsize=11,label="850", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s851[fontsize=11,label="851", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s20[fontsize=11,label="20", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s852[fontsize=11,label="852", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s853[fontsize=11,label="{&rarr;\n853\nd=6|{<p0>|<p1>|<p2>|<p3>|<p4>|<p5>}}", shape=record, fixedsize=false, peripheries=1];
+s854[fontsize=11,label="&larr;\n854", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s847[fontsize=11,label="847", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s20 -> s853 [fontname="Times-Italic", label="&epsilon;"];
+s853:p0 -> s847 [fontname="Times-Italic", label="&epsilon;"];
+s853:p1 -> s848 [fontname="Times-Italic", label="&epsilon;"];
+s853:p2 -> s849 [fontname="Times-Italic", label="&epsilon;"];
+s853:p3 -> s850 [fontname="Times-Italic", label="&epsilon;"];
+s853:p4 -> s851 [fontname="Times-Italic", label="&epsilon;"];
+s853:p5 -> s852 [fontname="Times-Italic", label="&epsilon;"];
+s847 -> s854 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<boolean_literal>", arrowhead = normal];
+s848 -> s854 [fontsize=11, fontname="Courier", arrowsize=.7, label = "Integer_Literal", arrowhead = normal];
+s849 -> s854 [fontsize=11, fontname="Courier", arrowsize=.7, label = "Real_Literal", arrowhead = normal];
+s850 -> s854 [fontsize=11, fontname="Courier", arrowsize=.7, label = "Character_Literal", arrowhead = normal];
+s851 -> s854 [fontsize=11, fontname="Courier", arrowsize=.7, label = "String_Literal", arrowhead = normal];
+s852 -> s854 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<null_literal>", arrowhead = normal];
+s854 -> s21 [fontname="Times-Italic", label="&epsilon;"];
+}

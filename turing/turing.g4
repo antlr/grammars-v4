@@ -29,301 +29,312 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar turing;
 
 program
-   : declarationOrStatementInMainProgram+ EOF
-   ;
+    : declarationOrStatementInMainProgram+ EOF
+    ;
 
 declarationOrStatementInMainProgram
-   : declaration
-   | statement
-   | subprogramDeclaration
-   ;
+    : declaration
+    | statement
+    | subprogramDeclaration
+    ;
 
 declaration
-   : constantDeclaration
-   | variableDeclaration
-   | typeDeclaration
-   ;
+    : constantDeclaration
+    | variableDeclaration
+    | typeDeclaration
+    ;
 
 constantDeclaration
-   : ('const' id_ ':=' expn)
-   | ('const' id_ (':' typeSpec)? ':=' initializingValue)
-   ;
+    : ('const' id_ ':=' expn)
+    | ('const' id_ (':' typeSpec)? ':=' initializingValue)
+    ;
 
 initializingValue
-   : expn '(' 'init' (initializingValue (',' initializingValue)* ')')
-   ;
+    : expn '(' 'init' (initializingValue (',' initializingValue)* ')')
+    ;
 
 variableDeclaration
-   : ('var' id_ (',' id_)* ':=' expn)
-   | ('var' id_ (',' id_)* ':' typeSpec (':=' initializingValue)?)
-   ;
+    : ('var' id_ (',' id_)* ':=' expn)
+    | ('var' id_ (',' id_)* ':' typeSpec (':=' initializingValue)?)
+    ;
 
 typeDeclaration
-   : 'type' id_ ':' typeSpec
-   ;
+    : 'type' id_ ':' typeSpec
+    ;
 
 typeSpec
-   : standardType
-   | subrangeType
-   | arrayType
-   | recordType
-   | namedType
-   ;
+    : standardType
+    | subrangeType
+    | arrayType
+    | recordType
+    | namedType
+    ;
 
 standardType
-   : 'int'
-   | 'real'
-   | 'boolean'
-   | 'string' ('(' compileTimeExpn ')')?
-   ;
+    : 'int'
+    | 'real'
+    | 'boolean'
+    | 'string' ('(' compileTimeExpn ')')?
+    ;
 
 subrangeType
-   : compileTimeExpn '..' expn
-   ;
+    : compileTimeExpn '..' expn
+    ;
 
 arrayType
-   : 'array' indexType (',' indexType)* 'of' typeSpec
-   ;
+    : 'array' indexType (',' indexType)* 'of' typeSpec
+    ;
 
 indexType
-   : subrangeType
-   | namedType
-   ;
+    : subrangeType
+    | namedType
+    ;
 
 recordType
-   : 'record' id_ (',' id_)* ':' typeSpec (id_ (',' id_)* ':' typeSpec)* 'end' 'record'
-   ;
+    : 'record' id_ (',' id_)* ':' typeSpec (id_ (',' id_)* ':' typeSpec)* 'end' 'record'
+    ;
 
 namedType
-   : id_
-   ;
+    : id_
+    ;
 
 subprogramDeclaration
-   : subprogramHeader subprogramBody
-   ;
+    : subprogramHeader subprogramBody
+    ;
 
 subprogramHeader
-   : 'procedure' id_ ('(' parameterDeclaration (',' parameterDeclaration)* ')')? 'function' id_ ('(' parameterDeclaration (',' parameterDeclaration)* ')')? ':' typeSpec
-   ;
+    : 'procedure' id_ ('(' parameterDeclaration (',' parameterDeclaration)* ')')? 'function' id_ (
+        '(' parameterDeclaration (',' parameterDeclaration)* ')'
+    )? ':' typeSpec
+    ;
 
 parameterDeclaration
-   : 'var'? id_ (',' id_)* ':' parameterType
-   ;
+    : 'var'? id_ (',' id_)* ':' parameterType
+    ;
 
 parameterType
-   : ':' typeSpec
-   | 'string' '(' '*' ')'
-   | 'array' compileTimeExpn '..' '*' (',' compileTimeExpn '..' '*')* 'of' typeSpec
-   | 'array' compileTimeExpn '..' '*' (',' compileTimeExpn '..' '*')* 'of' string '(' '*' ')'
-   ;
+    : ':' typeSpec
+    | 'string' '(' '*' ')'
+    | 'array' compileTimeExpn '..' '*' (',' compileTimeExpn '..' '*')* 'of' typeSpec
+    | 'array' compileTimeExpn '..' '*' (',' compileTimeExpn '..' '*')* 'of' string '(' '*' ')'
+    ;
 
 subprogramBody
-   : declarationsAndStatements 'end' id_
-   ;
+    : declarationsAndStatements 'end' id_
+    ;
 
 declarationsAndStatements
-   : declarationOrStatement*
-   ;
+    : declarationOrStatement*
+    ;
 
 declarationOrStatement
-   : declaration
-   | statement
-   ;
+    : declaration
+    | statement
+    ;
 
 statement
-   : (variableReference ':=' expn)
-   | procedureCall
-   | ('assert' booleanExpn)
-   | 'result' expn
-   | ifStatement
-   | loopStatement
-   | 'exit' ('when' booleanExpn)?
-   | caseStatement
-   | forStatement
-   | putStatement
-   | getStatement
-   | openStatement
-   | closeStatement
-   ;
+    : (variableReference ':=' expn)
+    | procedureCall
+    | ('assert' booleanExpn)
+    | 'result' expn
+    | ifStatement
+    | loopStatement
+    | 'exit' ('when' booleanExpn)?
+    | caseStatement
+    | forStatement
+    | putStatement
+    | getStatement
+    | openStatement
+    | closeStatement
+    ;
 
 procedureCall
-   : reference
-   ;
+    : reference
+    ;
 
 ifStatement
-   : 'if' booleanExpn 'then' declarationsAndStatements ('elsif' booleanExpn 'then' declarationsAndStatements)* ('else' declarationsAndStatements)? 'end' 'if'
-   ;
+    : 'if' booleanExpn 'then' declarationsAndStatements (
+        'elsif' booleanExpn 'then' declarationsAndStatements
+    )* ('else' declarationsAndStatements)? 'end' 'if'
+    ;
 
 loopStatement
-   : 'loop' declarationsAndStatements 'end' 'loop'
-   ;
+    : 'loop' declarationsAndStatements 'end' 'loop'
+    ;
 
 caseStatement
-   : 'case' expn 'of' 'label' compileTimeExpn (',' compileTimeExpn)* ':' declarationsAndStatements ('label' compileTimeExpn (',' compileTimeExpn)* ':' declarationsAndStatements)* ('label' ':' declarationsAndStatements)? 'end' 'case'
-   ;
+    : 'case' expn 'of' 'label' compileTimeExpn (',' compileTimeExpn)* ':' declarationsAndStatements (
+        'label' compileTimeExpn (',' compileTimeExpn)* ':' declarationsAndStatements
+    )* ('label' ':' declarationsAndStatements)? 'end' 'case'
+    ;
 
 forStatement
-   : ('for' id_ ':' expn '..' expn ('by' expn)? declarationsAndStatements 'end' 'for')
-   | ('for' 'decreasing' id_ ':' expn '..' expn ('by' expn)? declarationsAndStatements 'end' 'for')
-   ;
+    : ('for' id_ ':' expn '..' expn ('by' expn)? declarationsAndStatements 'end' 'for')
+    | (
+        'for' 'decreasing' id_ ':' expn '..' expn ('by' expn)? declarationsAndStatements 'end' 'for'
+    )
+    ;
 
 putStatement
-   : 'put' (':' streamNumber ',')? putItem (',' putItem)* ('..')?
-   ;
+    : 'put' (':' streamNumber ',')? putItem (',' putItem)* ('..')?
+    ;
 
 putItem
-   : expn (':' widthExpn (':' fractionWidth (':' exponentWidth)?)?)?
-   | 'skip'
-   ;
+    : expn (':' widthExpn (':' fractionWidth (':' exponentWidth)?)?)?
+    | 'skip'
+    ;
 
 getStatement
-   : 'get' (':' streamNumber ',')? getItem (',' getItem)*
-   ;
+    : 'get' (':' streamNumber ',')? getItem (',' getItem)*
+    ;
 
 getItem
-   : variableReference
-   | 'skip' variableReference ':' '*'
-   | variableReference ':' widthExpn
-   ;
+    : variableReference
+    | 'skip' variableReference ':' '*'
+    | variableReference ':' widthExpn
+    ;
 
 openStatement
-   : 'open' ':' fileNumber ',' string ',' capability (',' capability)*
-   ;
+    : 'open' ':' fileNumber ',' string ',' capability (',' capability)*
+    ;
 
 capability
-   : 'get'
-   | 'put'
-   ;
+    : 'get'
+    | 'put'
+    ;
 
 closeStatement
-   : 'close' ':' fileNumber
-   ;
+    : 'close' ':' fileNumber
+    ;
 
 streamNumber
-   : expn
-   ;
+    : expn
+    ;
 
 widthExpn
-   : expn
-   ;
+    : expn
+    ;
 
 fractionWidth
-   : expn
-   ;
+    : expn
+    ;
 
 exponentWidth
-   : expn
-   ;
+    : expn
+    ;
 
 fileNumber
-   : expn
-   ;
+    : expn
+    ;
 
 variableReference
-   : reference
-   ;
+    : reference
+    ;
 
 reference
-   : id_ reference_2
-   ;
+    : id_ reference_2
+    ;
 
 reference_2
-   : (componentSelector reference_2)?
-   ;
+    : (componentSelector reference_2)?
+    ;
 
 componentSelector
-   : '(' expn (',' expn)* ')'
-   | '.' id_
-   ;
+    : '(' expn (',' expn)* ')'
+    | '.' id_
+    ;
 
 booleanExpn
-   : expn
-   ;
+    : expn
+    ;
 
 compileTimeExpn
-   : expn
-   ;
+    : expn
+    ;
 
 expn
-   : reference
-   | explicitConstant
-   | substring
-   | expn infixOperator expn
-   | prefixOperator expn
-   | '(' expn ')'
-   ;
+    : reference
+    | explicitConstant
+    | substring
+    | expn infixOperator expn
+    | prefixOperator expn
+    | '(' expn ')'
+    ;
 
 string
-   : ExplicitStringConstant
-   ;
+    : ExplicitStringConstant
+    ;
 
 explicitConstant
-   : ExplicitUnsignedIntegerConstant
-   | ExplicitUnsignedRealConstant
-   | ExplicitStringConstant
-   | 'true'
-   | 'false'
-   ;
+    : ExplicitUnsignedIntegerConstant
+    | ExplicitUnsignedRealConstant
+    | ExplicitStringConstant
+    | 'true'
+    | 'false'
+    ;
 
 infixOperator
-   : '+'
-   | '–'
-   | '*'
-   | '/' 'div'
-   | 'mod'
-   | '**'
-   | '<'
-   | '>'
-   | '='
-   | '<='
-   | '>='
-   | 'not='
-   | 'and'
-   | 'or'
-   ;
+    : '+'
+    | '–'
+    | '*'
+    | '/' 'div'
+    | 'mod'
+    | '**'
+    | '<'
+    | '>'
+    | '='
+    | '<='
+    | '>='
+    | 'not='
+    | 'and'
+    | 'or'
+    ;
 
 prefixOperator
-   : '+'
-   | '–'
-   | 'not'
-   ;
+    : '+'
+    | '–'
+    | 'not'
+    ;
 
 substring
-   : reference '(' substringPosition ('..' substringPosition)? ')'
-   ;
+    : reference '(' substringPosition ('..' substringPosition)? ')'
+    ;
 
 substringPosition
-   : expn ('*' ('–' expn))
-   ;
+    : expn ('*' ('–' expn))
+    ;
 
 id_
-   : IDENTIFIER
-   ;
+    : IDENTIFIER
+    ;
 
 ExplicitUnsignedIntegerConstant
-   : ('+' | '-')? [0-9]+
-   ;
+    : ('+' | '-')? [0-9]+
+    ;
 
 ExplicitUnsignedRealConstant
-   : ('+' | '-')? ([0-9]+ '.')? [0-9]+ ('e' [0-9]+)
-   ;
+    : ('+' | '-')? ([0-9]+ '.')? [0-9]+ ('e' [0-9]+)
+    ;
 
 ExplicitStringConstant
-   : '"' ~ '"'* '"'
-   ;
+    : '"' ~ '"'* '"'
+    ;
 
 IDENTIFIER
-   : [a-zA-Z] [a-zA-Z_0-9]*
-   ;
+    : [a-zA-Z] [a-zA-Z_0-9]*
+    ;
 
 COMMENT
-   : '%' ~ [\r\n]* -> channel (HIDDEN)
-   ;
+    : '%' ~ [\r\n]* -> channel (HIDDEN)
+    ;
 
 WS
-   : [ \r\n\t]+ -> channel (HIDDEN)
-   ;
-
+    : [ \r\n\t]+ -> channel (HIDDEN)
+    ;

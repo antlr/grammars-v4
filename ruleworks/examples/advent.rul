@@ -1,0 +1,1152 @@
+
+
+(Declaration-block adv_wmes)
+
+(object-class location
+   ^name        	  ; short id (must be unique!)
+   ^print-name  	  ; what the user will see (usually the same)
+   ^up         		  ; names of locations that
+   ^down		  ;    can be reached by moving
+   ^east		  ;    in these directions
+   ^west		  ;
+   ^north       	  ;
+   ^south       	  ;
+   ^seen-before 	  ; has our hero visited this place before << yes no >>
+   ^home-base    	  ; << nil t >>  is this the starting point?
+   ^description compound  ; vector of text
+)
+
+(object-class hero 	  ; our hero
+   ^name compound      	  ; YOU figure it out!
+   ^location 		  ; the short-name of the location he is currently at.
+   ^score		  ; how many points for the booty collected so far
+   ^max-lifting-weight    ; how many pounds can this person lift at once.
+   ^current-lifting-weight; how many pounds lifted so far
+   ^weight-margin  	  ; how much under the max is he?
+   ^lives-remaining	  ; how many deaths yet to come before it ends
+   ^moves integer	  ; how many moves taken
+   ^check-up       	  ; when a health checkup should be performed
+   ^health		  ; percentage of health 0 - 100
+   ^weight-basis	  ; health value when max lifting weight last adjusted
+)
+
+(object-class object	  ; objects include treasures or other inanimate
+			  ; items our hero must collect or use during the
+			  ; course of the game [eg. gold, sword, rake]
+   ^name        	  ; short name of the object
+   ^location		  ; name of location object rests in (if not on hero)
+   ^owner		  ; << hero nil >>  depending if hero has this on him
+   ^weight         	  ; how much does this object weigh?
+   ^at-home-base   	  ; << t nil  >>  ; if at Home-Base, then give points
+   ^point-value    	  ; how much this is worth
+)
+
+(object-class prerequisite   ; prerequisite is something hero needs
+			  ; to get/drop object (or other verb)
+   ^verb		  ; << take drop kill rake >> etc.
+   ^object		  ; what you are applying verb to [eg. DROP VASE]
+   ^required-object	  ; what you need to be successfull [eg. PILLOW]
+   ^secret?        	  ; if you don't have required-object, do you say so?
+)
+
+(object-class monster	  ; monster is something to cause death or
+			  ; severe mutilation to our hero
+   ^name		  ; what is this evil being [eg. dragon, troll, etc.]
+   ^location		  ; place this is found
+   ^owner       	  ; << hero nil >>
+   ^weight      	  ; how much does this monster weigh?
+   ^state		  ; << sleeping awake hungry sick dead >>
+   ^entry-message 	  ; what is mentioned when you encounter this monster
+   ^exit-message  	  ; when you two part company...
+   ^look-message  	  ; when you two look at each other
+   ^take-message  	  ; when you try to "take" this monster
+   ^drop-message  	  ; when you try to get rid of this monster
+)
+
+(object-class input       ; input is where the hero enters what he wants to do
+   ^command     	  ; first atom entered by hero
+   ^abbrev		  ; first 3 characters of the command
+   ^args compound         ; the remaining arguments to the command (vector)
+)
+
+(object-class dispatch	  ; dispatch will take a command from hero and send
+			  ; it to proper subtask there will be one for each
+			  ; valid synonym for each command: for example-
+			  ; for command TAKE, there would be a dispatch for
+			  ; match TAKE and GET
+   ^command               ; valid game command
+   ^subtask               ; where to send it if received
+   ^normal-form	          ; a normalized form expected in the rules.
+   ^match                 ; result of match to the command
+)
+
+(End-block adv_wmes)
+
+
+
+
+(Declaration-block adv_task)
+
+(object-class task)
+
+(object-class subtask
+   (inherits-from task)
+   ^name)		  ; obvious!
+
+(object-class agenda
+   (inherits-from task)
+   ^type        	  ; << normal looping >>
+   ^list compound         ; vector of subtask names
+)
+
+
+(object-class local	  ; locals
+   ^scope	 	  ; name of owning subtask
+   ^name	 	  ; identifying name of this local
+   ^data compound	  ; vector of arbitrary data associated with name
+)
+
+(End-block adv_task)
+
+
+
+
+(Entry-Block |main| ;; advent
+;; advent.rul - adventure game.  
+;; 	Tom Cooper and John Frost
+;;
+;; This program is based on an OPS5 program that was written on the fly
+;; during the first three days at fall DECUS 1988 - Anaheim CA.
+;; So it really isn't very complete yet.  You had to have been there...
+;;
+;; Modified for RuleWorks, Fall 1993, Dan Williams
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;  subtask flow:
+;             		move
+;   +-->--+             take
+;   |	  v        /    drop
+;   |   input     /     look
+;   ^   parse ----      inventory
+;   |   select    \     help
+;   |     |        \    death
+;   +-->--+             attack
+;                       quit
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	(activates advent_actions advent_control)
+	(uses adv_wmes adv_task)
+	(strategy mea)
+)
+
+(on-entry
+	;; dispatch wmes
+    (make dispatch ^command east ^subtask move ^normal-form east)
+    (make dispatch ^command west ^subtask move ^normal-form west)
+    (make dispatch ^command south ^subtask move ^normal-form south)
+    (make dispatch ^command north ^subtask move ^normal-form north)
+    (make dispatch ^command up ^subtask move ^normal-form up)
+    (make dispatch ^command down ^subtask move ^normal-form down)
+    (make dispatch ^command look ^subtask look ^normal-form look)
+    (make dispatch ^command take ^subtask take ^normal-form take)
+    (make dispatch ^command get  ^subtask take ^normal-form take)
+    (make dispatch ^command drop ^subtask drop ^normal-form drop)
+    (make dispatch ^command inventory ^subtask inventory
+		   ^normal-form inventory)
+    (make dispatch ^command quit ^subtask quit ^normal-form quit)
+    (make dispatch ^command end-of-file ^subtask quit ^normal-form quit)
+    (make dispatch ^command help ^subtask help ^normal-form help)
+    (make dispatch ^command score ^subtask score ^normal-form score)
+
+	;; now make the monsters
+    (make monster ^name dragon ^location |Dragon Room| ^state sleeping
+		  ^entry-message |There is a sleeping Dragon on the floor.|
+		  ^take-message |You've got to be kidding!|
+		  ^weight 1500)
+    (make monster ^name troll ^location |Mushroom Room| ^state awake
+		  ^entry-message |A short, stumpy troll is across from you.|
+	       ^take-message |The troll grumbles as you stuff him in your bag.|
+		  ^drop-message |You drop the troll on his head - he is angry.|
+		  ^exit-message |The troll glares at you as you exit.|
+		  ^weight 100)
+
+	;; now the locations
+	;;  The places in the maze/map that our hero visits
+	;;  during the course of the game
+	;;     note:  only one location should be marked ^home-base t
+	;;            as the game starts our hero at the home base
+
+    (make location ^seen-before no ^name |Hotel Room| ^print-name |Hotel Room|
+	        ^east |2nd Floor Hallway| ^west nil ^north nil ^south nil  
+		^up |Hotel Loft| ^down nil ^home-base t
+		^description (compound
+			|A room at the Convention Hotel.|
+		        |There is no furniture in the room.|))
+
+    (make location ^seen-before no ^name |Hotel Loft| ^print-name |Hotel Loft|
+	        ^east nil ^west |Restaurant| ^north |Dark Musty Tunnel|
+		^south |Air Vent|  
+		^up   nil ^down |Hotel Room|
+		^description (compound 
+			|You are in the loft over your hotel room.|
+		 	|It is too dark to see anything.|))
+
+    (make location ^seen-before no ^name |Dark Musty Tunnel|
+		   ^print-name |Dark Musty Tunnel|
+	        ^east |Mushroom Room| ^west nil  ^north nil ^south |Hotel Loft|
+		^up nil   ^down  |Rushing River|
+		^description (compound 
+			|You are in a damp musty tunnel.  You can't see,|
+         	        |but you hear the sound of water coming from below.|))
+
+    (make location ^seen-before no ^name |2nd Floor Hallway|
+		^print-name |2nd Floor Hallway|
+	        ^east nil ^west |Hotel Room|  ^north nil  ^south nil  
+		^up   nil ^down |Hotel Lobby|
+		^description (compound 
+			|You are in the 2nd Floor Hallway at the Hotel.|
+		        |The hall is long with no doors other than that of|
+		        |your room.  A stairway leads down.|))
+
+    (make location ^seen-before no ^name |Hotel Lobby|
+		^print-name |Hotel Lobby|
+	        ^east |Restaurant| ^west |DECUS Campground|  
+		^north |Grand Ballroom|
+		^south   |Mushroom Room|
+		^up |2nd Floor Hallway|   ^down nil
+		^description  (compound 
+			|The lobby of the Hotel.  It is deserted.|
+		      	|A strange erie feeling is in the air.|))
+
+    (make location ^seen-before no ^name |Restaurant| ^print-name |Restaurant|
+	        ^east nil ^west |Hotel Lobby| ^north nil ^south nil
+		^up   |Hotel Loft| ^down  |Misty Canyon|
+		^description (compound 
+			|The Hotel Restaurant.  Broken dishes are|
+			|everywhere and moldy food is on the counter.|))
+
+    (make location ^seen-before no ^name |Misty Canyon|
+		^print-name |Misty Canyon|
+	        ^east |Restaurant| ^west |Mushroom Room|  ^north |Dragon Room|
+		^south   |Pillow Room|
+		^up Passage7 ^down  |Rushing River|
+		^description (compound 
+			|You are in Misty Canyon.  Mist rises from|
+		        |the river below.  A narrow path leads down.|))
+
+    (make location ^seen-before no ^name |Dragon Room|
+		^print-name |Dragon Room|
+	        ^east  |Misty Canyon| ^west |Pillow Room|
+		^north |Crystal Room|  ^south |Rushing River|  
+		^up |DECUS Campground|   ^down nil
+		^description (compound 
+			|A small cramped room with strange writing|
+			|on the walls|))
+
+    (make location ^seen-before no ^name |Mushroom Room|
+		^print-name |Mushroom Room|
+	        ^east |Misty Canyon| ^west |Dark Musty Tunnel|
+		^north nil ^south  |Crystal Room|   
+		^up |Hotel Lobby|   ^down nil
+		^description (compound 
+			|A damp room with disgusting-looking|
+			|mushrooms growing on the floor, walls, and ceiling.|))
+
+    (make location ^seen-before no ^name |Crystal Room|
+		^print-name |Crystal Room|
+	        ^east |Mushroom Room| ^west nil   
+		^north |Mushroom Room|  ^south   |Dragon Room|
+		^up  nil  ^down  nil
+		^description (compound 
+			|A brightly lit room with Waterford Crystal|
+			|Furniture.|))
+
+    (make location ^seen-before no ^name |Pillow Room|
+		^print-name |Pillow Room|
+	        ^east |Misty Canyon| ^west  nil
+		^north |Dragon Room|  ^south passage0
+		^up nil   ^down  nil
+		^description (compound 
+			|A room with feathers all over the place.|))
+
+    (make location ^seen-before no ^name passage0
+		^print-name  |Twisty Passages all alike|
+	        ^east  Passage1
+		^west  Passage2
+		^north Passage1
+		^south Passage4
+		^up    Passage2
+		^down  |Pillow Room|
+	^description (compound 
+		|You are in a series of twisting passages, all alike.|))
+
+    (make location ^seen-before no ^name passage1
+		^print-name  |Twisty Passages all alike|
+	        ^east  Passage1
+		^west  Passage2
+		^north Passage1
+		^south Passage4
+		^up    Passage2
+		^down  Passage3
+	^description (compound 
+		|You are in a series of twisting passages, all alike.|))
+
+    (make location ^seen-before no ^name passage2
+		^print-name  |Twisty Passages all alike|
+	        ^east  Passage1
+		^west  Passage2
+		^north Passage5
+		^south Passage3
+		^up    Passage4
+		^down  Passage3
+	^description (compound 
+		|You are in a series of twisting passages, all alike.|))
+
+    (make location ^seen-before no ^name passage3
+		^print-name  |Twisty Passages all alike|
+	        ^east  Passage3
+		^west  Passage5
+		^north Passage2
+		^south Passage4
+		^up    Passage6
+		^down  Passage4
+	^description (compound 
+		|You are in a series of twisting passages, all alike.|))
+
+    (make location ^seen-before no ^name passage4
+		^print-name  |Twisty Passages all alike|
+	        ^east  Passage1
+		^west  Passage2
+		^north Passage6
+		^south Passage4
+		^up    Passage7
+		^down  Passage5
+	^description (compound 
+		|You are in a series of twisting passages, all alike.|))
+
+    (make location ^seen-before no ^name passage5
+		^print-name  |Twisty Passages all alike|
+	        ^east  Passage6
+		^west  Passage7
+		^north Passage3
+		^south Passage2
+		^up    Passage4
+		^down  Passage5
+	^description (compound 
+		|You are in a series of twisting passages, all alike.|))
+
+    (make location ^seen-before no ^name passage6
+		^print-name  |Twisty Passages all alike|
+	        ^east  Passage7
+		^west  Passage4
+		^north Passage2
+		^south Passage5
+		^up    Passage5
+		^down  Passage1
+	^description (compound 
+		|You are in a series of twisting passages, all alike.|))
+
+    (make location ^seen-before no ^name passage7
+		^print-name  |Twisty Passages all alike|
+	        ^east  Passage3
+		^west  Passage7
+		^north Passage7
+		^south Passage5
+		^up    |Misty Canyon|
+		^down  Passage6
+	^description (compound 
+		|You are in a series of twisting passages, all alike.|))
+
+    (make location ^seen-before no ^name |Rushing River|
+		^print-name |Rushing River|
+	        ^east nil  ^west nil  ^north |Dark Musty Tunnel|  ^south   nil
+		^up |Misty Canyon|   ^down nil
+		^description (compound 
+			|You are standing in an intense fog.  A river|
+			|is rushing just below you.  There are strange cries|
+			|coming from across the river.  Through the mist, you|
+			|can barely make out a sign that says BRIDGE OUT.|))
+
+    (make location ^seen-before no ^name |DECUS Campground|
+		^print-name |DECUS Campground|
+	        ^east |Hotel Lobby|  ^west nil
+		^north |Dragon Room|  ^south   nil
+		^up nil   ^down nil
+		^description (compound 
+			|You are in the DECUS AI SIG Campground.|
+		    	|There are several folks passed out on the floor.|))
+
+;    (make location ^seen-before no ^name
+;	        ^east  ^west   ^north   ^south   
+;		^up    ^down
+;		^description
+
+	;; Now the objects
+      (make object ^name golden-sword ^location |Mushroom Room|
+		   ^point-value 100 ^weight 25)
+      (make object ^name antique-silverware ^location |Restaurant|
+		   ^point-value 75 ^weight 15)
+      (make object ^name jade-bracelet ^location |Dragon Room|
+		   ^point-value 50 ^weight 2)
+      (make object ^name crystal-vase ^location |Crystal Room|
+		   ^point-value 60 ^weight 10)
+      (make object ^name feather-pillow ^location |Pillow Room|
+		   ^point-value 10 ^weight 1)
+      (make object ^name sack-of-gold ^location Passage3
+		   ^point-value 150 ^weight 85)
+      (make object ^name roll-of-quarters ^location |DECUS Campground|
+		   ^point-value 10 ^weight 3)
+    (write |decus adventures...| (crlf))
+    (write (crlf) |Please enter your name [ Gulliver ]: |)
+    (bind <heros-name> (acceptline-compound nil (compound |Bogon|)))
+    (make hero ^name <heros-name> ^score 0 ^location nil
+	       ^lives-remaining 3 ^max-lifting-weight 200
+	       ^current-lifting-weight 0 ^moves 0 ^check-up 7
+	       ^health 100 ^weight-basis 100)
+
+    (make agenda ^type looping ^list (compound input parse select))
+    (make agenda ^type normal  ^list (compound place-hero look))
+    )
+
+
+
+
+(Rule-Group daemons-group)
+
+(Rule  daemon::maintain-weight-margin
+; when the weight margin is not correct, recompute it.
+    (hero ^$ID <hero> ^max-lifting-weight <max>
+	  ^current-lifting-weight <current>
+	  ^weight-margin <> (<max> - <current>))
+   -->
+    (modify <hero> ^weight-margin (<max> - <current>)))
+
+(Rule  daemon::adjust-lifting-weight
+; when the health changes, recompute strength.
+      (hero ^$ID <hero> ^health <new> ^weight-basis { <old> <> <new> }
+	    ^max-lifting-weight <strength>)
+   -->
+      (make subtask ^name check-strength)
+      (modify <hero> ^weight-basis <new>
+	  ^max-lifting-weight
+	   ((((<strength> * 100) / <old>) * <new>) / 100)))
+
+(End-group daemons-group)
+
+
+
+
+(Rule-Group place-hero-group)
+
+(Rule  place-hero::home-base
+; place the hero in the location marked home base
+    (subtask ^name place-hero)
+    (hero ^$ID <hero> ^location nil)
+    (location ^name <home> ^home-base t)
+   -->
+    (modify <hero> ^location <home>))
+
+(End-group place-hero-group)
+
+
+
+
+(Rule-Group input-group)
+
+(Rule  input::ask-for-some
+;; subtask input
+; if no input, ask for some.
+      (subtask ^name input)
+      - (input)
+   -->
+      (write (crlf) |> |)
+      (make input ^args (acceptline-compound nil (compound look))))
+
+(Rule  input:daemon:glue-word
+; pitch worthless words
+      (input ^$ID <input> ^command <> nil
+	^args[1] << a the an one my >> ^args <ag-lst>)
+   -->
+      (modify <input> ^args (subcompound <ag-lst> 2 $last)))
+
+(Rule  input::set-command
+; set the command to be the first word.
+      (subtask ^name input)
+      (input ^$ID <input> ^command nil ^args[1] <cmd> ^args <ag-lst>)
+   -->
+      (modify <input> ^command <cmd> ^abbrev (subsymbol <cmd> 1 3)
+		      ^args (subcompound <ag-lst> 2 $last)))
+
+
+(Rule  daemon::magic-word-back-to-start
+; check for ambiguity, or invoke handler
+    (input ^$ID <input> ^command magic)
+    (location ^name <home> ^home-base t)
+    (hero ^$ID <player> ^location <> <home>)
+   -->
+    (remove <input>)
+    (modify <player> ^location <home>))
+
+(Rule  daemon::xyzzy--to-maze
+   (input ^$ID <input>  ^command xyzzy)
+   (hero ^$ID <player> )
+  -->
+   (remove <input>)
+   (write (crlf) |There is a blinding flash of light.  A deep voice thunders..|
+   (crlf) |"this will teach you not to use another game's command!"|
+   (crlf) | |
+   (crlf) |When you regain consciousness, you do not like what you see.|
+          (crlf))
+    (modify <player> ^location passage4)
+    (make subtask ^name enter-location))
+
+(End-group input-group)
+
+
+
+
+(Rule-Group select-group)
+
+(Rule  select::dispatch-on-command
+; dispatch to a known subtask, not case sensitive
+      (subtask ^name select)
+      (input ^$ID <input> ^command { <cmd> <> nil })
+      (dispatch ^command = <cmd> ^subtask <handler> ^normal-form <command>)
+   -->
+      (modify <input> ^command <command>)
+      (make agenda ^list (compound <handler> post-process-input)))
+
+(Rule  select::dispatch-on-sounds-like
+; dispatch to a known subtask if no exact match exists
+      (subtask ^name select)
+      (input ^$ID <input> ^command { <cmd> <> nil })
+      - (dispatch ^command = <cmd>)
+      (dispatch ^command ~= <cmd> ^subtask <handler> ^normal-form <command>)
+   -->
+      (modify <input> ^command <command>)
+      (make agenda ^list (compound <handler> post-process-input)))
+
+(Rule  select::dispatch-on-abbreviation
+; dispatch to a known subtask based on abbreviation if no exact match exists
+      (subtask ^name select)
+      (input ^$ID <input> ^command { <abbrev> <> nil })
+      - (dispatch ^command = <abbrev>)
+      (dispatch ^command <cmd> ^subtask <handler> ^normal-form <command>)
+      (input ^$ID <input> ^abbrev = (subsymbol <cmd> 1 3))
+   -->
+      (modify <input> ^command <command>)
+      (make agenda ^list (compound <handler> post-process-input)))
+
+(Rule  select::bogus-command
+; this is not a known command
+      (subtask ^name select)
+      (input ^$ID <input> ^command { <what> <> nil })
+   -->
+      (remove <input>)
+      (write |But i don't know how to| <what> (rjust 1) |.|))
+
+
+(End-group select-group)
+
+
+
+
+(Rule-Group post-process-input-group)
+
+(Rule  post-process-input::pitch-used-arg
+;;	throw it away, or look for compound command
+; prune off an argument
+      (subtask ^name post-process-input)
+      (input ^$ID <input> ^args[1] { <> nil <> then } ^args <ag-lst>)
+   -->
+      (modify <input> ^args (subcompound <ag-lst> 2 $last)))
+
+(Rule  post-process-input::pitch-used-input
+; no more args
+      (subtask ^name post-process-input)
+      (input ^$ID <input> ^args [=] 0)
+   -->
+      (remove <input>))
+
+(Rule post-process-input::set-up-next-command
+; prepare next command
+      (subtask ^name post-process-input)
+      (input ^$ID <input> ^args[1] then ^args[2] <cmd> ^args <ag-lst>)
+   -->
+      (modify <input> ^command <cmd> ^args (subcompound <ag-lst> 3 $last)))
+    
+(End-group post-process-input-group)
+
+
+
+
+(Rule-Group checkup-group)
+
+(Rule  check-strength::drop-object
+; if the weight-margin is negative, drop something.
+      (subtask ^name check-strength)
+      (hero ^weight-margin < 0)
+      (object ^owner hero ^name <treasure>)
+   -->
+      (make subtask ^name drop)
+      (make input ^command drop ^args[1] <treasure>))
+
+(Rule  evaluate-health::getting-weak
+;; subtask evaluate-health
+; when the person's health is 40-something, say beginning to feel weak.
+      (subtask ^name evaluate-health)
+      (hero ^health { > 39 < 50 })
+   -->
+      (write (crlf) |You begin to feel a little queasiness.|))
+
+(Rule  evaluate-health::feeling-worse
+;when the person's health is between 10 and 20, say that you are feeling worse.
+      (subtask ^name evaluate-health)
+      (hero ^health { > 10 < 20 })
+   -->
+      (write (crlf) |You are growing weaker,| (crlf)
+	     |and a knot forms in the pit of your stomache.|))
+
+(Rule  evaluate-health::urgent
+; when the person's health is less than 5, say there is an urgency.
+      (subtask ^name evaluate-health)
+      (hero ^health { < 5 > 1 })
+   -->
+      (write (crlf) |You feel nauseous, and feel a sense of urgency.|))
+
+(Rule  evaluate-health::very-sick
+; when the person's health reaches 1, say it is getting serious.
+      (subtask ^name evaluate-health)
+      (hero ^health 1)
+   -->
+      (write (crlf) |You wonder how soon you will pass out.|))
+
+(Rule  evaluate-health::time-is-up
+; ok, that's it.
+      (subtask ^name evaluate-health)
+      (hero ^health 0)
+   -->
+      (write (crlf) |Overcome by weakness, you collapse to the ground| (crlf)
+		    |and everything goes black...|))
+
+(End-group checkup-group)
+
+(End-block |main| ;;advent
+)
+
+
+
+
+(Rule-Block advent_actions
+	(uses adv_wmes adv_task)
+)
+
+
+(Rule-Group look-group)
+
+(Rule  look::create-look-agenda
+; create an agenda to describe location, contents, and monsters.
+      (subtask ^name look)
+   -->
+      (make agenda ^list (compound display-location display-objects
+				   display-monsters)))
+
+(End-group look-group)
+
+
+
+
+(Rule-Group display-group)
+
+(Rule  display-location::description
+; describe the room contents
+      (subtask ^name display-location)
+      (hero ^location <where>)
+      (location ^$ID <location> ^name <where> ^description <desc>)
+   -->
+      (make local ^scope display-location
+	  ^name lines-of-text ^data (compound <desc>)))
+
+(Rule  display-location::line-of-text
+; write out each line of the description.
+      (subtask ^name display-location)
+      (local ^$ID <lines> ^scope display-location
+	^name lines-of-text ^data[1] <line> ^data <ag-lst>)
+   -->
+      (write (crlf) <line>)
+      (modify <lines> ^data (subcompound <ag-lst> 2 $last)))
+
+
+(Rule  display-objects::name
+;; subtask display-objects
+      (subtask ^name display-objects)
+      (hero ^location <where>)
+      (object ^name <what> ^location <where>)
+   -->
+      (write (crlf) |  There is a| <what> |here.|))
+
+(Rule  display-monsters::name
+;; subtask display-monsters
+      (subtask ^name display-monsters)
+      (hero ^location <where>)
+      (monster ^name <who> ^state <condition> ^location <where>)
+   -->
+      (write (crlf) |  There is a| <condition> <who> |here.|))
+
+(End-group display-group)
+
+
+
+
+(Rule-Group move-group)
+
+(Rule  move::find-new-location
+      (subtask ^name move)
+      (hero ^location <where>)
+      (input ^command <direction>)
+      (location ^$ID <location> ^name <where>)
+      - (local ^scope move ^name << propose accept reject >>)
+   -->
+      (make local ^scope move ^name propose
+		  ^data[1] (get <location> ^<direction>))
+)
+
+(Rule  move::make-move
+      (subtask ^name move)
+      (hero ^$ID <hero> ^moves <moves>)
+      (local ^$ID <local> ^scope move ^name propose ^data[1] <new>)
+      (location ^name <new>)
+   -->
+      (make subtask ^name enter-location)
+      (modify <hero> ^location <new> ^moves (<moves> + 1))
+      (modify <local> ^name accept))
+
+(Rule  move::does-not-exist
+      (subtask ^name move)
+      (hero)
+      (local ^scope move ^name propose ^data[1] { <new> <> NIL })
+      - (location ^name <new>)
+   -->
+      (write (crlf) |Well, you could go to the| <new> (crlf)
+	  |if it were implemented yet, but it isn't.|))
+
+(Rule  move::no-place-to-go
+      (subtask ^name move)
+      (local ^$ID <local> ^scope move ^name propose)
+   -->
+      (modify <local> ^name reject)
+      (write (crlf) |You cannot go that way.| (crlf)))
+
+
+(Rule  move::do-checkup
+; when a check-up is due, make the person feel more queasy.
+      (subtask ^name move)
+      (hero ^$ID <hero> ^moves <moves> ^check-up <moves> ^health <status>)
+   -->
+      (make subtask ^name evaluate-health)
+      (bind <new-status> ((<status> - 1) / 2))
+      (modify <hero> ^check-up (<moves> + 7) ^health <new-status>))
+
+
+(End-group move-group)
+
+
+
+
+(Rule-Group enter-group)
+
+(Rule  enter-location::first-view
+; if the hero has not seen this place yet, give the full description.
+      (subtask ^name enter-location)
+      (hero ^location <where>)
+      (location ^$ID <location> ^name <where> ^seen-before no)
+      - (local ^scope enter-location ^name viewed)
+   -->
+      (make subtask ^name look)
+      (modify <location> ^seen-before yes)
+      (make local ^scope enter-location ^name viewed))
+
+(Rule  enter-location::been-here-before
+; if the hero has seen this place, just give the name.
+      (subtask ^name enter-location)
+      (hero ^location <where>)
+      (location ^name <where> ^print-name <display> ^seen-before yes)
+      - (local ^scope enter-location ^name viewed)
+   -->
+      (write (crlf) <display> (crlf))
+      (make agenda ^list (compound display-objects display-monsters))
+      (make local ^scope enter-location ^name viewed))
+
+
+(End-group enter-group)
+
+
+
+
+(Rule-Group take-group)
+
+(Rule  take::only-object-update-arg
+; if there are no args, and only one thing in the room then
+; set the arg to that object
+      (subtask ^name take)
+      (input ^$id <input> ^args[1] nil)
+      (hero ^location <here>)
+      (object ^name <only> ^location <here>)
+      - (object ^name <> <only> ^location <here>)
+      - (local ^scope take)
+    -->
+      (modify <input> ^args[1] <only>))
+
+
+(Rule  take::which-one?
+; if no args, and not just one thing, say you don't know which one.
+      (subtask ^name take)
+      (input ^$ID <input> ^args[1] nil)
+      - (local ^scope take)
+    -->
+      (make local ^scope take ^name took-object)
+      (write (crlf) |Take what,  hmmmm?|)
+      (remove <input>))
+
+
+(Rule  daemon::take-specified-sounds-like
+; if the input doesn't match a treasure exactly, but sounds like one, then
+; assume that's what was meant.
+      (input ^$ID <input> ^args[1] <treasure>)
+      - (object ^name <treasure> ^owner <> hero)
+      (object ^name { <correct_name> ~= <treasure> } ^owner <> hero)
+      (subtask ^name take)
+    -->
+      (modify <input> ^args[1] <correct_name>))
+
+
+(Rule  daemon::take-three-letter-abbrev
+; if the input doesn't match a treasure exactly, but is a 3-letter abbrev, then
+; assume that's what was meant.
+      (input ^$ID <input> ^args[1] <treasure>)
+      - (object ^name <treasure> ^owner <> hero)
+      (object ^name <correct_name> ^owner <> hero)
+      (input ^$ID <input> ^args[1] (subsymbol <correct_name> 1 3))
+      (subtask ^name take)
+    -->
+      (modify <input> ^args[1] <correct_name>))
+
+
+(Rule  take::specified-object-ok
+; if they specify what to take, and it is there, then take it.
+      (subtask ^name take)
+      (input ^args[1] <treasure>)
+      (hero ^$ID <hero> ^location <here> ^weight-margin <max-allowed>
+	     ^current-lifting-weight <current>)
+      (object ^$ID <object> ^name <treasure> ^location <here>
+	       ^weight { <smaller> <= <max-allowed> })
+      - (local ^scope take)
+    -->
+      (modify <hero> ^current-lifting-weight (<current> + <smaller>))
+      (make local ^scope take ^name took-object)
+      (modify <object> ^owner hero ^location nil)
+      (write (crlf) |OK.|))
+
+(Rule  take::specified-object:too-weak
+; if they are too weak to pick this up, then tell them so
+      (subtask ^name take)
+      (input ^args[1] <treasure>)
+      (hero ^location <here> ^weight-margin <max-allowed>) 
+      (object ^name <treasure> ^location <here>
+	       ^weight > <max-allowed>)
+      - (local ^scope take)
+    -->
+      (make local ^scope take ^name took-object)
+      (write (crlf) |You are too weak to pick it up.|))
+
+(Rule  take::object-not-there-reject
+; if they specify what to take, and it is not there, then refuse.
+      (subtask ^name take)
+      (input ^$ID <input> ^args[1] <absent>)
+      (hero ^location <here>)
+      - (object ^name <absent> ^location <here>)
+      - (local ^scope take)
+    -->
+      (make local ^scope take ^name took-object)
+      (remove <input>)
+      (write (crlf) |But there is no| <absent> |to take.|))
+
+(Rule  take::monster-ok
+; if you try to take a monster, and it is allowed, then do it,
+;  but display the "take message"
+      (subtask ^name take)
+      (input ^args[1] <gimme>)
+      (hero ^$ID <hero> ^location <here> ^weight-margin <max-allowed>
+	     ^current-lifting-weight <current>)
+      (monster ^$ID <monster> ^name <gimme> ^location <here>
+		^weight { <smaller> <= <max-allowed> }
+		^take-message <message>)
+      - (local ^scope take)
+    -->
+      (modify <hero> ^current-lifting-weight (<smaller> + <current>))
+      (make local ^scope take ^name took-object)
+      (modify <monster> ^owner hero ^location nil)
+      (write (crlf) <message>))
+
+(Rule  take::monster-cant-do
+     (subtask ^name take)
+     (input ^args[1] <gimme>)
+     (hero ^location <here>)
+     (monster ^name <gimme> ^location <here>)
+     - (local ^scope take)
+   -->
+     (make local ^scope take ^name took-object)
+     (write (crlf) |Sorry, you are too weak to pick up| <gimme> (rjust 1) |.|))
+
+(Rule  take::removed-from-home-base:deduct-score
+; if we have picked up an object at home base, then deduct the score
+      (subtask ^name take)
+      (location ^name <home> ^home-base t)
+      (object ^$ID <object> ^location <> <home>
+	      ^at-home-base t ^point-value <points>)
+      (hero ^$ID <hero> ^score <so-far>)
+    -->
+      (modify <hero> ^score (<so-far> - <points>))
+      (modify <object> ^at-home-base nil))
+
+
+(End-group take-group)
+
+
+
+
+(Rule-Group drop-group)
+
+(Rule  drop::only-object-ok
+; if no args and only carrying one thing, just assume they mean that.
+      (subtask ^name drop)
+      (input ^$ID <input> ^args[1] nil)
+      (object ^name <only> ^owner hero)
+      - (object ^name <> <only> ^owner hero)
+      - (local ^scope drop)
+    -->
+      (modify <input> ^args[1] <only>))
+
+
+(Rule  drop::which-one?
+; if no args and not just one object, say don't know which one.
+      (subtask ^name drop)
+      (input ^$ID <input> ^args[1] nil)
+      - (local ^scope drop)
+    -->
+      (make local ^scope drop ^name took-object)
+      (write (crlf) |Drop what?|)
+      (remove <input>))
+
+
+(Rule  daemon::drop-specified-sounds-like
+; if the input doesn't match a treasure exactly, but sounds like one, then
+; assume that's what was meant.
+      (input ^$ID <input> ^args[1] <treasure>)
+      - (object ^name <treasure> ^owner hero)
+      (object ^name { <correct_name> ~= <treasure> } ^owner hero)
+      (subtask ^name drop)
+    -->
+      (modify <input> ^args[1] <correct_name>))
+
+
+(Rule  daemon::drop-three-letter-abbrev
+; if the input doesn't match a treasure exactly, but is a 3-letter abbrev, then
+; assume that's what was meant.
+      (input ^$ID <input> ^args[1] <treasure>)
+      - (object ^name <treasure> ^owner hero)
+      (object ^name <correct_name> ^owner hero)
+      (input ^$ID <input> ^args[1] (subsymbol <correct_name> 1 3))
+      (subtask ^name drop)
+    -->
+      (modify <input> ^args[1] <correct_name>))
+
+
+(Rule  drop::specified-object-ok
+; if specify what to drop, and you have it, then drop it.
+      (subtask ^name drop)
+      (input ^args[1] <treasure>)
+      (hero ^$ID <hero> ^location <here> ^current-lifting-weight <current>)
+      (object ^$ID <object> ^name <treasure> ^owner hero ^weight <discarded>)
+      - (local ^scope drop)
+    -->
+      (modify <hero> ^current-lifting-weight (<current> - <discarded>))
+      (make local ^scope drop ^name took-object)
+      (modify <object> ^owner nil ^location <here>)
+      (write (crlf) |OK.|))
+
+(Rule  drop::specified-monster-ok
+; if you have a monster and want to drop it, then do so and
+;   display the drop message
+      (subtask ^name drop)
+      (input ^args[1] <unwanted>)
+      (hero ^$ID <hero> ^location <here> ^current-lifting-weight <current>)
+      (monster ^$ID <monster> ^name <unwanted> ^owner hero
+	       ^drop-message <message> ^weight <discarded>)
+      - (local ^scope drop)
+    -->
+      (modify <hero> ^current-lifting-weight (<current> - <discarded>))
+      (make local ^scope drop ^name took-object)
+      (modify <monster> ^owner nil ^location <here>)
+      (write (crlf) <message>))
+
+(Rule  drop::dont-have-object-reject
+; if specify what to drop, and you don't have it, then refuse.
+      (subtask ^name drop)
+      (input ^$ID <input> ^args[1] <absent>)
+      - (object ^name <absent> ^owner hero)
+      - (local ^scope drop)
+    -->
+      (make local ^scope drop ^name took-object)
+      (remove <input>)
+      (write (crlf) |But you don't have the| <absent> (rjust 1) |.|))
+
+
+
+(Rule  drop::vase:crash!
+;;;; exception rules  
+; if you drop the vase, and no pillow to land it on, the it breaks
+      (subtask ^name drop)
+      (input ^args[1] crystal-vase)
+      (hero ^$ID <hero> ^location <here> ^current-lifting-weight <current>)
+      (object ^$ID <object> ^name crystal-vase
+	      ^owner hero ^weight <discarded>)
+      - (object ^name feather-pillow ^location <here>)
+      - (local ^scope drop)
+      (location ^$ID <location> ^name <here> ^description[1] <desc>)
+    -->
+      (modify <hero> ^current-lifting-weight (<current> - <discarded>))
+      (make local ^scope drop ^name took-object)
+      (remove <object>)
+      (write (crlf)
+	    |The delicate vase shatters into numerous, worthless fragements.|)
+      (modify <location> ^description (compound 
+	    |There are worthless crystal fragments scattered on the floor.|)))
+
+
+(Rule  drop::vase-lands-on-pillow
+      (subtask ^name drop)
+      (input ^args[1] crystal-vase)
+      (hero ^$ID <hero> ^location <here> ^current-lifting-weight <current>)
+      (object ^$ID <object> ^name crystal-vase ^owner hero ^weight <discarded>)
+      (object ^name feather-pillow ^location <here>)
+      - (local ^scope drop)
+    -->
+      (modify <hero> ^current-lifting-weight (<current> - <discarded>))
+      (make local ^scope drop ^name took-object)
+      (modify <object> ^owner nil ^location <here>)
+      (write (crlf)
+	    |The delicate vase lands gently on the feather pillow.|))
+
+(Rule  drop::object-at-home-base:add-score
+; if we have picked up an object at home base, then deduct the score
+      (subtask ^name drop)
+      (location ^name <home> ^home-base t)
+      (object ^$ID <object> ^location <home>
+	      ^at-home-base nil ^point-value <points>)
+      (hero ^$ID <hero> ^score <so-far> ^health <health>)
+    -->
+      (modify <hero> ^score (<so-far> + <points>)
+	 ^health (<health> * 2))
+      (modify <object> ^at-home-base t))
+
+(End-group drop-group)
+
+
+
+
+(Rule-Group score-group)
+
+(Rule  score::display-score
+      (subtask ^name score)
+      (hero ^score <score> ^name <name>)
+     -->
+      (write (crlf) |Player| <name> |has| <score> |points.| (crlf)))
+
+(End-group score-group)
+
+
+
+
+(Rule-Group inventory-group)
+
+(Rule  inventory::display-score
+      (subtask ^name inventory)
+      (hero ^score <score> ^name <name>)
+      - (local ^name score-displayed)
+     -->
+      (make local ^scope inventory ^name score-displayed)
+      (write (crlf) |Player| <name> |has| <score> |points.| (crlf)))
+
+(Rule  inventory::list-object
+      (subtask ^name inventory)
+      (object ^name <treasure> ^owner hero)
+      (local ^name score-displayed)
+     -->
+      (write (crlf) |You have a| <treasure>))
+
+(End-group inventory-group)
+
+
+
+
+(Rule-Group quit-group)
+
+(Rule  quit::halt
+	(subtask ^name quit)
+     -->
+	(write (crlf) |Ok, be that way.|)
+	(quit))
+
+(End-group quit-group)
+
+(End-block advent_actions)
+
+
+
+
+(Rule-Block advent_control
+	(uses adv_task)
+)
+
+
+(Rule-Group control-group)
+
+(Rule  pop-control
+; Throw out old control wmes 
+      (task ^$id <misc> )
+   -->
+      (remove <misc>))
+
+
+(Rule  schedule-subtask
+; Pop to the next agenda subtask
+      (agenda ^$ID <Agenda> ^list[1] <name> ^list <ag-lst>)
+   -->
+      (modify <Agenda> ^list (subcompound <ag-lst> 2 $last))
+      (make subtask ^name <name>))
+
+
+(Rule  schedule-looping-subtask
+; Pop to the next looping agenda subtask
+      (agenda ^$id <Agenda> ^type looping ^list[1] <name> ^list <ag-lst>)
+   -->
+      (modify <Agenda> ^list (compound (subcompound <ag-lst> 2 $last) <name>))
+      (make subtask ^name <name>))
+
+(Rule  remove-local
+; Pop a local
+      (local ^$ID <Obsolete> ^scope <where>)
+      - (subtask ^name <where>)
+   -->
+      (remove <Obsolete>))
+
+
+(End-Group control-group)
+
+(End-Block advent_control)
+
+
+
+
+
+

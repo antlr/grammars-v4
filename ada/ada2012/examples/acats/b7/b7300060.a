@@ -1,0 +1,118 @@
+-- B7300060.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making
+--     this public release, the Government intends to confer upon all
+--     recipients unlimited rights  equal to those held by the Government.
+--     These rights include rights to use, duplicate, release or disclose the
+--     released technical data and computer software in whole or in part, in
+--     any manner and for any purpose whatsoever, and to have or permit others
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that the visible components of a type extension are only those
+--      inherited from the parent type, even if additional components of an
+--      ancestor type are visible.
+--
+-- TEST DESCRIPTION:
+--      There are several ways to trigger this rule.
+--
+--      Declare a tagged private type Root, with components I and C.
+--
+--      Subtest 1:
+--      Declare Bar, a private extension of Root, in a child package, with
+--      component B.
+--      Declare Dock, a private extension of Root, in a child package of Root's
+--      package, with a component C of a different type than Root's C.
+--      Check that within the body of Dock's package, the new C component is
+--      visible, but Root's I and C components, and Bar's B component, are not
+--      visible.
+--
+--      Subtest 2:
+--      Declare Tool, a visible extension of Root, in a non-child package, with
+--      component B.
+--      Declare Hammer, a visible extension of Root, in a child package of
+--      Root's package, with component D.
+--      Check that within Hammer's package, components B and D are visible, but
+--      not C.
+--
+--      These requirements were confirmed by AI-00157.
+--
+-- TEST FILES:
+--      This test consists of the following files:
+--      -> B7300060.A
+--         B7300061.A
+--         B7300062.A
+--         B7300063.AM
+--
+-- PASS/FAIL CRITERIA:
+--      Files B7300061.A and B7300062.A contain errors. All errors in these
+--      files must be detected to pass the test.
+--
+-- CHANGE HISTORY:
+--      14 Sep 99   RLB     Created test.
+--      02 Feb 17   RLB     Fixed overlong line.
+--!
+
+package B730006_0 is
+   type Root is tagged private;
+private
+   type Root is tagged record
+      I : Integer;
+      C : Character;
+   end record;
+end B730006_0;
+
+-- Legal parts of Subtest 1:
+
+package B730006_0.Child1 is
+   type Bar is new B730006_0.Root with private;
+   procedure Create (Foo : in out Bar);
+private
+   type Bar is new B730006_0.Root with record
+      B : Boolean;
+   end record;
+end B730006_0.Child1;
+
+with B730006_0.Child1;
+package B730006_0.Child2 is
+   type Dock is tagged private;
+   procedure Create (Bay : in out Dock);
+private
+   type Dock is new B730006_0.Child1.Bar with record
+      C : Float; -- OK: Same name as component in Root,
+                 -- but it is not visible here.
+   end record;
+end B730006_0.Child2;
+
+-- Legal parts of Subtest 2:
+
+with B730006_0;
+package B730006_1 is
+   type Tool is new B730006_0.Root with record
+      B : Boolean;
+   end record;
+end B730006_1;
+
+with B730006_1;
+package B730006_0.Child3 is
+   type Hammer is new B730006_1.Tool with record
+      D : Float;
+   end record;
+   procedure Pound (Claw : in out Hammer);
+end B730006_0.Child3;
+

@@ -1,0 +1,865 @@
+/* Copyright (c) 2006, Sun Microsystems, Inc.
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ *     * Redistributions of source code must retain the above copyright notice,
+ *       this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the Sun Microsystems, Inc. nor the names of its
+ *       contributors may be used to endorse or promote products derived from
+ *       this software without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+ * THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+PARSER_BEGIN(IDLParser)
+
+public class IDLParser {
+
+  public static void main(String args[]) {
+    IDLParser parser;
+    if (args.length == 0) {
+      System.out.println("IDL Parser Version 0.1:  Reading from standard input . . .");
+      parser = new IDLParser(System.in);
+    } else if (args.length == 1) {
+      System.out.println("IDL Parser Version 0.1:  Reading from file " + args[0] + " . . .");
+      try {
+        parser = new IDLParser(new java.io.FileInputStream(args[0]));
+      } catch (java.io.FileNotFoundException e) {
+        System.out.println("IDL Parser Version 0.1:  File " + args[0] + " not found.");
+        return;
+      }
+    } else {
+      System.out.println("IDL Parser Version 0.1:  Usage is one of:");
+      System.out.println("         java IDLParser < inputfile");
+      System.out.println("OR");
+      System.out.println("         java IDLParser inputfile");
+      return;
+    }
+    try {
+      parser.specification();
+      System.out.println("IDL Parser Version 0.1:  IDL file parsed successfully.");
+    } catch (ParseException e) {
+      System.out.println("IDL Parser Version 0.1:  Encountered errors during parse.");
+    }
+  }
+
+}
+
+PARSER_END(IDLParser)
+
+
+/*
+ * Tokens to ignore in the BNF follow.
+ */
+
+SKIP :
+{
+  < " " >
+| < "\t" >
+| < "\n" >
+| < "\r" >
+| < "//" (~["\n"])* "\n" >
+| <"/*" (~["*"])* "*" (~["/"] (~["*"])* "*")* "/">
+| < "#" ([" ","\t"])* (["0"-"9"])+
+    (([" ","\t"])* "\"" (~["\""])+ "\""
+           ([" ","\t"])* (["0"-"9"])* ([" ","\t"])* (["0"-"9"])*)? "\n" >
+}
+
+/* Production 1 */
+
+void specification() :
+{}
+{
+  ( definition() )+
+}
+
+/* Production 2 */
+
+void definition() :
+{}
+{
+  type_dcl() ";"
+|
+  const_dcl() ";"
+|
+  except_dcl() ";"
+|
+  interfacex() ";"
+|
+  module() ";"
+}
+
+/* Production 3 */
+
+void module() :
+{}
+{
+  "module" identifier() "{" ( definition() )+ "}"
+}
+
+/* Production 4 */
+
+void interfacex() :
+{}
+{
+  LOOKAHEAD(3)
+  interface_dcl()
+|
+  forward_dcl()
+}
+
+/* Production 5 */
+
+void interface_dcl() :
+{}
+{
+  interface_header() "{" interface_body() "}"
+}
+
+/* Production 6 */
+
+void forward_dcl() :
+{}
+{
+  "interface" identifier()
+}
+
+/* Production 7 */
+
+void interface_header() :
+{}
+{
+  "interface" identifier() [ inheritance_spec() ]
+}
+
+/* Production 8 */
+
+void interface_body() :
+{}
+{
+  ( export() )*
+}
+
+/* Production 9 */
+
+void export() :
+{}
+{
+  type_dcl() ";"
+|
+  const_dcl() ";"
+|
+  except_dcl() ";"
+|
+  attr_dcl() ";"
+|
+  op_dcl() ";"
+}
+
+/* Production 10 */
+
+void inheritance_spec() :
+{}
+{
+  ":" scoped_name() ( "," scoped_name() )*
+}
+
+/* Production 11 */
+
+void scoped_name() :
+{}
+{
+  [ "::" ] identifier() ( "::" identifier() )*
+}
+
+/* Production 12 */
+
+void const_dcl() :
+{}
+{
+  "const" const_type() identifier() "=" const_exp()
+}
+
+/* Production 13 */
+
+void const_type() :
+{}
+{
+  integer_type()
+|
+  char_type()
+|
+  boolean_type()
+|
+  floating_pt_type()
+|
+  string_type()
+|
+  scoped_name()
+}
+
+/* Production 14 */
+
+void const_exp() :
+{}
+{
+  or_expr()
+}
+
+/* Production 15 */
+
+void or_expr() :
+{}
+{
+  xor_expr() ( "|" xor_expr() )*
+}
+
+/* Production 16 */
+
+void xor_expr() :
+{}
+{
+  and_expr() ( "^" and_expr() )*
+}
+
+/* Production 17 */
+
+void and_expr() :
+{}
+{
+  shift_expr() ( "&" shift_expr() )*
+}
+
+/* Production 18 */
+
+void shift_expr() :
+{}
+{
+  add_expr() ( ( ">>" | "<<" ) add_expr() )*
+}
+
+/* Production 19 */
+
+void add_expr() :
+{}
+{
+  mult_expr() ( ( "+" | "-" ) mult_expr() )*
+}
+
+/* Production 20 */
+
+void mult_expr() :
+{}
+{
+  unary_expr() ( ( "*" | "/" | "%" ) unary_expr() )*
+}
+
+/* Production 21 */
+
+void unary_expr() :
+{}
+{
+  [ unary_operator() ] primary_expr()
+}
+
+/* Production 22 */
+void unary_operator() :
+{}
+{
+  "-"
+|
+  "+"
+|
+  "~"
+}
+
+/* Production 23 */
+
+void primary_expr() :
+{}
+{
+  scoped_name()
+|
+  literal()
+|
+  "(" const_exp() ")"
+}
+
+/* Production 24 */
+
+void literal() :
+{}
+{
+  integer_literal()
+|
+  string_literal()
+|
+  character_literal()
+|
+  floating_pt_literal()
+|
+  boolean_literal()
+}
+
+/* Production 25 */
+
+void boolean_literal() :
+{}
+{
+  "TRUE"
+|
+  "FALSE"
+}
+
+/* Production 26 */
+
+void positive_int_const() :
+{}
+{
+  const_exp()
+}
+
+/* Production 27 */
+
+void type_dcl() :
+{}
+{
+  "typedef" type_declarator()
+|
+  struct_type()
+|
+  union_type()
+|
+  enum_type()
+}
+
+/* Production 28 */
+
+void type_declarator() :
+{}
+{
+  type_spec() declarators()
+}
+
+/* Production 29 */
+
+void type_spec() :
+{}
+{
+  simple_type_spec()
+|
+  constr_type_spec()
+}
+
+/* Production 30 */
+
+void simple_type_spec() :
+{}
+{
+  base_type_spec()
+|
+  template_type_spec()
+|
+  scoped_name()
+}
+
+/* Production 31 */
+
+void base_type_spec() :
+{}
+{
+  floating_pt_type()
+|
+  integer_type()
+|
+  char_type()
+|
+  boolean_type()
+|
+  octet_type()
+|
+  any_type()
+}
+
+/* Production 32 */
+
+void template_type_spec() :
+{}
+{
+  sequence_type()
+|
+  string_type()
+}
+
+/* Production 33 */
+
+void constr_type_spec() :
+{}
+{
+  struct_type()
+|
+  union_type()
+|
+  enum_type()
+}
+
+/* Production 34 */
+
+void declarators() :
+{}
+{
+  declarator() ( "," declarator() )*
+}
+
+/* Production 35 */
+
+void declarator() :
+{}
+{
+  LOOKAHEAD(2)
+  complex_declarator()
+|
+  simple_declarator()
+}
+
+/* Production 36 */
+
+void simple_declarator() :
+{}
+{
+  identifier()
+}
+
+/* Production 37 */
+
+void complex_declarator() :
+{}
+{
+  array_declarator()
+}
+
+/* Production 38 */
+
+void floating_pt_type() :
+{}
+{
+  "float"
+|
+  "double"
+}
+
+/* Production 39 */
+
+void integer_type() :
+{}
+{
+  signed_int()
+|
+  unsigned_int()
+}
+
+/* Production 40 */
+
+void signed_int() :
+{}
+{
+  signed_long_int()
+|
+  signed_short_int()
+}
+
+/* Production 41 */
+
+void signed_long_int() :
+{}
+{
+  "long"
+}
+
+/* Production 42 */
+
+void signed_short_int() :
+{}
+{
+  "short"
+}
+
+/* Production 43 */
+
+void unsigned_int() :
+{}
+{
+  LOOKAHEAD(2)
+  unsigned_long_int()
+|
+  unsigned_short_int()
+}
+
+/* Production 44 */
+
+void unsigned_long_int() :
+{}
+{
+  "unsigned" "long"
+}
+
+/* Production 45 */
+
+void unsigned_short_int() :
+{}
+{
+  "unsigned" "short"
+}
+
+/* Production 46 */
+
+void char_type() :
+{}
+{
+  "char"
+}
+
+/* Production 47 */
+
+void boolean_type() :
+{}
+{
+  "boolean"
+}
+
+/* Production 48 */
+
+void octet_type() :
+{}
+{
+  "octet"
+}
+
+/* Production 49 */
+
+void any_type() :
+{}
+{
+  "any"
+}
+
+/* Production 50 */
+
+void struct_type() :
+{}
+{
+  "struct" identifier() "{" member_list() "}"
+}
+
+/* Production 51 */
+
+void member_list() :
+{}
+{
+  ( member() )+
+}
+
+/* Production 52 */
+
+void member() :
+{}
+{
+  type_spec() declarators() ";"
+}
+
+/* Production 53 */
+
+void union_type() :
+{}
+{
+  "union" identifier() "switch" "(" switch_type_spec() ")" "{" switch_body() "}"
+}
+
+/* Production 54 */
+
+void switch_type_spec() :
+{}
+{
+  integer_type()
+|
+  char_type()
+|
+  boolean_type()
+|
+  enum_type()
+|
+  scoped_name()
+}
+
+/* Production 55 */
+
+void switch_body() :
+{}
+{
+  ( casex() )+
+}
+
+/* Production 56 */
+
+void casex() :
+{}
+{
+  ( case_label() )+ element_spec() ";"
+}
+
+/* Production 57 */
+
+void case_label() :
+{}
+{
+  "case" const_exp() ":"
+|
+  "default" ":"
+}
+
+/* Production 58 */
+
+void element_spec() :
+{}
+{
+  type_spec() declarator()
+}
+
+/* Production 59 */
+
+void enum_type() :
+{}
+{
+  "enum" identifier() "{" enumerator() ( "," enumerator() )* "}"
+}
+
+/* Production 60 */
+
+void enumerator() :
+{}
+{
+  identifier()
+}
+
+/* Production 61 */
+
+void sequence_type() :
+{}
+{
+  "sequence" "<" simple_type_spec() [ "," positive_int_const() ] ">"
+}
+
+/* Production 62 */
+
+void string_type() :
+{}
+{
+  "string" [ "<" positive_int_const() ">" ]
+}
+
+/* Production 63 */
+
+void array_declarator() :
+{}
+{
+  identifier() ( fixed_array_size() )+
+}
+
+/* Production 64 */
+
+void fixed_array_size() :
+{}
+{
+  "[" positive_int_const() "]"
+}
+
+/* Production 65 */
+
+void attr_dcl() :
+{}
+{
+  [ "readonly" ] "attribute" param_type_spec() simple_declarator() ( "," simple_declarator() )*
+}
+
+/* Production 66 */
+
+void except_dcl() :
+{}
+{
+  "exception" identifier() "{" ( member() )* "}"
+}
+
+/* Production 67 */
+
+void op_dcl() :
+{}
+{
+  [ op_attribute() ] op_type_spec() identifier() parameter_dcls() [ raises_expr() ] [ context_expr() ]
+}
+
+/* Production 68 */
+
+void op_attribute() :
+{}
+{
+  "oneway"
+}
+
+/* Production 69 */
+
+void op_type_spec() :
+{}
+{
+  param_type_spec()
+|
+  "void"
+}
+
+/* Production 70 */
+
+void parameter_dcls() :
+{}
+{
+  "(" [ param_dcl() ( "," param_dcl() )* ] ")"
+}
+
+/* Production 71 */
+
+void param_dcl() :
+{}
+{
+  param_attribute() param_type_spec() simple_declarator()
+}
+
+/* Production 72 */
+
+void param_attribute() :
+{}
+{
+  "in"
+|
+  "out"
+|
+  "inout"
+}
+
+/* Production 73 */
+
+void raises_expr() :
+{}
+{
+  "raises" "(" scoped_name() ( "," scoped_name() )* ")"
+}
+
+/* Production 74 */
+
+void context_expr() :
+{}
+{
+  "context" "(" string_literal() ( "," string_literal() )* ")"
+}
+
+/* Production 75 */
+
+void param_type_spec() :
+{}
+{
+  base_type_spec()
+|
+  string_type()
+|
+  scoped_name()
+}
+
+/* Definitions of complex regular expressions follow */
+
+void identifier() :
+{}
+{
+  <ID>
+}
+
+void integer_literal() :
+{}
+{
+  <OCTALINT>
+|
+  <DECIMALINT>
+|
+  <HEXADECIMALINT>
+}
+
+void string_literal() :
+{}
+{
+  <STRING>
+}
+
+void character_literal() :
+{}
+{
+  <CHARACTER>
+}
+
+void floating_pt_literal() :
+{}
+{
+  <FLOATONE>
+|
+  <FLOATTWO>
+}
+
+TOKEN :
+{
+  <  ID : ["a"-"z","A"-"Z", "_"] (["a"-"z","A"-"Z","0"-"9","_"])* >
+| <  OCTALINT : "0" (["0"-"7"])* (["u","U","l","L"])? >
+| <  DECIMALINT : ["1"-"9"] (["0"-"9"])* (["u","U","l","L"])? >
+| <  HEXADECIMALINT : ("0x"|"0X") (["0"-"9","a"-"f","A"-"F"])+ (["u","U","l","L"])? >
+| <  FLOATONE : ((["0"-"9"])+ "." (["0"-"9"])* | (["0"-"9"])* "." (["0"-"9"])+)
+   (["e","E"] (["-","+"])? (["0"-"9"])+)? (["f","F","l","L"])? >
+| <  FLOATTWO : (["0"-"9"])+ ["e","E"] (["-","+"])?
+   (["0"-"9"])+ (["f","F","l","L"])? >
+| <  CHARACTER : "'"
+   (   (~["'","\\","\n","\r"])
+   | ("\\" (
+             ["n","t","v","b","r","f","a","\\","?","'","\""]
+            |
+             "0" (["0"-"7"])*
+            |
+             ["1"-"9"] (["0"-"9"])*
+            |
+             ("0x" | "0X") (["0"-"9","a"-"f","A"-"F"])+
+           )
+     )
+   )
+   "'" >
+| <  STRING : "\""
+   ( ( ~["\"","\\","\n","\r"])
+   | ("\\" (
+             ["n","t","v","b","r","f","a","\\","?","'","\""]
+            |
+             "0" (["0"-"7"])*
+            |
+             ["1"-"9"] (["0"-"9"])*
+            |
+             ("0x" | "0X") (["0"-"9","a"-"f","A"-"F"])+
+           )
+     )
+   )*
+   "\"" >
+}

@@ -1,0 +1,7 @@
+environ
+begin
+scheme SchemeOne {P[]}:
+ thesis
+proof
+end;
+.

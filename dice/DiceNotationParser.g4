@@ -19,46 +19,48 @@
  * 
  * This is the notation which RPGs and other tabletop games use to represent operations with dice.
  */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar DiceNotationParser;
 
-options { tokenVocab=DiceNotationLexer; }
+options {
+    tokenVocab = DiceNotationLexer;
+}
 
 /**
  * Rules.
  */
 
-file_ : notation EOF ;
- 
+file_
+    : notation EOF
+    ;
+
 notation
-:
-   dice
-   | number
-   | addOp
-;
+    : dice
+    | number
+    | addOp
+    ;
 
 addOp
-:
-   multOp (ADDOPERATOR multOp)*
-;
+    : multOp (ADDOPERATOR multOp)*
+    ;
 
 multOp
-:
-   operand (MULTOPERATOR operand)*
-;
+    : operand (MULTOPERATOR operand)*
+    ;
 
 operand
-:
-   dice
-   | number
-   | LPAREN notation RPAREN
-;
+    : dice
+    | number
+    | LPAREN notation RPAREN
+    ;
 
 dice
-:
-   ADDOPERATOR? DIGIT? DSEPARATOR DIGIT
-;
+    : ADDOPERATOR? DIGIT? DSEPARATOR DIGIT
+    ;
 
 number
-:
-   ADDOPERATOR? DIGIT
-;
+    : ADDOPERATOR? DIGIT
+    ;

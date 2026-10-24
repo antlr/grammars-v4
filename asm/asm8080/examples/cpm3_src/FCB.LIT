@@ -1,0 +1,22 @@
+
+declare
+    f$drvusr          lit '0',        /* drive/user byte               */
+    f$name            lit '1',        /* file name                     */
+    f$namelen         lit '8',        /* file name length              */
+    f$type            lit '9',        /* file type field               */
+    f$typelen         lit '3',        /* type length                   */
+    f$rw              lit '9',        /* high bit is R/W attribute     */
+    f$dirsys          lit '10',       /* high bit is dir/sys attribute */
+    f$arc             lit '11',       /* high bit is archive attribute */
+    f$ex              lit '12',       /* extent                        */
+    f$s1              lit '13',       /* module byte                   */
+    f$rc              lit '15',       /* record count                  */
+    f$diskmap         lit '16',       /* file disk map                 */
+    diskmaplen        lit '16',       /* disk map length               */
+    f$drvusr2         lit '16',       /* fcb2                          */
+    f$name2           lit '17',
+    f$type2           lit '25',
+    f$rrec            lit '33',       /* random record                 */
+    f$rreco           lit '35';       /*   "      "    overflow        */
+
+

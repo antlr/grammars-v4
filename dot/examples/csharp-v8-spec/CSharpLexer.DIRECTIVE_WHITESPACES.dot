@@ -1,0 +1,21 @@
+digraph ATN {
+rankdir=LR;
+s466[fontsize=11, label="466", shape=doublecircle, fixedsize=true, width=.6];
+s465[fontsize=11,label="465", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2039[fontsize=11,label="2039", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2040[fontsize=11,label="&rarr;\n2040+\nd=67", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2041[fontsize=11,label="&larr;\n2041", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2042[fontsize=11,label="{2042+\nd=68|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s2043[fontsize=11,label="2043", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2044[fontsize=11,label="2044", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2045[fontsize=11,label="2045", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s465 -> s2040 [fontname="Times-Italic", label="&epsilon;"];
+s2040 -> s2039 [fontname="Times-Italic", label="&epsilon;"];
+s2039 -> s2041 [fontsize=11, fontname="Courier", arrowsize=.7, label = "{'	', ''..'', ' ', ' ', ' ', ' '..' ', ' ', ' ', '　'}", arrowhead = normal];
+s2041 -> s2042 [fontname="Times-Italic", label="&epsilon;"];
+s2042:p0 -> s2040 [fontname="Times-Italic", label="&epsilon;", style="dashed"];
+s2042:p1 -> s2043 [fontname="Times-Italic", label="&epsilon;"];
+s2043 -> s2044 [fontname="Times-Italic", label="&epsilon;"];
+s2044 -> s2045 [fontsize=11, fontname="Courier", arrowsize=.7, label = "action_230:4", arrowhead = normal];
+s2045 -> s466 [fontname="Times-Italic", label="&epsilon;"];
+}

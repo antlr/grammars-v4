@@ -1,0 +1,5 @@
+-- Enable Incremental Restore
+LOGGING INCREMENTAL ARCHIVE ON FOR MyDB;
+
+-- Enable Incremental Restore with DELETE LOG ROWS option
+LOGGING INCREMENTAL ARCHIVE ON FOR MyDB DELETE LOG ROWS;

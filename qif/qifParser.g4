@@ -29,58 +29,64 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar qifParser;
 
-options { tokenVocab = qifLexer; }
+options {
+    tokenVocab = qifLexer;
+}
+
 qif
-   : record* EOF
-   ;
+    : record* EOF
+    ;
 
 record
-   : (recordtype | date | total | check | state_ | memo | payee | accountorcategory)* eor
-   ;
+    : (recordtype | date | total | check | state_ | memo | payee | accountorcategory)* eor
+    ;
 
 recordtype
-   : TYPE TEXT
-   ;
+    : TYPE TEXT
+    ;
 
 date
-   : D DATE
-   ;
+    : D DATE
+    ;
 
 total
-   : T NUM
-   ;
+    : T NUM
+    ;
 
 check
-   : N NUM
-   ;
+    : N NUM
+    ;
 
 state_
-   : C STATE
-   ;
+    : C STATE
+    ;
 
 memo
-   : M TEXT
-   ;
+    : M TEXT
+    ;
 
 payee
-   : P TEXT
-   ;
+    : P TEXT
+    ;
 
 accountorcategory
-   : L (account | category)
-   ;
+    : L (account | category)
+    ;
 
 account
-   : LB ACCNTCATNAME RB
-   ;
+    : LB ACCNTCATNAME RB
+    ;
 
 category
-   : ACCNTCATNAME
-   ;
+    : ACCNTCATNAME
+    ;
 
 eor
-   : EOR
-   ;
-
+    : EOR
+    ;

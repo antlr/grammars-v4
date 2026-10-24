@@ -30,6 +30,6 @@ In order to ensure that the grammars on the tree worked, to a minimal degree, [a
 
 There is no single license for the Antlr4 grammars.  Some of the grammars on the tree were forward-ported from grammrs-v3 and in those cases the original author information was usually included.  Many of the grammars have licensing information in the .g4 file(s).
 
-It has long been the intention of grammars-v4 to provide an ecosystem of grammars for Antlr4 that would enable Antlr4 users to create parsers for the source and target language of thier choice for a wide variety of source languages.  At this time there are a little less than 300-ish source language grammars, and Antlr4 supports many targets including C, Java, C#, Python, JS, Swift and others. 
+It has long been the intention of grammars-v4 to provide an ecosystem of grammars for Antlr4 that would enable Antlr4 users to create parsers for the source and target language of their choice for a wide variety of source languages.  At this time there are a little less than 300-ish source language grammars, and Antlr4 supports many targets including C, Java, C#, Python, JS, Swift and others. 
 
 It is a tradition to thank every contributor to grammars-v4 for the time and effort they put into their pull requests.  There is a "thank-you" for every PR when it is pulled onto the tree.  Additionally grammars-v4 aims to be a welcoming community for all contributors both experienced and novice to contribute to, and to learn from.

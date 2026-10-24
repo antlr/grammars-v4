@@ -1,0 +1,9 @@
+Interfaced : {
+   In : {
+      sensorReading ;
+   }
+   InOut : {
+      sharedCounter ;
+   }
+   assignment : sharedCounter = sensorReading + 1 ;
+}

@@ -1,0 +1,5 @@
+MODULE MainModule
+    FUNC num Square(num value)
+        RETURN value * value;
+    ENDFUNC
+ENDMODULE

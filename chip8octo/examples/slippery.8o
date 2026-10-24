@@ -1,0 +1,805 @@
+###########################################
+#
+#  Slippery Slope
+#
+#  built for Octojam 2018.
+#  level editor: http://beyondloom.com/tools/slipedit.html
+#
+#  John Earnest
+#
+###########################################
+
+:const MODE-INPUT  0
+:const MODE-MOVE   1
+:const MODE-NEXT   2
+:const MODE-RESET  3
+
+:const FINAL_LEVEL 0xA
+
+# v0-v2 are reserved as temporaries.
+:alias px       vD # player x position (tiles)
+:alias py       vC # player y position (tiles)
+:alias pdir     vB # player direction ( E N W S )
+:alias pmode    vA # see MODE-XXX
+:alias gx       v9 # goal x position
+:alias gy       v8 # goal y position
+:alias gf       v7 # goal frame (0,5,10,15)
+:alias level    v6 # current level no.
+
+:alias move-dx  v5 # x amount player moved this step
+:alias move-dy  v4 # y amount player moved this step
+:alias move-dir v3 # temporary direction
+
+:alias load-ti  vD # tile index
+:alias load-tx  vC # x position
+:alias load-ty  vB # y position
+
+:alias copy-off vE # when unpacking, offset
+:alias copy-lvl vD # when unpacking, level index
+
+###########################################
+#
+#  Utilities
+#
+###########################################
+
+:macro temp-begin { :calc there { HERE }  :org 0 }
+:macro temp-end   { :org there }
+:macro xor_       { :byte { ( @ a + HERE - to ) ^ @ b + HERE - to } }
+:macro xor A B    { :calc to { HERE }  :calc a  { A }  :calc b  { B }
+                    xor_ xor_ xor_ xor_ xor_ }
+
+:macro sync N {
+	loop
+		vf := delay
+		if vf != 0 then
+	again
+	vf := N
+	delay := vf
+}
+:macro copy-2 SRC DST {
+	i := SRC  load v1
+	i := DST  save v1
+}
+:macro times-5 SRC DST {
+	DST :=  SRC
+	DST <<= DST
+	DST <<= DST
+	DST +=  SRC
+}
+:macro times-6 SRC DST {
+	DST :=  SRC
+	DST +=  SRC
+	DST +=  SRC
+	DST +=  DST
+}
+:macro to-tile SX SY DX DY {
+	times-5 SX DX   DX += 2
+	times-5 SY DY   DY += 1
+}
+
+###########################################
+#
+#  Step Counter
+#
+###########################################
+
+: step-total  0 0 # high 2 digits, low 2 digits
+: step-level  0 0
+: step-bcd    0 0 0
+
+:macro steps-clear {
+	v0 := 0
+	v1 := 0
+	i := step-total
+	save v1
+	i := step-level
+	save v1
+}
+
+:macro steps-inc {
+	i := step-level
+	load v1
+	v1 += 1
+	if v1 == 100 begin
+		v0 += 1
+		v1 := 0
+	end
+	if v0 == 100 begin
+		# cap at 9999
+		v1 := 99
+		v0 := 99
+	end
+	i := step-level
+	save v1
+}
+
+:macro steps-reset-level { copy-2 step-total step-level }
+:macro steps-next-level  { copy-2 step-level step-total }
+
+:macro steps-show-digits SRC {
+	i := SRC
+	load v0
+	i := step-bcd
+	bcd v0
+	load v2
+	i := hex v1
+	sprite v3 v4 5
+	v3 += 5
+	i := hex v2
+	sprite v3 v4 5
+	v3 += 5
+}
+:macro steps-show { # at v3,v4
+	steps-show-digits step-level
+	:calc low-digits { 1 + step-level }
+	steps-show-digits low-digits
+}
+
+###########################################
+#
+#  Level Representation
+#
+###########################################
+
+:const board-rows 6
+:const board-cols 12
+:calc  board-size { board-rows * board-cols }
+: board
+	00 00 00 00 00 00
+	00 00 00 05 00 00
+	00 00 05 00 05 00
+	00 00 00 00 00 00
+	00 00 00 00 00 00
+	00 00 00 00 00 00
+	00 00 00 00 00 00
+	00 00 00 00 00 00
+	00 00 00 00 00 00
+	00 00 00 00 00 00
+	00 00 00 00 00 00
+	00 00 00 00 00 00
+
+: goal-position  10 03 # (x tiles, y tiles)
+: start-position 02 03 # (x tiles, y tiles)
+
+: level-unpack-stash
+	0 0 0 0 0 0 0 0
+	0 0 0 0 0 0 0 0
+
+:macro level-base-addr {
+	v0 := copy-lvl
+	i := level-data
+	loop
+		while v0 != 1
+		v0 += -1
+		vf := 76
+		i  += vf
+	again
+}
+: level-unpack
+	# we need most of the registers for bulk copying,
+	# so stash the entire register file in a buffer:
+	vf := level
+	i := level-unpack-stash
+	save vf
+
+	# copy tile data
+	copy-off := 0  # source/dest offset
+	copy-lvl := vf # level index
+	loop
+		level-base-addr
+		i += copy-off
+		load vb
+
+		i := board
+		i += copy-off
+		save vb
+
+		copy-off += 12
+		if copy-off != 72 then
+	again
+
+	# copy goal/start positions
+	level-base-addr
+	i += copy-off
+	load v3
+	i := goal-position
+	save v3
+
+	i := level-unpack-stash
+	load vf
+;
+
+###########################################
+#
+#  Text
+#
+###########################################
+
+: let-A   0xF0 0xB0 0xF0 0xB0
+: let-D   0xE0 0xB0 0xB0 0xE0
+: let-E   0xF0 0xE0 0xC0 0xF0
+: let-G   0xF0 0xC0 0xD0 0xF0
+: let-H   0xB0 0xF0 0xB0 0xB0
+: let-I   0xC0 0x00 0xC0 0xC0
+: let-L   0xC0 0xC0 0xC0 0xE0
+: let-M   0xD8 0xE8 0xC8 0xC8
+: let-N   0xE0 0xF0 0xD0 0xD0
+: let-O   0xF0 0xB0 0xB0 0xF0
+: let-P   0xF0 0xB0 0xF0 0x80
+: let-R   0xF0 0xF0 0xA0 0x90
+: let-S   0xF0 0xE0 0x30 0xF0
+: let-T   0xF0 0x60 0x60 0x60
+: let-V   0xB0 0xB0 0xB0 0x60
+: let-Y   0xB0 0xF0 0x30 0xF0
+
+:stringmode print " " {
+	v0 += 4
+}
+:stringmode print "ADEGHILMNOPRSTVY" {
+	:calc S { let-A + VALUE * 4 }
+	i := S
+	sprite v0 v1 4
+	# compute the width of each glyph statically:
+	:calc p { ( @ S ) | ( @ 1 + S ) | ( @ 2 + S ) | ( @ 3 + S ) }
+	:calc w { 9 - ( log p & - p ) / log 2 }
+	v0 += w
+}
+
+:macro draw-title {
+	v0 := 14
+	v1 := 4
+	print "SLIPPERY"
+	v0 := 20
+	v1 := 24
+	print "SLOPE"
+}
+
+:macro draw-gameover {
+	v0 := 15
+	v1 := 12
+	print "THE END"
+	v3 := 8
+	v4 := 20
+	steps-show
+	v0 := v3
+	v1 := v4
+	print " STEPS"
+}
+
+:macro draw-levelno {
+	v0 := 17
+	v1 := 12
+	print "LEVEL "
+	i  := hex level
+	sprite v0 v1 5
+}
+
+###########################################
+#
+#  Player And Movement
+#
+###########################################
+
+: stand   0x20 0x70 0x70 0x30 0x20
+          0x20 0x70 0x70 0x70 0x50
+          0x20 0x70 0x70 0x60 0x20
+          0x20 0x70 0xF8 0x70 0x50
+: slide   0x20 0x38 0x30 0x38 0x48
+          0x20 0xF0 0x78 0xB0 0x90
+          0x20 0xE0 0x60 0xE0 0x90
+          0x20 0xF8 0x70 0x70 0x48
+
+:macro draw-player {
+	times-5 pdir v0
+	i += v0
+	to-tile px py v0 v1
+	sprite v0 v1 5
+}
+:macro draw-stand { i := stand  draw-player }
+:macro draw-slide { i := slide  draw-player }
+
+: deltas  1 0 0 -1 -1 0 0 1
+: dirs-\  3 2 1 0
+: dirs-/  1 0 3 2
+
+:macro at-edge REG DELTA VAL {
+	if REG == VAL begin
+		REG -= DELTA
+		pmode := MODE-INPUT
+	end
+}
+:macro get-current-tile {
+	times-6 px v0
+	v0 += py
+	i := board
+	i += v0
+	load v0
+	v1 := v0
+}
+:macro set-current-tile {
+	times-6 px v0
+	v0 += py
+	i := board
+	i += v0
+	v0 := v1
+	save v0
+}
+:macro draw-current-tile {
+	i := tiles
+	i += v1
+	times-5 px v0
+	times-5 py v1
+	v0 += 2
+	v1 += 1
+	sprite v0 v1 5
+}
+:macro change-dir TABLE {
+	i := TABLE
+	i += pdir
+	load v0
+	pdir := v0
+}
+:macro move-player {
+	loop
+		# move in facing direction
+		i := deltas
+		i += pdir
+		i += pdir
+
+		load v1
+		move-dx := v0
+		move-dy := v1
+		px += move-dx
+		py += move-dy
+
+		# out of bounds?
+		at-edge px move-dx -1
+		at-edge px move-dx 12
+		at-edge py move-dy -1
+		at-edge py move-dy 6
+
+		# at goal?
+		to-tile px py v0 v1
+		v0 ^= gx
+		v1 ^= gy
+		v0 |= v1
+		if v0 == 0 then pmode := MODE-NEXT
+
+		# check current cell (into v1)
+		get-current-tile
+
+		if v1 == tile-wall begin
+			px -= move-dx
+			py -= move-dy
+			pmode := MODE-INPUT
+		end
+
+		if v1 == tile-hole begin
+			pmode := MODE-RESET
+		end
+
+		if v1 == tile-mir-\ begin
+			change-dir dirs-\
+		end
+
+		if v1 == tile-mir-/ begin
+			change-dir dirs-/
+		end
+
+		if v1 == tile-flip-\ begin
+			change-dir dirs-\
+			draw-current-tile
+			v1 := tile-flop-/
+			set-current-tile
+			draw-current-tile
+			v1 := 0 # avoid fallthrough!
+		end
+
+		if v1 == tile-flop-/ begin
+			change-dir dirs-/
+			draw-current-tile
+			v1 := tile-flip-\
+			set-current-tile
+			draw-current-tile
+			v1 := 0 # avoid fallthrough!
+		end
+
+		if v1 >= tile-ground begin
+			draw-current-tile
+			pmode := MODE-INPUT
+		end
+
+		while pmode == MODE-MOVE
+		draw-slide
+		animate-goal
+		sync 5
+		draw-slide
+	again
+}
+
+:macro poll-key KEY DIR {
+	vf := KEY if vf key begin
+		pmode    := MODE-MOVE
+		move-dir := DIR
+	end
+}
+:macro poll-player {
+	poll-key OCTO_KEY_D 0
+	poll-key OCTO_KEY_W 1
+	poll-key OCTO_KEY_A 2
+	poll-key OCTO_KEY_S 3
+	if pmode == MODE-MOVE begin
+		steps-inc
+		draw-stand
+		get-current-tile
+		if v1 >= tile-ground begin
+			draw-current-tile
+		end
+		pdir := move-dir
+		move-player
+		draw-stand
+	end
+	if level != 0 begin
+		vf := OCTO_KEY_E
+		if vf key then pmode := MODE-RESET
+	end
+}
+
+###########################################
+#
+#  Level Display
+#
+###########################################
+
+: line   0xFF                     # top and bottom edge
+: corner 0x80                     # 1px
+: wall   0xC0 0xC0 0xC0 0xC0 0xC0 # 2x15 pixels
+         0xC0 0xC0 0xC0 0xC0 0xC0
+         0xC0 0xC0 0xC0 0xC0 0xC0
+
+:macro draw-border {
+	i  := wall
+	v0 := 0
+	v1 := 62
+	v2 := 1
+	sprite v0 v2 15
+	sprite v1 v2 15
+	v2 := 16
+	sprite v0 v2 15
+	sprite v1 v2 15
+
+	i  := line
+	v1 := 0
+	v2 := 31
+	loop
+		sprite v0 v1 1
+		sprite v0 v2 1
+		v0 += 8
+		if v0 != 64 then
+	again
+
+	i  := corner
+	v0 := 2
+	v1 := 61
+	v2 := 1
+	sprite v0 v2 1
+	sprite v1 v2 1
+	v2 := 30
+	sprite v0 v2 1
+	sprite v1 v2 1
+}
+
+temp-begin
+: tgoal-1 0x50 0x80 0x08 0x80 0x50
+: tgoal-2 0x50 0x88 0x00 0x88 0x20
+: tgoal-3 0x50 0x08 0x80 0x08 0x50
+temp-end
+: goal-0  0x20 0x88 0x00 0x88 0x50
+: goal-1  xor goal-0  tgoal-1
+: goal-2  xor tgoal-1 tgoal-2
+: goal-3  xor tgoal-2 tgoal-3
+: goal-4  xor tgoal-3 goal-0
+
+:macro init-goal {
+	gf := 0
+	i := goal-0
+	sprite gx gy 5
+}
+
+:macro animate-goal {
+	i := goal-1
+	i += gf
+	sprite gx gy 5
+	gf += 5
+	if gf == 20 then gf := 0
+}
+
+: tiles  0x00 0x00 0x00 0x00 0x00   # empty space
+         0xF8 0xF8 0xF8 0xF8 0xF8   :const tile-wall    5
+         0x88 0x50 0x20 0x50 0x88   :const tile-hole   10
+         0x80 0x40 0x20 0x10 0x08   :const tile-mir-\  15
+         0x08 0x10 0x20 0x40 0x80   :const tile-mir-/  20
+         0x80 0x60 0x50 0x30 0x08   :const tile-flip-\ 25
+         0x08 0x30 0x70 0x60 0x80   :const tile-flop-/ 30
+         0x50 0x88 0x88 0x88 0x70   :const tile-ground 35
+         0x58 0x80 0x80 0x80 0x78
+         0x88 0x88 0x88 0x88 0x70
+         0x80 0x80 0x80 0x80 0x78
+         0x50 0x08 0x08 0x08 0xF0
+         0x58 0x00 0x00 0x00 0xF8
+         0x08 0x08 0x08 0x08 0xF0
+         0x00 0x00 0x00 0x00 0xF8
+         0x50 0x88 0x88 0x88 0x88
+         0x58 0x80 0x80 0x80 0x80
+         0x88 0x88 0x88 0x88 0x88
+         0x80 0x80 0x80 0x80 0x80
+         0x50 0x08 0x08 0x08 0x08
+         0x58 0x00 0x00 0x00 0x00
+         0x08 0x08 0x08 0x08 0x08
+         0x00 0x00 0x00 0x00 0x00
+
+:macro load-tile REG Y {
+	i := tiles
+	i += REG
+	load-ty := Y
+	sprite load-tx load-ty 5
+}
+: load-level
+	clear
+	draw-border
+	load-ti := 0
+	load-tx := 2
+	loop
+		i := board
+		i += load-ti
+		load v5
+
+		load-tile v0 1
+		load-tile v1 6
+		load-tile v2 11
+		load-tile v3 16
+		load-tile v4 21
+		load-tile v5 26
+
+		load-tx += 5
+		load-ti += board-rows
+		if load-ti != board-size then
+	again
+	i := goal-position
+	load v3
+	to-tile v0 v1 gx gy
+	init-goal
+
+	px    := v2
+	py    := v3
+	pdir  := 3
+	pmode := MODE-INPUT
+	draw-stand
+;
+
+:macro try-key KEY {
+	vf := KEY
+	while vf -key
+}
+:macro wait-key {
+	v4 := random 3
+	i  := deltas
+	i  += v4
+	i  += v4
+	load v1
+	v0 += v0
+	v2 := random 63
+	v3 := random 31
+	i  := slide
+	i  += v4
+	i  += v4
+	i  += v4
+	i  += v4
+	i  += v4
+	sprite v2 v3 5
+	loop
+		sprite v2 v3 5
+		v2 += v0
+		v3 += v1
+		sprite v2 v3 5
+		try-key OCTO_KEY_E
+		try-key OCTO_KEY_A
+		try-key OCTO_KEY_S
+		try-key OCTO_KEY_W
+		try-key OCTO_KEY_D
+	again
+}
+
+###########################################
+#
+#  Main
+#
+###########################################
+
+: main
+	load-level
+	draw-title
+
+	loop
+		loop
+			poll-player
+			while pmode == MODE-INPUT
+			animate-goal
+			sync 5
+		again
+
+		if pmode == MODE-RESET begin
+			steps-reset-level
+			level-unpack
+			load-level
+		end
+
+		if pmode == MODE-NEXT begin
+			clear
+			if level == FINAL_LEVEL begin
+				level := 1
+				draw-gameover
+				steps-clear
+				steps-inc # start screen takes 1 move
+			else
+				level += 1
+				draw-levelno
+			end
+			steps-next-level
+			level-unpack
+			wait-key
+			load-level
+		end
+	again
+
+###########################################
+#
+#  Level Data
+#
+###########################################
+
+: level-data
+: level-1 # just walls and sliding
+	05 05 05 00 00 00
+	05 00 00 00 00 00
+	05 00 00 00 00 00
+	00 00 05 00 00 05
+	00 00 05 00 00 05
+	05 05 05 00 00 05
+	00 00 00 00 00 05
+	00 00 00 05 05 05
+	00 00 00 00 00 05
+	05 00 00 00 00 00
+	05 00 00 00 05 00
+	05 05 05 05 05 00
+	10 03 04 01
+: level-2 # more walls and sliding
+	00 00 00 00 00 05
+	00 05 00 00 00 05
+	05 00 00 00 00 05
+	05 00 00 00 05 05
+	05 05 00 00 05 05
+	00 00 00 00 00 05
+	05 05 00 00 00 05
+	05 00 00 00 00 05
+	05 00 00 00 05 05
+	05 00 00 00 00 05
+	00 00 00 00 00 05
+	00 00 00 00 05 05
+	05 00 01 04
+
+: level-3 # introduce mirrors
+	05 05 05 05 05 05
+	05 05 00 00 00 05
+	05 05 00 00 00 05
+	05 00 00 00 00 05
+	05 00 00 20 00 00
+	05 00 00 00 00 00
+	05 05 00 00 00 05
+	05 05 05 00 05 05
+	05 05 00 00 00 05
+	05 05 00 00 00 05
+	05 05 00 00 00 05
+	05 05 05 05 05 05
+	09 03 02 03
+: level-4 # many mirrors
+	00 00 00 00 00 00
+	00 00 00 00 00 20
+	15 00 00 00 00 00
+	00 05 00 00 00 00
+	00 00 00 00 15 00
+	00 20 00 00 00 00
+	00 00 00 00 00 00
+	00 00 00 00 00 00
+	15 00 00 05 00 20
+	00 15 00 00 00 00
+	00 00 00 00 00 00
+	00 00 00 15 00 00
+	10 03 01 01
+: level-5 # mild mirror maze
+	00 20 00 00 15 00
+	00 00 00 00 00 00
+	00 00 00 00 00 20
+	15 00 00 00 00 00
+	20 00 00 00 00 00
+	15 00 15 00 00 20
+	20 20 15 20 00 15
+	15 00 00 00 00 20
+	20 20 00 00 00 15
+	15 00 00 15 00 20
+	10 20 15 00 00 15
+	00 20 15 20 15 20
+	11 00 00 02
+
+: level-6 # introduce ground
+	10 10 10 10 10 10
+	10 00 00 00 00 10
+	10 00 00 00 00 10
+	10 00 00 00 00 10
+	10 00 00 00 00 10
+	10 00 80 50 00 10
+	10 00 95 65 00 10
+	10 00 00 00 00 10
+	10 00 00 00 00 10
+	10 00 00 00 00 10
+	10 00 00 00 00 10
+	10 10 10 10 10 10
+	09 03 02 02
+: level-7 # good clean fun with ground + mirrors
+	00 00 00 55 00 00
+	00 00 00 00 00 05
+	05 15 00 00 00 00
+	00 00 00 20 00 75
+	00 00 00 00 00 00
+	05 05 05 00 00 00
+	05 05 05 00 20 00
+	05 20 00 00 20 00
+	00 00 00 15 00 00
+	00 00 00 00 00 00
+	00 00 00 00 00 00
+	90 50 00 10 00 20
+	03 00 08 00
+
+: level-8 # introduce flip-flops
+	05 05 05 05 05 05
+	05 05 05 05 05 05
+	05 05 05 00 05 05
+	05 05 05 00 05 05
+	05 00 00 30 00 00
+	05 05 00 00 05 05
+	05 05 00 00 05 05
+	00 00 25 00 00 05
+	05 05 00 05 05 05
+	05 05 00 05 05 05
+	05 05 05 05 05 05
+	05 05 05 05 05 05
+	09 02 02 03
+: level-9 # mirror maze with a few flip-flops
+	15 20 00 00 20 15
+	00 00 15 00 35 00
+	20 00 00 00 00 20
+	00 15 00 00 00 15
+	00 30 00 20 00 00
+	45 00 00 00 00 20
+	00 20 15 20 00 00
+	00 00 00 00 25 00
+	20 00 20 00 00 20
+	00 00 00 20 35 00
+	00 00 00 00 15 00
+	20 15 00 20 00 20
+	02 02 10 01
+: level-A # many flip-flops
+	00 00 10 05 05 00
+	00 00 00 10 05 00
+	05 05 00 00 00 00
+	50 00 25 00 00 20
+	70 00 30 00 00 15
+	70 00 30 30 00 20
+	70 00 30 30 00 15
+	70 00 25 00 00 20
+	70 00 30 25 00 15
+	65 00 30 00 00 20
+	00 00 05 00 00 00
+	00 00 05 00 00 00
+	00 05 11 01

@@ -30,155 +30,141 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar rpn;
 
 expression
-   : signedAtom term* EOF
-   ;
+    : signedAtom term* EOF
+    ;
 
 term
-   : signedAtom
-   | oper
-   ;
+    : signedAtom
+    | oper
+    ;
 
 oper
-   : POW
-   | PLUS
-   | MINUS
-   | TIMES
-   | DIV
-   | COS
-   | TAN
-   | SIN
-   | ACOS
-   | ATAN
-   | ASIN
-   | LOG
-   | LN
-   ;
+    : POW
+    | PLUS
+    | MINUS
+    | TIMES
+    | DIV
+    | COS
+    | TAN
+    | SIN
+    | ACOS
+    | ATAN
+    | ASIN
+    | LOG
+    | LN
+    ;
 
 signedAtom
-   : PLUS signedAtom
-   | MINUS signedAtom
-   | scientific
-   | variable
-   ;
+    : PLUS signedAtom
+    | MINUS signedAtom
+    | scientific
+    | variable
+    ;
 
 variable
-   : VARIABLE
-   ;
+    : VARIABLE
+    ;
 
 scientific
-   : SCIENTIFIC_NUMBER
-   ;
-
+    : SCIENTIFIC_NUMBER
+    ;
 
 SCIENTIFIC_NUMBER
-   : NUMBER (E SIGN? NUMBER)?
-   ;
+    : NUMBER (E SIGN? NUMBER)?
+    ;
 
 //The integer part gets its potential sign from the signedAtom rule
 
 fragment NUMBER
-   : ('0' .. '9') + ('.' ('0' .. '9') +)?
-   ;
-
+    : ('0' .. '9')+ ('.' ('0' .. '9')+)?
+    ;
 
 fragment E
-   : 'E' | 'e'
-   ;
-
+    : 'E'
+    | 'e'
+    ;
 
 fragment SIGN
-   : ('+' | '-')
-   ;
-
+    : ('+' | '-')
+    ;
 
 VARIABLE
-   : VALID_ID_START VALID_ID_CHAR*
-   ;
-
+    : VALID_ID_START VALID_ID_CHAR*
+    ;
 
 fragment VALID_ID_START
-   : ('a' .. 'z') | ('A' .. 'Z') | '_'
-   ;
-
+    : ('a' .. 'z')
+    | ('A' .. 'Z')
+    | '_'
+    ;
 
 fragment VALID_ID_CHAR
-   : VALID_ID_START | ('0' .. '9')
-   ;
-
+    : VALID_ID_START
+    | ('0' .. '9')
+    ;
 
 POW
-   : '^'
-   ;
-
+    : '^'
+    ;
 
 PLUS
-   : '+'
-   ;
-
+    : '+'
+    ;
 
 MINUS
-   : '-'
-   ;
-
+    : '-'
+    ;
 
 TIMES
-   : '*'
-   ;
-
+    : '*'
+    ;
 
 DIV
-   : '/'
-   ;
-
+    : '/'
+    ;
 
 COS
-   : 'cos'
-   ;
-
+    : 'cos'
+    ;
 
 SIN
-   : 'sin'
-   ;
-
+    : 'sin'
+    ;
 
 TAN
-   : 'tan'
-   ;
-
+    : 'tan'
+    ;
 
 ACOS
-   : 'acos'
-   ;
-
+    : 'acos'
+    ;
 
 ASIN
-   : 'asin'
-   ;
-
+    : 'asin'
+    ;
 
 ATAN
-   : 'atan'
-   ;
-
+    : 'atan'
+    ;
 
 LN
-   : 'ln'
-   ;
-
+    : 'ln'
+    ;
 
 LOG
-   : 'log'
-   ;
-
+    : 'log'
+    ;
 
 POINT
-   : '.'
-   ;
-
+    : '.'
+    ;
 
 WS
-   : [ \r\n\t] + -> skip
-   ;
+    : [ \r\n\t]+ -> skip
+    ;

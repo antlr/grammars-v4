@@ -1,8 +1,11 @@
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar TJSParser;
 
 options {
-    tokenVocab=TJSLexer;
-    superClass=TJSBaseParser; 
+    tokenVocab = TJSLexer;
+    superClass = TJSBaseParser;
 }
 
 program
@@ -10,7 +13,7 @@ program
     ;
 
 statement
-    : block 
+    : block
     | variableStatement
     | emptyStatement_
     | classDeclaration
@@ -65,12 +68,13 @@ iterationStatement
     ;
 
 varModifier
-    : Var | Const
-    |'('(  Var | Const )')'
+    : Var
+    | Const
+    | '(' ( Var | Const) ')'
     ;
 
 typeConverter
-    : '('(Int | Real | String )')'
+    : '(' (Int | Real | String) ')'
     | Int
     | Real
     | String
@@ -93,7 +97,7 @@ withStatement
     ;
 
 switchStatement
-    : Switch '(' expressions ')' '{' ( caseClause | defaultClause )* '}'
+    : Switch '(' expressions ')' '{' (caseClause | defaultClause)* '}'
     ;
 
 caseClause
@@ -125,14 +129,11 @@ anoymousFunctionDeclaration
     ;
 
 classDeclaration
-    : Class Identifier (Extends expression (',' expression)* )? block
+    : Class Identifier (Extends expression (',' expression)*)? block
     ;
 
 propertyDeclaration
-    : Property Identifier '{'
-        ( Getter ('(' ')')? block
-        | Setter '(' functionParameter ')' block
-    )* '}'
+    : Property Identifier '{' (Getter ('(' ')')? block | Setter '(' functionParameter ')' block)* '}'
     ;
 
 functionParameters
@@ -158,11 +159,11 @@ arrayElementSeprator
     ;
 
 objectLiteral
-    : varModifier? '%[' objectProperty? (',' objectProperty)* ','?']'
+    : varModifier? '%[' objectProperty? (',' objectProperty)* ','? ']'
     ;
 
 objectProperty
-    : expression (':' |'=' | '=>' | ',') expression // TJS resolve object key in runtime
+    : expression (':' | '=' | '=>' | ',') expression // TJS resolve object key in runtime
     ;
 
 arguments
@@ -181,54 +182,54 @@ expressions
 
 // TODO: can we optimize it?
 expression
-    : anoymousFunctionDeclaration                           # FunctionExpression
-    | expression '[' expressions ']'                        # MemberIndexExpression
-    | expression '.' identifierName                         # MemberDotExpression
-    | '.' identifierName                                    # WithDotExpression
-    | expression arguments                                  # CallExpression
-    | New expression arguments?                             # NewExpression
-    | '&' expression                                        # ReferenceExpression
-    | '*' expression                                        # PointerExpression
-    | expression '<->' expression                           # SwapExpression
-    | expression '!'                                        # EvalExpression        // t.f incontextof 's'! => 0721 (s=%[v=>0721])
-    | expression Incontextof expression                     # InContextOfExpression // a incontextof d++ => Error: object++
-    | expression '++'                                       # PostIncrementExpression
-    | expression '--'                                       # PostDecreaseExpression
-    | expression Isvalid                                    # IsValidExpression     // t incontextof ctx isvalid => 1
-    | Delete expression                                     # DeleteExpression      // delete a.c isvalid => error
-    | Isvalid expression                                    # IsValidExpression     // isvalid delete a.c => 1
-    | Typeof expression                                     # TypeofExpression      // typeof 1 instanceof "String" => 'Integer'
-    | expression Instanceof expression                      # InstanceofExpression  // 1 instanceof "Number" isvalid => 0,isvalid 1 instanceof "String"=>1
-    | Invalidate expression                                 # InvalidateExpression  // invalidate a instanceof "Number" => 0
-    | expression In expression                              # InExpression          // TODO: any standard for it?
-    | '++' expression                                       # PreIncrementExpression
-    | '--' expression                                       # PreDecreaseExpression // typeof 1 + 1 = 'Integer1'
-    | '+' expression                                        # UnaryPlusExpression
-    | '-' expression                                        # UnaryMinusExpression
-    | '~' expression                                        # BitNotExpression
-    | '!' expression                                        # NotExpression
-    | expression ('*' | '/' | '%' | '\\') expression        # MultiplicativeExpression
-    | expression ('+' | '-') expression                     # AdditiveExpression
-    | expression ('<<' | '>>' | '>>>') expression           # BitShiftExpression
-    | expression ('<' | '>' | '<=' | '>=') expression       # RelationalExpression
-    | expression ('==' | '!=' | '===' | '!==') expression   # EqualityExpression
-    | expression '&' expression                             # BitAndExpression
-    | expression '^' expression                             # BitXOrExpression
-    | expression '|' expression                             # BitOrExpression
-    | expression '&&' expression                            # LogicalAndExpression
-    | expression '||' expression                            # LogicalOrExpression
-    | expression '?' expression ':' expression              # TernaryExpression
-    | expression '=' expression                             # AssignmentExpression
-    | expression assignmentOperator expression              # AssignmentOperatorExpression
-    | This                                                  # ThisExpression
-    | Identifier                                            # IdentifierExpression
-    | Super                                                 # SuperExpression
-    | typeConverter expression                              # TypeConvertExpression
-    | literal                                               # LiteralExpression
-    | arrayLiteral                                          # ArrayLiteralExpression
-    | objectLiteral                                         # ObjectLiteralExpression
-    | '(' expressions ')'                                   # ParenthesizedExpression
-    | expression If expressions                             # IfExpression          // b = c = 1 if a ==> (b=c=1)if a
+    : anoymousFunctionDeclaration                         # FunctionExpression
+    | expression '[' expressions ']'                      # MemberIndexExpression
+    | expression '.' identifierName                       # MemberDotExpression
+    | '.' identifierName                                  # WithDotExpression
+    | expression arguments                                # CallExpression
+    | New expression arguments?                           # NewExpression
+    | '&' expression                                      # ReferenceExpression
+    | '*' expression                                      # PointerExpression
+    | expression '<->' expression                         # SwapExpression
+    | expression '!'                                      # EvalExpression        // t.f incontextof 's'! => 0721 (s=%[v=>0721])
+    | expression Incontextof expression                   # InContextOfExpression // a incontextof d++ => Error: object++
+    | expression '++'                                     # PostIncrementExpression
+    | expression '--'                                     # PostDecreaseExpression
+    | expression Isvalid                                  # IsValidExpression    // t incontextof ctx isvalid => 1
+    | Delete expression                                   # DeleteExpression     // delete a.c isvalid => error
+    | Isvalid expression                                  # IsValidExpression    // isvalid delete a.c => 1
+    | Typeof expression                                   # TypeofExpression     // typeof 1 instanceof "String" => 'Integer'
+    | expression Instanceof expression                    # InstanceofExpression // 1 instanceof "Number" isvalid => 0,isvalid 1 instanceof "String"=>1
+    | Invalidate expression                               # InvalidateExpression // invalidate a instanceof "Number" => 0
+    | expression In expression                            # InExpression         // TODO: any standard for it?
+    | '++' expression                                     # PreIncrementExpression
+    | '--' expression                                     # PreDecreaseExpression // typeof 1 + 1 = 'Integer1'
+    | '+' expression                                      # UnaryPlusExpression
+    | '-' expression                                      # UnaryMinusExpression
+    | '~' expression                                      # BitNotExpression
+    | '!' expression                                      # NotExpression
+    | expression ('*' | '/' | '%' | '\\') expression      # MultiplicativeExpression
+    | expression ('+' | '-') expression                   # AdditiveExpression
+    | expression ('<<' | '>>' | '>>>') expression         # BitShiftExpression
+    | expression ('<' | '>' | '<=' | '>=') expression     # RelationalExpression
+    | expression ('==' | '!=' | '===' | '!==') expression # EqualityExpression
+    | expression '&' expression                           # BitAndExpression
+    | expression '^' expression                           # BitXOrExpression
+    | expression '|' expression                           # BitOrExpression
+    | expression '&&' expression                          # LogicalAndExpression
+    | expression '||' expression                          # LogicalOrExpression
+    | expression '?' expression ':' expression            # TernaryExpression
+    | expression '=' expression                           # AssignmentExpression
+    | expression assignmentOperator expression            # AssignmentOperatorExpression
+    | This                                                # ThisExpression
+    | Identifier                                          # IdentifierExpression
+    | Super                                               # SuperExpression
+    | typeConverter expression                            # TypeConvertExpression
+    | literal                                             # LiteralExpression
+    | arrayLiteral                                        # ArrayLiteralExpression
+    | objectLiteral                                       # ObjectLiteralExpression
+    | '(' expressions ')'                                 # ParenthesizedExpression
+    | expression If expressions                           # IfExpression // b = c = 1 if a ==> (b=c=1)if a
     ;
 
 assignmentOperator
@@ -304,7 +305,6 @@ keyword
     | Delete
     | In
     | Try
-
     | Class
     | Enum
     | Extends
@@ -313,7 +313,6 @@ keyword
     | Export
     | Import
     | Static
-
     | Incontextof
     ;
 

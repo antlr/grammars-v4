@@ -29,68 +29,71 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar scotty;
 
 prog
-   : program_lines EOF
-   ;
+    : program_lines EOF
+    ;
 
 program_lines
-   : prefix_exp
-   | fn_def program_lines
-   | var_assign program_lines
-   ;
+    : prefix_exp
+    | fn_def program_lines
+    | var_assign program_lines
+    ;
 
 var_assign
-   : identifier '=' prefix_exp
-   ;
+    : identifier '=' prefix_exp
+    ;
 
 fn_def
-   : 'fun' identifier identifier '=' prefix_exp
-   ;
+    : 'fun' identifier identifier '=' prefix_exp
+    ;
 
 prefix_exp
-   : ('+' prefix_exp prefix_exp)
-   | ('-' prefix_exp prefix_exp)
-   | ('*' prefix_exp prefix_exp)
-   | ('/' prefix_exp prefix_exp)
-   | ('(' identifier prefix_exp ')')
-   | identifier
-   | number
-   ;
+    : ('+' prefix_exp prefix_exp)
+    | ('-' prefix_exp prefix_exp)
+    | ('*' prefix_exp prefix_exp)
+    | ('/' prefix_exp prefix_exp)
+    | ('(' identifier prefix_exp ')')
+    | identifier
+    | number
+    ;
 
 identifier
-   : LETTER id_tail
-   | LETTER
-   ;
+    : LETTER id_tail
+    | LETTER
+    ;
 
 id_tail
-   : LETTER id_tail
-   | DIGIT id_tail
-   | LETTER
-   | DIGIT
-   ;
+    : LETTER id_tail
+    | DIGIT id_tail
+    | LETTER
+    | DIGIT
+    ;
 
 number
-   : '-' digits
-   | digits
-   ;
+    : '-' digits
+    | digits
+    ;
 
 digits
-   : DIGIT digits
-   | '.' digits
-   | DIGIT
-   ;
+    : DIGIT digits
+    | '.' digits
+    | DIGIT
+    ;
 
 DIGIT
-   : [0-9]
-   ;
+    : [0-9]
+    ;
 
 LETTER
-   : [A-Za-z]
-   ;
+    : [A-Za-z]
+    ;
 
 WS
-   : [ \t\r\n] -> skip
-   ;
-
+    : [ \t\r\n] -> skip
+    ;
