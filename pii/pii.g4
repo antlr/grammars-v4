@@ -32,50 +32,52 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // https://web.archive.org/web/20021118041502/http://www.icsti.org/forum/23/index.html#identifiers
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar pii;
 
 pii
-   : (issn | isbn) item check EOF
-   ;
+    : (issn | isbn) item check EOF
+    ;
 
 issn
-   : 'S' DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT year
-   ;
+    : 'S' DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT year
+    ;
 
 isbn
-   : 'B' DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT
-   ;
+    : 'B' DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT
+    ;
 
 year
-   : DIGIT DIGIT
-   ;
+    : DIGIT DIGIT
+    ;
 
 item
-   : DIGIT DIGIT DIGIT DIGIT DIGIT
-   ;
+    : DIGIT DIGIT DIGIT DIGIT DIGIT
+    ;
 
 check
-   : DIGIT
-   | 'X'
-   ;
+    : DIGIT
+    | 'X'
+    ;
 
 DIGIT
-   : [0-9]
-   ;
+    : [0-9]
+    ;
 
 LPAREN
-   : '(' -> skip
-   ;
+    : '(' -> skip
+    ;
 
 RPAREN
-   : ')' -> skip
-   ;
+    : ')' -> skip
+    ;
 
 DASH
-   : '-' -> skip
-   ;
+    : '-' -> skip
+    ;
 
 WS
-   : [ \r\n\t]+ -> skip
-   ;
-
+    : [ \r\n\t]+ -> skip
+    ;

@@ -24,435 +24,392 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar snobol;
 
 prog
-   : lin + EOF
-   ;
+    : lin+ EOF
+    ;
 
 lin
-   : line? EOL
-   ;
+    : line? EOL
+    ;
 
 line
-   : (label? subject pattern? (EQ expression +)? (COLON transfer)?)
-   | (COLON transfer)
-   | (COMMENT | END)
-   ;
+    : (label? subject pattern? (EQ expression+)? (COLON transfer)?)
+    | (COLON transfer)
+    | (COMMENT | END)
+    ;
 
 label
-   : STRING
-   ;
+    : STRING
+    ;
 
 subject
-   : (AMP? STRING ('[' STRING (',' STRING)* ']')?)
-   ;
+    : (AMP? STRING ('[' STRING (',' STRING)* ']')?)
+    ;
 
 pattern
-   : STRINGLITERAL1
-   | STRINGLITERAL2
-   ;
+    : STRINGLITERAL1
+    | STRINGLITERAL2
+    ;
 
 expression
-   : multiplyingExpression ((PLUS | MINUS) multiplyingExpression)*
-   ;
+    : multiplyingExpression ((PLUS | MINUS) multiplyingExpression)*
+    ;
 
 multiplyingExpression
-   : powExpression ((TIMES | DIV) powExpression)*
-   ;
+    : powExpression ((TIMES | DIV) powExpression)*
+    ;
 
 powExpression
-   : atom (POW expression)?
-   ;
+    : atom (POW expression)?
+    ;
 
 atom
-   : (STRINGLITERAL1 | STRINGLITERAL2 | INTEGER)
-   | subject
-   | command
-   | '[' expression (',' expression)* ']'
-   | LPAREN expression RPAREN
-   ;
+    : (STRINGLITERAL1 | STRINGLITERAL2 | INTEGER)
+    | subject
+    | command
+    | '[' expression (',' expression)* ']'
+    | LPAREN expression RPAREN
+    ;
 
 command
-   : ident
-   | differ
-   | eq
-   | ne
-   | ge
-   | le
-   | lt
-   | integer
-   | lgt
-   | atan
-   | chop
-   | cos
-   | exp
-   | ln
-   | remdr
-   | sin
-   | tan
-   | date
-   | dupl
-   | reverse
-   | replace
-   | size
-   | trim
-   | array_
-   | sort
-   | table
-   | break_
-   ;
+    : ident
+    | differ
+    | eq
+    | ne
+    | ge
+    | le
+    | lt
+    | integer
+    | lgt
+    | atan
+    | chop
+    | cos
+    | exp
+    | ln
+    | remdr
+    | sin
+    | tan
+    | date
+    | dupl
+    | reverse
+    | replace
+    | size
+    | trim
+    | array_
+    | sort
+    | table
+    | break_
+    ;
 
 ident
-   : 'ident' LPAREN expression RPAREN
-   ;
+    : 'ident' LPAREN expression RPAREN
+    ;
 
 differ
-   : 'differ' LPAREN expression RPAREN
-   ;
+    : 'differ' LPAREN expression RPAREN
+    ;
 
 eq
-   : 'eq' LPAREN expression RPAREN
-   ;
+    : 'eq' LPAREN expression RPAREN
+    ;
 
 ne
-   : 'ne' LPAREN expression RPAREN
-   ;
+    : 'ne' LPAREN expression RPAREN
+    ;
 
 ge
-   : 'ge' LPAREN expression RPAREN
-   ;
+    : 'ge' LPAREN expression RPAREN
+    ;
 
 gt
-   : 'gt' LPAREN expression RPAREN
-   ;
+    : 'gt' LPAREN expression RPAREN
+    ;
 
 le
-   : 'le' LPAREN expression RPAREN
-   ;
+    : 'le' LPAREN expression RPAREN
+    ;
 
 lt
-   : 'lt' LPAREN expression RPAREN
-   ;
+    : 'lt' LPAREN expression RPAREN
+    ;
 
 integer
-   : 'integer' LPAREN expression RPAREN
-   ;
+    : 'integer' LPAREN expression RPAREN
+    ;
 
 lgt
-   : 'lgt' LPAREN expression RPAREN
-   ;
+    : 'lgt' LPAREN expression RPAREN
+    ;
 
 atan
-   : 'atan' LPAREN expression RPAREN
-   ;
+    : 'atan' LPAREN expression RPAREN
+    ;
 
 chop
-   : 'chop' LPAREN expression RPAREN
-   ;
+    : 'chop' LPAREN expression RPAREN
+    ;
 
 cos
-   : 'cos' LPAREN expression RPAREN
-   ;
+    : 'cos' LPAREN expression RPAREN
+    ;
 
 exp
-   : 'exp' LPAREN expression RPAREN
-   ;
+    : 'exp' LPAREN expression RPAREN
+    ;
 
 ln
-   : 'ln' LPAREN expression RPAREN
-   ;
+    : 'ln' LPAREN expression RPAREN
+    ;
 
 remdr
-   : 'remdr' LPAREN expression RPAREN
-   ;
+    : 'remdr' LPAREN expression RPAREN
+    ;
 
 sin
-   : 'sin' LPAREN expression RPAREN
-   ;
+    : 'sin' LPAREN expression RPAREN
+    ;
 
 tan
-   : 'tan' LPAREN expression RPAREN
-   ;
+    : 'tan' LPAREN expression RPAREN
+    ;
 
 dupl
-   : 'dupl' LPAREN expression COMMA expression RPAREN
-   ;
+    : 'dupl' LPAREN expression COMMA expression RPAREN
+    ;
 
 reverse
-   : 'reverse' LPAREN expression RPAREN
-   ;
+    : 'reverse' LPAREN expression RPAREN
+    ;
 
 date
-   : 'date' LPAREN RPAREN
-   ;
+    : 'date' LPAREN RPAREN
+    ;
 
 replace
-   : 'replace' LPAREN expression COMMA expression COMMA expression RPAREN
-   ;
+    : 'replace' LPAREN expression COMMA expression COMMA expression RPAREN
+    ;
 
 size
-   : 'size' LPAREN expression RPAREN
-   ;
+    : 'size' LPAREN expression RPAREN
+    ;
 
 trim
-   : 'trim' LPAREN expression RPAREN
-   ;
+    : 'trim' LPAREN expression RPAREN
+    ;
 
 array_
-   : 'array' LPAREN expression COMMA expression RPAREN
-   ;
+    : 'array' LPAREN expression COMMA expression RPAREN
+    ;
 
 convert
-   : 'convert' LPAREN expression COMMA expression RPAREN
-   ;
+    : 'convert' LPAREN expression COMMA expression RPAREN
+    ;
 
 table
-   : 'table' LPAREN expression RPAREN
-   ;
+    : 'table' LPAREN expression RPAREN
+    ;
 
 sort
-   : 'sort' LPAREN expression RPAREN
-   ;
+    : 'sort' LPAREN expression RPAREN
+    ;
 
 break_
-   : 'break' LPAREN expression RPAREN
-   ;
+    : 'break' LPAREN expression RPAREN
+    ;
 
 transfer
-   : (transferpre? LPAREN (label | END) RPAREN)?
-   ;
+    : (transferpre? LPAREN (label | END) RPAREN)?
+    ;
 
 transferpre
-   : ('f' | 'F' | 's' | 'S')
-   ;
-
+    : ('f' | 'F' | 's' | 'S')
+    ;
 
 COMMA
-   : ','
-   ;
-
+    : ','
+    ;
 
 LPAREN
-   : '('
-   ;
-
+    : '('
+    ;
 
 RPAREN
-   : ')'
-   ;
-
+    : ')'
+    ;
 
 AMP
-   : '&'
-   ;
-
+    : '&'
+    ;
 
 PLUS
-   : '+'
-   ;
-
+    : '+'
+    ;
 
 MINUS
-   : '-'
-   ;
-
+    : '-'
+    ;
 
 TIMES
-   : '*'
-   ;
-
+    : '*'
+    ;
 
 DIV
-   : '/'
-   ;
-
+    : '/'
+    ;
 
 POW
-   : '^'
-   ;
-
+    : '^'
+    ;
 
 EQ
-   : '='
-   ;
-
+    : '='
+    ;
 
 COLON
-   : ':'
-   ;
-
+    : ':'
+    ;
 
 END
-   : 'END'
-   ;
-
+    : 'END'
+    ;
 
 STRINGLITERAL1
-   : '"' ~ ["\r\n]* '"'
-   ;
-
+    : '"' ~ ["\r\n]* '"'
+    ;
 
 STRINGLITERAL2
-   : '\'' ~['\r\n]* '\''
-   ;
-
+    : '\'' ~['\r\n]* '\''
+    ;
 
 STRING
-   : ('a' .. 'z' | 'A' .. 'Z') ('0' .. '9' | 'a' .. 'z' | 'A' .. 'Z')*
-   ;
-
+    : ('a' .. 'z' | 'A' .. 'Z') ('0' .. '9' | 'a' .. 'z' | 'A' .. 'Z')*
+    ;
 
 INTEGER
-   : ('+' | '-')? ('0' .. '9') +
-   ;
-
+    : ('+' | '-')? ('0' .. '9')+
+    ;
 
 REAL
-   : ('+' | '-')? ('0' .. '9') + ('.' ('0' .. '9') +)? (('e' | 'E') REAL)*
-   ;
-
+    : ('+' | '-')? ('0' .. '9')+ ('.' ('0' .. '9')+)? (('e' | 'E') REAL)*
+    ;
 
 fragment A
-   : ('a' | 'A')
-   ;
-
+    : ('a' | 'A')
+    ;
 
 fragment B
-   : ('b' | 'B')
-   ;
-
+    : ('b' | 'B')
+    ;
 
 fragment C
-   : ('c' | 'C')
-   ;
-
+    : ('c' | 'C')
+    ;
 
 fragment D
-   : ('d' | 'D')
-   ;
-
+    : ('d' | 'D')
+    ;
 
 fragment E
-   : ('e' | 'E')
-   ;
-
+    : ('e' | 'E')
+    ;
 
 fragment F
-   : ('f' | 'F')
-   ;
-
+    : ('f' | 'F')
+    ;
 
 fragment G
-   : ('g' | 'G')
-   ;
-
+    : ('g' | 'G')
+    ;
 
 fragment H
-   : ('h' | 'H')
-   ;
-
+    : ('h' | 'H')
+    ;
 
 fragment I
-   : ('i' | 'I')
-   ;
-
+    : ('i' | 'I')
+    ;
 
 fragment J
-   : ('j' | 'J')
-   ;
-
+    : ('j' | 'J')
+    ;
 
 fragment K
-   : ('k' | 'K')
-   ;
-
+    : ('k' | 'K')
+    ;
 
 fragment L
-   : ('l' | 'L')
-   ;
-
+    : ('l' | 'L')
+    ;
 
 fragment M
-   : ('m' | 'M')
-   ;
-
+    : ('m' | 'M')
+    ;
 
 fragment N
-   : ('n' | 'N')
-   ;
-
+    : ('n' | 'N')
+    ;
 
 fragment O
-   : ('o' | 'O')
-   ;
-
+    : ('o' | 'O')
+    ;
 
 fragment P
-   : ('p' | 'P')
-   ;
-
+    : ('p' | 'P')
+    ;
 
 fragment Q
-   : ('q' | 'Q')
-   ;
-
+    : ('q' | 'Q')
+    ;
 
 fragment R
-   : ('r' | 'R')
-   ;
-
+    : ('r' | 'R')
+    ;
 
 fragment S
-   : ('s' | 'S')
-   ;
-
+    : ('s' | 'S')
+    ;
 
 fragment T
-   : ('t' | 'T')
-   ;
-
+    : ('t' | 'T')
+    ;
 
 fragment U
-   : ('u' | 'U')
-   ;
-
+    : ('u' | 'U')
+    ;
 
 fragment V
-   : ('v' | 'V')
-   ;
-
+    : ('v' | 'V')
+    ;
 
 fragment W
-   : ('w' | 'W')
-   ;
-
+    : ('w' | 'W')
+    ;
 
 fragment X
-   : ('x' | 'X')
-   ;
-
+    : ('x' | 'X')
+    ;
 
 fragment Y
-   : ('y' | 'Y')
-   ;
-
+    : ('y' | 'Y')
+    ;
 
 fragment Z
-   : ('z' | 'Z')
-   ;
-
+    : ('z' | 'Z')
+    ;
 
 COMMENT
-   : '*' ~ [\r\n]*
-   ;
-
+    : '*' ~ [\r\n]*
+    ;
 
 EOL
-   : [\r\n] +
-   ;
-
+    : [\r\n]+
+    ;
 
 WS
-   : (' ' | '\t') + -> skip
-   ;
+    : (' ' | '\t')+ -> skip
+    ;

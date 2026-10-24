@@ -1,0 +1,27 @@
+	module $defextsym;
+/*
+/*  Copyright © 1996, Digital Equipment Corporation.
+/*
+/* Modifications:
+/*
+/*	001	Tom Benson	13-Feb-1984	(003 VCG)
+/*
+/*		Added modification history.
+/*
+/*
+
+/*
+/* define external symbol descriptor structure
+/*
+AGGREGATE vcg_ext_sym_descr	STRUCTURE;
+	extsym_l_displ		LONGWORD;	{ Displacment for the address of the symbol
+	extsym_a_sym_ptr	ADDRESS;	{ Pointer to the symbol node
+#extsym_length = .;
+	END;
+/*
+/* Define the length of an external symbol descriptor
+/*
+CONSTANT extsym_k_length EQUALS (#extsym_length);
+/*
+/*
+END_MODULE;

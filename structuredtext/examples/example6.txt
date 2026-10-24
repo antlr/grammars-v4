@@ -1,0 +1,3 @@
+FOR i := 1 TO 10 BY 1 DO
+    sum := sum + i;
+END_FOR;

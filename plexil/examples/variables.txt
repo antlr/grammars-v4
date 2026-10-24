@@ -1,0 +1,19 @@
+Declarations : {
+   Boolean : {
+      done = false ;
+      armed ;
+   }
+   Integer : {
+      pictures = 0 ;
+      limit ;
+   }
+   Real : {
+      temperature = 98.6 ;
+   }
+   String : {
+      label ;
+   }
+   Pointer : {
+      target = sensor 1 ;
+   }
+}

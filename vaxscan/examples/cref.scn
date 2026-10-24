@@ -1,0 +1,688 @@
+MODULE tpu_cross IDENT 'X1.0';
+    declare source_file: common file;
+   LIST TITLE 'TPU Program cross reference';
+   
+   !
+   ! Copyright notice goes here
+   !
+
+   !++
+   ! FACILITY:
+   !
+   !	TPU - Text Processign Unit
+   !
+   ! ABSTRACT:
+   !
+   !	This program demonstrates the use of VAX SCAN and provides a usefull
+   !	cross reference of any TPU program (including a source listing).
+   !
+   ! ENVIRONMENT:
+   !
+   !       VAX SCAN E1.0
+   !
+   ! AUTHOR: Tim Brandt, CREATION DATE: 22 Feburary 1985
+   !
+   ! MODIFIED BY:
+   !
+   !
+   !--
+   LIST PAGE;
+   !
+   ! Declare global storage used throught the procedures
+   !              
+   DECLARE keyword_tree: TREE(STRING) OF INTEGER;
+   DECLARE variable_tree: TREE(STRING,INTEGER,INTEGER) OF INTEGER;
+   DECLARE source_name: STRING;
+   DECLARE current_page: INTEGER;
+   DECLARE current_line: INTEGER;
+   DECLARE sbttl: FIXED STRING(64);
+   DECLARE doing_xref: BOOLEAN;
+   DECLARE module_name: FIXED STRING(64);
+   DECLARE program_ident: FIXED STRING(36);
+   DECLARE file_stuff: EXTERNAL FIXED STRING(88);
+   DECLARE source_line: EXTERNAL INTEGER;
+
+   FORWARD PROCEDURE keyword_setup;
+   FORWARD PROCEDURE insert_reference(STRING);
+   FORWARD PROCEDURE output_line(STRING);
+   FORWARD PROCEDURE output_new_page;
+   FORWARD PROCEDURE output_xref;
+   EXTERNAL PROCEDURE read_source(INTEGER,POINTER TO FIXED STRING(132))
+       OF INTEGER;
+   EXTERNAL PROCEDURE sys$fao(STRING,INTEGER,STRING,VALUE INTEGER,VALUE INTEGER);
+   
+   LIST PAGE;
+   !
+   ! Describe sets and tokens used to decompose a TPU source program.
+   !
+   
+   ! Describe the sets
+   !
+   SET alpha		('a' .. 'z'  OR 'A' .. 'Z');
+   SET numeric		('0' .. '9');
+   SET alphanumeric	(alpha OR numeric);
+   SET variable		(alphanumeric OR '$' OR '_');
+   SET non_eol		(NOT (s'eol' OR s'eos'));
+   
+   ! Describe the possible tokens
+   !
+   TOKEN source_comment			{'!' non_eol... };
+   TOKEN tpu_integer			{numeric...};
+   TOKEN tpu_string			{'"' [non_eol...] '"' |
+   					 '''' [non_eol...] ''''};
+   TOKEN spaces				{' '...};
+   TOKEN msg_variable	CASELESS	{'tpu$_' alphanumeric...};
+   TOKEN keys		CASELESS {
+   		 'pf' numeric | 'kp' numeric |
+   		 'period' | 'comma' | 'minus' | 'enter' |
+   		 'up' | 'down' | 'left' | 'right' | 'e' numeric | 'help' |
+   		 'do' | 'f' numeric [numeric] | 'tab_key' | 'ret_key' |
+   		 'del_key' | 'lf_key' | 'bs_key' | 'ctrl_' alpha '_key'};
+   TOKEN user_variable	CASELESS	{alpha [variable...]};
+   
+   LIST PAGE;
+   !
+   ! Describe TRIGGER MACRO's needed to recognize the important parts of
+   ! a TPU program and throw the junk away.
+   !
+   MACRO ignore_junk syntax { source_comment |
+				tpu_integer |
+				tpu_string |
+				spaces |
+				msg_variable |
+				keys };
+
+       ! NULL, just ignore from input stream
+
+   END MACRO;
+
+   MACRO find_variable syntax { vbl_name:user_variable };
+   
+       IF NOT EXISTS( keyword_tree(LOWER(vbl_name)) )
+       THEN
+           CALL insert_reference(UPPER(vbl_name));
+       END IF;
+   
+   END MACRO;
+   LIST PAGE;
+   PROCEDURE main MAIN;
+
+       !++
+       ! FUNCTIONAL DESCRIPTION:
+       !
+       !	This procedure is the main processing routine for the TPU
+       !	cross reference program.  Opens the input and output files
+       !	and performs the basic scan operation.
+       !
+       ! FORMAL PARAMETERS:
+       !
+       !	Called via DCL RUN command.
+       !
+       ! RETURN VALUE:
+       !
+       !	None
+       !
+       ! IMPLICIT INPUTS:
+       !
+       !	None
+       !
+       ! IMPLICIT OUTPUTS:
+       !
+       !	None
+       !
+       ! SIDE EFFECTS:
+       !
+       !	None
+       !
+       !--
+       
+       DECLARE junk: STRING;
+       
+       ! Set program name and version and setup TPU keyword table
+       !
+       program_ident = 'TPUCROSS X1.0';
+       CALL keyword_setup;
+       
+       ! Reset all counters, set current line to force new page
+       !
+       current_page = 0;
+       current_line = 100;
+       source_line = 0;
+       doing_xref = FALSE;
+       sbttl = 'Source Listing';
+       
+       ! Open the output file
+       !
+       OPEN file( output_file ) AS 'TPUCROSS.LIS' FOR OUTPUT;
+
+       ! Start scan operation, implicitly opens input and output file.
+       !
+       START SCAN
+           INPUT PROCEDURE read_source
+           OUTPUT STRING junk;
+
+       ! Finished with the source file, produce the XREF and exit
+       !
+       CALL output_xref;
+       CLOSE file( output_file );
+
+   END PROCEDURE;
+   LIST PAGE;
+   PROCEDURE keyword_setup;
+
+       !++
+       ! FUNCTIONAL DESCRIPTION:
+       !
+       !	This procedure initializes the keyword tree used to determine
+       !	if a variable is in reality a TPU keyword.
+       !
+       ! FORMAL PARAMETERS:
+       !
+       !	None
+       !
+       ! RETURN VALUE:
+       !
+       !	None
+       !
+       ! IMPLICIT INPUTS:
+       !
+       !	None
+       !
+       ! IMPLICIT OUTPUTS:
+       !
+       !	A keyword tree fully loaded.
+       !
+       ! SIDE EFFECTS:
+       !
+       !	None
+       !
+       !--
+       
+
+       ! Load builtin functions first
+       !
+       keyword_tree('adjust_window')	= 0;
+       keyword_tree('append_line')	= 0;
+       keyword_tree('ascii')		= 0;
+       keyword_tree('beginning_of')	= 0;
+       keyword_tree('call_user')	= 0;
+       keyword_tree('change_case')	= 0;
+       keyword_tree('compile')		= 0;
+       keyword_tree('copy_text')	= 0;
+       keyword_tree('create_buffer')	= 0;
+       keyword_tree('create_process')	= 0;
+       keyword_tree('create_range')	= 0;
+       keyword_tree('create_window')	= 0;
+       keyword_tree('current_buffer')	= 0;
+       keyword_tree('current_character')= 0;
+       keyword_tree('current_column')	= 0;
+       keyword_tree('current_direction')= 0;
+       keyword_tree('current_line')	= 0;
+       keyword_tree('current_offset')	= 0;
+       keyword_tree('current_row')	= 0;
+       keyword_tree('current_window')	= 0;
+       keyword_tree('cursor_horizontal')= 0;
+       keyword_tree('cursor_vertical')	= 0;
+       keyword_tree('define_key')	= 0;
+       keyword_tree('delete')		= 0;
+       keyword_tree('edit')		= 0;
+       keyword_tree('end_of')		= 0;
+       keyword_tree('erase')		= 0;
+       keyword_tree('erase_character')	= 0;
+       keyword_tree('erase_line')	= 0;
+       keyword_tree('execute')		= 0;
+       keyword_tree('exit')		= 0;
+       keyword_tree('expand_name')	= 0;
+       keyword_tree('fao')		= 0;
+       keyword_tree('file_parse')	= 0;
+       keyword_tree('file_search')	= 0;
+       keyword_tree('fill')		= 0;
+       keyword_tree('get_info')		= 0;
+       keyword_tree('help_text')	= 0;
+       keyword_tree('index')		= 0;
+       keyword_tree('int')		= 0;
+       keyword_tree('journal_close')	= 0;
+       keyword_tree('journal_open')	= 0;
+       keyword_tree('key_name')		= 0;
+       keyword_tree('last_key')		= 0;
+       keyword_tree('learn_begin')	= 0;
+       keyword_tree('learn_end')	= 0;
+       keyword_tree('length')		= 0;
+       keyword_tree('line_begin')	= 0;
+       keyword_tree('line_end')		= 0;
+       keyword_tree('lookup_key')	= 0;
+       keyword_tree('map')		= 0;
+       keyword_tree('mark')		= 0;
+       keyword_tree('message')		= 0;
+       keyword_tree('move_horizontal')	= 0;
+       keyword_tree('move_text')	= 0;
+       keyword_tree('move_vertical')	= 0;
+       keyword_tree('position')		= 0;
+       keyword_tree('print')		= 0;
+       keyword_tree('quit')		= 0;
+       keyword_tree('read_char')	= 0;
+       keyword_tree('read_file')	= 0;
+       keyword_tree('read_key')		= 0;
+       keyword_tree('read_line')	= 0;
+       keyword_tree('refresh')		= 0;
+       keyword_tree('save')		= 0;
+       keyword_tree('scroll')		= 0;
+       keyword_tree('search')		= 0;
+       keyword_tree('select')		= 0;
+       keyword_tree('select_range')	= 0;
+       keyword_tree('send')		= 0;
+       keyword_tree('send_eof')		= 0;
+       keyword_tree('set')		= 0;
+       keyword_tree('shift')		= 0;
+       keyword_tree('show')		= 0;
+       keyword_tree('split_line')	= 0;
+       keyword_tree('str')		= 0;
+       keyword_tree('substr')		= 0;
+       keyword_tree('translate')	= 0;
+       keyword_tree('undefine_key')	= 0;
+       keyword_tree('unmap')		= 0;
+       keyword_tree('update')		= 0;
+       keyword_tree('write_file')	= 0;
+       
+       ! Load builtin function keyword parameters
+       !
+       keyword_tree('all')		= 0;
+       keyword_tree('auto_repeat')	= 0;
+       keyword_tree('blank_tabs')	= 0;
+       keyword_tree('blink')		= 0;
+       keyword_tree('bold')		= 0;
+       keyword_tree('buffer')		= 0;
+       keyword_tree('buffers')		= 0;
+       keyword_tree('collapse')		= 0;
+       keyword_tree('command_line')	= 0;
+       keyword_tree('comment')		= 0;
+       keyword_tree('compress')		= 0;
+       keyword_tree('debug')		= 0;
+       keyword_tree('device')		= 0;
+       keyword_tree('direction')	= 0;
+       keyword_tree('directory')	= 0;
+       keyword_tree('eob_text')		= 0;
+       keyword_tree('exact')		= 0;
+       keyword_tree('facility_name')	= 0;
+       keyword_tree('forward')		= 0;
+       keyword_tree('graphic_tabs')	= 0;
+       keyword_tree('informational')	= 0;
+       keyword_tree('integer')		= 0;
+       keyword_tree('invert')		= 0;
+       keyword_tree('journaling')	= 0;
+       keyword_tree('keyword')		= 0;
+       keyword_tree('keywords')		= 0;
+       keyword_tree('learn')		= 0;
+       keyword_tree('lower')		= 0;
+       keyword_tree('marker')		= 0;
+       keyword_tree('margins')		= 0;
+       keyword_tree('max_lines')	= 0;
+       keyword_tree('message_flags')	= 0;
+       keyword_tree('mode')		= 0;
+       keyword_tree('name')		= 0;
+       keyword_tree('node')		= 0;
+       keyword_tree('none')		= 0;
+       keyword_tree('no_debug')		= 0;
+       keyword_tree('no_exact')		= 0;
+       keyword_tree('no_translate')	= 0;
+       keyword_tree('no_write')		= 0;
+       keyword_tree('off')		= 0;
+       keyword_tree('on')		= 0;
+       keyword_tree('output_file')	= 0;
+       keyword_tree('overstrike')	= 0;
+       keyword_tree('pad')		= 0;
+       keyword_tree('pattern')		= 0;
+       keyword_tree('permanent')	= 0;
+       keyword_tree('procedures')	= 0;
+       keyword_tree('process')		= 0;
+       keyword_tree('program')		= 0;
+       keyword_tree('prompt_area')	= 0;
+       keyword_tree('range')		= 0;
+       keyword_tree('reverse')		= 0;
+       keyword_tree('screen')		= 0;
+       keyword_tree('screen_update')	= 0;
+       keyword_tree('screen_width')	= 0;
+       keyword_tree('scrolling')	= 0;
+       keyword_tree('shift_key')	= 0;
+       keyword_tree('status_line')	= 0;
+       keyword_tree('string')		= 0;
+       keyword_tree('summary')		= 0;
+       keyword_tree('system')		= 0;
+       keyword_tree('tab_stops')	= 0;
+       keyword_tree('text')		= 0;
+       keyword_tree('timer')		= 0;
+       keyword_tree('trim')		= 0;
+       keyword_tree('trim_leading')	= 0;
+       keyword_tree('trim_trailing')	= 0;
+       keyword_tree('type')		= 0;
+       keyword_tree('underline')	= 0;
+       keyword_tree('unspecified')	= 0;
+       keyword_tree('upper')		= 0;
+       keyword_tree('variables')	= 0;
+       keyword_tree('version')		= 0;
+       keyword_tree('video')		= 0;
+       keyword_tree('width')		= 0;
+       keyword_tree('window')		= 0;
+       keyword_tree('windows')		= 0;
+       
+       ! Load the reserved keywords
+       !
+       keyword_tree('begin')		= 0;
+       keyword_tree('call')		= 0;
+       keyword_tree('continue')		= 0;
+       keyword_tree('control')		= 0;
+       keyword_tree('end')		= 0;
+       keyword_tree('endselect')	= 0;
+       keyword_tree('endselectone')	= 0;
+       keyword_tree('endswitch')	= 0;
+       keyword_tree('external_variables') = 0;
+       keyword_tree('field')		= 0;
+       keyword_tree('fields')		= 0;
+       keyword_tree('function')		= 0;
+       keyword_tree('keymap')		= 0;
+       keyword_tree('keymaps')		= 0;
+       keyword_tree('keypad')		= 0;
+       keyword_tree('no_diacritical')	= 0;
+       keyword_tree('printing')		= 0;
+       keyword_tree('real')		= 0;
+       keyword_tree('select')		= 0;
+       keyword_tree('selectone')	= 0;
+       keyword_tree('shift_control')	= 0;
+       keyword_tree('shift_function')	= 0;
+       keyword_tree('shift_keypad')	= 0;
+       keyword_tree('shift_printing')	= 0;
+       keyword_tree('signal')		= 0;
+       keyword_tree('switch')		= 0;
+   
+       ! Load TPU language statements
+       !
+       keyword_tree('procedure')	= 0;
+       keyword_tree('endprocedure')	= 0;
+       keyword_tree('loop')		= 0;
+       keyword_tree('exitif')		= 0;
+       keyword_tree('endloop')		= 0;
+       keyword_tree('if')		= 0;
+       keyword_tree('then')		= 0;
+       keyword_tree('else')		= 0;
+       keyword_tree('endif')		= 0;
+       keyword_tree('case')		= 0;
+       keyword_tree('from')		= 0;
+       keyword_tree('to')		= 0;
+       keyword_tree('inrange')		= 0;
+       keyword_tree('outrange')		= 0;
+       keyword_tree('endcase')		= 0;
+       keyword_tree('on_error')		= 0;
+       keyword_tree('endon_error')	= 0;
+       keyword_tree('abort')		= 0;
+       keyword_tree('and')		= 0;
+       keyword_tree('break')		= 0;
+       keyword_tree('local')		= 0;
+       keyword_tree('not')		= 0;
+       keyword_tree('or')		= 0;
+       keyword_tree('return')		= 0;
+       
+   END PROCEDURE;
+   LIST PAGE;
+   PROCEDURE insert_reference(variable_name: STRING);
+
+       !++
+       ! FUNCTIONAL DESCRIPTION:
+       !
+       !	This procedure inserts a reference entry into the symbol
+       !	table for a user variable.
+       !
+       ! FORMAL PARAMETERS:
+       !
+       !	current_page	- Current listing page
+       !	source_line	- Current line in source file
+       !	variable_name	- Name of the variable to insert
+       !
+       ! RETURN VALUE:
+       !
+       !	None
+       !
+       ! IMPLICIT INPUTS:
+       !
+       !	variable_tree	- Variable tree
+       !
+       ! IMPLICIT OUTPUTS:
+       !
+       !	variable_tree	- Variable tree updated
+       !
+       ! SIDE EFFECTS:
+       !
+       !	A new leaf to the variable_tree is added if the variable
+       !	does not already exist.
+       !
+       !--
+       
+       ! See if variable already in tree, if not add it.
+       !
+       IF NOT EXISTS( variable_tree(variable_name,current_page,source_line) )
+       THEN
+           ! Does not exist, create a new one with one reference
+           !
+           variable_tree(variable_name,current_page,source_line) = 1;
+       ELSE
+           ! Add one to the reference count for an existing variable
+           !
+           variable_tree(variable_name,current_page,source_line) =
+               VALUE(variable_tree(variable_name,current_page,source_line))+1;
+       END IF;
+       
+   END PROCEDURE;
+   LIST PAGE;
+   PROCEDURE output_line(source_text: STRING);
+   
+       !++
+       ! FUNCTIONAL DESCRIPTION:
+       !
+       !	This procedure displays the next source line on the listing
+       !	file.  A new page may be output if a page overflow would
+       !	occur by printing the next line.
+       !
+       ! FORMAL PARAMETERS:
+       !
+       !	source_text	- Source line to print
+       !
+       ! RETURN VALUE:
+       !
+       !	None
+       !
+       ! IMPLICIT INPUTS:
+       !
+       !	current_line	- Current listing line
+       !
+       ! IMPLICIT OUTPUTS:
+       !
+       !	None
+       !
+       ! SIDE EFFECTS:
+       !
+       !	A new page may be included in the listing.
+       !
+       !--
+      
+       DECLARE s_line: STRING;
+       DECLARE junk: INTEGER;
+
+       ! Require a new page before we print this line?  If so do it.
+       !
+       IF current_line>60
+       THEN
+           CALL output_new_page;
+       END IF;
+             
+       ! Require a source line number?  If so print line with it else
+       ! just print line.
+       !
+       IF doing_xref
+       THEN
+           WRITE file( output_file ) source_text;
+       ELSE
+           s_line = '    ';
+           CALL sys$fao('!4UL',junk,s_line,source_line,junk);
+           IF INDEX(source_text,s'ff')<>0
+           THEN
+               WRITE file( output_file ) s_line;
+               CALL output_new_page;
+           ELSE
+               WRITE file( output_file ) s_line,s'ht',source_text;
+           END IF;
+       END IF;
+       current_line = current_line+1;
+   
+   END PROCEDURE;
+   LIST PAGE;
+   PROCEDURE output_xref;
+
+       !++
+       ! FUNCTIONAL DESCRIPTION:
+       !
+       !	This procedure walks the variable tree and prints the
+       !	references for each variable.
+       !
+       ! FORMAL PARAMETERS:
+       !
+       !	None
+       !
+       ! RETURN VALUE:
+       !
+       !      	None
+       !
+       ! IMPLICIT INPUTS:
+       !
+       !	variable_tree	- User variable tree
+       !     
+       ! IMPLICIT OUTPUTS:
+       !
+       !	None
+       !
+       ! SIDE EFFECTS:
+       !
+       !	None
+       !
+       !--
+
+       ! Local variable storage
+       !
+       DECLARE xref_line: STRING;
+       DECLARE symbol_node: TREEPTR( STRING ) TO TREE( INTEGER,INTEGER ) OF INTEGER;
+       DECLARE reference_node: TREEPTR( INTEGER ) TO TREE( INTEGER ) OF INTEGER;
+       DECLARE line_node: TREEPTR( INTEGER ) TO INTEGER;
+       DECLARE symbol_name: FIXED STRING(31);
+       DECLARE page_no: INTEGER;
+       DECLARE next_reference: STRING;
+       DECLARE junk: INTEGER;
+       
+       ! Flag doing Xref, force new page at next line output
+       !
+       doing_xref = TRUE;
+       next_reference = '     ';
+       sbttl = 'Cross Reference';
+       current_line = 100;
+       xref_line = '';
+       
+       ! Get first symbol branch to get things going
+       !
+       symbol_node = FIRST(variable_tree);
+       next_reference = '   -      ';
+
+       ! Loop thru all symbol branches
+       !
+       WHILE symbol_node <> NIL;
+
+           ! Get the name of this symbol branch
+	   ! and put it into the output line
+	   !
+           symbol_name = SUBSCRIPT(symbol_node);
+           xref_line = symbol_name&'  ';
+
+           ! Get first page number branch
+	   !
+           reference_node = FIRST(symbol_node);
+           page_no = SUBSCRIPT(reference_node);
+
+           ! Loop thru all page number branches
+	   !
+           WHILE reference_node<>NIL;
+
+	       ! Get first source line number branch
+	       !
+               line_node = FIRST(reference_node);
+
+               ! Loop thru all line number branches building output lines
+	       ! and outputing them as we go.
+	       !
+               WHILE line_node<>NIL;
+                   CALL sys$fao('!3UL-!4UL  ',
+                       junk,next_reference,page_no,SUBSCRIPT(line_node));
+                   IF LENGTH(xref_line)>120
+                   THEN
+                       CALL output_line(xref_line);
+                       symbol_name = '';
+                       xref_line = symbol_name&'  '&next_reference;
+                   ELSE
+                       xref_line = xref_line&next_reference;
+                   END IF;
+                   line_node = NEXT(line_node);
+               END WHILE;
+               reference_node = NEXT(reference_node);
+           END WHILE;
+
+	   ! Do we have any residue that needs attention?
+	   !
+           IF LENGTH(xref_line)>LENGTH(symbol_name)+2
+           THEN
+               CALL output_line(xref_line);
+           END IF;
+           symbol_node = NEXT(symbol_node);
+       END WHILE;
+               
+
+   END PROCEDURE;
+   LIST PAGE;
+   PROCEDURE output_new_page;
+   
+       !++   
+       ! FUNCTIONAL DESCRIPTION:
+       !
+       !	This procedure forces a new page to the listing file.
+       !
+       ! FORMAL PARAMETERS:
+       !
+       !	None
+       !
+       ! RETURN VALUE:
+       !
+       !	None
+       !
+       ! IMPLICIT INPUTS:
+       !
+       !	source_name	- Name of source program being xref'ed
+       !	sbttl		- Listing subtitle
+       !
+       ! IMPLICIT OUTPUTS:
+       !
+       !	current_line	- Current listing line
+       !	current_page	- Current listing page
+       !
+       ! SIDE EFFECTS:
+       !
+       !	None
+       !
+       !--
+       
+       ! Update current page counter and output a new page heading
+       !
+       current_page = current_page+1;
+       WRITE file( output_file ) s'ff';
+       WRITE file( output_file ) module_name,TIME(),'  ',
+           program_ident,'Page ',current_page;
+       WRITE file( output_file ) sbttl,file_stuff;
+       WRITE file( output_file ) ' ';
+       current_line = 4;
+       
+   END PROCEDURE;
+       
+END MODULE;

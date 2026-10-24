@@ -28,3 +28,8 @@ function displayNames<T>(names:T[]): void {
 function display<T extends Person>(per: T): void {
     console.log(`${ per.firstName} ${per.lastName}` );
 }
+
+function genericWithKeyOf<T, K extends keyof T>(list: T[], field: K): T[] {}
+
+// https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-3.html#generic-parameter-defaults
+function genericParameterWithDefault<T = DefaultType>(field: T) {}

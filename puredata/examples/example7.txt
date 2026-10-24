@@ -1,0 +1,5 @@
+#N canvas 0 0 450 300 10;
+#X obj 50 50 loadbang;
+#X obj 50 100 s \$0-trigger;
+#X obj 150 100 r \$0-trigger;
+#X connect 0 0 1 0;

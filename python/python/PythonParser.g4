@@ -25,16 +25,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar PythonParser;
 
 // Insert here @header for C++ parser.
 
-options { tokenVocab=PythonLexer; superClass=PythonParserBase; }
+options {
+    tokenVocab = PythonLexer;
+    superClass = PythonParserBase;
+}
 
 root
-    : (single_input
-    | file_input
-    | eval_input)? EOF
+    : (single_input | file_input | eval_input)? EOF
     ;
 
 // A single interactive statement;
@@ -60,12 +64,12 @@ stmt
     ;
 
 compound_stmt
-    : IF cond=test COLON suite elif_clause* else_clause?                             #if_stmt
-    | WHILE test COLON suite else_clause?                                            #while_stmt
-    | ASYNC? FOR exprlist IN testlist COLON suite else_clause?                       #for_stmt
-    | TRY COLON suite (except_clause+ else_clause? finally_clause? | finally_clause) #try_stmt
-    | ASYNC? WITH with_item (COMMA with_item)* COLON suite                           #with_stmt
-    | decorator* (classdef | funcdef)                                                #class_or_func_def_stmt
+    : IF cond = test COLON suite elif_clause* else_clause?                           # if_stmt
+    | WHILE test COLON suite else_clause?                                            # while_stmt
+    | ASYNC? FOR exprlist IN testlist COLON suite else_clause?                       # for_stmt
+    | TRY COLON suite (except_clause+ else_clause? finally_clause? | finally_clause) # try_stmt
+    | ASYNC? WITH with_item (COMMA with_item)* COLON suite                           # with_stmt
+    | decorator* (classdef | funcdef)                                                # class_or_func_def_stmt
     ;
 
 suite
@@ -97,7 +101,12 @@ with_item
 // Python 2 : EXCEPT test COMMA name
 // Python 3 : EXCEPT test AS name
 except_clause
-    : EXCEPT (test ({this.CheckVersion(2)}? COMMA name {this.SetVersion(2);} | {this.CheckVersion(3)}? AS name {this.SetVersion(3);})?)? COLON suite
+    : EXCEPT (
+        test (
+            {this.CheckVersion(2)}? COMMA name {this.SetVersion(2);}
+            | {this.CheckVersion(3)}? AS name {this.SetVersion(3);}
+        )?
+    )? COLON suite
     ;
 
 classdef
@@ -144,23 +153,28 @@ simple_stmt
 // TODO 1: left part augmented assignment should be `test` only, no stars or lists
 // TODO 2: semantically annotated declaration is not an assignment
 small_stmt
-    : testlist_star_expr assign_part?                                                 #expr_stmt
-    | {this.CheckVersion(2)}? PRINT ((test (COMMA test)* COMMA?)
-                       | RIGHT_SHIFT test ((COMMA test)+ COMMA?)) {this.SetVersion(2);}    #print_stmt   // Python 2
-    | DEL exprlist                                                                    #del_stmt
-    | PASS                                                                            #pass_stmt
-    | BREAK                                                                           #break_stmt
-    | CONTINUE                                                                        #continue_stmt
-    | RETURN testlist?                                                                #return_stmt
-    | RAISE (test (COMMA test (COMMA test)?)?)? (FROM test)?                          #raise_stmt
-    | yield_expr                                                                      #yield_stmt
-    | IMPORT dotted_as_names                                                          #import_stmt
-    | FROM ((DOT | ELLIPSIS)* dotted_name | (DOT | ELLIPSIS)+)
-      IMPORT (STAR | OPEN_PAREN import_as_names CLOSE_PAREN | import_as_names)        #from_stmt
-    | GLOBAL name (COMMA name)*                                                       #global_stmt
-    | {this.CheckVersion(2)}? EXEC expr (IN test (COMMA test)?)? {this.SetVersion(2);}          #exec_stmt     // Python 2
-    | ASSERT test (COMMA test)?                                                       #assert_stmt
-    | {this.CheckVersion(3)}? NONLOCAL name (COMMA name)* {this.SetVersion(3);}                 #nonlocal_stmt // Python 3
+    : testlist_star_expr assign_part? # expr_stmt
+    | {this.CheckVersion(2)}? PRINT (
+        (test (COMMA test)* COMMA?)
+        | RIGHT_SHIFT test ((COMMA test)+ COMMA?)
+    ) {this.SetVersion(2);}                                  # print_stmt // Python 2
+    | DEL exprlist                                           # del_stmt
+    | PASS                                                   # pass_stmt
+    | BREAK                                                  # break_stmt
+    | CONTINUE                                               # continue_stmt
+    | RETURN testlist?                                       # return_stmt
+    | RAISE (test (COMMA test (COMMA test)?)?)? (FROM test)? # raise_stmt
+    | yield_expr                                             # yield_stmt
+    | IMPORT dotted_as_names                                 # import_stmt
+    | FROM ((DOT | ELLIPSIS)* dotted_name | (DOT | ELLIPSIS)+) IMPORT (
+        STAR
+        | OPEN_PAREN import_as_names CLOSE_PAREN
+        | import_as_names
+    )                                                                                  # from_stmt
+    | GLOBAL name (COMMA name)*                                                        # global_stmt
+    | {this.CheckVersion(2)}? EXEC expr (IN test (COMMA test)?)? {this.SetVersion(2);} # exec_stmt // Python 2
+    | ASSERT test (COMMA test)?                                                        # assert_stmt
+    | {this.CheckVersion(3)}? NONLOCAL name (COMMA name)* {this.SetVersion(3);}        # nonlocal_stmt // Python 3
     ;
 
 testlist_star_expr
@@ -174,24 +188,23 @@ star_expr
 
 assign_part
     // if left expression in assign is bool literal, it's mean that is Python 2 here
-    : ASSIGN ( testlist_star_expr (ASSIGN testlist_star_expr)* (ASSIGN yield_expr)?
-             | yield_expr)
+    : ASSIGN (testlist_star_expr (ASSIGN testlist_star_expr)* (ASSIGN yield_expr)? | yield_expr)
     | {this.CheckVersion(3)}? COLON test (ASSIGN testlist)? {this.SetVersion(3);} // annassign Python3 rule
-    | op=( ADD_ASSIGN
-         | SUB_ASSIGN
-         | MULT_ASSIGN
-         | AT_ASSIGN
-         | DIV_ASSIGN
-         | MOD_ASSIGN
-         | AND_ASSIGN
-         | OR_ASSIGN
-         | XOR_ASSIGN
-         | LEFT_SHIFT_ASSIGN
-         | RIGHT_SHIFT_ASSIGN
-         | POWER_ASSIGN
-         | IDIV_ASSIGN
-         )
-      (yield_expr | testlist)
+    | op = (
+        ADD_ASSIGN
+        | SUB_ASSIGN
+        | MULT_ASSIGN
+        | AT_ASSIGN
+        | DIV_ASSIGN
+        | MOD_ASSIGN
+        | AND_ASSIGN
+        | OR_ASSIGN
+        | XOR_ASSIGN
+        | LEFT_SHIFT_ASSIGN
+        | RIGHT_SHIFT_ASSIGN
+        | POWER_ASSIGN
+        | IDIV_ASSIGN
+    ) (yield_expr | testlist)
     ;
 
 exprlist
@@ -230,7 +243,10 @@ test
 
 // the same as `typedargslist`, but with no types
 varargslist
-    : (vardef_parameters COMMA)? (varargs (COMMA vardef_parameters)? (COMMA varkwargs)? | varkwargs) COMMA?
+    : (vardef_parameters COMMA)? (
+        varargs (COMMA vardef_parameters)? (COMMA varkwargs)?
+        | varkwargs
+    ) COMMA?
     | vardef_parameters COMMA?
     ;
 
@@ -255,25 +271,35 @@ varkwargs
 logical_test
     : comparison
     | NOT logical_test
-    | logical_test op=AND logical_test
-    | logical_test op=OR logical_test
+    | logical_test op = AND logical_test
+    | logical_test op = OR logical_test
     ;
 
 comparison
-    : comparison (LESS_THAN | GREATER_THAN | EQUALS | GT_EQ | LT_EQ | NOT_EQ_1 | NOT_EQ_2 | optional=NOT? IN | IS optional=NOT?) comparison
+    : comparison (
+        LESS_THAN
+        | GREATER_THAN
+        | EQUALS
+        | GT_EQ
+        | LT_EQ
+        | NOT_EQ_1
+        | NOT_EQ_2
+        | optional = NOT? IN
+        | IS optional = NOT?
+    ) comparison
     | expr
     ;
 
 expr
     : AWAIT? atom trailer*
-    | <assoc=right> expr op=POWER expr
-    | op=(ADD | MINUS | NOT_OP) expr
-    | expr op=(STAR | DIV | MOD | IDIV | AT) expr
-    | expr op=(ADD | MINUS) expr
-    | expr op=(LEFT_SHIFT | RIGHT_SHIFT) expr
-    | expr op=AND_OP expr
-    | expr op=XOR expr
-    | expr op=OR_OP expr
+    | <assoc = right> expr op = POWER expr
+    | op = (ADD | MINUS | NOT_OP) expr
+    | expr op = (STAR | DIV | MOD | IDIV | AT) expr
+    | expr op = (ADD | MINUS) expr
+    | expr op = (LEFT_SHIFT | RIGHT_SHIFT) expr
+    | expr op = AND_OP expr
+    | expr op = XOR expr
+    | expr op = OR_OP expr
     ;
 
 atom

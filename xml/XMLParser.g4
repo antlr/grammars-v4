@@ -27,28 +27,52 @@
 */
 
 /** XML parser derived from ANTLR v4 ref guide book example */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar XMLParser;
 
-options { tokenVocab=XMLLexer; }
+options {
+    tokenVocab = XMLLexer;
+}
 
-document    :   prolog? misc* element misc* EOF ;
+document
+    : prolog? misc* element misc* EOF
+    ;
 
-prolog      :   XMLDeclOpen attribute* SPECIAL_CLOSE ;
+prolog
+    : XMLDeclOpen attribute* SPECIAL_CLOSE
+    ;
 
-content     :   chardata?
-                ((element | reference | CDATA | PI | COMMENT) chardata?)* ;
+content
+    : chardata? ((element | reference | CDATA | PI | COMMENT) chardata?)*
+    ;
 
-element     :   '<' Name attribute* '>' content '<' '/' Name '>'
-            |   '<' Name attribute* '/>'
-            ;
+element
+    : '<' Name attribute* '>' content '<' '/' Name '>'
+    | '<' Name attribute* '/>'
+    ;
 
-reference   :   EntityRef | CharRef ;
+reference
+    : EntityRef
+    | CharRef
+    ;
 
-attribute   :   Name '=' STRING ; // Our STRING is AttValue in spec
+attribute
+    : Name '=' STRING
+    ; // Our STRING is AttValue in spec
 
 /** ``All text that is not markup constitutes the character data of
  *  the document.''
  */
-chardata    :   TEXT | SEA_WS ;
+chardata
+    : TEXT
+    | SEA_WS
+    ;
 
-misc        :   COMMENT | PI | SEA_WS ;
+misc
+    : COMMENT
+    | PI
+    | SEA_WS
+    ;

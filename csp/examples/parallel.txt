@@ -1,0 +1,5 @@
+-- Two processes composed in parallel, defined separately and then
+-- combined, with a sequential composition thrown in afterwards.
+Left = up -> SKIP
+Right = down -> SKIP
+Both = (Left || Right) ; done -> STOP

@@ -1,0 +1,231 @@
+-- BC70008.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that the actual corresponding to a generic formal package
+--      must be an instance of the template for the formal package. Check
+--      for the case where the formal package is declared in a library-
+--      level generic subprogram. Check for the case where the actuals have
+--      been renamed.
+--
+--      Check that a generic renaming declaration which renames the template
+--      may be used in instantiations of the template.
+--
+-- TEST DESCRIPTION:
+--      The template for a formal package is the generic_package_name
+--      in a formal_package_declaration:
+--
+--      formal_package_declaration ::=
+--       with package ID is new generic_package_name formal_package_actual_part
+--                              ^^^^^^^^^^^^^^^^^^^^
+--                                   template
+--
+--      Declare a library-level generic subprogram which declares a formal
+--      package with (<>) as its actual part. Declare various instances
+--      of the template for the formal package, rename them, and verify that
+--      the renaming entities may be passed as actuals in instantiations of
+--      the library-level generic subprogram. Use a rename of the template
+--      package in each of these instantiations. Attempt to pass other renaming
+--      entities as actuals in instantiations of the library-level subprogram:
+--
+--         - A rename of the template for the formal package.
+--         - A rename of an instance of a generic package which is identical
+--           to the template.
+--         - A rename of a generic subprogram.
+--         - A rename of a non-generic package similar to an instance of the
+--           template.
+--
+--      Each of these latter entities are illegal.
+--
+--
+-- CHANGE HISTORY:
+--      06 Dec 94   SAIC    ACVC 2.0
+--
+--!
+
+generic                                                -- Generic package which
+   type Element_Type is private;                       -- serves as template
+package BC70008_0 is                                   -- for formal package.
+   Object : Element_Type;
+end BC70008_0;
+
+
+     --==================================================================--
+
+
+with BC70008_0;
+generic                                                -- Generic procedure
+   with package Formal_Package is new BC70008_0 (<>);  -- which declares a
+procedure BC70008_1;                                   -- formal package.
+
+
+     --==================================================================--
+
+
+procedure BC70008_1 is
+   An_Element : Formal_Package.Element_Type;
+begin
+   null;
+end BC70008_1;
+
+
+     --==================================================================--
+
+
+generic                                                -- Generic subprogram.
+   type Element_Type is private;
+procedure BC70008_2;
+
+
+     --==================================================================--
+
+
+procedure BC70008_2 is
+   Object : Element_Type;
+begin
+   null;
+end BC70008_2;
+
+
+     --==================================================================--
+
+
+generic                                                -- Generic package
+   type Element_Type is private;                       -- which is identical
+package BC70008_3 is                                   -- to the template
+   Object : Element_Type;                              -- package.
+end BC70008_3;
+
+
+     --==================================================================--
+
+
+package BC70008_4 is                                   -- Non-generic package
+   type Element_Type is record                         -- similar in structure
+      Component : String (1 .. 6);                     -- to an instantiation
+   end record;                                         -- of the template
+                                                       -- package for a record
+   Object : Element_Type;                              -- type.
+end BC70008_4;
+
+
+     --==================================================================--
+
+
+-- Library-level renaming declaration.
+
+with BC70008_4;
+package BC70008_Rename_4 renames BC70008_4;
+
+
+     --==================================================================--
+
+
+with BC70008_0;         -- Template for formal package.
+with BC70008_1;         -- Generic subprogram which declares formal package.
+with BC70008_2;         -- Generic package.
+with BC70008_3;         -- Generic package identical to template.
+with BC70008_Rename_4;  -- Renamed non-generic package.
+
+procedure BC70008 is
+
+   type Enum_Type    is (One, Two, Three);
+   type Integer_Type is range -10 .. 10;
+   type Float_Type   is digits 1;
+   type Fixed_Type   is delta 0.125 range 0.0 .. 255.0;
+   type Array_Type   is array (Integer_Type range 0 .. 7) of Natural;
+
+   type Record_Type is record
+      Component : String (1 .. 6);
+   end record;
+
+
+   procedure Generic_Subprogram is new BC70008_2 (Enum_Type);
+   procedure Gen_But_Not_Pack renames Generic_Subprogram;  -- Renaming decl.
+
+   package Identical_Instance is new BC70008_3 (Record_Type);
+   package Inst_Of_Identical renames Identical_Instance;   -- Renaming decl.
+
+   generic package Template_Rename renames BC70008_0;      -- Renaming decl.
+
+
+   package Enum_L is new Template_Rename (Enum_Type);
+   package Char_L is new BC70008_0       (Character);
+   package Bool_L is new Template_Rename (Boolean);
+   package Int_L  is new BC70008_0       (Integer_Type);
+   package Flt_L  is new BC70008_0       (Float_Type);
+   package Fix_L  is new Template_Rename (Fixed_Type);
+   package Arr_L  is new Template_Rename (Array_Type);
+   package Rec_L  is new BC70008_0       (Record_Type);
+
+
+-- Renaming declarations:
+
+   package Enum_List renames Enum_L;
+   package Char_List renames Char_L;
+   package Bool_List renames Bool_L;
+   package Int_List  renames Int_L;
+   package Flt_List  renames Flt_L;
+   package Fix_List  renames Fix_L;
+   package Arr_List  renames Arr_L;
+   package Rec_List  renames Rec_L;
+
+-- Begin legal instantiations: ---------------------------
+
+   -- Check that if the formal package actual part is (<>),
+   -- the actual corresponding to a generic formal package
+   -- may be any instance of the generic named in the
+   -- formal package declaration.
+
+   procedure Enum_Check is new BC70008_1 (Enum_List);                 -- OK.
+   procedure Char_Check is new BC70008_1 (Char_List);                 -- OK.
+   procedure Bool_Check is new BC70008_1 (Bool_List);                 -- OK.
+   procedure Int_Check  is new BC70008_1 (Int_List);                  -- OK.
+   procedure Flt_Check  is new BC70008_1 (Flt_List);                  -- OK.
+   procedure Fix_Check  is new BC70008_1 (Fix_List);                  -- OK.
+   procedure Arr_Check  is new BC70008_1 (Arr_List);                  -- OK.
+   procedure Rec_Check  is new BC70008_1 (Rec_List);                  -- OK.
+
+-- End legal instantiations. -----------------------------
+
+-- Begin illegal instantiations: -------------------------
+
+   procedure Template      is new BC70008_1 (Template_Rename);        -- ERROR:
+                                      -- Actual is not an instance of template.
+
+   procedure Wrong_Package is new BC70008_1 (Inst_Of_Identical);      -- ERROR:
+                                      -- Actual is not an instance of template.
+
+   procedure Not_Package   is new BC70008_1 (Gen_But_Not_Pack);       -- ERROR:
+                                      -- Actual is not an instance of template.
+
+   procedure Not_Generic   is new BC70008_1 (BC70008_Rename_4);       -- ERROR:
+                                      -- Actual is not an instance of template.
+
+-- End illegal instantiations. ---------------------------
+
+begin
+   null;
+end BC70008;

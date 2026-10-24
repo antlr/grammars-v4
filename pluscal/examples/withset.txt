@@ -1,0 +1,9 @@
+--algorithm WithSet {
+  variables total = 0;
+  {
+    with (n \in {1, 2, 3}) {
+      total := total + n;
+    };
+    print total;
+  }
+}

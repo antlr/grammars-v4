@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>pdp7</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com pdp7 grammar</name>
+	<name>ASM pdp7 grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>asmparent</artifactId>
@@ -40,7 +40,6 @@
 					<showTree>false</showTree>
 					<entryPoint>prog</entryPoint>
 					<grammarName>pdp7</grammarName>
-					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
 				<executions>

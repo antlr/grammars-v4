@@ -1,0 +1,17 @@
+"   example3 -- addressing and arithmetic
+    name    example3
+    link    prds_link,prds$+0
+
+start:
+    szn     bp|apte.lock            "ASSUME bp locked
+    cmpq    bb|priority_sched_inc   "see if process has been asleep too long
+    eax2    bp|0                    "fp = entry waking up
+    ldx4    -1,du                   "put all-seven into RX4
+    lcq     1,dl                    "ok to decrement
+    asq     bb|apte.ittes_sent,3
+    tze     0,7                     "return if not in a list
+    ldx0    bb|itt_entry.next_itt_relp,1
+    desc9a  bp|0,size_of_apt_entry*4
+    lda     =o400000,du             "get wakeup bit
+    ldaq    =v18/6,18/4,18/6,18/0
+    equ     pi_timeout_mess_words,*-pi_timeout_mess

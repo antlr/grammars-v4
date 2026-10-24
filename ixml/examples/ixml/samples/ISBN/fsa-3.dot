@@ -1,0 +1,16 @@
+digraph divisible_by_3 {
+   start [peripheries=0];
+   0 [peripheries=2]; 1; 2;
+   start -> 0;
+   0 -> 0 [label="0, 3, 6, 9"];
+   0 -> 1 [label="1, 4, 7"];
+   0 -> 2 [label="2, 5, 8"];
+
+   1 -> 1 [label="0, 3, 6, 9"];
+   1 -> 2 [label="1, 4, 7"];
+   1 -> 0 [label="2, 5, 8"];
+
+   2 -> 2 [label="0, 3, 6, 9"];
+   2 -> 0 [label="1, 4, 7"];
+   2 -> 1 [label="2, 5, 8"];
+}

@@ -1,0 +1,6 @@
+MAIN: PROCEDURE OPTIONS(MAIN);
+    DECLARE I FIXED;
+    DO I = 1 TO 10 BY 2;
+        PUT LIST(I);
+    END;
+END;
