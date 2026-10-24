@@ -1,0 +1,10 @@
+FOR t IN observations
+    WINDOW t.val WITH { preceding: 10, following: 5 }
+    AGGREGATE rollingAverage = AVG(t.val), rollingSum = SUM(t.val)
+    RETURN {
+      time: t.time,
+      subject: t.subject,
+      val: t.val,
+      rollingAverage,
+      rollingSum
+    }

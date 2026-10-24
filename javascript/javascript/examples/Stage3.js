@@ -13,5 +13,3 @@ class CF {
 }
 
 var a = b??c;
-var d = e?.f?.g;
-var h = i?.j();

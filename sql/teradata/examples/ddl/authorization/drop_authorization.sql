@@ -1,0 +1,1 @@
+DROP AUTHORIZATION auth_cloud;

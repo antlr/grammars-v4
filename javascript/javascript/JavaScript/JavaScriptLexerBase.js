@@ -9,6 +9,8 @@ export default class JavaScriptLexerBase extends antlr4.Lexer {
         this.lastToken = null;
         this.useStrictDefault = false;
         this.useStrictCurrent = false;
+        this.currentDepth = 0;
+        this.templateDepthStack = new Array();
     }
 
     getStrictDefault() {
@@ -24,12 +26,16 @@ export default class JavaScriptLexerBase extends antlr4.Lexer {
         return this.useStrictCurrent;
     }
 
+    IsInTemplateString() {
+        return this.templateDepthStack.length > 0 && this.templateDepthStack[this.templateDepthStack.length - 1] === this.currentDepth;
+    }
+
     getCurrentToken() {
-        return nextToken.call(this);
+        return this.nextToken();
     }
 
     nextToken() {
-        var next = super.nextToken.call(this);
+        var next = super.nextToken();
 
         if (next.channel === antlr4.Token.DEFAULT_CHANNEL) {
             this.lastToken = next;
@@ -38,8 +44,9 @@ export default class JavaScriptLexerBase extends antlr4.Lexer {
     }
 
     ProcessOpenBrace() {
+        this.currentDepth++;
         this.useStrictCurrent =
-            this.scopeStrictModes.length > 0 && this.scopeStrictModes[0]
+            this.scopeStrictModes.length > 0 && this.scopeStrictModes[this.scopeStrictModes.length - 1]
                 ? true
                 : this.useStrictDefault;
         this.scopeStrictModes.push(this.useStrictCurrent);
@@ -50,16 +57,13 @@ export default class JavaScriptLexerBase extends antlr4.Lexer {
             this.scopeStrictModes.length > 0
                 ? this.scopeStrictModes.pop()
                 : this.useStrictDefault;
+        this.currentDepth--;
     }
 
     ProcessStringLiteral() {
-        if (
-            this.lastToken !== undefined &&
-            (this.lastToken === null ||
-                this.lastToken.type === JavaScriptLexer.OpenBrace)
-        ) {
-            const text = this._input.strdata.slice(0, "use strict".length);
-            if (text === '"use strict"' || text === "'use strict'") {
+        if (this.lastToken === null ||
+                this.lastToken.type === JavaScriptLexer.OpenBrace) {
+            if (super.text === '"use strict"' || super.text === "'use strict'") {
                 if (this.scopeStrictModes.length > 0) {
                     this.scopeStrictModes.pop();
                 }
@@ -67,6 +71,16 @@ export default class JavaScriptLexerBase extends antlr4.Lexer {
                 this.scopeStrictModes.push(this.useStrictCurrent);
             }
         }
+    }
+
+    ProcessTemplateOpenBrace() {
+        this.currentDepth++;
+        this.templateDepthStack.push(this.currentDepth);
+    }
+
+    ProcessTemplateCloseBrace() {
+        this.templateDepthStack.pop();
+        this.currentDepth--;
     }
 
     IsRegexPossible() {
@@ -95,5 +109,15 @@ export default class JavaScriptLexerBase extends antlr4.Lexer {
 
     IsStartOfFile() {
         return this.lastToken === null;
+    }
+
+    reset() {
+        this.scopeStrictModes = new Array();
+        this.lastToken = null;
+        this.useStrictDefault = false;
+        this.useStrictCurrent = false;
+        this.currentDepth = 0;
+        this.templateDepthStack = new Array();
+        super.reset();
     }
 }

@@ -1,0 +1,1 @@
+index=web sourcetype=/var/log | join type=inner user [ search index=users ]

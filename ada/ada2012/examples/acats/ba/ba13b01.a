@@ -1,0 +1,216 @@
+-- BA13B01.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that a separate subprogram declared in a private child unit 
+--      of a public parent does not have visibility into the private part 
+--      of the package on which its parent depends or the private part of 
+--      its parent's public sibling.
+--
+-- TEST DESCRIPTION:
+--      Declare a public parent package.  Declare a public child package
+--      with a private part.  Declare a procedure as a subunit in a private
+--      child package.  Verify that all cases in which a subunit tries to 
+--      access the private parts are illegal.
+--
+-- TEST FILES:
+--      The following files comprise this test:
+--
+--      FA13B00.A
+--      BA13B01.A
+--
+--
+-- CHANGE HISTORY:
+--      06 Dec 94   SAIC    ACVC 2.0
+--      27 Nov 95   SAIC    Update and repair for ACVC 2.0.1
+--
+--!
+
+-- Public parent.
+
+package BA13B01_0 is                      
+
+   type Parent_Integer is range 21 .. 50;
+
+   type Parent_Color is (White, Black, Red);
+
+   -- Other type definitions in real application.
+
+end BA13B01_0;
+
+-- No bodies provided for BA13B01_0.
+
+     --==================================================================--
+
+-- Public child package.
+
+package BA13B01_0.BA13B01_1 is
+
+   type Child_Record is private;
+
+   type Child_Vis_Tagged is tagged 
+      record
+         PI : Parent_Integer;
+      end record;
+
+   type Child_Vis_Ext is new Child_Vis_Tagged with 
+      record
+         CR : Child_Record;
+      end record;
+
+   function Assign_Color (C : Parent_Color) 
+     return Child_Vis_Ext;
+
+   type Child_Pri_Ext is new Child_Vis_Tagged with private;
+
+   type Child_Private is private;
+
+private
+
+   type Child_Record is 
+      record
+         VC : Parent_Color;
+      end record;
+
+   type Child_Pri_Ext is new Child_Vis_Tagged with
+      record
+         VI : Parent_Integer;
+      end record;
+
+   type Child_Private is 
+      record
+         VI : Parent_Integer;
+      end record;
+
+   function Assign_Integer (I : Parent_Integer)
+     return Child_Private;
+
+end BA13B01_0.BA13B01_1;
+
+     --==================================================================--
+
+package body BA13B01_0.BA13B01_1 is
+
+   function Assign_Color (C : Parent_Color) 
+     return Child_Vis_Ext is
+     CE : Child_Vis_Ext := (CR => (VC => C), PI => 24);
+   begin
+     return CE;
+   end Assign_Color;
+
+   -------------------------------------------------------
+
+   function Assign_Integer (I : Parent_Integer)
+     return Child_Private is
+     CE : Child_Private := (VI => I);
+   begin
+     return CE;
+   end Assign_Integer;
+
+end BA13B01_0.BA13B01_1;
+
+     --==================================================================--
+
+-- Private child package.
+
+private package BA13B01_0.BA13B01_2 is
+
+   procedure Private_Child_Pro;
+
+   -- Other type definitions in real application.
+
+end BA13B01_0.BA13B01_2;
+
+     --==================================================================--
+
+-- Context clauses required for visibility needed by separate subunit.
+
+with FA13B00_0;
+
+with BA13B01_0.BA13B01_1;
+
+package body BA13B01_0.BA13B01_2 is
+
+   procedure Private_Child_Pro is separate;
+
+end BA13B01_0.BA13B01_2;
+
+     --==================================================================--
+
+separate (BA13B01_0.BA13B01_2)
+
+procedure Private_Child_Pro is
+
+   Child_Var1 : FA13B00_0.Visible_Integer                            -- OK.
+              := FA13B00_0.Visible_Num;   
+
+   Child_Var2 : FA13B00_0.Visible_Integer                             
+              := FA13B00_0.Private_Num;                              -- ERROR:
+                             -- private var. of package with'ed by the subunit 
+                             -- parent's body
+
+   Child_Var3 : FA13B00_0.Private_Record                             
+              := (VI => 3);                                          -- ERROR:
+                             -- private record component of package with'ed by 
+                             -- the subunit parent's body
+
+   Child_Var4 : FA13B00_0.Private_Tagged;                            -- OK.
+
+   Child_Var5 : FA13B00_0.Private_Tagged
+              := FA13B00_0.Assign_Private_Tagged                     
+                    (Child_Var4.VI);                                 -- ERROR:
+                             -- private record component of package with'ed by
+                             -- the subunit parent's body
+
+   Child_Var6 : FA13B00_0.Visible_Tagged;                            -- OK.
+
+   Child_Var7 : FA13B00_0.Visible_Tagged   
+              := FA13B00_0.Assign_Visible_Tagged
+                    (Child_Var6.PR.VI);                              -- ERROR:
+                             -- private record component of package with'ed by
+                             -- the subunit parent's body
+
+   -------------------------------------------------------------------------
+
+   Child_Var8 :  BA13B01_0.BA13B01_1.Child_Pri_Ext;                  -- OK.
+
+   Child_Var9 :  BA13B01_0.BA13B01_1.Child_Private
+              := BA13B01_0.BA13B01_1.Assign_Integer (Child_Var8.PI); -- ERROR:
+                             -- private subprogram from public sibling of the
+                             -- subunit parent's body
+                                                          
+   Child_Var10 : BA13B01_0.BA13B01_1.Child_Vis_Ext;                  -- OK.
+
+   Child_Var11 : BA13B01_0.BA13B01_1.Child_Vis_Ext                 
+               := BA13B01_0.BA13B01_1.Assign_Color 
+                    (Child_Var10.CR.VC);                             -- ERROR:
+                             -- private record component from public sibling 
+                             -- of the subunit parent's body
+
+begin
+   Child_Var1 := 5;        
+   -- Real body of procedure goes here.
+
+end Private_Child_Pro;

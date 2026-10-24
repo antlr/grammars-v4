@@ -39,7 +39,7 @@ public abstract class JavaScriptParserBase extends Parser
     }
 
     protected boolean notLineTerminator() {
-        return !here(JavaScriptParser.LineTerminator);
+        return !lineTerminatorAhead();
     }
 
     protected boolean notOpenBraceAndNotFunction() {
@@ -49,30 +49,6 @@ public abstract class JavaScriptParserBase extends Parser
 
     protected boolean closeBrace() {
         return _input.LT(1).getType() == JavaScriptParser.CloseBrace;
-    }
-
-    /**
-     * Returns {@code true} iff on the current index of the parser's
-     * token stream a token of the given {@code type} exists on the
-     * {@code HIDDEN} channel.
-     *
-     * @param type
-     *         the type of the token on the {@code HIDDEN} channel
-     *         to check.
-     *
-     * @return {@code true} iff on the current index of the parser's
-     * token stream a token of the given {@code type} exists on the
-     * {@code HIDDEN} channel.
-     */
-    private boolean here(final int type) {
-
-        // Get the token ahead of the current index.
-        int possibleIndexEosToken = this.getCurrentToken().getTokenIndex() - 1;
-        Token ahead = _input.get(possibleIndexEosToken);
-
-        // Check if the token resides on the HIDDEN channel and if it's of the
-        // provided type.
-        return (ahead.getChannel() == Lexer.HIDDEN) && (ahead.getType() == type);
     }
 
     /**
@@ -90,6 +66,7 @@ public abstract class JavaScriptParserBase extends Parser
 
         // Get the token ahead of the current index.
         int possibleIndexEosToken = this.getCurrentToken().getTokenIndex() - 1;
+        if (possibleIndexEosToken < 0) return false;
         Token ahead = _input.get(possibleIndexEosToken);
 
         if (ahead.getChannel() != Lexer.HIDDEN) {
@@ -105,6 +82,7 @@ public abstract class JavaScriptParserBase extends Parser
         if (ahead.getType() == JavaScriptParser.WhiteSpaces) {
             // Get the token ahead of the current whitespaces.
             possibleIndexEosToken = this.getCurrentToken().getTokenIndex() - 2;
+            if (possibleIndexEosToken < 0) return false;
             ahead = _input.get(possibleIndexEosToken);
         }
 

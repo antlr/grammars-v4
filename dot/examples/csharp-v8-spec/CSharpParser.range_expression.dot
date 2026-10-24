@@ -1,0 +1,36 @@
+digraph ATN {
+rankdir=LR;
+s271[fontsize=11, label="271", shape=doublecircle, fixedsize=true, width=.6];
+s270[fontsize=11,label="270", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1842[fontsize=11,label="1842", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1843[fontsize=11,label="1843", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1844[fontsize=11,label="1844", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1845[fontsize=11,label="{&rarr;\n1845\nd=139|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1846[fontsize=11,label="&larr;\n1846", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1847[fontsize=11,label="{&rarr;\n1847\nd=140|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1848[fontsize=11,label="&larr;\n1848", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1849[fontsize=11,label="1849", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1850[fontsize=11,label="1850", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1851[fontsize=11,label="{&rarr;\n1851\nd=141|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1852[fontsize=11,label="&larr;\n1852", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1853[fontsize=11,label="{&rarr;\n1853\nd=142|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1854[fontsize=11,label="&larr;\n1854", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s270 -> s1853 [fontname="Times-Italic", label="&epsilon;"];
+s1853:p0 -> s1842 [fontname="Times-Italic", label="&epsilon;"];
+s1853:p1 -> s1849 [fontname="Times-Italic", label="&epsilon;"];
+s1842 -> s1847 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<unary_expression>", arrowhead = normal];
+s1849 -> s1851 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'..'", arrowhead = normal];
+s1847:p0 -> s1843 [fontname="Times-Italic", label="&epsilon;"];
+s1847:p1 -> s1848 [fontname="Times-Italic", label="&epsilon;"];
+s1851:p0 -> s1850 [fontname="Times-Italic", label="&epsilon;"];
+s1851:p1 -> s1852 [fontname="Times-Italic", label="&epsilon;"];
+s1843 -> s1845 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'..'", arrowhead = normal];
+s1848 -> s1854 [fontname="Times-Italic", label="&epsilon;"];
+s1850 -> s1852 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<unary_expression>", arrowhead = normal];
+s1852 -> s1854 [fontname="Times-Italic", label="&epsilon;"];
+s1845:p0 -> s1844 [fontname="Times-Italic", label="&epsilon;"];
+s1845:p1 -> s1846 [fontname="Times-Italic", label="&epsilon;"];
+s1854 -> s271 [fontname="Times-Italic", label="&epsilon;"];
+s1844 -> s1846 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<unary_expression>", arrowhead = normal];
+s1846 -> s1848 [fontname="Times-Italic", label="&epsilon;"];
+}

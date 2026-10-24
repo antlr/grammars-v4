@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>bcpl</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com BCPL grammar</name>
+	<name>BCPL grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>
@@ -18,7 +18,8 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
-					   <include>bcpl.g4</include>
+					   <include>bcplParser.g4</include>
+					   <include>bcplLexer.g4</include>
 					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>

@@ -10,3 +10,7 @@ It was written by my teamwork (Hugo Garza and Joaqu?n Moreno) and me (Miguel Uga
 for a computational theory class project.
 We all attend Monterrey Tech in Cuernavaca.
 We will appreciate so much your feedback at A00378918@itesm.mx
+
+## Reference
+* [pldb](http://pldb.info/concepts/masm)
+

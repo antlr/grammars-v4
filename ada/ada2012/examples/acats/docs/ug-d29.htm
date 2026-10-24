@@ -1,0 +1,112 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>Direct Files (Non-supported Features)</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    DIV.Indented2 {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 4.0em; margin-bottom: 0.6em}
+    DIV.WideAbove {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-top: 0.6em; margin-bottom: 0.6em}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-D28.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-D2A.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>D.2.9 Direct Files (Non-supported Features)</H1>
+<div class="Normal" style="margin-bottom: 0.4em">If <TT>Use_Error</TT> 
+or <TT>Name_Error</TT> is raised by every attempt to create or open a 
+direct access file (this is appropriate behavior for an implementation 
+which does not support direct access files), then the tests contained 
+in the following files should report NOT_APPLICABLE:</div>
+<div class="Indented2"><table width="70%">
+<TR><TD align="left">CE2102B.ADA<TD align="left">CE2104D.ADA<TD align="left">CE2401F.ADA<TD align="left">CE2408A.ADA<TD align="left">
+<TR><TD align="left">CE2102H.TST<TD align="left">CE2106B.ADA<TD align="left">CE2401H.ADA<TD align="left">CE2408B.ADA<TD align="left">
+<TR><TD align="left">CE2102K.ADA<TD align="left">CE2108G.ADA<TD align="left">CE2401I.ADA<TD align="left">CE2409A.ADA<TD align="left">
+<TR><TD align="left">CE2102R.ADA<TD align="left">CE2108H.ADA<TD align="left">CE2401J.ADA<TD align="left">CE2409B.ADA<TD align="left">
+<TR><TD align="left">CE2102S.ADA<TD align="left">CE2109B.ADA<TD align="left">CE2401K.ADA<TD align="left">CE2410A.ADA<TD align="left">
+<TR><TD align="left">CE2102T.ADA<TD align="left">CE2110C.ADA<TD align="left">CE2401L.ADA<TD align="left">CE2410B.ADA<TD align="left">
+<TR><TD align="left">CE2102U.ADA<TD align="left">CE2111B.ADA<TD align="left">CE2403A.TST<TD align="left">CE2411A.ADA<TD align="left">
+<TR><TD align="left">CE2102V.ADA<TD align="left">CE2111E.ADA<TD align="left">CE2404A.ADA<TD align="left">CXA8003.A<TD align="left">
+<TR><TD align="left">CE2102W.ADA<TD align="left">CE2111G.ADA<TD align="left">CE2404B.ADA<TD align="left">CXA9001.A<TD align="left">
+<TR><TD align="left">CE2102Y.ADA<TD align="left">CE2401A.ADA<TD align="left">CE2405B.ADA<TD align="left">CXA9002.A <TD align="left">
+<TR><TD align="left">CE2103B.TST<TD align="left">CE2401B.ADA<TD align="left">CE2406A.ADA<TD align="left">&nbsp;<TD align="left">
+<TR><TD align="left">CE2103D.ADA<TD align="left">CE2401C.ADA<TD align="left">CE2407A.ADA<TD align="left">&nbsp;<TD align="left">
+<TR><TD align="left">CE2104C.ADA<TD align="left">CE2401E.ADA<TD align="left">CE2407B.ADA<TD align="left">&nbsp;<TD align="left">
+</table></div>
+<div class="WideAbove" style="margin-bottom: 0.4em">If <TT>Use_Error</TT> 
+or <TT>Name_Error</TT> is raised by every attempt to create or open a 
+direct access file with mode <TT>In_File</TT>, then the tests contained 
+in the following files should report NOT_APPLICABLE:&nbsp;</div>
+<div class="Indented2"><table width="70%">
+<TR><TD align="left">CE2102K.ADA<TD align="left">CE2111B.ADA<TD align="left">CE2401E.ADA<TD align="left">CE2406A.ADA<TD align="left">
+<TR><TD align="left">CE2102U.ADA<TD align="left">CE2111E.ADA<TD align="left">CE2401F.ADA<TD align="left">CE2407A.ADA<TD align="left">
+<TR><TD align="left">CE2104C.ADA<TD align="left">CE2401A.ADA<TD align="left">CE2401H.ADA<TD align="left">CE2411A.ADA <TD align="left">
+<TR><TD align="left">CE2104D.ADA<TD align="left">CE2401B.ADA<TD align="left">CE2401I.ADA<TD align="left">&nbsp;<TD align="left">
+<TR><TD align="left">CE2108H.ADA<TD align="left">CE2401C.ADA<TD align="left">CE2405B.ADA<TD align="left">&nbsp;<TD align="left">
+</table></div>
+<div class="WideAbove" style="margin-bottom: 0.4em">If <TT>Use_Error</TT> 
+or <TT>Name_Error</TT> is raised by every attempt to create or open a 
+direct access file with mode <TT>Out_File</TT>, then the tests contained 
+in the following files should report NOT_APPLICABLE:&nbsp;</div>
+<div class="Indented2"><table width="70%">
+<TR><TD align="left">CE2102B.ADA<TD align="left">CE2104D.ADA<TD align="left">CE2404A.ADA<TD align="left">CE2410B.ADA<TD align="left">
+<TR><TD align="left">CE2102K.ADA<TD align="left">CE2106B.ADA<TD align="left">CE2404B.ADA<TD align="left">CE2411A.ADA<TD align="left">
+<TR><TD align="left">CE2102R.ADA<TD align="left">CE2108G.ADA<TD align="left">CE2405B.ADA<TD align="left">CXA8003.A<TD align="left">
+<TR><TD align="left">CE2102W.ADA<TD align="left">CE2108H.ADA<TD align="left">CE2407A.ADA<TD align="left">CXA9001.A<TD align="left">
+<TR><TD align="left">CE2102Y.ADA<TD align="left">CE2110C.ADA<TD align="left">CE2407B.ADA<TD align="left">CXA9002.A <TD align="left">
+<TR><TD align="left">CE2103B.TST<TD align="left">CE2111B.ADA<TD align="left">CE2408A.ADA<TD align="left">&nbsp;<TD align="left">
+<TR><TD align="left">CE2103D.ADA<TD align="left">CE2111E.ADA<TD align="left">CE2409B.ADA<TD align="left">&nbsp;<TD align="left">
+<TR><TD align="left">CE2104C.ADA<TD align="left">CE2403A.TST<TD align="left">CE2410A.ADA<TD align="left">&nbsp;<TD align="left">
+</table></div>
+<div class="WideAbove" style="margin-bottom: 0.4em">If <TT>Use_Error</TT> 
+or <TT>Name_Error</TT> is raised by every attempt to create or open a 
+direct access file with mode <TT>InOut_File</TT>, then the tests contained 
+in the following files should report NOT_APPLICABLE:&nbsp;</div>
+<div class="Indented2"><table width="70%">
+<TR><TD align="left">CE2102H.TST<TD align="left">CE2111B.ADA<TD align="left">CE2401F.ADA<TD align="left">CE2406A.ADA<TD align="left">
+<TR><TD align="left">CE2102K.ADA<TD align="left">CE2111E.ADA<TD align="left">CE2401H.ADA<TD align="left">CE2408B.ADA<TD align="left">
+<TR><TD align="left">CE2102S.ADA<TD align="left">CE2111G.ADA<TD align="left">CE2401I.ADA<TD align="left">CE2409A.ADA<TD align="left">
+<TR><TD align="left">CE2102T.ADA<TD align="left">CE2401A.ADA<TD align="left">CE2401J.ADA<TD align="left">CE2411A.ADA <TD align="left">
+<TR><TD align="left">CE2102U.ADA<TD align="left">CE2401B.ADA<TD align="left">CE2401K.ADA<TD align="left">&nbsp;<TD align="left">
+<TR><TD align="left">CE2102V.ADA<TD align="left">CE2401C.ADA<TD align="left">CE2401L.ADA<TD align="left">&nbsp;<TD align="left">
+<TR><TD align="left">CE2109B.ADA<TD align="left">CE2401E.ADA<TD align="left">CE2405B.ADA<TD align="left">&nbsp;<TD align="left">
+</table></div>
+<div class="WideAbove" style="margin-bottom: 0.4em">If <TT>Delete</TT> 
+for direct access files is not supported, then the following tests should 
+report NOT_APPLICABLE:&nbsp;</div>
+<div class="Indented2"><table width="70%">
+<TR><TD align="left">CE2106B.ADA<TD align="left">CE2110C.ADA <TD align="left">&nbsp;<TD align="left">&nbsp;<TD align="left">
+</table></div>
+<div class="WideAbove" style="margin-bottom: 0.4em">If the implementation 
+cannot restrict the file capacity for a direct file, then the test contained 
+in the following file should report NOT_APPLICABLE:&nbsp;</div>
+<div class="Indented2"><table width="70%">
+<TR><TD align="left">CE2403A.TST <TD align="left">&nbsp;<TD align="left">&nbsp;<TD align="left">&nbsp;<TD align="left">
+</table></div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-D28.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-D2A.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>

@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>Class B</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-421.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-423.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>4.2.2 Class B</H1>
+<div class="Normal">Class B tests check that illegal constructs are recognized 
+and treated as fatal errors. They are not expected to successfully compile, 
+bind, or execute. Lines that contain errors are marked <TT>-- ERROR:</TT> 
+and generally include a brief description of the illegality on the same 
+or following line. (The flag includes a final &quot;:&quot; so that search 
+programs can easily distinguish it from other occurrences of the word 
+&quot;error&quot; in the test code or documentation.) Some tests also 
+mark some lines as <TT>-- OK</TT>, indicating that the line must not 
+be flagged as an error.</div>
+<div class="Normal">An implementation passes a class B test if each indicated 
+error in the test is detected and reported, and no other errors are reported. 
+The test fails if one or more of the indicated errors are not reported, 
+or if an error is reported that cannot be associated with one of the 
+indicated errors. If the test structure is such that a compiler cannot 
+recover sufficiently to identify all errors, it may be permissible to 
+&quot;split&quot; the test program into separate units for re-processing 
+(see Section <A HREF="UG-525.HTM">5.2.5</A> for instructions on modifying 
+tests).<A NAME="I1022"></A></div>
+<div class="Normal">In some cases and for some constructs, compilers 
+may adopt various error handling and reporting strategies. In cases where 
+the test designers determined that an error might or might not be reported, 
+but that an error report would be appropriate, the line is marked with 
+<TT>-- OPTIONAL ERROR:</TT> or a similar phrase. In such cases, an implementation 
+is allowed to report an error or fail to report an error without affecting 
+the final grade of the test.</div>
+<div class="Normal">Similarly, in cases where the test designers determined 
+that an error might be reported at one of several source locations, all 
+such source locations are marked with <TT>-- POSSIBLE ERROR:</TT> and 
+an indication of which error (if the test contains several) is expected. 
+In such cases, an implementation is considered passing if it reports 
+an error at any of the possible places for the error to be reported. 
+It fails if no error is reported at any of the places.</div>
+<div class="Normal">All of these test markings can be followed by an 
+optional range indicator (see <A HREF="UG-632.HTM">6.3.2</A>). These 
+describe the expected locations of an error message for the error, and 
+are primarily used by the automated Grading Tool (see <A HREF="UG-6.HTM">6</A>).</div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-421.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-423.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>
