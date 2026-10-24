@@ -232,6 +232,7 @@
 				<module>gdscript</module>
 				<module>gedcom</module>
                 <module>geekcode</module>
+				<module>gerber</module>
 				<module>gff3</module>
 				<module>gql</module>
 				<module>glsl</module>
