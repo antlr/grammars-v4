@@ -37,10 +37,11 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>compilationUnit</entryPoint>
+					<entryPoint>compilationunit</entryPoint>
 					<grammarName>Java</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
+					<testFileExtension>.java</testFileExtension>
 				</configuration>
 				<executions>
 					<execution>

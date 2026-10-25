@@ -17,6 +17,9 @@
    @author Canwei He
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar FromClauseParser;
 
 //-----------------------------------------------------------------------------------
@@ -50,7 +53,6 @@ fromSource
     | joinSource
     ;
 
-
 atomjoinSource
     : tableSource lateralView*
     | virtualTableSource lateralView*
@@ -60,7 +62,9 @@ atomjoinSource
     ;
 
 joinSource
-    : atomjoinSource (joinToken joinSourcePart (KW_ON expression | KW_USING columnParenthesesList)?)*
+    : atomjoinSource (
+        joinToken joinSourcePart (KW_ON expression | KW_USING columnParenthesesList)?
+    )*
     ;
 
 joinSourcePart
@@ -84,29 +88,33 @@ joinToken
     | KW_INNER KW_JOIN
     | COMMA
     | KW_CROSS KW_JOIN
-    | KW_LEFT  KW_OUTER? KW_JOIN
+    | KW_LEFT KW_OUTER? KW_JOIN
     | KW_RIGHT KW_OUTER? KW_JOIN
-    | KW_FULL  KW_OUTER? KW_JOIN
+    | KW_FULL KW_OUTER? KW_JOIN
     | KW_LEFT KW_SEMI KW_JOIN
     ;
 
 lateralView
-	: KW_LATERAL KW_VIEW KW_OUTER function tableAlias (KW_AS identifier (COMMA identifier)*)?
-	| COMMA? KW_LATERAL KW_VIEW function tableAlias (KW_AS identifier (COMMA identifier)*)?
-    | COMMA? KW_LATERAL KW_TABLE LPAREN valuesClause RPAREN KW_AS? tableAlias (LPAREN identifier (COMMA identifier)* RPAREN)?
-	;
+    : KW_LATERAL KW_VIEW KW_OUTER function tableAlias (KW_AS identifier (COMMA identifier)*)?
+    | COMMA? KW_LATERAL KW_VIEW function tableAlias (KW_AS identifier (COMMA identifier)*)?
+    | COMMA? KW_LATERAL KW_TABLE LPAREN valuesClause RPAREN KW_AS? tableAlias (
+        LPAREN identifier (COMMA identifier)* RPAREN
+    )?
+    ;
 
 tableAlias
     : identifier
     ;
 
 tableBucketSample
-    : KW_TABLESAMPLE LPAREN KW_BUCKET Number KW_OUT KW_OF Number (KW_ON expression (COMMA expression)*)? RPAREN
+    : KW_TABLESAMPLE LPAREN KW_BUCKET Number KW_OUT KW_OF Number (
+        KW_ON expression (COMMA expression)*
+    )? RPAREN
     ;
 
 splitSample
-    : KW_TABLESAMPLE LPAREN  Number (KW_PERCENT|KW_ROWS) RPAREN
-    | KW_TABLESAMPLE LPAREN  ByteLengthLiteral RPAREN
+    : KW_TABLESAMPLE LPAREN Number (KW_PERCENT | KW_ROWS) RPAREN
+    | KW_TABLESAMPLE LPAREN ByteLengthLiteral RPAREN
     ;
 
 tableSample
@@ -137,25 +145,24 @@ subQuerySource
 
 //---------------------- Rules for parsing PTF clauses -----------------------------
 partitioningSpec
-   : partitionByClause orderByClause?
-   | orderByClause
-   | distributeByClause sortByClause?
-   | sortByClause
-   | clusterByClause
-   ;
+    : partitionByClause orderByClause?
+    | orderByClause
+    | distributeByClause sortByClause?
+    | sortByClause
+    | clusterByClause
+    ;
 
 partitionTableFunctionSource
-   : subQuerySource
-   | tableSource
-   | partitionedTableFunction
-   ;
+    : subQuerySource
+    | tableSource
+    | partitionedTableFunction
+    ;
 
 partitionedTableFunction
-   : identifier LPAREN KW_ON
-   partitionTableFunctionSource partitioningSpec?
-   (Identifier LPAREN expression RPAREN ( COMMA Identifier LPAREN expression RPAREN)*)?
-   RPAREN identifier?
-   ;
+    : identifier LPAREN KW_ON partitionTableFunctionSource partitioningSpec? (
+        Identifier LPAREN expression RPAREN (COMMA Identifier LPAREN expression RPAREN)*
+    )? RPAREN identifier?
+    ;
 
 //----------------------- Rules for parsing whereClause -----------------------------
 // where a=b and ...

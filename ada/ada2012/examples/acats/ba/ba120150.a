@@ -1,0 +1,142 @@
+-- BA120150.A
+--
+--                             Grant of Unlimited Rights
+--
+--     AdaCore holds unlimited rights in the software and documentation
+--     contained herein. Unlimited rights are the same as those granted
+--     by the U.S. Government for older parts of the Ada Conformity
+--     Assessment Test Suite, and are defined in DFAR 252.227-7013(a)(19).
+--     By making this public release, AdaCore intends to confer upon all
+--     recipients unlimited rights equal to those held by the Ada Conformity
+--     Assessment Authority. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever,
+--     and to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. ADACORE MAKES NO EXPRESS OR IMPLIED WARRANTY AS
+--     TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE SOFTWARE,
+--     DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE OR
+--     DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--     The ACAA has created and maintains the Ada Conformity Assessment Test
+--     Suite for the purpose of conformity assessments conducted in accordance
+--     with the International Standard ISO/IEC 18009 - Ada: Conformity
+--     assessment of a language processor. This test suite should not be used
+--     to make claims of conformance unless used in accordance with
+--     ISO/IEC 18009 and any applicable ACAA procedures.
+--
+--     This test is based on one submitted by AdaCore; AdaCore retains the
+--     copyright on the test.
+--*
+--
+-- OBJECTIVE:
+--     Check that a private with clause does not make entities in the private
+--     part of a package visible.
+--
+--     Check that a name mentioned in a private with clause can be used in a
+--     pragma in the same context clause.
+--
+-- TEST DESCRIPTION:
+--     This test also checks various other rules on private with clauses.
+--
+--     The general structure of this test is as follows:
+--
+--       F: Body of a library-level function that acts as its specification.
+--
+--       P: Library-level package with its private part. Although the private
+--          with clause on P is used, its private part is never visible because
+--          the current compilation unit is not a sibling.
+--       Q: Library-level package used to test that it is allowed to have the
+--          private with-clause and the normal with-clause in the context
+--          clauses of a compilation unit.
+--
+--     The following library-level subprogram is used to test that a name
+--     denoting a library item that is visible only due to being mentioned in
+--     a private with_clause can appear in the body of the library subprogram
+--     body (but not within the subprogram specification)
+--
+--       I: Body of a library-level function with private_with clauses.
+--
+--     In addition, the following packages are used to check the use of the
+--     private with_clause in siblings:
+--       X   : Parent package
+--       X.P : Private child package with public and private declarations.
+--       X.Q : Child package that uses the private with_clause to see the
+--             declarations defined in the private part of his sibling P.
+--       X.R : Child package that has a separate subprogram that uses the
+--             private with clause to see declarations defined in the private
+--             part of P.
+--
+-- TEST FILES:
+--     This test consists of the following files:
+--     -> BA120150.A
+--        BA120151.A
+--        BA120152.A
+--        BA120153.A
+--        BA120154.A
+--
+-- PASS/FAIL CRITERIA:
+--     Files BA120151.A, BA120152.A, BA120153.A, and BA120154.A contain errors.
+--     All errors in these files must be detected to pass the test.
+--
+-- CHANGE HISTORY:
+--     22 May 2004 JM  Initial Version.
+--     29 Mar 2007 RLB Created ACATS test from submitted test; removed
+--                     test cases already covered by BA12014; split into
+--                     multiple files.
+--!
+
+function BA12015f return Integer is
+begin
+   return 1;
+end BA12015f;
+
+--  ---------------------------------------------------------------------------
+
+package BA12015p is
+   type T_Data is new Integer;
+private
+   Datum : T_Data := 999;
+   type T_Hidden is access T_Data;
+end BA12015p;
+
+--  ---------------------------------------------------------------------------
+
+package BA12015q is
+   Max : constant Integer := 999;
+end BA12015q;
+
+--  ---------------------------------------------------------------------------
+
+package BA12015x is
+end BA12015x;
+
+--  ---------------------------------------------------------------------------
+
+private package BA12015X.P is
+   type Low_Level_Data is new Integer;
+private
+   Max_Value : constant Low_Level_Data := 999;
+   type T_Hidden is access Low_Level_Data;
+end BA12015X.P;
+
+--  ---------------------------------------------------------------------------
+
+package BA12015x.R is
+   procedure Our_Proc;
+end BA12015x.R;
+
+--  ---------------------------------------------------------------------------
+
+private with BA12015x.P;
+package body BA12015x.R is
+   procedure Our_Proc is separate;
+end BA12015x.R;
+
+

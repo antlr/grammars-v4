@@ -1,0 +1,161 @@
+#       $OpenBSD: pf.conf,v 1.52 2013/02/13 23:11:14 halex Exp $
+#
+# See pf.conf(5) for syntax and examples.
+#
+# Remember to set net.inet.ip.forwarding=1 and/or net.inet6.ip6.forwarding=1
+# in /etc/sysctl.conf if packets are to be forwarded between interfaces.
+
+### Macros
+
+# system
+
+ext_if = "em0"
+ext_if_inet = "10.0.2.15"
+ext_if_inet6 = "2607:f700:1234:2::15"
+
+int_if = "em1"
+int_if_inet = "10.0.3.15"
+int_if_inet6 = "2607:f700:abcd:3::1"
+
+# networks
+
+int_inet_net = "10.0.3.0/24"
+int_inet6_net = "2607:f700:abcd:3::/64"
+
+# hosts
+
+bastion_int_inet = "10.0.3.11"
+
+app_int_inet = "10.0.3.21"
+app_ext_inet = "208.87.29.16"
+
+# other
+
+icmp_types="echoreq"
+
+### Tables
+
+# black holes
+table <bruteforce> persist
+table <abusivehosts> persist
+
+# extremely trusted hosts
+table <trusted_hosts_inet> persist file "/etc/pf/trusted_hosts_inet"
+table <trusted_hosts_inet6> persist file "/etc/pf/trusted_hosts_inet6"
+
+### Policies
+
+## sane default options
+# http://www.openbsd.org/faq/pf/options.html
+
+# only generate debug messages for serious errors
+set debug urgent
+
+# gather statistics for interface
+# can only do one, may be expensive
+set loginterface em0
+
+# built-in optimizations for network environment
+set optimization normal
+
+# increase the default state limit from 10,000 on busy systems
+# set limit states 100000
+
+# dropping is less expensive than rejecting
+set block-policy drop
+
+# provide some protection against address spoofing
+antispoof quick for { lo0 $int_if $ext_if }
+
+# don't filter loopback
+set skip on lo0
+
+
+# default block policy
+block log
+
+# block undesired traffic up-front
+anchor "blacklist" {
+
+  # block rate-limited bad actors
+  block quick log from { <bruteforce> <abusivehosts> }
+
+  # block unwanted services
+  block quick log on { $int_if $ext_if } \
+    proto {tcp, udp} \
+    from any to any port { 111 67 }
+
+}
+
+# scrub incoming packets
+# no-df is so scrubbing plays nice with NFS,
+# which is known to generate fragmented packets
+# with the don't-fragment bit set... ;
+# random-id is used due to some OS's rather
+# pathetically predictable (zero) id headers
+# this is only for improved security, though,
+# so if it seems like it may be causing issues,
+# feel free to pull it
+match in all scrub (no-df random-id)
+
+# provide outbound nat for permitted traffic
+# but hold off on nat-ing until explicitly passed
+match out on $ext_if from $int_inet_net to any \
+  nat-to $ext_if_inet
+
+## start poking holes
+
+# Permit rate-limited ICMP
+pass inet proto icmp all icmp-type $icmp_types \
+  keep state (max-src-conn-rate 6/4, overload <abusivehosts> flush global)
+pass inet6 proto icmp6 all icmp6-type $icmp_types \
+  keep state (max-src-conn-rate 6/4, overload <abusivehosts> flush global)
+
+# Allow *very* trusted hosts
+anchor "whitelist" {
+
+  pass out quick log on $ext_if from { $ext_if_inet, $ext_if_inet6 }
+  pass in quick log on $ext_if inet from <trusted_hosts_inet>
+  pass in quick log on $ext_if inet6 from <trusted_hosts_inet6>
+
+}
+
+anchor "proxies" {
+
+  # Port forward for bastion and prevent brute-forcing of SSHD
+  pass in log on $ext_if proto tcp from any \
+    to $ext_if_inet port 2222 flags S/SA synproxy state \
+    (max-src-conn 40, max-src-conn-rate 5/10, \
+    overload <bruteforce> flush global) \
+    rdr-to $bastion_int_inet port 22
+
+}
+
+anchor "nats" {
+  anchor "inbound" {
+    # 1:1 NAT
+    pass quick log on $ext_if from $app_int_inet binat-to $app_ext_inet
+  }
+  anchor "outbound" {
+    # Outbound SNAT
+    pass out log on $ext_if from $int_inet_net nat-to $ext_if_inet
+  }
+}
+
+### End Rules
+#
+# Comments
+#
+# One of the confusing things about pf is that the rules are
+# applied as "last matching rule wins", which is counter-intuitive
+# for any who learned packet filtering on Linux.
+#
+# The exception to this rule is the use of the "quick" keyword,
+# which has the effect of cancelling any further rule-processing.
+#
+# This ruleset is designed to exercise a lot of the core concepts of
+# pf (macros, tables, anchors and syntax) while providing a reasonable
+# default gateway configuration. None of this is gospel best-practice,
+# and adaptation to best suit the environment in which it is deployed
+# is highly encouraged.
+#

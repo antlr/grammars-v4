@@ -1,0 +1,11 @@
+module lists.
+    use nats.
+    export nil, cons, append.
+    datatype list = { nil ; cons(nats.nat, list) }.
+    func append : list, list -> list.
+rules.
+    append(nil, L) = L.
+    append(cons(X, L1), L2) = cons(X, append(L1, L2)).
+end lists.
+
+?- append(cons(0, nil), cons(s(0), nil)) = R.

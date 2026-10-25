@@ -1,0 +1,8 @@
+     A          R MENU1                     CA03(03 'Exit')
+     A                                      CA12(12 'Cancel')
+     A                                  1 30'Main Menu'
+     A                                  3  5'1. Add Customer'
+     A                                  4  5'2. Update Customer'
+     A                                  5  5'3. Delete Customer'
+     A            OPTION         2S 0  B  8  5
+     A  50                                  DSPATR(HI)
