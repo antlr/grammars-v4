@@ -1,0 +1,28 @@
+/* Report if graph has non-hierarchical clusters */
+BEGIN {
+  graph_t c[node_t];
+  node_t n;
+
+  void proc (graph_t h, graph_t p, graph_t g)
+  {
+    if (h.name == "cluster*") {
+      for (n = fstnode(h); n; n = nxtnode_sg(h,n)) {
+		g = c[n];
+		if (g) {
+		  if (g != p) {
+            printf(2,"node %s in %s and %s\n", n.name, h.name, g.name);
+		    exit(1);
+          }
+        }
+        c[n] = h;
+      }
+      p = h;
+    }
+    for (g = fstsubg(h); g; g = nxtsubg(g)) {
+      proc(g,p,NULL);
+    }
+  }
+}
+BEG_G {
+  proc($,$,NULL);
+}

@@ -1,0 +1,41 @@
+MODULE $defphases;
+/*
+/*  Copyright © 1996, Digital Equipment Corporation.
+/*
+/* Define phase constants used by all.  Note, these correspond to the offsets 
+/* defined in vcg$gl_diagtyp.
+/*
+/*
+/* Modifications:
+/*
+/*	001	Jeff Zeeb	20-May-1988	VCG V4-475
+/*
+/*		Declare is now a reserved word.  Added quotation marks.
+/*
+/*	000	Caroline Davidson 02-May-1984	(034 VCG)
+/*
+/*		Created this sdl file to substitute the definitions in 
+/*		VCGGLOBAL.SDL and VCGSRCDEF.MAR for the phase constants.
+/*
+/*
+CONSTANT (
+	initial,
+	pass1,				/* PL/I parser phase
+	"declare",			/* PL/I declaration phase
+	pass2,				/* PL/I sematic anaylsis phase
+	optimize,
+	allocate,			/* storage allocation phase
+	gencode,
+	bindcode,
+	writemap,
+	,
+	,
+	cparser,			/* C parser phase
+	write_t,			/* write tree phase
+	phase2				/* C sematic anaylsis phase
+	)
+		EQUALS 0 INCREMENT 1 PREFIX "vcg$" TAG "c";
+/*
+CONSTANT vcg$c_parse EQUALS vcg$c_declare;
+/*
+END_MODULE;

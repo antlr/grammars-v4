@@ -1,0 +1,95 @@
+/******************************************************************************
+	mb/system/cmenu/MBContextMenuCaller.tjs
+*******************************************************************************/
+
+
+class MBContextMenuCaller extends MBComponentLayer
+{
+	var iconImage = "menu";	// 使用する画像のパス
+	var objButton;
+	
+	
+	function MBContextMenuCaller(win, par)
+	{
+		// コンストラクタ
+		
+		super.MBComponentLayer(...);
+		
+		init();
+	}
+	
+	function finalize()
+	{
+		// ファイナライザ
+		
+		invalidate objButton if (objButton !== void);
+		
+		super.finalize(...);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function init()
+	{
+		// 初期化
+		
+		objButton = new MBButton(window, this);
+		objButton.loadImages(sysfunc.getPathImage(iconImage));
+		objButton.visible = true;
+		
+		width = objButton.width;
+		height = objButton.height;
+		
+		var nx = 0;
+		var ny = 0;
+		var ww = window.fore.base.width;
+		var wh = window.fore.base.height;
+		
+		switch (MBGraphicPref.cmenuButtonPositionType) {
+			case "lbMargin":
+				nx = MBGraphicPref.cmenuButtonPositionValue.x;
+				ny = wh - (height + MBGraphicPref.cmenuButtonPositionValue.y);
+				break;
+			
+			case "rtMargin":
+				nx = ww - (width + MBGraphicPref.cmenuButtonPositionValue.x);
+				ny = MBGraphicPref.cmenuButtonPositionValue.y;
+				break;
+			
+			case "rbMargin":
+				nx = ww - (width + MBGraphicPref.cmenuButtonPositionValue.x);
+				ny = wh - (height + MBGraphicPref.cmenuButtonPositionValue.y);
+				break;
+			
+			case "ltMargin":
+			case "absolute":
+			default:
+				nx = MBGraphicPref.cmenuButtonPositionValue.x;
+				ny = MBGraphicPref.cmenuButtonPositionValue.y;
+				break;
+		}
+		
+		setPos(nx, ny);
+		absolute = MBLayerAbs.cmenuButton;
+		hitType = htMask;
+		hitThreshold = 255;
+		visible = true;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function callMenu()
+	{
+		// コンテクストメニューを開く
+		// （右クリックをエミュレート）
+		
+		window.callRightClickSubRoutine();
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onSelectedItemClick(sender)
+	{
+		callMenu();
+	}
+}

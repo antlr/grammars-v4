@@ -1,0 +1,10 @@
+--algorithm ArrayLoop {
+  variables arr = [i \in {0, 1, 2} |-> 0], i = 0;
+  {
+    w1: while (i < 3) {
+      arr[i] := i * 2;
+      i := i + 1;
+    };
+    w2: print arr[0];
+  }
+}

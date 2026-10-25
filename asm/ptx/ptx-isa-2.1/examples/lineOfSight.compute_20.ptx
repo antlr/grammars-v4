@@ -1,0 +1,284 @@
+	.version 2.1
+	.target sm_20
+	// compiled with C:\CUDA\bin/../open64/lib//be.exe
+	// nvopencc 3.1 built on 2010-06-08
+
+	.visible .func (.param .align 8 .b8 __cudaretf__Z11getLocation3Rayi[8]) _Z11getLocation3Rayi (.param .align 8 .b8 __cudaparmf1__Z11getLocation3Rayi[32], .param .s32 __cudaparmf2__Z11getLocation3Rayi)
+
+	.visible .func (.param .f32 __cudaretf__Z8getAngle3Ray6float2f) _Z8getAngle3Ray6float2f (.param .align 8 .b8 __cudaparmf1__Z8getAngle3Ray6float2f[32], .param .align 8 .b8 __cudaparmf2__Z8getAngle3Ray6float2f[8], .param .f32 __cudaparmf3__Z8getAngle3Ray6float2f)
+
+	//-----------------------------------------------------------
+	// Compiling lineOfSight.compute_20.cpp3.i (C:/Users/Ken/AppData/Local/Temp/ccBI#.a07012)
+	//-----------------------------------------------------------
+
+	//-----------------------------------------------------------
+	// Options:
+	//-----------------------------------------------------------
+	//  Target:ptx, ISA:sm_20, Endian:little, Pointer Size:32
+	//  -O3	(Optimization level)
+	//  -g0	(Debug level)
+	//  -m2	(Report advisories)
+	//-----------------------------------------------------------
+
+	.file	1	"lineOfSight.compute_20.cudafe2.gpu"
+	.file	2	"c:/ProgramData/NVIDIA Corporation/NVIDIA GPU Computing SDK/C/src/lineOfSight/lineOfSight.cu"
+	.file	3	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\crtdefs.h"
+	.file	4	"C:\CUDA\include\crt/device_runtime.h"
+	.file	5	"C:\CUDA\include\host_defines.h"
+	.file	6	"C:\CUDA\include\builtin_types.h"
+	.file	7	"c:\cuda\include\device_types.h"
+	.file	8	"c:\cuda\include\driver_types.h"
+	.file	9	"c:\cuda\include\surface_types.h"
+	.file	10	"c:\cuda\include\texture_types.h"
+	.file	11	"c:\cuda\include\vector_types.h"
+	.file	12	"c:\cuda\include\builtin_types.h"
+	.file	13	"c:\cuda\include\host_defines.h"
+	.file	14	"C:\CUDA\include\device_launch_parameters.h"
+	.file	15	"c:\cuda\include\crt\storage_class.h"
+	.file	16	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\time.h"
+	.file	17	"c:\ProgramData\NVIDIA Corporation\NVIDIA GPU Computing SDK\C\common\inc\cutil_math.h"
+	.file	18	"C:\CUDA\include\common_functions.h"
+	.file	19	"c:\cuda\include\math_functions.h"
+	.file	20	"c:\cuda\include\math_constants.h"
+	.file	21	"c:\cuda\include\device_functions.h"
+	.file	22	"c:\cuda\include\sm_11_atomic_functions.h"
+	.file	23	"c:\cuda\include\sm_12_atomic_functions.h"
+	.file	24	"c:\cuda\include\sm_13_double_functions.h"
+	.file	25	"c:\cuda\include\sm_20_atomic_functions.h"
+	.file	26	"c:\cuda\include\sm_20_intrinsics.h"
+	.file	27	"c:\cuda\include\surface_functions.h"
+	.file	28	"c:\cuda\include\texture_fetch_functions.h"
+	.file	29	"c:\cuda\include\math_functions_dbl_ptx3.h"
+
+	.global .texref g_HeightFieldTex;
+
+	.visible .func (.param .align 8 .b8 __cudaretf__Z11getLocation3Rayi[8]) _Z11getLocation3Rayi (.param .align 8 .b8 __cudaparmf1__Z11getLocation3Rayi[32], .param .s32 __cudaparmf2__Z11getLocation3Rayi)
+	{
+	.reg .u32 %r<4>;
+	.reg .f32 %f<16>;
+	.loc	2	326	0
+$LDWbegin__Z11getLocation3Rayi:
+	ld.param.f32 	%f1, [__cudaparmf1__Z11getLocation3Rayi+0];
+	mov.f32 	%f2, %f1;
+	ld.param.f32 	%f3, [__cudaparmf1__Z11getLocation3Rayi+4];
+	mov.f32 	%f4, %f3;
+	ld.param.f32 	%f5, [__cudaparmf1__Z11getLocation3Rayi+16];
+	mov.f32 	%f6, %f5;
+	ld.param.f32 	%f7, [__cudaparmf1__Z11getLocation3Rayi+20];
+	mov.f32 	%f8, %f7;
+	ld.param.f32 	%f9, [__cudaparmf1__Z11getLocation3Rayi+28];
+	mov.f32 	%f10, %f9;
+	ld.param.u32 	%r1, [__cudaparmf2__Z11getLocation3Rayi];
+	mov.s32 	%r2, %r1;
+	.loc	2	328	0
+	cvt.rn.f32.s32 	%f11, %r2;
+	mul.f32 	%f12, %f11, %f10;
+	fma.rn.f32 	%f13, %f6, %f12, %f2;
+	st.param.f32 	[__cudaretf__Z11getLocation3Rayi+0], %f13;
+	fma.rn.f32 	%f14, %f8, %f12, %f4;
+	st.param.f32 	[__cudaretf__Z11getLocation3Rayi+4], %f14;
+	ret;
+$LDWend__Z11getLocation3Rayi:
+	} // _Z11getLocation3Rayi
+
+	.visible .func (.param .f32 __cudaretf__Z8getAngle3Ray6float2f) _Z8getAngle3Ray6float2f (.param .align 8 .b8 __cudaparmf1__Z8getAngle3Ray6float2f[32], .param .align 8 .b8 __cudaparmf2__Z8getAngle3Ray6float2f[8], .param .f32 __cudaparmf3__Z8getAngle3Ray6float2f)
+	{
+	.reg .u32 %r<6>;
+	.reg .f32 %f<46>;
+	.reg .pred %p<4>;
+	.loc	2	338	0
+$LDWbegin__Z8getAngle3Ray6float2f:
+	ld.param.f32 	%f1, [__cudaparmf1__Z8getAngle3Ray6float2f+0];
+	mov.f32 	%f2, %f1;
+	ld.param.f32 	%f3, [__cudaparmf1__Z8getAngle3Ray6float2f+4];
+	mov.f32 	%f4, %f3;
+	ld.param.f32 	%f5, [__cudaparmf1__Z8getAngle3Ray6float2f+8];
+	mov.f32 	%f6, %f5;
+	ld.param.f32 	%f7, [__cudaparmf2__Z8getAngle3Ray6float2f+0];
+	mov.f32 	%f8, %f7;
+	ld.param.f32 	%f9, [__cudaparmf2__Z8getAngle3Ray6float2f+4];
+	mov.f32 	%f10, %f9;
+	ld.param.f32 	%f11, [__cudaparmf3__Z8getAngle3Ray6float2f];
+	mov.f32 	%f12, %f11;
+	.loc	19	1205	0
+	sub.f32 	%f13, %f12, %f6;
+	sub.f32 	%f14, %f10, %f4;
+	sub.f32 	%f15, %f8, %f2;
+	mul.f32 	%f16, %f14, %f14;
+	fma.rn.f32 	%f17, %f15, %f15, %f16;
+	sqrt.rn.f32 	%f18, %f17;
+	div.rn.f32 	%f19, %f13, %f18;
+	abs.f32 	%f20, %f19;
+	mov.f32 	%f21, 0f3f800000;    	// 1
+	setp.gt.f32 	%p1, %f20, %f21;
+	rcp.rn.f32 	%f22, %f20;
+	selp.f32 	%f23, %f22, %f20, %p1;
+	mul.f32 	%f24, %f23, %f23;
+	mov.f32 	%f25, 0fbf52c7ea;    	// -0.823363
+	mov.f32 	%f26, 0fc0b59883;    	// -5.67487
+	fma.rn.f32 	%f27, %f24, %f25, %f26;
+	mov.f32 	%f28, 0fc0d21907;    	// -6.56556
+	fma.rn.f32 	%f29, %f27, %f24, %f28;
+	.loc	19	1209	0
+	mov.f32 	%f30, 0f41355dc0;    	// 11.3354
+	add.f32 	%f31, %f24, %f30;
+	mov.f32 	%f32, 0f41e6bd60;    	// 28.8425
+	fma.rn.f32 	%f33, %f31, %f24, %f32;
+	.loc	19	1211	0
+	mov.f32 	%f34, 0f419d92c8;    	// 19.6967
+	fma.rn.f32 	%f35, %f33, %f24, %f34;
+	rcp.rn.f32 	%f36, %f35;
+	.loc	19	1212	0
+	mul.f32 	%f37, %f29, %f24;
+	mul.f32 	%f38, %f23, %f37;
+	fma.rn.f32 	%f39, %f38, %f36, %f23;
+	.loc	19	1877	0
+	mov.f32 	%f40, 0f3fc90fdb;    	// 1.5708
+	sub.f32 	%f41, %f40, %f39;
+	selp.f32 	%f42, %f41, %f39, %p1;
+	mov.f32 	%f43, 0f7f800000;    	// 1.#INF
+	setp.le.f32 	%p2, %f20, %f43;
+	@!%p2 bra 	$Lt_1_2562;
+	.loc	19	1883	0
+	mov.b32 	%r1, %f42;
+	mov.b32 	%r2, %f19;
+	and.b32 	%r3, %r2, -2147483648;
+	or.b32 	%r4, %r1, %r3;
+	mov.b32 	%f42, %r4;
+$Lt_1_2562:
+	.loc	2	340	0
+	mov.f32 	%f44, %f42;
+	st.param.f32 	[__cudaretf__Z8getAngle3Ray6float2f], %f44;
+	ret;
+$LDWend__Z8getAngle3Ray6float2f:
+	} // _Z8getAngle3Ray6float2f
+
+	.entry _Z20computeAngles_kernel3RayPf (
+		.param .align 8 .b8 __cudaparm__Z20computeAngles_kernel3RayPf___val_paramray[32],
+		.param .u32 __cudaparm__Z20computeAngles_kernel3RayPf_angles)
+	{
+	.reg .u32 %r<16>;
+	.reg .f32 %f<52>;
+	.reg .pred %p<5>;
+	.loc	2	264	0
+$LDWbegin__Z20computeAngles_kernel3RayPf:
+	mov.u32 	%r1, %ctaid.x;
+	mov.u32 	%r2, %ntid.x;
+	mul.lo.u32 	%r3, %r1, %r2;
+	mov.u32 	%r4, %tid.x;
+	add.u32 	%r5, %r4, %r3;
+	ld.param.s32 	%r6, [__cudaparm__Z20computeAngles_kernel3RayPf___val_paramray+24];
+	setp.le.u32 	%p1, %r6, %r5;
+	@%p1 bra 	$Lt_2_3330;
+	.loc	2	268	0
+	add.s32 	%r7, %r5, 1;
+	cvt.rn.f32.s32 	%f1, %r7;
+	ld.param.f32 	%f2, [__cudaparm__Z20computeAngles_kernel3RayPf___val_paramray+28];
+	mul.f32 	%f3, %f2, %f1;
+	ld.param.f32 	%f4, [__cudaparm__Z20computeAngles_kernel3RayPf___val_paramray+0];
+	ld.param.f32 	%f5, [__cudaparm__Z20computeAngles_kernel3RayPf___val_paramray+16];
+	fma.rn.f32 	%f6, %f5, %f3, %f4;
+	ld.param.f32 	%f7, [__cudaparm__Z20computeAngles_kernel3RayPf___val_paramray+4];
+	ld.param.f32 	%f8, [__cudaparm__Z20computeAngles_kernel3RayPf___val_paramray+20];
+	fma.rn.f32 	%f9, %f8, %f3, %f7;
+	mov.f32 	%f10, %f6;
+	mov.f32 	%f11, %f9;
+	mov.f32 	%f12, 0f00000000;    	// 0
+	mov.f32 	%f13, 0f00000000;    	// 0
+	tex.2d.v4.f32.f32 {%f14,%f15,%f16,%f17},[g_HeightFieldTex,{%f10,%f11,%f12,%f13}];
+	.loc	2	269	0
+	mov.f32 	%f18, %f14;
+	.loc	2	340	0
+	sub.f32 	%f19, %f6, %f4;
+	sub.f32 	%f20, %f9, %f7;
+	ld.param.f32 	%f21, [__cudaparm__Z20computeAngles_kernel3RayPf___val_paramray+8];
+	sub.f32 	%f22, %f18, %f21;
+	mul.f32 	%f23, %f20, %f20;
+	fma.rn.f32 	%f24, %f19, %f19, %f23;
+	sqrt.rn.f32 	%f25, %f24;
+	div.rn.f32 	%f26, %f22, %f25;
+	.loc	19	1212	0
+	abs.f32 	%f27, %f26;
+	mov.f32 	%f28, 0f3f800000;    	// 1
+	setp.gt.f32 	%p2, %f27, %f28;
+	rcp.rn.f32 	%f29, %f27;
+	selp.f32 	%f30, %f29, %f27, %p2;
+	mul.f32 	%f31, %f30, %f30;
+	mov.f32 	%f32, 0fbf52c7ea;    	// -0.823363
+	mov.f32 	%f33, 0fc0b59883;    	// -5.67487
+	fma.rn.f32 	%f34, %f31, %f32, %f33;
+	mov.f32 	%f35, 0fc0d21907;    	// -6.56556
+	fma.rn.f32 	%f36, %f34, %f31, %f35;
+	mul.f32 	%f37, %f31, %f36;
+	mul.f32 	%f38, %f30, %f37;
+	mov.f32 	%f39, 0f41355dc0;    	// 11.3354
+	add.f32 	%f40, %f31, %f39;
+	mov.f32 	%f41, 0f41e6bd60;    	// 28.8425
+	fma.rn.f32 	%f42, %f40, %f31, %f41;
+	mov.f32 	%f43, 0f419d92c8;    	// 19.6967
+	fma.rn.f32 	%f44, %f42, %f31, %f43;
+	rcp.rn.f32 	%f45, %f44;
+	fma.rn.f32 	%f46, %f38, %f45, %f30;
+	.loc	19	1877	0
+	mov.f32 	%f47, 0f3fc90fdb;    	// 1.5708
+	sub.f32 	%f48, %f47, %f46;
+	selp.f32 	%f49, %f48, %f46, %p2;
+	mov.f32 	%f50, 0f7f800000;    	// 1.#INF
+	setp.le.f32 	%p3, %f27, %f50;
+	@!%p3 bra 	$Lt_2_3842;
+	.loc	19	1883	0
+	mov.b32 	%r8, %f49;
+	mov.b32 	%r9, %f26;
+	and.b32 	%r10, %r9, -2147483648;
+	or.b32 	%r11, %r8, %r10;
+	mov.b32 	%f49, %r11;
+$Lt_2_3842:
+	.loc	2	271	0
+	ld.param.u32 	%r12, [__cudaparm__Z20computeAngles_kernel3RayPf_angles];
+	mul.lo.u32 	%r13, %r5, 4;
+	add.u32 	%r14, %r12, %r13;
+	st.global.f32 	[%r14+0], %f49;
+$Lt_2_3330:
+	.loc	2	273	0
+	exit;
+$LDWend__Z20computeAngles_kernel3RayPf:
+	} // _Z20computeAngles_kernel3RayPf
+
+	.entry _Z26computeVisibilities_kernelPKfS0_iPh (
+		.param .u32 __cudaparm__Z26computeVisibilities_kernelPKfS0_iPh_angles,
+		.param .u32 __cudaparm__Z26computeVisibilities_kernelPKfS0_iPh_scannedAngles,
+		.param .s32 __cudaparm__Z26computeVisibilities_kernelPKfS0_iPh_numAngles,
+		.param .u32 __cudaparm__Z26computeVisibilities_kernelPKfS0_iPh_visibilities)
+	{
+	.reg .u32 %r<17>;
+	.reg .f32 %f<4>;
+	.reg .pred %p<3>;
+	.loc	2	286	0
+$LDWbegin__Z26computeVisibilities_kernelPKfS0_iPh:
+	mov.u32 	%r1, %ctaid.x;
+	mov.u32 	%r2, %ntid.x;
+	mul.lo.u32 	%r3, %r1, %r2;
+	mov.u32 	%r4, %tid.x;
+	add.u32 	%r5, %r4, %r3;
+	ld.param.u32 	%r6, [__cudaparm__Z26computeVisibilities_kernelPKfS0_iPh_numAngles];
+	setp.le.u32 	%p1, %r6, %r5;
+	@%p1 bra 	$Lt_3_1026;
+	.loc	2	290	0
+	mul.lo.u32 	%r7, %r5, 4;
+	ld.param.u32 	%r8, [__cudaparm__Z26computeVisibilities_kernelPKfS0_iPh_angles];
+	add.u32 	%r9, %r8, %r7;
+	ld.global.f32 	%f1, [%r9+0];
+	ld.param.u32 	%r10, [__cudaparm__Z26computeVisibilities_kernelPKfS0_iPh_scannedAngles];
+	add.u32 	%r11, %r10, %r7;
+	ld.global.f32 	%f2, [%r11+0];
+	set.ge.u32.f32 	%r12, %f1, %f2;
+	neg.s32 	%r13, %r12;
+	ld.param.u32 	%r14, [__cudaparm__Z26computeVisibilities_kernelPKfS0_iPh_visibilities];
+	add.u32 	%r15, %r14, %r5;
+	st.global.u8 	[%r15+0], %r13;
+$Lt_3_1026:
+	.loc	2	291	0
+	exit;
+$LDWend__Z26computeVisibilities_kernelPKfS0_iPh:
+	} // _Z26computeVisibilities_kernelPKfS0_iPh
+

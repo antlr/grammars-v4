@@ -1,0 +1,26 @@
+//
+// $Id$
+//
+
+var image_radio_button_on	= "k_radio_button_on";
+var image_radio_button_off	= "k_radio_button_off";
+
+/**----------------------------------------------------------------------
+ * ラジオボタン
+ ----------------------------------------------------------------------*/
+class KRadioButton extends KCheckBox
+{
+  function KRadioButton()
+  {
+    super.KCheckBox(...);
+  }
+
+  function finalize()
+  {
+    super.finalize(...);
+  }
+
+  // 表示画像
+  property image_on	{ getter { return image_radio_button_on; } }
+  property image_off{ getter { return image_radio_button_off; } }
+}

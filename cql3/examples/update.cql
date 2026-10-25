@@ -21,3 +21,9 @@
     IN (88b8fd18-b1ed-4e96-bf79-4280797cba80,
         06a8913c-c0d6-477c-937d-6c1b69a95d43,
         bc108776-7cb5-477f-917d-869c12dfffa8);
+
+    UPDATE cyclist.cyclist_career_teams SET teams = teams + {'Team DSB - Ballast Nedam'} WHERE id = 88b8fd18-b1ed-4e96-bf79-4280797cba80;
+
+    UPDATE cyclist.cyclist_career_teams SET teams = teams - {'WOMBATS'} WHERE id = 88b8fd18-b1ed-4e96-bf79-4280797cba80;
+
+    UPDATE cyclist.cyclist_career_teams SET teams = {} WHERE id = 88b8fd18-b1ed-4e96-bf79-4280797cba80;

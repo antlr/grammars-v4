@@ -1,0 +1,10 @@
+/*
+  Script Metadata
+*/
+
+^ Metadata
+name = "Data Fetch Script"
+version = "1.3.0"
+author = "Jane Doe"
+schedule = "daily"
+active = true

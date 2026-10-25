@@ -1,0 +1,29 @@
+<ul>
+    #foreach( $product in $allProducts )
+        <li>$product</li>
+    #end
+</ul>
+
+<ul>
+    #foreach( $key in $allProducts.keySet() )
+        <li>Key: $key -> Value: $allProducts.get($key)</li>
+    #end
+</ul>
+
+<table>
+    #foreach( $customer in $customerList )
+        <tr><td>$foreach.count</td><td>$customer.Name</td></tr>
+    #end
+</table>
+
+#foreach( $customer in $customerList )
+    $customer.Name#if( $foreach.hasNext ),#end
+#end
+
+## list first 5 customers only
+#foreach( $customer in $customerList )
+    #if( $foreach.count > 5 )
+        #break
+    #end
+    $customer.Name
+#end

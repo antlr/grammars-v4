@@ -1,0 +1,142 @@
+//
+// $Id: KAbsoluteLayout.tjs,v 1.6 2007/09/04 10:29:44 m2 Exp $
+//
+
+
+/*----------------------------------------------------------------------
+ * 絶対位置レイアウト
+ ----------------------------------------------------------------------*/
+class KAbsoluteLayout extends KWidget
+{
+  // 格納してるウィジェット
+  var childList;
+
+  /**------------------------------
+   * 絶対位置レイアウト
+   * 
+   * ウィジェットを、レイアウト中に絶対座標基準で設置します。
+   * ウィジェット自身の margin と align の設定に従って、配置を行います。
+   *
+   * @param win ウィンドウ
+   * @param name 名前
+   ------------------------------*/
+  function KAbsoluteLayout(win, name) {
+    super.KWidget(win, name);
+
+    hasImage = false;
+    childList = [];
+  }
+
+  /**------------------------------
+   * ウィジェットをレイアウトに登録する
+   * 
+   * @param child 子ウィジェット
+   ------------------------------*/
+  function add(child, ignoreSize = false) {
+    child.parent = this;
+    child.ignoreSize = ignoreSize;
+    childList.add(child);
+    invalidateLayout();
+  }
+
+  /**------------------------------
+   * ウィジェットをレイアウトから開放する
+   * 
+   * @param child 子ウィジェット
+   * @param doInvalidate invalidateするかどうか
+   ------------------------------*/
+  function remove(child, doInvalidate = true) {
+    child.parent = widgetDepot;
+    childList.remove(child);
+    invalidateLayout();
+    if (doInvalidate)
+      invalidate child;
+  }
+
+  /**------------------------------
+   * 子アイテムをカウントする
+   * 
+   * @return 子アイテム数
+   ------------------------------*/
+  property childCount {
+    getter {
+      return childList.count;
+    }
+  }
+
+  /**------------------------------
+   * 子ウィジェットを参照する
+   *
+   * @param index インデックス
+   * @return 子ウィジェット
+   ------------------------------*/
+  function childAt(index) {
+    return childList[index];
+  }
+
+  /*------------------------------
+   * レイアウトをやり直し
+   ------------------------------*/
+  function invalidateLayout {
+    var minW, minH, maxW, maxH;
+    minW = minH = maxW = maxH = 0;
+    for (var i = 0; i < childList.count; i++) {
+      var child = childList[i];
+      if (child.ignoreSize)
+        continue;
+      minW = int(Math.max(minW, child.minWidth + child.marginHorizontal));
+      minH = int(Math.max(minH, child.minHeight + child.marginVertical));
+      maxW = int(Math.max(maxW, child.maxWidth + child.marginHorizontal));
+      maxH = int(Math.max(maxH, child.maxHeight + child.marginVertical));
+    }
+    setMinMaxSize(minW, minH, maxW, maxH);
+
+    for (var i = 0; i < childList.count; i++) {
+      var child = childList[i];
+      child.setSize(width - child.marginHorizontal,
+                    height - child.marginVertical);
+      switch (child.alignHorizontal) {
+      case ALIGN_LEFT:
+        child.left = child.marginLeft;
+        break;
+
+      case ALIGN_CENTER:
+        child.left = (width - child.marginIncludeWidth) / 2 + child.marginLeft;
+        break;
+
+      case ALIGN_RIGHT:
+        child.left = width - child.marginIncludeWidth;
+        break;
+      }
+      switch (child.alignVertical) {
+      case ALIGN_TOP:
+        child.top = child.marginTop;
+        break;
+
+      case ALIGN_CENTER:
+        child.top = (height - child.marginIncludeHeight) / 2 + child.marginTop;
+        break;
+
+      case ALIGN_BOTTOM:
+        child.top = height - child.marginIncludeHeight;
+        break;
+      }
+    }
+  }
+
+  function onChildMarginModified {
+    invalidateLayout();
+  }
+
+  function onChildAlignModified {
+    invalidateLayout();
+  }
+
+  function onChildMinMaxSizeModified {
+    invalidateLayout();
+  }
+
+  function onSizeModified {
+    invalidateLayout();
+  }
+};

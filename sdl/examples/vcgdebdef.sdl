@@ -1,0 +1,135 @@
+MODULE vcgdebug;
+/*
+/*  Copyright © 1996, Digital Equipment Corporation.
+/*
+/* Modifications:
+/*
+/*	002	Ian Stocks	27-Jun-1985	(021 SVCG M)
+/*
+/*		Make VCG$K_LINE_SIZE a local, rather than a global constant
+/*		(since it is also defined in VCGGLOBAL.SDL)
+/*
+/*	001	Tom Benson	13-Feb-1984	(003 VCG)
+/*
+/*		Added modification history.
+/*
+/*
+
+/*
+/* definition of entry points in vcg$debug.
+/*
+ENTRY vcg$debug;
+
+ENTRY vcg$debug_phase_break;
+
+ENTRY vcg$debug_line_break;
+
+ENTRY vcg$debug_op_break;
+
+ENTRY vcg$debug_node_break;
+
+ENTRY vcg$debug_output_line_break;
+
+ENTRY vcg$debug_first_read;
+
+ENTRY vcg$debug_pause PARAMETER(CHARACTER DESCRIPTOR);
+
+ENTRY vcg$dumpsym PARAMETER( LONGWORD VALUE, LONGWORD VALUE );
+
+ENTRY vcg$dump_vtree_head PARAMETER( CHARACTER DESCRIPTOR , ADDRESS VALUE );
+
+ENTRY vcg$debug_trace_vtree PARAMETER( CHARACTER DESCRIPTOR , ADDRESS VALUE );
+
+ENTRY vcg$debug_trace_checker PARAMETER( CHARACTER DESCRIPTOR , ADDRESS VALUE );
+
+ENTRY vcg$op_to_char PARAMETER( ADDRESS VALUE ) RETURNS CHARACTER LENGTH 9 VARYING;
+
+ENTRY vcg$listing_msg_dumper;
+
+/*
+/* definition of entry types for vcg$dumpsym
+/*
+CONSTANT (whole_table,node,"global",whole_blk,val_tree,vtree,whole_vtree,
+	walk_sym,cluster,msg_rcd
+	) EQUALS -1 INCREMENT 1 PREFIX debug_typ_ COUNTER #max_type;
+
+CONSTANT debug_typ_k_max_type EQUALS #max_type;
+/*
+/* used by vcg$dumpsym for tree walk dumps
+/*
+CONSTANT (blk,sym,token_table,tree_walk)
+	EQUALS 0 INCREMENT 1 PREFIX dps_ COUNTER #max_type;
+
+CONSTANT dps_k_walk_types EQUALS #max_type;
+
+    #vcg$k_line_size = 132;		{ M002
+					{ THIS LOCAL CONSTANT MUST HAVE THE
+					{ SAME VALUE AS THE GLOBAL CONSTANT OF
+					{ THE SAME NAME IN VCGGLOBAL.SDL
+					{ IT IS HERE SOLELY TO ALLOW A STRING
+					{ OF THIS LENGTH TO BE DECLARED AS
+					{ A RECORD COMPONENT
+
+/*
+/* definition of the debug control structure
+/*
+AGGREGATE vcg$debug_control STRUCTURE GLOBAL PREFIX deb_ ;
+/*
+/* break point
+/*
+	break_line		LONGWORD;	/* used by pli pass2 
+	break_op_id		LONGWORD;	/* not currently used
+	break_node_id		LONGWORD;	/* not currently used
+	break_output_line	LONGWORD;	/* used by write tree 
+/*
+/* debugging control flags
+/*
+	control_flags		STRUCTURE;
+
+		print_operators BITFIELD ;	/* enables operator dumping by write_node 
+		console_dump	BITFIELD ;
+		listing_dump	BITFIELD ;
+		tree_walk_dump	BITFIELD ;
+		dump_tokens	BITFIELD ;
+		dump_labels	BITFIELD ;
+		dump_symbols	BITFIELD ;
+		dump_dcl_trees	BITFIELD ;
+		output_tree_order	BITFIELD ;	/* for ordering of vtree dumps
+		print_at_trace	BITFIELD ;	/* for enabling vtrees and trace output
+		debug_init	BITFIELD ;	/* if true, vcg$debug has been called in this compilation
+		last_token	BITFIELD ;	/* used in reading console line
+		verify_only	BITFIELD ;	/* used if want to verify nodes w/o printing
+		use_curr_def	BITFIELD ;	/* used if want /diag= to use flags as set.
+		flag		BYTE FILL;	/* extra flags - M002
+		END;
+/*
+/* definition of trace flags for write tree and vtree utilities
+/*
+	trace_flags	STRUCTURE;
+		pause_wgroup	BITFIELD ;	/* used by write_tree
+		trace_wtree	BITFIELD ;	/* used by write_tree 
+		trace_wnode	BITFIELD ;	/* used by write_tree 
+		trace_wtrtbl	BITFIELD ;	/* used by write_tree 
+		trace_emit	BITFIELD ;	/* used by vcg$emit and vcg$emit_tree 
+		trace_checkertbl BITFIELD ;	/* used by the tuple checker
+		pause_checker	BITFIELD ;	/* used by the tuple checker
+		trace_checker	BITFIELD ;	/* used by the tuple checker
+		trace_spare	BYTE FILL;	/* M002
+		END;
+/*
+/* interval of output during trace 
+/*
+	pause		WORD;		/*
+	pause_interval	WORD;		/* fixed bin(15) static init(0);
+/*
+/* used for reading line from console by vcg$debug
+/*
+	next_char		WORD;
+	buffer_structure 	STRUCTURE;
+	last_char		WORD;
+	buffer			CHARACTER DIMENSION #vcg$k_line_size;
+	END;
+
+   END;
+
+END_MODULE;

@@ -1,0 +1,11 @@
+MODULE MainModule
+    PROC JumpAround()
+        VAR num x;
+        x := 0;
+        start:
+        x := x + 1;
+        IF x < 3 THEN
+            GOTO start;
+        ENDIF
+    ENDPROC
+ENDMODULE

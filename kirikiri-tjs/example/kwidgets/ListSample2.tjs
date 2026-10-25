@@ -1,0 +1,148 @@
+/*----------------------------------------------------------------------
+ * マルチセレクション用のリスト
+ ----------------------------------------------------------------------*/
+class MultiSelectionList extends KList
+{
+  function MultiSelectionList(window, name = "") {
+    super.KList(...);
+  }
+
+  function onSelectionDragEnter() {
+    // 選択範囲についてまとめてドラッグを開始する
+    beginDragPacket(new KPacket("ddlistitem2", selectedItemParentOnlyList));
+  }
+
+  function isChildPacketAcceptable(insertionIndex, packet) {
+    // 同テスト用のパケットを受け入れる
+    return (packet.name == "ddlistitem2");
+  }
+
+  function onChildPacketDrop(insertionIndex, x, y, packet, shift) {
+    // 直前に選択していたアイテムを記憶
+    var prevSelectedItemList = selectedItemList;
+    // 直前にフォーカスしていたアイテムを記憶
+    var prevFocusedItem = focusedItem;
+    // 選択範囲のアイテムを指定位置に挿入。
+    for (var i = 0; i < packet.arg.count; i++) {
+      var item = packet.arg[i];
+      if (item.parent == this && item.index < insertionIndex)
+        insertionIndex--;
+      item.parent.remove(item, false);
+      insert(insertionIndex, item);
+      insertionIndex++;
+    }
+    // 直前の選択状態とフォーカスを再現。
+    updateDrawItemList();
+    clearAllSelection();
+    for (var i = 0; i < prevSelectedItemList.count; i++)
+      prevSelectedItemList[i].selected = true;
+    focusItem(prevFocusedItem, false);
+  }
+};
+
+/*----------------------------------------------------------------------
+ * マルチセレクション用のリストアイテム
+ ----------------------------------------------------------------------*/
+class MultiSelectionListItem extends KListItem
+{
+  function MultiSelectionListItem(label = "", name = "") {
+    super.KListItem(...);
+  }
+
+  function isChildPacketAcceptable(insertionIndex, packet) {
+    // 同テスト用のパケットのみ受け入れる
+    if (packet.name != "ddlistitem2")
+      return false;
+    // 移動対象候補が自分の祖先だったら受け入れない
+    for (var i = 0; i < packet.arg.count; i++)
+      if (packet.arg[i].isAncestorOf(this))
+        return false;
+    // そうでなければ受け入れる
+    return true;
+  }
+
+  function onChildPacketDrop(insertionIndex, x, y, packet, shift) {
+    // 直前に選択していたアイテムを記憶
+    var prevSelectedItemList = root.selectedItemList;
+    // 直前にフォーカスしていたアイテムを記憶
+    var prevFocusedItem = root.focusedItem;
+    // 子を挿入したのでオープン状態にして可視化。
+    opened = true;
+    // 選択範囲のアイテムを指定位置に挿入。
+    for (var i = 0; i < packet.arg.count; i++) {
+      var item = packet.arg[i];
+      if (item.parent == this && item.index < insertionIndex)
+        insertionIndex--;
+      item.parent.remove(item, false);
+      insert(insertionIndex, item);
+      insertionIndex++;
+    }
+    // 直前の選択状態とフォーカスを再現。
+    root.updateDrawItemList();
+    root.clearAllSelection();
+    for (var i = 0; i < prevSelectedItemList.count; i++)
+      prevSelectedItemList[i].selected = true;
+    root.focusItem(prevFocusedItem, false);
+  }
+};
+
+/*----------------------------------------------------------------------
+ * リストサンプル2(マルチセレクションのテスト)
+ ----------------------------------------------------------------------*/
+class ListSample2 extends KWindow
+{
+  function ListSample2 {
+    super.KWindow("ListSample2");
+
+    // ウィンドウ初期設定
+    caption = 'リストサンプル2';
+    imeMode = imDontCare;
+
+    // デフォルト値
+    defaultFocusable = true;
+
+    // スクロールレイアウトを作リ、その中にリストを配置
+    primaryWidget.add(new KScrollLayout(this, true, true, "scroll"));
+    scroll.resize = true;
+    scroll.add(new MultiSelectionList(this, "list"));
+    
+    list.spaceVertical = 2;
+    list.multipleSelection = true;
+
+    // リスト項目を配置しまくる
+    locateListItem(list, "リストアイテム", 4);
+
+    // 永続化辞書の作成
+    var dict = new KPersistentDictionary(System.dataPath + name + "_dict.txt");
+    add(dict);
+    bindPersistentDictionary(dict);
+  }
+
+  function locateListItem(item, label, depth) {
+    if (depth == 0)
+      return;
+    for (var i = 0; i < 5; i++) {
+      var myLabel = label + (i + 1);
+      var child = new MultiSelectionListItem(myLabel);
+      item.add(child);
+      locateListItem(child, myLabel + "-", depth - 1);
+    }
+  }
+}
+
+
+//----------------------------------------------------------------------
+// サンプル表示・非表示の切り替え
+global.listSample2 = void;
+
+function showListSample2
+{
+  if (listSample2 === void)
+    listSample2 = new ListSample2();
+  listSample2.visible = true;
+}
+
+function hideListSample2
+{
+  listSample2.visible = false;
+}
