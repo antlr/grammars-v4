@@ -1,0 +1,293 @@
+namespace = aleran_society
+
+#country_event = {
+#	id = aleran_society.100
+#	#hide_window = yes
+#	#is_triggered_only = yes
+#	title = "aleran_society.100.name"
+#	desc = "aleran_society.100.desc"
+#	picture = GFX_evt_throne_room
+#	show_sound = event_factions
+#	
+#	trigger = {
+#		has_valid_civic = civic_dragon_gov
+#		is_ai = no
+#		has_policy_flag = slavery_allowed
+#	}
+#
+#	mean_time_to_happen = {
+#		days = 180
+#	}
+#	
+#	immediate = {		
+#		save_event_target_as = alerans
+#		capital_scope = {
+#			solar_system = {
+#				save_event_target_as = aleris
+#			}
+#		}	
+#	}
+#	
+#	option = {
+#		name = "aleran_society.100.click.a"
+#		ai_chance = {
+#			factor = 150
+#		}
+#		owner = {
+#		
+#		}
+#	}
+#}
+
+country_event = {
+	id = aleran_society.500
+	#hide_window = yes
+	#is_triggered_only = yes
+	title = "aleran_society.500.name"
+	desc = "aleran_society.500.desc"
+	picture = GFX_evt_throne_room
+	show_sound = event_factions
+	
+	trigger = {
+		has_valid_civic = civic_dragon_gov
+		is_ai = no
+		always = no
+		#any_owned_planet = {
+		#	is_colony = yes
+		#	happiness_planet < 20
+		#}
+	}
+
+	mean_time_to_happen = {
+		days = 180
+	}
+	
+	immediate = {		
+		save_event_target_as = alerans
+		capital_scope = {
+			solar_system = {
+				save_event_target_as = aleris
+			}
+		}	
+	}
+	
+	option = {
+		name = "aleran_society.500.click.a"
+		ai_chance = {
+			factor = 150
+		}
+		owner = {
+		
+		}
+	}
+}
+
+planet_event = {
+	id = aleran_society.530
+	#hide_window = yes
+	is_triggered_only = yes
+	title = "aleran_society.530.name"
+	desc = "aleran_society.530.desc"
+	picture = GFX_evt_throne_room
+	show_sound = event_factions
+	
+	immediate = {
+		add_modifier = {
+			modifier = disloyal_pops
+			days = -1
+		}
+	}
+	
+	option = {
+		name = "aleran_society.530.click.a"
+		ai_chance = {
+			factor = 150
+		}
+		owner = {
+		
+		}
+	}
+}
+
+planet_event = {
+	id = aleran_society.531
+	#hide_window = yes
+	is_triggered_only = yes
+	title = "aleran_society.531.name"
+	desc = "aleran_society.531.desc"
+	picture = GFX_evt_throne_room
+	show_sound = event_factions
+	
+	immediate = {	
+		random_playable_country = {
+			limit = {
+				NOT = {prev = {has_casus_belli = {target = prev type = cb_dragon}}}
+			}
+			save_event_target_as = receiver
+		}
+		random_owned_planet = {
+			limit = {
+				 is_colony = yes
+			}
+			save_event_target_as = deserter #for mention in the description of the option button
+			set_owner = event_target:receiver
+		} 
+	}
+	
+	option = {
+		name = "aleran_society.531.click.a"
+		ai_chance = {
+			factor = 150
+		}
+		owner = {
+		
+		}
+	}
+}
+
+country_event = {
+	id = aleran_society.540
+	#hide_window = yes
+	is_triggered_only = yes
+	title = "aleran_society.540.name"
+	desc = "aleran_society.540.desc"
+	picture = GFX_evt_throne_room
+	show_sound = event_factions
+	
+	immediate = {
+		random_owned_fleet = {
+			limit = {
+				any_owned_ship = {
+					is_ship_class = shipclass_military
+				}
+			}
+			every_owned_ship = {
+				add_modifier = {
+					modifier = disloyal_fleet
+					days = -1
+				}
+			}
+			save_event_target_as = disloyal #for mention in the description of the option button
+		}
+	}
+	
+	option = {
+		name = "aleran_society.540.click.a"
+		ai_chance = {
+			factor = 150
+		}
+		owner = {
+		
+		}
+	}
+}
+
+country_event = {
+	id = aleran_society.541
+	#hide_window = yes
+	is_triggered_only = yes
+	title = "aleran_society.541.name"
+	desc = "aleran_society.541.desc"
+	picture = GFX_evt_throne_room
+	show_sound = event_factions
+	
+	immediate = {		
+		random_owned_ship = {
+			limit = {
+				is_ship_class = shipclass_military
+			}
+			save_event_target_as = deserter #for mention in the description of the option button
+			delete_ship = this
+		} 
+	}
+	
+	option = {
+		name = "aleran_society.541.click.a"
+		ai_chance = {
+			factor = 150
+		}
+		owner = {
+		
+		}
+	}
+}
+
+country_event = {
+	id = aleran_society.542
+	#hide_window = yes
+	is_triggered_only = yes
+	title = "aleran_society.542.name"
+	desc = "aleran_society.542.desc"
+	picture = GFX_evt_throne_room
+	show_sound = event_factions
+	
+	immediate = {	
+		random_playable_country = {
+			limit = {
+				NOT = {prev = {has_casus_belli = {target = prev type = cb_dragon}}}
+			}
+			save_event_target_as = receiver
+		}
+		random_owned_ship = {
+			limit = {
+				#is_ship_class = shipclass_military
+			}
+			save_event_target_as = deserter #for mention in the description of the option button
+			set_owner = event_target:receiver
+		} 
+	}
+	
+	option = {
+		name = "aleran_society.542.click.a"
+		ai_chance = {
+			factor = 150
+		}
+		owner = {
+		
+		}
+	}
+}
+
+country_event = {
+	id = aleran_society.550
+	#hide_window = yes
+	is_triggered_only = yes
+	title = "aleran_society.550.name"
+	desc = "aleran_society.550.desc"
+	picture = GFX_evt_throne_room
+	show_sound = event_factions
+	
+	immediate = {
+		remove_country_flag = attacked_enclave
+		from = {
+			kill_leader = {
+				type = ruler
+				show_notification = no
+			}
+			kill_leader = {
+				type = ruler
+				show_notification = no
+				heir = yes
+			}
+		}
+		from = {
+			create_leader = {
+				type = governor
+				species = owner_main_species
+				name = random
+				skill = 1
+			}
+			assign_leader = last_created_leader
+		}
+	}
+	
+	option = {
+		name = "aleran_society.550.click.a"
+		ai_chance = {
+			factor = 150
+		}
+		owner = {
+		
+		}
+	}
+}

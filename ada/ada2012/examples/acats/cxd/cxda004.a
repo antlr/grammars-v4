@@ -1,0 +1,207 @@
+-- CXDA004.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE: 
+--      Check that Set_False and Set_True can be called from an
+--      interrupt handler.
+--      Check that a Suspension_Object is a by reference type.
+--      Check that Current_State returns the current state of
+--      a suspension object.
+--      Check that Program_Error is raised upon calling Suspend_Until_True
+--      if another task is waiting on that suspension object.
+--
+-- TEST DESCRIPTION: 
+--      A task is blocked waiting on a suspension object to become true.
+--      The task is unblocked by an interrupt handler.
+--      The check that a Suspension_Object is a by reference type
+--      is accomplished by passing a global SO to a procedure where
+--      the procedure manipulates the parameter and checks that the
+--      global variable is changed.
+--
+-- SPECIAL REQUIREMENTS
+--      This test requires that an interrupt be generated while the
+--      test is running.  The method is implementation dependent.
+--      See ImpDef.Annex_C for further details about the
+--      requirements for this interrupt.
+--
+-- APPLICABILITY CRITERIA:
+--      This test applies only to 
+--          implementations supporting the Real-Time Systems Annex, and
+--          having a non-reserved interrupt available that can be 
+--          triggered while the test is running.
+--
+--
+-- CHANGE HISTORY:
+--      28 Sep 95   SAIC    ACVC 2.1
+--
+--!
+
+with Ada.Synchronous_Task_Control;
+package CXDA004_1 is
+    Verbose : constant Boolean := False;
+
+    SO : Ada.Synchronous_Task_Control.Suspension_Object;
+    Interrupt_Count : Integer := 0;
+    pragma Volatile (Interrupt_Count);
+    procedure Make_Body_Legal;
+end CXDA004_1;
+
+with Ada.Interrupts;
+with System;
+with Report;
+with ImpDef;
+with ImpDef.Annex_C;
+package body CXDA004_1 is
+
+      protected Releaser is
+         procedure Release_It;
+         pragma Interrupt_Handler (Release_It);
+         pragma Attach_Handler (Release_It, 
+                  ImpDef.Annex_C.Interrupt_To_Generate);
+      end Releaser;
+
+      protected body Releaser is
+         procedure Release_It is
+         begin
+            Interrupt_Count := Interrupt_Count + 1;
+            Ada.Synchronous_Task_Control.Set_True (SO);
+         end Release_It;
+      end Releaser;
+
+      procedure Make_Body_Legal is
+      begin null; end;
+end CXDA004_1;
+
+------------------------------------------------------------------
+
+with Ada.Synchronous_Task_Control;
+with Ada.Interrupts;
+with System;
+with Report;
+with ImpDef;
+with ImpDef.Annex_C;
+with CXDA004_1;
+procedure CXDA004 is
+   Verbose : constant Boolean := CXDA004_1.Verbose;
+   In_Suspension : Boolean := False;
+   pragma Volatile (In_Suspension);
+   package STC renames Ada.Synchronous_Task_Control;
+   Check_SO : STC.Suspension_Object;
+
+   procedure Check_For_Ref (S : in out STC.Suspension_Object) is
+      -- this procedure is called with Check_SO as a parameter
+   begin
+     STC.Set_True (S);
+     if not STC.Current_State (Check_SO) then
+       Report.Failed ("Suspension_Object is not a by-reference type (1)");
+     end if;
+     STC.Set_False (S);
+     if STC.Current_State (Check_SO) then
+       Report.Failed ("Suspension_Object is not a by-reference type (2)");
+     end if;
+   end Check_For_Ref;
+
+begin
+
+   Report.Test ("CXDA004", "Check that a suspension_object can be changed" &
+                           " by an interrupt handler");
+   
+   declare -- encapsulate the test
+      task Does_Suspension is
+	 entry Do_PE_Test;
+         entry Do_Int_Test;
+      end Does_Suspension;
+
+
+      task body Does_Suspension is 
+      begin
+	 accept Do_PE_Test;
+	 STC.Suspend_Until_True (Check_SO);
+
+         accept Do_Int_Test;
+         -- time to wait
+         In_Suspension := True;
+         STC.Suspend_Until_True (CXDA004_1.SO);
+         In_Suspension := False;
+      exception
+         when others =>
+               Report.Failed ("Unexpected Exception in Does_Suspension");
+      end Does_Suspension; 
+
+
+   begin
+      -- the test for suspension objects being passed by reference
+      Check_For_Ref (Check_SO);     
+
+      -- check for program_error if a suspend_until_true is done on a 
+      -- suspension object that already has a task waiting on it.
+      STC.Set_False (Check_SO);
+      Does_Suspension.Do_PE_Test;
+      delay Impdef.Switch_To_New_Task;   -- let Does_Suspension suspend
+      begin
+	 STC.Suspend_Until_True (Check_SO);
+	 Report.Failed ("no exception on double suspend");
+      exception
+	 when Program_Error =>
+		 if Verbose then
+		    Report.Comment ("exception properly raised");
+		 end if;
+	 when others =>
+		 Report.Failed ("wrong exception on double suspend");
+      end;
+      STC.Set_True (Check_SO);  -- let Does_Suspension continue
+
+ 
+      -- interrupt test
+      STC.Set_False (CXDA004_1.SO);
+      Does_Suspension.Do_Int_Test;
+      delay Impdef.Switch_To_New_Task;  -- to allow Does_Suspension to block
+      ImpDef.Annex_C.Enable_Interrupts;
+      ImpDef.Annex_C.Generate_Interrupt;
+
+      delay ImpDef.Annex_C.Wait_For_Interrupt;
+
+      if In_Suspension then
+         Report.Failed ("Task was not unblocked");
+         abort Does_Suspension;  -- so test will terminate
+      end if;
+
+      if CXDA004_1.Interrupt_Count = 0 then
+         Report.Failed ("interrupt never occurred");
+      else
+         if Verbose then
+            Report.Comment ("interrupt count is" & 
+                  Integer'Image (CXDA004_1.Interrupt_Count));
+         end if;
+      end if;
+
+   exception
+      when others =>
+         Report.Failed ("Unexpected Exception in main procedure");
+   end;  -- encapsulation
+
+   Report.Result;
+
+end CXDA004;

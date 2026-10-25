@@ -1,0 +1,94 @@
+// UpdateConfig.tjs - Config.tjs を引き継ぐためのスクリプト
+// Copyright (C)2001-2009, W.Dee and contributors  改変・配布は自由です
+
+// Config.~new ファイルは新しい Config.tjs ファイル。
+// Config.tjs ファイル中のバージョン情報と KAG のバージョン情報が
+// 一致しない場合にこのスクリプトファイルが呼ばれる。
+
+if(Storages.isExistentStorage("Config.~new"))
+{
+	// Config.~new ファイルがあった
+
+	// Config.tjs を読み込む
+	var settings = %[]; // 設定情報を格納する辞書配列
+	var oldconfig = [].load("Config.tjs"); //Config.tjs を読み込む
+	var pattern = /^;\s*(.*?)\s*=(.*)$/; // 設定行を認識するための正規表現パターン
+	var pattern_adds = /^\/\/\[start-(.*?)-additionals\]$/;
+	for(var i = 0; i < oldconfig.count; i++)
+	{
+		var matched = pattern.match(oldconfig[i]);
+		if(matched.count) settings[matched[1]] = matched[2];
+		matched = pattern_adds.match(oldconfig[i]);
+		if(matched.count)
+		{
+			var end_mark = "//[end-" + matched[1] + "-additionals]";
+			i++;
+			var content = '';
+			while(oldconfig[i] != end_mark && i < oldconfig.count)
+			{
+				content += oldconfig[i] + "\n";
+				i++;
+			}
+			settings["additional" + matched[1]] = content;
+		}
+	}
+
+	// バージョン情報の書き込み
+	settings['global.config_version'] = " \"" + kagVersion + "\"; // この行を消さないでください";
+
+	// Config.~new の読み込みと設定の引継ぎ
+	var newconfig = [].load("Config.~new"); // Config.~new を読み込み
+	var lines = '';
+	for(var i = 0; i < newconfig.count; i++)
+	{
+		var matched = pattern.match(newconfig[i]);
+		var matched_adds = pattern_adds.match(newconfig[i]);
+		if(matched.count)
+		{
+			var setting_name = matched[1];
+			var setting = settings[setting_name];
+			if(setting !== void)
+				lines += ";" + setting_name + " =" + setting + "\n";
+			else
+				lines += newconfig[i] + "\n";
+		}
+		else if(matched_adds.count)
+		{
+			var setting_name = "additional" + matched_adds[1];
+			var end_mark = "//[end-" + matched_adds[1] + "-additionals]";
+			var setting = settings[setting_name];
+			if(setting !== void)
+			{
+				lines += "//[start-" + matched_adds[1] + "-additionals]\n" +
+					setting + end_mark + "\n";
+				i++;
+				while(newconfig[i] != end_mark && i < newconfig.count) i++;
+			}
+			else
+			{
+				lines += newconfig[i] + "\n";
+			}
+		}
+		else
+		{
+			lines += newconfig[i] + "\n";
+		}
+	}
+
+	// Pad の表示
+	global.configPad = new Pad();
+	global.configPad.text = lines;
+	global.configPad.color = 0;
+	global.configPad.title = "Config.tjs";
+	global.configPad.fileName = Storages.getLocalName(Storages.getPlacedPath("Config.tjs"));
+	global.configPad.visible = true;
+
+	// 通知
+	System.inform("設定内容を古い Config.tjs から引き継ぎました。\n"
+		"“Config.tjs”ウィンドウ上に表示されている内容でよければ、同ウィンドウ上で\n"
+		"右クリックをして「保存」を選択し、Config.tjs を保存してください。\n"
+		"Config.~new ファイルは削除してかまいません。");
+
+	// 新しい config の読み込み直し
+	Scripts.exec(lines);
+}

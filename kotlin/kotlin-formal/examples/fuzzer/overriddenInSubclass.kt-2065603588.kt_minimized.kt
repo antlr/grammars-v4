@@ -1,0 +1,1 @@
+fun box() = ((((Base::foo))!!) ?: (((Base::foo))!!)).get(Derived())

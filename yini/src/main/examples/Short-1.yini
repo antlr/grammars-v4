@@ -1,0 +1,8 @@
+^ MyPrefs
+
+HomeDir = "C:\Users\John Smith\"
+Buffers = 10
+IsNight = OFF  // Boolean false, YINI understands also OFF, YES, ON etc.
+
+// Following is a list (array) with strings as elements.
+KeyWords = [ "Orange", "Banana", "Pear", "Peach" ]

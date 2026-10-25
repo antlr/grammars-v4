@@ -1,0 +1,78 @@
+Family SharedDataFam = {
+    Port Type p_use = {
+        // this port isn't dangling
+        heuristic size(self.attachedRoles) >= 1<<label : string = "This port has attachment(s).";errMsg : string = "This port dangles!";>>;
+        
+        // only attach to role of type r_user
+        invariant Forall r : role in self.attachedroles | 
+            declaresType(r, r_user) <<label : string = "Attached roles have correct type r_user.";errMsg : string = "Detected attached role that is NOT of type r_user!";>>;
+        
+    }
+    
+    
+    Port Type p_provide = {
+        // this port isn't dangling
+        heuristic size(self.attachedRoles) >= 1<<label : string = "This port has attachment(s).";errMsg : string = "This port dangles!";>>;
+        
+        // only attach to role of type r_provider
+        invariant Forall r : role in self.attachedroles | 
+            declaresType(r, r_provider) <<label : string = "Attached roles have correct type r_provider.";errMsg : string = "Detected attached role that is NOT of type r_provider!";>>;
+        
+    }
+    
+    
+    Role Type r_user = {
+        // this role is not dangling
+        invariant size(self.attachedPorts) >= 1<<label : string = "This role has an attachment.";errMsg : string = "The role dangles!";>>;
+        
+        // only attach to port of type p_use
+        invariant Forall p : port in self.attachedports | 
+            declaresType(p, p_use) <<label : string = "Attached ports have correct type p_use.";errMsg : string = "Detected attached port that is NOT of type p_use!";>>;
+        
+    }
+    
+    
+    Role Type r_provider = {
+        // this role is not dangling
+        invariant size(self.attachedPorts) >= 1<<label : string = "This role has an attachment.";errMsg : string = "The role dangles!";>>;
+        
+        // only attach to port of type p_provide
+        invariant Forall p : port in self.attachedports | 
+            declaresType(p, p_provide) <<label : string = "Attached ports have correct type p_provide.";errMsg : string = "Detected attached port that is NOT of type p_provide!";>>;
+        
+    }
+    
+    
+    Component Type SharedDataT = {
+        Port provide : p_provide =  new p_provide;
+        
+        
+    }
+    
+    
+    Connector Type DataAccessConnT = {
+        Role user : r_user =  new r_user;
+        
+        
+        Role provider : r_provider =  new r_provider;
+        
+        
+        // only roles of provider and user types are allowed
+        invariant Forall r in self.roles | 
+            Exists t in {r_provider, r_user} | 
+                declaresType(r, t)  <<label : string = "Roles match the required types.";errMsg : string = "At least a role is not of type r_provider or r_user!";>>;
+        
+        // at most two roles are allowed
+        invariant size(self.roles) <= 2<<label : string = "Connector has at most two roles.";errMsg : string = "Connector should NOT have more than two roles!";>>;
+        
+        // no two roles have the same type
+        invariant Forall r1 : role in self.roles | 
+            Forall r2 : role in self.roles | 
+                r1 != r2 <-> !(Exists t in {r_provider, r_user} | 
+                    declaresType(r1, t) AND declaresType(r2, t))   <<label : string = "No two distinct roles have the same type.";errMsg : string = "Two distinct roles detected with the same type!";>>;
+        
+    }
+    
+    
+}
+

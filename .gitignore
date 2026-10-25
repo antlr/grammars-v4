@@ -4,11 +4,12 @@
 /**/.settings/
 /**/target
 /**/bin
+/**/*.bak?
 
 # Visual Studio Generated
 .antlr
 .fetch_time_cache
-/.vs
+.vs/
 .vscode/
 .gradle/
 
@@ -16,3 +17,26 @@
 .idea/
 *.iml
 /**/gen
+!_scripts/templates/**/gen
+!_scripts/templates/**/gen/**
+*.tokens
+out
+
+# Ignore C# regression temporaries.
+**/Generated*/
+
+# Ignore Emacs backup files.
+*~
+\#*\#
+
+# Ignore downloaded temporaries create by _scripts/get-antlr.ps1
+antlr4-*-complete.jar
+
+node_modules
+package-lock.json
+
+# Ignore C parser preprocessed output files in examples
+c/examples/**/*.p
+
+# Ignore Roslyn clone used for C# v7 grammar testing
+csharp/v7/testing/roslyn/

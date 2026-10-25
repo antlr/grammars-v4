@@ -1,0 +1,1 @@
+index=web sourcetype=access_combined | lookup user_lookup user OUTPUTNEW user_info

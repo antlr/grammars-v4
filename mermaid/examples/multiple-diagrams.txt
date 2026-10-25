@@ -1,0 +1,9 @@
+erDiagram
+    PERSON ||--o{ TASK : owns
+classDiagram
+    class Task {
+        +String title
+        +complete()
+    }
+erDiagram
+    TASK }o..o{ TAG : has

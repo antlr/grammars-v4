@@ -1,0 +1,22 @@
+# Kotlin Formal Grammar
+
+ANTLR4 grammar for Kotlin written only in ANTLR's special syntax.
+
+## Reference
+* [pldb](http://pldb.info/concepts/kotlin)
+* [EBNF Kotlin grammar](http://kotlinlang.org/docs/reference/grammar.html)
+* [Kotlin specification](https://github.com/Kotlin/kotlin-spec)
+
+## License
+Licensed under the Apache 2.0
+
+## Testing
+Test.kt includes the test data from the JetBrains's repository
+github.com/JetBrains/kotlin/tree/master/compiler/testData/psi
+(stale link).
+
+## Contacts
+Anastasiya Shadrina a.shadrina5@mail.ru
+
+## Origin source
+<https://github.com/shadrina/kotlin-grammar-antlr4>

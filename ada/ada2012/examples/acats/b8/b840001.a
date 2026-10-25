@@ -1,0 +1,294 @@
+-- B840001.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that the name in a use type clause must denote a subtype. Check
+--      that only the primitive operators of the type determined by the
+--      subtype mark in a use type clause are use-visible (in particular, that
+--      the primitive operators of no other type declared in the same
+--      package are use-visible). Check that the scope of a use type clause
+--      in the private part of a library unit does not include the visible
+--      part of any public descendant of that library unit.
+--
+-- TEST DESCRIPTION:
+--      The test checks that the name in a use-type clause may be a direct
+--      name or an expanded name of a subtype declared in a parent or
+--      child unit, but that it may not be the name of a package.
+--
+--      The test checks that, for a package which declares two types for which
+--      the primitive operators have the same names, only the operators of the
+--      type named in the use type clause are made directly visible. It also
+--      checks that the name of the type named in the use type clause is not
+--      made directly visible, nor are explicitly or implicitly declared
+--      primitive subprograms of the type which are not primitive operators.
+--
+--      The test checks that, for a use type clause in the private part of
+--      a library unit, the primitive operators of the named type are made
+--      directly visible in the visible and private parts of a private child
+--      unit and in the private part of a public child unit, but not in the
+--      visible part of a public child unit.
+--
+--
+-- CHANGE HISTORY:
+--      06 Dec 94   SAIC    ACVC 2.0
+--
+--!
+
+package B840001_0 is
+
+   type My_Integer is range -128 .. 127;
+
+   -- Equality operators (=, /=) implicitly declared here.
+   -- Ordering operators (<, <=, >, >=) implicitly declared here.
+   -- Binary adding operators (+, -) implicitly declared here.
+   -- Unary adding operators (+, -) implicitly declared here.
+   -- Multiplying operators (*, /, mod, rem) implicitly declared here.
+   -- Highest precedence operators (abs, **) implicitly declared here.
+
+   function Int_Op return My_Integer;
+
+   MyInt01 : My_Integer := 1;
+   MyInt02 : My_Integer := 2;
+
+   -------
+
+   type Der_Integer is new My_Integer;
+
+   -- Equality operators (=, /=) implicitly declared here.
+   -- Ordering operators (<, <=, >, >=) implicitly declared here.
+   -- Binary adding operators (+, -) implicitly declared here.
+   -- Unary adding operators (+, -) implicitly declared here.
+   -- Multiplying operators (*, /, mod, rem) implicitly declared here.
+   -- Highest precedence operators (abs, **) implicitly declared here.
+
+   -- function Int_Op return Der_Integer implicitly declared here.
+
+   DerInt01 : Der_Integer := 1;
+   DerInt02 : Der_Integer := 2;
+
+end B840001_0;
+
+
+     --==================================================================--
+
+
+with B840001_0;
+package B840001_1 is
+
+   type My_Tag is tagged record
+      C : Integer;
+   end record;
+
+   -- Equality operators (=, /=) implicitly declared here.
+
+   Tag01 : My_Tag := (C => 1);
+   Tag02 : My_Tag := (C => 2);
+
+   -------
+
+   type Derived_Tag is new My_Tag with null record;
+
+   -- Equality operators (=, /=) implicitly declared here.
+
+   Der01 : Derived_Tag := (C => 1);
+   Der02 : Derived_Tag := (C => 2);
+
+private
+
+   use type B840001_0.My_Integer;                                     -- OK.
+             -- The effects of this clause are tested in B840001_1.B840001_3
+             -- and in B840001_1.B840001 below.
+end B840001_1;
+
+
+     --==================================================================--
+
+
+with B840001_0;
+with B840001_1; use B840001_1;
+package B840001_2 is
+
+   -- Use of direct and expanded names in use type clauses (note that the
+   -- second clause is unnecessary due to the earlier use-package clause):
+   use type B840001_0.My_Integer;                                     -- OK.
+   use type My_Tag;                                                   -- OK.
+
+   TagEqual : Boolean := (Tag01 = Tag02);                             -- OK.
+                                                         -- "=" use-visible.
+   IntAdd   : B840001_0.My_Integer :=
+              B840001_0.MyInt01 + B840001_0.MyInt02;                  -- OK.
+                                                         -- "+" use-visible.
+   IntMod   : B840001_0.My_Integer :=
+              B840001_0.MyInt01 mod B840001_0.MyInt02;                -- OK.
+                                                       -- "mod" use-visible.
+
+   IntNeg   : B840001_0.My_Integer := - B840001_0.MyInt01;            -- OK.
+                                                   -- unary "-" use-visible.
+
+   IntLess  : Boolean := (B840001_0.MyInt01 < B840001_0.MyInt02);     -- OK.
+                                                         -- "<" use-visible.
+
+end B840001_2;
+
+
+     --==================================================================--
+
+--
+-- Private child unit:
+--
+
+with B840001_0;                    
+private package B840001_1.B840001_3 is
+  
+   -- Scope of use type clause in private part of parent unit includes
+   -- visible and private parts of private child unit:
+
+   Squared : B840001_0.My_Integer := B840001_0.MyInt01**2;            -- OK.
+                                                        -- "**" use-visible.
+   Int_Mul : B840001_0.My_Integer := 
+      B840001_0.MyInt02*B840001_0.MyInt01;                            -- OK.
+                                                        --  "*" use-visible.
+
+   IntNotEqual : Boolean := (B840001_0.MyInt01 /= B840001_0.MyInt02); -- OK.
+                                                       --  "/=" use-visible.
+
+private
+
+   AbsValue : B840001_0.My_Integer := abs B840001_0.MyInt02;          -- OK.
+                                                       -- "abs" use-visible.
+   Int_Sub : B840001_0.My_Integer := 
+      B840001_0.MyInt02-B840001_0.MyInt01;                            -- OK.
+                                                  -- binary "-" use-visible.
+   IntGreat : Boolean := (B840001_0.MyInt02 > B840001_0.MyInt01);     -- OK.
+                                                         -- ">" use-visible.
+
+end B840001_1.B840001_3;
+
+
+     --==================================================================--
+
+
+with B840001_1;
+package B840001_0.B840001_4 is
+
+   use type B840001_1.Derived_Tag;
+   
+   DerEqual : Boolean := (B840001_1.Der01 = B840001_1.Der02);         -- OK.
+                                                         -- "=" use-visible.
+
+   type Der_Tag is new B840001_1.My_Tag with null record;
+
+   function Tag_Op (P: Der_Tag) return Integer;
+
+   DerObj : Der_Tag := (C => 3);
+
+   type Another_Integer is new My_Integer;
+
+   -- Equality operators (=, /=) implicitly declared here.
+   -- Ordering operators (<, <=, >, >=) implicitly declared here.
+   -- Binary adding operators (+, -) implicitly declared here.
+   -- Unary adding operators (+, -) implicitly declared here.
+   -- Multiplying operators (*, /, mod, rem) implicitly declared here.
+   -- Highest precedence operators (abs, **) implicitly declared here.
+
+   -- function Int_Op return Another_Integer implicitly declared here.
+
+
+   Another01 : Another_Integer := 1;
+   Another02 : Another_Integer := 2;
+
+end B840001_0.B840001_4;
+
+
+     --==================================================================--
+
+
+--
+-- Public child unit:
+--
+
+with B840001_0.B840001_4;
+
+package B840001_1.B840001 is
+
+   use type B840001_0;                                                -- ERROR:
+                              -- Name in use type clause must denote a subtype.
+
+   use type B840001_0.B840001_4;                                      -- ERROR:
+                              -- Name in use type clause must denote a subtype.
+
+   use type B840001_0.B840001_4.Der_Tag;                              -- OK.
+
+   TagObj : Integer := Tag_Op (B840001_0.B840001_4.DerObj);           -- ERROR:
+                  -- Tag_Op is not directly visible (not a primitive operator).
+
+   use type B840001_0.B840001_4.Another_Integer;                      -- OK.
+
+   AnoObj01 : Another_Integer;                                        -- ERROR:
+                            -- Name in use type clause is not directly visible.
+
+   -- Implicitly declared primitive subprogram is not directly visible:
+   AnoObj02 : B840001_0.B840001_4.Another_Integer := Int_Op;          -- ERROR:
+                  -- Int_Op is not directly visible (not a primitive operator).
+
+
+   -- A use type clause for My_Integer exists in the private part of this 
+   -- unit's parent.
+   Object01 : My_Integer;                                             -- ERROR:
+                                         -- My_Integer is not directly visible.
+
+   -- Explicitly declared primitive subprogram is not directly visible:
+   Object02 : B840001_0.My_Integer := Int_Op;                         -- ERROR:
+                  -- Int_Op is not directly visible (not a primitive operator).
+  
+   Object03 : B840001_0.My_Integer := -B840001_0.MyInt01;             -- ERROR:
+              -- Unary "-" not directly visible (visible part of public child).
+
+   Object04 : Boolean := 
+              (B840001_0.MyInt02 >= B840001_0.MyInt01);               -- ERROR:
+          -- Ordering ">=" not directly visible (visible part of public child).
+
+
+private
+
+   Object05 : B840001_0.My_Integer := Int_Op;                         -- ERROR:
+                  -- Int_Op is not directly visible (not a primitive operator).
+  
+   Object06 : B840001_0.My_Integer :=
+              B840001_0.MyInt01/B840001_0.MyInt01;                    -- OK.
+                                                         -- "/" use-visible.
+   Object07 : B840001_0.My_Integer := 
+              B840001_0.MyInt02 rem B840001_0.MyInt01;                -- OK.
+                                                       -- "rem" use-visible.
+   Object08 : Boolean := 
+    (B840001_0.B840001_4.Another01 <= B840001_0.B840001_4.Another02); -- OK.
+                                                        -- "<=" use-visible.
+
+   BadObj01 : B840001_0.Der_Integer := 
+              B840001_0.DerInt01 - B840001_0.DerInt01;                -- ERROR:
+                         -- "-" not directly visible (B840001_0.Der_Integer not
+                         -- named in use type clause).
+
+end B840001_1.B840001;

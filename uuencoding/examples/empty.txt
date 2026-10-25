@@ -1,0 +1,3 @@
+begin 600 empty.bin
+`
+end

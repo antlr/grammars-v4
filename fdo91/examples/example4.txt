@@ -1,0 +1,1 @@
+man_start_object <ind_group, "Hello World">

@@ -1,0 +1,106 @@
+bracket-comment    = "/*" *not-star 1*STAR
+                        *(not-star-slash *not-star 1*STAR) "/"
+                          ; No */ allowed inside a comment.
+                          ; (No * is allowed unless it is the last
+                          ; character, or unless it is followed by a
+                          ; character that isn't a slash.)
+
+
+ comment            = bracket-comment / hash-comment
+
+   hash-comment       = "#" *octet-not-crlf CRLF
+
+   identifier         = (ALPHA / "_") *(ALPHA / DIGIT / "_")
+
+   multi-line         = "text:" *(SP / HTAB) (hash-comment / CRLF)
+                        *(multiline-literal / multiline-dotstart)
+                        "." CRLF
+
+   multiline-literal  = [ octet-not-period *octet-not-crlf ] CRLF
+
+   multiline-dotstart = "." 1*octet-not-crlf CRLF
+                          ; A line containing only "." ends the
+                          ; multi-line.  Remove a leading '.' if
+                          ; followed by another '.'.
+
+   not-star           = CRLF / %x01-09 / %x0B-0C / %x0E-29 / %x2B-FF
+                          ; either a CRLF pair, OR a single octet
+                          ; other than NUL, CR, LF, or star
+
+   not-star-slash     = CRLF / %x01-09 / %x0B-0C / %x0E-29 / %x2B-2E /
+                        %x30-FF
+                          ; either a CRLF pair, OR a single octet
+                          ; other than NUL, CR, LF, star, or slash
+
+   number             = 1*DIGIT [ QUANTIFIER ]
+
+   octet-not-crlf     = %x01-09 / %x0B-0C / %x0E-FF
+                          ; a single octet other than NUL, CR, or LF
+
+   octet-not-period   = %x01-09 / %x0B-0C / %x0E-2D / %x2F-FF
+                          ; a single octet other than NUL,
+                          ; CR, LF, or period
+
+   octet-not-qspecial = %x01-09 / %x0B-0C / %x0E-21 / %x23-5B / %x5D-FF
+                          ; a single octet other than NUL,
+                          ; CR, LF, double-quote, or backslash
+
+   QUANTIFIER         = "K" / "M" / "G"
+
+   quoted-other       = "\" octet-not-qspecial
+                          ; represents just the octet-no-qspecial
+                          ; character.  SHOULD NOT be used
+
+   quoted-safe        = CRLF / octet-not-qspecial
+                          ; either a CRLF pair, OR a single octet other
+                          ; than NUL, CR, LF, double-quote, or backslash
+
+
+   quoted-special     = "\" (DQUOTE / "\")
+                          ; represents just a double-quote or backslash
+
+   quoted-string      = DQUOTE quoted-text DQUOTE
+
+   quoted-text        = *(quoted-safe / quoted-special / quoted-other)
+
+   STAR               = "*"
+
+   tag                = ":" identifier
+
+   white-space        = 1*(SP / CRLF / HTAB) / comment
+
+
+   The following is the grammar of Sieve after it has been lexically
+   interpreted.  No whitespace or comments appear below.  The start
+   symbol is "start".
+
+   argument     = string-list / number / tag
+
+   arguments    = *argument [ test / test-list ]
+
+   block        = "{" commands "}"
+
+   command      = identifier arguments (";" / block)
+
+   commands     = *command
+
+	   start        = commands
+
+	   string       = quoted-string / multi-line
+
+	   string-list  = "[" string *("," string) "]" / string
+	                    ; if there is only a single string, the brackets
+	                    ; are optional
+
+	   test         = identifier arguments
+
+	   test-list    = "(" test *("," test) ")"
+
+
+     ADDRESS-PART = ":localpart" / ":domain" / ":all"
+
+
+   COMPARATOR   = ":comparator" string
+
+   MATCH-TYPE   = ":is" / ":contains" / ":matches"
+   

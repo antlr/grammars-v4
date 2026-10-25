@@ -1,0 +1,158 @@
+function test_equalStruct() 
+{
+  if (equalStruct(1, 1) == true
+      && equalStruct(1, 2) == false
+      && equalStruct(1, "1") == false
+      && equalStruct([ 1, 2, 3 ], [ 1, 2, 3 ]) == true
+      && equalStruct([ 1, 2, 3 ], [ 1, 2, 4 ]) == false
+      && equalStruct([ 1, 2, 3 ], [ 1, 2 ]) == false
+      && equalStruct(%[ a:1, b:2 ], %[ a:1, b:2 ]) == true
+      && equalStruct(%[ a:1, b:2 ], %[ a:1, b:3 ]) == false
+      && equalStruct(%[ a:1, b:2 ], %[ a:1 ]) == false
+      && equalStruct(%[ a: [ 1, %[ b: 25 ] ] ], %[ a: [ 1, %[ b: 25 ] ] ]) == true
+      && equalStruct(%[ a: [ 1, %[ b: 25 ] ] ], %[ a: [ 1, %[ b: 26 ] ] ]) == false
+      && equalStruct(test_equalStruct, test_equalStruct) == true
+      && equalStruct(test_equalStruct, test_all) == false
+      && equalStruct(test_equalStruct, []) == false
+      && equalStruct(test_equalStruct, %[]) == false
+      && equalStruct(test_equalStruct, void) == false)
+    Debug.message("test_equalStruct() success.");
+  else
+    Debug.message("test_equalStruct() fail.");
+}
+
+function test_eachArray()
+{
+  var a = [];
+  var b = [];
+  for (var i = 0; i < 10; i++)
+    a.add(i);
+  eachArray(a,
+	    function(index, value, b, add) { b[index] = value + add; },
+	    b, 
+	    10);
+  for (var i = 0; i < 10; i++)
+    if (b[i] != i + 10) {
+      Debug.message("test_eachArray fail.");
+      return;
+    }
+
+  Debug.message("test_eachArray success.");
+}
+
+function test_eachDictionary()
+{
+  var a = %[];
+  var b = %[];
+  for (var i = 0; i < 10; i++)
+    a["key" + i] = i;
+  eachDictionary(a,
+		 function(key, value, b, add) { b[key] = value + add; },
+		 b, 
+		 10);
+  for (var i = 0; i < 10; i++)
+    if (b["key" + i] != i + 10) {
+      Debug.message("test_eachDictionary fail.");
+      return;
+    }
+
+  Debug.message("test_eachDictionary success.");
+}
+
+function test_dictionaryKeys()
+{
+  var keys = dictionaryKeys(%[ a: 1, b: 23, c: 45 ]);
+  keys.sort();
+  if (equalStruct(keys, [ "a", "b", "c" ]))
+    Debug.message("test_dictionaryKeys success.");
+  else
+    Debug.message("test_dictionaryKeys fail.");
+}
+
+function test_dictionaryValues()
+{
+  var keys = dictionaryValues(%[ a: 1, b: 23, c: 45 ]);
+  keys.sort();
+  if (equalStruct(keys, [ 1, 23, 45 ]))
+    Debug.message("test_dictionaryValues success.");
+  else
+    Debug.message("test_dictionaryValues fail.");
+}
+
+function test_arrayHash() 
+{
+  var hash = arrayHash([ "z2", "abc", "n64fa" ]);
+  if (equalStruct(hash, %[ z2:true, abc:true, n64fa: true ]))
+    Debug.message("test_arrayHash success.");
+  else
+    Debug.message("test_arrayHash fail.");
+}
+
+function test_unionDictionary()
+{
+  if (equalStruct(unionDictionary(%[ a: 1, b: 2, c: 3 ],
+				  %[ a: 5, b: 6, d: 7 ]),
+		  %[ a: 5, b: 6, c: 3, d: 7 ]))
+    Debug.message("test_unionDictionary success.");
+  else
+    Debug.message("test_unionDictionary fail.");
+}
+
+function test_unionSet()
+{
+  var result = unionSet([ 1, 2, 3, 4 ], [ 1, 2, 5, 6 ]);
+  result.sort();
+  if (equalStruct(result, [ 1, 2, 3, 4, 5, 6 ]))
+    Debug.message("test_unionSet success.");
+  else
+    Debug.message("test_unionSet fail.");
+}
+
+function test_intersectionSet()
+{
+  var result = intersectionSet([ 1, 2, 3, 4 ], [ 1, 2, 5, 6 ]);
+  result.sort();
+  if (equalStruct(result, [ 1, 2 ]))
+    Debug.message("test_intersectionSet success.");
+  else
+    Debug.message("test_intersectionSet fail.");
+}
+
+function test_differenceSet()
+{
+  var a1 = [ 1, 2, 3, 4 ];
+  var a2 = [ 1, 2, 5, 6 ];
+  var result1 = differenceSet(a1, a2);
+  var result2 = differenceSet(a2, a1);
+  result1.sort();
+  result2.sort();
+  if (equalStruct(result1, [ 3, 4 ])
+      && equalStruct(result2, [ 5, 6 ]))
+    Debug.message("test_differenceSet success.");
+  else
+    Debug.message("test_differenceSet fail.");
+}
+
+function test_sliceArray()
+{
+  if (equalStruct(sliceArray([ 1, 2, 3, 4, 5, 6, 7 ], 3, 2),
+		  [ 4, 5 ] ))
+    Debug.message("test_sliceArray success.");
+  else
+    Debug.message("test_sliceArray fail.");
+}
+
+function test_all()
+{
+  test_equalStruct();
+  test_eachArray();
+  test_eachDictionary();
+  test_dictionaryKeys();
+  test_dictionaryValues();
+  test_arrayHash();
+  test_unionDictionary();
+  test_unionSet();
+  test_intersectionSet();
+  test_differenceSet();
+  test_sliceArray();
+}

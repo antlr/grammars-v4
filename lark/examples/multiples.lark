@@ -1,0 +1,5 @@
+start: "2:" multiple2
+     | "3:" multiple3
+
+%import .multiple2.start -> multiple2
+%import .multiple3.start -> multiple3

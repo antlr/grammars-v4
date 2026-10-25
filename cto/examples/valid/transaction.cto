@@ -3,7 +3,6 @@
  */
 namespace org.sample.trasaction
 
-import org.sample.owner.Owner
 import org.sample.car.*
 
 transaction Buy {
@@ -12,6 +11,7 @@ transaction Buy {
   o String foo 
   o Integer bar
 }
+
 
 event SampleEvent {
   --> Car asset
