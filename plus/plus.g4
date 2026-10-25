@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2021, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -40,14 +40,14 @@ statement_list
    ;
 
 statement
-   : type_delaration
+   : type_declaration
    | variable_declaration
    | constant_declaration
    | procedure_declaration
    | macro_declaration
    | open_declaration
    | equate_declaration
-   | esape
+   | escape
    | return
    | if_statement
    | pctif_statement
@@ -77,9 +77,9 @@ external_name
    : ('external' constant_expression)?
    ;
 
-type_delaration
+type_declaration
    : 'type' id_list 'is' type
-   | type_delaration ',' id_list 'is' type
+   | type_declaration ',' id_list 'is' type
    ;
 
 variable_declaration
@@ -154,7 +154,7 @@ procedure_head
    ;
 
 procedure_decl
-   : 'proedure' id_list 'is' type proc_specifications
+   : 'procedure' id_list 'is' type proc_specifications
    | procedure_decl ',' id_list 'is' type proc_specifications
    ;
 
@@ -210,7 +210,7 @@ basic_type
    | 'bit' '(' constant_expression ')'
    | 'real' '(' constant_expression ')'
    | 'character' '(' constant_expression ')'
-   | 'charater' '(' constant_expression 'to' constant_expression ')'
+   | 'character' '(' constant_expression 'to' constant_expression ')'
    | '(' constant_expression 'to' constant_expression ')'
    | record_type
    | 'pointer' 'to' type
@@ -281,7 +281,7 @@ variant_else
    ;
 
 procedure_type
-   : 'proedure' parameter_list result_part 'end'
+   : 'procedure' parameter_list result_part 'end'
    ;
 
 parameter_list
@@ -309,7 +309,7 @@ result_part
    : ('result' declaration_element | 'optional' 'result' declaration_element)?
    ;
 
-esape
+escape
    : escape_type optional_label when_unless
    ;
 
@@ -495,7 +495,6 @@ logical_formula
 
 relation
    : relation_op
-   | 'FIX ME' relation_op
    | 'not' relation_op
    ;
 
@@ -571,7 +570,7 @@ identifier
    ;
 
 number:
-    ('+' | '-') NUMBER ('.' NUMBER)?;
+    ('+' | '-')? NUMBER ('.' NUMBER)?;
 
 STRING:
     '"' ~'"'* '"';
