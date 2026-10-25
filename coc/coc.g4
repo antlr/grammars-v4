@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2022, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -32,10 +32,31 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 grammar coc;
 
-file_ : e* EOF;
+file_
+   : e_ EOF
+   ;
 
-e: t | p | x | e e | 'λ' x e '.' e | 'Ɐ'  e '.' e;
+e_
+   : ('λ' | 'lambda') ID ':' e_ '.' e_
+   | ('∀' | 'Ɐ' | 'forall') ID ':' e_ '.' e_
+   | application
+   ;
+
+application
+   : atom+
+   ;
+
+atom
+   : 'Type'
+   | 'Prop'
+   | ID
+   | '(' e_ ')'
+   ;
+
+ID
+   : [a-zA-Z_] [a-zA-Z_0-9]*
+   ;
 
 WS
-   : [ \r\n\t] + -> skip
+   : [ \r\n\t]+ -> skip
    ;

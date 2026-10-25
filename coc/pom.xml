@@ -42,6 +42,8 @@
 					<grammarName>coc</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
+					<testFileExtension>txt</testFileExtension>
+					<fileEncoding>UTF-8</fileEncoding>
 				</configuration>
 				<executions>
 					<execution>
