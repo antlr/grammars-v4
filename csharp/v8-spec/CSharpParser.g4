@@ -1729,8 +1729,8 @@ type_parameter_constraints_clause
     ;
 
 type_parameter_constraints
-    : primary_constraint (',' secondary_constraints)? (',' constructor_constraint)?
-    | secondary_constraints (',' constructor_constraint)?
+    : {this.IsPrimaryConstraintAhead()}?   primary_constraint (',' secondary_constraints)? (',' constructor_constraint)?
+    | {this.IsSecondaryConstraintAhead()}? secondary_constraints (',' constructor_constraint)?
     | constructor_constraint
     ;
 
@@ -1765,11 +1765,8 @@ class_body
 // Source: §15.3.1 General
 class_member_declaration
     : constant_declaration
-    | field_declaration
-    | method_declaration
-    | property_declaration
+    | typed_member_declaration
     | event_declaration
-    | indexer_declaration
     | operator_declaration
     | constructor_declaration
     | finalizer_declaration
@@ -1815,6 +1812,63 @@ variable_declarators
 variable_declarator
     : identifier { this.OnVariableDeclarator(); }
       ('=' variable_initializer)?
+    ;
+
+// Left-factored rule: field + method (non-void) + property + indexer.
+// Consumes attributes, modifiers, optional 'partial', optional ref_kind, and type_ once,
+// then dispatches on typed_member_rest / typed_member_rest_ref / typed_member_void_rest.
+// This ensures the long type_ scan happens only once; typed_member_rest is immediately
+// ambiguous to SLL (all identifier-starting alternatives), triggering LL fallback and
+// resolving in ≤2 tokens for common cases.
+typed_member_declaration
+    : attributes? typed_member_modifier* 'partial'?
+      ( ref_kind type_ typed_member_rest_ref
+      | type_         typed_member_rest
+      | 'void'        typed_member_void_rest
+      )
+    ;
+
+typed_member_modifier
+    : 'new'
+    | 'public'
+    | 'protected'
+    | 'internal'
+    | 'private'
+    | 'static'
+    | 'virtual'
+    | 'sealed'
+    | 'override'
+    | 'abstract'
+    | 'extern'
+    | 'readonly'
+    | 'volatile'
+    | 'async'
+    | unsafe_modifier
+    ;
+
+// After ref_kind type_ has been consumed.
+typed_member_rest_ref
+    : 'this' '[' parameter_list? ']' ref_indexer_body
+    | member_name type_parameter_list? '(' parameter_list? ')'
+      type_parameter_constraints_clause* ref_method_body
+    | member_name ref_property_body
+    | interface_type '.' 'this' '[' parameter_list? ']' ref_indexer_body
+    ;
+
+// After type_ has been consumed (non-ref, non-void).
+typed_member_rest
+    : 'this' '[' parameter_list? ']' indexer_body
+    | { this.BeginVariableDeclaration(); } variable_declarators ';'
+    | member_name type_parameter_list? '(' parameter_list? ')'
+      type_parameter_constraints_clause* method_body
+    | member_name property_body
+    | interface_type '.' 'this' '[' parameter_list? ']' indexer_body
+    ;
+
+// After 'void' has been consumed — only a method is valid.
+typed_member_void_rest
+    : member_name type_parameter_list? '(' parameter_list? ')'
+      type_parameter_constraints_clause* method_body
     ;
 
 // Source: §15.6.1 General
@@ -2226,11 +2280,8 @@ struct_body
 // Source: §16.3.1 General
 struct_member_declaration
     : constant_declaration
-    | field_declaration
-    | method_declaration
-    | property_declaration
+    | typed_member_declaration
     | event_declaration
-    | indexer_declaration
     | operator_declaration
     | constructor_declaration
     | static_constructor_declaration
@@ -2299,11 +2350,8 @@ interface_body
 // Source: §19.4.1 General
 interface_member_declaration
     : constant_declaration
-    | field_declaration
-    | method_declaration
-    | property_declaration
+    | typed_member_declaration
     | event_declaration
-    | indexer_declaration
     | static_constructor_declaration
     | operator_declaration
     | type_declaration

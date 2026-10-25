@@ -184,7 +184,11 @@ export default abstract class CSharpParserBase extends Parser {
         this.symTable.importNamespace(ctx.getChild(1).getText());
     }
     BeginVariableDeclaration(): void {
-        const ctx = this._ctx as any;
+        // After left-factoring (typed_member_declaration), type_ lives in the
+        // parent context; fall back to parent when current context has no children.
+        let ctx = this._ctx as any;
+        if (ctx.getChildCount() === 0 && ctx.parentCtx != null)
+            ctx = ctx.parentCtx;
         this._pendingVarType = ctx.getChild(ctx.getChildCount() - 1).getText() ?? "?";
     }
     OnVariableDeclarator(): void {
@@ -269,6 +273,20 @@ export default abstract class CSharpParserBase extends Parser {
 
     IsClassBaseInterfaceList(): boolean { return this._classBaseTypeCheck(true); }
     IsClassBaseClassType():     boolean { return this._classBaseTypeCheck(false); }
+
+    IsPrimaryConstraintAhead(): boolean {
+        const tok = (this._input as any).LT(1);
+        if (!tok) return false;
+        if (tok.type === CSharpLexer.KW_CLASS || tok.type === CSharpLexer.KW_STRUCT ||
+            tok.type === CSharpLexer.KW_NOTNULL || tok.type === CSharpLexer.KW_UNMANAGED ||
+            tok.type === CSharpLexer.KW_OBJECT || tok.type === CSharpLexer.KW_STRING) return true;
+        const sym = this.symTable.currentScope.lookupChain(tok.text);
+        if (!sym) return true;
+        if (sym.kind === CSharpSymbolKind.TypeParameter) return false;
+        if (sym.kind !== CSharpSymbolKind.Type) return true;
+        return sym.typeKind !== CSharpTypeKind.Interface;
+    }
+    IsSecondaryConstraintAhead(): boolean { return !this.IsPrimaryConstraintAhead(); }
 
     IsDeclarationPatternAhead(): boolean {
         // Heuristic (avoids stream corruption from Parser constructor's reset() → seek(0)):
