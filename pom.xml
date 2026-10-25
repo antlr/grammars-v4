@@ -299,6 +299,7 @@
 				<module>ltl</module>
 				<module>lua</module>
 				<module>lucene</module>
+				<module>makefile</module>
 				<module>maml</module>
 				<module>matlab</module>
 				<module>mckeeman-form</module>
