@@ -58,21 +58,21 @@ exp
    | 'let' dec 'in' exp (';' exp)* 'end'
    | exp ':' typ
    | 'raise' exp
-   | exp 'handle' match
+   | exp 'handle' match_
    | exp 'andalso' exp
    | exp 'orelse' exp
    | 'if' exp 'then' exp 'else' exp
    | 'while' exp 'do' exp
-   | 'case' exp 'of' match
-   | 'fn' match
+   | 'case' exp 'of' match_
+   | 'fn' match_
    ;
 
 exprow
    : lab '=' exp (',' exprow)?
    ;
 
-match
-   : pat '=>' exp ('|' match)?
+match_
+   : pat '=>' exp ('|' match_)?
    ;
 
 pat
