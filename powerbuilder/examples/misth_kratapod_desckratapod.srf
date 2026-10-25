@@ -1,0 +1,23 @@
+HA$PBExportHeader$misth_kratapod_desckratapod.srf
+$PBExportComments$
+global type misth_kratapod_desckratapod from function_object
+end type
+
+forward prototypes
+global function string misth_kratapod_desckratapod (long al_kodkratapod)
+end prototypes
+
+global function string misth_kratapod_desckratapod (long al_kodkratapod);// ÅðéóôñïöÞ ôçò ðåñéãñáöÞò áðüäïóçò
+
+	string	ls_desckratapod
+	setnull(ls_desckratapod)
+	
+	select	desckratapod into :ls_desckratapod
+	from		misth_kratapod
+	where		kodkratapod = :al_kodkratapod
+	and		kodxrisi = :gs_kodxrisi;
+	fn_sqlerror()
+	
+	return trim(ls_desckratapod)
+end function
+

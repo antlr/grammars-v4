@@ -1,0 +1,15 @@
+// startup.tjs - スタートアップスクリプト
+// Copyright (C) 2001, W.Dee  改変・配布は自由です
+
+@if (kirikiriz)
+property _dummyProp { getter {} setter (v) {} }
+with(Window) {
+    &.innerSunken    = &_dummyProp;
+    &.showScrollBars = &_dummyProp;
+}
+Plugins.link("menu.dll");
+Plugins.link("KAGParser.dll");
+@endif
+
+// このスクリプトは一番最初に実行されるスクリプトです
+Scripts.execStorage("system/Initialize.tjs"); // system/Initialize.tjs を実行

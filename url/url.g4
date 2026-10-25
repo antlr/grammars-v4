@@ -33,88 +33,90 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
 * scheme:[//[user:password@]host[:port]][/]path[?query][#fragment]
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar url;
 
 url
-   : uri
-   ;
+    : uri EOF
+    ;
 
 uri
-   : scheme '://' login? host (':' port)? ('/' path)? query? frag? WS?
-   ;
+    : scheme '://' login? host (':' port)? ('/' path?)? query? frag? WS?
+    ;
 
 scheme
-   : string
-   ;
+    : string
+    ;
 
 host
-   : '/'? (hostname | hostnumber)
-   ;
+    : '/'? hostname
+    ;
 
 hostname
-   : string ('.' string)*
-   ;
+    : string         # DomainNameOrIPv4Host
+    | '[' v6host ']' # IPv6Host
+    ;
 
-hostnumber
-   : DIGITS '.' DIGITS '.' DIGITS '.' DIGITS
-   ;
+v6host
+    : '::'? (string | DIGITS) ((':' | '::') (string | DIGITS))*
+    ;
 
 port
-   : DIGITS
-   ;
+    : DIGITS
+    ;
 
 path
-   : string ('/' string)*
-   ;
+    : string ('/' string)* '/'?
+    ;
 
 user
-   : string
-   ;
+    : string
+    ;
 
 login
-   : user ':' password '@'
-   ;
+    : user (':' password)? '@'
+    ;
 
 password
-   : string
-   ;
+    : string
+    ;
 
 frag
-   : ('#' string)
-   ;
+    : '#' (string | DIGITS)
+    ;
 
 query
-   : ('?' search)
-   ;
+    : '?' search
+    ;
 
 search
-   : searchparameter ('&' searchparameter)*
-   ;
+    : searchparameter ('&' searchparameter)*
+    ;
 
 searchparameter
-   : string ('=' (string | DIGITS | HEX))?
-   ;
+    : string ('=' (string | DIGITS | HEX))?
+    ;
 
 string
-   : STRING
-   ;
-
+    : STRING
+    | DIGITS
+    ;
 
 DIGITS
-   : [0-9] +
-   ;
-
+    : [0-9]+
+    ;
 
 HEX
-   : ('%' [a-fA-F0-9] [a-fA-F0-9]) +
-   ;
-
+    : ('%' [a-fA-F0-9] [a-fA-F0-9])+
+    ;
 
 STRING
-   : ([a-zA-Z~0-9] | HEX) ([a-zA-Z0-9.-] | HEX)*
-   ;
-
+    : ([a-zA-Z~0-9] | HEX) ([a-zA-Z0-9.+-] | HEX)*
+    ;
 
 WS
-   : [\r\n] +
-   ;
+    : [\r\n]+
+    ;

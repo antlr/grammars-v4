@@ -1,0 +1,3 @@
+line 4:8 no viable alternative at input 'unionB:'
+line 6:1 missing '{' at ';'
+line 6:2 missing '}' at '<EOF>'

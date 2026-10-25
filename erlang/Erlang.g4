@@ -21,370 +21,679 @@
 // An ANTLR4 Grammar of Erlang R16B01 made by Pierre Fenoll from
 // https://github.com/erlang/otp/blob/maint/lib/stdlib/src/erl_parse.yrl
 
+// Update to Erlang/OTP 23.3
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
 
 grammar Erlang;
 
-forms : form+ EOF ;
+forms
+    : form+ EOF
+    ;
 
-form : (attribute | function | ruleClauses) '.' ;
+form
+    : (attribute | function_) '.'
+    ;
 
 /// Tokens
 
-tokAtom : TokAtom ;
-TokAtom : [a-z@][0-9a-zA-Z_@]*
-        | '\'' ( '\\' (~'\\'|'\\') | ~[\\'] )* '\'' ;
+fragment DIGIT
+    : [0-9]
+    ;
 
-tokVar : TokVar ;
-TokVar : [A-Z_][0-9a-zA-Z_]* ;
+fragment LOWERCASE
+    : [a-z]
+    | '\u00df' ..'\u00f6'
+    | '\u00f8' ..'\u00ff'
+    ;
 
-tokFloat : TokFloat ;
-TokFloat : '-'? [0-9]+ '.' [0-9]+  ([Ee] [+-]? [0-9]+)? ;
+fragment UPPERCASE
+    : [A-Z]
+    | '\u00c0' ..'\u00d6'
+    | '\u00d8' ..'\u00de'
+    ;
 
-tokInteger : TokInteger ;
-TokInteger : '-'? [0-9]+ ('#' [0-9a-zA-Z]+)? ;
+tokAtom
+    : TokAtom
+    ;
 
-tokChar : TokChar ;
-TokChar : '$' ('\\'? ~[\r\n] | '\\' [0-9] [0-9] [0-9]) ;
+TokAtom
+    : LOWERCASE (DIGIT | LOWERCASE | UPPERCASE | '_' | '@')*
+    | '\'' ( '\\' (~'\\' | '\\') | ~[\\'])* '\''
+    ;
 
-tokString : TokString ;
-TokString : '"' ( '\\' (~'\\'|'\\') | ~[\\"] )* '"' ;
+tokVar
+    : TokVar
+    ;
+
+TokVar
+    : (UPPERCASE | '_') (DIGIT | LOWERCASE | UPPERCASE | '_' | '@')*
+    ;
+
+tokFloat
+    : TokFloat
+    ;
+
+TokFloat
+    : '-'? DIGIT+ '.' DIGIT+ ([Ee] [+-]? DIGIT+)?
+    ;
+
+tokInteger
+    : TokInteger
+    ;
+
+TokInteger
+    : '-'? DIGIT+ ('#' (DIGIT | [a-zA-Z])+)?
+    ;
+
+tokChar
+    : TokChar
+    ;
+
+TokChar
+    : '$' ('\\'? ~[\r\n] | '\\' DIGIT DIGIT DIGIT)
+    ;
+
+tokString
+    : TokString
+    ;
+
+TokString
+    : '"' ('\\' (~'\\' | '\\') | ~[\\"])* '"'
+    ;
 
 // antlr4 would not accept spec as an Atom otherwise.
-AttrName : '-' ('spec' | 'callback') ;
+AttrName
+    : '-' ('spec' | 'callback')
+    ;
 
-Comment : '%' ~[\r\n]* '\r'? '\n' -> skip ;
+Comment
+    : '%' ~[\r\n]* '\r'? '\n' -> skip
+    ;
 
-WS : [ \t\r\n]+ -> skip ;
+WS
+    : [\u0000-\u0020\u0080-\u00a0]+ -> skip
+    ;
 
-
-
-attribute : '-' tokAtom                           attrVal
-          | '-' tokAtom                      typedAttrVal
-          | '-' tokAtom                  '(' typedAttrVal ')'
-          | AttrName                           typeSpec
-          ;
-
+attribute
+    : '-' tokAtom attrVal
+    | '-' tokAtom typedAttrVal
+    | '-' tokAtom '(' typedAttrVal ')'
+    | AttrName typeSpec
+    ;
 
 /// Typing
 
-typeSpec :     specFun typeSigs
-         | '(' specFun typeSigs ')'
-         ;
+typeSpec
+    : specFun typeSigs
+    | '(' specFun typeSigs ')'
+    ;
 
-specFun :             tokAtom
-        | tokAtom ':' tokAtom
-// The following two are retained only for backwards compatibility;
-// they are not part of the EEP syntax and should be removed.
-        |             tokAtom '/' tokInteger '::'
-        | tokAtom ':' tokAtom '/' tokInteger '::'
-        ;
+specFun
+    : tokAtom
+    | tokAtom ':' tokAtom
+    ;
 
-typedAttrVal : expr ','  typedRecordFields
-             | expr '::' topType
-             ;
+typedAttrVal
+    : expr ',' typedRecordFields
+    | expr '::' topType
+    ;
 
-typedRecordFields : '{' typedExprs '}' ;
+typedRecordFields
+    : '{' typedExprs '}'
+    ;
 
-typedExprs : typedExpr
-           | typedExpr  ',' typedExprs
-           | expr       ',' typedExprs
-           | typedExpr  ','      exprs ;
+typedExprs
+    : typedExpr
+    | typedExpr ',' typedExprs
+    | expr ',' typedExprs
+    | typedExpr ',' exprs
+    ;
 
-typedExpr : expr '::' topType ;
+typedExpr
+    : expr '::' topType
+    ;
 
-typeSigs : typeSig (';' typeSig)* ;
+typeSigs
+    : typeSig (';' typeSig)*
+    ;
 
-typeSig : funType ('when' typeGuards)? ;
+typeSig
+    : funType ('when' typeGuards)?
+    ;
 
-typeGuards : typeGuard (',' typeGuard)* ;
+typeGuards
+    : typeGuard (',' typeGuard)*
+    ;
 
-typeGuard : tokAtom '(' topTypes ')'
-          | tokVar '::' topType ;
+typeGuard
+    : tokAtom '(' topTypes ')'
+    | tokVar '::' topType
+    ;
 
-topTypes : topType (',' topType)* ;
+topTypes
+    : topType (',' topType)*
+    ;
 
-topType : (tokVar '::')? topType100 ;
+topType
+    : (tokVar '::')? topType100
+    ;
 
-topType100 : type200 ('|' topType100)? ;
+topType100
+    : type200 ('|' topType100)?
+    ;
 
-type200 : type300 ('..' type300)? ;
+type200
+    : type300 ('..' type300)?
+    ;
 
-type300 : type300 addOp type400
-        |               type400 ;
+type300
+    : type300 addOp type400
+    | type400
+    ;
 
-type400 : type400 multOp type500
-        |                type500 ;
+type400
+    : type400 multOp type500
+    | type500
+    ;
 
-type500 : prefixOp? type ;
+type500
+    : prefixOp? type_
+    ;
 
-type : '(' topType ')'
-     | tokVar
-     | tokAtom
-     | tokAtom             '('          ')'
-     | tokAtom             '(' topTypes ')'
-     | tokAtom ':' tokAtom '('          ')'
-     | tokAtom ':' tokAtom '(' topTypes ')'
-     | '['                   ']'
-     | '[' topType           ']'
-     | '[' topType ',' '...' ']'
-     | '{'          '}'
-     | '{' topTypes '}'
-     | '#' tokAtom '{'            '}'
-     | '#' tokAtom '{' fieldTypes '}'
-     | binaryType
-     | tokInteger
-     | 'fun' '('            ')'
-     | 'fun' '(' funType100 ')' ;
+type_
+    : '(' topType ')'
+    | tokVar
+    | tokAtom
+    | tokAtom '(' ')'
+    | tokAtom '(' topTypes ')'
+    | tokAtom ':' tokAtom '(' ')'
+    | tokAtom ':' tokAtom '(' topTypes ')'
+    | '[' ']'
+    | '[' topType ']'
+    | '[' topType ',' '...' ']'
+    | '#' '{' '}'
+    | '#' '{' mapPairTypes '}'
+    | '{' '}'
+    | '{' topTypes '}'
+    | '#' tokAtom '{' '}'
+    | '#' tokAtom '{' fieldTypes '}'
+    | binaryType
+    | tokInteger
+    | tokChar
+    | 'fun' '(' ')'
+    | 'fun' '(' funType100 ')'
+    ;
 
-funType100 : '(' '...' ')' '->' topType
-           | funType ;
+funType100
+    : '(' '...' ')' '->' topType
+    | funType
+    ;
 
-funType : '(' (topTypes)? ')' '->' topType ;
+funType
+    : '(' (topTypes)? ')' '->' topType
+    ;
 
-fieldTypes : fieldType (',' fieldType)* ;
+mapPairTypes
+    : mapPairType (',' mapPairType)*
+    ;
 
-fieldType : tokAtom '::' topType ;
+mapPairType
+    : topType ('=>' | ':=') topType
+    ;
 
-binaryType : '<<'                             '>>'
-           | '<<' binBaseType                 '>>'
-           | '<<'                 binUnitType '>>'
-           | '<<' binBaseType ',' binUnitType '>>'
-           ;
+fieldTypes
+    : fieldType (',' fieldType)*
+    ;
 
-binBaseType : tokVar ':'            type ;
+fieldType
+    : tokAtom '::' topType
+    ;
 
-binUnitType : tokVar ':' tokVar '*' type ;
+binaryType
+    : '<<' '>>'
+    | '<<' binBaseType '>>'
+    | '<<' binUnitType '>>'
+    | '<<' binBaseType ',' binUnitType '>>'
+    ;
 
+binBaseType
+    : tokVar ':' type_
+    ;
 
+binUnitType
+    : tokVar ':' tokVar '*' type_
+    ;
 
 /// Exprs
 
-attrVal :     expr
-        | '(' expr           ')'
-        |     expr ',' exprs
-        | '(' expr ',' exprs ')' ;
+attrVal
+    : expr
+    | '(' expr ')'
+    | expr ',' exprs
+    | '(' expr ',' exprs ')'
+    ;
 
-function : functionClause (';' functionClause)* ;
+function_
+    : functionClause (';' functionClause)*
+    ;
 
-functionClause : tokAtom clauseArgs clauseGuard clauseBody ;
+functionClause
+    : tokAtom clauseArgs clauseGuard clauseBody
+    ;
 
+clauseArgs
+    : patArgumentList
+    ;
 
-clauseArgs : argumentList ;
+clauseGuard
+    : ('when' guard_)?
+    ;
 
-clauseGuard : ('when' guard)? ;
+clauseBody
+    : '->' exprs
+    ;
 
-clauseBody : '->' exprs ;
+expr
+    : 'catch' expr
+    | expr100
+    ;
 
+expr100
+    : expr150 (('=' | '!') expr150)*
+    ;
 
-expr : 'catch' expr
-     | expr100 ;
+expr150
+    : expr160 ('orelse' expr160)*
+    ;
 
-expr100 : expr150 (('=' | '!') expr150)* ;
+expr160
+    : expr200 ('andalso' expr200)*
+    ;
 
-expr150 : expr160 ('orelse' expr160)* ;
+expr200
+    : expr300 (compOp expr300)?
+    ;
 
-expr160 : expr200 ('andalso' expr200)* ;
+expr300
+    : expr400 (listOp expr400)*
+    ;
 
-expr200 : expr300 (compOp expr300)? ;
+expr400
+    : expr500 (addOp expr500)*
+    ;
 
-expr300 : expr400 (listOp expr400)* ;
+expr500
+    : expr600 (multOp expr600)*
+    ;
 
-expr400 : expr500 (addOp expr500)* ;
+expr600
+    : prefixOp expr600
+    | expr650
+    ;
 
-expr500 : expr600 (multOp expr600)* ;
+expr650
+    : mapExpr
+    | expr700
+    ;
 
-expr600 : prefixOp? expr700 ;
+expr700
+    : functionCall
+    | recordExpr
+    | expr800
+    ;
 
-expr700 : functionCall
-        | recordExpr
-        | expr800 ;
+expr800
+    : exprMax (':' exprMax)?
+    ;
 
-expr800 : exprMax (':' exprMax)? ;
+exprMax
+    : tokVar
+    | atomic
+    | list_
+    | binary
+    | listComprehension
+    | binaryComprehension
+    | tuple_
+    | '(' expr ')'
+    | 'begin' exprs 'end'
+    | ifExpr
+    | caseExpr
+    | receiveExpr
+    | funExpr
+    | tryExpr
+    ;
 
-exprMax : tokVar
-        | atomic
-        | list
-        | binary
-        | listComprehension
-        | binaryComprehension
-        | tuple
-      //  | struct
-        | '(' expr ')'
-        | 'begin' exprs 'end'
-        | ifExpr
-        | caseExpr
-        | receiveExpr
-        | funExpr
-        | tryExpr
-        ;
+patExpr
+    : patExpr200 ('=' patExpr)?
+    ;
 
-list : '['      ']'
-     | '[' expr tail
-     ;
-tail :          ']'
-     | '|' expr ']'
-     | ',' expr tail
-     ;
+patExpr200
+    : patExpr300 (compOp patExpr300)?
+    ;
 
-binary : '<<'             '>>'
-       | '<<' binElements '>>' ;
+patExpr300
+    : patExpr400 (listOp patExpr300)?
+    ;
 
-binElements : binElement (',' binElement)* ;
+patExpr400
+    : patExpr400 addOp patExpr500
+    | patExpr500
+    ;
 
-binElement : bitExpr optBitSizeExpr optBitTypeList ;
+patExpr500
+    : patExpr500 multOp patExpr600
+    | patExpr600
+    ;
 
-bitExpr : prefixOp? exprMax ;
+patExpr600
+    : prefixOp patExpr600
+    | patExpr650
+    ;
 
-optBitSizeExpr : (':' bitSizeExpr)? ;
+patExpr650
+    : mapPatExpr
+    | patExpr700
+    ;
 
-optBitTypeList : ('/' bitTypeList)? ;
+patExpr700
+    : recordPatExpr
+    | patExpr800
+    ;
 
-bitTypeList : bitType ('-' bitType)* ;
+patExpr800
+    : patExprMax
+    ;
 
-bitType : tokAtom (':' tokInteger)? ;
+patExprMax
+    : tokVar
+    | atomic
+    | list_
+    | binary
+    | tuple_
+    | '(' patExpr ')'
+    ;
 
-bitSizeExpr : exprMax ;
+mapPatExpr
+    : patExprMax? '#' mapTuple
+    | mapPatExpr '#' mapTuple
+    ;
 
+recordPatExpr
+    : '#' tokAtom ('.' tokAtom | recordTuple)
+    ;
 
-listComprehension :   '['  expr   '||' lcExprs ']' ;
+list_
+    : '[' ']'
+    | '[' expr tail
+    ;
 
-binaryComprehension : '<<' binary '||' lcExprs '>>' ;
+tail
+    : ']'
+    | '|' expr ']'
+    | ',' expr tail
+    ;
 
-lcExprs : lcExpr (',' lcExpr)* ;
+binary
+    : '<<' '>>'
+    | '<<' binElements '>>'
+    ;
 
-lcExpr : expr
-       | expr   '<-' expr
-       | binary '<=' expr
-       ;
+binElements
+    : binElement (',' binElement)*
+    ;
 
-tuple : '{' exprs? '}' ;
+binElement
+    : bitExpr optBitSizeExpr optBitTypeList
+    ;
 
+bitExpr
+    : prefixOp? exprMax
+    ;
+
+optBitSizeExpr
+    : (':' bitSizeExpr)?
+    ;
+
+optBitTypeList
+    : ('/' bitTypeList)?
+    ;
+
+bitTypeList
+    : bitType ('-' bitType)*
+    ;
+
+bitType
+    : tokAtom (':' tokInteger)?
+    ;
+
+bitSizeExpr
+    : exprMax
+    ;
+
+listComprehension
+    : '[' expr '||' lcExprs ']'
+    ;
+
+binaryComprehension
+    : '<<' exprMax '||' lcExprs '>>'
+    ;
+
+lcExprs
+    : lcExpr (',' lcExpr)*
+    ;
+
+lcExpr
+    : expr
+    | expr '<-' expr
+    | binary '<=' expr
+    ;
+
+tuple_
+    : '{' exprs? '}'
+    ;
+
+mapExpr
+    : exprMax? '#' mapTuple
+    | mapExpr '#' mapTuple
+    ;
+
+mapTuple
+    : '{' (mapField (',' mapField)*)? '}'
+    ;
+
+mapField
+    : mapFieldAssoc
+    | mapFieldExact
+    ;
+
+mapFieldAssoc
+    : mapKey '=>' expr
+    ;
+
+mapFieldExact
+    : mapKey ':=' expr
+    ;
+
+mapKey
+    : expr
+    ;
 
 /* struct : tokAtom tuple ; */
-
 
 /* N.B. This is called from expr700.
    N.B. Field names are returned as the complete object, even if they are
    always atoms for the moment, this might change in the future.           */
 
-recordExpr : exprMax?   '#' tokAtom ('.' tokAtom | recordTuple)
-           | recordExpr '#' tokAtom ('.' tokAtom | recordTuple)
-           ;
+recordExpr
+    : exprMax? '#' tokAtom ('.' tokAtom | recordTuple)
+    | recordExpr '#' tokAtom ('.' tokAtom | recordTuple)
+    ;
 
-recordTuple : '{' recordFields? '}' ;
+recordTuple
+    : '{' recordFields? '}'
+    ;
 
-recordFields : recordField (',' recordField)* ;
+recordFields
+    : recordField (',' recordField)*
+    ;
 
-recordField : (tokVar | tokAtom) '=' expr ;
-
+recordField
+    : (tokVar | tokAtom) '=' expr
+    ;
 
 /* N.B. This is called from expr700. */
 
-functionCall : expr800 argumentList ;
+functionCall
+    : expr800 argumentList
+    ;
 
+ifExpr
+    : 'if' ifClauses 'end'
+    ;
 
-ifExpr : 'if' ifClauses 'end' ;
+ifClauses
+    : ifClause (';' ifClause)*
+    ;
 
-ifClauses : ifClause (';' ifClause)* ;
+ifClause
+    : guard_ clauseBody
+    ;
 
-ifClause : guard clauseBody ;
+caseExpr
+    : 'case' expr 'of' crClauses 'end'
+    ;
 
+crClauses
+    : crClause (';' crClause)*
+    ;
 
-caseExpr : 'case' expr 'of' crClauses 'end' ;
+crClause
+    : expr clauseGuard clauseBody
+    ;
 
-crClauses : crClause (';' crClause)* ;
+receiveExpr
+    : 'receive' crClauses 'end'
+    | 'receive' 'after' expr clauseBody 'end'
+    | 'receive' crClauses 'after' expr clauseBody 'end'
+    ;
 
-crClause : expr clauseGuard clauseBody ;
+funExpr
+    : 'fun' tokAtom '/' tokInteger
+    | 'fun' atomOrVar ':' atomOrVar '/' integerOrVar
+    | 'fun' funClauses 'end'
+    ;
 
+atomOrVar
+    : tokAtom
+    | tokVar
+    ;
 
-receiveExpr : 'receive' crClauses                         'end'
-            | 'receive'           'after' expr clauseBody 'end'
-            | 'receive' crClauses 'after' expr clauseBody 'end'
-            ;
+integerOrVar
+    : tokInteger
+    | tokVar
+    ;
 
+funClauses
+    : funClause (';' funClause)*
+    ;
 
-funExpr : 'fun' tokAtom '/' tokInteger
-        | 'fun' atomOrVar ':' atomOrVar '/' integerOrVar
-        | 'fun' funClauses 'end'
-        ;
+funClause
+    : patArgumentList clauseGuard clauseBody
+    | tokVar patArgumentList clauseGuard clauseBody
+    ;
 
-atomOrVar : tokAtom | tokVar ;
+tryExpr
+    : 'try' exprs ('of' crClauses)? tryCatch
+    ;
 
-integerOrVar : tokInteger | tokVar ;
+tryCatch
+    : 'catch' tryClauses 'end'
+    | 'catch' tryClauses 'after' exprs 'end'
+    | 'after' exprs 'end'
+    ;
 
+tryClauses
+    : tryClause (';' tryClause)*
+    ;
 
-funClauses : funClause (';' funClause)* ;
+tryClause
+    : expr clauseGuard clauseBody
+    | (atomOrVar ':')? patExpr tryOptStackTrace clauseGuard clauseBody
+    ;
 
-funClause : argumentList clauseGuard clauseBody ;
+tryOptStackTrace
+    : (':' tokVar)?
+    ;
 
+argumentList
+    : '(' exprs? ')'
+    ;
 
-tryExpr : 'try' exprs ('of' crClauses)? tryCatch ;
+patArgumentList
+    : '(' patExprs? ')'
+    ;
 
-tryCatch : 'catch' tryClauses               'end'
-         | 'catch' tryClauses 'after' exprs 'end'
-         |                    'after' exprs 'end' ;
+exprs
+    : expr (',' expr)*
+    ;
 
-tryClauses : tryClause (';' tryClause)* ;
+patExprs
+    : patExpr (',' patExpr)*
+    ;
 
-tryClause : (atomOrVar ':')? expr clauseGuard clauseBody ;
+guard_
+    : exprs (';' exprs)*
+    ;
 
+atomic
+    : tokChar
+    | tokInteger
+    | tokFloat
+    | tokAtom
+    | (tokString)+
+    ;
 
+prefixOp
+    : '+'
+    | '-'
+    | 'bnot'
+    | 'not'
+    ;
 
-argumentList : '(' exprs? ')' ;
+multOp
+    : '/'
+    | '*'
+    | 'div'
+    | 'rem'
+    | 'band'
+    | 'and'
+    ;
 
-exprs : expr (',' expr)* ;
+addOp
+    : '+'
+    | '-'
+    | 'bor'
+    | 'bxor'
+    | 'bsl'
+    | 'bsr'
+    | 'or'
+    | 'xor'
+    ;
 
-guard : exprs (';' exprs)* ;
+listOp
+    : '++'
+    | '--'
+    ;
 
-atomic : tokChar
-       | tokInteger
-       | tokFloat
-       | tokAtom
-       | (tokString)+
-       ;
-
-prefixOp : '+'
-         | '-'
-         | 'bnot'
-         | 'not'
-         ;
-
-multOp : '/'
-       | '*'
-       | 'div'
-       | 'rem'
-       | 'band'
-       | 'and'
-       ;
-
-addOp : '+'
-      | '-'
-      | 'bor'
-      | 'bxor'
-      | 'bsl'
-      | 'bsr'
-      | 'or'
-      | 'xor'
-      ;
-
-listOp : '++'
-       | '--'
-       ;
-
-compOp : '=='
-       | '/='
-       | '=<'
-       | '<'
-       | '>='
-       | '>'
-       | '=:='
-       | '=/='
-       ;
-
-
-ruleClauses : ruleClause (';' ruleClause)* ;
-
-ruleClause : tokAtom clauseArgs clauseGuard ruleBody ;
-
-ruleBody : ':-' lcExprs ;
-
+compOp
+    : '=='
+    | '/='
+    | '=<'
+    | '<'
+    | '>='
+    | '>'
+    | '=:='
+    | '=/='
+    ;

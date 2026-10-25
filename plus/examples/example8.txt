@@ -1,0 +1,3 @@
+do I := 1 to 10
+  Total := Total + I;
+end do;

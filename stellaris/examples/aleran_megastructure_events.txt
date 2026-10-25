@@ -1,0 +1,337 @@
+namespace = aleran_megastructures
+
+country_event = {
+	id = aleran_megastructures.1
+	#hide_window = yes
+	is_triggered_only = yes
+	title = "aleran_megastructures.1.name"
+	desc = "aleran_megastructures.1.desc"
+	picture = GFX_evt_megastructure_construction
+	show_sound = event_construction
+	
+	location = FromFrom
+	trackable = yes
+	
+	immediate = {
+		
+	}
+	
+	option = {
+		name = "aleran_megastructures.1.click"
+		ai_chance = {
+			factor = 150
+		}
+		if = {
+			limit = {from = {is_megastructure_type = dyson_sphere_0}}
+			owner = { add_influence = 100 }
+		}
+		else_if = {
+			limit = {from = {is_megastructure_type = ring_world_1}}
+			owner = { add_influence = 50 }
+		}
+		else_if = {
+			limit = {from = {is_megastructure_type = gateway_restored}} #never happens, this is an upgrade, not a construct
+		}
+		else = {
+			owner = { add_influence = 75 }
+		}
+	}
+}
+
+country_event = {
+	id = aleran_megastructures.2
+	hide_window = yes
+	is_triggered_only = yes
+	#title = "aleran_megastructures.2.name"
+	#desc = "aleran_megastructures.2.desc"
+	#picture = GFX_evt_megastructure_construction
+	#show_sound = event_construction
+	
+	location = FromFrom
+	trackable = yes
+	
+	immediate = {
+		
+	}
+	
+	option = {
+		name = "aleran_megastructures.2.click"
+		ai_chance = {
+			factor = 150
+		}
+		if = {
+			limit = {from = {is_megastructure_type = dyson_sphere_0}}
+			
+		}
+		else_if = {
+			limit = {from = {is_megastructure_type = ring_world_1}}
+			
+		}
+		else_if = {
+			limit = {
+				from = {is_megastructure_type = gateway_restored}
+				always = no #disable this block
+			}
+			owner = { #no influence
+
+				if = {
+					limit = {NOT = {has_country_flag = opened_first_gateway}}
+					hidden_effect = {
+						set_country_flag = opened_first_gateway
+						#add_energy = 4000
+						country_event = {id = aleran_megastructures.101 days = 60 random = 30}
+					}
+				}
+				else_if = {
+					limit = {NOT = {has_country_flag = opened_second_gateway}}
+					hidden_effect = {
+						set_country_flag = opened_second_gateway
+						#add_energy = 2000
+						country_event = {id = aleran_megastructures.102 days = 30 random = 10}
+					}
+				}
+				else_if = {
+					limit = {NOT = {has_country_flag = opened_third_gateway}}
+					hidden_effect = {
+						set_country_flag = opened_third_gateway
+						#add_energy = 1000
+						country_event = {id = aleran_megastructures.102 days = 10 random = 5}
+					}
+				}
+				else_if = {
+					limit = {NOT = {has_country_flag = opened_fourth_gateway}}
+					hidden_effect = {
+						set_country_flag = opened_fourth_gateway
+						#add_energy = 100
+						country_event = {id = aleran_megastructures.102 days = 5 random = 2}
+					}
+				}
+				else_if = {
+					limit = {NOT = {has_country_flag = opened_fifth_gateway}}
+					hidden_effect = {
+						set_country_flag = opened_fifth_gateway
+						country_event = {id = aleran_megastructures.102 days = 2 random = 1}
+					}
+				}
+			}
+		}
+		else = {
+			
+		}
+	}
+}
+
+country_event = {
+	id = aleran_megastructures.100
+	is_triggered_only = yes
+	title = "aleran_megastructures.100.name"
+	desc = "aleran_megastructures.100.desc"
+	picture = GFX_evt_drifting_gateway
+	show_sound = event_scanner
+	
+	immediate = {
+		
+	}
+	
+	option = {
+		name = "aleran_megastructures.100.click.do"
+		ai_chance = {
+			factor = 150
+		}
+		owner = {
+		}
+	}
+	
+	option = {
+		name = "aleran_megastructures.100.click.dont"
+		ai_chance = {
+			factor = 150
+		}
+		owner = {
+		
+		}
+	}
+}
+
+country_event = {
+	id = aleran_megastructures.101
+	is_triggered_only = yes
+	title = "aleran_megastructures.101.name"
+	desc = "aleran_megastructures.101.desc"
+	picture = GFX_evt_drifting_gateway
+	show_sound = event_scanner
+	
+	immediate = {
+		
+	}
+	
+	option = {
+		name = "aleran_megastructures.101.click"
+		ai_chance = {
+			factor = 150
+		}
+		owner = {
+			add_energy = 4000
+			add_minerals = -10000
+		}
+		fromfrom = { #megastructure
+			#reduce_hp_percent = 0.7
+		}
+		fromfromfrom = { #system
+			every_fleet_in_system = {
+				every_owned_ship = {
+					random_list = {
+						50 = { reduce_hp_percent = 0.9 }
+						80 = { reduce_hp_percent = 0.7 }
+						40 = { reduce_hp_percent = 0.5 }
+						20 = { reduce_hp_percent = 0.3 }
+						10 = { reduce_hp_percent = 0.1 }
+					}					
+				}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = aleran_megastructures.102
+	is_triggered_only = yes
+	title = "aleran_megastructures.102.name"
+	desc = "aleran_megastructures.102.desc"
+	picture = GFX_evt_drifting_gateway
+	show_sound = event_scanner
+	
+	immediate = {
+		
+	}
+	
+	option = {
+		name = "aleran_megastructures.102.click"
+		ai_chance = {
+			factor = 150
+		}
+		owner = {
+			add_energy = 2000
+			add_minerals = -5000
+		}
+		fromfrom = { #megastructure
+			#reduce_hp_percent = 0.4
+		}
+		fromfromfrom = { #system
+			every_fleet_in_system = {
+				every_owned_ship = {
+					random_list = {
+						50 = { reduce_hp_percent = 0.6 }
+						80 = { reduce_hp_percent = 0.4 }
+						40 = { reduce_hp_percent = 0.3 }
+						20 = { reduce_hp_percent = 0.2 }
+						10 = { reduce_hp_percent = 0.1 }
+					}					
+				}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = aleran_megastructures.103
+	is_triggered_only = yes
+	title = "aleran_megastructures.103.name"
+	desc = "aleran_megastructures.103.desc"
+	picture = GFX_evt_drifting_gateway
+	show_sound = event_scanner
+	
+	immediate = {
+		
+	}
+	
+	option = {
+		name = "aleran_megastructures.103.click"
+		ai_chance = {
+			factor = 150
+		}
+		owner = {
+			add_energy = 1000
+			add_minerals = -2500
+		}
+		fromfrom = { #megastructure
+			#reduce_hp_percent = 0.2
+		}
+		fromfromfrom = { #system
+			every_fleet_in_system = {
+				every_owned_ship = {
+					random_list = {
+						50 = { reduce_hp_percent = 0.4 }
+						80 = { reduce_hp_percent = 0.3 }
+						40 = { reduce_hp_percent = 0.2 }
+						20 = { reduce_hp_percent = 0.1 }
+						10 = { reduce_hp_percent = 0.05 }
+					}					
+				}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = aleran_megastructures.104
+	is_triggered_only = yes
+	title = "aleran_megastructures.104.name"
+	desc = "aleran_megastructures.104.desc"
+	picture = GFX_evt_drifting_gateway
+	show_sound = event_scanner
+	
+	immediate = {
+		
+	}
+	
+	option = {
+		name = "aleran_megastructures.104.click"
+		ai_chance = {
+			factor = 150
+		}
+		owner = {
+			add_energy = 100
+			add_minerals = -500
+		}
+		fromfrom = { #megastructure
+			#reduce_hp_percent = 0.1
+		}
+		fromfromfrom = { #system
+			every_fleet_in_system = {
+				every_owned_ship = {
+					random_list = {
+						50 = { reduce_hp_percent = 0.2 }
+						80 = { reduce_hp_percent = 0.15 }
+						40 = { reduce_hp_percent = 0.1 }
+						20 = { reduce_hp_percent = 0.05 }
+						10 = {  }
+					}					
+				}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = aleran_megastructures.105
+	is_triggered_only = yes
+	title = "aleran_megastructures.105.name"
+	desc = "aleran_megastructures.105.desc"
+	picture = GFX_evt_drifting_gateway
+	show_sound = event_scanner
+	
+	immediate = {
+		
+	}
+	
+	option = {
+		name = "aleran_megastructures.105.click"
+		ai_chance = {
+			factor = 150
+		}
+		owner = {
+			add_energy = 5
+		}
+	}
+}

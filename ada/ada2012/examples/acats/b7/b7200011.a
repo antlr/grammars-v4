@@ -1,0 +1,62 @@
+-- B7200011.A 
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--     See B7200016.A.
+--
+-- TEST DESCRIPTION:
+--     See B7200016.A.
+--
+-- TEST FILES:
+--      This test consists of the following files:
+--         B7200010.A
+--      -> B7200011.A
+--         B7200012.A
+--         B7200013.A
+--         B7200014.A
+--         B7200015.A
+--         B7200016.A
+--
+-- CHANGE HISTORY:
+--     15 FEB 95   SAIC    Initial version
+--     08 DEC 96   SAIC    Split units into multiple files.
+--
+--!
+ 
+package B720001_1 is
+  I : Integer;
+  
+  package Non_Library_Sub_Pack1 is
+    I1 : Integer;
+    F1 : Float;
+  end Non_Library_Sub_Pack1;
+end B720001_1;
+
+     --==================================================================--
+
+package body B720001_1 is                                             -- ERROR:
+                                        -- Package body completion not allowed.
+  package body Non_Library_Sub_Pack1 is separate;        
+end B720001_1;                                               

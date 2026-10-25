@@ -1,0 +1,5 @@
+begin 644 digits.txt
+M,#$R,S0U-C<X.3`Q,C,T-38W.#DP,3(S-#4V-S@Y,#$R,S0U-C<X.3`Q,C,T
+/-38W.#DP,3(S-#4V-S@Y
+`
+end

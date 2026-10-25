@@ -1,0 +1,7 @@
+uni_start_stream
+if_online_then <1, 2>
+async_alert <info, "You are online">
+uni_sync_skip <1>
+async_alert <info, "You are NOT online">
+uni_sync_skip <2>
+uni_end_stream

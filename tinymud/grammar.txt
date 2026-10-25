@@ -1,0 +1,16 @@
+@chown <object>=<player>. Changes the ownership of an object.
+@create <name> [=<cost>]. Creates a thing with the specified name.
+@describe <object> [=<description>].
+@dig <name>. Creates a new room
+@fail <object> [=<message>].
+@find [name]. Displays the name and number ... whose name matches <name>.
+@link <object>=<number>; @link <object>=here; @link <dir>|<room>=home.
+@lock <object>=<key>.
+@name <object>=<new name> [<password>]. Changes the name of <object>.
+@ofail <object> [=<message>].
+@open <dir>[;<other dir>]* [=<number>].
+@osuccess <object> [=<message>].
+@set <object>=<flag>; @set <object>=!<flag>. Sets (or, with '!', unsets)
+@success <object> [=<message>].
+@unlink <dir>; @unlink here.
+@unlock <object>. Removes the lock on <object>.

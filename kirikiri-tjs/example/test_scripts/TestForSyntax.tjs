@@ -1,0 +1,228 @@
+(new TestForSyntax()).run();
+
+class TestForSyntax extends Test {
+  
+  var name = 'FOR SYNTAX';
+  var tests = [
+    'test_1_for_simple_block',
+    'test_1_for_simple_statement',
+    'test_2_for_simple_block',
+    'test_2_for_simple_statement',
+    'test_3_for_simple_block',
+    'test_3_for_simple_statement',
+    'test_4_for_nested_block',
+    'test_4_for_nested_statement',
+    'test_4_for_nested_statement_without_first_clause',
+    'test_5_for_continue',
+    'test_5_for_break'
+  ];
+  
+  var array;
+  
+  function setup {
+    array = [ 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ];
+  }
+  
+  /*
+   * TEST 1
+   *   FOR without first clause
+   */
+  
+  function test_1_for_simple_block {
+    var A = void, B = void;
+    var i = 0, j = 0;
+    
+    // add local variable
+    for (; i < array.count; ++i) { var A = array[i]; }
+    assert_equal(i, 10, 'i');
+    assert_equal(A, void, 'A');
+    
+    // ref upper block local variable
+    for (; j < array.count; ++j) { B = array[j]; }
+    assert_equal(B, 100, 'B');
+  }
+  
+  function test_1_for_simple_statement {
+    var A = void, B = void;
+    var i = 0, j = 0;
+    for (; i < array.count; ++i) var A = array[i];
+    assert_equal(i, 10, 'i');
+    assert_equal(A, void, 'A');
+    
+    for (; j < array.count; ++j) { B = array[j]; }
+    assert_equal(B, 100, 'B');
+  }
+  
+  /*
+   * TEST 2
+   *   FOR with initializing expression
+   */
+  
+  function test_2_for_simple_block {
+    var A = void, B = void;
+    var i = 0, j = 0;
+    var _ = function() { };
+    for (_ ; i < array.count; ++i) { var A = array[i]; }
+    assert_equal(i, 10, 'i');
+    assert_equal(A, void, 'A');
+    
+    for (; j < array.count; ++j) { B = array[j]; }
+    assert_equal(B, 100, 'B');
+  }
+  
+  function test_2_for_simple_statement {
+    var A = void, B = void;
+    var i = 0, j = 0;
+    var _ = function() { };
+    for (_ ; i < array.count; ++i) var A = array[i];
+    assert_equal(i, 10, 'i');
+    assert_equal(A, void, 'A');
+    
+    for (; j < array.count; ++j) { B = array[j]; }
+    assert_equal(B, 100, 'B');
+  }
+  
+  /*
+   * TEST 3
+   *   FOR with initializing declaration
+   */
+  
+  function test_3_for_simple_block {
+    var A = void;
+    var i = void;
+    for (var i = 0; i < array.count; ++i) { var A = array[i]; }
+    assert_equal(i, void, 'i');
+    assert_equal(A, void, 'A');
+  }
+  
+  function test_3_for_simple_statement {
+    var A = void;
+    var i = void;
+    for (var i = 0; i < array.count; ++i) var A = array[i];
+    assert_equal(i, void, 'i');
+    assert_equal(A, void, 'A');
+  }
+  
+  /*
+   * TEST 4
+   *   nested FOR
+   */
+  
+  
+  function test_4_for_nested_block {
+    var A = void, B = void, C = void;
+    var i = void, j = void, k = void;
+    for (var i = 0; i < array.count; ++i) {
+      var A = i;
+      for (var j = 0; j < array.count; ++j) {
+        var A = j;
+        var B = j;
+        for (var k = 0; k < array.count; ++k) {
+          var A = k;
+          var B = k;
+          var C = k;
+        }
+        assert_equal(C, void, 'C');
+      }
+      assert_equal(B, void, 'B');
+    }
+    assert_equal(A, void, 'A');
+    
+    assert_equal(i, void, 'i');
+    assert_equal(j, void, 'j');
+    assert_equal(k, void, 'k');
+  }
+  
+  function test_4_for_nested_statement {
+    var A = void, B = void, C = void;
+    var i = void, j = void, k = void;
+    for (var i = 0; i < array.count; ++i) 
+      for (var j = 0; j < array.count; ++j)
+        for (var k = 0; k < array.count; ++k)
+          var A = k, B = k, C = k;
+    assert_equal(A, void, 'A');
+    assert_equal(B, void, 'B');
+    assert_equal(C, void, 'C');
+    
+    assert_equal(i, void, 'i');
+    assert_equal(j, void, 'j');
+    assert_equal(k, void, 'k');
+  }
+  
+  function test_4_for_nested_statement_without_first_clause {
+    var A = void, B = void, C = void;
+    var i = void, j = void, k = void;
+    for (; i < array.count; ++i) 
+      for (; j < array.count; ++j)
+        for (; k < array.count; ++k)
+          var A = 10, B = 20, C = 30;
+    assert_equal(A, void, 'A');
+    assert_equal(B, void, 'B');
+    assert_equal(C, void, 'C');
+    
+    assert_equal(i, 10, 'i');
+    assert_equal(j, 10, 'j');
+    assert_equal(k, 10, 'k');
+  }
+  
+  /*
+   * TEST 5
+   *   continue and break
+   *   check wheather jump ip is valid or not
+   */
+  
+  function test_5_for_continue {
+    var A = void, B = void, C = void;
+    var z = 0.0;
+    for (var i = 0; i < array.count; ++i) {
+      if (i == 10) continue;
+      A = i;
+      if (i == 9) continue;
+      for (var j = 0; j < array.count; ++j) {
+        var B = i * j;
+        C = i * j;
+      }
+      
+      // here we need some long instructions...
+      var x = Math['random']();
+      var y = Math['random']();
+      z += x * y;
+      var f = function(z) { return x * z; } incontextof %[x:z];
+      z = f(z);
+    }
+    
+    assert_equal(A, 9, 'A');
+    assert_equal(B, void, 'B');
+    assert_equal(C, 72, 'C');
+  }
+  
+  function test_5_for_break {
+    var A = void, B = void;
+    var z = 0.0;
+    for (var i = 0; i < array.count; ++i) {
+      var A = i;
+      
+      // v interpreter will be CRASH when you enable this line!!!
+      //for (var j = 0; j < array.count; ++j) break if j === 5;
+      //for (var j = 0; j < array.count; ++j) continue if j === 5;
+      var j = 0;
+      for (; j < array.count; ++j) if (j === 5) break;
+      assert_equal(j, 5, 'j');
+      
+      A = i;
+      if (i == 9) { break; }
+      B = i * 10;
+      
+      // here we need some long instructions...
+      var x = Math['random']();
+      var y = Math['random']();
+      z += x * y;
+      var f = function(z) { return x * z; } incontextof %[x:z];
+      z = f(z);
+    }
+    
+    assert_equal(A, void, 'A');
+    assert_equal(B, 80, 'B');
+  }
+  
+}

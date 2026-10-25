@@ -1,0 +1,4 @@
+cycle
+  X := X + 1;
+  exit when X > 10;
+end cycle;

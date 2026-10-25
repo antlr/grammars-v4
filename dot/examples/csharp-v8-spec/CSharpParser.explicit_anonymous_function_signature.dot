@@ -1,0 +1,19 @@
+digraph ATN {
+rankdir=LR;
+s315[fontsize=11, label="315", shape=doublecircle, fixedsize=true, width=.6];
+s2084[fontsize=11,label="2084", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2085[fontsize=11,label="2085", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2086[fontsize=11,label="{&rarr;\n2086\nd=171|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s2087[fontsize=11,label="&larr;\n2087", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2088[fontsize=11,label="2088", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2089[fontsize=11,label="2089", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s314[fontsize=11,label="314", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s314 -> s2084 [fontname="Times-Italic", label="&epsilon;"];
+s2084 -> s2086 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'('", arrowhead = normal];
+s2086:p0 -> s2085 [fontname="Times-Italic", label="&epsilon;"];
+s2086:p1 -> s2087 [fontname="Times-Italic", label="&epsilon;"];
+s2085 -> s2087 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<explicit_anonymous_function_parameter_list>", arrowhead = normal];
+s2087 -> s2088 [fontname="Times-Italic", label="&epsilon;"];
+s2088 -> s2089 [fontsize=11, fontname="Courier", arrowsize=.7, label = "')'", arrowhead = normal];
+s2089 -> s315 [fontname="Times-Italic", label="&epsilon;"];
+}

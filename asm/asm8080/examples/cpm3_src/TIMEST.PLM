@@ -1,0 +1,226 @@
+$title('SDIR - Display Time Stamps')
+timestamp:
+do;
+       /* Display time stamp module for extended directory */
+       /* Time & Date ASCII Conversion Code	           */
+       /* From MP/M 1.1 TOD program		           */
+
+$include(comlit.lit)
+
+print$char: procedure (char) external;
+    declare char byte;
+end print$char;
+
+terminate: procedure external;
+end terminate;
+
+declare tod$adr address;
+declare tod based tod$adr structure (
+  opcode byte,
+  date address,
+  hrs byte,
+  min byte,
+  sec byte,
+  ASCII (21) byte );
+
+declare string$adr address;
+declare string based string$adr (1) byte;
+declare index byte;
+
+emitchar: procedure(c);
+    declare c byte;
+    string(index := index + 1) = c;
+    end emitchar;
+
+emitn: procedure(a);
+    declare a address;
+    declare c based a byte;
+    do while c <> '$';
+      string(index := index + 1) = c;
+      a = a + 1;
+    end;
+    end emitn;
+
+emit$bcd: procedure(b);
+    declare b byte;
+    call emitchar('0'+b);
+    end emit$bcd;
+
+emit$bcd$pair: procedure(b);
+    declare b byte;
+    call emit$bcd(shr(b,4));
+    call emit$bcd(b and 0fh);
+    end emit$bcd$pair;
+
+emit$colon: procedure(b);
+    declare b byte;
+    call emit$bcd$pair(b);
+    call emitchar(':');
+    end emit$colon;
+
+emit$bin$pair: procedure(b);
+    declare b byte;
+    call emit$bcd(b/10);	/* makes garbage if not < 10 */
+    call emit$bcd(b mod 10);
+    end emit$bin$pair;
+
+emit$slant: procedure(b);
+    declare b byte;
+    call emit$bin$pair(b);
+    call emitchar('/');
+    end emit$slant;
+
+declare
+    base$year lit '78',   /* base year for computations */
+    base$day  lit '0',    /* starting day for base$year 0..6 */
+    month$days (*) address data
+    /* jan feb mar apr may jun jul aug sep oct nov dec */
+    (  000,031,059,090,120,151,181,212,243,273,304,334);
+
+leap$days: procedure(y,m) byte;
+    declare (y,m) byte;
+    /* compute days accumulated by leap years */
+    declare yp byte;
+    yp = shr(y,2); /* yp = y/4 */
+    if (y and 11b) = 0 and month$days(m) < 59 then
+        /* y not 00, y mod 4 = 0, before march, so not leap yr */
+        return yp - 1;
+    /* otherwise, yp is the number of accumulated leap days */
+    return yp;
+    end leap$days;
+
+declare word$value address;
+
+get$next$digit: procedure byte;
+    /* get next lsd from word$value */
+    declare lsd byte;
+    lsd = word$value mod 10;
+    word$value = word$value / 10;
+    return lsd;
+    end get$next$digit;
+
+bcd:
+  procedure (val) byte;
+    declare val byte;
+    return shl((val/10),4) + val mod 10;
+  end bcd;
+
+declare (month, day, year, hrs, min, sec) byte;
+
+bcd$pair: procedure(a,b) byte;
+    declare (a,b) byte;
+    return shl(a,4) or b;
+    end bcd$pair;
+
+
+compute$year: procedure;
+    /* compute year from number of days in word$value */
+    declare year$length address;
+    year = base$year;
+        do while true;
+        year$length = 365;
+        if (year and 11b) = 0 then /* leap year */
+            year$length = 366;
+        if word$value <= year$length then
+            return;
+        word$value = word$value - year$length;
+        year = year + 1;
+        end;
+    end compute$year;
+
+declare
+    week$day  byte, /* day of week 0 ... 6 */
+    day$list (*) byte data
+    ('Sun$Mon$Tue$Wed$Thu$Fri$Sat$'),
+    leap$bias byte; /* bias for feb 29 */
+
+compute$month: procedure;
+    month = 12;
+        do while month > 0;
+        if (month := month - 1) < 2 then /* jan or feb */
+            leapbias = 0;
+        if month$days(month) + leap$bias < word$value then return;
+        end;
+    end compute$month;
+
+declare
+    date$test byte,    /* true if testing date */
+    test$value address;   /* sequential date value under test */
+
+get$date$time: procedure;
+    /* get date and time */
+    hrs = tod.hrs;
+    min = tod.min;
+    sec = tod.sec;
+    word$value = tod.date;
+    /* word$value contains total number of days */
+    week$day = (word$value + base$day - 1) mod 7;
+    call compute$year;
+    /* year has been set, word$value is remainder */
+    leap$bias = 0;
+    if (year and 11b) = 0 and word$value > 59 then
+        /* after feb 29 on leap year */ leap$bias = 1;
+    call compute$month;
+    day = word$value - (month$days(month) + leap$bias);
+    month = month + 1;
+    end get$date$time;
+
+emit$date$time: procedure;
+    if tod.opcode = 0 then
+      do;
+      call emitn(.day$list(shl(week$day,2)));
+      call emitchar(' ');
+      end;
+    call emit$slant(month);
+    call emit$slant(day);
+    call emit$bin$pair(year);
+    call emitchar(' ');
+    call emit$colon(hrs);
+    call emit$colon(min);
+    if tod.opcode = 0 then
+      call emit$bcd$pair(sec);
+    end emit$date$time;
+
+tod$ASCII:
+  procedure (parameter);
+    declare parameter address;
+    declare ret address;
+
+    ret = 0;
+    tod$adr = parameter;
+    string$adr = .tod.ASCII;
+    if	(tod.opcode = 0) or (tod.opcode = 3) then
+    do;
+      call get$date$time;
+      index = -1;
+      call emit$date$time;
+    end;
+    else
+      call terminate;             /* error */
+end tod$ASCII;
+
+  declare lcltod structure (
+    opcode byte,
+    date address,
+    hrs byte,
+    min byte,
+    sec byte,
+    ASCII (21) byte );
+
+display$time$stamp: procedure (tsadr) public;
+    dcl tsadr address,
+	i byte;
+
+     lcltod.opcode = 3;		/* display time and date stamp, no seconds */
+     call move (4,tsadr,.lcltod.date);	/* don't copy seconds */
+     	
+     call tod$ASCII (.lcltod);
+     do i = 0 to 13;
+       call printchar (lcltod.ASCII(i));
+     end;	
+end display$time$stamp;
+
+dcl last$data$byte byte initial(0);
+
+end timestamp;
+

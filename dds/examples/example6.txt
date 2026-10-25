@@ -1,0 +1,5 @@
+     A          R ORDERSL                   PFILE(ORDERS)
+     A            ORDERNO
+     A            CUSTNO
+     A            ORDERDATE
+     A          S ORDERDATE

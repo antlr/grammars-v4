@@ -1,0 +1,662 @@
+namespace = aleran_colossus
+
+#planet_event = {
+#	id = aleran_colossus.1
+#	is_triggered_only = yes
+#	hide_window = yes
+#
+#	immediate = {
+#		remove_planet = yes
+#	}
+#}
+
+# Add static war exhaustion for these planet destruction events with: 
+# add_static_war_exhaustion = {
+#				attacker = <country>		 				# attacker in this battle
+#				location = <planet>							# location for battle
+#				value_for_planet_destruction = <0.0-1.0>	# scale amount of WE added to this battle
+#			}
+
+planet_event = {
+	id = aleran_colossus.1
+	is_triggered_only = yes
+	hide_window = yes
+	
+	immediate = {
+		from = {
+			planet_event = { id = aleran_colossus.3 days = 10 random = 20 }
+		}
+	}
+}
+
+country_event = {
+	id = aleran_colossus.2
+	is_triggered_only = yes
+	hide_window = yes
+	
+	immediate = {		
+		every_owned_planet = {
+			limit = {
+				NOT = {has_modifier = stupor_drug_withdrawal}
+				NOT = {has_modifier = stupor_drugged}
+				has_planet_flag = was_stupor
+			}
+			
+			from = {
+				planet_event = { id = aleran_colossus.3 days = 10 random = 20 }
+			}
+		}
+	}
+}
+
+planet_event = {
+	id = aleran_colossus.3
+	is_triggered_only = yes
+	title = "aleran_colossus.3.name"
+	desc = "aleran_colossus.3.desc"
+	picture = GFX_evt_news_room
+	show_sound = event_planetary_riot
+	location = ROOT
+	trackable = yes
+	
+	immediate = {			
+		remove_planet_flag = was_stupor
+	}
+	
+	option = {
+		name = "aleran_colossus.3.wait"
+		ai_chance = {
+			factor = 150
+		}
+		add_modifier = { modifier = stupor_drug_withdrawal days = 1800 }
+	}
+	
+	option = {
+		name = "aleran_colossus.3.kill"
+		ai_chance = {
+			factor = 250
+		}
+		trigger = {
+			owner = {is_egalitarian = no}
+			OR = {
+				owner = {has_ethic = ethic_fanatic_authoritarian}
+				owner = {has_ethic = ethic_fanatic_militarist}
+				AND = {
+					owner = {has_ethic = ethic_authoritarian}
+					OR = {
+						owner = {has_policy_flag = slavery_allowed}
+						owner = {has_policy_flag = purge_allowed}
+					}
+				}
+			}
+		}
+		#destroy_colony = yes
+		every_tile = {
+			kill_pop = yes
+		}
+	}
+}
+
+planet_event = {
+	id = aleran_colossus.100
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = {
+				exists = owner
+				owner = {
+					NOT = { is_same_value = from.owner }
+					OR = {
+						is_country_type = default
+						is_country_type = fallen_empire
+						is_country_type = awakened_fallen_empire
+					}
+				}
+			}
+			# Generate threat
+			add_threat = { who = from.owner amount = 3 }
+			# modifier for allies + those upset by conversion
+			every_country = {
+				limit = {
+					NOR = {
+						is_same_value = from.owner
+						is_same_value = root.owner
+						AND = {
+							has_federation = yes
+							is_in_federation_with = from.owner
+						}
+					}
+					OR = {
+						has_communications = from.owner
+						has_communications = root.owner
+					}
+					OR = {
+						AND = {
+							has_federation = yes
+							is_in_federation_with = root.owner
+						}
+						has_ai_personality = awakened_fallen_empire_materialist
+						AND = {
+							is_country_type = default
+							OR = {
+								is_materialist = yes
+								is_egalitarian = yes
+								has_authority = auth_machine_intelligence
+							}
+						}
+					}
+				}
+				add_opinion_modifier = {
+					modifier = opinion_drugged_a_world
+					who = from.owner
+				}
+			}
+			# modifiers for victim
+			owner = {
+				add_opinion_modifier = {
+					modifier = opinion_drugged_my_world
+					who = from.owner
+				}
+				if = {
+					limit = { NOT = { has_ethic = ethic_gestalt_consciousness } }
+					add_modifier = {
+						modifier = colossus_victim
+						days = 10800 # 30 years
+					}
+				}
+			}
+			# Add war exhaustion to planet owner 
+			owner = {
+				add_static_war_exhaustion = {
+					attacker = from.fleet.owner
+					location = root
+					value_for_planet_destruction = 1.0
+				}
+			}
+		}
+		# Special graphics for Habitats and Ring Worlds
+		if = {
+			limit = {
+				is_planet_class = pc_habitat
+			}
+			spawn_habitat_divine_effect = yes
+		}
+		else_if = {
+			limit = {
+				is_planet_class = pc_ringworld_habitable
+			}
+			spawn_ringworld_divine_effect = yes
+		}
+		if = {
+			limit = {
+				OR = {
+					is_planet_class = pc_habitat
+					is_planet_class = pc_ringworld_habitable
+				}
+			}
+			# nothing
+		}
+		else = {
+			switch = {
+				trigger = is_planet_class
+				pc_desert = { change_pc = pc_desert }
+				pc_arid = { change_pc = pc_arid }
+				pc_savannah = { change_pc = pc_savannah }
+				pc_ocean = { change_pc = pc_ocean }
+				pc_continental = { change_pc = pc_continental }
+				pc_tropical = { change_pc = pc_tropical }
+				pc_tundra = { change_pc = pc_tundra }
+				pc_arctic = { change_pc = pc_arctic }
+				pc_alpine = { change_pc = pc_alpine }
+			}
+		}
+		add_modifier = {
+			modifier = stupor_drugged
+			days = -1
+		}
+		set_planet_flag = was_stupor
+		enable_special_project = {
+			name = "stupor_removal"
+			location = this
+			owner = root
+		}
+	}
+}
+
+planet_event = {
+	id = aleran_colossus.200
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = {
+				exists = owner
+				owner = {
+					NOT = { is_same_value = from.owner }
+					OR = {
+						is_country_type = default
+						is_country_type = fallen_empire
+						is_country_type = awakened_fallen_empire
+					}
+				}
+			}
+			# Generate threat
+			add_threat = { who = from.owner amount = 10 }
+			# Add war exhaustion to planet owner 
+			owner = {
+				add_static_war_exhaustion = {
+					attacker = from.fleet.owner
+					location = root
+					value_for_planet_destruction = 0.5
+				}
+			}
+			owner = {
+				if = {
+					limit = { NOT = { has_ethic = ethic_gestalt_consciousness } }
+					add_modifier = {
+						modifier = colossus_victim
+						days = 3600 # 10 years
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				is_planet_class = pc_o_star
+			}
+			random_list = {
+				20 = {
+					planet_event = { id = aleran_colossus.201 days = 2 random = 10 }
+				}
+				80 = {
+					planet_event = { id = aleran_colossus.202 days = 2 random = 30 }
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				is_planet_class = pc_b_star
+			}
+			random_list = {
+				7 = {
+					planet_event = { id = aleran_colossus.201 days = 2 random = 10 }
+				}
+				93 = {
+					planet_event = { id = aleran_colossus.202 days = 2 random = 30 }
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				is_planet_class = pc_a_star
+			}
+			random_list = {
+				1 = {
+					planet_event = { id = aleran_colossus.201 days = 2 random = 10 }
+				}
+				99 = {
+					planet_event = { id = aleran_colossus.202 days = 2 random = 30 }
+				}
+			}
+		}
+		else = {
+			planet_event = { id = aleran_colossus.202 days = 2 random = 30 }
+		}
+	}
+}
+
+planet_event = { #star goes nova, destroying everything
+	id = aleran_colossus.201
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		planet_event = { id = aleran_colossus.205 }
+		fromfrom = {ship_event = { id = aleran_colossus.206 }}
+		
+		create_ambient_object = {
+			type = explosion_particle_object
+			location = this
+			use_3d_location = yes
+			duration = 300
+			scale = 120
+		}
+		create_ambient_object = {
+			location = this
+			type = habitat_cracker_object
+			duration = 5
+			
+			use_3d_location = yes
+			base_angle_towards = star
+			entity_face_object = star
+			
+			entity_offset = { min = 0 max = 0 }
+			
+			entity_scale_to_size = yes
+			scale = 1
+		}
+		
+		create_ambient_object = {
+			type = nova_explosion_object
+			location = this
+			duration = 20
+			
+			use_3d_location = yes
+			
+			entity_offset = { min = 0 max = 0 }
+			entity_offset_angle = { min = 0 max = 0 }
+			entity_offset_height = { min = 0 max = 0 }
+			
+			entity_scale_to_size = no
+			scale = 1
+		}
+		
+		if = {
+			limit = {
+				exists = owner
+				owner = {
+					NOT = { is_same_value = fromfrom.owner }
+					OR = {
+						is_country_type = default
+						is_country_type = fallen_empire
+						is_country_type = awakened_fallen_empire
+					}
+				}
+			}
+			every_country = {
+				add_opinion_modifier = {
+					modifier = opinion_caused_nova
+					who = fromfrom.owner
+				}
+			}
+			# modifiers for victim
+			owner = {
+				add_opinion_modifier = {
+					modifier = opinion_caused_nova_on_me
+					who = fromfrom.owner
+				}
+			}
+			# Add war exhaustion to planet owner 
+			owner = {
+				add_static_war_exhaustion = {
+					attacker = fromfrom.fleet.owner
+					location = root
+					value_for_planet_destruction = 10
+				}
+			}
+			owner = {
+				add_modifier = {
+					modifier = lost_a_system_to_nova
+					days = 18000 # 50 years
+				}
+			}
+		}
+	
+	
+		solar_system = { #system scope
+			every_system_megastructure = {
+				 prev = {remove_megastructure = prev} #?
+			}
+			every_fleet_in_system = {
+				destroy_fleet = this
+			}
+			#every_mining_station = {
+			#	destroy_fleet = this
+			#}
+			#every_research_station = {
+			#	destroy_fleet = this
+			#}
+			#starbase = {
+			#	destroy_fleet = this
+			#}
+			every_system_planet = {
+				if = {
+					limit = {
+						is_star = yes
+					}
+					if = {
+						limit = {
+							OR = {
+								is_planet_class = pc_y_star
+								is_planet_class = pc_l_star
+								is_planet_class = pc_t_star
+								is_planet_class = pc_m_star
+								is_planet_class = pc_k_star
+							}
+						}
+						change_pc = pc_neutron_star
+					}
+					else = {
+						change_pc = pc_black_hole
+					}
+					set_planet_size = 12
+				}
+				else_if = {
+					limit = {
+						OR = {
+							is_planet_class = pc_asteroid
+							#is_planet_class = pc_rock_asteroid
+							is_planet_class = pc_ice_asteroid
+							is_planet_class = pc_habitat
+							is_planet_class = pc_ringworld_habitable
+							is_planet_class = pc_ringworld_habitable_damaged
+							is_planet_class = pc_ringworld_tech
+							is_planet_class = pc_ringworld_tech_damaged
+							is_planet_class = pc_ringworld_seam
+							is_planet_class = pc_ringworld_seam_damaged
+						}
+					}
+					remove_planet = yes
+				}
+				else_if = {
+					limit = {
+						is_planet_class = pc_gas_giant
+					}
+					change_pc = pc_broken
+					change_planet_size = -8
+				}
+				else = {
+					change_pc = pc_shattered
+				}
+				clear_planet_modifiers = yes
+				clear_planet_modifiers = yes
+				destroy_colony = yes
+				#orbital_deposit_tile = {
+					clear_deposits = yes
+				#}
+				set_ring = no
+			}
+			#asteroids_distance = 0 #no longer works
+			every_neighbor_system = {
+				every_system_planet = {
+					add_modifier = {
+						modifier = nova_irradiated
+						days = 7200 #20y
+					}
+				}
+			}
+			every_neighbor_system = {
+				remove_hyperlane = { from = prev to = this }
+			}
+		}
+	}
+}
+
+planet_event = { #solar storm
+	id = aleran_colossus.202
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		planet_event = { id = aleran_colossus.204 }
+		if = {
+			limit = {
+				exists = owner
+				owner = {
+					NOT = { is_same_value = fromfrom.owner }
+					OR = {
+						is_country_type = default
+						is_country_type = fallen_empire
+						is_country_type = awakened_fallen_empire
+					}
+				}
+			}
+			every_country = {
+				add_opinion_modifier = {
+					modifier = opinion_triggered_solar_storm
+					who = fromfrom.owner
+				}
+			}
+			# modifiers for victim
+			owner = {
+				add_opinion_modifier = {
+					modifier = opinion_triggered_solar_storm_on_me
+					who = fromfrom.owner
+				}
+			}
+		}
+		
+		set_timed_planet_flag = { flag = destablilized days = 300 } 
+		
+		planet_event = { id = aleran_colossus.203 days = 1 random = 0 }
+		planet_event = { id = aleran_colossus.203 days = 20 random = 10 }
+		planet_event = { id = aleran_colossus.203 days = 50 random = 10 }
+		planet_event = { id = aleran_colossus.203 days = 80 random = 10 }
+		planet_event = { id = aleran_colossus.203 days = 110 random = 10 }
+		planet_event = { id = aleran_colossus.203 days = 140 random = 10 }
+		planet_event = { id = aleran_colossus.203 days = 170 random = 10 }
+		planet_event = { id = aleran_colossus.203 days = 200 random = 10 }
+		planet_event = { id = aleran_colossus.203 days = 230 random = 10 }
+		planet_event = { id = aleran_colossus.203 days = 260 random = 10 }
+		planet_event = { id = aleran_colossus.203 days = 290 random = 10 }
+	}
+}
+
+planet_event = { #solar storm pulse
+	id = aleran_colossus.203
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		
+		create_ambient_object = {
+			type = explosion_particle_object
+			location = this
+			use_3d_location = yes
+			duration = 90
+			scale = 50
+		}
+		
+		solar_system = { #system scope
+			every_fleet_in_system = {
+				limit = {
+					owner = {
+					 	is_at_war_with = fromfrom.owner #?
+					}
+				}
+				destroy_fleet = this
+			}
+			every_system_planet = {
+				every_tile = { #destroy: shields, energy grids/nexi, robot pops
+					if = {
+						limit = {
+							OR = {
+								has_building = building_power_hub_1
+								has_building = building_power_hub_2
+								has_building = building_planetary_shield_generator
+							}
+						}
+						set_ruined = yes
+					}
+					if = {
+						limit = {
+							has_pop = yes
+							OR = {
+								pop = {is_species_class = ROBOT}
+								pop = {is_species_class = MACHINE}
+							}
+						}
+						kill_pop = yes
+					}
+				}
+			}
+		}
+	}
+}
+
+planet_event = { #destabilization notification
+	id = aleran_colossus.204
+	title = "aleran_colossus.204.name"
+	desc = "aleran_colossus.204.desc"
+	picture = GFX_evt_star_pulsar
+	show_sound = event_solar_fusion
+	location = ROOT
+	trackable = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		
+	}
+	
+	option = {
+		name = "aleran_colossus.204.click"
+		ai_chance = {
+			factor = 150
+		}
+	}
+}
+
+planet_event = { #nova notification
+	id = aleran_colossus.205
+	title = "aleran_colossus.205.name"
+	desc = "aleran_colossus.205.desc"
+	picture = GFX_evt_exploding_planet
+	show_sound = event_super_explosion
+	location = ROOT
+	trackable = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		
+	}
+	
+	option = {
+		name = "aleran_colossus.205.click"
+		ai_chance = {
+			factor = 150
+		}
+	}
+}
+
+ship_event = { #nova notification to attacker
+	id = aleran_colossus.206
+	title = "aleran_colossus.206.name"
+	desc = "aleran_colossus.206.desc"
+	picture = GFX_evt_exploding_planet
+	show_sound = event_super_explosion
+	location = ROOT.fleet.orbit
+	trackable = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		
+	}
+	
+	option = {
+		name = "aleran_colossus.206.click"
+		ai_chance = {
+			factor = 150
+		}
+	}
+}

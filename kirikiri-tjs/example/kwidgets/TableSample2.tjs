@@ -1,0 +1,153 @@
+/*----------------------------------------------------------------------
+ * テーブルサンプル
+ ----------------------------------------------------------------------*/
+@set (table_sample2_row_as_array = 0)
+
+//----------------------------------------------------------------------
+// テーブルクラス拡張
+//----------------------------------------------------------------------
+class MyTable2 extends KTable
+{
+  function MyTable2 {
+    super.KTable(...);
+  }
+
+  function onSelectionDragEnter() {
+    if (! tryPointDrag(...)) 
+      beginDragPacket(new KPacket("ddtable2row", selectedRowList));
+  }
+  
+  function isRowPacketAcceptable(index, packet) {
+    return (packet.name == "ddtable2row");
+  }
+
+  function onRowPacketDrop(index, x, y, packet, shift) {
+    moveRows(index, packet.arg);
+  }
+
+  function onSelectionRightClick() {
+    var targetRowList = selectedRowList;
+    if (targetRowList.count > 0) {
+      var menu = new KContextMenu();
+      menu.addItem("前に行を挿入する", "", true, funccall(onInsertRow, targetRowList[0].index));
+      menu.addItem("後に行を挿入する", "", true, funccall(onInsertRow, targetRowList[targetRowList.count - 1].index + 1));
+      menu.addSeparator();
+      menu.addItem("行を削除する", "", true, funccall(onEraseRows, targetRowList));
+      menu.show();
+    } 
+  }
+
+  function onBackgroundRightClick() {
+    var menu = new KContextMenu();
+    menu.addItem("行を追加する", "", true, funccall(onInsertRow, rowList.count));
+    menu.show();
+  }
+
+  function onEraseRows(eraseRowList) {
+    eraseRows(eraseRowList);
+  }
+
+  function onInsertRow(index) {
+@if (table_sample2_row_as_array == 0)
+    insertElement(index, %[]);
+@endif
+@if (table_sample2_row_as_array == 1)
+    insertElement(index, []);
+@endif
+  }
+};
+
+//----------------------------------------------------------------------
+// テーブルサンプル
+//----------------------------------------------------------------------
+class TableSample2 extends KWindow
+{
+  function TableSample2 {
+    super.KWindow("tablesample2");
+    
+    // ウィンドウ初期設定
+    caption = 'テーブルサンプル2';
+    imeMode = imDontCare;
+
+    // デフォルト値
+    defaultFocusable = true;
+
+    // テーブル配置
+@if (table_sample2_row_as_array == 0)
+    primaryWidget.add(new MyTable2(this, "table",
+                                            [ [ KTextTableColumn,   "ファイル名", "filename", %[ caseSensitive: false ] ],
+                                              [ KDateTableColumn,   "更新日時",   "mtime" ], 
+                                              [ KNumberTableColumn, "サイズ",     "size" ],
+                                              [ KTextTableColumn,   "属性",       "attrlist", %[ array: true, fixedWidth: 50, editable: true, innerDragSortable: true ] ]
+                                              ] ));
+@endif
+@if (table_sample2_row_as_array == 1)
+    primaryWidget.add(new RowDraggableTable(this, "table",
+                                            [ [ KTextTableColumn,   "ファイル名", 0, %[ caseSensitive: false ] ],
+                                              [ KDateTableColumn,   "更新日時",   1 ], 
+                                              [ KNumberTableColumn, "サイズ",     2 ],
+                                              [ KTextTableColumn,   "属性",       3, %[ array: true, fixedWidth: 50, editable: true, innerDragSortable: true ] ]
+
+                                              ] ));
+@endif
+    var targetDir = System.exePath + "data/kwidgets/";
+    var filelist = Storages.dirlist(targetDir);
+    var dirPat = /\/$/;
+    for (var i = 0; i < filelist.count; i++) {
+      var filename = filelist[i];
+      if (dirPat.test(filename))
+        continue;
+      var fstat = Storages.fstat(targetDir + filename);
+@if (table_sample2_row_as_array == 0)
+      table.addElement(%[ filename: filename, 
+                          mtime: fstat.mtime.getTime(),
+                          size: fstat.size,
+                          attrlist: [ "属性1", "属性2", "属性3" ] ]);
+@endif
+@if (table_sample2_row_as_array == 1)
+      table.addElement([ filename, 
+                         fstat.mtime.getTime(),
+                         fstat.size,
+                         [ "属性1", "属性2", "属性3" ] ]);
+@endif
+    }
+
+    table.cellSelection = false;
+    table.showHorizontalGrid = false;
+    table.showVerticalGrid = false;
+    table.instantDrag = false;
+    table.resize = true;
+
+    // 永続化辞書の作成
+    var dict = new KPersistentDictionary(System.dataPath + name + "_dict.txt");
+    add(dict);
+    bindPersistentDictionary(dict);
+  }
+
+  // ウィジェットの値が更新された時に呼ばれるフック関数
+  function onChildValueModified(child, value) {
+    switch (child.name) {
+    default: {
+      // 更新のあったウィジェットの名前と値を表示。
+      Debug.message("child value modified", child.name, typeof(value), value);
+      break;
+    }
+    }
+  }
+}
+
+//----------------------------------------------------------------------
+// サンプル表示・非表示の切り替え
+global.tableSample2 = void;
+
+function showTableSample2
+{
+  if (tableSample2 === void)
+    tableSample2 = new TableSample2();
+  tableSample2.visible = true;
+}
+
+function hideTableSample2
+{
+  tableSample2.visible = false;
+}

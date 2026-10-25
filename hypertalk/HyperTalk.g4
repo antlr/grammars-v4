@@ -22,30 +22,41 @@
  * SOFTWARE.
  */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar HyperTalk;
 
 // Start symbol accepting only well-formed HyperTalk scripts that consist of handlers, functions, whitespace and
-// comments (representing scipts that are assignable to objects like buttons, fields and cards). Disallows statements or
+// comments (representing scripts that are assignable to objects like buttons, fields and cards). Disallows statements or
 // expressions that are not inside of a handler or function block.
+start_script
+    : script EOF
+    ;
+
+start_scriptlet
+    : scriptlet EOF
+    ;
+
 script
     : handler script
-    | function script
+    | function_ script
     | NEWLINE script
-    | EOF
+    |
     ;
 
 // Start symbol accepting any sequence of HyperTalk statements, expressions, whitespace and comments. Suitable when
 // evaluating the message box or HyperTalk strings via the 'do' command and 'value of' function.
 scriptlet
-    : statement EOF
+    : statement
     | multilineScriptlet
     ;
 
 multilineScriptlet
     : statement NEWLINE multilineScriptlet
-    | statement EOF
+    | statement
     | NEWLINE multilineScriptlet
-    | EOF
+    |
     ;
 
 handler
@@ -53,14 +64,14 @@ handler
     | 'on' handlerName parameterList NEWLINE+ statementList? 'end' handlerName
     ;
 
-function
+function_
     : 'function' ID NEWLINE+ statementList? 'end' ID
     | 'function' ID parameterList NEWLINE+ statementList? 'end' ID
     ;
 
 handlerName
     : ID
-    | commandName   // Handlers can take the name of a command keyword (other keywords are disallowed)
+    | commandName // Handlers can take the name of a command keyword (other keywords are disallowed)
     ;
 
 parameterList
@@ -126,6 +137,8 @@ commandStmnt
     | 'answer' expression
     | 'ask' expression 'with' expression
     | 'ask' expression
+    | 'ask' 'file' expression
+    | 'ask' 'file' expression 'with' expression
     | 'beep'
     | 'beep' expression
     | 'choose' toolExpression 'tool'?
@@ -158,7 +171,7 @@ commandStmnt
     | 'find' expression? 'international'? expression
     | 'get' expression
     | 'go' 'to'? expression 'with' 'visual' expression
-    | 'go' 'to'? expression
+    | 'go' 'to'? expression remoteNavOption
     | 'go' 'back'
     | 'go' 'back' 'with' 'visual' expression
     | 'hide' expression
@@ -208,7 +221,7 @@ commandStmnt
     | 'sort' 'the'? cards of expression sortDirection sortStyle 'by' expression
     | 'sort' 'the'? 'marked' cards of expression sortDirection sortStyle 'by' expression
     | 'speak' expression
-    | 'speak' expression 'with' gender=('male'|'female'|'neuter'|'robotic') 'voice'
+    | 'speak' expression 'with' gender = ('male' | 'female' | 'neuter' | 'robotic') 'voice'
     | 'speak' expression 'with' 'voice' expression
     | 'subtract' expression 'from' expression
     | 'type' expression
@@ -223,6 +236,13 @@ commandStmnt
     | 'write' expression 'to' 'file' expression
     | 'write' expression 'to' 'file' expression 'at' ('eof' | 'end')
     | 'write' expression 'to' 'file' expression 'at' expression
+    ;
+
+remoteNavOption
+    : 'in a' 'new' 'window'
+    | 'in a' 'new' 'window' 'without' 'dialog'
+    | 'without' 'dialog'
+    |
     ;
 
 convertible
@@ -341,10 +361,11 @@ part
     | bkgndPart
     | cardPart
     | stackPart
+    | windowPart
     ;
 
 stackPart
-    : 'this' stack
+    : 'this'? stack
     | stack factor
     ;
 
@@ -369,20 +390,32 @@ fieldPart
     ;
 
 cardPart
-    : 'this' card
+    : 'this'? card
     | card 'id' factor
     | position card
     | ordinal card
     | card factor
     | cardPart of bkgndPart
+    | cardPart of stackPart
     ;
 
 bkgndPart
-    : 'this' background
+    : 'this'? background
     | background 'id' factor
     | background factor
     | ordinal background
     | position background
+    | bkgndPart of stackPart
+    ;
+
+windowPart
+    : 'the'? card 'window'
+    | 'the'? 'tool' 'window'
+    | 'the'? 'pattern' 'window'
+    | 'the'? 'message' 'watcher'
+    | 'the'? 'variable' 'watcher'
+    | 'window' expression
+    | 'window' 'id' expression
     ;
 
 listExpression
@@ -394,13 +427,29 @@ expression
     : factor
     | 'not' expression
     | '-' expression
-    | op=('there is a'|'there is an'|'there is no'|'there is not a'|'there is not an') expression
+    | op = ('there is a' | 'there is an' | 'there is no' | 'there is not a' | 'there is not an') expression
     | expression '^' expression
-    | expression op=('mod'| 'div'| '/'| '*') expression
-    | expression op=('+'| '-') expression
-    | expression op=('&&'| '&') expression
-    | expression op=('>='|'<='|'≤'|'≥'|'<'|'>'|'contains'|'is in'|'is not in'|'is a'|'is an'|'is not a'|'is not an'|'is within'|'is not within') expression
-    | expression op=('='|'is not'|'is'|'<>'|'≠') expression
+    | expression op = ('mod' | 'div' | '/' | '*') expression
+    | expression op = ('+' | '-') expression
+    | expression op = ('&&' | '&') expression
+    | expression op = (
+        '>='
+        | '<='
+        | '≤'
+        | '≥'
+        | '<'
+        | '>'
+        | 'contains'
+        | 'is in'
+        | 'is not in'
+        | 'is a'
+        | 'is an'
+        | 'is not a'
+        | 'is not an'
+        | 'is within'
+        | 'is not within'
+    ) expression
+    | expression op = ('=' | 'is not' | 'is' | '<>' | '≠') expression
     | expression 'and' expression
     | expression 'or' expression
     ;
@@ -422,7 +471,6 @@ container
     | property
     | menu
     | menuItem
-    | message
     | part
     | chunk container
     ;
@@ -484,33 +532,20 @@ zeroArgFunc
     | 'number' 'of' background button
     | 'number' 'of' card field
     | 'number' 'of' background? field
-    | 'number' 'of' 'menus'
-    | 'number' 'of' cards (of 'this' 'stack')?
+    | 'number' 'of' cards
+    | 'number' 'of' background
     | 'number' 'of' 'marked' cards
-    | 'number' 'of' background (of 'this' 'stack')?
+    | 'number' 'of' 'menus'
+    | 'number' 'of' 'windows'
     | 'menus'
     | 'diskspace'
     | 'params'
     | 'paramcount'
-    | 'sound'
-    | 'selectedtext'
-    | 'selectedchunk'
-    | 'selectedfield'
-    | 'selectedline'
     | 'target'
     | 'speech'
     | 'voices'
-    | 'clicktext'
-    | 'mouseh'
-    | 'mousev'
-    | 'screenrect'
-    | 'clickloc'
-    | 'clickh'
-    | 'clickv'
-    | 'foundchunk'
-    | 'foundfield'
-    | 'foundline'
-    | 'foundtext'
+    | 'windows'
+    | 'stacks'
     ;
 
 singleArgFunc
@@ -518,6 +553,15 @@ singleArgFunc
     | 'min'
     | 'max'
     | 'sum'
+    | 'number' 'of' card? 'parts'
+    | 'number' 'of' background 'parts'
+    | 'number' 'of' card? button
+    | 'number' 'of' background button
+    | 'number' 'of' card field
+    | 'number' 'of' background? field
+    | 'number' 'of' cards
+    | 'number' 'of' background
+    | 'number' 'of' 'marked' cards
     | 'number' 'of' character
     | 'number' 'of' word
     | 'number' 'of' item
@@ -666,6 +710,7 @@ propertyName
     | 'center'
     | 'scroll'
     | 'script'
+    | 'pattern'
     | ID
     ;
 
@@ -797,7 +842,7 @@ position
     ;
 
 message
-    : 'the'? ('message' | 'msg') ('box' | 'window' | )
+    : 'the'? ('message' | 'msg') ('box' | 'window' |)
     ;
 
 cards
@@ -902,7 +947,7 @@ DIGIT
     ;
 
 COMMENT
-    : ('--' ~('\r' | '\n' | '|')*) -> skip
+    : ('--' ~('\r' | '\n' | '|')*) -> channel(HIDDEN)
     ;
 
 NEWLINE
@@ -910,7 +955,7 @@ NEWLINE
     ;
 
 WHITESPACE
-    : (' ' | '\t')+ -> skip
+    : (' ' | '\t')+ -> channel(HIDDEN)
     ;
 
 UNLEXED_CHAR

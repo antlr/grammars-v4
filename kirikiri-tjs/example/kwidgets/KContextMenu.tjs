@@ -1,0 +1,192 @@
+//
+// $Id: KContextMenu.tjs,v 1.5 2007/09/22 21:38:39 cvs Exp $
+//
+
+
+class KContextMenu extends KWindow
+{
+  // ルートアイテム
+  var rootItem;
+  // メニューを閉じた後、自動的にメニューをinvalidateするかどうか
+  var toExit;
+
+  /**------------------------------
+   * コンストラクタ
+   * 
+   * @param toExit 一回メニューを開いた後、自動的に消滅するかどうかを設定する。
+   ------------------------------*/
+  function KContextMenu(_toExit = true) {
+    if (! k_kirikiriz)
+      super.KWindow("", null, true);
+    else
+      super.KWindow("", global.Window.mainWindow, true);
+    toExit = _toExit;
+    // 表示座標を得るために、プライマリレイヤをサイズ設定
+    primaryLayer.setFixedSize(1, 1);
+    // ルートアイテムを追加
+    rootItem = new KMenuItem(this, "ルート");
+    menu.add(rootItem);
+  }
+
+  /**------------------------------
+   * アイテムを全削除
+   ------------------------------*/
+  function clearItmes {
+    rootItem.clearItems();
+  }
+
+  /**------------------------------
+   * セパレータを追加
+   ------------------------------*/
+  function addSeparator {
+    return rootItem.add(new global.MenuItem(window, "-"));
+  }
+
+  /**------------------------------
+   * アイテムを追加
+   *
+   * @param caption キャプション
+   * @param name 名前 
+   * @param enabled 有効かどうか
+   * @param func onValueModified 関数のオーバーライド指定
+   ------------------------------*/
+  function addItem(caption, name = "", enabled = true, func = void) {
+    return rootItem.addItem(...);
+  }
+
+  /**------------------------------
+   * 値持ちアイテムを追加
+   *
+   * @param caption キャプション
+   * @param value 値
+   * @param name 名前 
+   * @param enabled 有効かどうか
+   * @param func onValueModified 関数のオーバーライド指定
+   ------------------------------*/
+  function addValueItem(caption, value, name = "", enabled = true, func = void) {
+    return rootItem.addValueItem(...);
+  }
+
+  /**------------------------------
+   * トグルアイテムを追加
+   *
+   * @param caption キャプション
+   * @param value トグルの初期値
+   * @param name 名前 
+   * @param enabled 有効かどうか
+   * @param func onValueModified 関数のオーバーライド指定
+   ------------------------------*/
+  function addToggleItem(caption, value, name = "", enabled = true, func = void) {
+    return rootItem.addToggleItem(...);
+  }
+
+  /**------------------------------
+   * ラジオアイテムを追加
+   *
+   * @param caption キャプション
+   * @param value アイテムの値
+   * @param name 名前 
+   * @param enabled 有効かどうか
+   * @param func onValueModified 関数のオーバーライド指定
+   ------------------------------*/
+  function addRadioItem(caption, value, name = "", enabled = true, func = void) {
+    return rootItem.addRadioItem(...);
+  }
+
+  /**------------------------------
+   * セパレータを追加
+   ------------------------------*/
+  function addSeparator {
+    return rootItem.addSeparator(...);
+  }
+
+  /**------------------------------
+   * 入れ子を追加
+   *
+   * @param caption キャプション
+   * @param enabled 有効か
+   * @param cmds  コマンド配列
+   * @return 追加したネストアイテム
+   ------------------------------*/
+  function addNest(caption, enabled, cmds = []) {
+    return rootItem.addNest(...);
+  }
+
+  /**------------------------------
+   * 値のon/offを追加
+   *
+   * @param caption キャプション
+   * @param enabled 有効化
+   * @param object オブジェクト
+   * @param member メンバ名
+   * @param method メソッド
+   * @return 追加したバリューアイテム
+   ------------------------------*/
+  function addValueCommand(caption, enabled, object, member, method = void) {
+    return rootItem.addValueCommand(...);
+  }
+
+  /**------------------------------
+   * メニュー表示
+   *
+   * 表示基準レイヤと基準座標を設定して呼び出すと、
+   * その位置にコンテキストメニューが開く。
+   *
+   * 指定を省略すると、カーソルの差している位置に開く。
+   *
+   * @param baseLayer 表示基準レイヤ
+   * @param x 表示基準X座標
+   * @param y 表示基準Y座標
+   ------------------------------*/
+  function show(baseLayer = void, x = void, y = void) {
+    // メニュー非選択時に onPopupHide が呼ばれるようにパラメータを設定
+    stayOnTop = true;
+    focusable = false;
+    // ウィンドウが見えないように細工する
+    borderStyle = bsNone;
+    //    setMinSize(0, 0);
+    //    setMaxSize(0, 0);
+    setSize(0, 0);
+
+    // 表示開始
+    visible = true;
+    // マウス位置を拾う
+    var baseX, baseY;
+    baseX = primaryLayer.cursorX;
+    baseY = primaryLayer.cursorY;
+    if (baseLayer) {
+      baseX -= (baseLayer.cursorX - x) * baseLayer.window.zoomNumer / baseLayer.window.zoomDenom;
+      baseY -= (baseLayer.cursorY - y) * baseLayer.window.zoomNumer / baseLayer.window.zoomDenom;
+    }
+      
+    // ルートアイテムをマウス位置にポップアップ
+    rootItem.popup(0,  baseX, baseY);
+  }
+
+  // メニュー非選択時、もしくは決定後別ウィンドウのフォーカス時に呼ばれる
+  function onPopupHide {
+    // ウィンドウを自動で閉じる
+    closeMenu();
+  }
+
+
+  // メニュー決定時、もしくはキャンセル時に自動でウィンドウを閉じる
+  function closeMenu {
+    // 非表示に
+    visible = false;
+    // メニュー自体を消す
+    if (toExit){
+      invalidate(this);
+    }
+  }
+
+  // ダミー関数
+  function invalidateLayout {
+  }
+
+  // ダミー関数
+  function onResize {
+  }
+};
+
+

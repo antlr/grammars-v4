@@ -1,0 +1,70 @@
+array arr[1] : w32 -> w8 = symbolic
+array arr_1[1] : w32 -> w8 = symbolic
+array arr_2[1] : w32 -> w8 = symbolic
+array arr_3[1] : w32 -> w8 = symbolic
+array arr_4[1] : w32 -> w8 = symbolic
+array const_arr1[5] : w32 -> w8 = [0 0 0 0 0]
+array pivot03[4] : w32 -> w8 = symbolic
+array pivot04[4] : w32 -> w8 = symbolic
+array pivot23[4] : w32 -> w8 = symbolic
+(query [(Eq false
+             (Eq N0:(ZExt w32 N1:(Read w8 0 arr))
+                 N2:(ZExt w32 N3:(Read w8 0 arr_1))))
+         (Eq false
+             (Eq N0
+                 N4:(ZExt w32 N5:(Read w8 0 arr_2))))
+         (Eq false
+             (Eq N0
+                 N6:(ZExt w32 N7:(Read w8 0 arr_3))))
+         (Eq false
+             (Eq N0
+                 N8:(ZExt w32 N9:(Read w8 0 arr_4))))
+         (Eq false (Eq N2 N4))
+         (Eq false (Eq N2 N6))
+         (Eq false (Eq N2 N8))
+         (Eq false (Eq N4 N6))
+         (Eq false (Eq N4 N8))
+         (Eq false (Eq N6 N8))
+         (Sle 0
+              N10:(ReadLSB w32 0 pivot04))
+         (Sle N10 4)
+         (Sle (ZExt w32 N11:(Read w8 0 U0:[N12:(Extract w32 0 (SExt w64 N10))=N9] @
+                                       U1:[4=N9,
+                                           3=N7,
+                                           2=N5,
+                                           1=N3,
+                                           0=N1] @ const_arr1))
+              N13:(ZExt w32 N14:(Read w8 N12 U1)))
+         (Sle (ZExt w32 N15:(Read w8 1 U0))
+              N13)
+         (Sle (ZExt w32 N16:(Read w8 2 U0))
+              N13)
+         (Sle (ZExt w32 N17:(Read w8 3 U0))
+              N13)
+         (Sle 0
+              N18:(ReadLSB w32 0 pivot03))
+         (Sle N18 3)
+         (Eq false
+             (Sle (ZExt w32 N19:(Read w8 0 U2:[N20:(Extract w32 0 (SExt w64 N18))=N17] @
+                                           U3:[4=N14,
+                                               3=N17,
+                                               2=N16,
+                                               1=N15,
+                                               0=N11] @ U0))
+                  N21:(ZExt w32 N22:(Read w8 N20 U3))))
+         (Eq false
+             (Sle (ZExt w32 N23:(Read w8 1 U2))
+                  N21))
+         (Sle (ZExt w32 N24:(Read w8 2 U2))
+              N21)
+         (Sle 2
+              N25:(ReadLSB w32 0 pivot23))
+         (Sle N25 3)
+         (Eq false
+             (Sle (ZExt w32 (Read w8 2 [N26:(Extract w32 0 (SExt w64 N25))=N23] @
+                                       U4:[3=N23,
+                                           2=N19,
+                                           1=N22,
+                                           0=N24] @ U2))
+                  (ZExt w32 (Read w8 N26 U4))))]
+        false)

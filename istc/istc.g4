@@ -30,36 +30,40 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar istc;
 
 istc
-   : 'ISTC' ' ' registration SEP year SEP work SEP check EOF
-   ;
+    : 'ISTC' ' ' registration SEP year SEP work SEP check EOF
+    ;
 
 registration
-   : CHAR CHAR CHAR
-   ;
+    : CHAR CHAR CHAR
+    ;
 
 year
-   : CHAR CHAR CHAR CHAR
-   ;
+    : CHAR CHAR CHAR CHAR
+    ;
 
 work
-   : CHAR CHAR CHAR CHAR CHAR CHAR CHAR CHAR
-   ;
+    : CHAR CHAR CHAR CHAR CHAR CHAR CHAR CHAR
+    ;
 
 check
-   : CHAR
-   ;
+    : CHAR
+    ;
 
 SEP
-   : '-' | ' '
-   ;
+    : '-'
+    | ' '
+    ;
 
 CHAR
-   : ('A' .. 'F' | '0' .. '9')
-   ;
+    : ('A' .. 'F' | '0' .. '9')
+    ;
 
 WS
-   : [\r\n\t] + -> skip
-   ;
+    : [\r\n\t]+ -> skip
+    ;

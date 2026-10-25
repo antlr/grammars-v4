@@ -1,0 +1,237 @@
+-- BA21002.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making
+--     this public release, the Government intends to confer upon all
+--     recipients unlimited rights  equal to those held by the Government.
+--     These rights include rights to use, duplicate, release or disclose the
+--     released technical data and computer software in whole or in part, in
+--     any manner and for any purpose whatsoever, and to have or permit others
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that each of the following constructs is illegal within the body
+--      of a library package to which a pragma Pure applies:
+--
+--         (a) A statement other than a null statement.
+--         (b) A primary that is a name of an object, if the name is
+--             not a static expression and does not statically denote a
+--             discriminant of an enclosing type.
+--         (c) A declaration of an object that is initialized by default
+--             of a type that does not have preelaborable initialization.
+--         (d) A declaration of a variable, with or without an initialization
+--             expression, outside of a subprogram, generic subprogram, task
+--             unit, or protected unit.
+--         (e) A declaration of a named access-to-object type whose
+--             Storage_Size is not zero outside of a subprogram, generic
+--             subprogram, task unit, or protected unit.
+--         (f) An extension aggregate with an ancestor subtype mark denoting
+--             a subtype of a private extension.
+--         (g) A declaration of a (constant) object which causes the
+--             evaluation of a default expression that will call a
+--             user-defined function.
+--
+--
+--      Check that each of the following constructs is legal within the body of
+--      a library package to which a pragma Pure applies:
+--
+--         (h) A call to a static function.
+--         (i) A primary that is a name of an object, if the name is a static
+--             expression.
+--         (j) A declaration of a constant object outside of a subprogram,
+--             generic subprogram, task unit, or protected unit.
+--         (k) A declaration of a (constant) object which would cause the
+--             evaluation of a default expression that will call a
+--             user-defined function, except that the component with the
+--             default expression is explicitly initialized.
+--         (l) A declaration of a variable, with or without an initialization
+--             expression, inside a subprogram.
+--         (m) A declaration of a named access type inside a subprogram.
+--         (n) A declaration of an anonymous access type.
+--         (o) A declaration of a constant object of a descendant of a private
+--             type (within the scope of the full view).
+--
+-- TEST DESCRIPTION:
+--      Declare various supporting types, objects, and subprograms in a
+--      preelaborated package declaration. Verify the legality of the
+--      constructs (h)-(o) above in the corresponding package body. Verify
+--      the illegality of the constructs (a)-(g) above in both the visible
+--      and private part of a preelaborated package declaration which names
+--      the first package in a with clause.
+--
+--
+-- CHANGE HISTORY:
+--      05 Apr 95   SAIC    Initial prerelease version.
+--      22 Mar 07   RLB     Updated objective for Amendment 1 changes.
+--
+--!
+
+package BA21002_0 is
+
+   pragma Pure (BA21002_0);
+
+
+   type My_Int is new Integer range 0 .. 100;
+   function Func return My_Int;                     -- Non-static function.
+
+   Three : constant My_Int :=  3;
+
+   type Int_Array is array (1 .. 5) of My_Int;
+
+   Arr   : constant Int_Array := (others => Three); -- Non-static.
+
+   type RecWithDisc (D: My_Int) is record
+      Table: Int_Array := (others => D);
+   end record;
+
+   type Tag is tagged record
+      C : My_Int := Func;
+      D : Integer;
+   end record;
+
+   type Pri_Ext is new Tag with private;
+
+private
+
+   type Pri_Ext is new Tag with record
+      N: String (1 .. 5);
+   end record;
+
+end BA21002_0;
+
+
+     --===================================================================--
+
+
+package body BA21002_0 is
+
+   function Func return My_Int is
+   begin
+      return 0;
+   end Func;
+
+end BA21002_0;
+
+
+     --===================================================================--
+
+
+with BA21002_0;
+use type BA21002_0.My_Int;
+package BA21002 is
+
+   pragma Pure (BA21002);
+
+   type Tag_Ext is new BA21002_0.Tag     with null record;
+   type Rec_Ext is new BA21002_0.Pri_Ext with null record;
+
+   procedure Proc;
+
+   type Priv is tagged private;
+
+private
+
+   type Priv is tagged record
+      A: Integer;
+      B: Boolean;
+   end record;
+
+end BA21002;
+
+
+     --===================================================================--
+
+
+package body BA21002 is
+
+   Pri   : constant Priv := (0, True);                                -- OK.
+                                 -- Declaration of a constant private object
+                                 -- (within scope of full view) (o).
+
+   type Rec (D: access BA21002_0.Tag) is limited record               -- OK.
+                                               -- Anonymous access type (n).
+      C : BA21002_0.My_Int;
+   end record;
+
+
+   procedure Proc is
+      type NAcc is access BA21002_0.Tag;                              -- OK.
+                               -- Named access type (within subprogram) (m).
+
+      Obj1 : BA21002_0.My_Int := 10;                                  -- OK.
+                            -- Variable declaration (within subprogram) (l).
+
+      Obj2 : BA21002_0.Tag;                                           -- OK.
+                            -- Variable declaration (within subprogram) (l).
+   begin
+      null;
+   end Proc;
+
+
+   Tag1  : constant BA21002_0.Tag := (0, 10);                         -- OK.
+                                       -- Declaration of a constant (j) (k).
+
+   Disc1 : constant BA21002_0.RecWithDisc(2) :=
+     (2, (others => BA21002_0.Three));                                -- OK.
+                                    -- Primary that is a name of an object
+                                    -- but which is a static expression (i).
+
+   Nine  : constant BA21002_0.My_Int := BA21002_0.Three**2;           -- OK.
+                       -- Call to static function (predefined operator) (h).
+
+
+   RExt  : constant BA21002_0.Tag'Class :=
+     Tag_Ext'(BA21002_0.Tag with null record);                        -- ERROR:
+                                        -- Call to nonstatic function (in
+                                        -- component's default expression) (g).
+
+   PExt  : constant Rec_Ext :=
+     (BA21002_0.Pri_Ext with null record);                            -- ERROR:
+           -- Extension aggregate with ancestor denoting private extension (f).
+
+   type Named_Access_Type is access BA21002_0.Tag;                    -- ERROR:
+                                                      -- Named access type (e).
+
+   Obj1  : BA21002_0.My_Int;                                          -- ERROR:
+                                                   -- Variable declaration (d).
+
+   Obj2  : BA21002_0.My_Int := 10;                                    -- ERROR:
+                                                   -- Variable declaration (d).
+
+   protected Prot is                                                  -- ERROR:
+                   -- (Anonymous) protected object with entry declarations (c).
+      entry E;
+   end Prot;
+
+   protected body Prot is                                    -- OPTIONAL ERROR:
+              -- No corresponding protected definition (due to previous error).
+      entry E when False is
+      begin
+         null;
+      end E;
+   end Prot;
+
+
+   Disc2 : constant BA21002_0.RecWithDisc(2) :=
+     (2, BA21002_0.Arr);                                              -- ERROR:
+                                       -- Primary that is a name of an object
+                                       -- which is not a static expression (b).
+
+begin
+   Proc;                                                             -- ERROR:
+                                                     -- Non-null statement (a).
+end BA21002;
