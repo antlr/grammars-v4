@@ -250,6 +250,7 @@
                 <module>hals</module>
 				<module>haskell</module>
 				<module>hexpat</module>
+				<module>hope</module>
 				<module>html</module>
 				<module>http</module>
                 <module>hume</module>
