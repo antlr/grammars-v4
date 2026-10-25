@@ -232,6 +232,7 @@
 				<module>fol</module>
 				<module>fortran</module>
 				<module>fusion-tables</module>
+				<module>gamegenie</module>
 				<module>gdscript</module>
 				<module>gedcom</module>
                 <module>geekcode</module>

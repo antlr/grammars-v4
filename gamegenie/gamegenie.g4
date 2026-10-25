@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2020, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -30,10 +30,42 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+/*
+ * A Game Genie code is a 6 or 8 character string drawn from a 16-letter
+ * alphabet (A P Z L G I T Y E O X U K S V N), each letter encoding one of
+ * the hex digits 0-F. Several codes may be combined into a single
+ * "equation", joined with '+', to patch more than one address at once.
+ */
 grammar gamegenie;
 
-gamegenie : equation* EOF;
+gamegenie
+   : equation* EOF
+   ;
 
+equation
+   : code (PLUS code)*
+   ;
+
+code
+   : CODE8
+   | CODE6
+   ;
+
+PLUS
+   : '+'
+   ;
+
+CODE8
+   : LETTER LETTER LETTER LETTER LETTER LETTER LETTER LETTER
+   ;
+
+CODE6
+   : LETTER LETTER LETTER LETTER LETTER LETTER
+   ;
+
+fragment LETTER
+   : [APZLGITYEOXUKSVN]
+   ;
 
 WS
    : [ \r\n\t] + -> skip
