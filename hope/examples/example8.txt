@@ -1,0 +1,2 @@
+dec quadratic_roots : num#num#num -> num#num;
+--- quadratic_roots(a,b,c) <= (r1,r2) where (r1,r2) == (0,0);

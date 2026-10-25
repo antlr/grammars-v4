@@ -32,12 +32,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar lazyk;
 
 program
-   : ccexpr
+   : ccexpr EOF
    ;
 
 ccexpr
-   : ccexpr expr
-   |
+   : expr*
    ;
 
 expr
@@ -61,10 +60,7 @@ expr1
    ;
 
 nonemptyjotexpr
-   : nonemptyjotexpr '0'
-   | nonemptyjotexpr '1'
-   | '0'
-   | '1'
+   : ('0' | '1')+
    ;
 
 COMMENT

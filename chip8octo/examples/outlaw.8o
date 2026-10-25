@@ -1,0 +1,295 @@
+###########################################
+#
+#  Outlaw
+#
+#  An adaptation of the Atari 2600 game
+#  "Outlaw" for the Chip8.
+#
+#  Move with ASWD and fire with E.
+#  Holding a direction while firing will
+#  fire an angled shot, which ricochets.
+#  Plays fairly well at 30 cycles/frame
+#
+###########################################
+
+: cactus 0x38 0x38 0x3B 0x1B 0x1B 0x1B 0xDF 0xDE 0xD8 0xD8 0xF8 0x78 0x18 0x1C 0x0C 
+: left   0x00 0x00 0x70 0xF8 0x70 0x67 0x7C 0x60 0x60 0x78 0x28 0xEC
+: lwalk1 0x18 0x3E 0x1C 0x18 0x7E 0x99 0x99 0x99 0x5A 0x3C 0x66 0xC3
+: lwalk2 0x18 0x3E 0x1C 0x18 0x7E 0x99 0x99 0x99 0x5A 0x3C 0x24 0x36
+: right  0x00 0x00 0x06 0x1F 0x0E 0xE6 0x3E 0x06 0x06 0x1E 0x14 0x37 
+: rwalk1 0x18 0x7C 0x38 0x18 0x7E 0x99 0x99 0x99 0x5A 0x3C 0x66 0xC3
+: rwalk2 0x18 0x7C 0x38 0x18 0x7E 0x99 0x99 0x99 0x5A 0x3C 0x24 0x6C
+: edge   0xFF 0xFF
+: bullet 0x80
+
+###########################################
+#
+#  Register map
+#
+###########################################
+
+:alias leftx      ve
+:alias lefty      vd
+:alias leftframe  vc
+:alias leftbx     vb
+:alias leftby     va
+:alias leftfire   v9
+
+:alias rightx     v8
+:alias righty     v7
+:alias rightframe v6
+:alias rightbx    v5
+:alias rightby    v4
+:alias rightfire  v3
+
+:const FIRE_ST 1
+:const FIRE_UP 2
+:const FIRE_DN 3
+
+# v0-v2 and vf are left as temporaries
+
+###########################################
+#
+#  Bullets
+#
+###########################################
+
+: fire-left-bullet
+	v0 := 6
+	if v0 -key then return
+	leftfire := FIRE_ST
+	v0 := 5
+	if v0 key then leftfire := FIRE_UP
+	v0 := 8
+	if v0 key then leftfire := FIRE_DN
+	
+	# spawn bullet
+	leftbx := leftx
+	leftbx += 9
+	leftby := lefty
+	leftby += 5
+
+	# draw initial bullet frame
+	i := bullet
+	sprite leftbx leftby 1
+;
+
+: move-left-bullet
+	sprite leftbx leftby 1
+	leftbx += 1
+	if leftfire == FIRE_UP then leftby += -1
+	if leftfire == FIRE_DN then leftby +=  1
+
+	# bounce off top and bottom edge
+	if leftby ==  1 then leftfire := FIRE_DN
+	if leftby == 30 then leftfire := FIRE_UP
+
+	# despawn on right edge
+	if leftbx   == 63 then leftfire := 0
+	if leftfire == 0  then return
+	sprite leftbx leftby 1
+
+	# collide with obstacles
+	if vf == 0 then return
+	leftfire := 0
+;
+
+: fire-right-bullet
+	if rightfire != 0 then return
+	rightfire := FIRE_ST
+	v0 := random 0b11
+	if v0 == 1 then rightfire := FIRE_UP
+	if v0 == 2 then rightfire := FIRE_DN
+	
+	# spawn bullet
+	rightbx := rightx
+	rightbx += -1
+	rightby := righty
+	rightby += 5
+
+	# draw initial bullet frame
+	i := bullet
+	sprite rightbx rightby 1
+;
+
+: move-right-bullet
+	sprite rightbx rightby 1
+	rightbx += -1
+	if rightfire == FIRE_UP then rightby += -1
+	if rightfire == FIRE_DN then rightby +=  1
+
+	# bounce off top and bottom edge
+	if rightby ==  1 then rightfire := FIRE_DN
+	if rightby == 30 then rightfire := FIRE_UP
+
+	# despawn on right edge
+	if rightbx   == 0 then rightfire := 0
+	if rightfire == 0 then return
+	sprite rightbx rightby 1
+
+	# collide with obstacles
+	if vf == 0 then return
+	rightfire := 0
+;
+
+###########################################
+#
+#  Gunslingers
+#
+###########################################
+
+: move-left-player
+	v1 := leftx
+	v2 := lefty
+
+	# process movement keys
+	v0 := 7
+	if v0 key then v1 += -1
+	v0 := 9
+	if v0 key then v1 +=  1
+	v0 := 5
+	if v0 key then v2 += -1
+	v0 := 8
+	if v0 key then v2 +=  1
+
+	# animate player movement
+	v0 := 0
+	if v1 != leftx then v0 := 24
+	if v2 != lefty then v0 := 24
+	if leftframe == 24 then v0 := 12
+	vf := 6
+	if vf key then v0 := 0
+
+	# clamp position within left side
+	if v1 ==  0 then v1 :=  1
+	if v1 == 21 then v1 := 20
+	if v2 ==  0 then v2 :=  1
+	if v2 == 18 then v2 := 17
+
+	# update position
+	i := left
+	i += leftframe
+	sprite leftx lefty 12
+	leftx     := v1
+	lefty     := v2
+	leftframe := v0
+	i := left
+	i += leftframe
+	sprite leftx lefty 12
+;
+
+: brain-table
+	v1 += -1          return
+	v1 +=  1          return
+	v2 += -1          return # vertical movement is 2x as likely
+	v2 += -1          return # as horizontal movement
+	v2 +=  1          return
+	v2 +=  1          return
+	v0 := v0          return # do nothing
+	fire-right-bullet return
+: do-brain
+	v0 := random 0b11100 # entries are 4 bytes each
+	jump0 brain-table
+
+: move-right-player
+	v1 := rightx
+	v2 := righty
+
+	# process (random) movement
+	do-brain
+
+	# animate movement
+	v0 := 0
+	if v1 != rightx then v0 := 24
+	if v2 != righty then v0 := 24
+	if rightframe == 24 then v0 := 12
+
+	# clamp position within right side
+	if v1 == 35 then v1 := 36
+	if v1 == 56 then v1 := 55
+	if v2 ==  0 then v2 :=  1
+	if v2 == 18 then v2 := 17
+
+	# update position
+	i := right
+	i += rightframe
+	sprite rightx righty 12
+	rightx     := v1
+	righty     := v2
+	rightframe := v0
+	i := right
+	i += rightframe
+	sprite rightx righty 12
+;
+
+###########################################
+#
+#  Main
+#
+###########################################
+
+: rightdead
+	sprite rightx righty 12
+	i := bullet
+	sprite leftbx leftby 1
+
+: gameover
+	v0 := 32
+	buzzer := v0
+	delay  := v0
+	loop
+		v0 := delay
+		if v0 != 0 then
+	again
+	jump main
+
+: leftdead
+	sprite leftx lefty 12
+	i := bullet
+	sprite rightbx rightby 1
+	jump gameover
+
+: main
+	# initialize state
+	leftx      :=  5
+	lefty      := 10
+	leftframe  :=  0
+	rightx     := 51
+	righty     := 10
+	rightframe :=  0
+	leftfire   :=  0
+	rightfire  :=  0
+
+	# draw background
+	clear
+	i  := cactus
+	v0 := 28
+	v1 := 9
+	sprite v0 v1 15
+
+	i  := edge
+	v0 := 0
+	v1 := 31
+	loop
+		sprite v0 v1 2
+		v0 += 8
+		if v0 != 64 then
+	again
+
+	i := left
+	sprite leftx lefty 12
+	i := right
+	sprite rightx righty 12
+
+	# main game loop
+	loop
+		move-left-player
+		if vf != 0 then jump leftdead
+		move-right-player
+		if vf != 0 then jump rightdead
+
+		i := bullet
+		if leftfire  != 0 then move-left-bullet
+		if leftfire  == 0 then fire-left-bullet
+		if rightfire != 0 then move-right-bullet
+	again

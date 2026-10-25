@@ -1,0 +1,6 @@
+     A          R PROMPT                    CF03(03 'Exit')
+     A                                  1 25'Enter your name:'
+     A            USERNAME      20   B  1 43
+     A                                  3 25'Enter your age:'
+     A            USERAGE        3S 0 B  3 43
+     A  90                                  ERRMSG('Age must be numeric' 90)

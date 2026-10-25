@@ -58,6 +58,9 @@ ALTER TABLE `order` ADD cancelled TINYINT(1) DEFAULT 0 NOT NULL, ADD delivered T
 #begin
 -- Alter database
 alter database test default character set = utf8;
+alter database character set = utf8;
+alter database default character set = utf8;
+alter schema default character set = utf8;
 #NB: alter schema somedb_name upgrade data directory name;
 alter database test_1 default encryption = 'Y' read only = 1;
 #end
