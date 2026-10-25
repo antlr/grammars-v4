@@ -1,0 +1,90 @@
+-- BB50001.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--     The ACAA has created and maintains the Ada Conformity Assessment Test
+--     Suite for the purpose of conformity assessments conducted in accordance
+--     with the International Standard ISO/IEC 18009 - Ada: Conformity
+--     assessment of a language processor. This test suite should not be used
+--     to make claims of conformance unless used in accordance with
+--     ISO/IEC 18009 and any applicable ACAA procedures.
+--*
+--
+-- OBJECTIVE:
+--
+--     Check that a checking pragma can only be given in a
+--     package_specification, declarative_part, or configuration pragma.
+--
+--     Check that the identifier in a checking pragma is the name of a check.
+--
+-- TEST DESCRIPTION:
+--
+--     We try a number of illegal locations for checking pragmas.
+--
+--     Following the grand tradition of ACATS tests (see B28001?.ADA), we use
+--     the names of ARG members as non-existent check names. Since check names
+--     can be implementation-defined, anything reasonable could have been used
+--     as an implementation-defined check. An implementation would need to
+--     ask for a grading modification in the unlikely event that one of these
+--     names is actually defined.
+--
+--     The author used his own name in the pragma Suppress test, lest the
+--     usage be considered some sort of political message.
+
+-- CHANGE HISTORY:
+--     30 Jun 2023  RLB  Created test.
+--
+procedure BB50001 is
+
+   pragma Suppress (Range_Check);                          -- OK. {4}
+   
+   pragma Unsuppress (Tag_Check);                          -- OK. {4}
+   
+   package Pack is
+      pragma Suppress (Index_Check);                       -- OK. {7}
+   
+      pragma Unsuppress (Division_Check);                  -- OK. {7}
+      
+      Foo : Natural;
+   end Pack;
+   
+begin
+   null;
+   pragma Suppress (Overflow_Check);                       -- ERROR: {4}
+   if True then
+      null;
+      pragma Unsuppress (Accessibility_Check);             -- ERROR: {7}
+   else
+      declare
+         pragma Unsuppress (Accessibility_Check);          -- OK. {10}
+         pragma Suppress (Randy_Brukardt);                 -- ERROR: {10}
+         pragma Unsuppress (Tucker_Taft);                  -- ERROR: {10}
+      begin
+         null;
+         pragma Suppress (Length_Check);                   -- ERROR: {10}
+      end;
+   end if;
+end BB50001;
+       

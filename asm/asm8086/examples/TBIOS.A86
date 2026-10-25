@@ -1,0 +1,829 @@
+	title	'Track Buffered BIOS - SBC204'
+
+;  5 Jan 82  -jrp
+
+
+;	Copyright (C) 1980,1981
+;	Digital Research, Inc.
+;	Box 579, Pacific Grove
+;	California, 93950
+;
+;	(Permission is hereby granted to use
+;	or abstract the following program in
+;	the implementation of CP/M, MP/M or
+;	CP/NET for the 8086 or 8088 Micro-
+;	processor)
+
+
+true		equ -1
+false		equ not true
+
+;	Track buffering equates...
+
+host_sectsiz	equ	128
+host_spt	equ	26
+host_fsn	equ	1
+
+bdos_int	equ 224
+bios_code	equ 2500h
+ccp_offset	equ 0000h
+bdos_ofst	equ 0B06h ;BDOS entry point
+
+csts		equ 0DAh  ;i8251 status port
+cdata		equ 0D8h  ;   "  data port
+
+lsts		equ 41h ;2651 No. 0 on BLC8538 status port
+ldata		equ 40h	; "   "   "  "    "    data port
+blc_reset	equ 60h	;reset selected USARTS on BLC8538
+
+
+;*********************************************
+;*                                           *
+;*    Intel iSBC 204 Disk Controller Ports   *
+;*                                           *
+;*********************************************
+
+base204		equ 0a0h	;SBC204 assigned address
+
+fdc_com		equ base204+0	;8271 FDC out command
+fdc_stat	equ base204+0	;8271 in status
+fdc_parm	equ base204+1	;8271 out parameter
+fdc_rslt	equ base204+1	;8271 in result
+fdc_rst		equ base204+2	;8271 out reset
+dmac_adr	equ base204+4	;8257 DMA base address out
+dmac_cont	equ base204+5	;8257 out control
+dmac_scan	equ base204+6	;8257 out scan control
+dmac_sadr	equ base204+7	;8257 out scan address
+dmac_mode	equ base204+8	;8257 out mode
+dmac_stat	equ base204+8	;8257 in status
+fdc_sel		equ base204+9	;FDC select port (not used)
+fdc_segment	equ base204+10	;segment address register 
+reset_204	equ base204+15	;reset entire interface
+
+max_retries	equ 10		;max retries on disk i/o 
+				;before perm error
+cr		equ 0dh		;carriage return
+lf		equ 0ah		;line feed
+
+	cseg
+	org	ccpoffset
+ccp:
+	org	bios_code
+
+;*********************************************
+;*                                           *
+;* BIOS Jump Vector for Individual Routines  *
+;*                                           *
+;*********************************************
+
+ jmp INIT	;Enter from BOOT ROM or LOADER
+ jmp WBOOT	;Arrive here from BDOS call 0  
+ jmp CONST	;return console keyboard status
+ jmp CONIN	;return console keyboard char
+ jmp CONOUT  	;write char to console device
+ jmp LISTOUT	;write character to list device
+ jmp PUNCH	;write character to punch device
+ jmp READER  	;return char from reader device 
+ jmp HOME	;move to trk 00 on cur sel drive
+ jmp SELDSK  	;select disk for next rd/write
+ jmp SETTRK  	;set track for next rd/write
+ jmp SETSEC  	;set sector for next rd/write
+ jmp SETDMA  	;set offset for user buff (DMA)
+ jmp READ	;read a 128 byte sector
+ jmp WRITE	;write a 128 byte sector
+ jmp LISTST  	;return list status 
+ jmp SECTRAN 	;xlate logical->physical sector 
+ jmp SETDMAB 	;set seg base for buff (DMA)
+ jmp GETSEGT 	;return offset of Mem Desc Table
+ jmp GETIOBF	;return I/O map byte (IOBYTE)
+ jmp SETIOBF	;set I/O map byte (IOBYTE) 
+
+
+
+		;print signon message and initialize hardware
+INIT:
+	mov ax,cs	;we entered with a JMPF so use
+	mov ds,ax	; CS: as the initial value of DS:,
+	mov es,ax	;	and ES:
+	mov ss,ax	; use local stack during initialization
+	mov sp,offset stkbase
+	cld		;set forward direction
+	push ds		;save the DS register
+	mov ax,0
+	mov ds,ax
+	mov es,ax 	;set ES and DS to zero
+	;setup interrupt 0 to address trap routine
+	mov int0_offset,offset int_trap
+	mov int0_segment,CS
+	mov di,4
+	mov si,0	;then propagate
+	mov cx,510	;trap vector to
+	rep movs ax,ax	;all 256 interrupts
+	;BDOS offset to proper interrupt
+	mov bdos_offset,bdos_ofst
+	pop ds		;restore the DS register
+
+; Initialize the BLC 8538 printer port
+	mov al,0FFh
+	out blc_reset,al ;reset all usarts on 8538
+	mov al,4Eh
+	out ldata+2,al	;set usart 0 in async 8 bit mode
+	mov al,3Eh
+	out ldata+2,al	;set usart 0 to 9600 baud
+	mov al,37h
+	out ldata+3,al	;enable Tx/Rx, and set up RTS,DTR
+	mov bx,offset signon
+	call pmsg	;print signon message
+
+	call clear_flags ; initialize track buffering
+
+	mov cl,0	;default to dr A: on coldstart
+	jmp ccp		;jump to cold start entry of CCP
+
+WBOOT:	jmp ccp+6	;direct entry to CCP at command level
+
+
+int_trap:
+	cli		;block interrupts
+	mov ax,cs
+	mov ds,ax	;get our data segment
+	mov bx,offset int_trp
+	call pmsg
+	hlt		;hardstop
+
+
+;*********************************************
+;*                                           *
+;*   CP/M Character I/O Interface Routines   *
+;*   Console is Usart (i8251a) on iSBC 86/12 *
+;*   at ports D8/DA                          *
+;*                                           *
+;*********************************************
+
+CONST:		;console status
+	in al,csts
+	and al,2
+	jz const_ret
+	or al,255	;return non-zero if RDA
+const_ret:
+	ret		;Receiver Data Available
+
+CONIN:			;console input
+	call const
+	jz CONIN	;wait for RDA
+	in al,cdata
+	and al,7fh 	;read data and remove parity bit
+	ret
+
+CONOUT:		;console output
+	in al,csts
+	and al,1	;get console status
+	jz CONOUT 	;wait for TBE
+	mov al,cl
+	out cdata,al	;Transmitter Buffer Empty
+	ret		;then return data
+
+LISTOUT:		;list device output
+
+	call LISTST
+	jz LISTOUT	;wait for printer not busy
+	mov al,cl
+	out ldata,al	;send char to TI 810
+	ret
+
+LISTST:			;poll list status
+
+	in al,lsts
+	and al,81h	;look at both TxRDY and DTR
+	cmp al,81h
+	jnz zero_ret	;either false, printer is busy
+	or al,255	;both true, LPT is ready
+	ret
+
+PUNCH:	;not implemented in this configuration
+READER:
+	mov al,1ah
+	ret		;return EOF for now
+
+GETIOBF:
+	mov al,0	;TTY: for consistency
+	ret		;IOBYTE not implemented
+
+SETIOBF:
+	ret		;iobyte not implemented
+
+zero_ret:
+	and al,0
+	ret		;return zero in AL and flags
+
+; Routine to get and echo a console character
+;	and shift it to upper case
+
+uconecho:
+	call CONIN	;get a console character
+	push ax
+	mov cl,al	;save and
+	call CONOUT
+	pop ax		;echo to console
+	cmp al,'a'
+	jb uret		;less than 'a' is ok
+	cmp al,'z'
+	ja uret		;greater than 'z' is ok
+	sub al,'a'-'A'	;else shift to caps
+uret:
+	ret
+
+;	utility subroutine to print messages
+
+pmsg:
+	mov al,[BX] 	;get next char from message
+	test al,al
+	jz return	;if zero return
+	mov CL,AL
+	call CONOUT  	;print it
+	inc BX
+	jmps pmsg	;next character and loop
+
+
+
+;*********************************************
+;*                                           *
+;*          Disk Input/Output Routines       *
+;*                                           *
+;*********************************************
+
+SELDSK:		;select disk given by register CL
+	mov cpm_disk,cl			; save the selected drive
+	mov bx,0000h
+	cmp cl,2	;this BIOS only supports 2 disks
+	jnb return	;return w/ 0000 in BX if bad drive
+			;now, we need disk parameter address
+	mov ch,0
+	mov bx,cx	;BX = word(CL)
+	mov cl,4
+	shl bx,cl	;multiply drive code * 16
+	add bx,offset dp_base	;create offset from Disk Parameter Base
+return:
+	ret
+
+home:
+	test wr_flag,1 ! jnz home1 ; if the buffer is clean,
+	mov	cur_disk,-1	; insure we read the directory by invalidating
+				;  the track buffer
+home1:
+	mov	cx,0		; home is a settrk zero
+
+settrk:
+	mov	cpm_track,cx	; save track number for next operation
+	ret
+
+setsec:
+	mov	cpm_sec,cx	; save sector number for next operation
+	ret
+
+
+
+setdma:
+	mov	dma_offset,cx		; save DMA offset address
+	ret
+setdmab:
+	mov	dma_segment,cx		; save DMA segment address
+	ret
+
+sectran:
+	mov	bx,cx		; Put logical sector into dest. reg.
+	test	dx,dx		; see if table address is zero
+	jz	sectran_exit	; yeah, logical = physical
+	add	bx,dx		; else, we need to fetch the
+	mov	bl,[BX]		;  actual sector number from the table
+	mov	bh,0		; zero high byte for good luck
+sectran_exit:
+	ret
+
+
+GETSEGT:  ;return address of physical memory table
+	mov bx,offset seg_table
+	ret
+
+
+
+read:
+	call	track_setup
+	push	es			; save the extra segment register
+	mov	si,offset track_buffer	; source segment is systems DS:
+	add	si,ax			; gives the offset into the buffer
+	les	di,dma_longword		; point ES:DI at the users sector
+	rep movsw			; doit
+	pop	es			; restore the extra segment
+	sub	ax,ax			; make a zero return code
+	ret
+
+write:
+	push	cx			; save the write mode from the BDOS
+	call	track_setup
+	push	ax			; save buffer offset
+	push	ds			; save the data segment
+	push	es			; save the extra segment
+	mov bx,ds ! mov es,bx		; destination is our data segment
+	mov	di,offset track_buffer	; destination is in track buffer
+	add	di,ax			; plus appropriate offset
+	lds	si,dma_longword		; source is users DMA address
+	rep movsw			; move that sector
+	pop	es			; restore the extra segment
+	pop	ds			; and the data segment registers
+	pop	ax			; recover buffer offset
+	mov	cx,host_sectsiz		; setup to divide by host sector size
+	sub	dx,dx			; extend ax to 32 bits
+	div	cx			; find out which host sector we changed
+	mov	bx,ax			; put into index [BX]
+	mov	sec_flags[BX],1		; set the update flag for that sector
+	mov	wr_flag,1		; also set the dirty buffer flag
+	pop	cx			; recover BDOS write code
+	cmp	cl,1			; is this a directory update ?
+	jne	write_return		; no, we may leave dirty records
+					;	in the buffer
+	call	flush_buffer		; we have a directory write, need to
+					; flush the buffer to insure the
+					; disks integrity
+write_return:
+	sub	ax,ax			; never return BAD SECTOR code
+	ret
+
+
+track_setup:			; common code for setting up reads and writes
+
+	mov	al,cpm_disk		; see if selected disk is
+	cmp	al,cur_disk		;	the same as last time
+	jne	wrong_track		; no, we have wrong track
+
+	mov	ax,cpm_track		; see if desired track is same as
+	cmp	ax,cur_track		;	the track in the buffer
+	je	correct_track		; same drive and track, we don't need to read
+
+;	Desired operation is on a different track then is in our buffer,
+;	So it will be nessecary to read in the desired track.  First, we
+;	must check to see if any sectors of the current buffer are dirty.
+
+wrong_track:
+	call	flush_buffer		; write any old records, if nessecary
+
+	mov	ax,cpm_track		; get desired track number
+	mov	cur_track,ax		; make in new track
+	mov	al,cpm_disk		; get desired disk number
+	mov	cur_disk,al		; make it current drive
+	mov	cur_dma_adr,offset track_buffer
+					; point dma offset at track buffer
+	mov	cur_sec,host_fsn	; starting from first sector
+	call	track_read		; load the track
+
+correct_track:
+	mov	ax,cpm_sec		; get the cp/m sector number
+  if (host_fsn ne 0)
+	sub	ax,host_fsn		; correct if we start with sector one
+    endif
+	mov	cl,7			; log2(128)
+	shl	ax,cl			; sector times 128 gives offset
+	mov cx,64 ! cld			; move 64 words forward
+	ret
+
+
+flush_buffer:
+	test	wr_flag,1		; see if we have anything to write
+	jz	no_flush		; no, skip scanning for dirty sectors
+	mov	bx,host_fsn		; start at first host sector
+	mov	cx,host_spt		; for host_spt sectors...
+next_sect:
+	test	sec_flags-host_fsn[BX],1 ; see if this sector has been changed
+	jz	not_updated		 ; no, leave it alone
+	mov	sec_flags-host_fsn[BX],0 ; zero the flag for next time
+	push	bx			 ; save the registers
+	push	cx
+	mov	cur_sec,bx		; save host sector number
+	mov	ax,host_sectsiz
+  if (host_fsn ne 0)
+	sub	bx,host_fsn
+  endif
+	mul	bx			; make track buffer offset
+	add	ax,offset track_buffer	; make direct pointer
+	mov	cur_dma_adr,ax		; save for write routine
+	call	sector_write
+	pop	cx
+	pop	bx
+not_updated:
+	inc	bx
+	loop	next_sect
+no_flush:
+	mov	wr_flag,0		; clear the dirty buffer flag
+	ret
+
+clear_flags:	; Clear all variables associated with the track buffer,
+		; so next operation will have to read a track.
+		;  This is involves clearing all write flags and setting
+		;  the old drive code to the invalid -1.
+
+	push es				; save extra segment
+	mov cur_disk,-1 		; insure initial pre-read
+	sub ax,ax			; make a zero
+	mov wr_flag,al			; clear the dirty buffer flag
+	mov di,offset sec_flags		; point to the update flag list
+	mov bx,ds ! mov es,bx		; ES <- DS
+	mov cx,host_spt ! cld		; set length and direction
+	rep stosb			; zero the sector update flags
+	mov cur_dma_seg,ds		; get our segment address
+	pop es				; recover extra segment
+	ret
+
+
+
+track_READ:
+	mov io_com,4		; read track takes 4 byte command
+	mov io_com+1,13h	; special read track command
+	jmps r_w_common
+
+sector_WRITE:
+	mov io_com,3		; write sector takes 3 byte command
+	mov io_com+1,0ah 	; basic write sector command
+
+r_w_common:
+	cmp cur_disk,1 ! jne not_first_b	; see if drive B
+	test b_first_flag,-1 ! jz not_first_b	; and first reference to B
+	call restore				; then restore drive B
+	mov b_first_flag,0			; and clear flag
+not_first_b:
+	mov bx,offset io_com ;point to command string
+	mov ax,cur_sec	; put sector in
+	mov sect,al	; iopb as 8 bits
+	mov ax,cur_track ; same with
+	mov trk,al	;    track . . 
+
+;	fall into execute and return
+
+execute:  ;execute command string.
+	;[BX] points to length,
+	;	followed by Command byte,
+	;	followed by length-1 parameter bytes
+
+	mov last_com,BX	;save command address for retries
+outer_retry:
+	;allow some retrying
+	mov rtry_cnt,max_retries
+retry:
+	mov BX,last_com
+	call send_com	;transmit command to i8271
+;	check status poll
+
+	mov BX,last_com
+	mov al,1[bx]	;get command op code
+	mov cx,0800h	;mask if it will be "int req"
+	cmp al,2ch
+	jb exec_poll	;ok if it is an interrupt type 
+	mov cx,8080h	;else we use "not command busy"
+	and al,0fh
+	cmp al,0ch	;unless there isn't
+	mov al,0
+	ja exec_exit	;	any result
+			;poll for bits in CH,
+exec_poll:		;  toggled with bits in CL
+
+	in al,fdc_stat	;read status
+	and al,ch
+	xor al,cl	;  isolate what we want to poll
+	jz exec_poll	;and loop until it is done
+
+			;Operation complete,
+	in al,fdc_rslt	; see if result code indicates error
+	and al,1eh
+	jz exec_exit	;no error, then exit
+			;some type of error occurred . . .
+	cmp al,10h
+	je dr_nrdy	;was it a not ready drive ?
+			;no,
+dr_rdy:	; then we just retry read or write
+	push ax		; save error code
+	call restore	; after physically homing this disk
+	pop ax		; recover error code
+	dec rtry_cnt
+	jnz retry	;  up to 10 times
+
+;	retries do not recover from the
+;	hard error
+
+	mov ah,0
+	mov bx,ax	;make error code 16 bits
+	mov bx,errtbl[BX]
+	call pmsg	;print appropriate message
+	in al,cdata	;flush usart receiver buffer
+	call uconecho	;read upper case console character
+	cmp al,'C'
+	je wboot_l	;cancel
+	cmp al,'R'
+	je outer_retry	;retry 10 more times
+	cmp al,'I'
+	je z_ret	;ignore error
+	or al,255	;set code for permanent error
+exec_exit:
+	ret
+
+dr_nrdy:	;here to wait for drive ready
+	call test_ready
+	jnz retry	;if it's ready now we are done
+	call test_ready
+	jnz retry	;if not ready twice in row,
+	mov bx,offset nrdymsg
+	call pmsg 	;"Drive Not Ready"
+nrdy01:
+	call test_ready
+	jz nrdy01 	;now loop until drive ready
+	jmps retry	;then go retry without decrement
+zret:
+	and al,0
+	ret		;return with no error code
+
+wboot_l:		;can't make it w/ a short leap
+	jmp WBOOT
+
+;*********************************************
+;*                                           *
+;*  The i8271 requires a read status command *
+;*  to reset a drive-not-ready after the     *
+;*  drive becomes ready                      *
+;*                                           *
+;*********************************************
+
+test_ready:
+	mov dh, 40h  	;proper mask if dr 1
+	test sel_mask,80h
+	jnz nrdy2
+	mov dh, 04h  	;mask for dr 0 status bit
+nrdy2:
+	mov bx,offset rds_com
+	call send_com
+dr_poll:
+	in al,fdc_stat	;get status word
+	test al,80h
+	jnz dr_poll 	;wait for not command busy
+	in al,fdc_rslt	;get "special result"
+	test al,dh	;look at bit for this drive
+	ret		;return status of ready
+
+
+restore:	;move selected disk to home position (Track 0)
+	mov bx,offset hom_com
+	call execute
+	jz restore_exit	;home drive and return if OK
+	mov bx,offset bad_hom	;else print 
+	call pmsg	;"Home Error"
+	jmps restore	;and retry
+restore_exit:
+	ret
+
+;*********************************************
+;*                                           *
+;*  Send_com sends a command and parameters  *
+;*  to the i8271:  BX addresses parameters.  *
+;*  The DMA controller is also initialized   *
+;*  if this is a read or write               *
+;*                                           *
+;*********************************************
+
+send_com:
+	in al,fdc_stat
+	test al,80h	;insure command not busy
+	jnz send_com	;loop until ready
+
+	;see if we have to initialize for a DMA operation
+
+	mov al,1[bx]	;get command byte
+	cmp al,13h
+	jne write_maybe	;if not a read it could be write
+	mov cl,40h
+	jmps init_dma	;is a read command, go set DMA
+write_maybe:
+	cmp al,0ah
+	jne dma_exit	;leave DMA alone if not read or write
+	mov cl,80h  	;we have write, not read
+init_dma:
+;we have a read or write operation, setup DMA controller
+;	(CL contains proper direction bit)
+	mov al,04h
+	out dmac_mode,al    ;enable dmac
+	mov al,00
+	out dmac_cont,al    ;send first byte to control port
+	mov al,cl
+	out dmac_cont,al   ;load direction register
+	mov ax,cur_dma_adr
+	out dmac_adr,al    ;send low byte of DMA
+	mov al,ah
+	out dmac_adr,al	   ;send high byte
+	mov ax,cur_dma_seg
+	out fdc_segment,al ;send low byte of segment address
+	mov al,ah
+	out fdc_segment,al ;then high segment address
+dma_exit:
+	mov cl,[BX]	;get count
+	inc BX
+	mov al, 80h
+	cmp cur_disk,0
+	jne sel1 	;drive 1 if not zero
+	mov al, 40h	;else drive is 0
+sel1:	mov sel_mask,al	; save select mask
+	or al,[BX]	;merge command and drive code
+	out fdc_com,al 	;send command byte
+parm_loop:
+	dec cl
+	jz parm_exit	;no (more) parameters, return
+	inc BX		;point to (next) parameter
+parm_poll:
+	in al,fdc_stat
+	test al,20h	;test "parameter register full" bit
+	jnz parm_poll	;idle until parm reg not full
+	mov al,[BX]
+	out fdc_parm,al	;send next parameter
+	jmps parm_loop	;go see if there are more parameters
+parm_exit:
+	ret
+
+;*********************************************
+;*                                           *
+;*               Data Areas                  *
+;*                                           *
+;*********************************************
+data_offset	equ offset $
+
+	dseg
+	org	data_offset	;contiguous with code segment
+
+
+signon	db	cr,lf,cr,lf
+	db	'  CP/M-86, 1 Feb 82 ',cr,lf,0
+
+bad_hom	db	cr,lf,'Home Error',cr,lf,0
+int_trp	db	cr,lf,'Interrupt Trap Halt',cr,lf,0
+
+errtbl  dw er0,er1,er2,er3
+	dw er4,er5,er6,er7
+	dw er8,er9,erA,erB
+	dw erC,erD,erE,erF
+
+er0 	db  cr,lf,'Error Code 0 :',0
+er1 	db  cr,lf,'Error Code 1 :',0
+er2 	db  cr,lf,'Error Code 2 :',0
+er3 	db  cr,lf,'Error Code 3 :',0
+er4 	db  cr,lf,'Clock Error :',0
+er5 	db  cr,lf,'Late DMA :',0
+er6 	db  cr,lf,'ID CRC Error :',0
+er7 	db  cr,lf,'Data CRC Error :',0
+er8 	db  cr,lf,'Drive Not Ready :',0
+er9 	db  cr,lf,'Write Protect :',0
+erA 	db  cr,lf,'Track 00 Not Found :',0
+erB 	db  cr,lf,'Write Fault :',0
+erC 	db  cr,lf,'Sector Not Found :',0
+erD 	db  cr,lf,'Error Code D :',0
+erE 	db  cr,lf,'Error Code E :',0
+erF 	db  cr,lf,'Error Code F :',0
+
+nrdymsg	equ er8
+
+b_first_flag	db	-1
+
+rtry_cnt db 0 	;disk error retry counter
+last_com dw 0 	;address of last command string
+cur_dma_adr  dw 0 	;dma offset stored here
+cur_dma_seg  dw 0 	;dma segment stored here
+sel_mask db 40h ;select mask, 40h or 80h
+
+;	Various command strings for i8271
+
+io_com	db 3	;length (changed to 4 to read a track)
+rd_wr	db 0	;read/write function code
+trk	db 0	;track #
+sect	db 0	;sector #
+sec_len	db 26	;transfer 26 sectors on a track read
+
+hom_com	db 2,29h,0	;home drive command
+rds_com	db 1,2ch	;read status command
+
+;	Track buffering variables
+
+cpm_disk	rb	1
+cpm_track	rw	1
+cpm_sec		rw	1
+
+cur_disk	rb	1
+cur_track	rw	1
+cur_sec		rw	1
+
+dma_offset	rw	1
+dma_segment	rw	1
+dma_longword	equ	dword ptr dma_offset
+
+bdos_wr_code	rb	1
+wr_flag		rb	1
+
+;	System Memory Segment Table
+
+segtable db 2	;2 segments
+	dw tpa_seg	;1st seg starts after BIOS
+	dw tpa_len	;and extends to 08000
+	dw 1000h	;second is 10000 -
+	dw 1000h	;1FFFF (64k)
+
+;	include singles.lib ;read in disk definitions
+;	        DISKS 2
+dpbase	equ	$		;Base of Disk Parameter Blocks
+dpe0	dw	xlt0,0000h	;Translate Table
+	dw	0000h,0000h	;Scratch Area
+	dw	dirbuf,dpb0	;Dir Buff, Parm Block
+	dw	csv0,alv0	;Check, Alloc Vectors
+dpe1	dw	xlt1,0000h	;Translate Table
+	dw	0000h,0000h	;Scratch Area
+	dw	dirbuf,dpb1	;Dir Buff, Parm Block
+	dw	csv1,alv1	;Check, Alloc Vectors
+;	        DISKDEF 0,1,26,6,1024,243,64,64,2
+;
+;	 1944:	128 Byte Record Capacity
+;	  243:	Kilobyte Drive  Capacity
+;	   64:	32 Byte Directory Entries
+;	   64:	Checked Directory Entries
+;	  128:	Records / Extent
+;	    8:	Records / Block
+;	   26:	Sectors / Track
+;	    2:	Reserved  Tracks
+;	    6:	Sector Skew Factor
+;
+dpb0	equ	offset $	;Disk Parameter Block
+	dw	26		;Sectors Per Track
+	db	3		;Block Shift
+	db	7		;Block Mask
+	db	0		;Extnt Mask
+	dw	242		;Disk Size - 1
+	dw	63		;Directory Max
+	db	192		;Alloc0
+	db	0		;Alloc1
+	dw	16		;Check Size
+	dw	2		;Offset
+xlt0	equ	offset $	;Translate Table
+	db	1,7,13,19
+	db	25,5,11,17
+	db	23,3,9,15
+	db	21,2,8,14
+	db	20,26,6,12
+	db	18,24,4,10
+	db	16,22
+als0	equ	(243+7)/8	;Allocation Vector Size
+css0	equ	16		;Check Vector Size
+;	        DISKDEF 1,0
+;
+;	Disk 1 is the same as Disk 0
+;
+dpb1	equ	dpb0		;Equivalent Parameters
+als1	equ	als0		;Same Allocation Vector Size
+css1	equ	css0		;Same Checksum Vector Size
+xlt1	equ	xlt0		;Same Translate Table
+;	        ENDEF
+;
+;	Uninitialized Scratch Memory Follows:
+;
+dirbuf	rs	128		;Directory Buffer
+alv0	rs	als0		;Alloc Vector
+csv0	rs	css0		;Check Vector
+alv1	rs	als1		;Alloc Vector
+csv1	rs	css1		;Check Vector
+
+
+sec_flags	rb	host_spt
+
+track_buffer	rb	host_spt*host_sectsiz
+
+
+loc_stk	rw  32	;local stack for initialization
+
+stkbase	equ offset $
+
+lastoff	equ offset $
+
+tpa_seg	equ ((lastoff+07FFh)/0400h)*40h		; round off to 1K boundary
+tpa_len	equ 0800h - tpa_seg
+
+	db 0	;fill last address for GENCMD
+
+;*********************************************
+;*                                           *
+;* Dummy Data Section for Interrupt Vectors  *
+;*                                           *
+;*********************************************
+
+	dseg	0	;absolute low memory
+	org 	0	;(interrupt vectors)
+
+int0_offset	rw	1
+int0_segment	rw	1
+
+;	pad to system call vector
+	org	bdos_int * 4
+
+bdos_offset	rw	1
+bdos_segment	rw	1
+
+	END
+	

@@ -1,0 +1,104 @@
+###########################################
+#
+#  Vertical Clip
+#
+#  Sprite drawing routines which are capable
+#  of clipping a sprite along the top and
+#  bottom edges of the screen.
+#
+#  These routines are designed with 'lores'
+#  64x32 pixel graphics in mind.
+#
+#  Sprite y coordinates must range between
+#  17 and 64- at either extreme the sprite
+#  is completely invisible. If only a partial
+#  clip along one edge is necessary or
+#  other constraints can be added these
+#  routines could be simplified.
+#
+###########################################
+
+:const HEIGHT   15 # sprite height
+:const N_EDGE   32
+:calc  N_LIMIT  { N_EDGE - HEIGHT }
+:const S_EDGE   64
+:calc  S_LIMIT  { S_EDGE - HEIGHT }
+
+:alias offset  vd # could be a temp register
+:alias height  vc # could be a temp register
+:alias y       vb
+:alias x       va
+
+: flower
+	0x3C 0x66 0x57 0xB7 0xFB 0x7A 0x1A
+	0xC4 0x64 0x79 0x12 0x26 0x2C 0x10 0x08
+
+: draw-sprite
+	# If our sprite is below the north edge,
+	# we don't need to perform top clipping:
+	if y >= N_EDGE then jump clip-s
+
+	# Calculate the number of pixels we should
+	# draw and the corresponding offset into
+	# the sprite data which should be used:
+	offset := N_EDGE
+	offset -= y
+	height := HEIGHT
+	height -= offset
+
+	# If we're entirely off the top edge,
+	# we don't need to draw anything:
+	if height == 0 then return
+
+	# Overwrite the lowest nybble of the 'sprite instruction
+	# to reflect the desired height:
+	v0 := height
+	i := nrows
+	save v0
+	v0 := 0
+
+	i := flower
+	i += offset
+	:next nrows sprite x v0 HEIGHT
+;
+
+: clip-s
+	# Calculate the number of pixels we
+	# should draw based on the height of the screen:
+	height := S_EDGE
+	height -= y
+
+	# Drawing a 0-height sprite has the unintended
+	# consequence of drawing a SuperChip 16x16 sprite,
+	# so we must break if the sprite is fully offscreen:
+	if height == 0 then return
+
+	# On the other hand, if we're far enough away from the
+	# bottom edge we should display the full sprite.
+	# We could skip this step if the sprite was always
+	# against the bottom edge:
+	if y < S_LIMIT then height := HEIGHT
+
+	# Overwrite the lowest nybble of the 'sprite' instruction
+	# to parameterize the sprite height on the fly.
+	# We must also preserve the y register setting, but
+	# that is known statically:
+	v0 := 0xB0
+	v0 += height
+	i := srows
+	save v0
+
+	i := flower
+	:next srows sprite x y HEIGHT
+;
+
+: main
+	x := 28
+	y := 32
+	loop
+		clear
+		draw-sprite
+		v0 := key
+		if v0 == 5 then y += -1
+		if v0 == 8 then y +=  1
+	again

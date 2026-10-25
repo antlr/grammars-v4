@@ -1,0 +1,551 @@
+// BGM.tjs - BGM管理
+// Copyright (C)2001-2009, W.Dee and contributors  改変・配布は自由です
+
+class KAGSoundBuffer
+{
+	// 各 KAG 用サウンドバッファクラスに、この KAGSoundBuffer
+	// クラスを継承させる
+
+	var sbclass; // サウンドバッファのクラス
+	var owner; // オーナー
+
+	var inFadeAndStop = false; // フェード終了時に演奏を停止するか
+    var inFadeAndPause = false; // フェード終了時に演奏を一時停止するか
+    var inFading = false; // フェード中か
+	var prevstatus = "unload"; // 直前のステータス
+
+	function KAGSoundBuffer(owner, sbclass)
+	{
+		this.sbclass = sbclass;
+		this.owner = owner;
+	}
+
+	function finalize()
+	{
+	}
+
+	function fade()
+	{
+		// fade オーバーライド
+		inFading = true;
+		inFadeAndStop = false;
+        inFadeAndPause = false;
+		sbclass.fade(...);
+	}
+
+	function stopFade()
+	{
+		// stopFade オーバーライド
+		sbclass.stopFade(...);
+		inFadeAndStop = false;
+        inFadeAndPause = false;
+    }
+
+	function stop()
+	{
+		// stop オーバーライド
+		sbclass.stop(...);
+		inFadeAndStop = false;
+		inFadeAndPause = false;
+	}
+
+	function fadeOutAndStop(time, delay = 0)
+	{
+		// 時間 time, delay でフェードアウト後、演奏を停止する
+		inFading = true;
+		inFadeAndStop = true;
+		sbclass.fade(0, time, delay);
+	}
+
+	function fadeOutAndPause(time, delay = 0)
+	{
+		// 時間 time, delay でフェードアウト後、演奏を停止する
+		inFading = true;
+		inFadeAndPause = true;
+		sbclass.fade(0, time, delay);
+	}
+    
+	function onFadeCompleted()
+	{
+        // フェードが終了した
+		inFading = false;
+		if(inFadeAndStop)
+		{
+			sbclass.stop(); // inFadeAndStop ならば停止
+			inFadeAndStop = false;
+        } else if (inFadeAndPause) {
+			sbclass.paused = true; // inFadeAndPause ならば一時停止
+			inFadeAndPause = false;
+        }
+		sbclass.onFadeCompleted(...);
+		owner.onSoundBufferFadeCompleted(this);
+	}
+
+	function onStatusChanged()
+	{
+        sbclass.onStatusChanged(...);
+		var ps = prevstatus; // prev. status
+		var cs = sbclass.status; // current status
+		prevstatus = cs;
+		if(ps == "play" && cs == "stop")
+			owner.onSoundBufferStop(this); // play => stop : 演奏が停止した
+	}
+}
+
+class KAGWaveSoundBuffer extends WaveSoundBuffer, KAGSoundBuffer
+{
+	function KAGWaveSoundBuffer(owner)
+	{
+		WaveSoundBuffer(owner);
+		KAGSoundBuffer(owner, global.WaveSoundBuffer);
+	}
+
+	function finalize()
+	{
+		global.KAGSoundBuffer.finalize(...);
+		global.WaveSoundBuffer.finalize(...);
+	}
+
+    function onLabel(label) {
+        owner.owner.onBGMLabel(label);
+    }
+}
+
+
+class BGM
+{
+	var owner; // このオブジェクトを保持する KAGWindow クラスのオブジェクト
+	var doubleBuffered = true; // クロスフェードを行うか
+
+	var buf1; // バッファ 1
+	var buf2; // バッファ 2
+	var currentBuffer;  // buf1 or buf2
+	var looping = true; // ループ中かどうか
+    var volume = 100000; // ボリューム
+
+	var playingStorage; // 演奏中のストレージ
+	var currentStorage; // 見かけの演奏中のストレージ
+
+
+	var _enabled; // 有効かどうか
+
+	function BGM(owner)
+	{
+		this.owner = owner;
+
+		(BGM_config incontextof this)();
+		(BGM_config_override incontextof this)()
+			if typeof global.BGM_config_override != "undefined";
+
+		createBuffers(); // サウンドバッファを作成
+
+		currentStorage = '';
+		playingStorage = '';
+		currentBuffer = buf1;
+		_enabled = true;
+	}
+
+	function finalize()
+	{
+		invalidate buf1 if buf1 !== void;
+		invalidate buf2 if buf2 !== void;
+//		super.finalize(...);
+	}
+
+	function createBuffers()
+	{
+		// バッファを作成する
+		buf1 = new KAGWaveSoundBuffer(this);
+		buf2 = new KAGWaveSoundBuffer(this) if doubleBuffered;
+		buf1.looping = looping;
+		buf2.looping = looping if buf2 !== void;
+	}
+
+	function freeBuffers()
+	{
+		// バッファを解放する
+		invalidate buf1 if buf1 !== void;
+		invalidate buf2 if buf2 !== void;
+	}
+
+	function playBuffer(buf, storage, loop, paused = false, start)
+	{
+		// buf に対して演奏を開始させる
+
+		// 拡張子やドライブ文字が省略された場合、検索を行う
+		var found = true;
+		var test;
+		if(!Storages.isExistentStorage(storage))
+		{
+			if(test = storage + ".wav", Storages.isExistentStorage(test))
+				storage = test;
+			else if(test = storage + ".ogg", Storages.isExistentStorage(test))
+				storage = test;
+			else if(test = storage + ".opus", Storages.isExistentStorage(test))
+				storage = test;
+			else if(test = storage + ".tcw", Storages.isExistentStorage(test))
+				storage = test;
+			else
+				found = false;
+		}
+
+
+		if(_enabled)
+		{
+			if(!found)
+			{
+				dm("BGM " + storage + " が見つかりません");
+				return;
+			}
+
+			try
+			{
+				buf.looping = loop; // 引数の "loop"
+				buf.open(storage);
+                // ごう追加 再生位置制御
+                if (start !== void &&
+                    buf.labels !== void &&
+                    (start = buf.labels[start]) !== void &&
+                    (start = start.samplePosition) !== void) {
+                    buf.samplePosition = start;
+                }
+                buf.paused = paused;
+                buf.play();
+			}
+			catch(e)
+			{
+				dm("BGM " + storage +" を再生できません : " + e.message);
+				return;
+			}
+		}
+		currentBuffer = buf;
+	}
+
+	function play(elm)
+	{
+		// elm.storage で与えられた BGM の演奏を開始
+		// elm.loop が true ならばループ再生を行う
+		// elm.paused が true ならばポーズされた状態で再生を開始する
+		// buf1 で演奏を行う
+		var loop = elm.loop === void ? true : +elm.loop;
+
+		try
+		{
+			buf1.stop();
+			buf2.stop() if buf2 !== void;
+		}
+		catch(e)
+		{
+			dm("BGM の停止に失敗しました(実行は続行できます) : " + e.message);
+		}
+		stopFade(); // フェーディングは終了
+        buf1.volume = volume;
+        playBuffer(buf1, elm.storage, loop, elm.paused ? true : false, elm.start);
+		if(loop)
+			currentStorage = elm.storage; // ループ演奏の場合
+		else
+			currentStorage = ""; // 単発演奏の場合
+		playingStorage = elm.storage;
+		looping = loop;
+	}
+
+	function fadeIn(elm)
+	{
+		// 音量 0 から演奏を開始し、フェードインする
+		var loop = elm.loop === void ? true : +elm.loop;
+		var time = elm.time === void ? 5000 : +elm.time;
+
+//		stopFade();
+		try
+		{
+			buf1.stop();
+			buf2.stop() if buf2 !== void;
+		}
+		catch(e)
+		{
+			dm("BGM の停止に失敗しました(実行は続行できます) : " + e.message);
+		}
+		if(time != 0) buf1.volume = 0; else buf1.volume = volume;
+		playBuffer(buf1, elm.storage, loop, false, elm.start);
+		if(_enabled) if(time !=0 ) currentBuffer.fade(volume, time);
+		looping = loop;
+		if(loop) currentStorage = elm.storage; else currentStorage = "";
+		playingStorage = elm.storage;
+	}
+
+	function stop()
+	{
+		// 演奏を停止
+		try
+		{
+			buf1.stop();
+			buf2.stop() if buf2 !== void;
+		}
+		catch(e)
+		{
+			dm("BGM の停止に失敗しました(実行は続行できます) : " + e.message);
+		}
+//		stopFade();
+        currentStorage = "";
+		playingStorage = "";
+	}
+
+	function pause()
+	{
+		// 演奏を一時停止
+		buf1.paused = true;
+		buf2.paused = true if buf2 !== void;
+	}
+
+	function resume()
+	{
+        // 演奏を再開
+        buf1.paused = false;
+        buf2.paused = false if buf2 !== void;
+	}
+
+	function fadeOut(elm)
+	{
+		// フェードアウト
+//		stopFade();
+		if(_enabled) currentBuffer.fadeOutAndStop(elm.time);
+		currentStorage = "";
+	}
+
+    function fadePause(elm)
+    {
+        if(_enabled) currentBuffer.fadeOutAndPause(elm.time);
+    }    
+    
+	function fade(elm)
+	{
+		// 指定音量までフェード
+		var time = elm.time === void ? 5000 : +elm.time;
+		var vol = +elm.volume * 1000;
+//		stopFade();
+		if(_enabled)
+		{
+			currentBuffer.fade(vol, time);
+		}
+		volume = vol;
+	}
+
+	function stopFade()
+	{
+		buf1.stopFade();
+		buf2.stopFade() if buf2 !== void;
+	}
+
+	function exchange(elm)
+	{
+		// 曲を入れ替える
+		// 現在演奏中の曲は time で指定された時間をかけてフェードアウトされ、
+		// storage で指定された曲が time で指定された時間をかけてフェードイン
+		// 再生される。
+		// time が指定されていなくて、intime と outtime が指定されている場合は、
+		// intime でフェードイン時間、outime でフェードアウト時間を指定したこと
+		// になる。
+		// overlap には、現在演奏中の曲がフェードアウトされてから新しい曲が
+		// フェードインされるまでの待ち時間(ただし与える値の正負は逆)で、
+		// 正の値を指定するとクロスフェードになる。
+		// storage は、このメソッドが呼ばれた時点で演奏を開始する
+
+		if(elm.storage == playingStorage) return;
+
+//		stopFade();
+
+		var loop = elm.loop === void ? true : +elm.loop;
+		var intime, outtime;
+		if(elm.time === void)
+		{
+			intime = elm.intime === void ? 5000:+elm.intime;
+			outtime = elm.outtime === void ? 5000:+elm.outtime;
+		}
+		else
+		{
+			intime = outtime = elm.time === void ? 5000 : +elm.time;
+		}
+		var overlap = elm.overlap === void ? 0 : +elm.overlap;
+
+		if(!_enabled)
+		{
+			// 無効になっている場合は 一応 play を呼んでからそのまま返る
+			play(elm);
+			return;
+		}
+
+		if(playingStorage == '')
+		{
+			// 現在演奏中の曲がない場合は、単なるフェードインと同じ動作になる
+			elm.time = intime;
+			fadeIn(elm);
+			return;
+		}
+
+		volume = int(+elm.volume * 1000) if elm.volume !== void;
+
+		if(doubleBuffered)
+		{
+			// ダブルバッファリングの場合
+			if(outtime != 0)
+				currentBuffer.fadeOutAndStop(outtime); // 現在演奏中の BGM をフェードアウト
+			else
+				currentBuffer.stop();
+			var nextbuffer; // 次の演奏バッファ
+			nextbuffer = (currentBuffer == buf1) ? buf2 : buf1;
+			if(intime != 0) nextbuffer.volume = 0; else nextbuffer.volume = volume;
+			playBuffer(nextbuffer, elm.storage, loop, false, elm.start);
+			if(intime != 0) nextbuffer.fade(volume, intime, outtime - overlap);
+		}
+		else
+		{
+			// シングルバッファリングの場合
+			play(elm); // 単に次の曲を演奏するだけ
+		}
+
+		if(loop)
+			currentStorage = elm.storage;
+		else
+			currentStorage = "";
+		looping = loop;
+		playingStorage = elm.storage;
+
+	}
+
+	function setVolume(vol)
+	{
+		volume = +vol;
+		stopFade();
+		buf1.volume = volume;
+		buf2.volume = volume if doubleBuffered;
+	}
+
+	function setOptions(elm)
+	{
+		if(elm.volume !== void)
+		{
+			setVolume(int(+elm.volume * 1000));
+		}
+		if(elm.gvolume !== void)
+		{
+			// 大域ボリューム
+			var sysvar = owner.scflags; // システム(コア)変数
+			if(sysvar.bgm === void) sysvar.bgm = %[];
+            sysvar = sysvar.bgm;
+            var v2 = +elm.gvolume;
+            v2 = int(v2 * 1000);
+			sysvar.globalVolume = v2;
+            if (sysvar.enable === void || sysvar.enable) {
+                buf1.volume2 = v2;
+                buf2.volume2 = v2 if doubleBuffered;
+            } else {
+                buf1.volume2 = 0;
+                buf2.volume2 = 0 if doubleBuffered;
+            }
+		}
+	}
+
+	property inFading // フェード中かどうかを返す
+	{
+		getter { return  currentBuffer.inFading; }
+	}
+
+	property canWaitStop // BGM の終了を待てるかどうかを返す
+	{
+		getter { return currentBuffer.status == "play" && !currentBuffer.looping; }
+	}
+
+
+	function onSoundBufferFadeCompleted(source)
+	{
+		if(currentBuffer == source)
+		{
+			// フェードが終了した
+			owner.onBGMFadeCompleted();
+		}
+	}
+
+	function onSoundBufferStop(source)
+	{
+        if(currentBuffer == source)
+		{
+			// 演奏が終了した
+			playingStorage = "";
+			currentStorage = "";
+			owner.onBGMStop();
+		}
+	}
+
+	function store()
+	{
+		// 辞書配列に現在の状態を待避
+		var dic = %[];
+		dic.currentStorage = currentStorage;
+        dic.paused = buf1.paused;
+		dic.volume = volume;
+		return dic;
+	}
+
+	function restore(dic)
+	{
+		// 辞書配列から現在の状態を復帰
+		stopFade();
+        setVolume(dic.volume);
+        if(dic.currentStorage != "") {
+            play(%[ storage : dic.currentStorage, loop : true, paused: dic.paused]);
+        } else
+			stop();
+	}
+
+	function restoreSystemState(dic)
+	{
+		// システム変数 dic から情報を設定する
+		// 大域ボリュームの情報を得る
+        var sysvar = dic.bgm;
+        if(sysvar !== void)
+		{
+            if (sysvar.enable === void || sysvar.enable) {
+                var v2 = sysvar.globalVolume;
+                if(v2 !== void)	{
+                    v2 = +v2;
+                    buf1.volume2 = v2;
+                    buf2.volume2 = v2 if doubleBuffered;
+                }
+            } else {
+                buf1.volume2 = 0;
+                buf2.volume2 = 0 if doubleBuffered;
+            }
+		}
+	}
+
+
+    // true の場合はボリューム補正する
+    var _voldown;
+
+    property voldown {
+        getter() {
+            return _voldown;
+        }
+        setter(v) {
+            _voldown = v;
+            if (_enabled &&  currentStorage != "") {
+                if (_voldown) {
+                    currentBuffer.fade(volume * 0.5, 300);
+                } else {
+                    currentBuffer.fade(volume, 300);
+                }
+            }
+        }
+    }
+
+    function setLoop(loop) {
+        if(_enabled) {
+            currentBuffer.looping = loop;
+            // ループするときはフラグ0を0にしておくルールに!
+            currentBuffer.flags[0] = loop ? 0 : 1;
+        }
+        looping = loop;
+    }
+
+}
+

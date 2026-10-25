@@ -1,0 +1,5 @@
+#include( "one.txt" )
+
+#include( "one.gif","two.txt","three.htm" )
+
+#include( "greetings.txt", $seasonalstock )

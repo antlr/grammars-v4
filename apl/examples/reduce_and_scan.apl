@@ -1,0 +1,5 @@
+V←1 2 3 4 5
+SUM←+/V
+RUNNING←+\V
+SUM
+RUNNING

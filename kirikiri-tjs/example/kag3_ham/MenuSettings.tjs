@@ -1,0 +1,104 @@
+//==============================================================================
+// MenuSettings.tjs
+// 右クリックメニューの設定ファイル
+//==============================================================================
+
+
+var HamContextMenuSettings = %[];
+var HamContextMenuFunctions = %[];
+
+
+// ◆ メニュー項目の定義
+// 複数用意しておいて切り替える
+// label : メニュー項目名（「--」を指定すると区切り線）
+// cond  : この関数の返り値が真の時のみ使用可能となる（動作時は右クリックメニューオブジェクトが渡される）
+
+// 標準メニュー（タイトル画面など）
+HamContextMenuSettings.dDefault = [
+	%[label : "環境設定", cond : function() { return true; }]
+];
+
+// 読み進め中
+HamContextMenuSettings.dReading = [
+	%[label : "自動読み進め (A)", cond : function() { return (!historyLayer.visible && !messageLayerHiding); } incontextof kag],
+	%[label : "メッセージスキップ (F)", cond : function() { return (!historyLayer.visible && !messageLayerHiding && !inSleep && nextSkipEnabled); } incontextof kag],
+	%[label : "メッセージ履歴 (R)", cond : function() { return historyEnabled; } incontextof kag],
+	%[label : "メッセージ枠を隠す (H)", cond : function() { return SystemManager.blMsgHideEnabled; } incontextof kag],
+	%[label : "--"],
+	%[label : "セーブ", cond : function() { return canStore(); } incontextof kag],
+	%[label : "ロード", cond : function() { return canRestore(); } incontextof kag],
+	%[label : "--"],
+	%[label : "環境設定", cond : function() { return true; }]
+];
+
+
+// ◆ 使用するメニュー項目を指定
+HamContextMenuSettings.currentMenu = HamContextMenuSettings.dReading;
+
+
+//------------------------------------------------------------------------------
+// 以下動作設定
+// メニュー項目として用意したものは必ず動作を定義すること
+// （システム項目は右クリックメニュークラスに定義されているので不要）
+
+HamContextMenuFunctions["自動読み進め (A)"] = function()
+{
+	TAG.unlocksnapshot(%[]);
+	kag.conductor.onReturn(%[]);
+	SystemManager.objContextMenu.objMenuLayer.disableAll(false);
+	sndfunc.seDecide();
+	kag.hideMouseCursor();
+	kag.onAutoModeMenuItemClick();
+	SystemManager.destroyContextMenu();
+} incontextof kag;
+
+
+HamContextMenuFunctions["メッセージスキップ (F)"] = function()
+{
+	TAG.unlocksnapshot(%[]);
+	kag.conductor.onReturn(%[]);
+	SystemManager.objContextMenu.objMenuLayer.disableAll(false);
+	sndfunc.seDecide();
+	kag.onSkipToNextStopMenuItemClick();
+	SystemManager.destroyContextMenu();
+} incontextof kag;
+
+
+HamContextMenuFunctions["メッセージ履歴 (R)"] = function()
+{
+	TAG.unlocksnapshot(%[]);
+	kag.conductor.onReturn(%[]);
+	SystemManager.objContextMenu.objMenuLayer.disableAll(false);
+	sndfunc.seDecide();
+	kag.showHistory();
+	SystemManager.destroyContextMenu();
+} incontextof kag;
+
+
+HamContextMenuFunctions["メッセージ枠を隠す (H)"] = function()
+{
+	SystemManager.hideMessageLayerAsTemp();
+	SystemManager.destroyContextMenu();
+} incontextof kag;
+
+
+HamContextMenuFunctions["セーブ"] = function()
+{
+	SystemManager.startPlayDataStorager('save');
+	SystemManager.destroyContextMenu();
+} incontextof kag;
+
+
+HamContextMenuFunctions["ロード"] = function()
+{
+	SystemManager.startPlayDataStorager('load');
+	SystemManager.destroyContextMenu();
+} incontextof kag;
+
+
+HamContextMenuFunctions["環境設定"] = function()
+{
+	sndfunc.seDecide();
+	SystemManager.objContextMenu.objMenuLayer.makePreferenceMenu();
+} incontextof kag;
+

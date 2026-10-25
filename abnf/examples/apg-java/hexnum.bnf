@@ -1,0 +1,4 @@
+hexnum   = 1*HEXDIGIT
+HEXDIGIT = ALPHA / DIGIT / "A" / "B" / "C" / "D" / "E" / "F"
+ALPHA    = %d65-90 / %d97-122 / %d95
+DIGIT    = %d48-57

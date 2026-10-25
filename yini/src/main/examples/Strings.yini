@@ -1,0 +1,38 @@
+^ Strings
+
+	^^  String_Concatenation
+	/*
+		All below should result in the following string literal:
+		The boat's name is "Mare Stella"
+	*/
+
+	text1 = "The boat's name is " + '"Mare Stella"'
+	text2 = "The boat's name is " +
+	    '"Mare Stella"'
+
+	text3 = "The boat's name " + 'is "Mare Stella"'
+	text4 = "The boat's name " +
+	    'is "Mare Stella"'
+
+	text5 = C'The boat\'s name is "Mare Stella"'
+	text6 = C"The boat's name is \"Mare Stella\""
+
+	^^  DifferentKindOfStrings
+
+	// Using a Raw String (default).
+	string1 = ""
+	string2 = "Pets"
+	string3 = "Pets are animals"
+	rawString = "Pets are animals kept for companionship or entertainment, rather than as a working animal, livestock or laboratory animal. Two of the most popular pets are dogs and cats. Other animals include fish, birds, rabbits, rodents, ferrets, pigs and many other."
+
+	// Using a Hyper String.
+	hyperString = h"Pets are animals kept for companionship or entertainment,
+		rather than as a working animal, livestock or laboratory animal. Two
+		of the most popular pets are dogs and cats. Other animals include
+		fish, birds, rabbits, rodents, ferrets, pigs and many other."
+
+	// Using a Classic String.
+	classicString = c"Pets are animals kept for companionship or entertainment,\n" +
+		"\trather than as a working animal, livestock or laboratory animal. Two\n" +
+		"\tof the most popular pets are dogs and cats.\n" +
+		"\tOther animals include fish, birds, rabbits, rodents, ferrets, pigs and many other.\n"

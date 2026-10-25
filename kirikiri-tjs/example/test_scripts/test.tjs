@@ -1,0 +1,48 @@
+//Scripts.dump();
+
+Scripts.execStorage("test_variant.tjs");
+Scripts.execStorage("test_misc.tjs");
+Scripts.execStorage("test_class.tjs");
+Scripts.execStorage("test_function.tjs");
+Scripts.execStorage("test_string.tjs");
+Scripts.execStorage("test_with.tjs");
+
+
+// パーサーテスト
+var tl = [];
+var sl = [ %[number : 10, line : 4], %[number : 1, line : 7] ];
+tl.count = sl.count;
+for(var i = sl.count-1; i>=0; i--) {
+	(Dictionary.assign incontextof (tl[i] = %[]))(sl[i]);
+}
+var result = true;
+if( tl[0].number == 10 && tl[0].line == 4 ) {
+} else {
+	result = false;
+}
+if( tl[1].number == 1 && tl[1].line == 7 ) {
+} else {
+	result = false;
+}
+if( result == false ) {
+	Debug.message( "faild: dic assign" );
+}
+
+// 16進数実数値テスト
+var testRealVal = (const) %[
+ "quakeEndTick" => 0x1.07CC000000000p14 /* 16883.0 */
+];
+if( testRealVal.quakeEndTick != 16883.0 ) {
+	Debug.message("faild: quakeEndTick => 0x1.07CC000000000p14");
+}
+if( 0b1.1 != 1.5 ) {
+	Debug.message("faild: 0b1.1 != 1.5");
+}
+if( 0x2.f != 2.9375 ) {
+	Debug.message("faild: 0x2.f != 2.9375");
+}
+if( 0x1p8 != 256.0 ) {
+	Debug.message("faild: 0x2.f != 2.9375");
+}
+
+

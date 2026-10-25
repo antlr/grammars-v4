@@ -1,0 +1,200 @@
+/*******************************************************************************
+	system_mb/mb/system/MBActionCanceller.tjs
+********************************************************************************/
+
+class MBActCancelLayer extends GraphicLayer
+{
+	var cancelState = false;	// アクションを許可するかどうか
+	
+	var clickState = false;		// クリックによるキャンセルを許可するかどうか
+	var jumptarget = "*actcancel_cancel";	// キャンセルされた場合の飛び先ラベル名
+	
+	
+	function MBActCancelLayer(win, par)
+	{
+		// コンストラクタ
+		
+		super.GraphicLayer(win, par);
+		
+		name = "アクションキャンセラ";
+		hitType = htMask;
+		hitThreshold = 256;
+		absolute = MBLayerAbs.actCanceller;
+		visible = true;
+		opacity = 255;
+		
+		setImageSize(win.fore.base.width, win.fore.base.height);
+		setSizeToImageSize();
+		setPos(0, 0);
+	}
+	
+	function finalize()
+	{
+		// ファイナライザ
+		
+		super.finalize(...);
+	}
+	
+	function showConsoleMsg()
+	{
+		// コンソールにキャンセル通知を渡す
+		
+		dm("<ActionCanceller> ユーザーのアクションをキャンセルしました。");
+	}
+	
+	function setState(bl, cl)
+	{
+		// キャンセルステータスを設定
+		
+		hitThreshold = 256 - 256 * bl;
+		
+		cancelState = bl;
+		clickState = cl;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onMouseDown(x, y, button, shift)
+	{
+		// マウスクリックを無条件でキャンセル
+		
+		if (clickState && jumptarget != "") {
+			if (button == mbLeft) {
+				try {
+					window.process("", jumptarget);
+					setState(false);
+				}
+				catch {
+					showConsoleMsg();
+				}
+			}
+			else {
+				showConsoleMsg();
+			}
+		}
+		else {
+			showConsoleMsg();
+		}
+	}
+	
+	function onMouseUp(x, y, button, shift)
+	{
+		;	// do nothing
+	}
+	
+	function onMouseWheel(shift, delta, x, y)
+	{
+		;	// do nothing
+	}
+	
+	function onClick(x, y)
+	{
+		;	// do nothing
+	}
+	
+	function onDoubleClick(x, y)
+	{
+		;	// do nothing
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onKeyDown(key, shift)
+	{
+		// キー入力を無条件でキャンセル
+		
+		if (cancelState) {
+			if (clickState && jumptarget != "") {
+				if (key == VK_RETURN || key == VK_SPACE) {
+					try {
+						window.process("", jumptarget);
+						setState(false);
+					}
+					catch {
+						showConsoleMsg();
+					}
+				}
+			}
+			else {
+				showConsoleMsg();
+			}
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	function onKeyPress(key)
+	{
+		;	// do nothing
+	}
+	
+	function onKeyUp(x, y)
+	{
+		;	// do nothing
+	}
+}
+
+class MBActionCanceller
+{
+	var window;
+	
+	var layFore;
+	var layBack;
+	
+	function MBActionCanceller(win)
+	{
+		// コンストラクタ
+		
+		window = win;
+		
+		var st = System.getTickCount();
+		
+		layFore = new MBActCancelLayer(window, window.fore.base);
+		layBack = new MBActCancelLayer(window, window.back.base);
+		
+		layFore.setCompLayer(layBack);
+		layBack.setCompLayer(layFore);
+		
+		//dm("<MBActionCanceller> アクションキャンセラが生成されました。(%s ms)".sprintf(System.getTickCount() - st));
+	}
+	
+	function finalize()
+	{
+		// ファイナライザ
+		
+		invalidate layFore if (layFore !== void);
+		invalidate layBack if (layBack !== void);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function setCancellerState(bl, cl = false)
+	{
+		// キャンセラのステータスを変える
+		/*
+			true が指定されると、アクション不可能になる
+			false が指定されると、アクションが可能になる
+		*/
+		
+		if (bl) {
+			layFore.setState(true, cl);
+			layBack.setState(true, cl);
+			//dm("<MBActionCanceller> アクションキャンセラが有効になりました。");
+		}
+		else {
+			layFore.setState(false, false);
+			layBack.setState(false, false);
+			//dm("<MBActionCanceller> アクションキャンセラが無効になりました。");
+		}
+	}
+	
+	function getCancellerState()
+	{
+		// キャンセルステータスを返す
+		
+		return (layFore.cancelState || layBack.cancelState);
+	}
+}
+

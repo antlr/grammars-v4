@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>Sample Output From CZ1101A</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    DIV.Examples {font-family: "Courier New", monospace; font-size: 90%; line-height: 122%; margin-left: 2.2em; margin-bottom: 0.6em}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-C1.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-C3.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>C.2 Sample Output From CZ1101A</H1>
+<div class="Normal">The following is the output of CZ1101A from a particular 
+implementation. The output of this test should have the same messages 
+(except for the time-stamp) and reported results as indicated here (including 
+failure reports), and the format of the output lines should be as described 
+in the output text.</div>
+<div class="Examples">&nbsp;&nbsp;&nbsp;-&nbsp;NO_NAME&nbsp;(CZ1101A)&nbsp;CHECK&nbsp;REPORT&nbsp;ROUTINES.<BR>
+&nbsp;&nbsp;&nbsp;-&nbsp;NO_NAME&nbsp;&nbsp;&nbsp;&nbsp;INITIAL&nbsp;VALUES&nbsp;SHOULD&nbsp;BE&nbsp;'NO_NAME'&nbsp;AND&nbsp;'FAILED'.<BR>
+****&nbsp;NO_NAME&nbsp;FAILED&nbsp;****************************.</div>
+<div class="Examples">,.,.&nbsp;PASS_TEST&nbsp;ACATS&nbsp;4.2A&nbsp;24-05-13&nbsp;09:57:42<BR>
+----&nbsp;PASS_TEST&nbsp;CHECKING&nbsp;'TEST'&nbsp;AND&nbsp;'RESULT'&nbsp;FOR&nbsp;'PASSED'.<BR>
+&nbsp;&nbsp;&nbsp;-&nbsp;PASS_TEST&nbsp;THIS&nbsp;LINE&nbsp;IS&nbsp;EXACTLY&nbsp;'MAX_LEN'&nbsp;LONG.&nbsp;...5...60....5...70.<BR>
+&nbsp;&nbsp;&nbsp;-&nbsp;PASS_TEST&nbsp;THIS&nbsp;COMMENT&nbsp;HAS&nbsp;A&nbsp;WORD&nbsp;THAT&nbsp;SPANS&nbsp;THE&nbsp;FOLD&nbsp;POINT.&nbsp;THIS<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;COMMENT&nbsp;FITS&nbsp;EXACTLY&nbsp;ON&nbsp;TWO&nbsp;LINES.&nbsp;..5...60....5...70.<BR>
+&nbsp;&nbsp;&nbsp;-&nbsp;PASS_TEST<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;THIS_COMMENT_IS_ONE_VERY_LONG_WORD_AND_SO_IT_SHOULD_BE<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_SPLIT_AT_THE_FOLD_POINT.<BR>
+====&nbsp;PASS_TEST&nbsp;PASSED&nbsp;============================.<BR>
+&nbsp;&nbsp;&nbsp;-&nbsp;NO_NAME&nbsp;CHECK&nbsp;THAT&nbsp;'RESULT'&nbsp;RESETS&nbsp;VALUES&nbsp;TO&nbsp;'NO_NAME'&nbsp;AND<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'FAILED'.<BR>
+****&nbsp;NO_NAME&nbsp;FAILED&nbsp;****************************.</div>
+<div class="Examples">,.,.&nbsp;FAIL_TEST&nbsp;ACATS&nbsp;4.2A&nbsp;24-05-13&nbsp;09:57:42<BR>
+----&nbsp;FAIL_TEST&nbsp;CHECKING&nbsp;'FAILED'&nbsp;AND&nbsp;'RESULT'&nbsp;FOR&nbsp;'FAILED'.<BR>
+&nbsp;&nbsp;&nbsp;*&nbsp;FAIL_TEST&nbsp;'RESULT'&nbsp;SHOULD&nbsp;NOW&nbsp;BE&nbsp;'FAILED'.<BR>
+****&nbsp;FAIL_TEST&nbsp;FAILED&nbsp;****************************.</div>
+<div class="Examples">,.,.&nbsp;NA_TEST&nbsp;ACATS&nbsp;4.2A&nbsp;24-05-13&nbsp;09:57:42<BR>
+----&nbsp;NA_TEST&nbsp;CHECKING&nbsp;'NOT-APPLICABLE'.<BR>
+&nbsp;&nbsp;&nbsp;+&nbsp;NA_TEST&nbsp;'RESULT'&nbsp;SHOULD&nbsp;NOW&nbsp;BE&nbsp;'NOT-APPLICABLE'.<BR>
+++++&nbsp;NA_TEST&nbsp;NOT-APPLICABLE&nbsp;++++++++++++++++++++.</div>
+<div class="Examples">,.,.&nbsp;FAIL_NA_TEST&nbsp;ACATS&nbsp;4.2A&nbsp;24-05-13&nbsp;09:57:42<BR>
+----&nbsp;FAIL_NA_TEST&nbsp;CHECKING&nbsp;'NOT_APPLICABLE',&nbsp;'FAILED',&nbsp;'NOT_APPLICABLE'.<BR>
+&nbsp;&nbsp;&nbsp;+&nbsp;FAIL_NA_TEST&nbsp;'RESULT'&nbsp;BECOMES&nbsp;'NOT-APPLICABLE'.<BR>
+&nbsp;&nbsp;&nbsp;*&nbsp;FAIL_NA_TEST&nbsp;'RESULT'&nbsp;BECOMES&nbsp;'FAILED'.<BR>
+&nbsp;&nbsp;&nbsp;+&nbsp;FAIL_NA_TEST&nbsp;CALLING&nbsp;'NOT_APPLICABLE'&nbsp;DOESN'T&nbsp;CHANGE&nbsp;'RESULT'.<BR>
+****&nbsp;FAIL_NA_TEST&nbsp;FAILED&nbsp;****************************.</div>
+<div class="Examples">,.,.&nbsp;SPEC_NA_TEST&nbsp;ACATS&nbsp;4.2A&nbsp;24-05-13&nbsp;09:57:42<BR>
+----&nbsp;SPEC_NA_TEST&nbsp;CHECKING&nbsp;'SPEC_ACT',&nbsp;'NOT_APPLICABLE',&nbsp;'SPEC_ACT'.<BR>
+&nbsp;&nbsp;&nbsp;!&nbsp;SPEC_NA_TEST&nbsp;'RESULT'&nbsp;BECOMES&nbsp;'TENTATIVELY&nbsp;PASSED'.<BR>
+&nbsp;&nbsp;&nbsp;+&nbsp;SPEC_NA_TEST&nbsp;'RESULT'&nbsp;BECOMES&nbsp;'NOT&nbsp;APPLICABLE'.<BR>
+&nbsp;&nbsp;&nbsp;!&nbsp;SPEC_NA_TEST&nbsp;CALLING&nbsp;'SPECIAL_ACTION'&nbsp;DOESN'T&nbsp;CHANGE&nbsp;'RESULT'.<BR>
+++++&nbsp;SPEC_NA_TEST&nbsp;NOT-APPLICABLE&nbsp;++++++++++++++++++++.</div>
+<div class="Examples">,.,.&nbsp;SPEC_FAIL_TEST&nbsp;ACATS&nbsp;4.2A&nbsp;24-05-13&nbsp;09:57:42<BR>
+----&nbsp;SPEC_FAIL_TEST&nbsp;CHECKING&nbsp;'SPEC_ACT',&nbsp;'FAILED',&nbsp;'SPEC_ACT'.<BR>
+&nbsp;&nbsp;&nbsp;!&nbsp;SPEC_FAIL_TEST&nbsp;'RESULT'&nbsp;BECOMES&nbsp;'TENTATIVELY&nbsp;PASSED'.<BR>
+&nbsp;&nbsp;&nbsp;*&nbsp;SPEC_FAIL_TEST&nbsp;'RESULT'&nbsp;BECOMES&nbsp;'FAILED'.<BR>
+&nbsp;&nbsp;&nbsp;!&nbsp;SPEC_FAIL_TEST&nbsp;CALLING&nbsp;'SPECIAL_ACTION'&nbsp;DOESN'T&nbsp;CHANGE&nbsp;'RESULT'.<BR>
+****&nbsp;SPEC_FAIL_TEST&nbsp;FAILED&nbsp;****************************.</div>
+<div class="Examples">,.,.&nbsp;CZ1101A&nbsp;ACATS&nbsp;4.2A&nbsp;24-05-13&nbsp;09:57:42<BR>
+----&nbsp;CZ1101A&nbsp;CHECKING&nbsp;'SPECIAL_ACTION'&nbsp;ALONE.<BR>
+&nbsp;&nbsp;&nbsp;!&nbsp;CZ1101A&nbsp;'RESULT'&nbsp;BECOMES&nbsp;'TENTATIVELY&nbsp;PASSED'.<BR>
+!!!!&nbsp;CZ1101A&nbsp;TENTATIVELY&nbsp;PASSED&nbsp;!!!!!!!!!!!!!!!!.<BR>
+!!!!&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SEE&nbsp;'!'&nbsp;COMMENTS&nbsp;FOR&nbsp;SPECIAL&nbsp;NOTES!!</div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-C1.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-C3.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>
