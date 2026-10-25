@@ -43,7 +43,7 @@ file
 line
    : NEWLINE
    | assignment
-   | rule
+   | rule_
    ;
 
 assignment
@@ -54,7 +54,7 @@ value
    : WORD+
    ;
 
-rule
+rule_
    : target_list ':' prerequisite_list? NEWLINE command*
    ;
 
