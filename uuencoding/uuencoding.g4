@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2017, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -33,26 +33,37 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar uuencoding;
 
 uuencoding
-   : header? uu trailer? CR*
+   : (header uu? trailer | uu) EOF
    ;
 
 header
-    : 'begin' ASCII+ ASCII+ CR;
-
+   : HEADER EOL
+   ;
 
 trailer
-    : '`' CR 'end' CR
-    ;
+   : ZERO EOL END EOL?
+   ;
 
 uu
-    : ASCII+ '`'? CR?
-    ;
+   : (DATA EOL)* DATA EOL?
+   ;
 
-ASCII
-    :  [\u0020-\u005F]
-    ;
-    
-CR
-    : ['\r\n']+
-    ;
+HEADER
+   : 'begin ' [0-7] [0-7] [0-7] [0-7]? ' ' ~[\r\n]+
+   ;
 
+ZERO
+   : [ `]
+   ;
+
+DATA
+   : [\u0021-\u004D] [\u0020-\u0060]+
+   ;
+
+END
+   : 'end'
+   ;
+
+EOL
+   : '\r'? '\n'
+   ;
