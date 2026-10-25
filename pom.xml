@@ -425,6 +425,7 @@
                 <module>squirrel</module>
 				<module>srt</module>
 				<module>stacktrace</module>
+				<module>standardml</module>
 				<module>star</module>
 				<module>stellaris</module>
 				<module>stl</module>
