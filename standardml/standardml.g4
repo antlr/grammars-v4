@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2020, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -41,22 +41,22 @@ longid
 
 lab
    : id
-   | IDENTIFIER
+   | INT
    ;
 
 exp
    : con
    | 'op'? longid
-   | (exp exp)
-   | (exp id exp)
-   | '(' exp ')'
-   | '(' exp (',' exp)* ')'
+   | exp exp
+   | exp id exp
+   | '(' ')'
+   | '(' exp (',' exp)+ ')'
    | '{' exprow? '}'
    | '#' lab
-   | '[' exp (',' exp)* ']'
+   | '[' (exp (',' exp)*)? ']'
    | '(' exp (';' exp)* ')'
    | 'let' dec 'in' exp (';' exp)* 'end'
-   | exp ':' typ*
+   | exp ':' typ
    | 'raise' exp
    | exp 'handle' match
    | exp 'andalso' exp
@@ -78,33 +78,44 @@ match
 pat
    : con
    | '_'
-   | 'op'? id
    | 'op'? longid pat?
    | pat id pat
-   | '(' pat ')'
+   | '(' ')'
    | '(' pat (',' pat)* ')'
    | '{' patrow? '}'
-   | '[' pat (',' pat)* ']'
-   | pat ':' typ*
-   | 'op'? id (':' typ*)? 'as' pat
+   | '[' (pat (',' pat)*)? ']'
+   | pat ':' typ
+   | 'op'? id (':' typ)? 'as' pat
    ;
 
 patrow
    : '...'
    | lab '=' pat (',' patrow)*
-   | id (':' typ*)? ('as' pat)? (',' patrow)?
+   | id (':' typ)? ('as' pat)? (',' patrow)?
    ;
 
 typ
+   : tupletyp ('->' typ)?
+   ;
+
+tupletyp
+   : appliedtyp ('*' appliedtyp)*
+   ;
+
+appliedtyp
+   : atomtyp longid*
+   | '(' typ ',' typ (',' typ)* ')' longid+
+   ;
+
+atomtyp
    : var
-   //   | typ? longid
-   | '(' typ* ')'
-   | typ '->' typ
+   | longid
+   | '(' typ ')'
    | '{' typrow? '}'
    ;
 
 typrow
-   : lab ':' typ* (',' typrow)?
+   : lab ':' typ (',' typrow)?
    ;
 
 dec
@@ -120,8 +131,8 @@ dec
    | 'local' dec 'in' dec 'end'
    | 'open' longid+
    | 'nonfix' id+
-   | 'infix' DIGIT? id+
-   | 'infixr' DIGIT? id+
+   | 'infix' INT? id+
+   | 'infixr' INT? id+
    ;
 
 valbind
@@ -140,7 +151,7 @@ funmatch
    ;
 
 typbind
-   : var? id '=' typ* ('and' typbind)?
+   : var? id '=' typ ('and' typbind)?
    ;
 
 datbind
@@ -148,17 +159,17 @@ datbind
    ;
 
 conbind
-   : id ('of' typ) ('|' conbind)
+   : id ('of' typ)? ('|' conbind)?
    ;
 
 exnbind
-   : id ('of' typ) ('and' exnbind)
-   | id '=' longid ('and' exnbind)
+   : id ('of' typ)? ('and' exnbind)?
+   | id '=' longid ('and' exnbind)?
    ;
 
 str
    : longid
-   | 'struct' dec 'end'
+   | 'struct' dec? 'end'
    | str ':' sig
    | str ':>' sig
    | id '(' str ')'
@@ -167,17 +178,17 @@ str
    ;
 
 strbind
-   : id (':' '>'? sig)? '=' str ('and' strbind)?
+   : id ((':' | ':>') sig)? '=' str ('and' strbind)?
    ;
 
 sig
    : id
-   | 'sig' spec 'end'
+   | 'sig' spec? 'end'
    | sig 'where' 'type' typrefin
    ;
 
 typrefin
-   : var? longid '=' typ* ('and' 'type' typrefin)?
+   : var? longid '=' typ ('and' 'type' typrefin)?
    ;
 
 spec
@@ -188,15 +199,15 @@ spec
    | 'datatype' datdesc
    | 'datatype' id '=' 'datatype' longid
    | 'exception' exndesc
-   | 'structure' strdesc spec ';'? spec
-   | 'include' sig exp
-   | 'include' id+
+   | 'structure' strdesc
+   | 'include' sig
+   | spec ';'? spec
    | spec 'sharing' 'type' longid ('=' longid)*
    | spec 'sharing' longid ('=' longid)*
    ;
 
 valdesc
-   : id ':' typ* ('and' valdesc)?
+   : id ':' typ ('and' valdesc)?
    ;
 
 typdesc
@@ -220,16 +231,16 @@ strdesc
    ;
 
 progs
-   : prog (';'? prog)*
+   : (prog ';'?)* EOF
    ;
 
 prog
-   : (dec | 'functor' fctbind | 'signature' sigbind) EOF?
+   : dec | 'functor' fctbind | 'signature' sigbind
    ;
 
 fctbind
-   : id '(' id ':' sig ')' (':' '>'? sig)? '=' str ('and' fctbind)?
-   | id '(' spec ')' (':' '>'? sig)? '=' str ('and' fctbind)?
+   : id '(' id ':' sig ')' ((':' | ':>') sig)? '=' str ('and' fctbind)?
+   | id '(' spec ')' ((':' | ':>') sig)? '=' str ('and' fctbind)?
    ;
 
 sigbind
@@ -249,11 +260,15 @@ id
    ;
 
 var
-   : IDENTIFIER
+   : TYPEVAR
+   ;
+
+TYPEVAR
+   : '\'' '\''? LETTER (LETTER | DIGIT | '_' | '\'')*
    ;
 
 IDENTIFIER
-   : (LETTER (LETTER | DIGIT | '_')*)
+   : (LETTER (LETTER | DIGIT | '_' | '\'')*)
    | (('!' | '%' | '&' | '$' | '#' | '+' | '-' | '/' | ':' | '<' | '=' | '>' | '?' | '@' | '\\' | '~' | '`' | '^' | '|' | '*')+)
    ;
 
@@ -264,40 +279,38 @@ INT
 
 WORD
    : ('0w' NUM)
-   | ('0w' HEX)
+   | ('0wx' HEX)
    ;
 
 FLOAT
-   : ('~'? NUM ' .' NUM)
-   | ('~'? NUM ('.' NUM)? 'e' '~'? NUM)
+   : '~'? NUM '.' NUM ([eE] '~'? NUM)?
+   | '~'? NUM [eE] '~'? NUM
    ;
 
 CHAR
-   : '#' ASCII
+   : '#"' STRINGCHAR '"'
    ;
 
 STRING
-   : '"' ASCII* '"'
+   : '"' STRINGCHAR* '"'
    ;
 
-DIGIT
+fragment DIGIT
    : [0-9]
    ;
-
-//VAR
-//   : (LETTER | DIGIT | '_')+
-//   ;
 
 fragment NUM
    : DIGIT+
    ;
 
 fragment HEX
-   : (DIGIT | LETTER)+
+   : [0-9a-fA-F]+
    ;
 
-fragment ASCII
-   : '\u0021' .. '\u007E'
+fragment STRINGCHAR
+   : ~["\\\r\n]
+   | '\\' ([abtnvfr"\\] | '^' [@-_] | DIGIT DIGIT DIGIT)
+   | '\\' [ \t\r\n\f]+ '\\'
    ;
 
 fragment LETTER
@@ -305,10 +318,9 @@ fragment LETTER
    ;
 
 COMMENT
-   : '(*' .*? '*)' -> skip
+   : '(*' (COMMENT | .)*? '*)' -> skip
    ;
 
 WS
    : [ \r\n\t]+ -> skip
    ;
-
