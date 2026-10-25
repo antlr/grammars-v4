@@ -1,0 +1,234 @@
+-- B392004.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making
+--     this public release, the Government intends to confer upon all
+--     recipients unlimited rights  equal to those held by the Government.
+--     These rights include rights to use, duplicate, release or disclose the
+--     released technical data and computer software in whole or in part, in
+--     any manner and for any purpose whatsoever, and to have or permit others
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that:
+--      A dynamically tagged value is not allowed in an object or expression
+--      for which the expected type is a specific tagged value (unless it is
+--      a controlling operand on a dispatching operation).
+--      An access-to-classwide type is not allowed in an expression for
+--      which the expected type is an anonymous access to specific type
+--      (unless it is a controlling operand on a dispatching operation).
+--      A call on dispatching operation may not have both dynamically tagged
+--      and statically tagged controlling operands.
+--
+-- TEST DESCRIPTION:
+--      This test declares tagged types, a type extension, a tagged type
+--      with discriminant, and some dispatching operations.  Verify that
+--      compiler generates errors for all cases as described in the objective.
+--
+--
+-- CHANGE HISTORY:
+--      06 Dec 94   SAIC    ACVC 2.0
+--      13 Nov 95   SAIC    Update and repair for ACVC 2.0.1
+--      07 Feb 18   RLB     Added error location indicators to reflect common
+--                          error reporting strategies.
+--
+--!
+
+package B392004_0 is
+
+   type Tagged_Type is tagged
+     record
+        Field : Boolean;
+   end record;
+
+   function No_Parm return Tagged_Type'class;
+
+   function One_Parm (P : Tagged_Type) return Tagged_Type;
+
+   procedure Proc_Specific_Type_Parms (P1, P2 : Tagged_Type);
+
+   type New_Tagged_Type is new Tagged_Type with
+     record
+        New_Field : Integer;
+   end record;
+
+   -- Override inherited One_Parm.
+   function One_Parm (P : New_Tagged_Type) return New_Tagged_Type;
+
+   -- Override inherited Proc_Specific_Type_Parms.
+   procedure Proc_Specific_Type_Parms (P1, P2 : New_Tagged_Type);
+
+   type Access_To_Class_Wide_Type is access all Tagged_Type'class;
+
+   type Rec_Anon_Acc_Disc (D : access Tagged_Type) is tagged limited
+     record
+        Other_Field : Integer;
+   end record;
+
+end B392004_0;
+
+     --=================================================================--
+
+package body B392004_0 is
+
+   function No_Parm return Tagged_Type'class is
+   begin
+      return Tagged_Type'(Field => False);
+   end No_Parm;
+   -----------------------------------------
+   function One_Parm (P : Tagged_Type) return Tagged_Type is
+   begin
+      return (Field => False);
+   end One_Parm;
+   -----------------------------------------
+   function One_Parm (P : New_Tagged_Type) return New_Tagged_Type is
+   begin
+      return P;
+   end One_Parm;
+   -----------------------------------------
+   procedure Proc_Specific_Type_Parms (P1, P2 : Tagged_Type) is
+   begin
+      null;
+   end Proc_Specific_Type_Parms;
+   -----------------------------------------
+   procedure Proc_Specific_Type_Parms (P1, P2 : New_Tagged_Type) is
+   begin
+      null;
+   end Proc_Specific_Type_Parms;
+
+end B392004_0;
+
+     --=================================================================--
+
+with B392004_0;
+procedure B392004 is
+
+   Specific_Type_Const   :  constant B392004_0.Tagged_Type
+                         := B392004_0.Tagged_Type'(Field => false);
+   Specific_Type_Var     :  B392004_0.Tagged_Type
+                         := B392004_0.Tagged_Type'(Field => false);
+   Dynamic_Tagged_Obj    :  B392004_0.Tagged_Type'class
+                         := B392004_0.Tagged_Type'(Field => false);
+   Dynamic_Tagged_Const  :  constant B392004_0.Tagged_Type'class
+                         := B392004_0.Tagged_Type'(Field => false);
+
+   Specific_Type_Obj_1   :  constant B392004_0.Tagged_Type
+                         := Dynamic_Tagged_Obj;              -- ERROR: {1:38;1}
+                          -- Expected type of constant is specific tagged type.
+
+   Specific_Type_Obj_2   :  B392004_0.Tagged_Type
+                         := Dynamic_Tagged_Const;            -- ERROR: {1:29;1}
+                          -- Expected type of variable is specific tagged type.
+
+   Specific_Type_Obj_3   :  B392004_0.Tagged_Type
+                         := B392004_0.No_Parm;               -- ERROR: {1:29;1}
+                          -- Expected type of variable is specific tagged type.
+
+   Specific_Type_Obj_4   :  B392004_0.Tagged_Type
+     := B392004_0.Tagged_Type'Class(Specific_Type_Var);      -- ERROR: {1:29;1}
+                          -- Expected type of variable is specific tagged type.
+
+   Class_Wide_Acc_Obj    :  B392004_0.Access_To_Class_Wide_Type
+                         := new B392004_0.Tagged_Type;       -- OK. {1:29;1}
+
+   Rec_Obj : B392004_0.Rec_Anon_Acc_Disc (Class_Wide_Acc_Obj);-- ERROR: {14;1}
+                           -- Expected type of discriminant is anonymous access
+                           -- to specific tagged type.
+
+   procedure Anon_Acc_Parm_Proc_1 (P : access B392004_0.Tagged_Type
+     := Class_Wide_Acc_Obj) is                               -- ERROR: {1:36;4}
+   begin                   -- Expected type of operand is anonymous access to
+      null;                -- specific tagged type.
+   end Anon_Acc_Parm_Proc_1;
+
+   -----------------------------------------
+   procedure Specific_Type_Parm_Proc
+     (P : B392004_0.Tagged_Type) is
+   begin
+      null;
+   end Specific_Type_Parm_Proc;
+
+   -----------------------------------------
+   procedure Anon_Acc_Parm_Proc_2
+     (P : access B392004_0.Tagged_Type) is
+   begin
+      null;
+   end Anon_Acc_Parm_Proc_2;
+
+begin
+
+   Specific_Type_Var := Dynamic_Tagged_Obj;                   -- ERROR: {4;1}
+                         -- Expected type of variable is specific tagged type.
+
+   Specific_Type_Var := B392004_0.No_Parm;                    -- ERROR: {4;1}
+                         -- Expected type of variable is specific tagged type.
+
+   Specific_Type_Var := B392004_0.One_Parm (B392004_0.No_Parm);-- ERROR: {4;1}
+                         -- Expected type of variable is specific tagged type.
+
+   Specific_Type_Var := B392004_0.One_Parm (Dynamic_Tagged_Obj);-- ERROR: {4;1}
+                         -- Expected type of variable is specific tagged type.
+
+   Specific_Type_Var := B392004_0.One_Parm
+     (B392004_0.Tagged_Type'Class (Specific_Type_Var));       -- ERROR: {1:4;1}
+                         -- Expected type of variable is specific tagged type.
+
+   Specific_Type_Parm_Proc (Dynamic_Tagged_Obj);              -- ERROR: {4;1}
+                           -- Expected type of actual is specific tagged type.
+
+   Specific_Type_Parm_Proc (B392004_0.No_Parm);               -- ERROR: {4;1}
+                           -- Expected type of actual is specific tagged type.
+
+   Specific_Type_Parm_Proc
+     (B392004_0.Tagged_Type'Class (Specific_Type_Var));       -- ERROR: {1:4;1}
+                           -- Expected type of actual is specific tagged type.
+
+   Anon_Acc_Parm_Proc_2 (Class_Wide_Acc_Obj);                 -- ERROR: {4;1}
+                           -- Expected type of parameter is anonymous access
+                           -- to specific tagged type.
+
+   B392004_0.Proc_Specific_Type_Parms
+     (Specific_Type_Var, Specific_Type_Const);                -- OK. {1:4;1}
+
+   B392004_0.Proc_Specific_Type_Parms
+     (Dynamic_Tagged_Obj, Dynamic_Tagged_Const);              -- OK. {1:4;1}
+
+   B392004_0.Proc_Specific_Type_Parms
+     (Specific_Type_Var, Dynamic_Tagged_Obj);                 -- ERROR: {1:4;1}
+                                         -- Mixed tagged controlling operands.
+
+   B392004_0.Proc_Specific_Type_Parms
+     (Specific_Type_Var, B392004_0.No_Parm);                  -- ERROR: {1:4;1}
+                                         -- Mixed tagged controlling operands.
+
+   B392004_0.Proc_Specific_Type_Parms (Specific_Type_Var,
+      B392004_0.Tagged_Type'Class(Specific_Type_Var));        -- ERROR: {1:4;1}
+                                         -- Mixed tagged controlling operands.
+
+   B392004_0.Proc_Specific_Type_Parms (Specific_Type_Var,
+     B392004_0.One_Parm (B392004_0.No_Parm));                 -- ERROR: {1:4;1}
+                                         -- Mixed tagged controlling operands.
+
+   B392004_0.Proc_Specific_Type_Parms (Specific_Type_Var,
+     B392004_0.One_Parm (Dynamic_Tagged_Obj));                -- ERROR: {1:4;1}
+                                         -- Mixed tagged controlling operands.
+
+   B392004_0.Proc_Specific_Type_Parms (Specific_Type_Var,
+     B392004_0.Tagged_Type'(B392004_0.One_Parm
+       (Dynamic_Tagged_Obj)));                                -- ERROR: {2:4;1}
+                                         -- Mixed tagged controlling operands.
+end B392004;

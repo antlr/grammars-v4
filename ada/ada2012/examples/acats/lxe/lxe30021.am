@@ -1,0 +1,91 @@
+-- LXE30021.AM
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      See LXE30020.AM.
+--
+-- TEST DESCRIPTION:
+--      See LXE30020.AM.
+--      
+-- SPECIAL REQUIREMENTS:
+--      See LXE30020.AM.
+--
+-- APPLICABILITY CRITERIA:
+--      See LXE30020.AM.
+--
+-- PASS/FAIL CRITERIA:
+--      See LXE30020.AM.
+--        
+--
+-- CHANGE HISTORY:
+--     26 JUN 95   SAIC    Initial version
+--
+--!
+
+-----------------------------------------------------------------------------
+
+package LXE3002_Shared is
+  pragma Shared_Passive;
+  Counter : Integer := 1;
+
+  Id : Character := 'B';   -- initial value changes between specs 
+  -- the following declaration is different in the two versions of
+  -- this package.  This will prevent automatic recompilation from
+  -- being able to make the program consistent.
+  Only_In_B : Boolean;     -- name changes between specs. 
+end LXE3002_Shared;
+
+-----------------------------------------------------------------------------
+
+with LXE3002_Shared;
+with Report;
+procedure LXE3002_B is
+begin
+  -- this partition attempts to use the data in the Shared_Passive
+  -- package.
+  Report.Test ("LXE3002_B", 
+               "Checking that an inconsistent program is detected when" &
+                " the inconsistency is due to a change in a" &
+                " shared_passive package");
+
+  if LXE3002_Shared.Counter = 1 then
+    Report.Comment ("Partition B is the first partition to run");
+  else
+    Report.Failed ("Partition A has already altered the shared data");
+  end if;
+
+  LXE3002_Shared.Counter := 11;
+  LXE3002_Shared.Only_In_B := True;
+
+  if LXE3002_Shared.Id = 'B' then
+    Report.Comment ("'B' version of LXE3002_Shared is present");
+    Report.Special_Action ("If partition A reports that the test" &
+                           " passed then the test failed");
+  else
+    Report.Failed ("'A' version of LXE3002_Shared is present");
+  end if;
+
+ Report.Result;
+end LXE3002_B;

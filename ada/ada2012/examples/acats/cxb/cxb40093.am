@@ -1,0 +1,253 @@
+-- CXB40093.AM
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that using Pragma Import (which references a COBOL subprogram)
+--      as a completion of a procedure declaration will allow the use of the 
+--      imported subprogram by the calling routine.
+--      
+-- TEST DESCRIPTION:
+--      This test checks that user-defined COBOL language procedures can
+--      be imported and referenced from an Ada program.  Three COBOL
+--      procedures are specified in files CXB40090.CBL, CXB40091.CBL,
+--      and CXB40092.CBL.  These procedures are imported to this test 
+--      program, using three calls to Pragma Import with convention
+--      identifier "COBOL".  These procedures are used as completions
+--      to Ada procedure specifications.  Each procedure is then called 
+--      in this test, and the results (where available) of the call are 
+--      verified.
+--
+--      The three subprogram cases tested are as follows:
+--      1) A parameterless COBOL procedure that is simply called from this
+--         Ada test program,
+--      2) A COBOL procedure that takes an eight character alphanumeric 
+--         string input parameter and returns a copy of the alphanumeric 
+--         string as an Out parameter, and
+--      3) A COBOL procedure that takes a four byte binary integer input 
+--         parameter and returns a copy of the binary integer, as well as 
+--         the double of the input binary integer, as Out parameters.
+--      
+--      The procedures are called, and the results (where verifiable) are
+--      examined.
+--      
+--      This test assumes that the following characters are all included
+--      in the implementation defined type Interfaces.COBOL.COBOL_Character:
+--      ' ', '0..9', 'a'..'z', and 'A'..'Z'.
+--      
+-- SPECIAL REQUIREMENTS:
+--      The files CXB40090.CBL, CXB40091.CBL, and CXB40092.CBL must be 
+--      compiled with a COBOL compiler.  Implementation dialects of COBOL
+--      may require alteration of the COBOL program syntax.  An 
+--      implementation must provide the necessary modifications to satisfy 
+--      the function requirements.
+--     
+--      Note that the compiled COBOL code must be bound with the compiled
+--      Ada code to create an executable image.  An implementation must
+--      provide the necessary commands to accomplish this.
+--     
+-- TEST FILES:
+--      The following files comprise this test:
+--
+--         CXB40090.CBL
+--         CXB40091.CBL
+--         CXB40092.CBL
+--         CXB40093.AM
+--
+-- APPLICABILITY CRITERIA: 
+--      This test is applicable to all implementations that provide 
+--      package Interfaces.COBOL and support the binding of COBOL code
+--      to Ada programs.
+--      If an implementation does not provide package Interfaces.COBOL
+--      then the line marked "-- N/A => ERROR" must be rejected, and the
+--      test is graded Not Applicable.
+--      If an implementation does not support the binding of COBOL code
+--      to Ada programs, then the test may be rejected at compile time,
+--      preferable by flagging the lines containing "pragma Import(COBOL...",
+--      or the test may fail at link/bind time.  In either case, the test
+--      should be graded Not Applicable.
+--      If an executable is created, then it must be executed and report
+--      "PASSED"; else the test must be graded Failed.
+--
+--       
+-- CHANGE HISTORY:
+--      23 Feb 96   SAIC    Initial release for 2.1.
+--      10 Jun 96   SAIC    Incorporated reviewer comments for ACVC 2.1.
+--      21 Nov 96   SAIC    Added N/A indication on context clause.
+--      26 Jun 98   EDS     Corrected commentary to allow support of
+--                          Interfaces.COBOL without being able to execute.
+--!
+
+with Report;
+with Impdef;
+with Ada.Exceptions;
+with Interfaces.COBOL;                                         -- N/A => ERROR
+
+procedure CXB40093 is
+begin
+
+   Report.Test ("CXB4009", "Check that using Pragma Import, which "          &
+                           "references a COBOL subprogram, as a completion " &
+                           "of a procedure declaration will allow the use "  &
+                           "of the imported subprogram by the calling "      &
+                           "routine");
+
+   Test_Block:
+   declare
+
+      use Interfaces.COBOL;
+      use Ada.Exceptions;
+
+      -- The Initialize procedure does not produce any result visible to the
+      -- test program.  No parameter values are required, and therefore no
+      -- testable returned result.
+
+      procedure Initialize;
+
+      -- The Copy_String procedure accepts an eight byte Alphanumeric string
+      -- In parameter, and copies it to an eight byte out parameter 
+      -- Alphanumeric result string.
+
+      procedure Copy_String (Source :  in Alphanumeric;
+                             Target : out Alphanumeric);
+
+      -- The Copy_And_Double procedure accepts a four byte binary integer
+      -- In parameter.  The procedure then performs two actions: it copies
+      -- the integer value to a four byte binary integer Out parameter,
+      -- and it doubles the original value, placing this second result into
+      -- another four byte binary integer Out parameter.
+
+      procedure Copy_And_Double (Original :  in Interfaces.COBOL.Binary;
+                                 Copy     : out Interfaces.COBOL.Binary;
+                                 Double   : out Interfaces.COBOL.Binary);
+
+
+      -- Use the COBOL01, COBOL02, and COBOL03 procedures as completions
+      -- to the Ada procedure specifications above.
+
+      pragma Import(COBOL, Initialize,      Impdef.CXB40090_External_Name);
+
+      pragma Import(COBOL, Copy_String,     Impdef.CXB40091_External_Name);
+
+      pragma Import(COBOL, Copy_And_Double, Impdef.CXB40092_External_Name);
+
+
+      type Decimal_Type is delta 0.01 digits 10;
+
+      package Convert is 
+        new Interfaces.COBOL.Decimal_Conversions(Num => Decimal_Type);
+
+
+      TC_String_In,
+      TC_String_Out : Interfaces.COBOL.Alphanumeric(1..8) := 
+         Interfaces.COBOL.To_COBOL("        ");
+
+      TC_Binary_In,
+      TC_Binary_Out,
+      TC_Binary_Double : Interfaces.COBOL.Binary := 
+         Convert.To_Binary(Item => 0.00);
+
+
+   begin
+
+      -- Call the Initialization procedure.
+
+      Initialize;
+
+
+      -- Check that the imported version of procedure COBOL02 produces the
+      -- correct results.
+
+      TC_String_In := Interfaces.COBOL.To_COBOL(Item => "Validate");
+      -- Note: Call uses named parameter association.
+      Copy_String(Source => TC_String_In, Target => TC_String_Out);
+
+      if TC_String_In          /= TC_String_Out          or
+         To_Ada(TC_String_Out) /= "Validate"             or
+         To_Ada(TC_String_In)  /= To_Ada(TC_String_Out)  or
+         TC_String_In(1..8)    /= TC_String_Out(1..8)
+      then
+         Report.Failed("Incorrect result from the imported version of " &
+                       "procedure COBOL02 - 1");
+      end if;
+
+      TC_String_In := Interfaces.COBOL.To_COBOL("TEST 1 2");
+      -- Note: Call uses positional parameter association.
+      Copy_String(TC_String_In, TC_String_Out);
+
+      if TC_String_In          /= TC_String_Out          or
+         To_Ada(TC_String_Out) /= "TEST 1 2"             or
+         To_Ada(TC_String_In)  /= To_Ada(TC_String_Out)  or
+         TC_String_In(1..8)    /= TC_String_Out(1..8)
+      then
+         Report.Failed("Incorrect result from the imported version of " &
+                       "procedure COBOL02 - 2");
+      end if;
+
+
+      -- Check that the imported version of procedure COBOL03 produces the
+      -- correct results.
+
+      TC_Binary_In := Convert.To_Binary(Item => 123.00);
+      Copy_And_Double(Original => TC_Binary_In,
+                      Copy     => TC_Binary_Out,
+                      Double   => TC_Binary_Double);
+
+      if TC_Binary_In                         /= TC_Binary_Out    or
+         TC_Binary_Out                         = TC_Binary_Double or
+         Convert.To_Decimal(TC_Binary_Out)    /= 123.00           or
+         Convert.To_Decimal(TC_Binary_Double) /= (123.0 + 123.00) or
+         Convert.To_Decimal(TC_Binary_Double) /= 
+         (2.0 * Convert.To_Decimal(TC_Binary_Out))
+      then
+         Report.Failed("Incorrect result from the imported version of " &
+                       "procedure COBOL03 - 1");
+      end if;
+
+      -- Note: This subtest depends on the correct execution of the 
+      --       previous subtest.
+      TC_Binary_In := TC_Binary_Double;  -- Sets value to 246.00, from above.
+      Copy_And_Double(TC_Binary_In, TC_Binary_Out, TC_Binary_Double);
+
+      if TC_Binary_In                         /= TC_Binary_Out    or
+         TC_Binary_Out                         = TC_Binary_Double or
+         Convert.To_Decimal(TC_Binary_Out)    /= 246.00           or
+         Convert.To_Decimal(TC_Binary_Double) /= (246.0 + 246.00) or
+         Convert.To_Decimal(TC_Binary_Double) /= 
+         (2.0 * Convert.To_Decimal(TC_Binary_Out))
+      then
+         Report.Failed("Incorrect result from the imported version of " &
+                       "procedure COBOL03 - 2");
+      end if;
+
+
+   exception
+      when The_Error : others => 
+         Report.Failed("The following exception was raised in the " &
+                       "Test_Block: " & Exception_Name(The_Error));
+   end Test_Block;
+
+   Report.Result;
+
+end CXB40093;

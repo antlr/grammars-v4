@@ -1,0 +1,32 @@
+uni_start_stream
+	man_start_object <ind_group, "Test - Lesson3">
+		mat_orientation <vff>
+		mat_position <center_center>
+		mat_bool_resize_vertical <no>
+		mat_precise_width <300>
+		mat_precise_height <150>
+		mat_bool_precise <yes>
+		mat_art_id <1-1-40898>
+		mat_bool_background_pic <yes>
+		man_start_object <trigger, "Test">
+		      mat_context_help <"Click here!">
+		      mat_trigger_style <rectangle>
+		      mat_bool_precise <yes>
+		      mat_precise_width <70>
+		      mat_precise_height <24>
+		      mat_precise_x <220>
+		      mat_precise_y <120>
+		      mat_font_sis <arial, 8, normal>
+		      mat_color_face <0, 109, 170>
+		      mat_color_text <255, 255, 255>
+		      mat_color_top_edge <145, 182, 255>
+		      mat_color_bottom_edge <1, 1, 1>
+		      act_replace_select_action
+			<
+			uni_start_stream
+			sm_send_token_arg <"L1", 28>
+			uni_end_stream
+			>
+		man_end_object
+	man_end_object
+	man_update_display

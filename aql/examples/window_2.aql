@@ -1,0 +1,20 @@
+FOR t IN observations
+    COLLECT subject = t.subject INTO group = t
+    LET subquery = (FOR t2 IN group
+      SORT t2.time
+      WINDOW { preceding: 1, following: 1 }
+      AGGREGATE rollingAverage = AVG(t2.val), rollingSum = SUM(t2.val)
+      WINDOW { preceding: "unbounded", following: 0 }
+      AGGREGATE cumulativeSum = SUM(t2.val)
+      RETURN {
+        time: t2.time,
+        subject: t2.subject,
+        val: t2.val,
+        rollingAverage,
+        rollingSum,
+        cumulativeSum
+      }
+    )
+    // flatten subquery result
+    FOR t2 IN subquery
+      RETURN t2

@@ -1,0 +1,99 @@
+-- LXD70031.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making
+--     this public release, the Government intends to confer upon all
+--     recipients unlimited rights  equal to those held by the Government.
+--     These rights include rights to use, duplicate, release or disclose the
+--     released technical data and computer software in whole or in part, in
+--     any manner and for any purpose whatsoever, and to have or permit others
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      See LXD70032.AM.
+--
+-- TEST FILES:
+--      This test consists of the following files:
+--          LXD70030.A     A text file containing the Restrictions pragma
+--       => LXD70031.A     A Library task containing an Abort statement
+--          LXD70032.AM    The main program
+--
+-- CHANGE HISTORY:
+--      06 Dec 94   SAIC    ACVC 2.0
+--      10 Nov 95   SAIC    Fix for 2.0.1 in files LXD70030.A and
+--                          LXD70032.AM
+--      30 Sep 96   SAIC    Multi-file prolog convention fix.
+--      02 Feb 17   RLB     Added missing error tag (and location indicator).
+--
+--!
+
+package  LXD70031 is
+
+   task type Line_Driver is
+      entry Input;
+   end Line_Driver;
+   type acc_Driver is access Line_Driver;
+
+   task Close_Control is
+      entry Normal_Shut_Down;
+      entry Disaster_Shut_Down;
+   end Close_Control;
+
+end  LXD70031;
+
+
+package body  LXD70031 is
+
+   subtype Driver_Index is integer range 1..4;
+
+   task body Line_Driver is
+   begin
+      loop
+         accept Input do
+            null;  -- Application code
+         end Input;
+      end loop;
+   end Line_Driver;
+
+   -- Create a group of Line_Driver tasks
+   Driver_Array : array (Driver_Index) of acc_Driver :=
+                                           (Driver_Index => new Line_Driver);
+
+
+   task body Close_Control is
+   begin
+      select
+         accept Normal_Shut_Down do
+            null;  -- Application code
+         end Normal_Shut_Down;
+      or
+         accept Disaster_Shut_Down do
+            null;  -- Application code
+               for i in Driver_Index loop
+                  -- This abort should not be allowed when
+                  -- restriction No_Abort_Statements is in force.
+                  abort Driver_Array(i).all;      -- OPTIONAL ERROR: {19}
+               end loop;
+         end Disaster_Shut_Down;
+      end select;
+   end Close_Control;
+
+begin -- LXD70031
+
+   null;
+
+end LXD70031;

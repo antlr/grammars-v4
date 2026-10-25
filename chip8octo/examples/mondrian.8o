@@ -1,0 +1,80 @@
+###########################################
+#
+#  Mondri8
+#
+#  Draw random compositions in the style
+#  of Piet Mondrian. When drawing completes,
+#  press any Chip8 key to draw another.
+#
+###########################################
+
+:const LINE_COUNT 10
+:const FILL_COUNT 5
+
+:alias x       v0
+:alias y       v1
+:alias px      v2 # x position when scanning
+:alias py      v3 # y position when scanning
+:alias dx      v4 # change (delta) in x position when scanning
+:alias dy      v5 # change (delta) in y position when scanning
+:alias counter v6
+
+: main
+	hires
+	i  := point
+	loop
+		counter := LINE_COUNT
+		loop
+			somewhere h-line	
+			somewhere v-line
+			counter += -1
+			if counter != 0 then
+		again
+		counter := FILL_COUNT
+		loop
+			somewhere fill
+			counter += -1
+			if counter != 0 then
+		again
+		v0 := key
+		clear
+	again
+
+: somewhere
+	x := random 0xFF
+	y := random 0xFF
+;
+
+: scan
+	loop
+		sprite px py 1
+		while vf == 0
+		px += dx
+		py += dy
+	again
+	sprite px py 1
+;
+
+: v-line
+	px := x dx :=  0
+	py := y dy := -1          scan
+	py := y dy :=  1 py += dy scan
+;
+
+: h-line
+	py := y dy :=  0
+	px := x dx := -1          scan
+	px := x dx :=  1 px += dx scan
+;
+
+: fill
+	loop
+		h-line
+		y += 1
+		sprite x y 1
+		while vf == 0
+	again
+	sprite x y 1
+;
+
+: point 0x80

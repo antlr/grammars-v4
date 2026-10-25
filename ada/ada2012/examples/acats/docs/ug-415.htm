@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>Special Core Tests</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    DIV.Indented2 {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 4.0em; margin-bottom: 0.6em}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-414.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-416.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>4.1.5 Special Core Tests</H1>
+<div class="Normal">This section identifies tests that appear in the 
+Core (since their requirements are enunciated there) but that may be 
+graded as non-supported for implementations not claiming support of certain 
+Specialized Needs Annexes.</div>
+<div class="Normal"><I>Annex C Requirements</I></div>
+<div class="Normal">Clause 13 of the Ada Standard includes implementation 
+advice paragraphs include the words &quot;recommended level of support&quot;. 
+The ACATS does not require implementations to conform to those paragraphs 
+unless they claim support for Annex C, Systems Programming (because of 
+<A HREF="http://www.adaic.org/resources/add_content/standards/12rm/html/RM-C-2.html#p2">C.2(2)</A>: 
+&quot;The implementation shall support at least the functionality defined 
+by the recommended levels of support in Clause 13.&quot;)</div>
+<div class="Normal" style="margin-bottom: 0.4em">Tests that (in part) 
+check conformance to the implementation advice are listed below:</div>
+<div class="Indented2"><table width="70%">
+<TR><TD align="left">BD10001<TD align="left">CD20001<TD align="left">CD30009<TD align="left">CDD2B01<TD align="left">
+<TR><TD align="left">BD30001<TD align="left">CD30001<TD align="left">CD30010<TD align="left">CDD2B02<TD align="left">
+<TR><TD align="left">BD30002<TD align="left">CD30002<TD align="left">CD30011<TD align="left">CDD2B03<TD align="left">
+<TR><TD align="left">BD30003<TD align="left">CD30003<TD align="left">CD30012<TD align="left">CDD2B04<TD align="left">
+<TR><TD align="left">BDD2006<TD align="left">CD30004<TD align="left">CD40001<TD align="left">CDE0002 <TD align="left">
+<TR><TD align="left">BDD2007<TD align="left">CD30006<TD align="left">CD72A01<TD align="left">&nbsp;<TD align="left">
+<TR><TD align="left">C452A03<TD align="left">CD30007<TD align="left">CD72A02<TD align="left">&nbsp;<TD align="left">
+<TR><TD align="left">CD10001<TD align="left">CD30008<TD align="left">CD90001<TD align="left">&nbsp;<TD align="left">
+</table></div>
+<div class="Normal">Implementations that claim support for Annex C are 
+required to process and pass the tests listed above.</div>
+<div class="Normal">Implementations that do not claim support for Annex 
+C are still required to process these tests. Such implementations may 
+reject the lines marked with the special comment <TT>-- ANX-C RQMT</TT>, 
+in which case the test will be graded as &quot;unsupported&quot;. If 
+an implementation accepts such lines in one of these tests, then the 
+test must be bound (linked) and executed, with a passed or not_applicable 
+result.</div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-414.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-416.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>

@@ -1,0 +1,13 @@
+--algorithm Euclid {
+  variables x = 10, y = 15;
+  {
+    while (x /= y) {
+      if (x > y) {
+        x := x - y;
+      } else {
+        y := y - x;
+      };
+    };
+    print x;
+  }
+}

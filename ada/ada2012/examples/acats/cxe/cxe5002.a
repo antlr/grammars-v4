@@ -1,0 +1,365 @@
+-- CXE5002.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making
+--     this public release, the Government intends to confer upon all
+--     recipients unlimited rights  equal to those held by the Government.
+--     These rights include rights to use, duplicate, release or disclose the
+--     released technical data and computer software in whole or in part, in
+--     any manner and for any purpose whatsoever, and to have or permit others
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that the Partition Communication Subsystem is used for handling
+--      remote calls. Check that pragma Asynchronous causes procedure Do_APC
+--      to be called and that all other calls go through Do_RPC.  Check that
+--      pragma All_Calls_Remote is honored by making a call to an RCI unit in
+--      the same partition.
+--
+-- TEST DESCRIPTION:
+--      This test is composed of the following compilation units:
+--          System.RPC (body)
+--          CXE5002_A
+--          CXE5002_Part_A
+--          CXE5002_State
+--          CXE5002_B
+--          CXE5002_Part_B
+--      The main procedure, CXE5002_A, makes calls to RCI procedures in
+--      both partition A and partition B.  These calls should all result in
+--      a Communication_Error exception being raised by the System.RPC body
+--      that is included here.  By having all the RCI calls result in an
+--      exception we don't have to worry about the implementation expecting
+--      something to be returned in the Result stream.
+--
+-- SPECIAL REQUIREMENTS:
+--      Compile the compilation units in this file.
+--      Create the two partitions (A and B) with the following contents:
+--        Partition A contains:
+--           CXE5002_A  (main procedure)
+--           CXE5002_Part_A  (RCI package)
+--           System.RPC (body of this package included with this test)
+--           and all other normal and pure packages with'ed by these units.
+--        Partition B contains:
+--           CXE5002_B  (main procedure)
+--           CXE5002_Partition_B  (RCI package)
+--           and all normal and pure packages with'ed by these units.
+--      Note that a body for package System.RPC is included in this test
+--      and replaces any implementation provided version of that package
+--      body.
+--
+--      Only CXE5002_A need be run as no actual communication between
+--      the partitions occurs.  Partition B need not be built unless the
+--      implementation requires it.
+--
+--      IMPORTANT:  Be sure to remove the body of System.RPC that is
+--      compiled as part of this test from the library before continuing
+--      with any other test as the other tests may require the
+--      implementation provided version of System.RPC.
+--
+-- APPLICABILITY CRITERIA:
+--      This test applies only to implementations:
+--         supporting the Distribution Annex,
+--         supporting the Remote_Call_Interface pragma, and
+--         supporting the language-defined System.RPC interface
+--            rather than an alternative declaration as allowed by E.5(27.1/2).
+--
+-- PASS/FAIL CRITERIA:
+--      This test passes if and only if CXE5002_A prints a message
+--      reporting that the test passed.  If the implementation requires
+--      that both partitions be executed then CXE5002_B must also print
+--      a message reporting that the test passed.
+--
+--
+-- CHANGE HISTORY:
+--     18 APR 95   SAIC    Initial version
+--     23 OCT 95   SAIC    Added checks on Partition_ID.
+--     21 OCT 98   RLB     Corrected so Partition B does not display a
+--                         spurious failure message.
+--     08 JUL 99   RLB     Revised the applicability criteria to require
+--                         support for the recompilation of the body of
+--                         System.RPC (AI95-00082).
+--     21 DEC 07   RLB     Revised the applicability criteria to make
+--                         the test inapplicable if an alternative definition
+--                         of System.RPC is used.
+--!
+
+
+-----------------------------------------------------------------------------
+
+package CXE5002_Part_A is
+  pragma Remote_Call_Interface;
+  pragma All_Calls_Remote;
+
+  procedure Local_Remote_Call;
+end CXE5002_Part_A;
+
+-----------------------------------------------------------------------------
+
+package CXE5002_Part_B is
+  pragma Remote_Call_Interface;
+
+  procedure Remote_Normal (X : Integer);
+  procedure Remote_Async  (X : Integer);
+  pragma Asynchronous (Remote_Async);
+end CXE5002_Part_B;
+
+-----------------------------------------------------------------------------
+
+package CXE5002_State is
+--
+-- This package contains state information that is communicated between the
+-- main test procedure and the body of System.RPC.  The purpose of the state
+-- information is to inform System.RPC as to what type of call is expected
+-- and to let the main test procedure know if the expected call occurred.
+  APC_Expected : Boolean := False;
+  Remote_Call_Occurred : Boolean := False;
+
+-- Let System.RPC know whether the call is intended for partition A
+-- or partition B.
+  Calls_To_Partition_B : Boolean := False;
+end CXE5002_State;
+
+-----------------------------------------------------------------------------
+--
+-- main procedure for partition B
+--
+
+with CXE5002_Part_B;
+with Report;
+procedure CXE5002_B is
+begin
+  Report.Test ("CXE5002_B", "Partition Communication System usage." &
+                            " Execution of this partition is optional.");
+  Report.Result;
+end CXE5002_B;
+
+-----------------------------------------------------------------------------
+--
+-- main procedure for partition A (and the test)
+--
+
+with CXE5002_Part_A;
+with CXE5002_Part_B;
+with CXE5002_State;
+with System.RPC;
+with Report;
+procedure CXE5002_A is
+  use type System.RPC.Partition_ID;
+begin
+  Report.Test ("CXE5002", "Partition Communication System usage");
+
+  -- make sure partitioning is performed correctly
+  if CXE5002_Part_A'Partition_ID = CXE5002_Part_B'Partition_ID then
+    Report.Failed ("Partitioning Error - CXE5002_Part_A and CXE5002_Part_B" &
+                   " are in the same partition.");
+  end if;
+  if CXE5002_Part_A'Partition_ID /= CXE5002_A'Partition_ID then
+    Report.Failed ("Partitioning Error - CXE5002_Part_A and CXE5002_A" &
+                   " are not in the same partition.");
+  end if;
+
+  -- test calls to the other partition
+  CXE5002_State.APC_Expected         := False;
+  CXE5002_State.Remote_Call_Occurred := False;
+  CXE5002_State.Calls_To_Partition_B := True;
+  begin
+    CXE5002_Part_B.Remote_Normal (1);
+    Report.Failed ("Expected exception not raised");
+  exception
+    when System.RPC.Communication_Error => null;
+    when others => Report.Failed ("Unexpected exception raised");
+  end;
+  if CXE5002_State.Remote_Call_Occurred then
+    null;
+    -- Report.Comment ("Remote call went through System.RPC");
+  else
+    Report.Failed ("Remote call did not go through System.RPC");
+  end if;
+
+  CXE5002_State.APC_Expected         := True;
+  CXE5002_State.Remote_Call_Occurred := False;
+  CXE5002_State.Calls_To_Partition_B := True;
+  begin
+    CXE5002_Part_B.Remote_Async (2);
+    Report.Failed ("Expected exception not raised");
+  exception
+    when System.RPC.Communication_Error => null;
+    when others => Report.Failed ("Unexpected exception raised");
+  end;
+  if CXE5002_State.Remote_Call_Occurred then
+    null;
+    -- Report.Comment ("Remote async call went through System.RPC");
+  else
+    Report.Failed ("Remote async call did not go through System.RPC");
+  end if;
+
+  -- test calls to this partition
+
+  CXE5002_State.APC_Expected         := False;
+  CXE5002_State.Remote_Call_Occurred := False;
+  CXE5002_State.Calls_To_Partition_B := False;
+  begin
+    CXE5002_Part_A.Local_Remote_Call;
+    Report.Failed ("Expected exception not raised");
+  exception
+    when System.RPC.Communication_Error => null;
+    when others => Report.Failed ("Unexpected exception raised");
+  end;
+  if CXE5002_State.Remote_Call_Occurred then
+    null;
+    -- Report.Comment ("Local remote call went through System.RPC");
+  else
+    Report.Failed ("Local remote call did not go through System.RPC");
+  end if;
+
+  -- finish up
+  Report.Result;
+end CXE5002_A;
+
+-----------------------------------------------------------------------------
+
+with Report;
+package body CXE5002_Part_A is
+  -- This procedure should not be directly called because it has a pragma
+  -- All_Calls_Remote applied to it.  Since the System.RPC body does not
+  -- forward any calls, this procedure would only be called if the pragma
+  -- were to be ignored.
+  procedure Local_Remote_Call is
+  begin
+    Report.Failed ("pragma All_Calls_Remote was ignored.");
+  end Local_Remote_Call;
+end CXE5002_Part_A;
+
+-----------------------------------------------------------------------------
+
+with Report;
+package body CXE5002_Part_B is
+  -- the procedures in this package are never actually called.  If a call
+  -- actually occurs then probably the wrong body of System.RPC was used.
+
+  procedure Remote_Normal (X : Integer) is
+  begin
+    Report.Failed ("Remote_Normal called - check version of System.RPC");
+  end Remote_Normal;
+
+  procedure Remote_Async  (X : Integer) is
+  begin
+    Report.Failed ("Remote_Async called - check version of System.RPC");
+  end Remote_Async;
+
+end CXE5002_Part_B;
+
+-----------------------------------------------------------------------------
+
+with Report;
+with CXE5002_State;
+with CXE5002_Part_A;   -- just to get its partition id
+with CXE5002_Part_B;   -- just to get its partition id
+package body System.RPC is
+  procedure Read (
+      Stream : in out Params_Stream_Type;
+      Item : out Ada.Streams.Stream_Element_Array;
+      Last : out Ada.Streams.Stream_Element_Offset) is
+  begin
+    -- shouldn't ever be called.  If it is then report that the stream
+    -- is empty
+    Last := Ada.Streams.Stream_Element_Offset'First;
+  end Read;
+
+
+  procedure Write (
+      Stream : in out Params_Stream_Type;
+      Item : in Ada.Streams.Stream_Element_Array) is
+  begin
+    null;  -- we are going to ignore everything in the stream anyway
+  end Write;
+
+
+  procedure Do_RPC (
+      Partition : in Partition_ID;
+      Params    : access Params_Stream_Type;
+      Result    : access Params_Stream_Type) is
+  begin
+    CXE5002_State.Remote_Call_Occurred := True;
+    if CXE5002_State.APC_Expected then
+      Report.Failed ("Do_RPC called instead of Do_APC");
+    end if;
+
+    if CXE5002_State.Calls_To_Partition_B then
+      if Partition /= CXE5002_Part_B'Partition_ID then
+        Report.Failed ("partition parameter to Do_RPC is wrong." &
+                       " Expected " &
+                       Partition_ID'Image (CXE5002_Part_B'Partition_ID) &
+                       " (B) but got " &
+                       Partition_ID'Image (Partition));
+      end if;
+    else  -- call is to partition A
+      if Partition /= CXE5002_Part_A'Partition_ID then
+        Report.Failed ("partition parameter to Do_RPC is wrong." &
+                       " Expected " &
+                       Partition_ID'Image (CXE5002_Part_A'Partition_ID) &
+                       " (A) but got " &
+                       Partition_ID'Image (Partition));
+      end if;
+    end if;
+
+    raise Communication_Error;
+  end Do_RPC;
+
+
+  procedure Do_APC (
+      Partition : in Partition_ID;
+      Params    : access Params_Stream_Type) is
+  begin
+    CXE5002_State.Remote_Call_Occurred := True;
+    if not CXE5002_State.APC_Expected then
+      Report.Failed ("Do_APC called instead of Do_RPC");
+    end if;
+
+    if CXE5002_State.Calls_To_Partition_B then
+      if Partition /= CXE5002_Part_B'Partition_ID then
+        Report.Failed ("partition parameter to Do_RPC is wrong." &
+                       " Expected " &
+                       Partition_ID'Image (CXE5002_Part_B'Partition_ID) &
+                       " (B) but got " &
+                       Partition_ID'Image (Partition));
+      end if;
+    else  -- call is to partition A
+      if Partition /= CXE5002_Part_A'Partition_ID then
+        Report.Failed ("partition parameter to Do_RPC is wrong." &
+                       " Expected " &
+                       Partition_ID'Image (CXE5002_Part_A'Partition_ID) &
+                       " (A) but got " &
+                       Partition_ID'Image (Partition));
+      end if;
+    end if;
+
+    raise Communication_Error;
+  end Do_APC;
+
+
+  procedure Establish_RPC_Receiver (
+      Partition : in Partition_ID;
+      Receiver  : in RPC_Receiver) is
+  begin
+    if Partition /= CXE5002_Part_A'Partition_ID and then
+       Partition /= CXE5002_Part_B'Partition_ID then
+      Report.Failed ("partition parameter to Establish_RPC_Receiver" &
+                     " is not correct");
+    end if;
+  end Establish_RPC_Receiver;
+end System.RPC;
