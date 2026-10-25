@@ -1,4 +1,4 @@
-# Google Fusion Tables Sql
+# Google Fusion Tables Grammar
 
 Parses Google fusion tables sql as defined in the
 [Row and Query SQL Reference](https://developers.google.com/fusiontables/docs/v2/sql-reference)
@@ -17,3 +17,6 @@ if anyone is interested in such a thing.
 # License
 
 [The Unlicense](hoosealicense.com/licenses/unlicense/).
+
+## Reference
+

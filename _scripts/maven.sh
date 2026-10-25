@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/bash
 #set -x
 #set -e
 
@@ -11,7 +11,7 @@ fi
 prefix=`pwd`
 for g in $directories
 do
-    pushd $g
+    pushd $g > /dev/null 2>&1
     while true
     do
         if [ `pwd` == '/' ]
@@ -35,23 +35,32 @@ do
     fi
     if [ ! -f pom.xml ]
     then
-        popd > /dev/null
+        popd > /dev/null 2>&1
         continue
     fi
     grep -q -e '<modules>' pom.xml
     if [ $? -eq 0 ]
     then
-        popd > /dev/null
+        popd > /dev/null 2>&1
         continue
     fi
-    popd > /dev/null
-    grammars+=( $g )
+    popd > /dev/null 2>&1
+    if [[ ! " ${grammars[@]} " =~ " $g " ]]; then
+        grammars+=( $g )
+    fi
 done
 
+echo All grammars:
+echo ${grammars[@]}
+
+failed_grammars=()
 for grammar in ${grammars[@]}
 do
     pushd $grammar
-    mvn -B package --file pom.xml
+    mvn -B clean test
+    if [ $? -ne 0 ]; then
+        failed_grammars+=( $grammar )
+    fi
     popd
 done
 
@@ -59,3 +68,14 @@ done
 root=`git rev-parse --show-toplevel`
 pushd $root
 mvn clean
+status=$?
+
+if [ ${#failed_grammars[@]} -ne 0 ]; then
+    echo "The following grammars failed:"
+    for g in "${failed_grammars[@]}"; do
+        echo "  $g"
+    done
+    exit 1
+fi
+
+exit $status

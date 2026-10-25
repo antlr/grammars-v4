@@ -1,0 +1,12 @@
+PolicyStatement : [
+{
+  "Id" : "Policy1",
+  "Type": "A+",
+  "Who": "*",
+  "Action": *,
+  "What" : {"Resource": "Email"},
+  "Why" : "allow all",
+  "How" : "direct",
+  "Trigger" : "always"
+}
+]

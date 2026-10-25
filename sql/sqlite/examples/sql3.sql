@@ -18,3 +18,6 @@ SELECT UNBOUNDED FROM table_name;
 
 -- NATURAL and other join operator keywords can only work as aliases if preceeded by AS
 SELECT 1 FROM table_name AS NATURAL;
+
+-- Parse functions after binary exprs
+SELECT sql FROM sqlite_schema WHERE lower(name) = lower('MyTable');

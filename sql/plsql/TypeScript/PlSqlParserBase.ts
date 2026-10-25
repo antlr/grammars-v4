@@ -1,10 +1,12 @@
-import { Parser, TokenStream } from "antlr4";
+import { Parser, TokenStream, Token } from "antlr4";
+import PlSqlLexer from './PlSqlLexer.js';
 
 export default abstract class PlSqlParserBase extends Parser {
 
   _isVersion10: boolean;
   _isVersion11: boolean;
   _isVersion12: boolean;
+  _lastUnitWasPlsql: boolean;
   self: PlSqlParserBase;
 
   constructor(input: TokenStream) {
@@ -12,7 +14,37 @@ export default abstract class PlSqlParserBase extends Parser {
     this._isVersion10 = false;
     this._isVersion11 = true;
     this._isVersion12 = true;
+    this._lastUnitWasPlsql = false;
     this.self = this;
+  }
+
+  reset(): void {
+    this._lastUnitWasPlsql = false;
+    super.reset();
+  }
+
+  setLastUnitPlsql(): void { this._lastUnitWasPlsql = true; }
+  setLastUnitSql(): void   { this._lastUnitWasPlsql = false; }
+  isLastUnitSql(): boolean { return !this._lastUnitWasPlsql; }
+  isLastUnitPlsql(): boolean { return this._lastUnitWasPlsql; }
+
+  isSolidusSeparator(): boolean {
+    const stream = this.getTokenStream();
+    const solidus = stream.LT(1);
+    if (solidus == null || solidus!.type !== PlSqlLexer.SOLIDUS)
+      return false;
+
+    const solidusLine = solidus!.line;
+
+    const prev = stream.LT(-1);
+    if (prev != null && prev!.type !== Token.EOF && prev!.line === solidusLine)
+      return false;
+
+    const next = stream.LT(2);
+    if (next != null && next!.type !== Token.EOF && next!.line === solidusLine)
+      return false;
+
+    return true;
   }
 
   isVersion10(): boolean {
@@ -37,6 +69,35 @@ export default abstract class PlSqlParserBase extends Parser {
 
   setVersion12(value: boolean): void {
     this._isVersion12 = value;
+  }
+
+  IsNotNumericFunction(): boolean {
+    const lt1 = this.getTokenStream().LT(1);
+    const lt2 = this.getTokenStream().LT(2);
+    if ((lt1!.type === PlSqlLexer.SUM ||
+      lt1!.type === PlSqlLexer.COUNT ||
+      lt1!.type === PlSqlLexer.AVG ||
+      lt1!.type === PlSqlLexer.MIN ||
+      lt1!.type === PlSqlLexer.MAX ||
+      lt1!.type === PlSqlLexer.ROUND ||
+      lt1!.type === PlSqlLexer.LEAST ||
+      lt1!.type === PlSqlLexer.GREATEST) && lt2!.type === PlSqlLexer.LEFT_PAREN)
+      return false;
+    return true;
+  }
+
+  isNotStartOfJoin(): boolean {
+    const lt1 = this.getTokenStream().LT(1);
+    if (lt1!.type == PlSqlLexer.INNER ||
+        lt1!.type == PlSqlLexer.CROSS ||
+        lt1!.type == PlSqlLexer.NATURAL ||
+        lt1!.type == PlSqlLexer.PARTITION ||
+        lt1!.type == PlSqlLexer.FULL ||
+        lt1!.type == PlSqlLexer.LEFT ||
+        lt1!.type == PlSqlLexer.RIGHT ||
+        lt1!.type == PlSqlLexer.OUTER)
+      return false;
+    return true
   }
 
 }

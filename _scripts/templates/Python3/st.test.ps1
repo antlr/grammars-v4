@@ -1,10 +1,10 @@
 # Generated from trgen <version>
+<if(test.IsWindows)>.venv\Scripts\Activate.ps1<else>.venv/bin/Activate.ps1<endif>
 
 $workingDirectory = Get-Location
 $filePath = "$workingDirectory/tests.txt"
 
-$Tests = "<if(os_win)>../<example_files_win><else>../<example_files_unix><endif>"
-Write-Host "Test cases here: $Tests"
+Write-Host "Test cases: <glob_args_win>"
 
 # Get a list of test files from the test directory. Do not include any
 # .errors or .tree files. Pay close attention to remove only file names
@@ -14,7 +14,7 @@ if (Test-Path -Path "$filePath" -PathType Leaf) {
 }
 
 $files = New-Object System.Collections.Generic.List[string]
-$allFiles = $(& dotnet trglob "$Tests" ; $last = $LASTEXITCODE )
+$allFiles = $(& dotnet trash glob <glob_args_win> ; $last = $LASTEXITCODE )
 foreach ($file in $allFiles) {
     $ext = $file | Split-Path -Extension
     if (Test-Path $file -PathType Container) {
@@ -43,18 +43,22 @@ if (-not(Test-Path -Path "$filePath" -PathType Leaf)) {
 }
 $size = (Get-Item -Path "$filePath").Length
 if ( $size -eq 0 ) {
-    Write-Host "No test cases provided."
+    Write-Host "Test cases file empty."
     exit 0
 }
+
+# Before anything, clean out the testsuite directory of any previous
+# run.
+git clean -f ..\\<example_dir_unix>
 
 # Parse all input files.
 <if(individual_parsing)>
 # Individual parsing.
-Get-Content "$filePath" | ForEach-Object { dotnet trwdog python3 Test.py -q -tee -tree $_ *>> parse.txt }
+Get-Content "$filePath" | ForEach-Object { dotnet trash wdog python Test.py -q -tee -tree $_ *>> parse.txt }
 $status = $LASTEXITCODE
 <else>
 # Group parsing.
-get-content "$filePath" | dotnet trwdog python3 Test.py -q -x -tee -tree *> parse.txt
+get-content "$filePath" | dotnet trash wdog python Test.py -q -x -tee -tree *> parse.txt
 $status = $LASTEXITCODE
 <endif>
 

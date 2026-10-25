@@ -1,0 +1,7 @@
+begin
+    procedure square(x); integer x;
+    begin
+        outint(x * x, 0)
+    end;
+    square(5)
+end

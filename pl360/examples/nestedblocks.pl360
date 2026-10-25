@@ -1,0 +1,20 @@
+COMMENT -- adapted from the 5-block scoping example in manual section 3.4 --;
+BEGIN INTEGER ALPHA, SAVE;
+   R0 := ALPHA;
+   BEGIN REAL BETA, SAVE;
+      R0 := SAVE;
+      BEGIN INTEGER GAMMA;
+         R0 := GAMMA;
+      END;
+      R0 := BETA;
+      BEGIN INTEGER SAVE;
+         R0 := SAVE;
+      END;
+      R0 := SAVE;
+   END;
+   R0 := ALPHA;
+   BEGIN REAL DELTA;
+      R0 := DELTA;
+   END;
+   R0 := ALPHA;
+END.

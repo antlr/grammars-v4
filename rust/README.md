@@ -1,7 +1,11 @@
-# Rust ANTLR 4 grammar
+# Rust Grammar
 
 This grammar is based on official language reference
 at https://doc.rust-lang.org/reference/.
+
+## Reference
+* [pldb](http://pldb.info/concepts/rust)
+
 
 ## License
 MIT

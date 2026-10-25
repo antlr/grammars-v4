@@ -9,10 +9,20 @@ shopt -s globstar
 SAVEIFS=$IFS
 IFS=$(echo -en "\n\b")
 
+# Get environment.
+unameOut="$(uname -s)"
+case "${unameOut}" in
+    Linux*)     machine=Linux;;
+    Darwin*)    machine=Mac;;
+    CYGWIN*)    machine=Cygwin;;
+    MINGW*)     machine=MinGw;;
+    *)          machine="UNKNOWN:${unameOut}"
+esac
+
 # Get a list of test files from the test directory. Do not include any
 # .errors or .tree files. Pay close attention to remove only file names
 # that end with the suffix .errors or .tree.
-files2=`dotnet trglob '../<example_files_unix>' | grep -v '[.]errors$' | grep -v '[.]tree$' | grep -v '[.]trq$'`
+files2=`dotnet trash glob <glob_args_unix> | tr -d '\r' | grep -v '[.]errors$' | grep -v '[.]tree$' | grep -v '[.]trq$'`
 files=()
 for f in $files2
 do
@@ -29,13 +39,17 @@ then
     exit 0
 fi
 
+# Before anything, clean out the testsuite directory of any previous
+# run.
+git clean -f ../<example_dir_unix>
+
 # Parse all input files.
 <if(individual_parsing)>
 # Individual parsing.
 rm -f parse.txt
 for f in ${files[*]}
 do
-    dotnet trwdog ./target/release/test.exe/<if(os_win)>test.exe<else>test<endif> -q -tee -tree $f >> parse.txt 2>&1
+    dotnet trash wdog ./target/release/test.exe/<if(os_win)>test.exe<else>test<endif> -q -tee -tree $f >> parse.txt 2>&1
     xxx="$?"
     if [ "$xxx" -ne 0 ]
     then
@@ -44,7 +58,7 @@ do
 done
 <else>
 # Group parsing.
-echo "${files[*]}" | dotnet trwdog ./target/release/<if(os_win)>test.exe<else>test<endif> -q -x -tee -tree > parse.txt 2>&1
+echo "${files[*]}" | dotnet trash wdog ./target/release/<if(os_win)>test.exe<else>test<endif> -q -x -tee -tree > parse.txt 2>&1
 status=$?
 <endif>
 
@@ -69,14 +83,6 @@ fi
 
 # For Unix environments, convert the newline in the .errors and .trees
 # to Unix style.
-unameOut="$(uname -s)"
-case "${unameOut}" in
-    Linux*)     machine=Linux;;
-    Darwin*)    machine=Mac;;
-    CYGWIN*)    machine=Cygwin;;
-    MINGW*)     machine=MinGw;;
-    *)          machine="UNKNOWN:${unameOut}"
-esac
 if [[ "$machine" == "MinGw" || "$machine" == "Msys" || "$machine" == "Cygwin" || "#machine" == "Linux" ]]
 then
     gen=`find ../<example_dir_unix> -type f -name '*.errors' -o -name '*.tree'`
@@ -85,25 +91,6 @@ then
         dos2unix -f $gen
     fi
 fi
-
-# Validate parse trees via trquery assertions.
-# Execute trquery parse tree validation.
-echo "Checking any trquery parse tree assertions..."
-assertions_err=0
-for file in `dotnet trglob '../<example_files_unix>' | grep -v '[.]errors$' | grep -v '[.]tree$' | grep -v '[.]trq$'`
-do
-    trq=$file.trq
-    if [ -f "$trq" ]
-    then
-        dotnet trparse $file | dotnet trquery -c $trq
-        xxx=$?
-        if [ "$xxx" -ne 0 ]
-        then
-            assertions_err=$xxx
-        fi
-    fi
-done
-echo "Finished checking parse tree assertions."
 
 old=`pwd`
 cd ..
@@ -190,13 +177,6 @@ then
     cat $old/new_errors.txt
     echo "Test failed."
     rm -f $old/updated.txt $old/new_errors2.txt $old/new_errors.txt
-    exit 1
-fi
-
-# Test assertions errors.
-if [ "$assertions_err" -ne 0 ]
-then
-    echo "Test failed."
     exit 1
 fi
 

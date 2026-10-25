@@ -1,0 +1,4 @@
+environ
+begin
+reserve x for @;
+.

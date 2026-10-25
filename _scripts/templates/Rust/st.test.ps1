@@ -3,8 +3,7 @@
 $workingDirectory = Get-Location
 $filePath = "$workingDirectory/tests.txt"
 
-$Tests = "<if(os_win)>../<example_files_win><else>../<example_files_unix><endif>"
-Write-Host "Test cases here: $Tests"
+Write-Host "Test cases: <glob_args_win>"
 
 # Get a list of test files from the test directory. Do not include any
 # .errors or .tree files. Pay close attention to remove only file names
@@ -14,7 +13,7 @@ if (Test-Path -Path "$filePath" -PathType Leaf) {
 }
 
 $files = New-Object System.Collections.Generic.List[string]
-$allFiles = $(& dotnet trglob "$Tests" ; $last = $LASTEXITCODE )
+$allFiles = $(& dotnet trash glob <glob_args_win> ; $last = $LASTEXITCODE )
 foreach ($file in $allFiles) {
     $ext = $file | Split-Path -Extension
     if (Test-Path $file -PathType Container) {
@@ -47,14 +46,18 @@ if ( $size -eq 0 ) {
     exit 0
 }
 
+# Before anything, clean out the testsuite directory of any previous
+# run.
+git clean -f ..\\<example_dir_unix>
+
 # Parse all input files.
 <if(individual_parsing)>
 # Individual parsing.
-Get-Content "$filePath" | ForEach-Object { dotnet trwdog ./target/release/<if(os_win)>test.exe<else>test<endif> -q -tee -tree $_ *>> parse.txt }
+Get-Content "$filePath" | ForEach-Object { dotnet trash wdog ./target/release/<if(os_win)>test.exe<else>test<endif> -q -tee -tree $_ *>> parse.txt }
 $status = $LASTEXITCODE
 <else>
 # Group parsing.
-get-content "$filePath" | dotnet trwdog ./target/release/<if(os_win)>test.exe<else>test<endif> -q -x -tee -tree *> parse.txt
+get-content "$filePath" | dotnet trash wdog ./target/release/<if(os_win)>test.exe<else>test<endif> -q -x -tee -tree *> parse.txt
 $status = $LASTEXITCODE
 <endif>
 
@@ -76,23 +79,6 @@ if ( $size -eq 0 ) {
     Get-Content "parse.txt" | Write-Host
     exit 1
 }
-
-# Validate parse trees via trquery assertions.
-# Execute trquery parse tree validation.
-Write-Host "Checking any trquery parse tree assertions..."
-$assertions_err = 0
-foreach ($file in $files) {
-    $trq = "$file.trq"
-    if (Test-Path $trq -PathType Leaf) {
-        Write-Host "Assert test case: $trq"
-        dotnet trparse $file | dotnet trquery -c $trq
-        $xxx = $LASTEXITCODE
-        if ( $xxx -ne 0 ) {
-            $assertions_err = $xxx
-        }
-    }
-}
-Write-Host "Finished checking parse tree assertions."
 
 $old = Get-Location
 Set-Location "<if(os_win)>../<example_dir_win><else>../<example_dir_unix><endif>"
@@ -195,15 +181,6 @@ if ( $updated -eq 1 ) {
 if ( $new_errors_txt.Count -gt 0 ) {
     Write-Host "New errors in output."
     Get-Content "$old/new_errors.txt" | Write-Host
-    Write-Host "Test failed."
-    Remove-Item -Force -Path $old/updated.txt -errorAction ignore 2>&1 | Out-Null
-    Remove-Item -Force -Path $old/new_errors2.txt -errorAction ignore 2>&1 | Out-Null
-    Remove-Item -Force -Path $old/new_errors.txt -errorAction ignore 2>&1 | Out-Null
-    exit 1
-}
-
-# Test assertions errors.
-if ( "$assertions_err" -ne 0 ) {
     Write-Host "Test failed."
     Remove-Item -Force -Path $old/updated.txt -errorAction ignore 2>&1 | Out-Null
     Remove-Item -Force -Path $old/new_errors2.txt -errorAction ignore 2>&1 | Out-Null

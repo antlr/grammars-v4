@@ -27,14 +27,30 @@ fn parse_input(
     input_name: &str,
     idx: i32,
     flags: &Flags,
-) -> usize {
-	let writer: Rc\<RefCell\<Box\<dyn Write>>> = Rc::new(RefCell::new(
-		if flags.tee {
-			Box::new(File::create(format!("{}.errors", input_name)).unwrap()) as Box\<dyn Write>
-		} else {
-			Box::new(io::sink()) as Box\<dyn Write>
-		}
-	));
+) -> (usize, usize, f64) {
+    let out_name: String = if let Some(ref odir) = flags.output_dir {
+        let abs = std::fs::canonicalize(input_name)
+            .unwrap_or_else(|_| std::env::current_dir().unwrap_or_default().join(input_name));
+        let root = std::fs::canonicalize("../<example_dir_unix>")
+            .unwrap_or_else(|_| std::env::current_dir().unwrap_or_default().join("../<example_dir_unix>"));
+        let rootless = abs.strip_prefix(&root)
+            .map(std::path::PathBuf::from)
+            .unwrap_or_else(|_| abs.file_name().map(std::path::PathBuf::from).unwrap_or_default());
+        let p = std::path::Path::new(odir).join(rootless);
+        if let Some(parent) = p.parent() {
+            std::fs::create_dir_all(parent).ok();
+        }
+        p.to_string_lossy().into_owned()
+    } else {
+        input_name.to_string()
+    };
+        let writer: Rc\<RefCell\<Box\<dyn Write>>> = Rc::new(RefCell::new(
+                if flags.tee {
+                        Box::new(File::create(format!("{}.errors", out_name)).unwrap()) as Box\<dyn Write>
+                } else {
+                        Box::new(io::sink()) as Box\<dyn Write>
+                }
+        ));
 
     let my_string_result = fs::read_to_string(input_name);
     let input = my_string_result.unwrap(); // Panics if Err
@@ -44,25 +60,25 @@ fn parse_input(
     let lec = Rc::new(RefCell::new(0));
     let lel = Box::new(ParserErrorListener {
         quiet: flags.quiet,
-		tee: flags.tee,
+                tee: flags.tee,
         error_count: Rc::clone(&lec),
-		output: Rc::clone(&writer),
-	});
+                output: Rc::clone(&writer),
+        });
     lexer.add_error_listener(lel);
 
     if flags.show_tokens {
-	let mut i: isize = 0;
-	loop {
-		let token = lexer.next_token();
-		let token_type = token.get_token_type();
-		token.set_token_index(i);
-		i = i + 1;
-		eprintln!("{}", token.to_string());
-		if token_type == -1 {
-			break;
-		}
-	}
-	// no lexer.reset();
+        let mut i: isize = 0;
+        loop {
+                let token = lexer.next_token();
+                let token_type = token.get_token_type();
+                token.set_token_index(i);
+                i = i + 1;
+                eprintln!("{}", token.to_string());
+                if token_type == -1 {
+                        break;
+                }
+        }
+        // no lexer.reset();
     }
 
     let token_stream = CommonTokenStream::new(lexer);
@@ -71,37 +87,41 @@ fn parse_input(
     let pec = Rc::new(RefCell::new(0));
     let pel = Box::new(ParserErrorListener {
         quiet: flags.quiet,
-		tee: flags.tee,
+        tee: flags.tee,
         error_count: Rc::clone(&pec),
-		output: Rc::clone(&writer),
-	});
+        output: Rc::clone(&writer),
+        });
     parser.add_error_listener(pel);
 
     let start = Instant::now();
     let tree = parser.<start_symbol>().expect("parsing failed setup");
     let elapsed = start.elapsed();
+    let parse_seconds = elapsed.as_secs_f64();
+    let token_count = parser.get_input_stream_mut().size() as usize;
 
     let error_cnt = *lec.borrow() + *pec.borrow();
 
     if flags.show_tree {
-	let tree_str = tree.to_string_tree(&*parser);
+        let tree_str = tree.to_string_tree(&*parser);
         if flags.tee {
-            let mut f = File::create(format!("{}.tree", input_name)).unwrap();
+            let mut f = File::create(format!("{}.tree", out_name)).unwrap();
             write!(f, "{}", tree_str).ok();
         } else {
-	    eprintln!("{}", tree_str);
+            eprintln!("{}", tree_str);
         }
     }
 
-    if !flags.quiet {
-        eprint!("{}Rust {} {} {} {:.3}\n",
+    if !flags.quiet && flags.per_file {
+        eprint!("{}Rust {} {} {} {:.3} s {} tokens {:.0} pr\n",
             flags.prefix, idx, input_name,
             if error_cnt > 0 { "fail" } else { "success" },
-            elapsed.as_secs_f64()
+            parse_seconds,
+            token_count,
+            token_count as f64 / parse_seconds
         );
     }
 
-    if error_cnt > 0 { 1 } else { 0 }
+    if error_cnt > 0 { (1, token_count, parse_seconds) } else { (0, token_count, parse_seconds) }
 }
 
 struct Flags {
@@ -113,6 +133,9 @@ struct Flags {
     show_trace: bool,
     tee: bool,
     quiet: bool,
+    perf: bool,
+    per_file: bool,
+    output_dir: Option\<String>,
 }
 
 fn main() {
@@ -125,6 +148,9 @@ fn main() {
         show_trace: false,
         tee: false,
         quiet: false,
+        perf: false,
+        per_file: false,
+        output_dir: None,
     };
 
     let args: Vec\<String> = env::args().collect();
@@ -143,7 +169,14 @@ fn main() {
                 flags.is_fns.push(false);
             }
             "-tee" => flags.tee = true,
+            "-o" => {
+                i += 1;
+                flags.output_dir = Some(args[i].clone());
+                flags.tee = true;
+            }
             "-q" => flags.quiet = true,
+            "--perf" => flags.perf = true,
+            "--per-file" => flags.per_file = true,
             "-trace" => flags.show_trace = true,
             "-x" => {
                 let stdin = io::stdin();
@@ -154,8 +187,10 @@ fn main() {
                 }
             }
             other => {
-                flags.inputs.push(other.to_string());
-                flags.is_fns.push(true);
+                if other.to_string().as_bytes()[0] != b'-' {
+                    flags.inputs.push(other.to_string());
+                    flags.is_fns.push(true);
+                }
             }
         }
         i += 1;
@@ -165,17 +200,50 @@ fn main() {
             process::exit(1);
     } else {
         let mut exit_code = 0;
+        let mut total_tokens: usize = 0;
+        let mut total_parse_seconds: f64 = 0.0;
+        let mut first_file_tokens: usize = 0;
+        let mut first_file_parse_seconds: f64 = 0.0;
         let start_all = Instant::now();
         for (idx, input) in flags.inputs.iter().enumerate() {
-	    let rc = parse_input(input, idx as i32, &flags);
-	    if rc > 0 {
-		exit_code = 1;
-	    }
+            let (rc, tc, ps) = parse_input(input, idx as i32, &flags);
+            total_tokens += tc;
+            total_parse_seconds += ps;
+            if idx == 0 {
+                first_file_tokens = tc;
+                first_file_parse_seconds = ps;
+            }
+            if rc > 0 {
+                exit_code = 1;
+            }
         }
         let elapsed = start_all.elapsed();
-	if !flags.quiet {
-	    eprintln!("{}Total Time: {:.3}", flags.prefix, elapsed.as_secs_f64());
-	}
+        if !flags.quiet {
+            let overall_seconds = elapsed.as_secs_f64();
+            if !flags.perf {
+                eprintln!("{}TT: {:.3}", flags.prefix, overall_seconds);
+            } else {
+            let warm_tokens = total_tokens - first_file_tokens;
+            let warm_seconds = total_parse_seconds - first_file_parse_seconds;
+            let warm_tps = if flags.inputs.len() > 1 && warm_seconds > 0.0 {
+                format!("{:.0}", warm_tokens as f64 / warm_seconds)
+            } else {
+                "n.a.".to_string()
+            };
+            let first_tps = if first_file_parse_seconds > 0.0 { first_file_tokens as f64 / first_file_parse_seconds } else { 0.0 };
+            let speedup = if flags.inputs.len() > 1 && warm_seconds > 0.0 && first_tps > 0.0 {
+                format!("{:.2}", (warm_tokens as f64 / warm_seconds) / first_tps)
+            } else {
+                "n.a.".to_string()
+            };
+            eprintln!("{}PT: {:.3}", flags.prefix, total_parse_seconds);
+            eprintln!("{}OT: {:.3}", flags.prefix, overall_seconds - total_parse_seconds);
+            eprintln!("{}TT: {:.3}", flags.prefix, overall_seconds);
+            eprintln!("{}PR: {:.0}", flags.prefix, total_tokens as f64 / total_parse_seconds);
+            eprintln!("{}Post-warmup PR: {}", flags.prefix, warm_tps);
+            eprintln!("{}Post-warmup speed up: {}", flags.prefix, speedup);
+            }
+        }
         process::exit(exit_code as i32);
     }
 }
@@ -197,7 +265,7 @@ impl\<'a, T: Recognizer\<'a>> ErrorListener\<'a, T> for ParserErrorListener {
         msg: &str,
         _error: Option\<&ANTLRError>,
     ) {
-	    *self.error_count.borrow_mut() += 1;
+        *self.error_count.borrow_mut() += 1;
         if self.tee {
             writeln!(self.output.borrow_mut().as_mut(), "line {}:{} {}", line, column, msg).ok();
         }

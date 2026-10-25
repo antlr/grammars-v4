@@ -1,0 +1,8 @@
+MAIN: PROCEDURE OPTIONS(MAIN);
+    DECLARE X FIXED;
+    X = 10;
+    IF X > 5 THEN
+        PUT LIST('big');
+    ELSE
+        PUT LIST('small');
+END;
