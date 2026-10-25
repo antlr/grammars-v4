@@ -306,6 +306,7 @@
 				<module>mckeeman-form</module>
 				<module>mdx</module>
 				<module>memcached_protocol</module>
+				<module>mermaid</module>
 				<module>metamath</module>
 				<module>metric</module>
 				<module>microc</module>

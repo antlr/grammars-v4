@@ -1,7 +1,7 @@
 /*
  BSD License
 
- Copyright (c) 2022, Tom Everett All rights reserved.
+ Copyright (c) 2026, Tom Everett All rights reserved.
 
  Redistribution and use in source and binary forms, with or without modification, are permitted
  provided that the following conditions are met:
@@ -26,19 +26,46 @@
 lexer grammar mermaidLexer;
 
 ER_DIAGRAM: 'erDiagram' -> mode (ER);
+CLASS_DIAGRAM: 'classDiagram' -> mode (CLASS_MODE);
+COMMENT: '%%' ~[\r\n]* -> skip;
 WS: [ \r\n\t]+ -> skip;
 
 mode ER;
+ER_NEXT_DIAGRAM: 'erDiagram' -> type(ER_DIAGRAM);
+ER_NEXT_CLASS: 'classDiagram' -> type(CLASS_DIAGRAM), mode(CLASS_MODE);
 ER_LINETYPE: '..' | '--';
 ER_CARDINALITY: '|o' | 'o|' | '||' | '}o' | 'o{' | '}|' | '|{';
 ER_COLON: ':';
 ER_LBRACE: '{';
 ER_RBRACE: '}';
-ER_STRING: '"' .*? '"';
+ER_STRING: '"' ('\\' . | ~["\\\r\n])* '"';
 ER_INTTYPE: 'int';
 ER_FLOATTYPE:'float';
 ER_STRINGTYPE:'string';
-ER_NAME: [a-zA-Z] [a-zA-Z0-9-]*;
-ER_WS: [ \r\n\t]+ -> skip;
+ER_KEY: 'PK' | 'FK' | 'UK';
+ER_COMMA: ',';
+ER_NAME: [a-zA-Z_] [a-zA-Z0-9_\u005B\u005D()-]*;
+ER_COMMENT: '%%' ~[\r\n]* -> skip;
+ER_NL: '\r'? '\n';
+ER_WS: [ \t]+ -> skip;
 
+mode CLASS_MODE;
+CLASS_NEXT_ER: 'erDiagram' -> type(ER_DIAGRAM), mode(ER);
+CLASS_NEXT_DIAGRAM: 'classDiagram' -> type(CLASS_DIAGRAM);
+CLASS: 'class';
+CLASS_RELATION: '<|--' | '--|>' | '*--' | '--*' | 'o--' | '--o'
+    | '-->' | '<--' | '--' | '..>' | '<..' | '..|>' | '<|..' | '..';
+CLASS_MEMBER: ':' ~[\r\n]+;
+CLASS_STRING: '"' ('\\' . | ~["\\\r\n])* '"';
+CLASS_NAME: [a-zA-Z_] [a-zA-Z0-9_-]*;
+CLASS_OPEN: '{' -> pushMode(CLASS_BODY);
+CLASS_COMMENT: '%%' ~[\r\n]* -> skip;
+CLASS_NL: '\r'? '\n';
+CLASS_WS: [ \t]+ -> skip;
+
+mode CLASS_BODY;
+CLASS_CLOSE: '}' -> popMode;
+CLASS_BODY_COMMENT: '%%' ~[\r\n]* -> skip;
+CLASS_BODY_LINE: ~[}\r\n]+;
+CLASS_BODY_NL: '\r'? '\n';
 

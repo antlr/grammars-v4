@@ -36,12 +36,13 @@
 				<artifactId>antlr4test-maven-plugin</artifactId>
 				<version>${antlr4test-maven-plugin.version}</version>
 				<configuration>
-					<verbose>true</verbose>
-					<showTree>true</showTree>
+					<verbose>false</verbose>
+					<showTree>false</showTree>
 					<entryPoint>mermaid</entryPoint>
 					<grammarName>mermaid</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
+					<testFileExtension>txt</testFileExtension>
 				</configuration>
 				<executions>
 					<execution>

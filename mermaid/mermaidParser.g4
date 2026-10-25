@@ -1,7 +1,7 @@
 /*
  BSD License
 
- Copyright (c) 2022, Tom Everett All rights reserved.
+ Copyright (c) 2026, Tom Everett All rights reserved.
 
  Redistribution and use in source and binary forms, with or without modification, are permitted
  provided that the following conditions are met:
@@ -26,25 +26,34 @@
 parser grammar mermaidParser;
 options { tokenVocab = mermaidLexer; }
 
-mermaid: diagram* EOF;
+mermaid: diagram+ EOF;
 
-diagram: (erdiagram)+;
+diagram: erdiagram | classdiagram;
 
-erdiagram: ER_DIAGRAM (erentity | entityattributes)*;
+erdiagram: ER_DIAGRAM ER_NL* ((erentity | entityattributes | entityname) (ER_NL+ | EOF))*;
 
 erentity:
 	entityname relationship entityname ER_COLON relationshiplabel;
 
-entityattributes: entityname ER_LBRACE entityattribute* ER_RBRACE;
+entityattributes: entityname ER_LBRACE ER_NL* (entityattribute ER_NL+)* ER_RBRACE;
 
-entityattribute: entityattributetype entityattributename;
+entityattribute: entityattributetype entityattributename (ER_KEY (ER_COMMA ER_KEY)*)? ER_STRING?;
 
-entityattributetype: ER_INTTYPE | ER_STRINGTYPE | ER_FLOATTYPE;
+entityattributetype: ER_INTTYPE | ER_STRINGTYPE | ER_FLOATTYPE | ER_NAME;
 
-entityattributename: ER_NAME;
+entityattributename: entityname;
 
-relationshiplabel:ER_NAME | ER_STRING;
+relationshiplabel: entityname+ | ER_STRING;
 
 relationship: ER_CARDINALITY ER_LINETYPE ER_CARDINALITY;
-entityname: ER_NAME;
+entityname: ER_NAME | ER_STRING | ER_INTTYPE | ER_STRINGTYPE | ER_FLOATTYPE | ER_KEY;
 
+classdiagram: CLASS_DIAGRAM CLASS_NL* (classstatement (CLASS_NL+ | EOF))*;
+
+classstatement
+    : CLASS CLASS_NAME classbody?
+    | CLASS_NAME CLASS_MEMBER
+    | CLASS_NAME CLASS_STRING? CLASS_RELATION CLASS_STRING? CLASS_NAME CLASS_MEMBER?
+    ;
+
+classbody: CLASS_OPEN (CLASS_BODY_LINE | CLASS_BODY_NL)* CLASS_CLOSE;
