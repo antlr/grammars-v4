@@ -222,6 +222,7 @@
 				<module>esolang</module>
 				<module>euler</module>
 				<module>evm-bytecode</module>
+				<module>falcon</module>
                 <module>fantom</module>
 				<module>fasta</module>
 				<module>fdo91</module>
