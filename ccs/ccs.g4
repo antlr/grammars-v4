@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2020, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -48,15 +48,26 @@ lit
    | STR
    | COLOR
    | NONE
+   | NAME
    ;
 
 exp
-   : exp STAR exp
-   | exp PLUS exp
-   | exp SUB exp
-   | exp DIV exp
+   : additive
+   ;
+
+additive
+   : multiplicative ((PLUS | SUB) multiplicative)*
+   ;
+
+multiplicative
+   : unary ((STAR | DIV) unary)*
+   ;
+
+unary
+   : (PLUS | SUB) unary
    | lit
    | var
+   | OPAREN exp CPAREN
    ;
 
 alist
@@ -75,10 +86,11 @@ selector
    | NAME
    | DOT NAME
    | HASH NAME
+   | COLOR
    | selector COLON NAME (OPAREN alist CPAREN)?
    | selector COLON COLON NAME (OPAREN alist CPAREN)?
    | selector IMM_CHI selector
-   | selector ADJ_SIB selector
+   | selector PLUS selector
    | selector GEN_SIB selector
    | selector ALT selector
    | OPAREN selector CPAREN
@@ -120,7 +132,52 @@ stmt
    ;
 
 stmts
-   : (stmt SEMI)*
+   : (stmt SEMI)* EOF
+   ;
+
+DOLL
+   : '$'
+   ;
+
+VW
+   : 'vw'
+   ;
+
+VH
+   : 'vh'
+   ;
+
+SEC
+   : 's'
+   ;
+
+NONE
+   : 'none'
+   ;
+
+IMM_CHI
+   : '>'
+   ;
+
+GEN_SIB
+   : '~'
+   ;
+
+ALT
+   : '|'
+   ;
+
+STR
+   : '"' ('\\' . | ~["\\\r\n])* '"'
+   | '\'' ('\\' . | ~['\\\r\n])* '\''
+   ;
+
+COLOR
+   : '#' HEX HEX HEX (HEX HEX HEX)?
+   ;
+
+fragment HEX
+   : [0-9a-fA-F]
    ;
 
 SEMI
@@ -188,22 +245,26 @@ ASSGN
    ;
 
 NUM
-   : DIGIT+
+   : DIGIT+ ('.' DIGIT+)?
+   | '.' DIGIT+
    ;
 
 NAME
-   : LETTER (LETTER|DIGIT)*
+   : LETTER (LETTER | DIGIT | '-' | '_')*
    ;
 
-DIGIT
+fragment DIGIT
    : [0-9]
    ;
 
-LETTER
-   : [A-Za-z]
+fragment LETTER
+   : [A-Za-z_]
+   ;
+
+COMMENT
+   : '/*' .*? '*/' -> skip
    ;
 
 WS
-   : [ \t\r\n] -> skip
+   : [ \t\r\n]+ -> skip
    ;
-

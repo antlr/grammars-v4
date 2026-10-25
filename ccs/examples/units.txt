@@ -1,0 +1,6 @@
+.panel {
+    width: 80vw;
+    height: 50vh;
+    opacity: 75%;
+    duration: 1.5s;
+};
