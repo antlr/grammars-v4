@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2018, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -30,65 +30,70 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 /*
-* Based on BNF grammar from https://github.com/perlancar/samples/blob/master/bnf-marpa/makefile.bnf
-*/
+ * Based loosely on the BNF grammar from
+ * https://github.com/perlancar/samples/blob/master/bnf-marpa/makefile.bnf
+ */
 
 grammar makefile;
 
 file
-   : recipe +
+   : line* EOF
    ;
 
-recipe
-   : target_declaration
-   | variable
+line
+   : NEWLINE
+   | assignment
+   | rule
    ;
 
-variable
-   : VARNAME '=' VARNAME EOL
+assignment
+   : WORD ASSIGN_OP value? NEWLINE
    ;
 
-target_declaration
-   : target_line command_lines
+value
+   : WORD+
    ;
 
-target_line
-   : target ':' dependencies? EOL
+rule
+   : target_list ':' prerequisite_list? NEWLINE command*
    ;
 
-command_lines
-   : COMMAND +
+target_list
+   : WORD+
    ;
 
-target
-   : NAME
+prerequisite_list
+   : WORD+
    ;
 
-dependencies
-   : NAME
+command
+   : COMMAND NEWLINE
    ;
 
-
-VARNAME
-   : [a-zA-Z] [a-zA-Z0-9."]*
+ASSIGN_OP
+   : '='
+   | ':='
+   | '+='
+   | '?='
+   | '!='
    ;
-
 
 COMMAND
-   : '\t' NAME EOL
+   : '\t' ~[\r\n]*
    ;
 
-
-NAME
-   : ~ [:\r\n] +
+WORD
+   : ~[ \t\r\n:=#]+
    ;
 
-
-EOL
-   : [\r\n] +
+NEWLINE
+   : '\r'? '\n'
    ;
 
+COMMENT
+   : '#' ~[\r\n]* -> skip
+   ;
 
 WS
-   : [ ] -> skip
+   : [ ]+ -> skip
    ;
