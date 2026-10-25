@@ -461,6 +461,7 @@
 				<module>upnp</module>
 				<module>url</module>
 				<module>useragent</module>
+				<module>uuencoding</module>
 				<module>v</module>
 				<module>vaxscan</module>
 				<module>vb6</module>
