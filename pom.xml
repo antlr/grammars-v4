@@ -435,6 +435,7 @@
 				<module>swift-fin</module>
 				<module>sysml-v2</module>
 				<module>szf</module>
+				<module>tcpdump</module>
 				<module>tcpheader</module>
 				<module>teal</module>
 				<module>telephone</module>

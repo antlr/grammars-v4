@@ -1,0 +1,1 @@
+12:00:07.000000 IP6 fe80::1 > ff02::1: ICMP6, router advertisement, length 64

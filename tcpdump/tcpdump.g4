@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2013, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -33,41 +33,71 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar tcpdump;
 
 dump
-   : (line? EOL) + line?
+   : EOL* line (EOL+ line)* EOL* EOF
    ;
 
 line
-   : time  protocol hostandprotocol direction  hostandprotocol ;
-   
+   : DATE? time (ipPacket | arpPacket)
+   ;
+
 time
-   : DIGIT+ ':' DIGIT+ ':' DIGIT + '.' DIGIT+
+   : TIME
+   ;
+
+ipPacket
+   : protocol source direction destination details?
    ;
 
 protocol
-    : STRING;
-
-hostandprotocol
-    : STRING ('.' (STRING | DIGIT+))* ':'?
-    ;
-
-direction
-    : '<' | '>';
-
-
-STRING
-   : [a-zA-Z] [a-zA-Z0-9_]*
+   : IP
+   | IP6
    ;
 
+source
+   : FIELD
+   | DESTINATION
+   ;
 
-DIGIT
-   : [0-9]
+destination
+   : DESTINATION
+   ;
+
+direction
+   : '>' | '<'
+   ;
+
+arpPacket
+   : ARP details
+   ;
+
+details
+   : (~EOL)+
+   ;
+
+IP: 'IP';
+IP6: 'IP6';
+ARP: 'ARP,';
+
+DATE
+   : [0-9] [0-9] [0-9] [0-9] '-' [0-9] [0-9] '-' [0-9] [0-9]
+   ;
+
+TIME
+   : ([01] [0-9] | '2' [0-3]) ':' [0-5] [0-9] ':' [0-5] [0-9] ('.' [0-9]+)?
+   ;
+
+DESTINATION
+   : ~[ \t\r\n<>]+ ':'
+   ;
+
+FIELD
+   : ~[ \t\r\n<>]+
    ;
 
 EOL
    : '\r'? '\n'
    ;
 
-
 WS
-   : [ \t\r\n] -> skip
+   : [ \t]+ -> skip
    ;
