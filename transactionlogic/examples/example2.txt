@@ -1,0 +1,1 @@
+move(X,Y) <- pickup(X) (x) putdown(X,Y).

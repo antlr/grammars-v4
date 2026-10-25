@@ -7866,10 +7866,12 @@ regular_id
     | CONSTRUCTOR
     | CUSTOMDATUM
     | CASESENSITIVE
+    | COUNTED
     | DECIMAL
     | DELETE
     | DEPRECATE
     | DETERMINISTIC
+    | DISABLED
     | DSINTERVAL_UNCONSTRAINED
     | DURATION
     | E_LETTER
@@ -7884,6 +7886,7 @@ regular_id
     | EXIT
     | EXTEND
     | FIELDS
+    | FILE_EXT
     | FILESTORE
     | FLOAT
     | FORALL

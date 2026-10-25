@@ -152,7 +152,7 @@ alterStatement
     ;
 
 alterDatabase
-    : DATABASE_SYMBOL schemaRef alterDatabaseOption+
+    : DATABASE_SYMBOL schemaRef? alterDatabaseOption+
     ;
 
 alterDatabaseOption
