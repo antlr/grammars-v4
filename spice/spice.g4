@@ -1,145 +1,107 @@
-
 grammar spice;
 
+options { caseInsensitive = true; }
+
 netlist
-   : (line? CR) +
+   : EOL* (title EOL)? (line EOL+)* line? EOF
+   ;
+
+title
+   : TITLE
    ;
 
 line
-   : (node | simulationcommand | END)
+   : component
+   | directive
+   | continuation
+   | comment
    ;
 
-node
-   : NAME vertexID vertexID + (expression | parameter)*
+component
+   : NAME argument+ inlineComment?
    ;
 
-vertexID
-   : number
+directive
+   : DIRECTIVE argument* inlineComment?
    ;
 
-parameter
-   : NAME
+continuation
+   : '+' argument+ inlineComment?
    ;
 
-simulationcommand
-   : dotdc
+comment
+   : '*' ~EOL*
    ;
 
-dotdc
-   : '.DC' VNODENAME expression +
+inlineComment
+   : ';' ~EOL*
+   ;
+
+argument
+   : signedNumber
+   | NAME ('=' expression)?
+   | NAME '(' arguments? ')'
+   | '{' expression '}'
+   | STRING
+   ;
+
+arguments
+   : argument (','? argument)*
    ;
 
 expression
-   : multiplyingExpression ((PLUS | MINUS) multiplyingExpression)*
+   : product (('+' | '-') product)*
    ;
 
-multiplyingExpression
-   : powExpression ((TIMES | DIV) powExpression)*
+product
+   : power (('*' | '/') power)*
    ;
 
-powExpression
-   : atom (POW expression)?
+power
+   : unary ('^' power)?
    ;
 
-atom
-   : value
-   | LPAREN expression RPAREN
+unary
+   : ('+' | '-') unary
+   | NUMBER
+   | NAME ('(' expression (',' expression)* ')')?
+   | '(' expression ')'
+   | '{' expression '}'
    ;
 
-value
-   : scientific
+signedNumber
+   : ('+' | '-')? NUMBER
    ;
 
-// a number with a potential metrix suffix and a potential exponent
-scientific
-   : NUMBER METRIC_PREFIX? (E NUMBER METRIC_PREFIX?)?
+TITLE
+   : [a-z_] [a-z0-9_-]* '.cir' [ \t]+ ~[\r\n]*
    ;
 
-number
-   : NUMBER
+DIRECTIVE
+   : '.' [a-z] [a-z0-9_]*
    ;
-
 
 NUMBER
-   : MINUS? DIGIT* (POINT DIGIT +)?
+   : ([0-9]+ ('.' [0-9]*)? | '.' [0-9]+) ('e' [+-]? [0-9]+)? [a-z]*
    ;
-
-
-LPAREN
-   : '('
-   ;
-
-
-RPAREN
-   : ')'
-   ;
-
-
-PLUS
-   : '+'
-   ;
-
-
-MINUS
-   : '-'
-   ;
-
-
-TIMES
-   : '*'
-   ;
-
-
-DIV
-   : '/'
-   ;
-
-
-EQ
-   : '='
-   ;
-
-
-POINT
-   : '.'
-   ;
-
-
-METRIC_PREFIX
-   : ('a' .. 'z' | 'A' .. 'Z')
-   ;
-
 
 NAME
-   : ('a' .. 'z' | 'A' .. 'Z') ('a' .. 'z' | 'A' .. 'Z' | '0' .. '9')*
+   : [a-z_] [a-z0-9_./:-]*
    ;
 
-
-fragment DIGIT
-   : ('0' .. '9')
+STRING
+   : '"' ('\\' . | ~["\\\r\n])* '"'
+   | '\'' ('\\' . | ~['\\\r\n])* '\''
    ;
 
-
-END
-   : '.END' | '.end'
+EOL
+   : '\r'? '\n'
    ;
-
-
-COMMENT_1
-   : '*' ~ [\r\n]* -> skip
-   ;
-
-
-COMMENT_2
-   : ';' ~ [\r\n]* -> skip
-   ;
-
-
-CR
-   : [\r\n]
-   ;
-
 
 WS
-   : [ \t] + -> channel (HIDDEN)
+   : [ \t]+ -> skip
+   ;
+
+OTHER
+   : .
    ;
