@@ -32,7 +32,7 @@ options {
 }
 
 source_text
-    : compiler_directive*
+    : compiler_directive* EOF
     ;
 
 compiler_directive

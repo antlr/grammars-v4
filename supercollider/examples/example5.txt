@@ -1,0 +1,1 @@
+{ PinkNoise.ar(0.1) }.play;

@@ -2701,7 +2701,7 @@ select_into_statement
 
 values_into_statement
     : VALUES
-    (expression | '(' expression_list ')' | row_expression)
+    (expression | '(' expr_list ')' | row_expression)
     INTO assignment_target (',' assignment_target)*
     ;
 
@@ -3975,7 +3975,7 @@ col_names
     ;
 
 sequence_key_spec
-    : '(' sequence_key_spec_list ')' (ALLOW | DISALLOW) OVERFLOW (PCTFREE integer_value)?
+    : '(' sequence_key_spec_list ')' (ALLOW | DISALLOW) OVERFLOW_ (PCTFREE integer_value)?
     ;
 
 sequence_key_spec_list
@@ -5187,7 +5187,7 @@ wrapper_option
 // EXPRESSION
 expression
     : function_invocation
-    | '(' expression_list ')'
+    | '(' expr_list ')'
     | constant_
     | expression '**' expression
     | expression ('*' | '/') expression
@@ -5258,7 +5258,7 @@ array_element_specification
     ;
 
 array_constructor
-    : ARRAY '[' ((WITH common_table_expression_list)? fullselect | expression_list)? ']'
+    : ARRAY '[' ((WITH common_table_expression_list)? fullselect | expr_list)? ']'
     ;
 
 method_invocation
@@ -5276,7 +5276,7 @@ ordered_olap_specification
     ;
 
 window_partition_clause
-    : PARTITION BY expression_list
+    : PARTITION BY expr_list
     ;
 
 window_order_clause
@@ -5368,12 +5368,12 @@ subtype_treatment
     : TREAT '(' AS data_type ')'
     ;
 
-expression_list
+expr_list
     : expression (',' expression)*
     ;
 
 expression_list_in_parentheses
-    : '(' expression_list ')'
+    : '(' expr_list ')'
     ;
 
 // ID

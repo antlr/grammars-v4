@@ -1,0 +1,1 @@
+withdraw(Account,Amount) <- balance(Account,B) (x) gte(B,Amount) (x) tdelete(balance(Account,B)) (x) tinsert(balance(Account,B)).
