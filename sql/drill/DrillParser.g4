@@ -21,9 +21,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar DrillParser;
 
-options { tokenVocab=DrillLexer; }
+options {
+    tokenVocab = DrillLexer;
+}
 
 drill_file
     : batch* EOF
@@ -53,11 +58,10 @@ create_command
     ;
 
 create_schema
-    : CREATE or_replace? SCHEMA
-        (LOAD string)?
-        ('(' column_definition (',' column_definition)* ')')?
-        (FOR TABLE table_name | PATH string)?
-        (PROPERTIES '(' kv_list ')')?
+    : CREATE or_replace? SCHEMA (LOAD string)? ('(' column_definition (',' column_definition)* ')')? (
+        FOR TABLE table_name
+        | PATH string
+    )? (PROPERTIES '(' kv_list ')')?
     ;
 
 column_definition
@@ -105,9 +109,7 @@ alter_command
     ;
 
 alter_system
-    : ALTER SYSTEM ( SET option_name '=' value
-                   | RESET (option_name | ALL)
-                   )
+    : ALTER SYSTEM (SET option_name '=' value | RESET (option_name | ALL))
     ;
 
 option_name
@@ -156,10 +158,11 @@ refresh_table_metadata
     ;
 
 analyze_command
-    : ANALYZE TABLE (table_name | TABLE '(' id_ '(' param_list ')' ')')?
-      (COLUMNS (column_list_paren | NONE))?
-      (REFRESH METADATA (string LEVEL)?)?
-      ((COMPUTE | ESTIMATE) STATISTICS (SAMPLE number PERCENT)?)?
+    : ANALYZE TABLE (table_name | TABLE '(' id_ '(' param_list ')' ')')? (
+        COLUMNS (column_list_paren | NONE)
+    )? (REFRESH METADATA (string LEVEL)?)? (
+        (COMPUTE | ESTIMATE) STATISTICS (SAMPLE number PERCENT)?
+    )?
     ;
 
 param_list
@@ -174,7 +177,7 @@ describe_command
 
 show_command
     : SHOW (TABLES | DATABASES | SCHEMAS)
-    | SHOW FILES ((FROM | IN ) fs=id_ '.' dir=id_)?
+    | SHOW FILES ((FROM | IN) fs = id_ '.' dir = id_)?
     ;
 
 use_command
@@ -182,15 +185,7 @@ use_command
     ;
 
 select_stmt
-    : with_clause?
-        select_clause
-        from_clause?
-        where_clause?
-        group_by_clause?
-        having_clause?
-        order_by_clause?
-        limit_clause?
-        offset_clause?
+    : with_clause? select_clause from_clause? where_clause? group_by_clause? having_clause? order_by_clause? limit_clause? offset_clause?
     ;
 
 with_clause
@@ -206,10 +201,9 @@ select_clause
     ;
 
 select_item
-    : ( COLUMNS '[' number ']'
-      | ((table_name | column_alias) '.')? '*'
-      | expression
-      ) (AS? column_alias)?
+    : (COLUMNS '[' number ']' | ((table_name | column_alias) '.')? '*' | expression) (
+        AS? column_alias
+    )?
     ;
 
 from_clause
@@ -238,10 +232,7 @@ join_clause
     ;
 
 join_type
-    : ( INNER?
-      | (LEFT | RIGHT | FULL) OUTER?
-      | CROSS
-      ) JOIN
+    : (INNER? | (LEFT | RIGHT | FULL) OUTER? | CROSS) JOIN
     ;
 
 table_reference
@@ -275,10 +266,7 @@ boolean_expression
     ;
 
 table_subquery
-    : '(' query
-          order_by_clause?
-          offset_clause?
-      ')'
+    : '(' query order_by_clause? offset_clause? ')'
     ;
 
 expression
@@ -286,10 +274,10 @@ expression
     | '(' expression ')'
     | table_subquery
     | function_call
-//    | case_expression
-    | op=('+' | '-') expression
-    | expression op=(STAR | DIVIDE | MODULE) expression
-    | expression op=(PLUS | MINUS ) expression
+    //    | case_expression
+    | op = ('+' | '-') expression
+    | expression op = (STAR | DIVIDE | MODULE) expression
+    | expression op = (PLUS | MINUS) expression
     | expression DOT expression
     | expression comparison_operator expression
     | expression AND expression
@@ -316,12 +304,17 @@ literal
 
 function_call
     : function_name '(' expr_list? ')'
-//    | standard_built_in_function '(' expr_list? ')'
-//    | aggreagate_built_in_function '(' expr_list? ')'
+    //    | standard_built_in_function '(' expr_list? ')'
+    //    | aggreagate_built_in_function '(' expr_list? ')'
     ;
 
 comparison_operator
-    : '<' | '=' | '>' | '<=' | '>=' | '<>'
+    : '<'
+    | '='
+    | '>'
+    | '<='
+    | '>='
+    | '<>'
     ;
 
 expr_list
@@ -354,22 +347,13 @@ number
     ;
 
 query
-    : '(' query
-            order_by_clause?
-            offset_clause?
-        ')'
+    : '(' query order_by_clause? offset_clause? ')'
     | query UNION ALL? query
     | select_stmt
     ;
 
 select_expression
-    : select_clause
-        from_clause?
-        where_clause?
-        group_by_clause?
-        having_clause?
-        order_by_clause?
-        offset_clause?
+    : select_clause from_clause? where_clause? group_by_clause? having_clause? order_by_clause? offset_clause?
     ;
 
 data_type

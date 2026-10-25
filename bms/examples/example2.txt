@@ -1,0 +1,16 @@
+*---------------------- HEADER FIELD
+#PLAYER 1
+#GENRE Techno
+#TITLE Midnight Drive
+#ARTIST DJ Example
+#BPM 150
+#PLAYLEVEL 8
+#TOTAL 250
+#RANK 1
+#WAV01 kick.wav
+#WAV02 snare.wav
+#WAV03 hihat.wav
+*---------------------- MAIN DATA FIELD
+#00101:01020102
+#00111:01000100
+#00211:02000200

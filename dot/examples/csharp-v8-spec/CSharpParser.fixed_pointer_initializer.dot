@@ -1,0 +1,17 @@
+digraph ATN {
+rankdir=LR;
+s783[fontsize=11, label="783", shape=doublecircle, fixedsize=true, width=.6];
+s4187[fontsize=11,label="4187", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s4188[fontsize=11,label="4188", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s4189[fontsize=11,label="4189", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s782[fontsize=11,label="782", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s4190[fontsize=11,label="{&rarr;\n4190\nd=456|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s4191[fontsize=11,label="&larr;\n4191", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s782 -> s4190 [fontname="Times-Italic", label="&epsilon;"];
+s4190:p0 -> s4187 [fontname="Times-Italic", label="&epsilon;"];
+s4190:p1 -> s4189 [fontname="Times-Italic", label="&epsilon;"];
+s4187 -> s4188 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'&'", arrowhead = normal];
+s4189 -> s4191 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<expression>", arrowhead = normal];
+s4188 -> s4191 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<variable_reference>", arrowhead = normal];
+s4191 -> s783 [fontname="Times-Italic", label="&epsilon;"];
+}

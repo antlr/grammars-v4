@@ -1,1 +1,29 @@
-Oracle SQL Language Reference: https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/Introduction-to-Oracle-SQL.html
+# PL/SQL grammar
+
+This grammar is for recognizing the latest version of PL/SQL.
+
+## Authors
+
+Various
+
+## Reference
+
+Oracle� Database; Database PL/SQL Language Reference [html](https://docs.oracle.com/en/database/oracle/oracle-database/26/lnpls/index.html) [pdf](https://docs.oracle.com/en/database/oracle/oracle-database/26/lnpls/database-pl-sql-language-reference.pdf)
+
+SQL Language Reference [html](https://docs.oracle.com/en/database/oracle/oracle-database/26/sqlrf/index.html)
+
+Oracle's SQL*Plus�
+User's Guide and Reference [html](https://docs.oracle.com/en/database/oracle/oracle-database/26/sqpug/index.html#SQL*Plus%C2%AE)
+
+[wikipedia](https://en.wikipedia.org/wiki/PL/SQL)
+
+* [pldb](http://pldb.info/concepts/pl-sql)
+
+## Issues
+* The grammar is ambiguous, but generally performs well.
+
+## Performance
+<img src="./times.svg">
+<a href="/sql/plsql/data.zip">data.zip</a>
+<a href="/sql/plsql/te.sh">te.sh</a>
+<a href="/sql/plsql/gr.sh">gr.sh</a>

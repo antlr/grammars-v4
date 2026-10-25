@@ -1,0 +1,9 @@
+syntax = "proto3";
+enum TestEnum {
+        UNKNOWN = 0;
+        FOO = 1;
+        BAR = 2;
+}
+message TestMessage {
+        TestEnum value = 1;
+}

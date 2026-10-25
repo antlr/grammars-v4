@@ -29,172 +29,175 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
 Adapted from https://github.com/jynnantonix/lolcode/blob/master/BNFGrammar.txt
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar lolcode;
 
 program
-   : 'HAI' code_block 'KTHXBYE'? EOF
-   ;
+    : 'HAI' code_block 'KTHXBYE'? EOF
+    ;
 
 code_block
-   : statement+
-   ;
+    : statement+
+    ;
 
 statement
-   : loop
-   | declaration
-   | comment
-   | print_block
-   | if_block
-   | input_block
-   | func_decl
-   | assignment
-   | expression
-   ;
+    : loop
+    | declaration
+    | comment
+    | print_block
+    | if_block
+    | input_block
+    | func_decl
+    | assignment
+    | expression
+    ;
 
 loop
-   : 'IM IN YR' LABEL 'WILE' expression code_block 'IM OUTTA YR' LABEL
-   ;
+    : 'IM IN YR' LABEL 'WILE' expression code_block 'IM OUTTA YR' LABEL
+    ;
 
 declaration
-   : 'I HAS A' LABEL
-   | 'I HAS A' LABEL 'ITZ' < value >
-   ;
+    : 'I HAS A' LABEL
+    | 'I HAS A' LABEL 'ITZ' < value>
+    ;
 
 comment
-   : 'BTW' STRING
-   | 'OBTW' STRING 'TLDR'
-   ;
+    : 'BTW' STRING
+    | 'OBTW' STRING 'TLDR'
+    ;
 
 print_block
-   : 'VISIBLE' expression* 'MKAY?'?
-   ;
+    : 'VISIBLE' expression* 'MKAY?'?
+    ;
 
 if_block
-   : 'O RLY?' 'YA RLY' code_block 'OIC'
-   | 'O RLY?' 'YA RLY' code_block else_if_block 'OIC'
-   ;
+    : 'O RLY?' 'YA RLY' code_block 'OIC'
+    | 'O RLY?' 'YA RLY' code_block else_if_block 'OIC'
+    ;
 
 else_if_block
-   : 'MEBBE' expression code_block else_if_block
-   | 'NO WAI' code_block
-   | 'MEBBE' expression code_block
-   ;
+    : 'MEBBE' expression code_block else_if_block
+    | 'NO WAI' code_block
+    | 'MEBBE' expression code_block
+    ;
 
 input_block
-   : 'GIMMEH' LABEL
-   ;
+    : 'GIMMEH' LABEL
+    ;
 
 func_decl
-   : 'HOW DUZ I' LABEL (('YR' LABEL) ('AN YR' LABEL)*)? code_block 'IF U SAY SO'
-   ;
+    : 'HOW DUZ I' LABEL (('YR' LABEL) ('AN YR' LABEL)*)? code_block 'IF U SAY SO'
+    ;
 
 assignment
-   : LABEL 'R' expression
-   ;
+    : LABEL 'R' expression
+    ;
 
 expression
-   : equals
-   | both
-   | not_equals
-   | greater
-   | less
-   | add
-   | sub
-   | mul
-   | div
-   | mod
-   | cast
-   | either
-   | all_
-   | any_
-   | not_
-   | func_
-   | LABEL
-   | ATOM
-   ;
+    : equals
+    | both
+    | not_equals
+    | greater
+    | less
+    | add
+    | sub
+    | mul
+    | div
+    | mod
+    | cast
+    | either
+    | all_
+    | any_
+    | not_
+    | func_
+    | LABEL
+    | ATOM
+    ;
 
 equals
-   : 'BOTH SAEM' expression 'AN' expression
-   ;
+    : 'BOTH SAEM' expression 'AN' expression
+    ;
 
 not_equals
-   : 'DIFFRINT' expression 'AN' expression
-   ;
+    : 'DIFFRINT' expression 'AN' expression
+    ;
 
 both
-   : 'BOTH OF' expression 'AN' expression
-   ;
+    : 'BOTH OF' expression 'AN' expression
+    ;
 
 either
-   : 'EITHER OF' expression 'AN' expression
-   ;
+    : 'EITHER OF' expression 'AN' expression
+    ;
 
 greater
-   : 'BIGGR OF' expression 'AN' expression
-   ;
+    : 'BIGGR OF' expression 'AN' expression
+    ;
 
 less
-   : 'SMALLR OF' expression 'AN' expression
-   ;
+    : 'SMALLR OF' expression 'AN' expression
+    ;
 
 add
-   : 'SUM OF' expression 'AN' expression
-   ;
+    : 'SUM OF' expression 'AN' expression
+    ;
 
 sub
-   : 'DIFF OF' expression 'AN' expression
-   ;
+    : 'DIFF OF' expression 'AN' expression
+    ;
 
 mul
-   : 'PRODUKT OF' expression 'AN' expression
-   ;
+    : 'PRODUKT OF' expression 'AN' expression
+    ;
 
 div
-   : 'QUOSHUNT OF' expression 'AN' expression
-   ;
+    : 'QUOSHUNT OF' expression 'AN' expression
+    ;
 
 mod
-   : 'MOD OF' expression 'AN' expression
-   ;
+    : 'MOD OF' expression 'AN' expression
+    ;
 
 cast
-   : 'MAEK' expression 'A' < type >
-   ;
+    : 'MAEK' expression 'A' < type>
+    ;
 
 all_
-   : 'ALL OF' expression ('AN' expression)* 'MKAY?'
-   ;
+    : 'ALL OF' expression ('AN' expression)* 'MKAY?'
+    ;
 
 any_
-   : 'ANY OF' expression ('AN' expression)* 'MKAY?'
-   ;
+    : 'ANY OF' expression ('AN' expression)* 'MKAY?'
+    ;
 
 not_
-   : 'NOT' expression
-   ;
+    : 'NOT' expression
+    ;
 
 func_
-   : LABEL expression+ 'MKAY?'
-   ;
+    : LABEL expression+ 'MKAY?'
+    ;
 
 LABEL
-   : ('a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_')+
-   ;
+    : ('a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_')+
+    ;
 
 ATOM
-   : 'WIN'
-   | 'FAIL'
-   | 'NOOB'
-   | ('0' .. '9')+
-   | ('0' .. '9')* '.' ('0' .. '9')*
-   | STRING
-   ;
+    : 'WIN'
+    | 'FAIL'
+    | 'NOOB'
+    | ('0' .. '9')+
+    | ('0' .. '9')* '.' ('0' .. '9')*
+    | STRING
+    ;
 
 STRING
-   : '"' ('\'"' | ~ '"')* '"'
-   ;
+    : '"' ('\'"' | ~ '"')* '"'
+    ;
 
 WS
-   : [ \r\n] -> skip
-   ;
-
+    : [ \r\n] -> skip
+    ;

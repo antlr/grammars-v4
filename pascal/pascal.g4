@@ -33,860 +33,798 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 Adapted from pascal.g by  Hakki Dogusan, Piet Schoutteten and Marton Papp
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar pascal;
 
-options { caseInsensitive = true; }
+options {
+    caseInsensitive = true;
+}
 
 program
-   : programHeading (INTERFACE)? block DOT EOF
-   ;
+    : programHeading (INTERFACE)? block DOT EOF
+    ;
 
 programHeading
-   : PROGRAM identifier (LPAREN identifierList RPAREN)? SEMI
-   | UNIT identifier SEMI
-   ;
+    : PROGRAM identifier (LPAREN identifierList RPAREN)? SEMI
+    | UNIT identifier SEMI
+    ;
 
 identifier
-   : IDENT
-   ;
+    : IDENT
+    ;
 
 block
-   : (labelDeclarationPart | constantDefinitionPart | typeDefinitionPart | variableDeclarationPart | procedureAndFunctionDeclarationPart | usesUnitsPart | IMPLEMENTATION)* compoundStatement
-   ;
+    : (
+        labelDeclarationPart
+        | constantDefinitionPart
+        | typeDefinitionPart
+        | variableDeclarationPart
+        | procedureAndFunctionDeclarationPart
+        | usesUnitsPart
+        | IMPLEMENTATION
+    )* compoundStatement
+    ;
 
 usesUnitsPart
-   : USES identifierList SEMI
-   ;
+    : USES identifierList SEMI
+    ;
 
 labelDeclarationPart
-   : LABEL label (COMMA label)* SEMI
-   ;
+    : LABEL label (COMMA label)* SEMI
+    ;
 
 label
-   : unsignedInteger
-   ;
+    : unsignedInteger
+    ;
 
 constantDefinitionPart
-   : CONST (constantDefinition SEMI) +
-   ;
+    : CONST (constantDefinition SEMI)+
+    ;
 
 constantDefinition
-   : identifier EQUAL constant
-   ;
+    : identifier EQUAL constant
+    ;
 
 constantChr
-   : CHR LPAREN unsignedInteger RPAREN
-   ;
+    : CHR LPAREN unsignedInteger RPAREN
+    ;
 
 constant
-   : unsignedNumber
-   | sign unsignedNumber
-   | identifier
-   | sign identifier
-   | string
-   | constantChr
-   ;
+    : unsignedNumber
+    | sign unsignedNumber
+    | identifier
+    | sign identifier
+    | string
+    | constantChr
+    ;
 
 unsignedNumber
-   : unsignedInteger
-   | unsignedReal
-   ;
+    : unsignedInteger
+    | unsignedReal
+    ;
 
 unsignedInteger
-   : NUM_INT
-   ;
+    : NUM_INT
+    ;
 
 unsignedReal
-   : NUM_REAL
-   ;
+    : NUM_REAL
+    ;
 
 sign
-   : PLUS
-   | MINUS
-   ;
+    : PLUS
+    | MINUS
+    ;
 
 bool_
-   : TRUE
-   | FALSE
-   ;
+    : TRUE
+    | FALSE
+    ;
 
 string
-   : STRING_LITERAL
-   ;
+    : STRING_LITERAL
+    ;
 
 typeDefinitionPart
-   : TYPE (typeDefinition SEMI) +
-   ;
+    : TYPE (typeDefinition SEMI)+
+    ;
 
 typeDefinition
-   : identifier EQUAL (type_ | functionType | procedureType)
-   ;
+    : identifier EQUAL (type_ | functionType | procedureType)
+    ;
 
 functionType
-   : FUNCTION (formalParameterList)? COLON resultType
-   ;
+    : FUNCTION (formalParameterList)? COLON resultType
+    ;
 
 procedureType
-   : PROCEDURE (formalParameterList)?
-   ;
+    : PROCEDURE (formalParameterList)?
+    ;
 
 type_
-   : simpleType
-   | structuredType
-   | pointerType
-   ;
+    : simpleType
+    | structuredType
+    | pointerType
+    ;
 
 simpleType
-   : scalarType
-   | subrangeType
-   | typeIdentifier
-   | stringtype
-   ;
+    : scalarType
+    | subrangeType
+    | typeIdentifier
+    | stringtype
+    ;
 
 scalarType
-   : LPAREN identifierList RPAREN
-   ;
+    : LPAREN identifierList RPAREN
+    ;
 
 subrangeType
-   : constant DOTDOT constant
-   ;
+    : constant DOTDOT constant
+    ;
 
 typeIdentifier
-   : identifier
-   | (CHAR | BOOLEAN | INTEGER | REAL | STRING)
-   ;
+    : identifier
+    | (CHAR | BOOLEAN | INTEGER | REAL | STRING)
+    ;
 
 structuredType
-   : PACKED unpackedStructuredType
-   | unpackedStructuredType
-   ;
+    : PACKED unpackedStructuredType
+    | unpackedStructuredType
+    ;
 
 unpackedStructuredType
-   : arrayType
-   | recordType
-   | setType
-   | fileType
-   ;
+    : arrayType
+    | recordType
+    | setType
+    | fileType
+    ;
 
 stringtype
-   : STRING LBRACK (identifier | unsignedNumber) RBRACK
-   ;
+    : STRING LBRACK (identifier | unsignedNumber) RBRACK
+    ;
 
 arrayType
-   : ARRAY LBRACK typeList RBRACK OF componentType
-   | ARRAY LBRACK2 typeList RBRACK2 OF componentType
-   ;
+    : ARRAY LBRACK typeList RBRACK OF componentType
+    | ARRAY LBRACK2 typeList RBRACK2 OF componentType
+    ;
 
 typeList
-   : indexType (COMMA indexType)*
-   ;
+    : indexType (COMMA indexType)*
+    ;
 
 indexType
-   : simpleType
-   ;
+    : simpleType
+    ;
 
 componentType
-   : type_
-   ;
+    : type_
+    ;
 
 recordType
-   : RECORD fieldList? END
-   ;
+    : RECORD fieldList? END
+    ;
 
 fieldList
-   : fixedPart (SEMI variantPart)?
-   | variantPart
-   ;
+    : fixedPart (SEMI variantPart)?
+    | variantPart
+    ;
 
 fixedPart
-   : recordSection (SEMI recordSection)*
-   ;
+    : recordSection (SEMI recordSection)*
+    ;
 
 recordSection
-   : identifierList COLON type_
-   ;
+    : identifierList COLON type_
+    ;
 
 variantPart
-   : CASE tag OF variant (SEMI variant)*
-   ;
+    : CASE tag OF variant (SEMI variant)*
+    ;
 
 tag
-   : identifier COLON typeIdentifier
-   | typeIdentifier
-   ;
+    : identifier COLON typeIdentifier
+    | typeIdentifier
+    ;
 
 variant
-   : constList COLON LPAREN fieldList RPAREN
-   ;
+    : constList COLON LPAREN fieldList RPAREN
+    ;
 
 setType
-   : SET OF baseType
-   ;
+    : SET OF baseType
+    ;
 
 baseType
-   : simpleType
-   ;
+    : simpleType
+    ;
 
 fileType
-   : FILE OF type_
-   | FILE
-   ;
+    : FILE OF type_
+    | FILE
+    ;
 
 pointerType
-   : POINTER typeIdentifier
-   ;
+    : POINTER typeIdentifier
+    ;
 
 variableDeclarationPart
-   : VAR variableDeclaration (SEMI variableDeclaration)* SEMI
-   ;
+    : VAR variableDeclaration (SEMI variableDeclaration)* SEMI
+    ;
 
 variableDeclaration
-   : identifierList COLON type_
-   ;
+    : identifierList COLON type_
+    ;
 
 procedureAndFunctionDeclarationPart
-   : procedureOrFunctionDeclaration SEMI
-   ;
+    : procedureOrFunctionDeclaration SEMI
+    ;
 
 procedureOrFunctionDeclaration
-   : procedureDeclaration
-   | functionDeclaration
-   ;
+    : procedureDeclaration
+    | functionDeclaration
+    ;
 
 procedureDeclaration
-   : PROCEDURE identifier (formalParameterList)? SEMI block
-   ;
+    : PROCEDURE identifier (formalParameterList)? SEMI block
+    ;
 
 formalParameterList
-   : LPAREN formalParameterSection (SEMI formalParameterSection)* RPAREN
-   ;
+    : LPAREN formalParameterSection (SEMI formalParameterSection)* RPAREN
+    ;
 
 formalParameterSection
-   : parameterGroup
-   | VAR parameterGroup
-   | FUNCTION parameterGroup
-   | PROCEDURE parameterGroup
-   ;
+    : parameterGroup
+    | VAR parameterGroup
+    | FUNCTION parameterGroup
+    | PROCEDURE parameterGroup
+    ;
 
 parameterGroup
-   : identifierList COLON typeIdentifier
-   ;
+    : identifierList COLON typeIdentifier
+    ;
 
 identifierList
-   : identifier (COMMA identifier)*
-   ;
+    : identifier (COMMA identifier)*
+    ;
 
 constList
-   : constant (COMMA constant)*
-   ;
+    : constant (COMMA constant)*
+    ;
 
 functionDeclaration
-   : FUNCTION identifier (formalParameterList)? COLON resultType SEMI block
-   ;
+    : FUNCTION identifier (formalParameterList)? COLON resultType SEMI block
+    ;
 
 resultType
-   : typeIdentifier
-   ;
+    : typeIdentifier
+    ;
 
 statement
-   : label COLON unlabelledStatement
-   | unlabelledStatement
-   ;
+    : label COLON unlabelledStatement
+    | unlabelledStatement
+    ;
 
 unlabelledStatement
-   : simpleStatement
-   | structuredStatement
-   ;
+    : simpleStatement
+    | structuredStatement
+    ;
 
 simpleStatement
-   : assignmentStatement
-   | procedureStatement
-   | gotoStatement
-   | emptyStatement_
-   ;
+    : assignmentStatement
+    | procedureStatement
+    | gotoStatement
+    | emptyStatement_
+    ;
 
 assignmentStatement
-   : variable ASSIGN expression
-   ;
+    : variable ASSIGN expression
+    ;
 
 variable
-   : (AT identifier | identifier) (LBRACK expression (COMMA expression)* RBRACK | LBRACK2 expression (COMMA expression)* RBRACK2 | DOT identifier | POINTER)*
-   ;
+    : (AT identifier | identifier) (
+        LBRACK expression (COMMA expression)* RBRACK
+        | LBRACK2 expression (COMMA expression)* RBRACK2
+        | DOT identifier
+        | POINTER
+    )*
+    ;
 
 expression
-   : simpleExpression (relationaloperator expression)?
-   ;
+    : simpleExpression (relationaloperator expression)?
+    ;
 
 relationaloperator
-   : EQUAL
-   | NOT_EQUAL
-   | LT
-   | LE
-   | GE
-   | GT
-   | IN
-   ;
+    : EQUAL
+    | NOT_EQUAL
+    | LT
+    | LE
+    | GE
+    | GT
+    | IN
+    ;
 
 simpleExpression
-   : term (additiveoperator simpleExpression)?
-   ;
+    : term (additiveoperator simpleExpression)?
+    ;
 
 additiveoperator
-   : PLUS
-   | MINUS
-   | OR
-   ;
+    : PLUS
+    | MINUS
+    | OR
+    ;
 
 term
-   : signedFactor (multiplicativeoperator term)?
-   ;
+    : signedFactor (multiplicativeoperator term)?
+    ;
 
 multiplicativeoperator
-   : STAR
-   | SLASH
-   | DIV
-   | MOD
-   | AND
-   ;
+    : STAR
+    | SLASH
+    | DIV
+    | MOD
+    | AND
+    ;
 
 signedFactor
-   : (PLUS | MINUS)? factor
-   ;
+    : (PLUS | MINUS)? factor
+    ;
 
 factor
-   : variable
-   | LPAREN expression RPAREN
-   | functionDesignator
-   | unsignedConstant
-   | set_
-   | NOT factor
-   | bool_
-   ;
+    : variable
+    | LPAREN expression RPAREN
+    | functionDesignator
+    | unsignedConstant
+    | set_
+    | NOT factor
+    | bool_
+    ;
 
 unsignedConstant
-   : unsignedNumber
-   | constantChr
-   | string
-   | NIL
-   ;
+    : unsignedNumber
+    | constantChr
+    | string
+    | NIL
+    ;
 
 functionDesignator
-   : identifier LPAREN parameterList RPAREN
-   ;
+    : identifier LPAREN parameterList RPAREN
+    ;
 
 parameterList
-   : actualParameter (COMMA actualParameter)*
-   ;
+    : actualParameter (COMMA actualParameter)*
+    ;
 
 set_
-   : LBRACK elementList RBRACK
-   | LBRACK2 elementList RBRACK2
-   ;
+    : LBRACK elementList RBRACK
+    | LBRACK2 elementList RBRACK2
+    ;
 
 elementList
-   : element (COMMA element)*
-   |
-   ;
+    : element (COMMA element)*
+    |
+    ;
 
 element
-   : expression (DOTDOT expression)?
-   ;
+    : expression (DOTDOT expression)?
+    ;
 
 procedureStatement
-   : identifier (LPAREN parameterList RPAREN)?
-   ;
+    : identifier (LPAREN parameterList RPAREN)?
+    ;
 
 actualParameter
-   : expression parameterwidth*
-   ;
+    : expression parameterwidth*
+    ;
 
 parameterwidth
-   : COLON expression
-   ;
+    : COLON expression
+    ;
 
 gotoStatement
-   : GOTO label
-   ;
+    : GOTO label
+    ;
 
 emptyStatement_
-   :
-   ;
+    :
+    ;
 
 empty_
-   :
-   /* empty */
-   ;
+    :
+    /* empty */
+    ;
 
 structuredStatement
-   : compoundStatement
-   | conditionalStatement
-   | repetetiveStatement
-   | withStatement
-   ;
+    : compoundStatement
+    | conditionalStatement
+    | repetetiveStatement
+    | withStatement
+    ;
 
 compoundStatement
-   : BEGIN statements END
-   ;
+    : BEGIN statements END
+    ;
 
 statements
-   : statement (SEMI statement)*
-   ;
+    : statement (SEMI statement)*
+    ;
 
 conditionalStatement
-   : ifStatement
-   | caseStatement
-   ;
+    : ifStatement
+    | caseStatement
+    ;
 
 ifStatement
-   : IF expression THEN statement (: ELSE statement)?
-   ;
+    : IF expression THEN statement (: ELSE statement)?
+    ;
 
 caseStatement
-   : CASE expression OF caseListElement (SEMI caseListElement)* (SEMI ELSE statements)? END
-   ;
+    : CASE expression OF caseListElement (SEMI caseListElement)* (SEMI ELSE statements)? END
+    ;
 
 caseListElement
-   : constList COLON statement
-   ;
+    : constList COLON statement
+    ;
 
 repetetiveStatement
-   : whileStatement
-   | repeatStatement
-   | forStatement
-   ;
+    : whileStatement
+    | repeatStatement
+    | forStatement
+    ;
 
 whileStatement
-   : WHILE expression DO statement
-   ;
+    : WHILE expression DO statement
+    ;
 
 repeatStatement
-   : REPEAT statements UNTIL expression
-   ;
+    : REPEAT statements UNTIL expression
+    ;
 
 forStatement
-   : FOR identifier ASSIGN forList DO statement
-   ;
+    : FOR identifier ASSIGN forList DO statement
+    ;
 
 forList
-   : initialValue (TO | DOWNTO) finalValue
-   ;
+    : initialValue (TO | DOWNTO) finalValue
+    ;
 
 initialValue
-   : expression
-   ;
+    : expression
+    ;
 
 finalValue
-   : expression
-   ;
+    : expression
+    ;
 
 withStatement
-   : WITH recordVariableList DO statement
-   ;
+    : WITH recordVariableList DO statement
+    ;
 
 recordVariableList
-   : variable (COMMA variable)*
-   ;
+    : variable (COMMA variable)*
+    ;
 
 AND
-   : 'AND'
-   ;
-
+    : 'AND'
+    ;
 
 ARRAY
-   : 'ARRAY'
-   ;
-
+    : 'ARRAY'
+    ;
 
 BEGIN
-   : 'BEGIN'
-   ;
-
+    : 'BEGIN'
+    ;
 
 BOOLEAN
-   : 'BOOLEAN'
-   ;
-
+    : 'BOOLEAN'
+    ;
 
 CASE
-   : 'CASE'
-   ;
-
+    : 'CASE'
+    ;
 
 CHAR
-   : 'CHAR'
-   ;
-
+    : 'CHAR'
+    ;
 
 CHR
-   : 'CHR'
-   ;
-
+    : 'CHR'
+    ;
 
 CONST
-   : 'CONST'
-   ;
-
+    : 'CONST'
+    ;
 
 DIV
-   : 'DIV'
-   ;
-
+    : 'DIV'
+    ;
 
 DO
-   : 'DO'
-   ;
-
+    : 'DO'
+    ;
 
 DOWNTO
-   : 'DOWNTO'
-   ;
-
+    : 'DOWNTO'
+    ;
 
 ELSE
-   : 'ELSE'
-   ;
-
+    : 'ELSE'
+    ;
 
 END
-   : 'END'
-   ;
-
+    : 'END'
+    ;
 
 FILE
-   : 'FILE'
-   ;
-
+    : 'FILE'
+    ;
 
 FOR
-   : 'FOR'
-   ;
-
+    : 'FOR'
+    ;
 
 FUNCTION
-   : 'FUNCTION'
-   ;
-
+    : 'FUNCTION'
+    ;
 
 GOTO
-   : 'GOTO'
-   ;
-
+    : 'GOTO'
+    ;
 
 IF
-   : 'IF'
-   ;
-
+    : 'IF'
+    ;
 
 IN
-   : 'IN'
-   ;
-
+    : 'IN'
+    ;
 
 INTEGER
-   : 'INTEGER'
-   ;
-
+    : 'INTEGER'
+    ;
 
 LABEL
-   : 'LABEL'
-   ;
-
+    : 'LABEL'
+    ;
 
 MOD
-   : 'MOD'
-   ;
-
+    : 'MOD'
+    ;
 
 NIL
-   : 'NIL'
-   ;
-
+    : 'NIL'
+    ;
 
 NOT
-   : 'NOT'
-   ;
-
+    : 'NOT'
+    ;
 
 OF
-   : 'OF'
-   ;
-
+    : 'OF'
+    ;
 
 OR
-   : 'OR'
-   ;
-
+    : 'OR'
+    ;
 
 PACKED
-   : 'PACKED'
-   ;
-
+    : 'PACKED'
+    ;
 
 PROCEDURE
-   : 'PROCEDURE'
-   ;
-
+    : 'PROCEDURE'
+    ;
 
 PROGRAM
-   : 'PROGRAM'
-   ;
-
+    : 'PROGRAM'
+    ;
 
 REAL
-   : 'REAL'
-   ;
-
+    : 'REAL'
+    ;
 
 RECORD
-   : 'RECORD'
-   ;
-
+    : 'RECORD'
+    ;
 
 REPEAT
-   : 'REPEAT'
-   ;
-
+    : 'REPEAT'
+    ;
 
 SET
-   : 'SET'
-   ;
-
+    : 'SET'
+    ;
 
 THEN
-   : 'THEN'
-   ;
-
+    : 'THEN'
+    ;
 
 TO
-   : 'TO'
-   ;
-
+    : 'TO'
+    ;
 
 TYPE
-   : 'TYPE'
-   ;
-
+    : 'TYPE'
+    ;
 
 UNTIL
-   : 'UNTIL'
-   ;
-
+    : 'UNTIL'
+    ;
 
 VAR
-   : 'VAR'
-   ;
-
+    : 'VAR'
+    ;
 
 WHILE
-   : 'WHILE'
-   ;
-
+    : 'WHILE'
+    ;
 
 WITH
-   : 'WITH'
-   ;
-
+    : 'WITH'
+    ;
 
 PLUS
-   : '+'
-   ;
-
+    : '+'
+    ;
 
 MINUS
-   : '-'
-   ;
-
+    : '-'
+    ;
 
 STAR
-   : '*'
-   ;
-
+    : '*'
+    ;
 
 SLASH
-   : '/'
-   ;
-
+    : '/'
+    ;
 
 ASSIGN
-   : ':='
-   ;
-
+    : ':='
+    ;
 
 COMMA
-   : ','
-   ;
-
+    : ','
+    ;
 
 SEMI
-   : ';'
-   ;
-
+    : ';'
+    ;
 
 COLON
-   : ':'
-   ;
-
+    : ':'
+    ;
 
 EQUAL
-   : '='
-   ;
-
+    : '='
+    ;
 
 NOT_EQUAL
-   : '<>'
-   ;
-
+    : '<>'
+    ;
 
 LT
-   : '<'
-   ;
-
+    : '<'
+    ;
 
 LE
-   : '<='
-   ;
-
+    : '<='
+    ;
 
 GE
-   : '>='
-   ;
-
+    : '>='
+    ;
 
 GT
-   : '>'
-   ;
-
+    : '>'
+    ;
 
 LPAREN
-   : '('
-   ;
-
+    : '('
+    ;
 
 RPAREN
-   : ')'
-   ;
-
+    : ')'
+    ;
 
 LBRACK
-   : '['
-   ;
-
+    : '['
+    ;
 
 LBRACK2
-   : '(.'
-   ;
-
+    : '(.'
+    ;
 
 RBRACK
-   : ']'
-   ;
-
+    : ']'
+    ;
 
 RBRACK2
-   : '.)'
-   ;
-
+    : '.)'
+    ;
 
 POINTER
-   : '^'
-   ;
-
+    : '^'
+    ;
 
 AT
-   : '@'
-   ;
-
+    : '@'
+    ;
 
 DOT
-   : '.'
-   ;
-
+    : '.'
+    ;
 
 DOTDOT
-   : '..'
-   ;
-
+    : '..'
+    ;
 
 LCURLY
-   : '{'
-   ;
-
+    : '{'
+    ;
 
 RCURLY
-   : '}'
-   ;
-
+    : '}'
+    ;
 
 UNIT
-   : 'UNIT'
-   ;
-
+    : 'UNIT'
+    ;
 
 INTERFACE
-   : 'INTERFACE'
-   ;
-
+    : 'INTERFACE'
+    ;
 
 USES
-   : 'USES'
-   ;
-
+    : 'USES'
+    ;
 
 STRING
-   : 'STRING'
-   ;
-
+    : 'STRING'
+    ;
 
 IMPLEMENTATION
-   : 'IMPLEMENTATION'
-   ;
-
+    : 'IMPLEMENTATION'
+    ;
 
 TRUE
-   : 'TRUE'
-   ;
-
+    : 'TRUE'
+    ;
 
 FALSE
-   : 'FALSE'
-   ;
-
+    : 'FALSE'
+    ;
 
 WS
-   : [ \t\r\n] -> skip
-   ;
-
+    : [ \t\r\n] -> skip
+    ;
 
 COMMENT_1
-   : '(*' .*? '*)' -> skip
-   ;
-
+    : '(*' .*? '*)' -> skip
+    ;
 
 COMMENT_2
-   : '{' .*? '}' -> skip
-   ;
-
+    : '{' .*? '}' -> skip
+    ;
 
 IDENT
-   : ('A' .. 'Z') ('A' .. 'Z' | '0' .. '9' | '_')*
-   ;
-
+    : ('A' .. 'Z') ('A' .. 'Z' | '0' .. '9' | '_')*
+    ;
 
 STRING_LITERAL
-   : '\'' ('\'\'' | ~ ('\''))* '\''
-   ;
-
+    : '\'' ('\'\'' | ~ ('\''))* '\''
+    ;
 
 NUM_INT
-   : ('0' .. '9') +
-   ;
-
+    : ('0' .. '9')+
+    ;
 
 NUM_REAL
-   : ('0' .. '9') + (('.' ('0' .. '9') + (EXPONENT)?)? | EXPONENT)
-   ;
-
+    : ('0' .. '9')+ (('.' ('0' .. '9')+ (EXPONENT)?)? | EXPONENT)
+    ;
 
 fragment EXPONENT
-   : ('E') ('+' | '-')? ('0' .. '9') +
-   ;
+    : ('E') ('+' | '-')? ('0' .. '9')+
+    ;

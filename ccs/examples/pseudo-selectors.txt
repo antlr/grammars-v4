@@ -1,0 +1,3 @@
+button:hover { color: #f00; };
+item:nth-child(2) { opacity: 1; };
+paragraph::before { text: "prefix"; };

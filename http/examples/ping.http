@@ -1,0 +1,2 @@
+PING /google.com HTTP/1.1
+Host:  www.google.com.hk

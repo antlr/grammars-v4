@@ -1,0 +1,1 @@
+DECRBY test 1

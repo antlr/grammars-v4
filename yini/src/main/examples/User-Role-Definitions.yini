@@ -1,0 +1,45 @@
+^ Users
+# A list of user-objects, each with its own fields.
+users = [
+    {
+        id       : 1001,
+        name     : "Alice",
+        email    : "alice@example.org",
+        role     : "admin",
+        preferences : {
+            theme       : "dark",
+            notifications : ["email", "sms"],
+        },
+    },
+    {
+        id       : 1002,
+        name     : "Bob",
+        email    : "bob@example.org",
+        role     : "editor",
+        preferences : {
+            theme       : "light",
+            notifications : ["email"],
+        },
+    },
+    {
+        id       : 1003,
+        name     : "Charlie",
+        email    : "charlie@example.org",
+        role     : "viewer",
+        preferences : {
+            theme       : "light",
+            notifications : [],
+        },
+    },
+]
+
+# A top-level object defining roles and their permissions.
+roles = {
+    admin  : ["create", "read", "update", "delete"],
+    editor : ["read", "update"],
+    viewer : ["read"],
+}
+
+# A separate list: system-wide default tags
+defaultTags = ["new-user", "trial", "beta"]
+

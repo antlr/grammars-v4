@@ -1,3 +1,24 @@
+/*
+PostgreSQL grammar.
+The MIT License (MIT).
+Copyright (c) 2021-2023, Oleksii Kovalov (Oleksii.Kovalov@outlook.com).
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -10,12 +31,13 @@ public abstract class PostgreSQLParserBase extends Parser {
     }
 
     ParserRuleContext GetParsedSqlTree(String script, int line) {
-        PostgreSQLParser ph = getPostgreSQLParser(script);
+        PostgreSQLParser ph = GetPostgreSQLParser(script);
         ParserRuleContext result = ph.root();
         return result;
     }
 
-    public void ParseRoutineBody(PostgreSQLParser.Createfunc_opt_listContext _localctx) {
+    public void ParseRoutineBody() {
+        PostgreSQLParser.Createfunc_opt_listContext _localctx = (PostgreSQLParser.Createfunc_opt_listContext) this.getContext();
         String lang = null;
         for (PostgreSQLParser.Createfunc_opt_itemContext coi : _localctx.createfunc_opt_item()) {
             if (coi.LANGUAGE() != null) {
@@ -42,13 +64,14 @@ public abstract class PostgreSQLParserBase extends Parser {
         }
         if (func_as != null) {
             String txt = GetRoutineBodyString(func_as.func_as().sconst(0));
-            PostgreSQLParser ph = getPostgreSQLParser(txt);
             switch (lang) {
                 case "plpgsql":
-                    func_as.func_as().Definition = ph.plsqlroot();
+                    //NB: Cannot be done this way.
+                    //PostgreSQLParser ph = GetPostgreSQLParser(txt);
+                    //func_as.func_as().Definition = ph.plsqlroot();
                     break;
                 case "sql":
-                    func_as.func_as().Definition = ph.root();
+                    //func_as.func_as().Definition = ph.root();
                     break;
             }
         }
@@ -87,7 +110,7 @@ public abstract class PostgreSQLParserBase extends Parser {
         return result;
     }
 
-    public PostgreSQLParser getPostgreSQLParser(String script) {
+    public PostgreSQLParser GetPostgreSQLParser(String script) {
         CharStream charStream = CharStreams.fromString(script);
         Lexer lexer = new PostgreSQLLexer(charStream);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -99,5 +122,14 @@ public abstract class PostgreSQLParserBase extends Parser {
         lexer.addErrorListener(listener_lexer);
         parser.addErrorListener(listener_parser);
         return parser;
+    }
+
+    public boolean OnlyAcceptableOps()
+    {
+        var c = ((CommonTokenStream)this.getInputStream()).LT(1);
+        var text = c.getText();
+        return text.equals("!") || text.equals("!!")
+            || text.equals("!=-")
+            ;
     }
 }

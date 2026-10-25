@@ -1,0 +1,18 @@
+line 1:4 token recognition error at: '"\C'
+line 2:5 token recognition error at: '\'
+line 3:4 token recognition error at: '"\"CSubs\i'
+line 3:22 token recognition error at: '"
+a = 'http:./.\.'
+line 4:16 token recognition error at: '\'
+line 4:17 token recognition error at: ''
+a = "http:/.\.'
+line 5:14 mismatched input '/' expecting {'function', 'nil', 'false', 'true', '~', '-', '#', '(', 'not', '{', '...', NAME, NORMALSTRING, CHARSTRING, LONGSTRING, INT, HEX, FLOAT, HEX_FLOAT}
+line 5:16 token recognition error at: '\'
+line 5:15 mismatched input '.' expecting {'function', 'nil', 'false', 'true', '~', '-', '#', '(', 'not', '{', '...', NAME, NORMALSTRING, CHARSTRING, LONGSTRING, INT, HEX, FLOAT, HEX_FLOAT}
+line 6:6 token recognition error at: '\'
+line 6:8 token recognition error at: '\'
+line 7:5 token recognition error at: '\'
+line 7:6 token recognition error at: '\'
+line 8:6 token recognition error at: '"
+'
+line 9:0 mismatched input '<EOF>' expecting {'function', 'nil', 'false', 'true', '~', '-', '#', '(', 'not', '{', '...', NAME, NORMALSTRING, CHARSTRING, LONGSTRING, INT, HEX, FLOAT, HEX_FLOAT}

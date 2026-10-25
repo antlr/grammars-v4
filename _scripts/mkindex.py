@@ -27,6 +27,7 @@ import sys
 from pathlib import Path
 import re
 import json
+import subprocess
 from typing import Sequence
 
 """
@@ -94,20 +95,40 @@ def index_grammars(root : str) -> Sequence[dict]:
             grammars = get_values("include", pom)
             if grammars is None:
                 continue
+
+            skip = False
+            for name in files:
+                if name.endswith(".g4"):
+                    foo = os.path.join(path, name)
+                    p1 = subprocess.Popen(["dotnet", "trparse", "-t", "ANTLRv4", foo], stdout=subprocess.PIPE)
+                    p2 = subprocess.Popen(["dotnet", "trxgrep", "//actionBlock[1]"], stdin=p1.stdout, stdout=subprocess.PIPE)
+                    p3 = subprocess.Popen(["dotnet", "trtext"], stdin=p2.stdout, stdout=subprocess.PIPE)
+                    bar = p3.stdout.readline()
+                    if bar:
+                        skip = True
+                    p1 = subprocess.Popen(["dotnet", "trparse", "-t", "ANTLRv4", foo], stdout=subprocess.PIPE)
+                    p2 = subprocess.Popen(["dotnet", "trxgrep", "//delegateGrammar/identifier"], stdin=p1.stdout, stdout=subprocess.PIPE)
+                    p3 = subprocess.Popen(["dotnet", "trtext"], stdin=p2.stdout, stdout=subprocess.PIPE)
+                    imp = p3.stdout.readline()
+                    if imp:
+                        skip = True
+            if skip:
+                continue
+
             if len(grammars) > 1:
                 lexer = grammars[0] if 'Lexer' in grammars[0] else grammars[1]
                 parser = grammars[0] if 'Parser' in grammars[0] else grammars[1]
                 gdir = path[len(root)+1:]
                 if lexer:
-                    lexer = f'https://raw.githubusercontent.com/antlr/grammars-v4/master/{gdir}/{lexer}'
+                    lexer = f'https://raw.githubusercontent.com/antlr/grammars-v4/master/{gdir}/{lexer}'.replace('\\','/')
                 if parser:
-                    parser = f'https://raw.githubusercontent.com/antlr/grammars-v4/master/{gdir}/{parser}'
+                    parser = f'https://raw.githubusercontent.com/antlr/grammars-v4/master/{gdir}/{parser}'.replace('\\','/')
             else:
                 lexer = ""
                 parser = grammars[0]
                 gdir = path[len(root)+1:]
                 if parser:
-                    parser = f'https://raw.githubusercontent.com/antlr/grammars-v4/master/{gdir}/{parser}'
+                    parser = f'https://raw.githubusercontent.com/antlr/grammars-v4/master/{gdir}/{parser}'.replace('\\','/')
 
             exampleFilesDir = get_single_value("exampleFiles", pom)
             if exampleFilesDir is None:

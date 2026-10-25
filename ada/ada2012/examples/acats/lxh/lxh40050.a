@@ -1,0 +1,90 @@
+-- LXH40050.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      See file LXH40053.AM for details on this test
+--
+-- TEST DESCRIPTION:
+--      See file LXH40053.AM for details on this test
+--
+-- SPECIAL REQUIREMENTS:
+--      See file LXH40053.AM for details on this test
+--
+-- TEST FILES:
+--      This test consists of the following files:
+--
+--    =>   LXH40050.A
+--         LXH40051.A
+--         LXH40052.A
+--         LXH40053.AM
+--
+-- APPLICABILITY CRITERIA:
+--      See file LXH40053.AM for details on this test
+--
+-- PASS/FAIL CRITERIA:
+--      See file LXH40053.AM for details on this test
+--
+-- CHANGE HISTORY:
+--      20 MAR 96   SAIC   Initial version
+--
+--!
+
+----------------------------------------------------------------- LXH4005_0
+
+package LXH4005_0 is
+
+  procedure Raise_One;
+
+end LXH4005_0;
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+package body LXH4005_0 is
+
+  Just_A_Number : Natural := 0;
+
+  An_Exception : exception;           
+
+  procedure Raise_One is
+  begin
+    raise Constraint_Error;  -- violate pragma Restrictions(No_Exceptions)
+  end Raise_One;
+
+begin
+
+  Just_A_Number := Just_A_Number -1;                              -- OK
+                             -- not a particularly good idea, but legal
+
+  -- the following case may be flagged as any of:
+     -- the existence of the handler is an error
+     -- the when AND the raise are errors
+     -- all three
+
+exception                    -- violate pragma Restrictions(No_Exceptions)
+
+  when Constraint_Error => Just_A_Number := 0;
+       raise;                -- violate pragma Restrictions(No_Exceptions)
+
+end LXH4005_0;

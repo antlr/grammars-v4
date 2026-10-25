@@ -1,0 +1,21 @@
+MAIN: PROCEDURE OPTIONS(MAIN);
+    /* declare some variables */
+    DECLARE NAME CHARACTER(20) VARYING;
+    DECLARE AGE FIXED;
+    DECLARE ADULT BIT;
+
+    NAME = 'Ada';
+    AGE = 30;
+
+    IF AGE >= 18 & ¬(AGE > 120) THEN
+        PUT LIST('Hello, ' || NAME || '!');
+    ELSE
+        PUT LIST('invalid');
+
+    DO AGE = 1 TO 3;
+        IF AGE = 2 THEN
+            PUT LIST('two');
+        ELSE
+            PUT LIST(AGE);
+    END;
+END;

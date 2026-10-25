@@ -22,22 +22,78 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-parser grammar DesktopEntryParser;
-options { tokenVocab = DesktopEntryLexer; }
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
 
-desktop_entry : group* EOF ;
-group : group_header entry* ;
-group_header : LEFT_BRACKET group_name RIGHT_BRACKET ;
-group_name : GROUP_NAME ;
-entry : key locale? EQUAL value? ( SEMICOLON value )* SEMICOLON? ;
-key : KEY_NAME ;
-locale : LEFT_BRACKET language_ ( UNDERSCORE country )? ( DOT encoding )? ( AT modifier )? RIGHT_BRACKET ;
-language_ : LANGUAGE ;
-country : COUNTRY ;
-encoding : ENCODING ;
-modifier : MODIFIER ;
-value : string_ | number | true_ | false_ ;
-string_ : STRING ;
-number : NUMBER ;
-true_ : TRUE ;
-false_ : FALSE ;
+parser grammar DesktopEntryParser;
+
+options {
+    tokenVocab = DesktopEntryLexer;
+}
+
+desktop_entry
+    : group* EOF
+    ;
+
+group
+    : group_header entry*
+    ;
+
+group_header
+    : LEFT_BRACKET group_name RIGHT_BRACKET
+    ;
+
+group_name
+    : GROUP_NAME
+    ;
+
+entry
+    : key locale? EQUAL value? (SEMICOLON value)* SEMICOLON?
+    ;
+
+key
+    : KEY_NAME
+    ;
+
+locale
+    : LEFT_BRACKET language_ (UNDERSCORE country)? (DOT encoding)? (AT modifier)? RIGHT_BRACKET
+    ;
+
+language_
+    : LANGUAGE
+    ;
+
+country
+    : COUNTRY
+    ;
+
+encoding
+    : ENCODING
+    ;
+
+modifier
+    : MODIFIER
+    ;
+
+value
+    : string_
+    | number
+    | true_
+    | false_
+    ;
+
+string_
+    : STRING
+    ;
+
+number
+    : NUMBER
+    ;
+
+true_
+    : TRUE
+    ;
+
+false_
+    : FALSE
+    ;

@@ -29,102 +29,105 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar datalog;
 
 program
-   : statement* EOF
-   ;
+    : statement* EOF
+    ;
 
 statement
-   : assertion
-   | retraction
-   | query
-   | requirement
-   ;
+    : assertion
+    | retraction
+    | query
+    | requirement
+    ;
 
 assertion
-   : clause '.'
-   ;
+    : clause '.'
+    ;
 
 retraction
-   : clause '~'
-   ;
+    : clause '~'
+    ;
 
 query
-   : literal '?'
-   ;
+    : literal '?'
+    ;
 
 requirement
-   : '(' IDENTIFIER ')' '.'
-   ;
+    : '(' IDENTIFIER ')' '.'
+    ;
 
 clause
-   : literal ':-' body
-   | literal
-   ;
+    : literal ':-' body
+    | literal
+    ;
 
 body
-   : literal ',' body
-   | literal
-   ;
+    : literal ',' body
+    | literal
+    ;
 
 literal
-   : predicate_sym '(' ')'
-   | predicate_sym '(' terms_ ')'
-   | predicate_sym
-   | term_ '=' term_
-   | term_ '!=' term_
-   | VARIABLE ':-' external_sym '(' terms_ ')'
-   ;
+    : predicate_sym '(' ')'
+    | predicate_sym '(' terms_ ')'
+    | predicate_sym
+    | term_ '=' term_
+    | term_ '!=' term_
+    | VARIABLE ':-' external_sym '(' terms_ ')'
+    ;
 
 predicate_sym
-   : IDENTIFIER
-   | STRING
-   ;
+    : IDENTIFIER
+    | STRING
+    ;
 
 terms_
-   : term_
-   | term_ ',' terms_
-   ;
+    : term_
+    | term_ ',' terms_
+    ;
 
 term_
-   : VARIABLE
-   | constant
-   ;
+    : VARIABLE
+    | constant
+    ;
 
 constant
-   : IDENTIFIER
-   | STRING
-   | INTEGER
-   | 'true'
-   | 'false'
-   ;
+    : IDENTIFIER
+    | STRING
+    | INTEGER
+    | 'true'
+    | 'false'
+    ;
 
 external_sym
-   : IDENTIFIER
-   ;
+    : IDENTIFIER
+    ;
 
 VARIABLE
-   : [A-Z] [a-zA-Z_]*
-   ;
+    : [A-Z] [a-zA-Z_]*
+    ;
 
 IDENTIFIER
-   : [a-z] [a-zA-Z0-9_-]*
-   ;
+    : [a-z] [a-zA-Z0-9_-]*
+    ;
 
 STRING
-   : '"' ~ '"'* '"'
-   ;
+    : '"' ~ '"'* '"'
+    ;
 
 INTEGER
-   : [0-9]+
-   ;
+    : [0-9]+
+    ;
 
 COMMENT
-   : '#' (~ [\n\r])* -> skip
-   ;
+    : '#' (~ [\n\r])* -> skip
+    ;
 
 WS
-   : [ \r\n\t]+ -> skip
-   ;
-
+    : [ \r\n\t]+ -> skip
+    ;

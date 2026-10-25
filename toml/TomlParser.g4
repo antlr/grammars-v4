@@ -17,54 +17,135 @@ with the License.  You may obtain a copy of the License at
   under the License.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar TomlParser;
-options { tokenVocab = TomlLexer; }
 
-document : expression (NL expression)* EOF ;
+options {
+    tokenVocab = TomlLexer;
+}
 
-expression : key_value comment | table comment | comment ;
+document
+    : expression (NL expression)* EOF
+    ;
 
-comment: COMMENT? ;
+expression
+    : key_value comment
+    | table comment
+    | comment
+    ;
 
-key_value : key EQUALS value ;
+comment
+    : COMMENT?
+    ;
 
-key : simple_key | dotted_key ;
+key_value
+    : key EQUALS value
+    ;
 
-simple_key : quoted_key | unquoted_key ;
+key
+    : simple_key
+    | dotted_key
+    ;
 
-unquoted_key : UNQUOTED_KEY ;
+simple_key
+    : quoted_key
+    | unquoted_key
+    ;
 
-quoted_key :  BASIC_STRING | LITERAL_STRING ;
+unquoted_key
+    : UNQUOTED_KEY
+    ;
 
-dotted_key : simple_key (DOT simple_key)+ ;
+quoted_key
+    : BASIC_STRING
+    | LITERAL_STRING
+    ;
 
-value : string | integer | floating_point | bool_ | date_time | array_ | inline_table ;
+dotted_key
+    : simple_key (DOT simple_key)+
+    ;
 
-string : BASIC_STRING | ML_BASIC_STRING | LITERAL_STRING | ML_LITERAL_STRING ;
+value
+    : string
+    | integer
+    | floating_point
+    | bool_
+    | date_time
+    | array_
+    | inline_table
+    ;
 
-integer : DEC_INT | HEX_INT | OCT_INT | BIN_INT ;
+string
+    : BASIC_STRING
+    | ML_BASIC_STRING
+    | LITERAL_STRING
+    | ML_LITERAL_STRING
+    ;
 
-floating_point : FLOAT | INF | NAN ;
+integer
+    : DEC_INT
+    | HEX_INT
+    | OCT_INT
+    | BIN_INT
+    ;
 
-bool_ : BOOLEAN ;
+floating_point
+    : FLOAT
+    | INF
+    | NAN
+    ;
 
-date_time : OFFSET_DATE_TIME | LOCAL_DATE_TIME | LOCAL_DATE | LOCAL_TIME ;
+bool_
+    : BOOLEAN
+    ;
 
-array_ : L_BRACKET array_values? comment_or_nl R_BRACKET ;
+date_time
+    : OFFSET_DATE_TIME
+    | LOCAL_DATE_TIME
+    | LOCAL_DATE
+    | LOCAL_TIME
+    ;
 
-array_values : (comment_or_nl value nl_or_comment COMMA array_values comment_or_nl) | comment_or_nl value nl_or_comment COMMA? ;
+array_
+    : L_BRACKET array_values? comment_or_nl R_BRACKET
+    ;
 
-comment_or_nl : (COMMENT? NL)* ;
-nl_or_comment : (NL COMMENT?)* ;
+array_values
+    : (comment_or_nl value nl_or_comment COMMA array_values comment_or_nl)
+    | comment_or_nl value nl_or_comment COMMA?
+    ;
 
-table : standard_table | array_table ;
+comment_or_nl
+    : (COMMENT? NL)*
+    ;
 
-standard_table : L_BRACKET key R_BRACKET ;
+nl_or_comment
+    : (NL COMMENT?)*
+    ;
 
-inline_table : L_BRACE inline_table_keyvals R_BRACE ;
+table
+    : standard_table
+    | array_table
+    ;
 
-inline_table_keyvals : inline_table_keyvals_non_empty? ;
+standard_table
+    : L_BRACKET key R_BRACKET
+    ;
 
-inline_table_keyvals_non_empty : key EQUALS value (COMMA inline_table_keyvals_non_empty)? ;
+inline_table
+    : L_BRACE inline_table_keyvals R_BRACE
+    ;
 
-array_table : DOUBLE_L_BRACKET key DOUBLE_R_BRACKET ;
+inline_table_keyvals
+    : inline_table_keyvals_non_empty?
+    ;
+
+inline_table_keyvals_non_empty
+    : key EQUALS value (COMMA inline_table_keyvals_non_empty)?
+    ;
+
+array_table
+    : DOUBLE_L_BRACKET key DOUBLE_R_BRACKET
+    ;
