@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2020, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -31,110 +31,89 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 grammar zone;
 
+options { caseInsensitive = true; }
+
 zonefile
-   : orig include* record*
+   : (entry? EOL)* entry? EOF
    ;
 
-orig
-   : '$ORIGIN' domainname
+entry
+   : HWS? directive HWS?
+   | record HWS?
+   | HWS
    ;
 
-include
-   : '$INCLUDE' filename domainname?
+directive
+   : ORIGIN HWS name
+   | INCLUDE HWS (name | STRING) (HWS name)?
+   | DEFAULT_TTL HWS TTL
    ;
 
 record
-   : (domainname | '@')? rr
+   : name HWS rr
+   | HWS rr
    ;
 
 rr
-   : rr1
-   | rr2
-   ;
-
-rr1
-   : ttl? record_class? record_type? record_data
-   ;
-
-rr2
-   : record_class? ttl? record_type? record_data
-   ;
-
-ttl
-   : integer
-   ;
-
-record_class
-   : 'IN'
+   : (TTL HWS (CLASS HWS)? | CLASS HWS (TTL HWS)?)? record_type HWS record_data
    ;
 
 record_type
-   : 'A'
-   ;
-
-filename
-   : LETTER+
-   ;
-
-integer
-   : DIGIT+
+   : RECORD_TYPE
+   | GENERIC_TYPE
    ;
 
 record_data
-   : (LETTER | DIGIT | '.')+
+   : field (HWS field)*
    ;
 
-domainname
-   : subdomain
+field
+   : name
+   | STRING
+   | group
    ;
 
-//subdomain
- //  : (subdomain '.')? label
- //  ;
-
-label
-   : letter (ldhstr? LETDIG)?
+group
+   : '(' (name | STRING | HWS | EOL)* ')'
    ;
 
-letter
-   : LETTER
+name
+   : WORD
+   | TTL
+   | CLASS
+   | RECORD_TYPE
+   | GENERIC_TYPE
    ;
 
-ldhstr
-   : LETDIGHYP
-   | (LETDIGHYP ldhstr)
+ORIGIN: '$ORIGIN';
+INCLUDE: '$INCLUDE';
+DEFAULT_TTL: '$TTL';
+CLASS: 'IN' | 'CH' | 'HS';
+RECORD_TYPE
+   : 'A' | 'AAAA' | 'NS' | 'SOA' | 'MX' | 'CNAME' | 'PTR' | 'TXT'
+   | 'SRV' | 'CAA' | 'DNAME' | 'NAPTR' | 'HINFO' | 'RP' | 'LOC'
+   | 'DNSKEY' | 'DS' | 'RRSIG' | 'NSEC' | 'NSEC3' | 'NSEC3PARAM'
+   | 'TLSA' | 'SSHFP' | 'SVCB' | 'HTTPS'
+   ;
+GENERIC_TYPE: 'TYPE' [0-9]+;
+TTL: ([0-9]+ [wdhms]?)+;
+
+STRING
+   : '"' ('\\' ~[\r\n] | ~["\\\r\n])* '"'
    ;
 
-LETDIGDOT
-   : LETTER
-   | DIGIT
-   | '.'
-   ;
-
-LETDIGHYP
-   : LETTER
-   | DIGIT
-   | '-'
-   ;
-
-LETDIG
-   : LETTER
-   | DIGIT
-   ;
-
-DIGIT
-   : [0-9]
-   ;
-
-LETTER
-   : [a-zA-Z]
+WORD
+   : ('\\' ~[\r\n] | ~[ \t\r\n();"\\$])+
    ;
 
 COMMENT
-   : ';' ~ [\r\n]*
+   : ';' ~[\r\n]* -> skip
    ;
 
-WS
-   : [ \t\r\n] -> skip
+HWS
+   : [ \t]+
    ;
 
+EOL
+   : '\r'? '\n'
+   ;

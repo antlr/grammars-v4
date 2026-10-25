@@ -1,0 +1,4 @@
+$ORIGIN example.test.
+@ TXT "v=spf1 -all"
+info TXT "First segment; not a comment" "Second \"quoted\" segment"
+escaped\032name TXT "An escaped owner name"
