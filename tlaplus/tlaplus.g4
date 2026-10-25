@@ -191,7 +191,7 @@ product
    ;
 
 unary
-   : (DOMAIN | 'SUBSET' | 'UNION' | 'UNCHANGED' | 'ENABLED' | '~' | '-' | '[]' | '<>') unary
+   : (DOMAIN_ | 'SUBSET' | 'UNION' | 'UNCHANGED' | 'ENABLED' | '~' | '-' | '[]' | '<>') unary
    | (ALL | EXISTS | CHOOSE) identifier IN expression ':' expression
    | AND expression
    | OR expression
@@ -266,7 +266,7 @@ CHOOSE
    : 'CHOOSE'
    ;
 
-DOMAIN
+DOMAIN_
    : 'DOMAIN'
    ;
 
