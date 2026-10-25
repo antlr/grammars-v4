@@ -1,0 +1,113 @@
+-- BDE0005.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that the explicit declaration of a primitive subprogram of a
+--      tagged type must occur before the type is frozen.  Check for cases
+--      where the primitive subprogram occurs in a package body.
+--
+-- TEST DESCRIPTION:
+--      Declare a tagged type with two primitive operations for the type.
+--      Extend the type in the body of the package.  The type extension
+--      inherits the operations.  Override the inherited operations. The test
+--      verifies two cases:
+--      a. If the overriding operations are declared by subprogram
+--         declarations, the type is not frozen and all overriding bodies are 
+--         legal.
+--      b. If the overriding operations are declared by a subprogram body,
+--         only the first is allowed since it freezes the type. 
+--         AARM 3.9.2(13.e);6.0
+--
+--
+-- CHANGE HISTORY:
+--      28 Apr 95   SAIC    Initial prerelease version.
+--	01 Jun 98   EDS     Removed unneeded and misleading comments.
+--!
+
+package BDE0005 is
+   type Tag_Type is tagged record
+      I : Integer;
+   end record;
+
+   procedure Op1 (P : Tag_Type);
+   procedure Op2 (P : Tag_Type);
+
+end BDE0005;
+
+     --==================================================================--
+
+
+package body BDE0005 is
+
+   procedure Op1 (P : Tag_Type) is
+   begin
+      null;
+   end Op1;    
+   ---------------------------------------------
+
+   procedure Op2 (P : Tag_Type) is                                    -- OK.
+   begin
+      null;
+   end Op2;    
+
+   ---------------------------------------------
+   type NTag_T1 is new Tag_Type with null record;       
+   -- implicit procedure Op1 (P : NTag_T1) declared here
+   -- implicit procedure Op2 (P : NTag_T1) declared here
+
+   procedure Op1 (P : NTag_T1);                     -- Overrides.
+   procedure Op2 (P : NTag_T1);                     -- Overrides.
+
+   ---------------------------------------------
+   procedure Op1 (P : NTag_T1) is
+   begin
+      null;
+   end Op1;    
+
+   ---------------------------------------------
+   procedure Op2 (P : NTag_T1) is  
+   begin 
+      null;
+   end Op2;    
+
+   ---------------------------------------------
+   type NTag_T2 is new Tag_Type with null record;       
+   -- implicit procedure Op1 (P : NTag_T2) declared here
+   -- implicit procedure Op2 (P : NTag_T2) declared here
+
+   procedure Op1 (P : NTag_T2) is                   -- Freezes NTag_T2.
+   -- overrides inherited Op1 (P1 : NTag_T2)
+   begin
+      null;
+   end Op1;    
+
+   ---------------------------------------------
+   procedure Op2 (P : NTag_T2) is                                     -- ERROR:
+                              -- Primitive declaration of a frozen tagged type.
+   begin 
+      null;
+   end Op2;    
+
+end BDE0005;

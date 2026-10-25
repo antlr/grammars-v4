@@ -1,0 +1,5 @@
+#N canvas 0 0 450 300 10;
+#X text 20 20 This is a comment explaining the patch.;
+#X obj 50 60 +~ 1;
+#X obj 50 100 -~ 1;
+#X connect 1 0 2 0;

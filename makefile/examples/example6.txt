@@ -1,0 +1,5 @@
+VERSION := 1.2.3
+PREFIX ?= /usr/local
+
+install:
+	cp main $(PREFIX)/bin/main

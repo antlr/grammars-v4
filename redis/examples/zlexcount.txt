@@ -1,0 +1,1 @@
+ZLEXCOUNT test lex1 lex2

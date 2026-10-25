@@ -23,6 +23,7 @@ SELECT * FROM f3p1 WHERE 1;
 #begin
 -- insert base syntax
 insert ignore into t1(col1, col2, col3) values ('abc', 0, .12), ('adfasdf',23432, -.12);
+INSERT INTO test_auto_inc () VALUES ();
 -- http://dev.mysql.com/doc/refman/5.6/en/insert.html
 INSERT INTO tbl_name (col1,col2) VALUES(col2*2, 15);
 INSERT INTO tbl_name (col1,col2) VALUES(15,col1*2);
@@ -41,4 +42,16 @@ SELECT 'Aleem' UNION ALL SELECT 'Latif' UNION ALL SELECT 'Mughal';
 -- not latin1 literals
 insert into t values ('кириллица', 2, 3);
 insert INTO `wptests_posts` (`post_author`, `post_date`, `post_date_gmt`, `post_content`, `post_content_filtered`, `post_title`, `post_excerpt`, `post_status`, `post_type`, `comment_status`, `ping_status`, `post_password`, `post_name`, `to_ping`, `pinged`, `post_modified`, `post_modified_gmt`, `post_parent`, `menu_order`, `post_mime_type`, `guid`) VALUES (7, '2016-09-06 16:49:51', '2016-09-06 16:49:51', '', '', 'صورة', '', 'inherit', 'attachment', 'open', 'closed', '', '%d8%b5%d9%88%d8%b1%d8%a9', '', '', '2016-09-06 16:49:51', '2016-09-06 16:49:51', 0, 0, 'image/jpeg', '');
+#end
+insert into sql_log values(retGUID,log_type,log_text,0,0,current_user,now());
+insert into sql_log values(retGUID,log_type,log_text,0,0,current_user(),now());
+#begin
+CREATE TABLE tbl (tbl.a BIGINT);
+CREATE TABLE tbl (.a BIGINT);
+INSERT INTO tbl (tbl.a) SELECT * FROM another_table;
+INSERT INTO tbl (.tbl.a) SELECT * FROM another_table;
+#end
+
+#begin
+INSERT INTO t1 (a,b,c) VALUES (1,2,3),(4,5,6) AS new ON DUPLICATE KEY UPDATE c = new.a+new.b; 
 #end

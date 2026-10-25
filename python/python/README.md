@@ -1,12 +1,12 @@
 # Python 2 and 3 universal grammar
 
-Universal, clear and fast Python grammar implementations with C# and Java targets.
+Universal, clear and fast Python grammar.
 
 ## How to use
 
 * Generate lexer and parser with ANTLR4 generator
 * Include both generated and base classes to project from corresponding
-  directory (C# or Java)
+  directory
 * Use `TabSize` property in `PythonLexerBase` to configure tab size
   (8 spaces by default)
 * Use `Version` property in `PythonParserBase` to configure python version
@@ -28,6 +28,10 @@ Universal, clear and fast Python grammar implementations with C# and Java target
     * Error fixes
     * Java version
     * Refactoring
+
+## Reference
+* [pldb](http://pldb.info/concepts/python)
+
 
 ## License
 

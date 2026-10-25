@@ -1,0 +1,349 @@
+MODULE $vcgcmddef;
+/*
+/*  Copyright © 1996, Digital Equipment Corporation.
+/*
+/* Modifications:
+/*
+/*	019D	Jeff Zeeb	18-Nov-1987	(410 SVCG D)
+/*
+/*		Added support for /AUDIT[=text] qualifier.
+/*
+/*	018D	Ayub Khan	15-Oct-1986	<367 SVCG D>
+/*
+/*		Added support for INCLUDE, PROFILE, PRECISION,
+/*		and PREPROC for Ultrix.
+/*
+/*	017D	Peter Craig	15-Dec-1986	(317 SVCG D)
+/*
+/*		The flag cmd_v_parse_include, added for the
+/*		last edit, should have been added at the end
+/*		so it occupies one of the spare positions.
+/*
+/*	016D	Peter Craig	12-Dec-1986	(316 SVCG D)
+/*
+/*		Add the /INCLUDE_DIRECTORY=(<list>) qualifier.
+/*
+/*	015D	Keith Knowles	 3-Dec-1986	(310 SVCG D)
+/*
+/*		Add /PRECISION qualifier.
+/*
+/*	014D	Tom Benson	02-Mar-1986	(180 SVCG D)
+/*
+/*		Added CMD_V_SPLIT_LIFETIME in VCG$GL_DEBUGTYP.
+/*
+/*	013D	Keith Knowles	10-Feb-1986	(179 SVCG D)
+/*
+/*		Add CMD_V_ANALYSIS_DATA and CMD_V_PARSE_ANALYSIS_DATA.
+/*
+/*	012D	Ian Stocks	02-Dec-1985	(123 SVCG D)
+/*
+/*		Define bit for pre-register peephole optimizer
+/*
+/*	011	Ian Stocks	06-June-1985	(012 SVCG D)
+/*
+/*		Define additional option for code dumper
+/*		Mark _SPARE fields as FILL
+/*
+/*	010	Keith Knowles	12-Feb-1985	(173 VCG)
+/*
+/*		Define data structures for /WARN value list.
+/*
+/*	009	Tom Benson	16-Nov-1984	(122 VCG)
+/*
+/*		Added debug_no_rout bit, used only by Ada to indicate that
+/*		the VCG should not emit routine DSTs.
+/*
+/*	008	Caroline Davidson 09-Aug-1984	(070 VCG)
+/*
+/*		Changed the spelling of all "overlay" variable names to 
+/*		eliminate warnings in the SDL generated BLISS include.
+/*
+/*	007	Caroline Davidson 07-Aug-1984	(069 VCG)
+/*
+/*		Replaced bit fields for /UPDATE with placeholders.  They
+/*		are now spare bits.
+/*
+/*	006	Caroline Davidson 01-Aug-1984	(066 VCG)
+/*
+/*		Rearranged declarations and redefined most of the structures
+/*		to be unions of the existing bitfields and a data longword.
+/*
+/*	005	Caroline Davidson 08-June-1984	(048 VCG)
+/*
+/*		Added field, lst_v_local_incl, to be used to control the setting
+/*		of the related name for an include file.
+/*
+/*	004	Caroline Davidson 31-May-1984	(045 VCG)
+/*
+/*		Added field, cmd_v_list_translation, to vcg$gl_showtyp for C.
+/*
+/*	003	Caroline Davidson 21-May-1984	(042 VCG)
+/*
+/*		Added field to vcg$gl_debugtyp to indicate if language
+/*		requires case sensitive DSTs and TBTs in the object.
+/*
+/*	002	Caroline Davidson 30-Mar-1984	(019 VCG)
+/*
+/*		Added fields to vcg$gl_cmd_optn and vcg$gl_parse_actions
+/*		for the PSE Interface. 
+/*
+/*	001	Tom Benson	13-Feb-1984	(003 VCG)
+/*
+/*		Added modification history.
+/*
+/*
+
+/*
+/* Declare layout of command parse data structure
+/*
+AGGREGATE vcg_value_parse_data STRUCTURE PREFIX "pv_";
+	"default"	LONGWORD;
+	none		LONGWORD;
+	all		LONGWORD;
+	size		WORD;
+	val_size	BYTE;
+	"value"		CHARACTER LENGTH(32);{ Actual length in pv_b_val_size
+	END;
+/*
+AGGREGATE vcg$gl_cmd_optn UNION GLOBAL;
+	vcg$gb_cmd_data LONGWORD;
+	optn_overlay 	STRUCTURE PREFIX "cmd_";
+		listing		BITFIELD;
+		object		BITFIELD;
+		machine		BITFIELD;
+		g_float		BITFIELD;
+		warning		BITFIELD;
+		moresrc		BITFIELD;
+		cmd_spare	BITFIELD FILL; /* M007 M011
+		mainprog	BITFIELD;
+		cross		BITFIELD;
+		expsource	BITFIELD;
+		moreinp		BITFIELD;
+		emit_pse	BITFIELD; /* A002 
+		analysis_data	BITFIELD;
+		profile		BITFIELD; /* A018D
+		"precision"	BITFIELD; /* A018D
+		preproc		BITFIELD; /* A018D
+		audit		BITFIELD; /* A019D
+		cmd_optn_spares	BITFIELD LENGTH 32-^ FILL; /* M011
+		END;
+	END;
+/*
+AGGREGATE vcg$gq_parse_actions   STRUCTURE GLOBAL PREFIX "cmd_"; /* M019D
+	proc_src_file	BITFIELD;
+	proc_lib_file	BITFIELD;
+	parse_obj	BITFIELD;
+	parse_lis	BITFIELD;
+	parse_warning	BITFIELD;
+	parse_check	BITFIELD;
+	parse_debug	BITFIELD;
+	parse_diag	BITFIELD;
+	parse_show	BITFIELD;
+	parse_g_float	BITFIELD;
+	parse_optim	BITFIELD;
+	parse_machine	BITFIELD;
+	parse_cross	BITFIELD;
+	parse_library	BITFIELD;
+	parse_gbl	BITFIELD;
+	parse_local	BITFIELD;
+	parse_precision	BITFIELD; /* M018D
+	parse_enable	BITFIELD;
+	parse_error	BITFIELD;
+	parse_variant	BITFIELD;
+	parse_vspare1	BITFIELD;
+	parse_vspare2	BITFIELD;
+	parse_vspare3	BITFIELD;
+	parse_vspare4	BITFIELD;
+	parse_vspare5 	BITFIELD;
+	parse_pse_file	BITFIELD; /* A002
+	parse_define	BITFIELD;
+	parse_undefine	BITFIELD;
+	parse_include	BITFIELD; /* A018D
+	parse_profile	BITFIELD; /* A018D
+	parse_analysis_data BITFIELD;
+	parse_preproc	BITFIELD; /* A018D
+	parse_audit	BITFIELD; /* A019D
+	parse_actions_spares BITFIELD LENGTH 64-^ FILL; /* A019D
+	END;
+/*
+AGGREGATE vcg$gl_checktyp  UNION GLOBAL;
+	vcg$gd_checktyp	LONGWORD;
+	check_overlay 	STRUCTURE PREFIX "cmd_";
+		checkbnds	BITFIELD;
+		checkport	BITFIELD; /* portable in cmdparse?
+		check_spares	BITFIELD LENGTH 30 FILL; /* M011
+		END;
+	END;
+/*
+AGGREGATE vcg$gl_debugtyp UNION GLOBAL;
+	vcg$gd_debugtyp	LONGWORD;
+	dbg_overlay 	STRUCTURE PREFIX "cmd_";
+		debugsym	BITFIELD;
+		debugtrac	BITFIELD;
+		debug_spares	BITFIELD LENGTH 27 FILL;    /* M014D M011
+		split_lifetime	BITFIELD; /* A014D - collect split lifetime info
+		debug_no_rout	BITFIELD; /* A009 - suppress routine DSTs
+		debug_case	BITFIELD; /* A003 - set when language is case sensitive
+		END;
+	END;
+/*
+AGGREGATE vcg$gl_diagtyp   UNION GLOBAL;
+	vcg$gd_diagtyp	LONGWORD;
+	diag_overlay 	STRUCTURE PREFIX "cmd_";
+		diagini		BITFIELD;
+		diagps1		BITFIELD;
+		diagdcl		BITFIELD;
+		diagps2		BITFIELD;
+		diagopt		BITFIELD;
+		diagalc		BITFIELD;
+		diagcod		BITFIELD;
+		diagbind	BITFIELD;/* diagbind in cmdparse?
+		operator	BITFIELD;
+		symbols		BITFIELD;
+		breakpt		BITFIELD;
+		cparser		BITFIELD;
+		write_t		BITFIELD;
+		phase2		BITFIELD;
+		list_mem	BITFIELD;
+		peep_dump	BITFIELD;
+		dump_flow_graph	BITFIELD;
+		tuple_check	BITFIELD;
+		diagreg		BITFIELD; /* Dump after register allocator - A011
+		vcg_diag_spares	BITFIELD LENGTH 5 FILL; /* M011
+		front_diag_spares BITFIELD LENGTH 8;
+		END;
+	END;
+/*
+AGGREGATE vcg$gl_enabletyp STRUCTURE GLOBAL ;
+	vcg$gd_enabletyp LONGWORD;
+	END;
+/*
+AGGREGATE vcg$gl_listing_control STRUCTURE GLOBAL PREFIX "lst_";
+	cnd_src		BITFIELD;
+	nocnd_src	BITFIELD;
+	use_prefix	BITFIELD;
+	page_align_msgs	BITFIELD;
+	no_blank_btwn	BITFIELD;
+	local_incl	BITFIELD; /* A005: use default directory for incl if set
+	bit_spare	BITFIELD LENGTH 2 FILL;	/* M011
+	byte_spare	BYTE FILL;		/* M011
+	word_spare	WORD FILL;		/* M011
+	END;
+/*
+AGGREGATE vcg$gl_machinetyp   UNION GLOBAL;
+	vcg$gd_machinetyp	LONGWORD;
+	mach_overlay 	STRUCTURE PREFIX "cmd_";
+		mach_inters	BITFIELD;
+		mach_after	BITFIELD;
+		mach_before	BITFIELD;
+		bit_spare	BITFIELD LENGTH 29 FILL; /* M011
+		END;
+	END;
+/*
+AGGREGATE vcg$gl_optimtyp   UNION GLOBAL;
+	vcg$gd_optimtyp	LONGWORD;
+	optim_overlay 	STRUCTURE PREFIX "cmd_";
+		peephole	BITFIELD;
+		invariant	BITFIELD;
+		local_reg	BITFIELD;
+		cse		BITFIELD;
+		results		BITFIELD;
+		disjoint	BITFIELD;
+		short_circuit	BITFIELD;
+		hoist		BITFIELD;
+		pre_peep	BITFIELD;		    /* A012D
+		vcg_opt_spares	BITFIELD LENGTH 15 FILL;    /* M012D
+		front_opt_spares BITFIELD LENGTH 8;
+		END;
+	END;
+/*
+AGGREGATE vcg$gl_showtyp   UNION GLOBAL;
+	vcg$gd_showtyp	 LONGWORD;
+	show_overlay 	 STRUCTURE PREFIX "cmd_";
+		"include"	BITFIELD;
+		statistics	BITFIELD;/* statistic in cmdparse?
+		list_map	BITFIELD;
+		list_source	BITFIELD;/* list_src in cmdparse?
+		list_header	BITFIELD;/* list_hdr in cmdparse?
+		list_expansion	BITFIELD;
+		list_intermediate BITFIELD;
+		list_brief_map	BITFIELD;/* this used by C only. (Not defined in cmdparse?)
+		list_dictionary	BITFIELD;/* for CDD
+		list_trace	BITFIELD;/* for PL/I trace
+		list_terminal	BITFIELD;
+		list_translation BITFIELD; /* A004, for SHELL file name expansion
+		show_spares	BITFIELD LENGTH 20 FILL;    /* M011
+		END;
+	END;
+/*
+AGGREGATE vcg$gl_warntyp  UNION GLOBAL;		/* A010 starts
+	vcg$gd_warntyp	LONGWORD;
+	warn_overlay 	STRUCTURE PREFIX "cmd_";
+		enabl_warn	BITFIELD;
+		enabl_info	BITFIELD;
+		warn_spares	BITFIELD LENGTH 30 FILL;  /* M011
+		END;
+	END;					/* A010 ends
+/*
+AGGREGATE vcg$gl_preproctyp	UNION GLOBAL;		/* A018D+
+	vcg$gd_preproctyp	LONGWORD;
+	preproc_overlay 	STRUCTURE PREFIX "cmd_";
+		preproc_only 	BITFIELD;
+		preproc_make 	BITFIELD;
+		preproc_spares	BITFIELD LENGTH 30 FILL;
+		END;
+	END;					
+/*
+AGGREGATE vcg$gl_precisiontyp	UNION GLOBAL;	
+	vcg$gd_precisiontyp	LONGWORD;
+	precision_overlay 	STRUCTURE PREFIX "cmd_";
+		single_prec	BITFIELD;
+		double_prec	BITFIELD;
+		prec_spares	BITFIELD LENGTH 30 FILL;
+		END;
+	END;					/* A018D-
+/*
+ITEM vcg$gvt_cmd_line      CHARACTER LENGTH 256 VARYING GLOBAL;
+/*
+ITEM vcg$gvt_object        CHARACTER LENGTH 255 VARYING GLOBAL;
+ITEM vcg$gvt_listing       CHARACTER LENGTH 255 VARYING GLOBAL;
+ITEM vcg$gvt_pse_data_file CHARACTER LENGTH 255 VARYING GLOBAL; /* A002
+ITEM vcg$gvt_analysis_data_file	CHARACTER LENGTH 255 VARYING GLOBAL;
+/* 
+ITEM	vcg$gal_cdd_audit_data    ADDRESS  GLOBAL;	/* A019D
+ITEM	vcg$gal_check_data        ADDRESS  GLOBAL;
+ITEM	vcg$gal_debug_data        ADDRESS  GLOBAL;
+ITEM	vcg$gal_diag_data         ADDRESS  GLOBAL;
+ITEM	vcg$gal_warn_data	  ADDRESS  GLOBAL;	/* A010
+ITEM	vcg$gal_machine_data      ADDRESS  GLOBAL;
+ITEM	vcg$gal_optim_data	  ADDRESS  GLOBAL;
+ITEM	vcg$gal_enable_data       ADDRESS  GLOBAL;
+ITEM	vcg$gal_show_data         ADDRESS  GLOBAL;
+ITEM	vcg$ga_variant	          ADDRESS  GLOBAL;
+ITEM	vcg$gal_variant_data      ADDRESS  GLOBAL;
+ITEM	vcg$gl_error_limit        LONGWORD GLOBAL;
+ITEM	vcg$gal_error_limit_data  ADDRESS  GLOBAL;
+ITEM	vcg$gl_vspare1typ         LONGWORD GLOBAL;
+ITEM	vcg$gal_vspare1_data      ADDRESS  GLOBAL;
+ITEM	vcg$gl_vspare2typ         LONGWORD GLOBAL;
+ITEM	vcg$gal_vspare2_data      ADDRESS  GLOBAL;
+ITEM	vcg$gl_vspare3typ         LONGWORD GLOBAL;
+ITEM	vcg$gal_vspare3_data      ADDRESS  GLOBAL;
+ITEM	vcg$gl_vspare4typ         LONGWORD GLOBAL;
+ITEM	vcg$gal_vspare4_data      ADDRESS  GLOBAL;
+ITEM	vcg$gl_vspare5typ 	  LONGWORD GLOBAL;
+ITEM	vcg$gal_vspare5_data  	  ADDRESS  GLOBAL;
+ITEM	vcg$gl_precision	  ADDRESS  GLOBAL;  /* A018D+
+ITEM	vcg$gal_precision_data	  ADDRESS  GLOBAL;
+ITEM	vcg$gl_preproc	 	  ADDRESS  GLOBAL;
+ITEM	vcg$gal_preproc_data	  ADDRESS  GLOBAL;  /* A018D-
+ITEM	vcg$ga_define             ADDRESS  GLOBAL;
+ITEM	vcg$gal_define_data       ADDRESS  GLOBAL;
+ITEM	vcg$ga_undefine           ADDRESS  GLOBAL;
+ITEM	vcg$gal_undefine_data     ADDRESS  GLOBAL;
+ITEM	vcg$ga_include		  ADDRESS  GLOBAL;  /* A018D+
+ITEM	vcg$gal_include_data	  ADDRESS  GLOBAL;
+ITEM	vcg$ga_profile		  ADDRESS  GLOBAL;
+ITEM	vcg$gal_profile_data	  ADDRESS  GLOBAL;  /* A018D-
+/*
+END_MODULE;

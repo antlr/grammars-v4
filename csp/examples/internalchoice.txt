@@ -1,0 +1,3 @@
+-- Internal (nondeterministic) choice: the environment has no
+-- control over which branch is taken.
+Dice = one -> SKIP |~| two -> SKIP |~| six -> SKIP

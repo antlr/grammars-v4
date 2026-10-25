@@ -1,0 +1,202 @@
+$title('GENCPM Token File Creator')
+create$defaults:
+do;
+
+/*
+  Copyright (C) 1982
+  Digital Research
+  P.O. Box 579
+  Pacific Grove, CA 93950
+*/
+
+/*
+    Revised:
+      20 Sept 82  by Bruce Skidmore
+*/
+
+  declare true literally '0FFH';
+  declare false literally '0';
+  declare forever literally 'while true';
+  declare boolean literally 'byte';
+  declare cr literally '0dh';
+  declare lf literally '0ah';
+  declare tab literally '09h';
+
+/*
+    D a t a    S t r u c t u r e s
+*/
+
+  declare data$fcb (36) byte external;
+
+  declare obuf (128) byte at (.memory);
+ 
+  declare hexASCII (16) byte external;
+
+  declare symtbl (20) structure(
+    token(8) byte,
+    len      byte,
+    flags    byte,
+    qptr     byte,
+    ptr      address) external;
+
+/*
+     B D O S    P r o c e d u r e   &   F u n c t i o n    C a l l s
+*/
+
+  delete$file:
+    procedure (fcb$address) external;
+      declare fcb$address address;
+    end delete$file;
+
+  create$file:
+    procedure (fcb$address) external;
+      declare fcb$address address;
+    end create$file;
+
+  close$file:
+    procedure (fcb$address) external;
+      declare fcb$address address;
+    end close$file;
+
+  write$record:
+    procedure (fcb$address) external;
+      declare fcb$address address;
+    end write$record;
+
+  set$DMA$address:
+    procedure (DMA$address) external;
+      declare DMA$address address;
+    end set$DMA$address;
+
+/*
+     M a i n   C R T D E F   P r o c e d u r e
+*/
+ crtdef: 
+  procedure public;
+    declare (flags,symbol$done,i,j,obuf$index,inc) byte;
+    declare val$adr address;
+    declare val based val$adr byte;
+
+    inc$obuf$index:
+      procedure;
+
+        if obuf$index = 7fh then
+          do;
+            call write$record(.data$fcb);
+            do obuf$index = 0 to 7fh;
+              obuf(obuf$index) = 1ah;
+            end;
+            obuf$index = 0;
+          end;
+        else
+          obuf$index = obuf$index + 1;
+
+      end inc$obuf$index;
+
+   emit$ascii$hex:
+     procedure(dig);
+       declare dig byte;
+
+       call inc$obuf$index;
+       obuf(obuf$index) = hexASCII(shr(dig,4));
+       call inc$obuf$index;
+       obuf(obuf$index) = hexASCII(dig and 0fh);
+
+     end emit$ascii$hex;
+
+    call set$dma$address(.obuf);
+    call delete$file(.data$fcb);
+    call create$file(.data$fcb);  
+
+    obuf$index = 0ffh;
+
+    do i = 0 to 21;
+
+      symbol$done = false;
+      flags = symtbl(i).flags;
+      inc = 0;
+      do while (inc < 16) and (not symbol$done);
+
+        do j = 0 to 7;
+          call inc$obuf$index;
+          obuf(obuf$index) = symtbl(i).token(j);
+        end;
+
+        if (flags and 8) = 0 then
+          symbol$done = true;
+        else
+          do;
+            if (flags and 10h) <> 0 then
+              obuf(obuf$index) = 'A' + inc;
+            else
+              do;
+                if inc < 10 then
+                  do;
+                    obuf(obuf$index) = '0' + inc;
+                  end;
+                else
+                  do;
+                    obuf(obuf$index) = 'A' + inc - 10;
+                  end;
+              end;
+          end;
+
+        call inc$obuf$index;
+        obuf(obuf$index) = ' ';
+        call inc$obuf$index;
+        obuf(obuf$index) = '=';
+        call inc$obuf$index;
+        obuf(obuf$index) = ' ';
+
+        val$adr = symtbl(i).ptr + (inc * symtbl(i).len);
+
+        if (flags and 1) <> 0 then
+          do;
+            call inc$obuf$index;
+            obuf(obuf$index) = 'A' + val;
+          end;
+        else
+          do;
+            if (flags and 2) <> 0 then
+              do;
+                call inc$obuf$index;
+                if val then
+                  obuf(obuf$index) = 'Y';
+                else
+                  obuf(obuf$index) = 'N';
+              end;
+            else
+              do;
+                call emit$ascii$hex(val);
+                if (flags and 18h) = 8 then
+                  do;
+                    call inc$obuf$index;
+                    obuf(obuf$index) = ',';
+                    val$adr = val$adr + 1;
+                    call emit$ascii$hex(val);
+                    call inc$obuf$index;
+                    obuf(obuf$index) = ',';
+                    val$adr = val$adr + 1;
+                    call emit$ascii$hex(val);
+                  end;
+              end;
+          end;
+
+        call inc$obuf$index;
+        obuf(obuf$index) = cr;
+        call inc$obuf$index;
+        obuf(obuf$index) = lf;
+
+        inc = inc + 1;
+
+      end;      
+
+    end;
+
+    if obuf$index <= 7fh then
+      call write$record(.data$fcb);
+    call close$file(.data$fcb);
+
+  end crtdef;
+end create$defaults;
+

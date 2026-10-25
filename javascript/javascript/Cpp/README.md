@@ -6,7 +6,7 @@
 
     ```
     @header {
-        #include "JavaScriptBaseLexer.h"
+        #include "JavaScriptLexerBase.h"
     }
     ```
 
@@ -14,10 +14,10 @@
 
     ```
     @header {
-        #include "JavaScriptBaseParser.h"
+        #include "JavaScriptParserBase.h"
     }
     ```
 
-* In both `JavaScriptLexer.g4` and `JavaScriptParser.g4`, replace all `this.` ocurrences with `this->`
+* In both `JavaScriptLexer.g4` and `JavaScriptParser.g4`, replace all `this.` occurrences with `this->`
 
 Or you can use `pitch.sed` to do convert.
