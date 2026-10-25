@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2013, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar tlaplus;
 
 modules
-   : module+
+   : module+ EOF
    ;
 
 module
@@ -44,7 +44,15 @@ moduleheader
    ;
 
 modulebody
-   : extends_? algo invariants?
+   : extends_? (algo | declaration | invariant | assumption)*
+   ;
+
+declaration
+   : ('CONSTANT' | 'CONSTANTS' | 'VARIABLE' | 'VARIABLES') identifier (',' identifier)*
+   ;
+
+assumption
+   : ('ASSUME' | 'THEOREM') expression
    ;
 
 extends_
@@ -52,7 +60,7 @@ extends_
    ;
 
 algo
-   : '(*' '--algorithm' identifier vars? constants? (processes | block) 'end' 'algorithm' '*)'
+   : '(*' '--algorithm' identifier vars? constants? (processes | block) 'end' 'algorithm' ';'? '*)'
    ;
 
 processes
@@ -93,12 +101,11 @@ expressiondecl
    ;
 
 setdecl
-   : identifier IN atom '..' atom
+   : identifier IN expression
    ;
 
 set
-   : ('{' expression (',' expression)* '}')
-   | ('{' '}')
+   : '{' (identifier IN expression ':' expression | expression (',' expression)*)? '}'
    ;
 
 tuple
@@ -111,7 +118,7 @@ block
    ;
 
 statement
-   : label? (assignstmt | assertstmt | ifstmt | whilestmt | withstmt)+
+   : label? (assignstmt | assertstmt | ifstmt | whilestmt | withstmt | simplestmt)
    ;
 
 label
@@ -119,7 +126,7 @@ label
    ;
 
 assignstmt
-   : lhs ':=' expression ';'
+   : lhs ':=' expression (MULTIASSIGN lhs ':=' expression)* ';'
    ;
 
 assertstmt
@@ -127,7 +134,7 @@ assertstmt
    ;
 
 ifstmt
-   : 'if' expression 'then' statement* 'end' 'if' ';'
+   : 'if' expression 'then' statement* ('elsif' expression 'then' statement*)* ('else' statement*)? 'end' 'if' ';'
    ;
 
 whilestmt
@@ -135,77 +142,84 @@ whilestmt
    ;
 
 withstmt
-   : 'with' 'from' expression 'to' expression 'do' statement* 'end' 'with' ';'
+   : 'with' vardecl (',' vardecl)* 'do' statement* 'end' 'with' ';'
    ;
 
-invariants
-   : invariant+
+simplestmt
+   : ('skip' | 'goto' identifier) ';'
+   | ('await' | 'print') expression ';'
    ;
 
 invariant
-   : identifier '==' (expression | equation)
+   : identifier ('(' identifier (',' identifier)* ')')? '==' expression
    ;
 
 lhs
-   : identifier
-   ;
-
-equation
-   : expression '=' expression
+   : identifier ('[' expression (',' expression)* ']')*
    ;
 
 expression
-   : (atom binop expression)
-   | (atom compareop expression)
-   | (atom)
-   | ('(' expression ')')
-   | func
+   : implication
    ;
 
-binop
-   : '+'
-   | '-'
-   | '*'
-   | '/'
-   | '/='
-   | '*='
-   | '+='
-   | '-='
-   | AND
-   | OR
+implication
+   : disjunction ((IMPLIES | EITHER) implication)?
    ;
 
-compareop
-   : '<'
-   | '>'
-   | '>='
-   | '<='
+disjunction
+   : conjunction (OR conjunction)*
    ;
 
-moduleend
-   : '===='
+conjunction
+   : comparison (AND comparison)*
+   ;
+
+comparison
+   : range (('=' | '/=' | '<' | '>' | '>=' | '<=' | IN | '\\notin' | '\\subseteq') range)*
+   ;
+
+range
+   : sum ('..' sum)?
+   ;
+
+sum
+   : product (('+' | '-' | COMBINE | '\\cup' | '\\cap' | '\\') product)*
+   ;
+
+product
+   : unary (('*' | '/' | '\\div' | '%' | CARTESIANPRODUCT) unary)*
+   ;
+
+unary
+   : (DOMAIN | 'SUBSET' | 'UNION' | 'UNCHANGED' | 'ENABLED' | '~' | '-' | '[]' | '<>') unary
+   | (ALL | EXISTS | CHOOSE) identifier IN expression ':' expression
+   | AND expression
+   | OR expression
+   | postfix
+   ;
+
+postfix
+   : atom ('[' expression (',' expression)* ']' | '(' (expression (',' expression)*)? ')' | '\'')*
    ;
 
 atom
    : number
    | identifier
-   | (identifier '[' expression ']')
    | TRUE
    | FALSE
+   | STRING
    | tuple
    | set
+   | '(' expression ')'
+   | 'IF' expression 'THEN' expression 'ELSE' expression
    ;
 
-func
-   : domainfunc
-   ;
-
-domainfunc
-   : DOMAIN expression
+moduleend
+   : '====' '='*
    ;
 
 number
-   : DIGIT+
+   : NUMBER
    ;
 
 identifier
@@ -276,8 +290,12 @@ COMMENT
    : '\\*' ~ [\r\n]* -> skip
    ;
 
-DIGIT
-   : '0' .. '9'
+STRING
+   : '"' ('\\' . | ~["\\\r\n])* '"'
+   ;
+
+NUMBER
+   : [0-9]+
    ;
 
 ID
@@ -285,6 +303,5 @@ ID
    ;
 
 WS
-   : [ \t\r\n] -> skip
+   : [ \t\r\n]+ -> skip
    ;
-

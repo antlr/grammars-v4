@@ -2,7 +2,7 @@
 EXTENDS TLC, Sequences, Integers
                 
 (* --algorithm hanoi
-variables tower = <<<<1, 2, 3>>, <<>>, <<>>>>, 
+variables tower = <<<<1, 2, 3>>, <<>>, <<>>>>;
 
 define 
   D == DOMAIN tower

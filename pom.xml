@@ -443,6 +443,7 @@
 				<module>tinyc</module>
 				<module>tinymud</module>
 				<module>tl</module>
+				<module>tlaplus</module>
 				<module>tmg</module>
 				<module>tnsnames</module>
 				<module>tnt</module>
