@@ -41,7 +41,8 @@
 					<entryPoint>file_</entryPoint>
 					<grammarName>zil</grammarName>
 					<packageName></packageName>
-					<exampleFiles>examples/working/</exampleFiles>
+					<exampleFiles>examples/</exampleFiles>
+					<testFileExtension>zil</testFileExtension>
 				</configuration>
 				<executions>
 					<execution>

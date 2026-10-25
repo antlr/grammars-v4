@@ -13,4 +13,9 @@ Language references:
 - [ZIL Language Guide](https://foss.heptapod.net/zilf/zilf/-/blob/branch/default/doc/ZIL%20Language%20Guide.odt?ref_type=heads)
 - [MDL Language reference](https://mdl-language.readthedocs.io/en/latest/)
 
-Run the ten working example parser tests from this directory with `mvn test`.
+Semicolons comment out the following expression (an atom, string, list, or form),
+not the rest of the line. Commented expressions remain represented in the parse
+tree.
+
+Run all example parser tests, including the historical samples and the ten
+focused examples, from this directory with `mvn test`.

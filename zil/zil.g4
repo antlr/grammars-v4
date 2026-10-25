@@ -59,6 +59,7 @@ expression
    | form
    | operator
    | formprefix expression
+   | ';' expression
    ;
 
 list
@@ -100,7 +101,7 @@ FIX2
    ;
 
 ATOM
-   : ~[ \t\r\n()<>"`;\u005B\u005D]+
+   : ('\\' . | ~[ \t\f\r\n()<>"'!%`;\\\u005B\u005D])+
    ;
 
 GT
@@ -125,10 +126,6 @@ LPAREN
 
 RPAREN
    : ')'
-   ;
-
-COMMENT
-   : ';' ~[\r\n]* -> skip
    ;
 
 WS
