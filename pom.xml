@@ -180,6 +180,7 @@
 				<module>cerbac</module>
                 <module>chip8</module>
                 <module>chip8octo</module>
+				<module>clazz</module>
 				<module>clf</module>
 				<module>clif</module>
 				<module>clojure</module>
