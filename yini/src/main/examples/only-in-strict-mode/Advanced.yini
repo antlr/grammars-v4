@@ -1,0 +1,13 @@
+^ AdvancedSettings
+
+MaxThreads = 16
+Timeout = 30
+IsEnabled = YES
+UseSSL = NO
+IsAdmin = true
+
+^ `Complex Number Literals`
+Epsilon = 1e-6
+LargeNumber = 3e+8
+
+/END

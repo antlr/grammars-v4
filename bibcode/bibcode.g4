@@ -32,66 +32,72 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // https://web.archive.org/web/20110607153038/http://cdsweb.u-strasbg.fr/simbad/refcode/refcode-paper.html
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar bibcode;
 
 bibcode
-   : year publish volume pagesection author EOF
-   ;
+    : year publish volume pagesection author EOF
+    ;
 
 year
-   : DIGIT DIGIT DIGIT DIGIT
-   ;
+    : DIGIT DIGIT DIGIT DIGIT
+    ;
 
 publish
-   : (letter | digit | DOT) (letter | digit | DOT) (letter | digit | DOT) (letter | digit | DOT) (letter | digit | DOT)
-   ;
+    : (letter | digit | DOT) (letter | digit | DOT) (letter | digit | DOT) (letter | digit | DOT) (
+        letter
+        | digit
+        | DOT
+    )
+    ;
 
 volume
-   : (letter | digit | DOT) (letter | digit | DOT) (letter | digit | DOT) (letter | digit | DOT)
-   ;
+    : (letter | digit | DOT) (letter | digit | DOT) (letter | digit | DOT) (letter | digit | DOT)
+    ;
 
 pagesection
-   : section? page
-   ;
+    : section? page
+    ;
 
 section
-   : letter
-   ;
+    : letter
+    ;
 
 page
-   : (digit | DOT)+
-   ;
+    : (digit | DOT)+
+    ;
 
 author
-   : letter
-   ;
+    : letter
+    ;
 
 DOT
-   : '.'
-   ;
+    : '.'
+    ;
 
 letter
-   : UPPERLETTER
-   | LOWERLETTER
-   ;
+    : UPPERLETTER
+    | LOWERLETTER
+    ;
 
 digit
-   : DIGIT
-   ;
+    : DIGIT
+    ;
 
 UPPERLETTER
-   : [A-Z]
-   ;
+    : [A-Z]
+    ;
 
 LOWERLETTER
-   : [a-z]
-   ;
+    : [a-z]
+    ;
 
 DIGIT
-   : [0-9]
-   ;
+    : [0-9]
+    ;
 
 WS
-   : [ \r\n\t]+ -> skip
-   ;
-
+    : [ \r\n\t]+ -> skip
+    ;

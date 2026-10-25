@@ -1,0 +1,240 @@
+-- B457007.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--     The ACAA has created and maintains the Ada Conformity Assessment Test
+--     Suite for the purpose of conformity assessments conducted in accordance
+--     with the International Standard ISO/IEC 18009 - Ada: Conformity
+--     assessment of a language processor. This test suite should not be used
+--     to make claims of conformance unless used in accordance with
+--     ISO/IEC 18010 and any applicable ACAA procedures.
+--*
+--
+-- OBJECTIVE:
+--     Check that if the type of a conditional expression is not determined by
+--     the resolution rules, it is illegal.
+--
+-- TEST DESCRIPTION:
+--     In order for this to happen, the context must be one that allows
+--     the type to be one of a class of types (else 4.5.7(13/3) would apply),
+--     but not a type conversion (else 4.5.7(10/3) would apply).
+--     Additionally, the expressions must be of different types (else
+--     4.5.7(11/3) would apply), and none of the types can be universal
+--     (else 4.5.7(12/3) would apply).
+--
+--     We try a number of such contexts.
+--
+--     We didn't try the expression of a "delay until", as the only interesting
+--     case (that is, one that doesn't fail Legality Rules) using
+--     language-defined types would have required using Ada.Calendar and
+--     Ada.Real_Time, the latter being an Annex package which we can't use in
+--     core tests like this one. The test would have looked something like:
+--         delay until (if Accurate then Ada.Real_Time.Clock + 10.0
+--                                  else Ada.Calendar.Clock + 10.0);
+--
+--     We didn't try many cases that require static expressions. These
+--     require using two typed constants of different types in order to cause
+--     a problem; possible but not likely as most such expressions are likely
+--     to be of a universal type. We did try one such case just to touch the
+--     possibility. Some untested such contexts include:
+--        The expressions of an enumeration reprrsentation clause;
+--        The expressions of a real_range_specification;
+--        The expressions of a signed_integer_range_specification.
+--
+-- CHANGE HISTORY:
+--      30 Nov 2015   RLB     Created test.
+--       1 Dec 2015   RLB     Fixed incorrect declarations.
+--      26 Apr 2021   RLB     Added error location indicators.
+--!
+
+procedure B457007 is
+
+   type Der_Bool is new Boolean;
+
+   function OK return Der_Bool is (True);
+
+   A, B : Boolean := True;
+
+   C, D : Natural := 12;
+
+   type Small is range 0 .. 1000;
+
+   type Color is (Red, Blue, Green);
+
+   L, M : Color := Blue;
+
+   type Der_Color is new Color;
+
+   LD, MD : Der_Color := Green;
+
+   type Root is tagged null record;
+
+   R1 : Root;
+
+   type Ext1 is new Root with null record;
+
+   E1, E11 : Ext1;
+
+   type Ext2 is new Ext1 with null record;
+
+   E2, E22 : Ext2;
+
+begin
+
+   -- Condition:
+
+   if (if A then C > 4 else True) then                       -- OK. {7;5}
+      null;
+   end if;
+      -- Note: Here, the expression meets all of 4.5.7(8-13/3) when
+      -- True is interpreted as type Boolean, and does not when True
+      -- is interpreted as type Der_Bool (none of 4.5.7(10-13/3 trigger),
+      -- so there is a single correct resolution and the expression is OK.
+      -- Similar logic applies to all correct expressions using overloaded
+      -- enumeration literals.
+
+   if (if A then C > 4 else OK) then                         -- ERROR: {7;5}
+      null;
+   end if;
+
+   if (if A then Der_Bool(C > 4) else OK) then               -- OK. {7;5}
+      null;
+   end if;
+
+   C := (if (if A then D > 4 else B) then 66 else 92);       -- OK. {9;1}
+
+   C := (if (if A then OK else B) then 66 else 92);          -- ERROR: {9;1}
+
+   C := (if (if A then OK else Der_Bool(B)) then 66 else 92);-- OK. {9;1}
+
+   if (case L is
+         when Red   => A,
+         when Green => C > 4,
+         when Blue  => True) then                            -- OK. {3:7;5}
+      null;
+   end if;
+
+   if (case L is
+         when Red   => OK,
+         when Green => C > 4,
+         when Blue  => True) then                            -- ERROR: {3:7;5}
+      null;
+   end if;
+
+   if (case L is
+         when Red   => OK,
+         when Green => Der_Bool(C > 4),
+         when Blue  => True) then                            -- OK. {3:7;5}
+      null;
+   end if;
+
+   C := (if (case L is
+               when Red   => B,
+               when Green => D > 4,
+               when Blue  => False) then 66 else 92);        -- OK. {3:9;1}
+
+   C := (if (case L is
+               when Red   => B,
+               when Green => D > 4,
+               when Blue  => OK) then 66 else 92);           -- ERROR: {3:9;1}
+
+   -- Case expression:
+
+   case (if A then L else Green) is                          -- OK. {9;3}
+      when Red | Green => null;
+      when Blue => null;
+   end case;
+
+   case (if A then L else MD) is                             -- ERROR: {9;3}
+      when Red | Green => null;
+      when Blue => null;
+   end case;
+
+   case (if A then Red else MD) is                           -- OK. {9;3}
+      when Red | Green => null;
+      when Blue => null;
+   end case;
+
+   case (case L is
+            when Green => Green,
+            when Red | Blue => M) is                         -- OK. {2:9;3}
+      when Red | Green => null;
+      when Blue => null;
+   end case;
+
+   case (case L is
+            when Green => LD,
+            when Red | Blue => M) is                         -- ERROR: {2:9;3}
+      when Red | Green => null;
+      when Blue => null;
+   end case;
+
+   case (case L is
+            when Green => LD,
+            when Red | Blue => MD) is                        -- OK. {2:9;3}
+      when Red | Green => null;
+      when Blue => null;
+   end case;
+
+   -- Extension aggregate expression:
+
+   E2 := Ext2'((if B then R1 else E1) with null record);     -- ERROR: {10;1}
+
+   E2 := Ext2'((if B then E11 else E1) with null record);    -- OK. {10;1}
+
+   E2 := Ext2'((case L is
+                 when Red   => R1,
+                 when Green => E1,
+                 when Blue  => E11) with null record);       -- ERROR: {3:10;1}
+
+   E2 := Ext2'((case L is
+                 when Red   => E1,
+                 when Green => E1,
+                 when Blue  => E11) with null record);       -- OK. {3:10;1}
+
+   -- Modular type definitions:
+
+   declare
+      Now    : constant Boolean := True;
+      Clr    : constant Color := Blue;
+      Nibble : constant Natural := 2**4;
+      Byte   : constant Small := 2**8;
+      type M1 is mod (if Now then 2**6 else Nibble);         -- OK. {22;1}
+      type M2 is mod (if Now then Byte else Nibble);         -- ERROR: {22;1}
+      type M3 is mod (if Now then Byte else 2**2);           -- OK. {22;1}
+      type M4 is mod (case Clr is
+                         when Red   => Byte,
+                         when Green => 2**3,
+                         when Blue  => 7);                   -- OK. {3:22;1}
+      type M5 is mod (case Clr is
+                         when Red   => Byte,
+                         when Green => Nibble,
+                         when Blue  => 7);                   -- ERROR: {3:22;1}
+
+   begin
+      null;
+   end;
+
+end B457007;

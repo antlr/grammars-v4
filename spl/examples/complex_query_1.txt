@@ -1,0 +1,1 @@
+index=web sourcetype=access_combined | where _time > relative_time(now(), "-1d@d") AND _time < relative_time(now(), "@d")

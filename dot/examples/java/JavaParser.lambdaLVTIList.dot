@@ -1,0 +1,23 @@
+digraph ATN {
+rankdir=LR;
+s101[fontsize=11, label="101", shape=doublecircle, fixedsize=true, width=.6];
+s100[fontsize=11,label="100", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s804[fontsize=11,label="804", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s805[fontsize=11,label="805", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s806[fontsize=11,label="806", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s807[fontsize=11,label="&rarr;\n807*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s808[fontsize=11,label="&larr;\n808", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s809[fontsize=11,label="{809*\nd=86|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s810[fontsize=11,label="810", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s811[fontsize=11,label="811*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s100 -> s804 [fontname="Times-Italic", label="&epsilon;"];
+s804 -> s809 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<lambdaLVTIParameter>", arrowhead = normal];
+s809:p0 -> s807 [fontname="Times-Italic", label="&epsilon;"];
+s809:p1 -> s810 [fontname="Times-Italic", label="&epsilon;"];
+s807 -> s805 [fontname="Times-Italic", label="&epsilon;"];
+s810 -> s101 [fontname="Times-Italic", label="&epsilon;"];
+s805 -> s806 [fontsize=11, fontname="Courier", arrowsize=.7, label = "','", arrowhead = normal];
+s806 -> s808 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<lambdaLVTIParameter>", arrowhead = normal];
+s808 -> s811 [fontname="Times-Italic", label="&epsilon;"];
+s811 -> s809 [fontname="Times-Italic", label="&epsilon;", style="dashed"];
+}

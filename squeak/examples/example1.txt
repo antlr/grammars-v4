@@ -1,0 +1,14 @@
+proc Mouse = DN? . M?p . moveTo!p . UP? . Mouse
+
+proc Kbd(s)=K?c.
+    if c==NewLine then
+        typed!s . Kbd(emptyString)
+    else
+        Kbd(append(s,c))
+    fi
+
+proc Text(p) =
+    < moveTo?p . Text(p)
+    :: typed?s . {drawString(s,p)}? . Text (p) >
+
+type = Mouse & Kbd(emptyString) & Text(nullPt)

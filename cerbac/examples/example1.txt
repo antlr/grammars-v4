@@ -1,0 +1,59 @@
+PolicyStatement:[
+
+ {
+
+   "Id" : "Policy1",
+
+   "Type": "A+",
+
+   "Who": "Admin",
+
+   "Action": *,
+
+  "What" : {"Resource": "Email"}
+
+},
+
+ 
+
+{
+
+   "Id" : "Policy2",
+
+   "Type": "A-",
+
+   "Who": "Support Engineer",
+
+   "Action": ["DELETE", "UPDATE"],
+
+  "What" : {"Resource": "Software"},
+
+  "Why" : "for troubleshooting"
+
+},
+
+ 
+
+{
+
+   "Id" : "Policy3",
+
+   "Type": "O+",
+
+   "Who": "Support Engineer",
+
+   "Action": ["BACKUP"],
+
+  "What" : {"Resource": "Software/Data"},
+
+  "Trigger" : "On Update",
+
+  "When": "timeBetween": {"startTime": "10AM", "endTime":"11PM"}
+
+}
+
+ 
+
+ 
+
+]

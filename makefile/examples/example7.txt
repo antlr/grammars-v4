@@ -1,0 +1,3 @@
+all:
+	@echo "Building version $(VERSION)"
+	@echo "Done"

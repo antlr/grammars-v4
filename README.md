@@ -1,13 +1,21 @@
-![CI](https://github.com/antlr/grammars-v4/workflows/CI/badge.svg)
+Last PR merge build: [![CI](https://github.com/antlr/grammars-v4/actions/workflows/main.yml/badge.svg)](https://github.com/antlr/grammars-v4/actions/workflows/main.yml?query=branch%3Amaster)
+Weekly .jar build: [![Weekly JAR](https://github.com/antlr/grammars-v4/actions/workflows/weekly-jar.yml/badge.svg)](https://github.com/antlr/grammars-v4/actions/workflows/weekly-jar.yml?query=branch%3Amaster)
+Weekly dev build: [![Weekly Dev](https://github.com/antlr/grammars-v4/actions/workflows/weekly-dev.yml/badge.svg)](https://github.com/antlr/grammars-v4/actions/workflows/weekly-dev.yml?query=branch%3Amaster)
 
-# grammars-v4
+# Grammars-v4
 
-Grammars written for [ANTLR v4](https://github.com/antlr/antlr4)
+This repository is a collection of formal grammars written for [ANTLR v4](https://github.com/antlr/antlr4).
 
-This repository is a collection of Antlr4 grammars.   
+The root directory name is the all-lowercase name of the language or file format parsed by the grammar. For example, java, cpp, csharp, c, etc.
 
-The root directory name is the all-lowercase name of the language parsed by the grammar. For example, java, cpp, csharp, c, etc...
+## Performance
 
-# FAQ
+[Grammar performance table](https://htmlpreview.github.io/?https://github.com/antlr/grammars-v4/blob/master/performance.html) (sortable by column header).
+
+## FAQ
 
 Please refer to the [grammars-v4 Wiki](https://github.com/antlr/grammars-v4/wiki)
+
+## Code of Conduct
+
+Please refer to [House Rules](https://github.com/antlr/grammars-v4/blob/master/House_Rules.md)

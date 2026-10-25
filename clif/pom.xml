@@ -38,7 +38,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>termseq</entryPoint>
+					<entryPoint>start_</entryPoint>
 					<grammarName>CLIF</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>

@@ -1,0 +1,5 @@
+CONST PI=3
+
+PROC main()
+  IF PI = 3 THEN WriteF('yes') ELSE WriteF('no')
+ENDPROC
