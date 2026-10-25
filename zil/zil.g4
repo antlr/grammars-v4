@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2025, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar zil;
 
 file_
-   : (STRING | form)* EOF
+   : expression* EOF
    ;
 
 formprefix
@@ -48,7 +48,7 @@ formprefix
    ;
 
 form
-   : formprefix? LT operation? expression* GT
+   : LT expression* GT
    ;
 
 expression
@@ -57,21 +57,23 @@ expression
    | list
    | ATOM
    | form
+   | operator
+   | formprefix expression
    ;
 
 list
    : LPAREN expression* RPAREN
+   | LBRACKET expression* RBRACKET
    ;
 
 fix
    : FIX10
    | FIX16
-   | FIX16
+   | FIX2
    ;
 
-operation
-   : ATOM
-   | '*'
+operator
+   : '*'
    | '+'
    | '/'
    | '-'
@@ -81,16 +83,8 @@ operation
    | '=?'
    ;
 
-ATOM
-   : (LOCAL | GLOBAL)? [A-Z#=+-]+ QUES?
-   ;
-
 STRING
-   : '"' (~ '"' | ESCAPED_QUOTES)* '"'
-   ;
-
-fragment ESCAPED_QUOTES
-   : '\\"'
+   : '"' ('\\' . | ~["\\])* '"'
    ;
 
 FIX10
@@ -98,11 +92,15 @@ FIX10
    ;
 
 FIX16
-   : '*' [0-9]+ '*'
+   : '*' [0-9A-F]+ '*'
    ;
 
 FIX2
    : '#2' [0-1]*
+   ;
+
+ATOM
+   : ~[ \t\r\n()<>"`;\u005B\u005D]+
    ;
 
 GT
@@ -129,36 +127,10 @@ RPAREN
    : ')'
    ;
 
-LOCAL
-   : '.'
+COMMENT
+   : ';' ~[\r\n]* -> skip
    ;
 
-GLOBAL
-   : ','
-   ;
-
-QUES
-   : '?'
-   ;
-
-COMMENT2
-   : ';' STRING -> skip
-   ;
-
-ESC1
-   : '\\' '\u0000' .. '\u0255' -> skip
-   ;
-
-ESC2
-   : '/^' '\u0000' .. '\u0255' -> skip
-   ;
-   //COMMENT1
-   
-   //   : ';' ~ [\r\n]*
-   
-   //   ;
-   
 WS
-   : [ \r\n\t]+ -> skip
+   : [ \f\r\n\t]+ -> skip
    ;
-
