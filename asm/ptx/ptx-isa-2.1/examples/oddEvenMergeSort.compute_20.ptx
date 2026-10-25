@@ -1,0 +1,336 @@
+	.version 2.1
+	.target sm_20
+	// compiled with C:\CUDA\bin/../open64/lib//be.exe
+	// nvopencc 3.1 built on 2010-06-08
+
+	//-----------------------------------------------------------
+	// Compiling oddEvenMergeSort.compute_20.cpp3.i (C:/Users/Ken/AppData/Local/Temp/ccBI#.a07532)
+	//-----------------------------------------------------------
+
+	//-----------------------------------------------------------
+	// Options:
+	//-----------------------------------------------------------
+	//  Target:ptx, ISA:sm_20, Endian:little, Pointer Size:32
+	//  -O3	(Optimization level)
+	//  -g0	(Debug level)
+	//  -m2	(Report advisories)
+	//-----------------------------------------------------------
+
+	.file	1	"oddEvenMergeSort.compute_20.cudafe2.gpu"
+	.file	2	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\crtdefs.h"
+	.file	3	"C:\CUDA\include\crt/device_runtime.h"
+	.file	4	"C:\CUDA\include\host_defines.h"
+	.file	5	"C:\CUDA\include\builtin_types.h"
+	.file	6	"c:\cuda\include\device_types.h"
+	.file	7	"c:\cuda\include\driver_types.h"
+	.file	8	"c:\cuda\include\surface_types.h"
+	.file	9	"c:\cuda\include\texture_types.h"
+	.file	10	"c:\cuda\include\vector_types.h"
+	.file	11	"c:\cuda\include\builtin_types.h"
+	.file	12	"c:\cuda\include\host_defines.h"
+	.file	13	"C:\CUDA\include\device_launch_parameters.h"
+	.file	14	"c:\cuda\include\crt\storage_class.h"
+	.file	15	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\time.h"
+	.file	16	"c:\programdata\nvidia corporation\nvidia gpu computing sdk\c\src\sortingnetworks\sortingNetworks_common.h"
+	.file	17	"c:\cuda\include\texture_fetch_functions.h"
+	.file	18	"c:/ProgramData/NVIDIA Corporation/NVIDIA GPU Computing SDK/C/src/sortingNetworks/oddEvenMergeSort.cu"
+	.file	19	"C:\CUDA\include\common_functions.h"
+	.file	20	"c:\cuda\include\math_functions.h"
+	.file	21	"c:\cuda\include\math_constants.h"
+	.file	22	"c:\cuda\include\device_functions.h"
+	.file	23	"c:\cuda\include\sm_11_atomic_functions.h"
+	.file	24	"c:\cuda\include\sm_12_atomic_functions.h"
+	.file	25	"c:\cuda\include\sm_13_double_functions.h"
+	.file	26	"c:\cuda\include\sm_20_atomic_functions.h"
+	.file	27	"c:\cuda\include\sm_20_intrinsics.h"
+	.file	28	"c:\cuda\include\surface_functions.h"
+	.file	29	"c:\cuda\include\math_functions_dbl_ptx3.h"
+
+
+	.entry _Z22oddEvenMergeSortSharedPjS_S_S_jj (
+		.param .u32 __cudaparm__Z22oddEvenMergeSortSharedPjS_S_S_jj___val_paramd_DstKey,
+		.param .u32 __cudaparm__Z22oddEvenMergeSortSharedPjS_S_S_jj___val_paramd_DstVal,
+		.param .u32 __cudaparm__Z22oddEvenMergeSortSharedPjS_S_S_jj___val_paramd_SrcKey,
+		.param .u32 __cudaparm__Z22oddEvenMergeSortSharedPjS_S_S_jj___val_paramd_SrcVal,
+		.param .u32 __cudaparm__Z22oddEvenMergeSortSharedPjS_S_S_jj_arrayLength,
+		.param .u32 __cudaparm__Z22oddEvenMergeSortSharedPjS_S_S_jj_dir)
+	{
+	.reg .u32 %r<70>;
+	.reg .pred %p<9>;
+	.shared .align 4 .b8 __cuda___cuda_local_var_288043_33_s_val24[4096];
+	.shared .align 4 .b8 __cuda___cuda_local_var_288042_33_s_key4120[4096];
+	.loc	18	38	0
+$LDWbegin__Z22oddEvenMergeSortSharedPjS_S_S_jj:
+	mov.u32 	%r1, __cuda___cuda_local_var_288043_33_s_val24;
+	mov.u32 	%r2, __cuda___cuda_local_var_288042_33_s_key4120;
+	.loc	18	49	0
+	mov.u32 	%r3, %ctaid.x;
+	mul.lo.u32 	%r4, %r3, 1024;
+	mov.u32 	%r5, %tid.x;
+	mul.lo.u32 	%r6, %r5, 4;
+	add.u32 	%r7, %r4, %r5;
+	add.u32 	%r8, %r6, %r2;
+	mul.lo.u32 	%r9, %r7, 4;
+	ld.param.u32 	%r10, [__cudaparm__Z22oddEvenMergeSortSharedPjS_S_S_jj___val_paramd_SrcKey];
+	add.u32 	%r11, %r10, %r9;
+	ld.global.u32 	%r12, [%r11+0];
+	st.shared.u32 	[%r8+0], %r12;
+	.loc	18	50	0
+	add.u32 	%r13, %r6, %r1;
+	ld.param.u32 	%r14, [__cudaparm__Z22oddEvenMergeSortSharedPjS_S_S_jj___val_paramd_SrcVal];
+	add.u32 	%r15, %r14, %r9;
+	ld.global.u32 	%r16, [%r15+0];
+	st.shared.u32 	[%r13+0], %r16;
+	.loc	18	51	0
+	ld.global.u32 	%r17, [%r11+2048];
+	st.shared.u32 	[%r8+2048], %r17;
+	.loc	18	52	0
+	ld.global.u32 	%r18, [%r15+2048];
+	st.shared.u32 	[%r13+2048], %r18;
+	ld.param.u32 	%r19, [__cudaparm__Z22oddEvenMergeSortSharedPjS_S_S_jj_arrayLength];
+	mov.u32 	%r20, 2;
+	setp.lt.u32 	%p1, %r19, %r20;
+	@%p1 bra 	$Lt_0_4610;
+	mul.lo.u32 	%r21, %r5, 2;
+	ld.param.u32 	%r22, [__cudaparm__Z22oddEvenMergeSortSharedPjS_S_S_jj_dir];
+	mov.u32 	%r23, 2;
+$Lt_0_5122:
+ //<loop> Loop body line 52, nesting depth: 1, estimated iterations: unknown
+	.loc	18	59	0
+	bar.sync 	0;
+	shr.u32 	%r24, %r23, 1;
+	sub.u32 	%r25, %r24, 1;
+	and.b32 	%r26, %r25, %r5;
+	sub.u32 	%r27, %r21, %r26;
+	mul.lo.u32 	%r28, %r27, 4;
+	add.u32 	%r29, %r24, %r27;
+	add.u32 	%r30, %r28, %r2;
+	mul.lo.u32 	%r31, %r29, 4;
+	ld.shared.u32 	%r32, [%r30+0];
+	add.u32 	%r33, %r31, %r2;
+	ld.shared.u32 	%r34, [%r33+0];
+	set.lt.u32.u32 	%r35, %r34, %r32;
+	neg.s32 	%r36, %r35;
+	setp.ne.u32 	%p2, %r22, %r36;
+	@%p2 bra 	$Lt_0_5378;
+ //<loop> Part of loop body line 52, head labeled $Lt_0_5122
+	.loc	18	61	0
+	st.shared.u32 	[%r30+0], %r34;
+	st.shared.u32 	[%r33+0], %r32;
+	add.u32 	%r37, %r28, %r1;
+	ld.shared.u32 	%r38, [%r37+0];
+	add.u32 	%r39, %r31, %r1;
+	ld.shared.u32 	%r40, [%r39+0];
+	st.shared.u32 	[%r37+0], %r40;
+	st.shared.u32 	[%r39+0], %r38;
+$Lt_0_5378:
+ //<loop> Part of loop body line 52, head labeled $Lt_0_5122
+	.loc	18	66	0
+	shr.u32 	%r41, %r24, 1;
+	mov.s32 	%r42, %r41;
+	mov.u32 	%r43, 0;
+	setp.eq.u32 	%p3, %r41, %r43;
+	@%p3 bra 	$Lt_0_5890;
+$Lt_0_6402:
+ //<loop> Loop body line 70
+	.loc	18	70	0
+	bar.sync 	0;
+	setp.lt.u32 	%p4, %r26, %r42;
+	@%p4 bra 	$Lt_0_6658;
+ //<loop> Part of loop body line 70, head labeled $Lt_0_6402
+	sub.u32 	%r44, %r42, 1;
+	and.b32 	%r45, %r44, %r5;
+	sub.u32 	%r46, %r21, %r45;
+	mul.lo.u32 	%r47, %r46, 4;
+	sub.u32 	%r48, %r46, %r42;
+	add.u32 	%r49, %r47, %r2;
+	mul.lo.u32 	%r50, %r48, 4;
+	ld.shared.u32 	%r51, [%r49+0];
+	add.u32 	%r52, %r50, %r2;
+	ld.shared.u32 	%r53, [%r52+0];
+	set.lt.u32.u32 	%r54, %r51, %r53;
+	neg.s32 	%r55, %r54;
+	setp.ne.u32 	%p5, %r22, %r55;
+	@%p5 bra 	$Lt_0_7170;
+ //<loop> Part of loop body line 70, head labeled $Lt_0_6402
+	.loc	18	73	0
+	st.shared.u32 	[%r52+0], %r51;
+	st.shared.u32 	[%r49+0], %r53;
+	add.u32 	%r56, %r50, %r1;
+	ld.shared.u32 	%r57, [%r56+0];
+	add.u32 	%r58, %r47, %r1;
+	ld.shared.u32 	%r59, [%r58+0];
+	st.shared.u32 	[%r56+0], %r59;
+	st.shared.u32 	[%r58+0], %r57;
+$Lt_0_7170:
+$Lt_0_6658:
+ //<loop> Part of loop body line 70, head labeled $Lt_0_6402
+	.loc	18	69	0
+	shr.u32 	%r42, %r42, 1;
+	mov.u32 	%r60, 0;
+	setp.ne.u32 	%p6, %r42, %r60;
+	@%p6 bra 	$Lt_0_6402;
+$Lt_0_5890:
+ //<loop> Part of loop body line 52, head labeled $Lt_0_5122
+	.loc	18	54	0
+	shl.b32 	%r23, %r23, 1;
+	setp.ge.u32 	%p7, %r19, %r23;
+	@%p7 bra 	$Lt_0_5122;
+$Lt_0_4610:
+	.loc	18	81	0
+	bar.sync 	0;
+	.loc	18	82	0
+	ld.param.u32 	%r61, [__cudaparm__Z22oddEvenMergeSortSharedPjS_S_S_jj___val_paramd_DstKey];
+	add.u32 	%r62, %r61, %r9;
+	ld.shared.u32 	%r63, [%r8+0];
+	st.global.u32 	[%r62+0], %r63;
+	.loc	18	83	0
+	ld.param.u32 	%r64, [__cudaparm__Z22oddEvenMergeSortSharedPjS_S_S_jj___val_paramd_DstVal];
+	add.u32 	%r65, %r64, %r9;
+	ld.shared.u32 	%r66, [%r13+0];
+	st.global.u32 	[%r65+0], %r66;
+	.loc	18	84	0
+	ld.shared.u32 	%r67, [%r8+2048];
+	st.global.u32 	[%r62+2048], %r67;
+	.loc	18	85	0
+	ld.shared.u32 	%r68, [%r13+2048];
+	st.global.u32 	[%r65+2048], %r68;
+	.loc	18	86	0
+	exit;
+$LDWend__Z22oddEvenMergeSortSharedPjS_S_S_jj:
+	} // _Z22oddEvenMergeSortSharedPjS_S_S_jj
+
+	.entry _Z18oddEvenMergeGlobalPjS_S_S_jjjj (
+		.param .u32 __cudaparm__Z18oddEvenMergeGlobalPjS_S_S_jjjj_d_DstKey,
+		.param .u32 __cudaparm__Z18oddEvenMergeGlobalPjS_S_S_jjjj_d_DstVal,
+		.param .u32 __cudaparm__Z18oddEvenMergeGlobalPjS_S_S_jjjj_d_SrcKey,
+		.param .u32 __cudaparm__Z18oddEvenMergeGlobalPjS_S_S_jjjj_d_SrcVal,
+		.param .u32 __cudaparm__Z18oddEvenMergeGlobalPjS_S_S_jjjj_arrayLength,
+		.param .u32 __cudaparm__Z18oddEvenMergeGlobalPjS_S_S_jjjj_size,
+		.param .u32 __cudaparm__Z18oddEvenMergeGlobalPjS_S_S_jjjj_stride,
+		.param .u32 __cudaparm__Z18oddEvenMergeGlobalPjS_S_S_jjjj_dir)
+	{
+	.reg .u32 %r<70>;
+	.reg .pred %p<6>;
+	.loc	18	102	0
+$LDWbegin__Z18oddEvenMergeGlobalPjS_S_S_jjjj:
+	ld.param.u32 	%r1, [__cudaparm__Z18oddEvenMergeGlobalPjS_S_S_jjjj_size];
+	shr.u32 	%r2, %r1, 1;
+	mov.u32 	%r3, %ctaid.x;
+	mov.u32 	%r4, %ntid.x;
+	mul.lo.u32 	%r5, %r3, %r4;
+	mov.u32 	%r6, %tid.x;
+	add.u32 	%r7, %r6, %r5;
+	ld.param.u32 	%r8, [__cudaparm__Z18oddEvenMergeGlobalPjS_S_S_jjjj_stride];
+	setp.le.u32 	%p1, %r2, %r8;
+	@%p1 bra 	$Lt_1_3586;
+	sub.u32 	%r9, %r2, 1;
+	and.b32 	%r10, %r7, %r9;
+	setp.gt.u32 	%p2, %r8, %r10;
+	@%p2 bra 	$Lt_1_3330;
+	.loc	18	112	0
+	sub.u32 	%r11, %r8, 1;
+	mul.lo.u32 	%r12, %r7, 2;
+	and.b32 	%r13, %r7, %r11;
+	sub.u32 	%r14, %r12, %r13;
+	sub.u32 	%r15, %r14, %r8;
+	mul.lo.u32 	%r16, %r15, 4;
+	ld.param.u32 	%r17, [__cudaparm__Z18oddEvenMergeGlobalPjS_S_S_jjjj_d_SrcKey];
+	add.u32 	%r18, %r16, %r17;
+	ld.global.u32 	%r19, [%r18+0];
+	mov.s32 	%r20, %r19;
+	.loc	18	113	0
+	ld.param.u32 	%r21, [__cudaparm__Z18oddEvenMergeGlobalPjS_S_S_jjjj_d_SrcVal];
+	add.u32 	%r22, %r16, %r21;
+	ld.global.u32 	%r23, [%r22+0];
+	mov.s32 	%r24, %r23;
+	.loc	18	114	0
+	mul.lo.u32 	%r25, %r14, 4;
+	add.u32 	%r26, %r25, %r17;
+	ld.global.u32 	%r27, [%r26+0];
+	mov.s32 	%r28, %r27;
+	.loc	18	115	0
+	add.u32 	%r29, %r25, %r21;
+	ld.global.u32 	%r30, [%r29+0];
+	mov.s32 	%r31, %r30;
+	ld.param.u32 	%r32, [__cudaparm__Z18oddEvenMergeGlobalPjS_S_S_jjjj_dir];
+	set.lt.u32.u32 	%r33, %r27, %r19;
+	neg.s32 	%r34, %r33;
+	setp.ne.u32 	%p3, %r32, %r34;
+	@%p3 bra 	$Lt_1_4354;
+	.loc	18	117	0
+	mov.s32 	%r20, %r27;
+	mov.s32 	%r28, %r19;
+	mov.s32 	%r24, %r30;
+	mov.s32 	%r31, %r23;
+$Lt_1_4354:
+	.loc	18	123	0
+	ld.param.u32 	%r35, [__cudaparm__Z18oddEvenMergeGlobalPjS_S_S_jjjj_d_DstKey];
+	add.u32 	%r36, %r16, %r35;
+	st.global.u32 	[%r36+0], %r20;
+	.loc	18	124	0
+	ld.param.u32 	%r37, [__cudaparm__Z18oddEvenMergeGlobalPjS_S_S_jjjj_d_DstVal];
+	add.u32 	%r38, %r16, %r37;
+	st.global.u32 	[%r38+0], %r24;
+	.loc	18	125	0
+	add.u32 	%r39, %r25, %r35;
+	st.global.u32 	[%r39+0], %r28;
+	.loc	18	126	0
+	add.u32 	%r40, %r25, %r37;
+	st.global.u32 	[%r40+0], %r31;
+	bra.uni 	$Lt_1_3330;
+$Lt_1_3586:
+	.loc	18	129	0
+	sub.u32 	%r41, %r8, 1;
+	mul.lo.u32 	%r42, %r7, 2;
+	and.b32 	%r43, %r7, %r41;
+	sub.u32 	%r44, %r42, %r43;
+	mul.lo.u32 	%r45, %r44, 4;
+	ld.param.u32 	%r46, [__cudaparm__Z18oddEvenMergeGlobalPjS_S_S_jjjj_d_SrcKey];
+	add.u32 	%r47, %r45, %r46;
+	ld.global.u32 	%r48, [%r47+0];
+	mov.s32 	%r49, %r48;
+	.loc	18	130	0
+	ld.param.u32 	%r50, [__cudaparm__Z18oddEvenMergeGlobalPjS_S_S_jjjj_d_SrcVal];
+	add.u32 	%r51, %r45, %r50;
+	ld.global.u32 	%r52, [%r51+0];
+	mov.s32 	%r53, %r52;
+	.loc	18	131	0
+	add.u32 	%r54, %r44, %r8;
+	mul.lo.u32 	%r55, %r54, 4;
+	add.u32 	%r56, %r55, %r46;
+	ld.global.u32 	%r57, [%r56+0];
+	.loc	18	132	0
+	add.u32 	%r58, %r55, %r50;
+	ld.global.u32 	%r59, [%r58+0];
+	set.gt.u32.u32 	%r60, %r48, %r57;
+	neg.s32 	%r61, %r60;
+	ld.param.u32 	%r62, [__cudaparm__Z18oddEvenMergeGlobalPjS_S_S_jjjj_dir];
+	setp.ne.u32 	%p4, %r61, %r62;
+	@%p4 bra 	$Lt_1_4866;
+	.loc	18	134	0
+	mov.s32 	%r49, %r57;
+	mov.s32 	%r57, %r48;
+	mov.s32 	%r53, %r59;
+	mov.s32 	%r59, %r52;
+$Lt_1_4866:
+	.loc	18	140	0
+	ld.param.u32 	%r63, [__cudaparm__Z18oddEvenMergeGlobalPjS_S_S_jjjj_d_DstKey];
+	add.u32 	%r64, %r45, %r63;
+	st.global.u32 	[%r64+0], %r49;
+	.loc	18	141	0
+	ld.param.u32 	%r65, [__cudaparm__Z18oddEvenMergeGlobalPjS_S_S_jjjj_d_DstVal];
+	add.u32 	%r66, %r45, %r65;
+	st.global.u32 	[%r66+0], %r53;
+	.loc	18	142	0
+	add.u32 	%r67, %r55, %r63;
+	st.global.u32 	[%r67+0], %r57;
+	.loc	18	143	0
+	add.u32 	%r68, %r55, %r65;
+	st.global.u32 	[%r68+0], %r59;
+$Lt_1_3330:
+	.loc	18	145	0
+	exit;
+$LDWend__Z18oddEvenMergeGlobalPjS_S_S_jjjj:
+	} // _Z18oddEvenMergeGlobalPjS_S_S_jjjj
+

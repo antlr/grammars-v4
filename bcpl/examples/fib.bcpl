@@ -1,0 +1,9 @@
+GET "libhdr"
+
+LET start() = VALOF
+{ FOR i = 0 TO 15 DO writef("%n, ", fibonacci(i))
+  writef("...*n")
+  RESULTIS 0
+}
+
+AND fibonacci(n) = n<2 -> 1, fibonacci(n-1)+fibonacci(n-2)

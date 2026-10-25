@@ -1,0 +1,6 @@
+begin
+    integer array a(1:10);
+    integer i;
+    for i := 1 step 1 until 10 do
+        a(i) := i * i
+end

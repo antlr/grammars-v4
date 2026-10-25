@@ -13,7 +13,7 @@ type TJSBaseParser struct {
 
 func (p *TJSBaseParser) notOpenBraceAndNotFunction() bool {
 	nextTokenType := p.GetTokenStream().LT(1).GetTokenType()
-	return nextTokenType != TJSParserOpenBrace && nextTokenType != TJSParserFunction
+	return nextTokenType != TJSParserOpenBrace && nextTokenType != TJSParserFunction_
 }
 
 func (p *TJSBaseParser) closeBrace() bool {

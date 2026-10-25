@@ -1,0 +1,3 @@
+DO IDX = 1 TO 10;
+TOTAL = IDX;
+END;

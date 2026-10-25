@@ -1,0 +1,865 @@
+; built in function examples
+; the intention ultimately is to have a one line example or two for most every built in function.
+; while not adequate, it is at least a start.
+; all examples are meant to run on a clear stack
+
+;;; stack ops ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+1 2 3 clear
+
+1 2 3 cleard
+
+1 2 3 stackDepth
+
+7 aa 
+
+9 aaa 
+
+1 2 ba
+
+1 2 aba
+
+1 2 bab
+
+1 2 aab
+
+1 2 aabb
+
+1 2 abab
+
+1 2 3 bac
+
+1 2 3 cba
+
+1 2 3 cab
+
+1 2 3 bca
+
+1 2 3 nip
+
+1 2 pop
+
+
+;;; list ops ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+ord finite
+
+1 5 to finite
+
+[1 2 3] size
+
+1 bub
+
+[1 2] bub
+
+[1 2] @ bub
+
+1 2 nbub
+
+1 2 2ple
+
+1 2 3 3ple
+
+1 2 3 4 4ple
+
+6 7 8 9 0  5ple
+
+[1 2 3] un3
+
+0 ord 2ples
+
+nat ord 2ples
+
+ord 2 3 3ples
+
+ord ord 3 4 4ples
+
+[1 2 3 4 5] reverse
+
+[[1 2 3][4 5 6]] @ reverse
+
+[1 2 3 4] mirror0
+
+[1 2 3 4] mirror1
+
+[1 2 3 4] mirror2
+
+[1 2 3 4 5] 1 rot
+
+[1 2 3 4 5] -1 rot
+
+[1 2 3 4 5][-2 -1 0 1 2] rot
+
+[1 2 3 4 5] 1 shift
+
+[1 2 3 4 5] -1 shift
+
+[1 2 3 4 5](-3 3 to) shift
+
+[1 2 3 4 5](-3 3 to) clipShift
+
+[1 2 3 4 5](-3 3 to) foldShift
+
+(1 10 to) muss
+
+[1 2 3 4][0 0 2 2 1 1 3 2 1 0 -1 4] at
+
+[1 2 3] -6 6 to at
+
+[1 2 3] -6 6 to clipAt
+
+[1 2 3] -6 6 to wrapAt
+
+[1 2 3] -6 6 to foldAt
+
+[3 1 2 5 6 4] sort
+
+[3 1 2 5 6 4] sort>
+
+[3 1 2 5 6 4] grade
+
+[3 1 2 5 6 4] grade>
+
+[3 1 2 5 6 4] aa grade at 
+
+[3 1 2 5 6 4] aa grade> at 
+
+;;; loops ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(1 10 to) \x[ x pr cr ] do
+
+
+;;; conditional ops ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[1 2 3] [1 2 3] equals
+
+1 \['a]\['b] if
+
+0 \['a]\['b] if
+
+
+;;; form ops ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+{:a 1 :b 2 :c 3} ['b 'd] has
+
+{:a 1 :b 2 :c 3} keys
+
+{:a 1 :b 2 :c 3} values
+
+{:a 1 :b 2 :c 3} kv
+
+{{{:a 1} :b 2} :c 3} local
+
+{{{:a 1} :b 2} :c 3} parent
+
+{:a 1 :b 2 :c 3} 'b dot
+
+{:a 1 :b 2 :c 3} ['b 'a] dot
+
+
+;;; ref ops ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+\[123 R = r   r get] !
+
+\[123 R = r   456 r set  r get] !
+
+
+;;; function ops
+
+"ord sq" compile !
+
+
+;;; printing ops ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;; string ops ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;;; sample rate ops ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[sr nyq isr inyq rps]
+
+
+;;; help ops ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+`sinosc help
+
+helpbifs
+
+helpudfs
+
+helpall
+
+"add this line to the end of the user defined function help text" helpLine 
+
+
+;;; thread ops ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+\[ (1 10 to) \x[ x pr cr 1 sleep ] do ] go
+
+
+;;; misc ops ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[1 "a" \[1] [2] #[3] 4 R  {:a 1}] @ type
+
+1 trace 1 2 + 0 trace
+
+
+;;; text files ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+prelude
+
+examples
+
+logfile
+
+readme
+
+
+;;; list conversion ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+"abc" V
+
+"abc" Z
+
+#[1 2 3] V
+
+[1 2 3] Z
+
+5 L
+
+[2 3 4] L
+
+5 L1
+
+[2 3 4] L1
+
+[97 98 99] unspell
+
+
+;;; list generation ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+1 ever
+
+[1] ever
+
+5 3 by
+
+9 5 3 nby
+
+5 3 grow
+
+9 5 3 ngrow
+
+-4 5 to
+
+5 -4 to
+
+1 everz
+
+5 3 byz
+
+9 5 3 nbyz
+
+5 3 growz
+
+9 5 3 ngrowz
+
+-4 5 toz
+
+5 -4 toz
+
+6 1 5 lindiv
+
+6 1 5 expdiv
+
+6 1 5 lindivz
+
+6 1 5 expdivz
+
+6 1 5 lindiv1
+
+6 1 5 expdiv1
+
+6 1 5 lindiv1z
+
+6 1 5 expdiv1z
+
+[ord nat invs negs evens odds ints primes (0 1 fib)] @ 8 N prall
+
+[ordz natz invz negz evenz oddz intz primez (0 1 fibz)] @ 8 N prall
+
+6 ninvs
+
+6 ninvz
+
+
+;;; list ordering operations ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[1 2 3] cyc
+
+[1 2 3] 4 ncyc
+
+7 3 X
+
+\[ 1 5 irand sq ] 6 X
+
+7 3 XZ
+
+[(1k 0 sinosc .2 * .1 T)  (.1 mum)] $/ cyc  play
+
+[1 2 3] [7 8 9] $
+
+#[1 2 3] #[7 8 9] $z
+
+[#[1 2 3] #[4 5 6]] #[7 8 9] $z
+
+[[1 2 3][4 5 6][7 8 9]] $/
+
+ord 5 N
+
+ord 5 N>
+
+((10 8h 8k xline) 0 sinosc) .2 * 3 T play
+
+((10 8h 8k xline) 0 sinosc) .2 * 3 T> play
+
+(1 10 to) 3 take
+
+(1 10 to) -3 take
+
+(1 10 to) 13 take
+
+(1 10 to) -13 take
+
+(1 10 to) 3 drop
+
+(1 10 to) -3 drop
+
+([100 101] 0 saw) 2 8 choff
+
+0 1 tog
+
+0 ord tog
+
+[0] [1] tog
+
+[0 0 0] [1 1 1] tog
+
+[0] ever [1] ever tog
+
+0 1 togz
+
+0 ordz togz
+
+0 ord togz
+
+#[0 0 0] #[1 1 1] tog
+
+[ord negs] [0 0 1 1] cyc sel
+
+[ord negs] [0 0 1 1] cyc sell
+
+[ord negs] [0 1 1] cyc sell
+
+ord [0 0 1 1] cyc ?
+
+ord ord ?
+
+ord .5 coins ?
+
+ord 1 spread
+
+ord [0 1 2] cyc spread
+
+ord ord spread
+
+ordz ordz spreadz
+
+ordz ord spreadz
+
+ord ordz spreadz
+
+[1 1 1 2 2 3 3 4 4 4 5 6 6] change
+
+#[1 1 1 2 2 3 3 4 4 4 5 6 6] change
+
+[#[1 1 2 2 3 3] #[4 4 5 5 6 6]] changez
+
+ord [1 1 0 1 0 0] cyc expand
+
+ord 3 clump
+
+ord [2 3] cyc clump
+
+ord ord clump
+
+[1 2 3] hang
+
+#[1 2 3] hang
+
+[#[1 2 3] #[4 5 6]] hang
+
+[#[1 2 3] #[4 5 6]] hangz
+
+(10k 0 10 nrands) 10 histo
+
+(10k -5 15 nrands) 10 histo
+
+(10k 2.5 6.5 nrands) 10 histo
+
+ord aa 5 < keepWhile
+
+ord aa 5 < skipWhile
+
+[0 #[5 6 7 8] ord sq] flop
+
+[0 #[5 6 7 8] ord sq] flops
+
+[[1 2 3][[4 5] 6 7]] @ flop $/
+
+[[1 2 3][[4 5] 6 7]] @ flop1 $/
+
+[0 #[5 6 7 8] ord sq] lace
+
+[1 2 3] 0 add
+
+[1 2 3] 0 cons
+
+
+;;; dsp operations ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+512 -144 kaiser 0 >sfo
+
+512 hanning 0 >sfo
+
+512 hamming 0 >sfo
+
+512 blackman 0 >sfo
+
+(64 1z 2048 64 - 0z $) (2048 0z) fft hypot normalize 1024 rot 0 >sfo
+
+"/System/Library/Sounds/Submarine.aiff" sf> .05 .2 seg @ $/ 0 >sfo
+
+"/System/Library/Sounds/Submarine.aiff" sf> .05 (.2 sr * hanning) wseg @ $/ 0 >sfo
+
+"/System/Library/Sounds/Submarine.aiff" sf> .01 (.16 sr * hanning) wseg flop .04 1 2 ola  100 T 0 >sfo
+
+"/System/Library/Sounds/Submarine.aiff" sf> .01 (.16 sr * hanning) wseg flop .02 1.02 grow 1 2 ola  100 T 0 >sfo
+
+"/System/Library/Sounds/Submarine.aiff" sf> .01 (.16 sr * hanning) wseg flop muss .04 1 2 ola  100 T 0 >sfo
+
+
+;;; audio I/O operations ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+200 0 (8 1 100 xline) blip 144 0 sgram
+
+200 0 (8 1 100 xline) blip bench
+
+
+;;; random number generation ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+1 4 rands
+
+1 4 xrands
+
+1 4 irands
+
+1 4 eprands
+
+1 4 linrands
+
+1 4 ilinrands
+
+[.4 .3 .2 .1] wrands
+
+[.4 .3 .2 .1] wrands 10k N 4 histo
+
+
+[0 2 4 5 7 9 11] picks
+
+[0 2 4 5 7 9 11] [.2 .1 .2 .1 .2 .1 .1] wpicks
+ 
+
+;;; noise unit generators ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+.2 2X white play
+
+.2 2X pink play
+
+.2 2X brown play
+
+.2 2X gray play
+
+1k .2 2X dust play
+
+1k .2 2X dust 1 T 0 >sfo
+
+1k .2 2X dust2 play
+
+1k .2 2X dust2 1 T 0 >sfo
+
+(.05 0 sinosc 4m *) .2 2X toosh play
+
+(.05 0 sinosc 4m *) .2 2X tooshp play
+
+(20 1 2 line) crackle .5 * play
+
+
+;;; unit generators ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[800 4.13 573.37] 0 sinosc un3 *+ .2 * play
+
+
+;;; wavetable generation ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+invz 0 0 wavefill 0 >sfo
+
+invz 0 2 wavefill 0 >sfo
+
+(invz #[1 0] cyc *) 0 0 wavefill 0 >sfo
+
+(invz #[1 0 0] cyc *) 0 2 wavefill 0 >sfo
+
+(invz .4 coinz 1 cons *) 0 2 wavefill 0 >sfo
+
+100 0 ((invz .4 coinz 1 cons *) 0 2 wavefill) osc .2 * play
+
+;;; classic wave tables ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+parTbl 0 >sfo
+
+triTbl 0 >sfo
+
+sqrTbl 0 >sfo
+
+sawTbl 0 >sfo
+
+
+;;; oscillator unit generators ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(8 80 8k xline) 0 par .2 * play
+
+(8 80 8k xline) 0 tri .2 * play
+
+(8 80 8k xline) 0 square .2 * play
+
+(8 80 8k xline) 0 saw .2 * play
+
+100 0 (6 .01 .99 line) pulse .2 * play
+
+100 0 (6 .01 .99 line) vsaw .2 * play
+
+100 (8 100 1200 xline) ssaw .2 * play
+
+200 0 (8 1 100 xline) blip .2 * play
+
+200 0 (8 1 100 xline) blip 144 0 sgram
+
+
+400 5 3 .4 16 dsf1 .2 * play
+
+400 5 3 (4 1 0 line) 16 dsf1 .2 * play
+
+400 5 3 (4 1 0 line) 16 dsf1 144 0 sgram
+
+400 5 (3 0 sinosc 1 4 bilin) (4 1 0 line) 16 dsf1 .2 * play
+
+400 5 (3 0 sinosc 1 4 bilin) (4 1 0 line) 16 dsf1 144 0 sgram
+
+400 (3 0 sinosc 2 5 bilin) 3 (4 1 0 line) 16 dsf1 .2 * play
+
+400 (3 0 sinosc 2 5 bilin) 3 (4 1 0 line) 16 dsf1 144 0 sgram
+
+
+400 5 3 .4 16 dsf3 .2 * play
+
+400 5 3 (4 1 0 line) 16 dsf3 .2 * play
+
+400 5 3 (4 1 0 line) 16 dsf3 144 0 sgram
+
+400 5 (3 0 sinosc 1 4 bilin) (4 1 0 line) 16 dsf3 .2 * play
+
+400 5 (3 0 sinosc 1 4 bilin) (4 1 0 line) 16 dsf3 144 0 sgram
+
+400 (3 0 sinosc 2 5 bilin) 3 (4 1 0 line) 16 dsf3 .2 * play
+
+400 (3 0 sinosc 2 5 bilin) 3 (4 1 0 line) 16 dsf3 144 0 sgram
+
+(1 0 lfsaw 2h 2k biexp) 0 sinosc .2 * play
+
+[50 50.2] 0 lfsaw .2 * play
+
+[100 100.7] 0 (6 .01 .99 line) lfpulse .2 * play
+
+(1k 0 sinosc) ((5 0 impulse) 2m .2 decay2) * .2 * play
+
+100 0 (8 0 4 line) sinoscfb .2 * play
+
+(20 4h 2k nxrands) 1/60 0 klang play
+
+
+;;; filter unit generators ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(((2 0 .5 lfpulse) .1 lag) 3h 6h uniexp) 0 sinosc .2 * play
+
+(((2 0 .5 lfpulse) .1 lag2) 3h 6h uniexp) 0 sinosc .2 * play
+
+(((2 0 .5 lfpulse) .1 lag3) 3h 6h uniexp) 0 sinosc .2 * play
+
+([0 1 0 1] .2 1 steps) \a[ [ a (a .1 lag) (a .1 lag2) (a .1 lag3) ] ]! 0 >sfo
+
+(100 0 saw .2 *) (8 10 4k xline) lpf1 0 >sfo
+
+(100 0 saw .2 *) (8 10 4k xline) lpf 0 >sfo
+
+(100 0 saw .2 *) (8 10 4k xline) lpf2 0 >sfo
+
+(100 0 saw .2 *) (8 10 4k xline) hpf1 0 >sfo
+
+(100 0 saw .2 *) (8 10 4k xline) hpf 0 >sfo
+
+(100 0 saw .2 *) (8 10 4k xline) hpf2 0 >sfo
+
+
+
+(100 0 saw .1 *) (8 10 4k xline) .1 rlpf 0 >sfo
+
+(100 0 saw .1 *) (8 10 4k xline) .1 rhpf 0 >sfo
+
+(100 0 saw .02 *) (8 10 4k xline) .1 rlpf2 0 >sfo
+
+(100 0 saw .02 *) (8 10 4k xline) .1 rhpf2 0 >sfo
+
+
+;;; delay unit generators ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(1 0 impulse .3 decay) white aa  .2 aa delayn  2ple play
+
+(1 0 impulse .3 decay) white aa   (1/20 0 sinosc 1m .4 bilin)  .4 delayl  2ple play
+
+(1 0 impulse .3 decay) white aa   (1/20 0 sinosc 1m .4 bilin)  .4 delayc  2ple play
+
+(.2 2X brown) (.05 0 sinosc 4m *) 5m flange play
+
+(.2 2X brown) (.05 0 sinosc 4m *) 5m flangep play
+
+(.5 0 impulse .3 decay) (.2 2X white) *  .2 aa 2 combn play
+
+(1 0 impulse .3 decay) (.2 2X white) *  (1/20 0 sinosc 1m .2 bilin) .2 2 combn play
+
+(1 0 impulse .3 decay) (.2 2X white) *  (1/20 0 sinosc 1m .2 bilin) .2 2 combl play
+
+(1 0 impulse .3 decay) (.2 2X white) *  (1/20 0 sinosc 1m .2 bilin) .2 2 combc play
+
+(1 0 impulse .3 decay) (.2 2X white) *  (1/20 0 sinosc 1m .2 bilin) .2 2 alpasn play
+
+(1 0 impulse .3 decay) (.2 2X white) *  (1/20 0 sinosc 1m .2 bilin) .2 2 alpasl play
+
+(1 0 impulse .3 decay) (.2 2X white) *  (1/20 0 sinosc 1m .2 bilin) .2 2 alpasc play
+
+([1 2] [0 .5] impulse 4c decay) ([300 500] 1/) .05 2 (30 5h 20k xline hang 40 T) lpcombc .99 leakdc play
+
+
+;;; control function unit generators ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+.6 .1 1 imps 1 T 0 >sfo
+
+(.1 .8 rands) .1 1 imps 1 T 0 >sfo
+
+(.1 .8 rands) (.05 .2 rands) 1 imps 1 T 0 >sfo
+
+(.6 rand2s) (.05 .2 rands) 1 imps 1 T 0 >sfo
+
+
+(.1 .8 rands) .1 1 steps 1 T 0 >sfo
+
+(.1 .8 rands) (.02 .2 rands) 1 steps 1 T 0 >sfo
+
+(.6 rand2s) (.02 .2 rands) 1 steps 1 T 0 >sfo
+
+
+(.1 .8 rands) .1 .03 1 gates 1 T 0 >sfo
+
+(.1 .8 rands) (.02 .2 rands) aa .3 * 1 gates 1 T 0 >sfo
+
+(.6 rand2s) (.02 .2 rands) aa .3 * 1 gates 1 T 0 >sfo
+
+
+(.1 .8 rands) .1 1 lines 1 T 0 >sfo
+
+(.1 .8 rands) (.02 .2 rands) 1 lines 1 T 0 >sfo
+
+(.6 rand2s) (.02 .2 rands) 1 lines 1 T 0 >sfo
+
+
+(.1 .8 rands) .1 1 xlines 1 T 0 >sfo
+
+(.1 .8 rands) (.02 .2 rands) 1 xlines 1 T 0 >sfo
+
+
+(.1 .8 rands) 20 cubics 1 T 0 >sfo
+
+
+(.8 rand2s) [-4 -2 2 4]@ .1 1 curves 1 T 0 >sfo
+
+
+;;; random control unit generators ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+8h lfnoise0 .2 * play
+
+8h lfnoise1 .2 * play
+
+8h lfnoise3 .2 * play
+
+8h lfnoise0 5c T 0 >sfo
+
+8h lfnoise1 5c T 0 >sfo
+
+8h lfnoise3 5c T 0 >sfo
+
+
+;;; envelope unit generators ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+5h 0 sinosc 2 1 fadeout play
+
+5h 0 sinosc 1 fadein 5 T play
+
+1k 0 sinosc [1 parenv  1 quadenv  1 octenv  1 trienv  1 tri2env  1 trapezenv  1 trapez2env  1 cosenv  1 hanenv  1 han2env] * 0 >sfo
+
+1k 0 sinosc 1 [.05 .10 .15 .20 .25 .30] gaussenv * 0 >sfo
+
+
+;;; spawn unit generators ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+\[ 1h 2k xrand 0 sinosc ^5 .3 han2env * 1 rand2 pan2] .1 1 2 ola play
+
+\[ 1h 2k xrand 0 sinosc ^5 .3 han2env * 1 rand2 pan2] .1 ord * 1 2 ola play
+
+8 1h 4h nxrands 1 8 to @ * $/ cyc \f[ f 0 sinosc ^5 .3 han2env * 1 rand2 pan2] ! .1 1 2 ola play
+
+
+;;; panner unit generators ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(.2 pink) (.2 0 sinosc) pan2 play
+
+(.2 pink) (.2 0 sinosc) 1m itd play
+
+(.2 pink) (1h 0 sinosc ^7 .2 *) (.1 0 lfsaw) rot2 play
+
+(.2 pink) (1h 0 sinosc ^7 .2 *) (.2 0 sinosc) bal2 play
+
+(.2 pink) (1h 0 sinosc ^7 .2 *) (.2 0 sinosc) fade2 play
+
+
+;;; trigger unit generators ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(2 0 sinosc) tr .4 decay (.2 2X pink) * play
+
+(3 0 impulse) .1 gate (.2 2X pink) * play
+
+(3 0 impulse) .1 gate 8m lag (.2 2X pink) * play
+
+(3 0 impulse) .1 gate 8m lag (1k 0 sinosc .2 *) * play
+
+(2h 2k xrands) (7 1 dust) seq 0 sinosc .2 * play
+
+(8 0 impulse)
+
+(.37 0 sinosc 4h 2k biexp) (8 0 impulse) sah 0 sinosc ^5 .2 * play
+
+(1 lfnoise1 1h 4k biexp) (8 0 impulse) sah 0 sinosc ^5 .2 * play
+
+
+;;; bounds unit generators ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(1h 0 sinosc) -.7 .5 clip .1 T 0 >sfo
+
+(1h 0 sinosc) -.7 .5 wrap .1 T 0 >sfo
+
+(1h 0 sinosc) -.7 .5 fold .1 T 0 >sfo
+
+ord 3 9 iwrap 
+
+ord 3 9 ifold
+
+
+;;; mouse control unit generators ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(1h 1k mousex) 0 sinosc .2 * play
+
+(1h 1k mousey) 0 sinosc .2 * play
+
+(1h 1k xmousex) 0 sinosc .2 * play
+
+(1h 1k xmousey) 0 sinosc .2 * play
+
+1 10 mousex1
+
+1 10 mousey1
+
+1 10 xmousex1
+
+1 10 xmousey1
+
+
+;;; set operations ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[1 4 3 4 5 2 3 5 1] S
+
+[1 4 3] [3 6 1] S|
+
+[1 4 3] [3 6 1] S&
+
+[1 4 3] [3 6 1] Sx
+
+[1 4 3] [3 6 1] S-
+
+[1 4 3] [3 6 1] ba S-
+
+[1 4 3] [3 6 1] S=
+
+[1 4 3] [3 4 1] S=
+
+[1 4 3] [7 3 4 1] subset?
+
+[1 4 3] [3 4 1] subset?
+
+[1 4 3] [3 6 1] subset?
+
+4 [1 4 3 2 6 7 5] find
+
+[4 5 6] [1 4 3 2 6 7 5] find
+
+[4 5 6] [1 4 3 2 6 7 5] find
+
+[4 5 6 8] [1 4 3 2 6 7 5] find
+
+(1 10 to) [1 4 3 9 7] Shas
+
+
+;; ZP example
+
+.2 2X pink ZP = x play
+
+[400 401] 0 sinosc .2 * x set
+
+[300 301] 0 saw 4k lpf .2 * x set
+
+[200 201] 0 saw 4k lpf .2 * x set
+
+.2 2X brown x set
+
+.2 2X white x set
+
+;; P example
+
+48 72 irands P = a midihz .2 1 steps 0 sinosc .2 * play
+
+[60 64 67 72] cyc a set
+
+72 84 irands a set
+
+ 
+
+
+

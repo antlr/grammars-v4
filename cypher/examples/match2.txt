@@ -1,0 +1,1 @@
+MATCH (tom:Person)-[:ACTED_IN]->(tomHanksMovies) RETURN tom
