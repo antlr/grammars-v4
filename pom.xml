@@ -336,6 +336,7 @@
 				<module>pascal</module>
 				<module>pbm</module>
 				<module>pcre</module>
+				<module>pdb</module>
 				<module>pddl</module>
 				<module>pdn</module>
 				<module>peoplecode</module>

@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2020, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -32,16 +32,89 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 grammar pdb;
 
-file_ : equation* EOF;
+file_
+   : record (EOL record)* EOL? EOF
+   ;
 
-HEADER: 'HEADER';
-TITLE: 'TITLE';
-AUTHOR: 'AUTHOR';
-REMARK: 'REMARK';
-SEQRES: 'SEQRES';
-ATOM: 'ATOM';
-HETATM: 'HETATM';
+record
+   : HEADER
+   | TITLE
+   | AUTHOR
+   | REMARK
+   | SEQRES
+   | ATOM
+   | HETATM
+   | metadata
+   | structure
+   | coordinates
+   | connectivity
+   | bookkeeping
+   ;
 
-WS
-   : [ \r\n\t] + -> skip
+metadata
+   : METADATA
+   ;
+
+structure
+   : STRUCTURE
+   ;
+
+coordinates
+   : COORDINATES
+   ;
+
+connectivity
+   : CONNECTIVITY
+   ;
+
+bookkeeping
+   : BOOKKEEPING
+   ;
+
+HEADER: 'HEADER' PAYLOAD?;
+TITLE: 'TITLE ' PAYLOAD? | 'TITLE';
+AUTHOR: 'AUTHOR' PAYLOAD?;
+REMARK: 'REMARK' PAYLOAD?;
+SEQRES: 'SEQRES' PAYLOAD?;
+ATOM: 'ATOM  ' PAYLOAD? | 'ATOM';
+HETATM: 'HETATM' PAYLOAD?;
+
+METADATA
+   : ('OBSLTE' | 'SPLIT ' | 'CAVEAT' | 'COMPND' | 'SOURCE' | 'KEYWDS'
+     | 'EXPDTA' | 'NUMMDL' | 'MDLTYP' | 'REVDAT' | 'SPRSDE' | 'JRNL  ') PAYLOAD?
+   ;
+
+STRUCTURE
+   : ('DBREF ' | 'DBREF1' | 'DBREF2' | 'SEQADV' | 'MODRES' | 'HET   '
+     | 'HETNAM' | 'HETSYN' | 'FORMUL' | 'HELIX ' | 'SHEET ' | 'SSBOND'
+     | 'LINK  ' | 'CISPEP' | 'SITE  ' | 'CRYST1' | 'ORIGX1' | 'ORIGX2'
+     | 'ORIGX3' | 'SCALE1' | 'SCALE2' | 'SCALE3' | 'MTRIX1' | 'MTRIX2'
+     | 'MTRIX3') PAYLOAD?
+   ;
+
+COORDINATES
+   : ('MODEL ' | 'ANISOU' | 'TER   ') PAYLOAD?
+   | 'ENDMDL' SPACE*
+   | 'TER'
+   ;
+
+CONNECTIVITY
+   : 'CONECT' PAYLOAD?
+   ;
+
+BOOKKEEPING
+   : 'MASTER' PAYLOAD?
+   | 'END' SPACE*
+   ;
+
+fragment PAYLOAD
+   : ~[\r\n\t]+
+   ;
+
+fragment SPACE
+   : ' '
+   ;
+
+EOL
+   : '\r'? '\n'
    ;

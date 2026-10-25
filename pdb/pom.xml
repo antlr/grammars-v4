@@ -42,6 +42,7 @@
 					<grammarName>pdb</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
+					<testFileExtension>pdb</testFileExtension>
 				</configuration>
 				<executions>
 					<execution>
