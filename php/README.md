@@ -1,10 +1,4 @@
-## Summary
-
-PHP 7.4 grammar with C# ([Sharwell runtime](https://github.com/tunnelvisionlabs/antlr4cs)) 
-and Java runtime by Ivan Kochurkin (kvanttt@gmail.com), Positive Technologies.
-PHP keywords are case-insensitive, but tokens in grammar written in lower case.
-Thus [CaseInsensitiveInputStream](https://gist.github.com/sharwell/9424666) should be used.
-C# or Java code actions used for context-sensitivity features like Heredoc.
+# PHP Grammar
 
 Parser grammar based on [Phalanger](https://github.com/DEVSENSE/Phalanger) grammar
 by Jakub Míšek (jakubmisek).
@@ -36,6 +30,10 @@ PHP parser has been successfully tested (parsing without errors) on the followin
 
 Also this parser has been tested on plenty number of PHP files from different CMS (~70000 files).
 It took approximately 1 hour and 15 minutes with 70% on lexer part and 30% on parser part.
+
+## Reference
+* [pldb](http://pldb.info/concepts/php)
+
 
 ## License
 

@@ -1,0 +1,72 @@
+digit  =   "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9".
+hexDigit  =  digit | "A" | "B" | "C" | "D" | "E" | "F".
+ident  =  letter {letter | digit}.
+qualident  =  [ident "."] ident.
+identdef = ident ["*"].
+integer  =  digit {digit} | digit {hexDigit} "H".
+real  =  digit {digit} "." {digit} [ScaleFactor].
+ScaleFactor  =  ("E" |"D") ["+" | "-"] digit {digit}.
+number  =  integer | real.
+string  =  "'" {character} "'" | digit {hexdigit} "X".
+ConstDeclaration  =  identdef "=" ConstExpression.
+ConstExpression  =  expression.
+TypeDeclaration  =  identdef "=" StrucType.
+StrucType  =  ArrayType | RecordType | PointerType | ProcedureType.
+type  =  qualident | StrucType.
+ArrayType  =  "ARRAY" length {"," length} "OF" type.
+length  =  ConstExpression.
+RecordType  =  "RECORD" ["(" BaseType ")"] [FieldListSequence] "END".
+BaseType  =  qualident.
+FieldListSequence  =  FieldList {";" FieldList}.
+FieldList  =  IdentList ":" type.
+IdentList  =  identdef {"," identdef}.
+PointerType  =  "POINTER" "TO" type.
+ProcedureType  =  "PROCEDURE" [FormalParameters].
+VariableDeclaration  =  IdentList ":" type.
+expression  =  SimpleExpression [relation SimpleExpression].
+relation  =  "=" | "#" | "<" | "<=" | ">" | ">=" | "IN" | "IS".
+SimpleExpression  =  ["+" | "-"] term {AddOperator term}.
+AddOperator  =  "+" | "-" | "OR".
+term  =  factor {MulOperator factor}.
+MulOperator  =  "*" | "/" | "DIV" | "MOD" | "&".
+factor  =  number | string | "NIL" | "TRUE" | "FALSE" |
+  set | designator [ActualParameters] | "(" expression ")" | "~" factor.
+designator  =  qualident {selector}.
+selector  =  "." ident | "[" ExpList "]" | "^" |  "(" qualident ")".
+set  =  "{" [element {"," element}] "}".
+element  =  expression [".." expression].
+ExpList  =  expression {"," expression}.
+ActualParameters  =  "(" [ExpList] ")" .
+statement  =  [assignment | ProcedureCall | IfStatement | CaseStatement |
+  WhileStatement | RepeatStatement | ForStatement].
+assignment  =  designator ":=" expression.
+ProcedureCall  =  designator [ActualParameters].
+StatementSequence  =  statement {";" statement}.
+IfStatement  =  "IF" expression "THEN" StatementSequence
+  {"ELSIF" expression "THEN" StatementSequence}
+  ["ELSE" StatementSequence] "END".
+CaseStatement  =  "CASE" expression "OF" case {"|" case} "END".
+Case  =  CaseLabelList ":"  StatementSequence.
+CaseLabelList  = LabelRange {"," LabelRange}.
+LabelRange  =  label [".." label].
+label  =  integer | string | ident.
+WhileStatement  =  "WHILE" expression "DO" StatementSequence
+{"ELSIF" expression "DO" StatementSequence} "END".
+RepeatStatement  =  "REPEAT" StatementSequence "UNTIL" expression.
+ForStatement  =  "FOR" ident ":=" expression "TO" expression ["BY" ConstExpression]
+"DO" StatementSequence "END".
+ProcedureDeclaration  =  ProcedureHeading ";" ProcedureBody ident.
+ProcedureHeading  =  "PROCEDURE" identdef [FormalParameters].
+ProcedureBody  =  DeclarationSequence ["BEGIN" StatementSequence]
+    ["RETURN" expression] "END".
+DeclarationSequence  =  ["CONST" {ConstDeclaration ";"}]
+  ["TYPE" {TypeDeclaration ";"}]
+  ["VAR" {VariableDeclaration ";"}]
+  {ProcedureDeclaration ";"}.
+FormalParameters  =  "(" [FPSection {";" FPSection}] ")" [":" qualident].
+FPSection  =  ["CONST" | "VAR"] ident {"," ident} ":" FormalType.
+FormalType  =  ["ARRAY" "OF"] qualident.
+module  =  "MODULE" ident ";" [ImportList] DeclarationSequence
+  ["BEGIN" StatementSequence] "END" ident "." .
+ImportList  =  "IMPORT" import {"," import} ";".
+import  =  ident [":=" ident].

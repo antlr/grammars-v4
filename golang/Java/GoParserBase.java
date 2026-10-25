@@ -1,5 +1,8 @@
 import java.util.List;
 import org.antlr.v4.runtime.*;
+import java.io.PrintStream;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * All parser methods that used in grammar (p, prev, notLineTerminator, etc.)
@@ -7,10 +10,29 @@ import org.antlr.v4.runtime.*;
  */
 public abstract class GoParserBase extends Parser
 {
+    private static boolean debug = false;
+    private Set<String> table = new HashSet<>();
+
     protected GoParserBase(TokenStream input) {
         super(input);
+	String cmdLine = System.getProperty("sun.java.command");
+	String[] args = cmdLine != null ? cmdLine.split("\\s+") : new String[0];
+	debug = hasArg(args, "--debug");
     }
 
+    private static boolean hasArg(String[] args, String arg) {
+	for (String a : args) {
+	    if (a.toLowerCase().contains(arg.toLowerCase())) {
+		return true;
+	    }
+	}
+	return false;
+    }
+
+    protected void myreset()
+    {
+        table = new HashSet<String>();
+    }
 
     /**
      * Returns true if the current Token is a closing bracket (")" or "}")
@@ -18,8 +40,156 @@ public abstract class GoParserBase extends Parser
     protected boolean closingBracket()
     {
         BufferedTokenStream stream = (BufferedTokenStream)_input;
-        int prevTokenType = stream.LA(1);
-        
-        return prevTokenType == GoParser.R_CURLY || prevTokenType == GoParser.R_PAREN;
+        var la = stream.LT(1);
+        return la.getType() == GoLexer.R_PAREN || la.getType() == GoLexer.R_CURLY || la.getType() == Token.EOF;
+    }
+
+
+    protected boolean isNotReceive()
+    {
+        BufferedTokenStream stream = (BufferedTokenStream)_input;
+        var la = stream.LT(2);
+        return la.getType() != GoLexer.RECEIVE;
+    }
+
+    public void addImportSpec() {
+        if (!(this._ctx instanceof GoParser.ImportSpecContext)) {
+            return;
+        }
+        GoParser.ImportSpecContext importSpec = (GoParser.ImportSpecContext) this._ctx;
+        if (importSpec == null) {
+            return;
+        }
+        GoParser.PackageNameContext packageName = importSpec.packageName();
+        if (packageName != null) {
+            String name = packageName.getText();
+            if (debug) System.out.println("Entering " + name);
+            table.add(name);
+            return;
+        }
+        GoParser.ImportPathContext importPath = importSpec.importPath();
+        if (importPath == null) {
+            return;
+        }
+        String name = importPath.getText();
+        if (debug) System.out.println("import path " + name);
+        name = name.replace("\"", "");
+        if (name.isEmpty()) {
+            return;
+        }
+        name = name.replace("\\", "/");
+        String[] pathArr = name.split("/");
+        if (pathArr.length == 0) {
+            return;
+        }
+        String lastComponent = pathArr[pathArr.length - 1];
+        if (lastComponent.isEmpty()) {
+            return;
+        }
+        // Handle special cases like "." and ".."
+        if (lastComponent.equals(".") || lastComponent.equals("..")) {
+            return;
+        }
+        String[] fileArr = lastComponent.split("\\.");
+        // Guard against empty array (can happen if lastComponent is all dots)
+        if (fileArr.length == 0) {
+            table.add(lastComponent);
+            if (debug) System.out.println("Entering " + lastComponent);
+            return;
+        }
+        String fileName = fileArr[fileArr.length - 1];
+        if (fileName.isEmpty()) {
+            // Fall back to lastComponent if split resulted in empty string
+            fileName = lastComponent;
+        }
+        if (debug) System.out.println("Entering " + fileName);
+        table.add(fileName);
+    }
+
+    public boolean isOperand() {
+        BufferedTokenStream stream = (BufferedTokenStream)_input;
+        var la = stream.LT(1);
+        if ("err".equals(la.getText())) {
+            return true;
+        }
+        boolean result = true;
+        if (la.getType() != GoParser.IDENTIFIER) {
+            if (debug) System.out.println("isOperand Returning " + result + " for " + la);
+            return result;
+        }
+        result = table.contains(la.getText());
+        Token la2 = stream.LT(2);
+        if (la2.getType() != GoParser.DOT) {
+            result = true;
+            if (debug) System.out.println("isOperand Returning " + result + " for " + la);
+            return result;
+        }
+        Token la3 = stream.LT(3);
+        if (la3.getType() == GoParser.L_PAREN) {
+            result = true;
+            if (debug) System.out.println("isOperand Returning " + result + " for " + la);
+            return result;
+        }
+        if (debug) System.out.println("isOperand Returning " + result + " for " + la);
+        return result;
+    }
+
+    public boolean isMethodExpr() {
+        BufferedTokenStream stream = (BufferedTokenStream)_input;
+        Token la = stream.LT(1);
+        boolean result = true;
+
+        // If '*' => definitely a method expression
+        if (la.getType() == GoParser.STAR) {
+            if (debug) System.out.println("isMethodExpr Returning " + result + " for " + la);
+            return result;
+        }
+
+        // If not an identifier, can't be a method expr
+        if (la.getType() != GoParser.IDENTIFIER) {
+            result = false;
+            if (debug) System.out.println("isMethodExpr Returning " + result + " for " + la);
+            return result;
+        }
+
+        // If it's an identifier not in the table => method expr
+        result = !table.contains(la.getText());
+        if (debug) System.out.println("isMethodExpr Returning " + result + " for " + la);
+        return result;
+    }
+    
+    protected boolean isConversion()
+    {
+        BufferedTokenStream stream = (BufferedTokenStream)_input;
+        var la = stream.LT(1);
+        var result = la.getType() != GoLexer.IDENTIFIER;
+        if (debug) System.out.println("isConversion Returning " + result + " for " + la);
+        return result;
+    }
+
+    // Built-in functions that take a type as first argument
+    private static final Set<String> BUILTIN_TYPE_FUNCTIONS = Set.of("make", "new");
+
+    // Check if we're in a call to a built-in function that takes a type as first argument.
+    // Called after L_PAREN has been matched in the arguments rule.
+    public boolean isTypeArgument() {
+        BufferedTokenStream stream = (BufferedTokenStream)_input;
+        // After matching L_PAREN, LT(-1) is '(' and LT(-2) is the token before it
+        Token funcToken = stream.LT(-2);
+        if (funcToken == null || funcToken.getType() != GoParser.IDENTIFIER) {
+            if (debug) System.out.println("isTypeArgument Returning false - no identifier before (");
+            return false;
+        }
+        boolean result = BUILTIN_TYPE_FUNCTIONS.contains(funcToken.getText());
+        if (debug) System.out.println("isTypeArgument Returning " + result + " for " + funcToken.getText());
+        return result;
+    }
+
+    // Check if we're NOT in a call to a built-in function that takes a type.
+    // This is the inverse of isTypeArgument for the expressionList alternative.
+    public boolean isExpressionArgument() {
+        boolean result = !isTypeArgument();
+        if (debug) System.out.println("isExpressionArgument Returning " + result);
+        return result;
     }
 }

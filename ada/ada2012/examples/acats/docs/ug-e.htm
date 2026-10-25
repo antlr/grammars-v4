@@ -1,0 +1,201 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>Guidelines for Test Development</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    DIV.Bulleted-NoPrefix {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 2.0em; margin-right: 2.0em; margin-top: 0em; margin-bottom: 0.5em}
+    DIV.Bulleted {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 2.0em; margin-right: 2.0em; margin-top: 0em; margin-bottom: 0.5em; display: list-item; list-style-type: disc}
+    DIV.Indented2NestedBulleted-NoPrefix {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 4.0em; margin-right: 2.0em; margin-top: 0em; margin-bottom: 0.5em}
+    DIV.Indented2NestedBulleted {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 4.0em; margin-right: 2.0em; margin-top: 0em; margin-bottom: 0.5em; display: list-item; list-style-type: disc}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-D2L.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-F.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>Annex E<BR>
+Guidelines for Test Development</H1>
+<div class="Normal">The guidelines used for developing recent ACATS tests 
+are summarized in this Annex. Developers of potential ACATS tests should 
+follow these guidelines closely. Tests that deviate extensively from 
+these guidelines are far less likely to be added to the ACATS than those 
+that follow them carefully.</div>
+<div class="Bulleted" style="margin-bottom: 0.3em">Tests should follow 
+the test structure and organization of existing ACATS tests. Many details 
+of existing tests are described elsewhere in this document. Important 
+topics include:</div>
+<div class="Indented2NestedBulleted">Test classes (see <A HREF="UG-42.HTM">4.2</A>);</div>
+<div class="Indented2NestedBulleted">Test naming conventions (see <A HREF="UG-432.HTM">4.3.2</A> 
+and <A HREF="UG-433.HTM">4.3.3</A>);</div>
+<div class="Indented2NestedBulleted">Test layout and prologue (see <A HREF="UG-44.HTM">4.4</A>);</div>
+<div class="Indented2NestedBulleted">Identifier and reserved word conventions 
+(see <A HREF="UG-45.HTM">4.5</A>);</div>
+<div class="Indented2NestedBulleted">Library unit naming within tests 
+(see <A HREF="UG-433.HTM">4.3.3</A>);</div>
+<div class="Indented2NestedBulleted">Executable test structure (see <A HREF="UG-46.HTM">4.6</A>); 
+and</div>
+<div class="Indented2NestedBulleted">Indication of errors in B and L 
+tests (see <A HREF="UG-46.HTM">4.6</A>).</div>
+<div class="Bulleted">Submitted tests should be include the standard 
+ACAA &quot;Grant of Unlimited Rights&quot; (found in most newer tests 
+issued since 2010) or an equivalent release allowing the test to be freely 
+used by anyone. Under no circumstances should submitted tests contain 
+proprietary information or code. Submitted tests without such a grant 
+cannot be included in the ACATS or even the submitted tests directory.</div>
+<div class="Bulleted">The test number (character positions 6 and 7) should 
+be assigned letters rather than numbers by submitting test authors. Letters 
+that are likely to be unique (such as the author's initials) are preferred. 
+(Of course, different tests for the same clause with the same author 
+should have different names.) The ACAA Technical Agent will perform the 
+final naming of tests in order to ensure that the names are unique and 
+appropriate. Following this guideline reduces the chance of test conflicts 
+between authors.</div>
+<div class="Bulleted">If a single test file contains multiple compilation 
+units, they should be given in an order such that any dependent units 
+follow the units they depend on (so an implementation can process the 
+units sequentially in order). However, it should be assumed that all 
+units in a file will be presented to the compiler simultaneously. If 
+a test requires units to be presented in a specific order (as some separate 
+compilation tests do), the units with ordering requirements should be 
+in separate files, and the required order should be documented in the 
+test prologue.</div>
+<div class="Bulleted">When possible for B-Tests, only the last unit in 
+a file should contain errors (or even better, units with errors should 
+be in separate files from those without errors). This avoids penalizing 
+implementations that process units in a file sequentially and stop on 
+the first bad unit. (Multiple units in a single file are fairly rare 
+in real user code; the ACATS shouldn't require work in areas not useful 
+to typical users.) This guideline should be violated only when the number 
+of units with errors would be prohibitive to have in separate files. 
+(The maximum number of separate files in a test is 36 plus any foundations, 
+because the naming conventions for tests only leave a single character 
+for sequence numbers.)</div>
+<div class="Bulleted">C-Tests (especially those testing rules that are 
+not runtime checks) should be written in a usage-oriented style. That 
+means that the tests should reflect the way the features are typically 
+used in practice. Using a feature with no context is discouraged. For 
+instance, C-Tests for <B>limited with</B> clauses should use them to 
+declare mutually dependent types (the reason that <B>limited with</B> 
+clauses were added to the language) rather than just using them to replace 
+regular <B>with</B> clauses.</div>
+<div class="Bulleted">Tests should avoid the use of Text_IO (unless required 
+by the test objective). In particular, C-Tests should not create messages 
+with Text_IO; all messages should be generated via the subprograms in 
+the Report package. Messages in C-Tests should be written in mixed case, 
+not all UPPER CASE. Failure messages should be unique, so that the exact 
+failure can be pinpointed. This is often accomplished by including a 
+subtest identifier in the messages.</div>
+<div class="Bulleted">Executable tests should not call routines in Report 
+(directly, or indirectly via another package like TCTouch or Check_File) 
+before the call to Report.Test or after the call to Report.Result. Doing 
+so could cause an individual report (Comment, Failure, and so on) to 
+not properly identify the test, or for the overall test result to be 
+incorrectly reported. This does not apply to the various functions defined 
+in Report with the exception of Legal_File_Name; these can be used freely 
+in a test. It also does not apply to TCTouch.Touch.</div>
+<div class="Bulleted">Tests can combine multiple objectives if a test 
+for a single objective is very short. However, the objectives should 
+be related, and the number of objectives in a test should be limited 
+(to avoid creating gigantic tests that are hard to understand and use). 
+In particular, objectives should not be combined if in doing so, the 
+test will exceed 500 lines. Objectives from different clauses should 
+never be combined, as that makes it hard to find the associated test 
+(it will necessarily be filed in the wrong clause for one of the objectives).</div>
+<div class="Bulleted">When possible, tests should define (and thus share) 
+foundation code (see <A HREF="UG-414.HTM">4.1.4</A>). Foundation packages 
+are a better alternative than creating large tests with many objectives 
+when the primary reason for combining the objectives is to avoid writing 
+set-up code multiple times. Foundation code is specific to tests for 
+a particular clause, however, so this technique cannot be used to combine 
+objectives from multiple clauses.</div>
+<div class="Bulleted">When a rule includes a term defined elsewhere, 
+testing of the rule should include testing all of the combinations implied 
+by the term. For instance, if we have a definition like &quot;something 
+is either this, that, or fuzzy&quot;, then a test for a test objective 
+involving something should test cases where something is this and that 
+and fuzzy. If multiple layers of definitions make this impractical, then 
+a wide selection of combinations (as different as possible) should be 
+tried. The only exception to this rule is if separate tests of the definition 
+exist or should exist (that is, there is a test objective to test that 
+the definition is appropriately implemented).</div>
+<div class="Bulleted">When appropriate, tests should try a variety of 
+things. For instance, when testing subprograms, both procedures and functions 
+should be tested, with varying numbers of parameters, and with different 
+modes and types. Similarly, types should be more than just Integer &ndash; 
+tagged types, tasks, protected types, and anonymous access types should 
+be tried. However, adding variety should not be used as an excuse to 
+create multiple tests for an objective when one will do. That is, variety 
+is a secondary goal; exhaustive coverage of possibilities isn't needed 
+(unless the testing includes testing a term defined elsewhere, as described 
+in the previous guideline). Remember that the goal isn't to test combinations 
+of features; the point of using variety is to ensure that the objective 
+being tested works in more than just the simplest cases.</div>
+<div class="Bulleted">Tests should generally use only the 7-bit ASCII 
+characters. However, some tests will need to use other characters in 
+order to test Wide_Wide_Character support, Unicode characters in identifiers, 
+and the like. Such tests should be encoded in UTF-8 and start with a 
+UTF-8 Byte Order Mark. Tests should only use the code points that were 
+assigned in version 4.0 of the Unicode standard; when possible, using 
+only commonly used characters such as Greek and Cyrillic characters is 
+preferred. (Such characters are more likely to be present in the fonts 
+available to ACATS users; users will be more likely to be able to view 
+the tests as intended if common characters are used.)</div>
+<div class="Bulleted">When constructing tests that check to see that 
+run-time checks are made, take special care that 10.2.1 and 11.6 permissions 
+don't render the test impotent. 11.6(5) allows language-defined checks 
+to be optimized away if the result of the operation is not used (even 
+if the exception is handled). Similarly, 10.2.1(18/3) allows calls to 
+subprograms in Pure packages to be omitted if the result of the operation 
+is not used. That means it is critical that the values that fail checks 
+are used in some way afterwards (even though a correct program will never 
+execute that code). Failure to do that could allow a compiler to optimize 
+the entire test away, and that would require the test to be corrected 
+later.</div>
+<div class="Bulleted">When creating a B-Test for which different parts 
+test different errors, each error should identify the intended failure. 
+The standard error indication includes a colon; any needed text can follow 
+that colon. If the error identification will not fit on one line, place 
+it somewhere else and index to it. One common way to do this is to put 
+a list of intended errors into the header, labeling each with a letter. 
+Then each error comment can just identify the letter of the intended 
+error.</div>
+<div class="Bulleted">Tests that cover test objectives that are documented 
+as untested are especially welcome as test submissions. Tests that cover 
+previously tested objectives are less likely to be included in the test 
+suite.</div>
+<div class="Normal">Submitted tests can be sent to the ACAA Technical 
+Agent (<A HREF="mailto:agent@ada-auth.org">agent@ada-auth.org</A>) via 
+e-mail; include a subject of &quot;Submitted ACATS Test&quot; in your 
+e-mail. The agent will attempt to work with all submitters to correct 
+critical definencies, and will attempt to publicly add tests to the submitted 
+tests index in a timely fashion. However, there can be no promise that 
+submitted tests (or a similar test for a similar objective) will ever 
+be added to the ACATS.&nbsp;</div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-D2L.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-F.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>

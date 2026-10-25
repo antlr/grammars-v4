@@ -1,0 +1,68 @@
+-- BA110073.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making
+--     this public release, the Government intends to confer upon all
+--     recipients unlimited rights  equal to those held by the Government.
+--     These rights include rights to use, duplicate, release or disclose the
+--     released technical data and computer software in whole or in part, in
+--     any manner and for any purpose whatsoever, and to have or permit others
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      See BA110070.A.
+--
+-- TEST DESCRIPTION:
+--      See BA110070.A.
+--
+-- TEST FILES:
+--      This test consists of the following files:
+--         BA110070.A
+--         BA110071.A
+--         BA110072.A
+--      -> BA110073.A
+--         BA110074.A
+--         BA110075.A
+--
+-- PASS/FAIL CRITERIA:
+--      See BA110070.A.
+--
+-- CHANGE HISTORY:
+--      06 Dec 94   SAIC    ACVC 2.0
+--      17 Nov 95   SAIC    Update and repair for ACVC 2.0.1
+--      08 Sep 96   SAIC    ACVC 2.1
+--      14 Feb 18   RLB     Split into separate files so error recovery between
+--                          units is not required, added error location
+--                          indicators.
+--
+--!
+
+-- Public grandchild function.
+
+function BA11007_3.BA11007_1.Parent_Function
+  (I : New_Child_Integer) return New_Child_Integer is        -- ERROR: {1:1}
+               -- overrides (inherited) BA11007_3.BA11007_1.Parent_Function
+begin
+
+   -- Real body of grandchild function goes here.
+
+   return I;
+
+end BA11007_3.BA11007_1.Parent_Function;
+
+
+

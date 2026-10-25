@@ -1,0 +1,19 @@
+digraph ATN {
+rankdir=LR;
+s463[fontsize=11, label="463", shape=doublecircle, fixedsize=true, width=.6];
+s2629[fontsize=11,label="2629", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2630[fontsize=11,label="2630", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2631[fontsize=11,label="{&rarr;\n2631\nd=235|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s2632[fontsize=11,label="&larr;\n2632", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2633[fontsize=11,label="2633", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2634[fontsize=11,label="2634", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s462[fontsize=11,label="462", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s462 -> s2629 [fontname="Times-Italic", label="&epsilon;"];
+s2629 -> s2631 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'throw'", arrowhead = normal];
+s2631:p0 -> s2630 [fontname="Times-Italic", label="&epsilon;"];
+s2631:p1 -> s2632 [fontname="Times-Italic", label="&epsilon;"];
+s2630 -> s2632 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<expression>", arrowhead = normal];
+s2632 -> s2633 [fontname="Times-Italic", label="&epsilon;"];
+s2633 -> s2634 [fontsize=11, fontname="Courier", arrowsize=.7, label = "';'", arrowhead = normal];
+s2634 -> s463 [fontname="Times-Italic", label="&epsilon;"];
+}

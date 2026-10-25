@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>databank</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com databank grammar</name>
+	<name>databank grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>

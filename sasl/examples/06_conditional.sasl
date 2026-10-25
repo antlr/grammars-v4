@@ -1,0 +1,4 @@
+absval (-6)
+where
+   absval x = x < 0 -> 0 - x ; x
+?

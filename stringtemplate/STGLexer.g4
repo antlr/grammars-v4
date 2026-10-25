@@ -27,7 +27,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
- /**
+/**
  *	A grammar for StringTemplate v4 implemented using Antlr v4 syntax
  *
  *	Modified 2015.06.16 gbr
@@ -35,85 +35,87 @@
  *	-- use imported standard fragments
  */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine true, allowShortBlocksOnASingleLine true, minEmptyLines 0, alignSemicolons ownLine
+// $antlr-format alignColons trailing, singleLineOverrulesHangingColon true, alignLexerCommands true, alignLabels true, alignTrailers true
+
 lexer grammar STGLexer;
 
-import LexBasic;	// Standard set of fragments
+import LexBasic;
+// Standard set of fragments
 
 channels {
-	OFF_CHANNEL		// non-default channel for whitespace and comments
+    OFF_CHANNEL // non-default channel for whitespace and comments
 }
 
 // ------------------------------------------------------------------------------
 // mode default
 
-DOC_COMMENT			: DocComment		-> channel(OFF_CHANNEL)	;
-BLOCK_COMMENT		: BlockComment		-> channel(OFF_CHANNEL)	;
-LINE_COMMENT		: LineComment		-> channel(OFF_CHANNEL)	;
+DOC_COMMENT   : DocComment   -> channel(OFF_CHANNEL);
+BLOCK_COMMENT : BlockComment -> channel(OFF_CHANNEL);
+LINE_COMMENT  : LineComment  -> channel(OFF_CHANNEL);
 
-TMPL_COMMENT		: LBang .? RBang	-> channel(OFF_CHANNEL)	;
+TMPL_COMMENT: LBang .? RBang -> channel(OFF_CHANNEL);
 
-HORZ_WS				: Hws+			-> channel(OFF_CHANNEL)	;
-VERT_WS				: Vws+			-> channel(OFF_CHANNEL)	;
+HORZ_WS : Hws+ -> channel(OFF_CHANNEL);
+VERT_WS : Vws+ -> channel(OFF_CHANNEL);
 
-ID        			: NameStartChar NameChar*			;
+ID: NameStartChar NameChar*;
 
-STRING				: DQuoteLiteral			;
-BIGSTRING 			: LDAngle .*? RDAngle	;
-BIGSTRING_NO_NL		: LPct .*?	RPct		;
-ANON_TEMPLATE		: LBrace .*? RBrace		;
-
+STRING          : DQuoteLiteral;
+BIGSTRING       : LDAngle .*? RDAngle;
+BIGSTRING_NO_NL : LPct .*? RPct;
+ANON_TEMPLATE   : LBrace .*? RBrace;
 
 // -----------------------------------
 // Symbols
 
-TMPL_ASSIGN	: TmplAssign	;
-ASSIGN		: Equal			;
+TMPL_ASSIGN : TmplAssign;
+ASSIGN      : Equal;
 
-DOT			: Dot			;
-COMMA		: Comma			;
-COLON		: Colon			;
-LPAREN		: LParen		;
-RPAREN		: RParen		;
-LBRACK		: LBrack		;
-RBRACK		: RBrack		;
-AT			: At			;
-TRUE		: True_			;
-FALSE		: False_			;
-ELLIPSIS	: Ellipsis		;
+DOT      : Dot;
+COMMA    : Comma;
+COLON    : Colon;
+LPAREN   : LParen;
+RPAREN   : RParen;
+LBRACK   : LBrack;
+RBRACK   : RBrack;
+AT       : At;
+TRUE     : True_;
+FALSE    : False_;
+ELLIPSIS : Ellipsis;
 
 // -----------------------------------
 // Key words
 
-DELIMITERS	: 'delimiters'	;
-IMPORT		: 'import'		;
-DEFAULT		: 'default'		;
-KEY			: 'key'			;
-VALUE		: 'value'		;
+DELIMITERS : 'delimiters';
+IMPORT     : 'import';
+DEFAULT    : 'default';
+KEY        : 'key';
+VALUE      : 'value';
 
-FIRST		: 'first'		;
-LAST		: 'last'		;
-REST		: 'rest'		;
-TRUNC		: 'trunc'		;
-STRIP		: 'strip'		;
-TRIM		: 'trim'		;
-LENGTH		: 'length'		;
-STRLEN		: 'strlen'		;
-REVERSE		: 'reverse'		;
+FIRST   : 'first';
+LAST    : 'last';
+REST    : 'rest';
+TRUNC   : 'trunc';
+STRIP   : 'strip';
+TRIM    : 'trim';
+LENGTH  : 'length';
+STRLEN  : 'strlen';
+REVERSE : 'reverse';
 
-GROUP		: 'group'		;	// not used by parser?
-WRAP		: 'wrap'		;
-ANCHOR		: 'anchor'		;
-SEPARATOR	: 'separator'	;
-
+GROUP     : 'group'; // not used by parser?
+WRAP      : 'wrap';
+ANCHOR    : 'anchor';
+SEPARATOR : 'separator';
 
 // -----------------------------------
 // Grammar specific fragments
 
-fragment TmplAssign	: '::='		;
-fragment LBang		: '<!'		;
-fragment RBang		: '!>'		;
-fragment LPct		: '<%'		;
-fragment RPct		: '%>'		;
-fragment LDAngle	: LShift	;
-fragment RDAngle	: RShift	;
-
+fragment TmplAssign : '::=';
+fragment LBang      : '<!';
+fragment RBang      : '!>';
+fragment LPct       : '<%';
+fragment RPct       : '%>';
+fragment LDAngle    : LShift;
+fragment RDAngle    : RShift;

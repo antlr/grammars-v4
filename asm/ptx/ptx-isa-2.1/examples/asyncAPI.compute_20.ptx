@@ -1,0 +1,73 @@
+	.version 2.1
+	.target sm_20
+	// compiled with C:\CUDA\bin/../open64/lib//be.exe
+	// nvopencc 3.1 built on 2010-06-08
+
+	//-----------------------------------------------------------
+	// Compiling asyncAPI.compute_20.cpp3.i (C:/Users/Ken/AppData/Local/Temp/ccBI#.a07732)
+	//-----------------------------------------------------------
+
+	//-----------------------------------------------------------
+	// Options:
+	//-----------------------------------------------------------
+	//  Target:ptx, ISA:sm_20, Endian:little, Pointer Size:32
+	//  -O3	(Optimization level)
+	//  -g0	(Debug level)
+	//  -m2	(Report advisories)
+	//-----------------------------------------------------------
+
+	.file	1	"asyncAPI.compute_20.cudafe2.gpu"
+	.file	2	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\crtdefs.h"
+	.file	3	"C:\CUDA\include\crt/device_runtime.h"
+	.file	4	"C:\CUDA\include\host_defines.h"
+	.file	5	"C:\CUDA\include\builtin_types.h"
+	.file	6	"c:\cuda\include\device_types.h"
+	.file	7	"c:\cuda\include\driver_types.h"
+	.file	8	"c:\cuda\include\surface_types.h"
+	.file	9	"c:\cuda\include\texture_types.h"
+	.file	10	"c:\cuda\include\vector_types.h"
+	.file	11	"c:\cuda\include\builtin_types.h"
+	.file	12	"c:\cuda\include\host_defines.h"
+	.file	13	"C:\CUDA\include\device_launch_parameters.h"
+	.file	14	"c:\cuda\include\crt\storage_class.h"
+	.file	15	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\time.h"
+	.file	16	"c:\cuda\include\texture_fetch_functions.h"
+	.file	17	"C:\CUDA\include\common_functions.h"
+	.file	18	"c:\cuda\include\math_functions.h"
+	.file	19	"c:\cuda\include\math_constants.h"
+	.file	20	"c:\cuda\include\device_functions.h"
+	.file	21	"c:\cuda\include\sm_11_atomic_functions.h"
+	.file	22	"c:\cuda\include\sm_12_atomic_functions.h"
+	.file	23	"c:\cuda\include\sm_13_double_functions.h"
+	.file	24	"c:\cuda\include\sm_20_atomic_functions.h"
+	.file	25	"c:\cuda\include\sm_20_intrinsics.h"
+	.file	26	"c:\cuda\include\surface_functions.h"
+	.file	27	"c:\cuda\include\math_functions_dbl_ptx3.h"
+	.file	28	"c:/ProgramData/NVIDIA Corporation/NVIDIA GPU Computing SDK/C/src/asyncAPI/asyncAPI.cu"
+
+
+	.entry _Z16increment_kernelPii (
+		.param .u32 __cudaparm__Z16increment_kernelPii_g_data,
+		.param .s32 __cudaparm__Z16increment_kernelPii_inc_value)
+	{
+	.reg .u32 %r<13>;
+	.loc	28	28	0
+$LDWbegin__Z16increment_kernelPii:
+	.loc	28	31	0
+	mov.u32 	%r1, %ctaid.x;
+	mov.u32 	%r2, %ntid.x;
+	mul.lo.u32 	%r3, %r1, %r2;
+	mov.u32 	%r4, %tid.x;
+	add.u32 	%r5, %r4, %r3;
+	mul.lo.u32 	%r6, %r5, 4;
+	ld.param.u32 	%r7, [__cudaparm__Z16increment_kernelPii_g_data];
+	add.u32 	%r8, %r7, %r6;
+	ld.global.s32 	%r9, [%r8+0];
+	ld.param.s32 	%r10, [__cudaparm__Z16increment_kernelPii_inc_value];
+	add.s32 	%r11, %r9, %r10;
+	st.global.s32 	[%r8+0], %r11;
+	.loc	28	32	0
+	exit;
+$LDWend__Z16increment_kernelPii:
+	} // _Z16increment_kernelPii
+

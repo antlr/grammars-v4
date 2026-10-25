@@ -1,0 +1,1 @@
+MATCH (a) CALL proc(   ) RETURN *
