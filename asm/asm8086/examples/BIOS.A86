@@ -1,0 +1,689 @@
+	title	'8086 Disk I/O Drivers'
+
+;*********************************************
+;*                                           *
+;* Basic Input/Output System (BIOS) for      *
+;* CP/M-86 Configured for iSBC 86/12 with    *
+;* the iSBC 204 Floppy Disk Controller       *
+;*                                           *
+;* (Note:  this file contains both embedded  *
+;* tabs and blanks to minimize the list file *
+;* width for printing purposes.  You may wish*
+;* to expand the blanks before performing    *
+;* major editing.)                           *
+;*********************************************
+
+;	Copyright (C) 1980,1981
+;	Digital Research, Inc.
+;	Box 579, Pacific Grove
+;	California, 93950
+;
+;	(Permission is hereby granted to use
+;	or abstract the following program in
+;	the implementation of CP/M, MP/M or
+;	CP/NET for the 8086 or 8088 Micro-
+;	processor)
+
+
+true		equ -1
+false		equ not true
+
+;*********************************************
+;*                                           *
+;* Loader_bios is true if assembling the     *
+;* LOADER BIOS, otherwise BIOS is for the    *
+;* CPM.SYS file.  Blc_list is true if we     *
+;* have a serial printer attached to BLC8538 *
+;* Bdos_int is interrupt used for earlier    *
+;* versions.                                 *
+;*                                           *
+;*********************************************
+
+loader_bios	equ false
+blc_list	equ true
+bdos_int	equ 224	;reserved BDOS Interrupt
+
+	IF	not loader_bios
+;---------------------------------------------
+;|                                           |
+bios_code	equ 2500h
+ccp_offset	equ 0000h
+bdos_ofst	equ 0B06h ;BDOS entry point
+;|                                           |
+;---------------------------------------------
+	ENDIF	;not loader_bios
+
+	IF	loader_bios
+;---------------------------------------------
+;|                                           |
+bios_code	equ 1200h ;start of LDBIOS
+ccp_offset	equ 0003h ;base of CPMLOADER
+bdos_ofst	equ 0406h ;stripped BDOS entry
+;|                                           |
+;---------------------------------------------
+	ENDIF	;loader_bios
+
+csts		equ 0DAh  ;i8251 status port
+cdata		equ 0D8h  ;   "  data port
+
+	IF	blc_list
+;---------------------------------------------
+;|                                           |
+lsts		equ 41h ;2651 No. 0 on BLC8538 status port
+ldata		equ 40h	; "   "   "  "    "    data port
+blc_reset	equ 60h	;reset selected USARTS on BLC8538
+;|                                           |
+;---------------------------------------------
+	ENDIF	;blc_list
+
+;*********************************************
+;*                                           *
+;*    Intel iSBC 204 Disk Controller Ports   *
+;*                                           *
+;*********************************************
+
+base204		equ 0a0h	;SBC204 assigned address
+
+fdc_com		equ base204+0	;8271 FDC out command
+fdc_stat	equ base204+0	;8271 in status
+fdc_parm	equ base204+1	;8271 out parameter
+fdc_rslt	equ base204+1	;8271 in result
+fdc_rst		equ base204+2	;8271 out reset
+dmac_adr	equ base204+4	;8257 DMA base address out
+dmac_cont	equ base204+5	;8257 out control
+dmac_scan	equ base204+6	;8257 out scan control
+dmac_sadr	equ base204+7	;8257 out scan address
+dmac_mode	equ base204+8	;8257 out mode
+dmac_stat	equ base204+8	;8257 in status
+fdc_sel		equ base204+9	;FDC select port (not used)
+fdc_segment	equ base204+10	;segment address register 
+reset_204	equ base204+15	;reset entire interface
+
+max_retries	equ 10		;max retries on disk i/o 
+				;before perm error
+cr		equ 0dh		;carriage return
+lf		equ 0ah		;line feed
+
+	cseg
+	org	ccpoffset
+ccp:
+	org	bios_code
+
+;*********************************************
+;*                                           *
+;* BIOS Jump Vector for Individual Routines  *
+;*                                           *
+;*********************************************
+
+ jmp INIT	;Enter from BOOT ROM or LOADER
+ jmp WBOOT	;Arrive here from BDOS call 0  
+ jmp CONST	;return console keyboard status
+ jmp CONIN	;return console keyboard char
+ jmp CONOUT  	;write char to console device
+ jmp LISTOUT	;write character to list device
+ jmp PUNCH	;write character to punch device
+ jmp READER  	;return char from reader device 
+ jmp HOME	;move to trk 00 on cur sel drive
+ jmp SELDSK  	;select disk for next rd/write
+ jmp SETTRK  	;set track for next rd/write
+ jmp SETSEC  	;set sector for next rd/write
+ jmp SETDMA  	;set offset for user buff (DMA)
+ jmp READ	;read a 128 byte sector
+ jmp WRITE	;write a 128 byte sector
+ jmp LISTST  	;return list status 
+ jmp SECTRAN 	;xlate logical->physical sector 
+ jmp SETDMAB 	;set seg base for buff (DMA)
+ jmp GETSEGT 	;return offset of Mem Desc Table
+ jmp GETIOBF	;return I/O map byte (IOBYTE)
+ jmp SETIOBF	;set I/O map byte (IOBYTE) 
+
+;*********************************************
+;*                                           *
+;* INIT Entry Point, Differs for LDBIOS and  *
+;* BIOS, according to "Loader_Bios" value    *
+;*                                           *
+;*********************************************
+
+INIT:	;print signon message and initialize hardware
+	mov ax,cs	;we entered with a JMPF so use
+	mov ss,ax	; CS: as the initial value of SS:,
+	mov ds,ax	;	DS:,
+	mov es,ax	;	and ES:
+	;use local stack during initialization
+	mov sp,offset stkbase
+	cld		;set forward direction
+
+	IF	not loader_bios
+;---------------------------------------------
+;|                                           |
+	; This is a BIOS for the CPM.SYS file.
+	; Setup all interrupt vectors in low
+	; memory to address trap
+
+	push ds		;save the DS register
+	mov ax,0
+	mov ds,ax
+	mov es,ax 	;set ES and DS to zero
+	;setup interrupt 0 to address trap routine
+	mov int0_offset,offset int_trap
+	mov int0_segment,CS
+	mov di,4
+	mov si,0	;then propagate
+	mov cx,510	;trap vector to
+	rep movs ax,ax	;all 256 interrupts
+	;BDOS offset to proper interrupt
+	mov bdos_offset,bdos_ofst
+	pop ds		;restore the DS register
+
+;*********************************************
+;*                                           *
+;* National "BLC 8538" Channel 0 for a serial*
+;* 9600 baud printer - this board uses 8 Sig-*
+;* netics 2651 Usarts which have on-chip baud*
+;* rate generators.                          *
+;*                                           *
+;*********************************************
+
+	mov al,0FFh
+	out blc_reset,al ;reset all usarts on 8538
+	mov al,4Eh
+	out ldata+2,al	;set usart 0 in async 8 bit mode
+	mov al,3Eh
+	out ldata+2,al	;set usart 0 to 9600 baud
+	mov al,37h
+	out ldata+3,al	;enable Tx/Rx, and set up RTS,DTR
+;|                                           |
+;---------------------------------------------
+	ENDIF	;not loader_bios
+
+	IF	loader_bios
+;---------------------------------------------
+;|                                           |
+	;This is a BIOS for the LOADER
+	push ds		;save data segment
+	mov ax,0
+	mov ds,ax	;point to segment zero
+	;BDOS interrupt offset
+	mov bdos_offset,bdos_ofst
+	mov bdos_segment,CS ;bdos interrupt segment
+	pop ds		;restore data segment
+;|                                           |
+;---------------------------------------------
+	ENDIF	;loader_bios
+
+	mov bx,offset signon
+	call pmsg	;print signon message
+	mov cl,0	;default to dr A: on coldstart
+	jmp ccp		;jump to cold start entry of CCP
+
+WBOOT:	jmp ccp+6	;direct entry to CCP at command level
+
+	IF	not loader_bios
+;---------------------------------------------
+;|                                           |
+int_trap:
+	cli		;block interrupts
+	mov ax,cs
+	mov ds,ax	;get our data segment
+	mov bx,offset int_trp
+	call pmsg
+	hlt		;hardstop
+;|                                           |
+;---------------------------------------------
+	ENDIF	;not loader_bios
+
+;*********************************************
+;*                                           *
+;*   CP/M Character I/O Interface Routines   *
+;*   Console is Usart (i8251a) on iSBC 86/12 *
+;*   at ports D8/DA                          *
+;*                                           *
+;*********************************************
+
+CONST:		;console status
+	in al,csts
+	and al,2
+	jz const_ret
+	or al,255	;return non-zero if RDA
+const_ret:
+	ret		;Receiver Data Available
+
+CONIN:			;console input
+	call const
+	jz CONIN	;wait for RDA
+	in al,cdata
+	and al,7fh 	;read data and remove parity bit
+	ret
+
+CONOUT:		;console output
+	in al,csts
+	and al,1	;get console status
+	jz CONOUT 	;wait for TBE
+	mov al,cl
+	out cdata,al	;Transmitter Buffer Empty
+	ret		;then return data
+
+LISTOUT:		;list device output
+
+	IF	blc_list
+;---------------------------------------------
+;|                                           |
+	call LISTST
+	jz LISTOUT	;wait for printer not busy
+	mov al,cl
+	out ldata,al	;send char to TI 810
+;|                                           |
+;---------------------------------------------
+	ENDIF	;blc_list
+
+	ret
+
+LISTST:			;poll list status
+
+	IF	blc_list
+;---------------------------------------------
+;|                                           |
+	in al,lsts
+	and al,81h	;look at both TxRDY and DTR
+	cmp al,81h
+	jnz zero_ret	;either false, printer is busy
+	or al,255	;both true, LPT is ready
+;|                                           |
+;---------------------------------------------
+	ENDIF	;blc_list
+
+	ret
+
+PUNCH:	;not implemented in this configuration
+READER:
+	mov al,1ah
+	ret		;return EOF for now
+
+GETIOBF:
+	mov al,0	;TTY: for consistency
+	ret		;IOBYTE not implemented
+
+SETIOBF:
+	ret		;iobyte not implemented
+
+zero_ret:
+	and al,0
+ret			;return zero in AL and flags
+
+; Routine to get and echo a console character
+;	and shift it to upper case
+
+uconecho:
+	call CONIN	;get a console character
+	push ax
+	mov cl,al	;save and
+	call CONOUT
+	pop ax		;echo to console
+	cmp al,'a'
+	jb uret		;less than 'a' is ok
+	cmp al,'z'
+	ja uret		;greater than 'z' is ok
+	sub al,'a'-'A'	;else shift to caps
+uret:
+	ret
+
+;	utility subroutine to print messages
+
+pmsg:
+	mov al,[BX] 	;get next char from message
+	test al,al
+	jz return	;if zero return
+	mov CL,AL
+	call CONOUT  	;print it
+	inc BX
+	jmps pmsg	;next character and loop
+
+;*********************************************
+;*                                           *
+;*          Disk Input/Output Routines       *
+;*                                           *
+;*********************************************
+
+SELDSK:		;select disk given by register CL
+	mov bx,0000h
+	cmp cl,2	;this BIOS only supports 2 disks
+	jnb return	;return w/ 0000 in BX if bad drive
+	mov al, 80h
+	cmp cl,0
+	jne sel1 	;drive 1 if not zero
+	mov al, 40h	;else drive is 0
+sel1:	mov sel_mask,al	;save drive select mask
+			;now, we need disk parameter address
+	mov ch,0
+	mov bx,cx	;BX = word(CL)
+	mov cl,4
+	shl bx,cl	;multiply drive code * 16
+	;create offset from Disk Parameter Base
+	add bx,offset dp_base
+return:
+	ret
+
+HOME:	;move selected disk to home position (Track 0)
+	mov trk,0	;set disk i/o to track zero
+	mov bx,offset hom_com
+	call execute
+	jz return	;home drive and return if OK
+	mov bx,offset bad_hom	;else print 
+	call pmsg	;"Home Error"
+	jmps home	;and retry
+
+SETTRK: ;set track address given by CX
+	mov trk,cl	;we only use 8 bits of track address
+	ret
+
+SETSEC: ;set sector number given by cx
+	mov sect,cl	;we only use 8 bits of sector address
+	ret
+
+SECTRAN: ;translate sector CX using table at [DX]
+	mov bx,cx
+	add bx,dx	;add sector to tran table address
+	mov bl,[bx]	;get logical sector
+	ret
+
+SETDMA: ;set DMA offset given by CX
+	mov dma_adr,CX
+	ret
+
+SETDMAB: ;set DMA segment given by CX
+	mov dma_seg,CX
+	ret
+;
+GETSEGT:  ;return address of physical memory table
+	mov bx,offset seg_table
+	ret
+
+;*********************************************
+;*                                           *
+;*  All disk I/O parameters are setup:  the  *
+;*  Read and Write entry points transfer one *
+;*  sector of 128 bytes to/from the current  *
+;*  DMA address using the current disk drive *
+;*                                           *
+;*********************************************
+
+READ:
+	mov al,12h 	;basic read sector command
+	jmps r_w_common
+
+WRITE:
+	mov al,0ah 	;basic write sector command
+
+r_w_common:
+	mov bx,offset io_com ;point to command string
+	mov byte ptr 1[BX],al ;put command into string
+;	fall into execute and return
+
+execute:  ;execute command string.
+	;[BX] points to length,
+	;	followed by Command byte,
+	;	followed by length-1 parameter bytes
+
+	mov last_com,BX	;save command address for retries
+outer_retry:
+	;allow some retrying
+	mov rtry_cnt,max_retries
+retry:
+	mov BX,last_com
+	call send_com	;transmit command to i8271
+;	check status poll
+
+	mov BX,last_com
+	mov al,1[bx]	;get command op code
+	mov cx,0800h	;mask if it will be "int req"
+	cmp al,2ch
+	jb exec_poll	;ok if it is an interrupt type 
+	mov cx,8080h	;else we use "not command busy"
+	and al,0fh
+	cmp al,0ch	;unless there isn't
+	mov al,0
+	ja exec_exit	;	any result
+			;poll for bits in CH,
+exec_poll:		;  toggled with bits in CL
+
+	in al,fdc_stat	;read status
+	and al,ch
+	xor al,cl	;  isolate what we want to poll
+	jz exec_poll	;and loop until it is done
+
+			;Operation complete,
+	in al,fdc_rslt	; see if result code indicates error
+	and al,1eh
+	jz exec_exit	;no error, then exit
+			;some type of error occurred . . .
+	cmp al,10h
+	je dr_nrdy	;was it a not ready drive ?
+			;no,
+dr_rdy:	; then we just retry read or write
+	dec rtry_cnt
+	jnz retry	;  up to 10 times
+
+;	retries do not recover from the
+;	hard error
+
+	mov ah,0
+	mov bx,ax	;make error code 16 bits
+	mov bx,errtbl[BX]
+	call pmsg	;print appropriate message
+	in al,cdata	;flush usart receiver buffer
+	call uconecho	;read upper case console character
+	cmp al,'C'
+	je wboot_l	;cancel
+	cmp al,'R'
+	je outer_retry	;retry 10 more times
+	cmp al,'I'
+	je z_ret	;ignore error
+	or al,255	;set code for permanent error
+exec_exit:
+	ret
+
+dr_nrdy:	;here to wait for drive ready
+	call test_ready
+	jnz retry	;if it's ready now we are done
+	call test_ready
+	jnz retry	;if not ready twice in row,
+	mov bx,offset nrdymsg
+	call pmsg ;"Drive Not Ready"
+nrdy01:
+	call test_ready
+	jz nrdy01 	;now loop until drive ready
+	jmps retry	;then go retry without decrement
+zret:
+	and al,0
+	ret		;return with no error code
+
+wboot_l:		;can't make it w/ a short leap
+	jmp WBOOT
+
+;*********************************************
+;*                                           *
+;*  The i8271 requires a read status command *
+;*  to reset a drive-not-ready after the     *
+;*  drive becomes ready                      *
+;*                                           *
+;*********************************************
+
+test_ready:
+	mov dh, 40h  	;proper mask if dr 1
+	test sel_mask,80h
+	jnz nrdy2
+	mov dh, 04h  	;mask for dr 0 status bit
+nrdy2:
+	mov bx,offset rds_com
+	call send_com
+dr_poll:
+	in al,fdc_stat	;get status word
+	test al,80h
+	jnz dr_poll 	;wait for not command busy
+	in al,fdc_rslt	;get "special result"
+	test al,dh	;look at bit for this drive
+	ret		;return status of ready
+
+;*********************************************
+;*                                           *
+;*  Send_com sends a command and parameters  *
+;*  to the i8271:  BX addresses parameters.  *
+;*  The DMA controller is also initialized   *
+;*  if this is a read or write               *
+;*                                           *
+;*********************************************
+
+send_com:
+	in al,fdc_stat
+	test al,80h	;insure command not busy
+	jnz send_com	;loop until ready
+
+	;see if we have to initialize for a DMA operation
+
+	mov al,1[bx]	;get command byte
+	cmp al,12h
+	jne write_maybe	;if not a read it could be write
+	mov cl,40h
+	jmps init_dma	;is a read command, go set DMA
+write_maybe:
+	cmp al,0ah
+	jne dma_exit	;leave DMA alone if not read or write
+	mov cl,80h  	;we have write, not read
+init_dma:
+;we have a read or write operation, setup DMA controller
+;	(CL contains proper direction bit)
+	mov al,04h
+	out dmac_mode,al    ;enable dmac
+	mov al,00
+	out dmac_cont,al    ;send first byte to control port
+	mov al,cl
+	out dmac_cont,al   ;load direction register
+	mov ax,dma_adr
+	out dmac_adr,al    ;send low byte of DMA
+	mov al,ah
+	out dmac_adr,al	   ;send high byte
+	mov ax,dma_seg
+	out fdc_segment,al ;send low byte of segment address
+	mov al,ah
+	out fdc_segment,al ;then high segment address
+dma_exit:
+	mov cl,[BX]	;get count
+	inc BX
+	mov al,[BX]	;get command
+	or al,sel_mask 	;merge command and drive code
+	out fdc_com,al 	;send command byte
+parm_loop:
+	dec cl
+	jz exec_exit	;no (more) parameters, return
+	inc BX		;point to (next) parameter
+parm_poll:
+	in al,fdc_stat
+	test al,20h	;test "parameter register full" bit
+	jnz parm_poll	;idle until parm reg not full
+	mov al,[BX]
+	out fdc_parm,al	;send next parameter
+	jmps parm_loop	;go see if there are more parameters
+
+;*********************************************
+;*                                           *
+;*               Data Areas                  *
+;*                                           *
+;*********************************************
+data_offset	equ offset $
+
+	dseg
+	org	data_offset	;contiguous with code segment
+
+	IF	loader_bios
+;---------------------------------------------
+;|                                           |
+signon 	db	cr,lf,cr,lf
+	db	'CP/M-86 Version 2.2',cr,lf,0
+;|                                           |
+;---------------------------------------------
+	ENDIF	;loader_bios
+
+	IF	not loader_bios
+;---------------------------------------------
+;|                                           |
+signon	db	cr,lf,cr,lf
+	db	'  System Generated  - 11 Jan 81',cr,lf,0
+;|                                           |
+;---------------------------------------------
+	ENDIF	;not loader_bios
+
+bad_hom	db	cr,lf,'Home Error',cr,lf,0
+int_trp	db	cr,lf,'Interrupt Trap Halt',cr,lf,0
+
+errtbl  dw er0,er1,er2,er3
+	dw er4,er5,er6,er7
+	dw er8,er9,erA,erB
+	dw erC,erD,erE,erF
+
+er0 	db  cr,lf,'Null Error ??',0
+er1 	equ er0
+er2 	equ er0
+er3 	equ er0
+er4 	db  cr,lf,'Clock Error :',0
+er5 	db  cr,lf,'Late DMA :',0
+er6 	db  cr,lf,'ID CRC Error :',0
+er7 	db  cr,lf,'Data CRC Error :',0
+er8 	db  cr,lf,'Drive Not Ready :',0
+er9 	db  cr,lf,'Write Protect :',0
+erA 	db  cr,lf,'Trk 00 Not Found :',0
+erB 	db  cr,lf,'Write Fault :',0
+erC 	db  cr,lf,'Sector Not Found :',0
+erD 	equ er0
+erE 	equ er0
+erF 	equ er0
+nrdymsg	equ er8
+
+rtry_cnt db 0 	;disk error retry counter
+last_com dw 0 	;address of last command string
+dma_adr  dw 0 	;dma offset stored here
+dma_seg  dw 0 	;dma segment stored here
+sel_mask db 40h ;select mask, 40h or 80h
+
+;	Various command strings for i8271
+
+io_com	db 3	;length
+rd_wr	db 0	;read/write function code
+trk	db 0	;track #
+sect	db 0	;sector #
+
+hom_com	db 2,29h,0	;home drive command
+rds_com	db 1,2ch	;read status command
+
+;	System Memory Segment Table
+
+segtable db 2	;2 segments
+	dw tpa_seg	;1st seg starts after BIOS
+	dw tpa_len	;and extends to 08000
+	dw 2000h	;second is 20000 -
+	dw 2000h	;3FFFF (128k)
+
+	include singles.lib ;read in disk definitions
+
+loc_stk	rw  32	;local stack for initialization
+stkbase	equ offset $
+
+lastoff	equ offset $
+tpa_seg	equ (lastoff+0400h+15) / 16
+tpa_len	equ 0800h - tpa_seg
+	db 0	;fill last address for GENCMD
+
+;*********************************************
+;*                                           *
+;*          Dummy Data Section               *
+;*                                           *
+;*********************************************
+	dseg	0	;absolute low memory
+	org 	0	;(interrupt vectors)
+int0_offset	rw	1
+int0_segment	rw	1
+;	pad to system call vector
+	rw	2*(bdos_int-1)
+
+bdos_offset	rw	1
+bdos_segment	rw	1
+	END

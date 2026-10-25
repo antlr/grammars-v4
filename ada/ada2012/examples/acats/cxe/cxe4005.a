@@ -1,0 +1,786 @@
+-- CXE4005.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making
+--     this public release, the Government intends to confer upon all
+--     recipients unlimited rights  equal to those held by the Government.
+--     These rights include rights to use, duplicate, release or disclose the
+--     released technical data and computer software in whole or in part, in
+--     any manner and for any purpose whatsoever, and to have or permit others
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that calls can be made to remote procedures when a
+--      dispatching call is made to a remote access to class wide
+--      type.  (5)
+--      Check that Program_Error is raised if the tag of the actual
+--      parameter identifies a tagged type declared in a normal
+--      package or in the body of a remote call interface package. (18)
+--      Check that in a dispatching call with two controlling
+--      operands, Constraint_Error is raised if the two remote
+--      access-to-class-wide values originated
+--      from Access attribute_references in different partitions. (19)
+--
+-- TEST DESCRIPTION:
+--      This test is composed of the following compilation units:
+--          CXE4005_Common  - pure package containing declarations
+--              shared between partitions A & B
+--          CXE4005_Part_A1 - rci package interface for partition A
+--          CXE4005_Part_A2 - rci package interface for partition A
+--          CXE4005_Part_B  - rci package interface for partition B
+--          CXE4005_Remote_Types - a remote types package
+--          CXE4005_Normal  - normal package
+--          CXE4005_A  - main procedure for partition A
+--          CXE4005_B  - main procedure for partition B - main driver
+--              for the test.
+--      Tagged types are declared in a variety of the above packages.
+--      Objects of these tagged types are declared in each of the RCI
+--      packages.  A remote access to class wide type is created for each
+--      of the objects and stored in a table created by CXE4005_B.
+--      These access values are used to make a variety of dispatching calls
+--      where the object passed to the dispatched routine is checked
+--      to insure the correct call was made.  This check is accomplished
+--      by having each of the tagged type objects contain a serial number
+--      that is returned as a result of the remote call.  The actual
+--      serial number is compared against the expected serial number.
+--
+-- SPECIAL REQUIREMENTS:
+--      Compile the compilation units in this file.
+--      Create the two partitions (A and B) with the following contents:
+--        Partition A contains:
+--           CXE4005_A  (main procedure)
+--           CXE4005_Part_A1  (RCI package body)
+--           CXE4005_Part_A2  (RCI package body)
+--           CXE4005_Remote_Types
+--           CXE4005_Common
+--           Report
+--           and all normal and pure packages with'ed by these units.
+--        Partition B contains:
+--           CXE4005_B  (main procedure)
+--           CXE4005_Part_B  (RCI package body)
+--           CXE4005_Remote_Types
+--           CXE4005_Normal
+--           CXE4005_Common
+--           Report
+--           and all normal and pure packages with'ed by these units.
+--        Note that package Report is included in both partitions and
+--        prints messages from both partitions.
+--      Run the program by starting partition A and then partition B.
+--
+-- APPLICABILITY CRITERIA:
+--      This test applies only to implementations:
+--         supporting the Distribution Annex,
+--         supporting the Remote_Call_Interface pragma, and
+--         providing an implementation of System.RPC.
+--
+-- PASS/FAIL CRITERIA:
+--      This test passes if and only if both partition A and
+--      partition B print a message reporting that the test passed.
+--
+--
+-- CHANGE HISTORY:
+--     17 MAY 95   SAIC    Initial version
+--     29 APR 96   SAIC    Incorporated reviewer comments.
+--     02 FEB 99   RLB     Corrected so that the subtest for E.4(18) makes
+--                         the correct check.
+--     03 FEB 99   RLB     Corrected again to avoid violation of more rules.
+--     25 JAN 01   RLB     Repaired startup race condition.
+--
+--!
+
+package CXE4005_Common is
+  pragma Pure;
+
+  -- controls progress output from the tests.
+  Verbose : constant Boolean := False;
+
+  -- exception to signify that the serial number of an object
+  -- was not a one of the expected values for that type
+  Wrong_Object : exception;
+
+  -- identification of where a type is declared and where
+  -- an access type was evaluated that refers to an object
+  -- of that type.
+  type Type_Selection is (Common_Spec,        --  xx1
+                          RT_Spec,            --  xx6
+                          B_Body,             --  xx7
+                          Normal_Spec);       --  xx8
+  type Access_Evaluation is (A1,              --  1xx
+                             A2,              --  2xx
+                             B);              --  3xx
+
+  -- root tagged type for remote access to class wide type test
+  type Root_Tagged_Type is tagged limited private;
+
+  procedure Single_Controlling_Operand (
+      RTT         : access Root_Tagged_Type;
+      Test_Number : in     Integer;
+      Obj_SN      : out    Integer);
+  procedure Dual_Controlling_Operands (
+      RTT1        : access Root_Tagged_Type;
+      RTT2        : access Root_Tagged_Type;
+      Test_Number : in     Integer;
+      Obj_SN1     : out    Integer;
+      Obj_SN2     : out    Integer);
+
+  procedure Set_Serial_Number (
+      RTT         : access Root_Tagged_Type;
+      Sn          : in     Integer);
+
+  function Serial_Number (RTT : access Root_Tagged_Type) return Integer;
+
+  type Open_Tagged_Type is tagged
+    record
+       Field : Integer;
+    end record;
+  procedure Open_Op (OTT : Open_Tagged_Type);
+
+private
+  type Root_Tagged_Type is tagged limited
+    record
+      Serial_Number        : Integer := 123;
+    end record;
+end CXE4005_Common;
+
+---
+-- This package is pure so it cannot depend upon Report
+---
+package body CXE4005_Common is
+  Op_Is_Zero : exception;
+
+  -- All objects that do not have an overriding definition of
+  -- Single_Controlling_Operand and Dual_Controlling_Operands
+  -- have a serial number with the least significant digit in
+  -- the range from 1 to 5.
+  -- If a wrong object is passed to these
+  -- routines then the exception Wrong_Object is raised.
+
+  procedure Single_Controlling_Operand (
+      RTT         : access Root_Tagged_Type;
+      Test_Number : in     Integer;
+      Obj_SN      : out    Integer) is
+  begin
+    Obj_SN := Serial_Number(RTT);
+    if RTT.Serial_Number mod 10 not in 1..5 then
+      raise Wrong_Object;
+    end if;
+  end Single_Controlling_Operand;
+
+  procedure Dual_Controlling_Operands (
+      RTT1        : access Root_Tagged_Type;
+      RTT2        : access Root_Tagged_Type;
+      Test_Number : in     Integer;
+      Obj_SN1     : out    Integer;
+      Obj_SN2     : out    Integer) is
+  begin
+    Obj_SN1 := RTT1.Serial_Number;
+    Obj_SN2 := RTT2.Serial_Number;
+
+    if RTT1.Serial_Number mod 10 not in 1..5 then
+      raise Wrong_Object;
+    end if;
+    if RTT2.Serial_Number mod 10 not in 1..5 then
+      raise Wrong_Object;
+    end if;
+  end Dual_Controlling_Operands;
+
+  procedure Set_Serial_Number (
+      RTT         : access Root_Tagged_Type;
+      Sn          : in     Integer) is
+  begin
+    RTT.Serial_Number := Sn;
+  end Set_Serial_Number;
+
+  function Serial_Number (RTT : access Root_Tagged_Type) return Integer is
+  begin
+    return RTT.Serial_Number;
+  end Serial_Number;
+
+  procedure Open_Op (OTT : Open_Tagged_Type) is
+  begin
+    if OTT.Field = 0 then
+      raise Op_Is_Zero;
+    end if;
+  end Open_Op;
+
+end CXE4005_Common;
+
+-----------------------------------------------------------------------------
+
+with CXE4005_Common;
+package CXE4005_Normal is
+  type Cant_Use_In_Remote_Call is new CXE4005_Common.Root_Tagged_Type
+       with null record;
+
+  procedure Single_Controlling_Operand (
+      RTT         : access Cant_Use_In_Remote_Call;
+      Test_Number : in     Integer;
+      Obj_SN      : out    Integer);
+  procedure Dual_Controlling_Operands (
+      RTT1        : access Cant_Use_In_Remote_Call;
+      RTT2        : access Cant_Use_In_Remote_Call;
+      Test_Number : in     Integer;
+      Obj_SN1     : out    Integer;
+      Obj_SN2     : out    Integer);
+
+  type Open_But_Not_For_Export is new CXE4005_Common.Open_Tagged_Type
+      with null record;
+end CXE4005_Normal;
+
+
+with Report;
+package body CXE4005_Normal is
+  procedure Single_Controlling_Operand (
+      RTT         : access Cant_Use_In_Remote_Call;
+      Test_Number : in     Integer;
+      Obj_SN      : out    Integer) is
+  begin
+    Report.Failed ("Call made where type is declared in a normal " &
+                   "package.  Test number " &
+                   Integer'Image (Test_Number));
+    Obj_SN := Serial_Number(RTT);
+  end Single_Controlling_Operand;
+
+  procedure Dual_Controlling_Operands (
+      RTT1        : access Cant_Use_In_Remote_Call;
+      RTT2        : access Cant_Use_In_Remote_Call;
+      Test_Number : in     Integer;
+      Obj_SN1     : out    Integer;
+      Obj_SN2     : out    Integer)is
+  begin
+    Report.Failed ("Call made where type is declared in a normal " &
+                   "package.  Test number " &
+                   Integer'Image (Test_Number));
+    Obj_SN1 := Serial_Number(RTT1);
+    Obj_SN2 := Serial_Number(RTT2);
+  end Dual_Controlling_Operands;
+end CXE4005_Normal;
+
+-----------------------------------------------------------------------------
+
+with CXE4005_Common;  use CXE4005_Common;
+package CXE4005_Part_A1 is
+  pragma Remote_Call_Interface;
+
+  type RACWT is access all CXE4005_Common.Root_Tagged_Type'Class;
+
+  -- provide remote access values to other partitions
+  function Get_RACWT (Which_Type : Type_Selection)
+       return CXE4005_Part_A1.RACWT;
+
+  -- for checking E.4(18);6.0.
+  procedure Takes_Class_Wide (X : CXE4005_Common.Open_Tagged_Type'Class);
+  function Return_Open_Tagged_Type_Class
+    return CXE4005_Common.Open_Tagged_Type'Class;
+
+  -- coordination of test termination across partitions
+  procedure Can_Quit;
+  procedure Quit;
+
+end CXE4005_Part_A1;
+
+-----------------------------------------------------------------------------
+
+with CXE4005_Common;  use CXE4005_Common;
+with CXE4005_Part_A1;
+package CXE4005_Part_A2 is
+  pragma Remote_Call_Interface;
+
+  -- provide remote access values to other partitions
+  function Get_RACWT (Which_Type : Type_Selection)
+      return CXE4005_Part_A1.RACWT;
+end CXE4005_Part_A2;
+
+-----------------------------------------------------------------------------
+
+with CXE4005_Common;  use CXE4005_Common;
+with CXE4005_Part_A1;
+package CXE4005_Part_B is
+  pragma Remote_Call_Interface;
+
+  -- provide remote access values to other partitions
+  function Get_RACWT (Which_Type : Type_Selection)
+      return CXE4005_Part_A1.RACWT;
+end CXE4005_Part_B;
+
+-----------------------------------------------------------------------------
+
+with CXE4005_Common;
+with CXE4005_Part_A1;
+with CXE4005_Part_A2;
+with Report;
+procedure CXE4005_A is
+begin
+  -- this partition is a server that deals with calls
+  -- from CXE4005_B.
+  Report.Test ("CXE4005_A", "Remote dispatching calls (server)");
+  CXE4005_Part_A1.Can_Quit; -- OK to quit now.
+
+  -- Report.Result is called in the body of CXE4005_Part_A1.
+end CXE4005_A;
+
+-----------------------------------------------------------------------------
+
+with CXE4005_Common;  use CXE4005_Common;
+with CXE4005_Normal;
+with CXE4005_Part_A1;
+with CXE4005_Part_A2;
+with CXE4005_Part_B;
+with Report;
+procedure CXE4005_B is
+
+  -- table of remote access values to all the objects of interest.
+  -- Given this table, we can select a remote access value based upon
+  -- the type of the object and where the access attribute was evaluated.
+  type Pointer_Table_Type is array (Access_Evaluation, Type_Selection) of
+      CXE4005_Part_A1.RACWT;
+  Pointers : Pointer_Table_Type;
+
+  -- table of serial numbers for the objects used in the Pointers table.
+  -- Note that the serial numbers follow the convention that the hundreds
+  -- place indicates the package where the object is declared and the
+  -- least significant digit indicates the type of the object.
+  type Object_SN_Table_Type is array (Access_Evaluation, Type_Selection) of
+      Integer;
+  Objects : Object_SN_Table_Type := (
+     A1 => (101, 106, 107, 108),
+     A2 => (201, 206, 207, 208),
+     B  => (301, 306, 307, 308));
+
+  Test_Number : Integer := 100;
+
+begin  -- CXE4005_B
+  Report.Test ("CXE4005_B", "Remote dispatching calls");
+
+  -- make sure partitioning was performed correctly
+  if CXE4005_Part_A1'Partition_ID = CXE4005_B'Partition_ID then
+    Report.Failed ("Partitioning Error - CXE4005_Part_A1 and CXE4005_B" &
+                   " are in the same partition.");
+  end if;
+  if CXE4005_Part_A2'Partition_ID = CXE4005_B'Partition_ID then
+    Report.Failed ("Partitioning Error - CXE4005_Part_A2 and CXE4005_B" &
+                   " are in the same partition.");
+  end if;
+  if CXE4005_Part_B'Partition_ID /= CXE4005_B'Partition_ID then
+    Report.Failed ("Partitioning Error - CXE4005_Part_B and CXE4005_B" &
+                   " are not in the same partition.");
+  end if;
+
+  -- initialize the table of all access values
+
+  for TS in Type_Selection loop
+    Pointers (A1, TS) := CXE4005_Part_A1.Get_RACWT (TS);
+    Pointers (A2, TS) := CXE4005_Part_A2.Get_RACWT (TS);
+    Pointers (B,  TS) := CXE4005_Part_B.Get_RACWT (TS);
+  end loop;
+
+  -- Check the legal calls
+  -- This is done by calling Single_Controlling_Operand with
+  -- all the legal remote access to class wide type values we have
+  -- in the Pointers table and check that the serial number of the object
+  -- reported back is the expected value.
+  -- Dual_Controlling_Operands is also called with both operands
+  -- being the same.
+  declare
+    SN1 : Integer;
+    SN2 : Integer;
+  begin
+    for AE in Access_Evaluation loop
+      for TS in Common_Spec .. RT_Spec loop
+        Test_Number := Test_Number + 1;
+
+        if Verbose then
+          Report.Comment ("Test" & Integer'Image (Test_Number) &
+                          "  Object SN" &
+                          Integer'Image (Objects (AE, TS)));
+        end if;
+
+        Single_Controlling_Operand (Pointers (AE, TS), Test_Number, SN1);
+        if SN1 /= Objects (AE, TS) then
+          Report.Failed ("Wrong object used in test number" &
+                         Integer'Image (Test_Number) &
+                         "  Expected" &
+                         Integer'Image (Objects (AE, TS)) &
+                         "  Received" &
+                         Integer'Image (SN1) &
+                         " Single_Controlling_Operands SN" );
+        end if;
+
+        Dual_Controlling_Operands  (Pointers (AE, TS),
+                                    Pointers (AE, TS),
+                                    Test_Number,
+                                    SN1,
+                                    SN2);
+        if SN1 /= Objects (AE, TS) then
+          Report.Failed ("Wrong object used in test number" &
+                         Integer'Image (Test_Number) &
+                         "  Expected" &
+                         Integer'Image (Objects (AE, TS)) &
+                         "  Received" &
+                         Integer'Image (SN1) &
+                         " Dual_Controlling_Operands SN1" );
+        end if;
+        if SN2 /= Objects (AE, TS) then
+          Report.Failed ("Wrong object used in test number" &
+                         Integer'Image (Test_Number) &
+                         "  Expected" &
+                         Integer'Image (Objects (AE, TS)) &
+                         "  Received" &
+                         Integer'Image (SN2) &
+                         " Dual_Controlling_Operands SN2" );
+        end if;
+      end loop;
+    end loop;
+  exception
+    when others => Report.Failed ("Unexpected exception during test" &
+                                  Integer'Image (Test_Number));
+  end;
+
+
+  -- Check that Program_Error is raised if the tag of the actual
+  -- parameter identifies a tagged type declared in a normal package.
+  -- E.4(18);6.0
+  declare
+    X : CXE4005_Normal.Open_But_Not_For_Export;
+  begin
+    X.Field := 1;
+    CXE4005_Part_A1.Takes_Class_Wide (
+          CXE4005_Common.Open_Tagged_Type'Class(X));
+    Report.Failed ("Program_Error not raised when remote call is" &
+                   " made passing a class-wide object where the" &
+                   " type was declared in a" &
+                   " normal package");
+  exception
+    when Program_Error =>  -- expected exception
+       if Verbose then
+         Report.Comment ("Program_Error raised as expected" &
+                   " when a remote call is made passing a class" &
+                   " wide object where the type was declared in" &
+                   " a normal package");
+       end if;
+    when others =>
+         Report.Failed ("Incorrect exception raised." &
+                        " Program_Error was expected" &
+                        " when remote call is made passing a class" &
+                        " wide object where the type was declared in" &
+                        " a normal package");
+  end;
+
+
+  -- Check that Program_Error is raised if the tag of the actual
+  -- parameter identifies a tagged type declared in the body of a
+  -- remote call interface package.
+  begin
+    CXE4005_Part_A1.Takes_Class_Wide (CXE4005_Part_A1.
+        Return_Open_Tagged_Type_Class);
+    Report.Failed ("Program_Error not raised when remote access to" &
+                   " class wide type designated type declared in a" &
+                   " package body");
+  exception
+    when Program_Error =>  -- expected exception
+       if Verbose then
+         Report.Comment ("Program_Error raised as expected" &
+                   " when remote access to" &
+                   " class wide type designated type declared in a" &
+                   " package body");
+       end if;
+    when others =>
+         Report.Failed ("Incorrect exception raised." &
+                        " Program_Error was expected" &
+                        " when remote access to" &
+                        " class wide type designated type declared in a" &
+                        " package body");
+  end;
+
+
+  -- Check that in a dispatching call with two controlling operands
+  -- where the two remote access-to-class-wide values originated
+  -- from Access attribute_references in different partitions that
+  -- Constraint_Error is raised.
+  declare
+    SN1 : Integer;
+    SN2 : Integer;
+  begin
+    Test_Number := 400;
+    Dual_Controlling_Operands (Pointers (A1, Common_Spec),
+                               Pointers (B,  Common_Spec),
+                               Test_Number, SN1, SN2);
+    Report.Failed ("Constraint_Error not raised when remote access to" &
+                   " class wide type originated from different partitions");
+  exception
+    when Constraint_Error =>  -- expected exception
+       if Verbose then
+         Report.Comment ("Constraint_Error raised as expected" &
+                   " when remote access to" &
+                   " class wide type originated from different partitions");
+       end if;
+    when others =>
+         Report.Failed ("Incorrect exception raised." &
+                        " Constraint_Error was expected");
+  end;
+
+  -- Check that in a dispatching call with two controlling operands
+  -- where the two remote access-to-class-wide values originated
+  -- from Access attribute_references in the same partition but
+  -- different RCI packages that no exception is raised.
+  declare
+    SN1 : Integer;
+    SN2 : Integer;
+  begin
+    Test_Number := 500;
+    Dual_Controlling_Operands (Pointers (A1, Common_Spec),
+                               Pointers (A2, Common_Spec),
+                               Test_Number, SN1, SN2);
+    if SN1 /= Objects (A1, Common_Spec) then
+          Report.Failed ("Wrong object used in test number" &
+                         Integer'Image (Test_Number) &
+                         "  Expected" &
+                         Integer'Image (Objects (A1, Common_Spec)) &
+                         "  Received" &
+                         Integer'Image (SN1) &
+                         " Dual_Controlling_Operands SN1" );
+    end if;
+    if SN2 /= Objects (A2, Common_Spec) then
+          Report.Failed ("Wrong object used in test number" &
+                         Integer'Image (Test_Number) &
+                         "  Expected" &
+                         Integer'Image (Objects (A2, Common_Spec)) &
+                         "  Received" &
+                         Integer'Image (SN2) &
+                         " Dual_Controlling_Operands SN2" );
+    end if;
+    if Verbose then
+      Report.Comment ("Two controlling operands from different RCI" &
+                     " packages within the same partition ok");
+    end if;
+  exception
+    when others =>
+         Report.Failed ("Two controlling operands from different RCI" &
+                        " packages within the same partition" &
+                        " resulted in an unexpected exception");
+  end;
+
+
+  -- finish up
+  CXE4005_Part_A1.Quit;
+  Report.Result;
+end CXE4005_B;
+
+-----------------------------------------------------------------------------
+
+with CXE4005_Common; use CXE4005_Common;
+package CXE4005_Remote_Types is
+  pragma Remote_Types;
+
+  type RT_Tagged_Type is new Root_Tagged_Type with null record;
+
+  procedure Single_Controlling_Operand (
+      RTT         : access RT_Tagged_Type;
+      Test_Number : in     Integer;
+      Obj_SN      : out    Integer);
+  procedure Dual_Controlling_Operands (
+      RTT1        : access RT_Tagged_Type;
+      RTT2        : access RT_Tagged_Type;
+      Test_Number : in     Integer;
+      Obj_SN1     : out    Integer;
+      Obj_SN2     : out    Integer);
+end CXE4005_Remote_Types;
+
+
+
+package body CXE4005_Remote_Types is
+  --
+  -- The serial number for all objects of RT_Tagged_Type will contain
+  -- a 6 as the least significant digit.  Make sure the correct object
+  -- is passed to these routines.
+  --
+
+  procedure Single_Controlling_Operand (
+      RTT         : access RT_Tagged_Type;
+      Test_Number : in     Integer;
+      Obj_SN      : out    Integer) is
+  begin
+    Obj_SN := Serial_Number(RTT);
+    if Serial_Number(RTT) mod 10 /= 6 then
+      raise Wrong_Object;
+    end if;
+  end Single_Controlling_Operand;
+
+  procedure Dual_Controlling_Operands (
+      RTT1        : access RT_Tagged_Type;
+      RTT2        : access RT_Tagged_Type;
+      Test_Number : in     Integer;
+      Obj_SN1     : out    Integer;
+      Obj_SN2     : out    Integer) is
+  begin
+    Obj_SN1 := Serial_Number(RTT1);
+    Obj_SN2 := Serial_Number(RTT2);
+    if Serial_Number(RTT1) mod 10 /= 6 or
+       Serial_Number(RTT2) mod 10 /= 6 then
+      raise Wrong_Object;
+    end if;
+  end Dual_Controlling_Operands;
+
+end CXE4005_Remote_Types;
+
+-----------------------------------------------------------------------------
+
+with Report;
+with CXE4005_Part_A2;
+with CXE4005_Part_B;
+with CXE4005_Normal;
+with CXE4005_Remote_Types;
+package body CXE4005_Part_A1 is
+  Root_Obj : aliased CXE4005_Common.Root_Tagged_Type;
+  RT_Obj   : aliased CXE4005_Remote_Types.RT_Tagged_Type;
+  Normal_Obj : aliased CXE4005_Normal.Cant_Use_In_Remote_Call;
+
+  ---------  partition termination coordination ----------
+  -- use a task to prevent the partition from completing its execution
+  -- until the main procedure in partition B tells it to quit.
+
+  task Wait_For_Quit is
+    entry Can_Quit;
+    entry Quit;
+  end Wait_For_Quit;
+
+  task body Wait_For_Quit is
+  begin
+    accept Can_Quit; -- Called once we've called Report.Test. (Else we might
+                     -- call Report.Result before Report.Test.)
+    accept Quit;
+    Report.Result;
+  end Wait_For_Quit;
+
+  procedure Can_Quit is
+  begin
+    Wait_For_Quit.Can_Quit;
+  end Can_Quit;
+
+  procedure Quit is
+  begin
+    Wait_For_Quit.Quit;
+  end Quit;
+
+
+  function Get_RACWT (Which_Type : Type_Selection)
+       return CXE4005_Part_A1.RACWT is
+  begin
+    case Which_Type is
+      when Common_Spec => return Root_Obj'Access;
+      when RT_Spec     => return RT_Obj'Access;
+      when B_Body      => return null;
+      when Normal_Spec => return Normal_Obj'Access;
+    end case;
+  end Get_RACWT;
+
+  procedure Takes_Class_Wide (X : CXE4005_Common.Open_Tagged_Type'Class) is
+  begin
+    CXE4005_Common.Open_Op(X);
+  end Takes_Class_Wide;
+
+  package Nested is
+    type Body_Open_Tagged_Type is new CXE4005_Common.Open_Tagged_Type
+          with null record;
+  end Nested;
+
+  function Return_Open_Tagged_Type_Class
+    return CXE4005_Common.Open_Tagged_Type'Class is
+    -- Return an object of a type not visible to the B partition.
+    Obj : Nested.Body_Open_Tagged_Type;
+  begin
+    return Obj;
+  end Return_Open_Tagged_Type_Class;
+
+begin
+  Set_Serial_Number (Root_Tagged_Type(Root_Obj)'Access,   101);
+  Set_Serial_Number (Root_Tagged_Type(RT_Obj)'Access,     106);
+  -- no 107 object
+  Set_Serial_Number (Root_Tagged_Type(Normal_Obj)'Access, 108);
+end CXE4005_Part_A1;
+
+-----------------------------------------------------------------------------
+
+with Report;
+with CXE4005_Part_B;
+with CXE4005_Normal;
+with CXE4005_Remote_Types;
+package body CXE4005_Part_A2 is
+  Root_Obj : aliased CXE4005_Common.Root_Tagged_Type;
+  RT_Obj   : aliased CXE4005_Remote_Types.RT_Tagged_Type;
+  Normal_Obj : aliased CXE4005_Normal.Cant_Use_In_Remote_Call;
+
+
+  function Get_RACWT (Which_Type : Type_Selection)
+       return CXE4005_Part_A1.RACWT is
+  begin
+    case Which_Type is
+      when Common_Spec => return Root_Obj'Access;
+      when RT_Spec     => return RT_Obj'Access;
+      when B_Body      => return null;
+      when Normal_Spec => return Normal_Obj'Access;
+    end case;
+  end Get_RACWT;
+
+begin
+  Set_Serial_Number (Root_Tagged_Type(Root_Obj)'Access   , 201);
+  Set_Serial_Number (Root_Tagged_Type(RT_Obj)'Access     , 206);
+  -- no 207 object
+  Set_Serial_Number (Root_Tagged_Type(Normal_Obj)'Access , 208);
+end CXE4005_Part_A2;
+
+
+-----------------------------------------------------------------------------
+
+with CXE4005_Part_A1;
+with CXE4005_Part_A2;
+with CXE4005_Normal;
+with CXE4005_Remote_Types;
+with Report;
+package body CXE4005_Part_B is
+
+  type Not_Available_For_Remote_Call is new CXE4005_Common.Root_Tagged_Type
+       with null record;
+
+
+  Root_Obj : aliased CXE4005_Common.Root_Tagged_Type;
+  RT_Obj   : aliased CXE4005_Remote_Types.RT_Tagged_Type;
+  Local_Only_Obj : aliased Not_Available_For_Remote_Call;
+  Normal_Obj : aliased CXE4005_Normal.Cant_Use_In_Remote_Call;
+
+  -- provide access to a remote access value
+  function Get_RACWT (Which_Type : Type_Selection)
+       return CXE4005_Part_A1.RACWT is
+  begin
+    case Which_Type is
+      when Common_Spec => return Root_Obj'Access;
+      when RT_Spec     => return RT_Obj'Access;
+      when B_Body      => return Local_Only_Obj'Access;
+      when Normal_Spec => return Normal_Obj'Access;
+    end case;
+  end Get_RACWT;
+
+begin
+  CXE4005_Common.Set_Serial_Number (
+        Root_Tagged_Type(Root_Obj)'Access          , 301);
+  CXE4005_Common.Set_Serial_Number (
+        Root_Tagged_Type(RT_Obj)'Access            , 306);
+  CXE4005_Common.Set_Serial_Number (
+        Root_Tagged_Type(Local_Only_Obj)'Access    , 307);
+  CXE4005_Common.Set_Serial_Number (
+        Root_Tagged_Type(Normal_Obj)'Access        , 308);
+end CXE4005_Part_B;

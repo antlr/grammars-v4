@@ -1,0 +1,57 @@
+#macro( d )
+<tr><td></td></tr>
+#end
+
+#d()
+
+#macro( d )
+<tr><td>$!bodyContent</td></tr>
+#end
+
+#@d()Hello!#end
+
+#macro( tablerows $color $somelist )
+    #foreach( $something in $somelist )
+    <tr><td bgcolor=$color>$something</td></tr>
+    #end
+#end
+
+#set( $greatlakes = ["Superior","Michigan","Huron","Erie","Ontario"] )
+#set( $color = "blue" )
+<table>
+    #tablerows( $color $greatlakes )
+</table>
+
+#set( $parts = ["volva","stipe","annulus","gills","pileus"] )
+#set( $cellbgcol = "#CC00FF" )
+<table>
+    #tablerows( $cellbgcol $parts )
+</table>
+
+#macro( callme $a )
+    $a $a $a
+#end
+
+#callme( $foo.bar() )
+
+#set( $myval = $foo.bar() )
+#callme( $myval )
+
+#macro( inner $foo )
+inner : $foo
+#end
+
+#macro( outer $foo )
+    #set($bar = "outerlala")
+outer : $foo
+#end
+
+#set($bar = 'calltimelala')
+#outer( "#inner($bar)" )
+
+#macro( foo $color )
+<tr bgcolor=$color><td>Hi</td></tr>
+<tr bgcolor=$color><td>There</td></tr>
+#end
+
+#foo( $bar.rowColor() )

@@ -1,0 +1,80 @@
+-- B6700010.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--    The ACAA has created and maintains the Ada Conformity Assessment Test
+--    Suite for the purpose of conformity assessments conducted in accordance
+--    with the International Standard ISO/IEC 18009 - Ada: Conformity
+--    assessment of a language processor. This test suite should not be used
+--    to make claims of conformance unless used in accordance with
+--    ISO/IEC 18009 and any applicable ACAA procedures.
+--
+--*
+--
+-- OBJECTIVE:
+--    Check that a completion is not allowed for a null_procedure_declaration.
+--
+-- TEST DESCRIPTION:
+--    The test declares various null procedures, and then tries to complete
+--    them with various kinds of completion: a procedure body,
+--    a renames-as-body, a procedure stub, and an instance of a generic
+--    procedure. A pragma Import is also a completion, but B.1(22)
+--    says that an Import may serve as a completion "notwithstanding any
+--    rule to the contrary". Thus it (could be) legal to complete a
+--    null procedure with a pragma Import.
+--
+--    The test also checks that the presence of a null procedure in a
+--    package specification does not require the existence of a body.
+--
+-- TEST FILES:
+--      This test consists of the following files:
+--      -> B6700010.A
+--         B6700011.AM
+--         B6700012.A
+--         B6700013.A
+--
+-- CHANGE HISTORY:
+--    19 Aug 2004   PHL   Initial version.
+--    03 May 2007   RLB   Added test cases for additional kinds of completion.
+--    18 Aug 2007   RLB   Corrected unit name.
+--
+--!
+
+package B670001_0 is
+    procedure Null1 (X : out Integer) is null;
+
+    package Pak is
+	procedure Null2 (X, Y : Boolean; Z : in out Duration) is null;
+        procedure Not_Null1 (T : access Float);
+    private
+	procedure Null3 (T : access Float) is null;
+    end Pak;
+
+end B670001_0;
+
+package B670001_0.Child is
+    procedure Null4 (X : Character) is null;
+end B670001_0.Child;
+

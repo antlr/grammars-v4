@@ -1,0 +1,63 @@
+function Sum(x: number, y: number) : void {
+    console.log('processNumKeyPairs: key = ' + key + ', value = ' + value)
+    return x + y;
+}
+
+
+let greeting = function() {
+    console.log("Hello TypeScript!");
+};
+
+let SumAnon = function(x: number, y: number) : number
+{
+    return x + y;
+}
+
+function Greet(greeting: string, name?: string ) : string {
+    return greeting + ' ' + name + '!';
+}
+
+function terminateJob(jobId: string) {
+    return this.http.delete<IOperationResult<any>>();
+}
+
+function Greet2(name: string, greeting: string = "Hello") : string {
+    return greeting + ' ' + name + '!';
+}
+
+Greet(undefined, 'Steve');
+
+let sumArrow = (x: number, y: number): number => {
+    return x + y
+}
+
+let Print = () => console.log("Hello TypeScript");
+
+let sumShortArrow = (x: number, y: number) => x + y;
+
+function Greet(greeting: string, ...names: string[]) {
+    return greeting + " " + names.join(", ") + "!";
+}
+
+function Test(value: TestClass | TestClass2): value is TestClass {
+    return (<TestClass>value).someFunction !== undefined;
+}
+
+function buildName(firstName: string, lastName?: string) {
+    if (lastName) return firstName + " " + lastName;
+    else return firstName;
+  }
+
+// Try passing a nested type to the function. This tests we don't match ">>" and ">>>" operators
+// when closing nested types.
+function nestedType(map: Map<string, Map<string, Set<string>>>) {
+    // Check that we can parse these too.
+    let a = 12;
+    let b = a >> 5;
+    let c = b >>> 5;
+}
+
+// Function parameter lists can have a trailing comma.
+// See https://github.com/Microsoft/TypeScript/issues/16152
+function TrailingComma(arg1: string, arg2: number,) {}
+var myFunction = function(arg1: string, arg2: number,) {};

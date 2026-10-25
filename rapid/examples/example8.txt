@@ -1,0 +1,6 @@
+MODULE MainModule (SYSMODULE, NOSTEPIN)
+    CONST num pi := 3.14159;
+    VAR num total := 0;
+    VAR num values{10};
+    PERS bool running := TRUE;
+ENDMODULE

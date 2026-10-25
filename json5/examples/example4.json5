@@ -1,0 +1,59 @@
+//modified from
+//https://github.com/json5/json5/blob/32bb2cdae4864b2ac80a6d9b4045efc4cc54f47a/test/parse.js
+{
+  obj:{
+    empty:{},
+    doublestr:{"a":1},
+    singlestr:{'a':1},
+    unquoted:{a:1},
+    specialname:{$_:1,_$:2,a\u200c:3},
+    unicode:{ùńîċõďë:9},
+    escaped:{\u0061\u0062:1,\u0024\u005F:2,\u005F\u0024:3},
+  nultiple:{abc:1,def:2},
+  mested:{a:{b:2}},
+},
+array:{
+empty:[],
+val:[1],
+multival:[1,2],
+nested:[1,[2,3]],
+},
+nulls: null,
+boolean: {
+true: true,
+false: false,
+},
+number:{
+lead0:[0,0.,0e0],
+int:[1,23,456,7890],
+signed:[-1,+2,-.1,-0],
+leaddot:[.1,.23],
+frac:[1.0,1.23],
+exp:[1e0,1e1,1e01,1.e0,1.1e0,1e-1,1e+1],
+hex:[0x1,0x10,0xff,0xFF],
+inf:[Infinity,-Infinity],
+nan:NaN,
+singnan:-NaN,
+one:1,
+onep23e100:+1.23e100,
+onehex:0x1,
+longhex:-0x0123456789abcdefABCDEF,
+},
+str:{
+doublequote:"abc",
+singlequote:'abc',
+quoteinstr:['"',"'"],
+esc:
+'\b\f\n\r\t\v\0\x0f\u01fF\
+\
+\ \\ \a\'\"',
+notecma:'\u2028\u2029',
+},
+comment:{
+single:{//comment
+},
+multi:{/*comment
+** */},
+},
+}
+//eof comment

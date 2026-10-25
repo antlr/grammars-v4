@@ -1,0 +1,341 @@
+/******************************************************************************
+	MBSystemLayer.tjs
+
+	じわーっと出てくるシステムレイヤ基本クラス
+*******************************************************************************/
+
+class MBSystemLayer extends MBComponentLayer
+{
+	var layerCaption;	// キャプション
+	var timer;	// タイマー
+	var counter;	// カウンター
+	
+	var fontSize = MBFontStyle.size.label;	// 文字の大きさ
+	var fontColor = MBColors.font.label.normal;	// 文字色
+	var borderColor = MBColors.window.border;	// 枠色
+	var bgColor = MBColors.window.background;	// 背景色
+	
+	var defWidth = 320;	// 設定横幅
+	var defHeight = 480;	// 設定縦幅
+	var posX;	// X座標
+	var posY;	// Y座標
+	
+	// ゲームウィンドウの端からの最小距離
+	var minLengthFromWindowBorder = %[x : 20,  y : 20];
+	
+	var borderWidth = 2;	// 枠線幅
+	var marginWidth = 10;	// マージン
+	
+	var titleHeight = 18;	// タイトルバーの高さ
+	
+	var blActionCancelAuto = true;	// 自動でアクションキャンセラを呼ぶかどうか
+	var objShadeLayer;	// 非アクティブ時のマスクレイヤ
+	
+	var isNewLayer = true;
+	
+	
+	function MBSystemLayer(win, par, cap)
+	{
+		// コンストラクタ
+		
+		super.MBComponentLayer(win, par);
+		
+		face = dfBoth;
+		opacity = 255;
+		enabled = false;
+		focusable = false;
+		visible = false;
+		hitType = htMask;
+		hitThreshold = 0;
+		
+		layerCaption = cap;
+		
+		font.face = "ＭＳ Ｐゴシック";
+		font.height = fontSize;
+		
+		posX = Math.round(win.primaryLayer.width - defWidth) / 2;
+		posY = Math.round(win.primaryLayer.height - defHeight) / 4;
+		
+		if (layerCaption != "") {
+			defHeight += titleHeight;
+			posY += titleHeight;
+		}
+	}
+	
+	function finalize()
+	{
+		// ファイナライザ
+		
+		invalidate timer if (timer !== void);
+		invalidate objShadeLayer if (objShadeLayer !== void);
+		
+		super.finalize(...);
+		
+		//dm("<MBSystemLayer> レイヤ `%s' が破棄されました。".sprintf((layerCaption != "") ? layerCaption : "untitled"));
+	}
+	
+	function show()
+	{
+		// 表示発動トリガ
+		
+		/*try {
+			setMode();
+		}
+		catch {
+			dm("[MBSystemLayer] Maybe I already have a mode!");
+		}*/
+		
+		if (blActionCancelAuto) {
+			SystemManager.acActivateCanceller();
+		}
+		visible = true;
+		timer = new Timer(onTimerShowing, '');
+		timer.interval = 10;
+		timer.enabled = true;
+	}
+	
+	function onTimerShowing()
+	{
+		// じわーっと表示
+		
+		counter += 1;
+		var newh = defHeight * (counter * 0.1);
+		
+		if (newh > defHeight) {
+			invalidate timer if (timer !== void);
+			onEndOfShowing();
+			return;
+		}
+		
+		if (newh < 1) {
+			newh = 1;
+		}
+		
+		setImageSize(defWidth, newh);
+		setSizeToImageSize();
+		setPos(posX, posY + (defHeight - newh) / 2);
+		fillRect(0, 0, width, height, borderColor);
+		if (height > borderWidth) {
+			fillRect(borderWidth, borderWidth, width - borderWidth * 2, height - borderWidth * 2, bgColor);
+		}
+	}
+	
+	function onEndOfShowing()
+	{
+		// 表示完了後に呼ばれる
+		
+		if (layerCaption != "") {
+			setImageSize(defWidth, defHeight);
+			setSizeToImageSize();
+			setPos(posX, posY);
+			fillRect(0, 0, width, height, borderColor);
+			fillRect(borderWidth, borderWidth, width - borderWidth * 2, height - borderWidth * 2, bgColor);
+			fillRect(0, 0, width, titleHeight, borderColor);
+			font.height = 12;
+			font.bold = true;
+			font.italic = true;
+			//drawText(borderWidth + marginWidth, borderWidth + 1, layerCaption, fontColor);
+			drawText(borderWidth + marginWidth, borderWidth + 1, layerCaption, MBColors.font.label.title);
+			font.height = fontSize;
+			font.bold = false;
+			font.italic = false;
+		}
+		//dm("<MBSystemLayer> 新規レイヤ `%s' が生成されました。".sprintf((layerCaption != "") ? layerCaption : "untitled"));
+		enabled = true;
+		
+		if (blActionCancelAuto) {
+			SystemManager.acDisactivateCanceller();
+		}
+		window.trigger("end_syslay_showing");
+	}
+	
+	function hide()
+	{
+		// 消去トリガー
+		
+		visible = true;
+		enabled = false;
+		
+		if (blActionCancelAuto) {
+			SystemManager.acActivateCanceller();
+		}
+		timer = new Timer(onTimerHiding, '');
+		timer.interval = 10;
+		timer.enabled = true;
+	}
+	
+	function onTimerHiding()
+	{
+		// じわーっと消える
+		
+		counter -= 1;
+		var newh = defHeight * (counter * 0.1);
+		
+		if (counter == 0 || newh < 1) {
+			timer.enabled = false;
+			invalidate timer;
+			visible = false;
+			removeMode();
+			onEndOfHiding();
+			return;
+		}
+		
+		setImageSize(defWidth, newh);
+		setSizeToImageSize();
+		setPos(posX, posY + (defHeight - newh) / 2);
+		fillRect(0, 0, width, height, borderColor);
+		if (height > borderWidth) {
+			fillRect(borderWidth, borderWidth, width - borderWidth * 2, height - borderWidth * 2, bgColor);
+		}
+	}
+	
+	function onEndOfHiding()
+	{
+		// 消去完了後に呼ばれる
+		
+		try {
+			removeMode();
+		}
+		catch {}
+		
+		if (blActionCancelAuto) {
+			SystemManager.acDisactivateCanceller();
+		}
+		
+		SystemManager.fcApplyFocusTargetSearch();
+		window.trigger("end_syslay_hiding");
+	}
+	
+	function clearAll()
+	{
+		// 完全消去
+		
+		fillRect(0, 0, width, height, 0x00000000);
+		visible = false;
+		counter = 0;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function setOpenPosition(x, y)
+	{
+		// 出現位置を設定
+		
+		posX = x;
+		posY = y;
+		
+		var mx = (window.fore.base.width - minLengthFromWindowBorder.x) - defWidth;
+		var my = (window.fore.base.height - minLengthFromWindowBorder.y) - defHeight;
+		
+		if (posX < minLengthFromWindowBorder.x) {
+			posX = minLengthFromWindowBorder.x;
+		}
+		else if (posX > mx) {
+			posX = mx;
+		}
+		
+		if (posY < minLengthFromWindowBorder.y) {
+			posY = minLengthFromWindowBorder.y;
+		}
+		else if (posY > my) {
+			posY = my;
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function activate()
+	{
+		// アクティブにする
+		
+		invalidate objShadeLayer if (objShadeLayer !== void);
+		enabled = true;
+	}
+	
+	function disactivate()
+	{
+		// 非アクティブにする
+		
+		enabled = false;
+		
+		objShadeLayer = new global.GraphicLayer(window, this);
+		objShadeLayer.setSize(width, height);
+		objShadeLayer.setPos(0, 0);
+		objShadeLayer.hitType = htMask;
+		objShadeLayer.hitThreshold = 0;
+		objShadeLayer.fillRect(0, 0, width, height, 0x66000000);
+		objShadeLayer.visible = true;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function drawHorizontalBorderLine(py, wd)
+	{
+		// 水平区切り線を描く
+		
+		if (wd < 1) {
+			wd = width - (borderWidth + marginWidth) * 2;
+		}
+		
+		fillRect(12, py, wd, 1, fontColor + 0xff000000);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+		function save()
+	{
+		// 状態を保存
+		
+		var dict = %[
+			counter : counter,
+			visible : visible
+		];
+		
+		return dict;
+	}
+	
+	function load(dict)
+	{
+		// 状態復元
+		
+		counter = dict.counter;
+		visible = dict.visible;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onMouseDown(x, y, button, shift)
+	{
+		super.onMouseDown(...);
+		
+		if (button == mbLeft) {
+			window.onPrimaryClick();
+		}
+		else if (button == mbRight) {
+			window.onPrimaryRightClick();
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onMouseMove(x, y, shift)
+	{
+		super.onMouseMove(...);
+		isNewLayer = false;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onKeyDown(key, shift)
+	{
+		if (!window.preProcessKeys(key, shift)) {
+			super.onKeyDown(...);
+		}
+	}
+	
+	function onEscapeKeyDown(key, shift)
+	{
+		dm("エスケープされますた");
+	}
+
+}

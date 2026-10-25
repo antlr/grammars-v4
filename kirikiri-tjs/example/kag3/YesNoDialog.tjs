@@ -1,0 +1,182 @@
+// YesNoDialog.tjs - はい/いいえを選択するダイアログボックス
+// Copyright (C)2001-2009, W.Dee and contributors  改変・配布は自由です
+
+class YesNoDialogWindow extends Window
+{
+	var yesButton; // [はい] ボタン
+	var noButton; // [いいえ] ボタン
+
+	var result = false; // no:false yes:true
+
+	function YesNoDialogWindow(message, cap)
+	{
+		super.Window();
+
+		// このウィンドウではもっとも基本的なdrawerを用いる
+		// drawDevice.preferredDrawer = global.Window.PassThroughDrawDevice.dtDrawDib;
+
+		// メインウィンドウから cursor**** の情報をとってくる
+		if(global.Window.mainWindow !== null &&
+			typeof global.Window.mainWindow.cursorDefault != "undefined")
+			this.cursorDefault = global.Window.mainWindow.cursorDefault;
+		if(global.Window.mainWindow !== null &&
+			typeof global.Window.mainWindow.cursorPointed != "undefined")
+			this.cursorPointed = global.Window.mainWindow.cursorPointed;
+
+		// 外見の調整
+		borderStyle = bsDialog;
+		innerSunken = false;
+		caption = cap;
+		showScrollBars = false;
+
+		// プライマリレイヤの作成
+		add(new Layer(this, null));
+
+		// プライマリのマウスカーソルを設定
+		if(typeof this.cursorDefault !== "undefined")
+			primaryLayer.cursor = cursorDefault;
+
+		// サイズを決定
+		var tw = primaryLayer.font.getTextWidth(message);
+		var th = primaryLayer.font.getTextHeight(message);
+
+		var w = tw + 40;
+		if(w<200) w = 200;
+		var h = th*2 + 60;
+
+		// 拡大率の設定
+		if (kag.fullScreen) {
+			if (kag.innerWidth / kag.scWidth
+				< kag.innerHeight / kag.scHeight)
+				setZoom(kag.innerWidth, kag.scWidth);
+			else
+				setZoom(kag.innerHeight, kag.scHeight);
+		} else {
+		  setZoom(kag.zoomNumer, kag.zoomDenom);
+		}
+		// サイズを決定
+		setInnerSize(w * zoomNumer / zoomDenom,
+			 h * zoomNumer / zoomDenom);
+
+		// プライマリレイヤのサイズを設定
+		primaryLayer.width = w;
+		primaryLayer.height = h;
+		primaryLayer.colorRect(0, 0, w, h, clBtnFace, 255);
+
+		// ウィンドウ位置の調整
+		if(global.Window.mainWindow !== null && global.Window.mainWindow isvalid)
+		{
+			var win = global.Window.mainWindow;
+			var l, t;
+			l = ((win.width - width)>>1) + win.left;
+			t = ((win.height - height)>>1) + win.top;
+			if(l < 0) l = 0;
+			if(t < 0) t = 0;
+			if(l + width > System.screenWidth) l = System.screenWidth - width;
+			if(t + height > System.screenHeight) t = System.screenHeight - height;
+			setPos(l, t);
+		}
+		else
+		{
+			setPos((System.screenWidth - width)>>1, (System.screenHeight - height)>>1);
+		}
+
+		// メッセージの描画
+		primaryLayer.drawText((w - tw)>>1, 14, message, clBtnText);
+
+		// Yesボタン
+		add(yesButton = new ButtonLayer(this, primaryLayer));
+		yesButton.caption = "はい";
+		yesButton.captionColor = clBtnText;
+		yesButton.width = 70;
+		yesButton.height = 25;
+		yesButton.top = th + 35;
+		yesButton.left = (w - (70*2 + 10)>>1);
+		yesButton.visible = true;
+
+		// Noボタン
+		add(noButton = new ButtonLayer(this, primaryLayer));
+		noButton.caption = "いいえ";
+		noButton.captionColor = clBtnText;
+		noButton.width = 70;
+		noButton.height = 25;
+		noButton.top = th + 35;
+		noButton.left = ((w - (70*2 + 10))>>1) + 70 + 10;
+		noButton.visible = true;
+
+	}
+
+	function finalize()
+	{
+		super.finalize(...);
+	}
+
+	function action(ev)
+	{
+		// action
+		if(ev.type == "onClick")
+		{
+			if(ev.target == yesButton)
+			{
+				result = true;
+				close();
+			}
+			else if(ev.target == noButton)
+			{
+				result = false;
+				close();
+			}
+		}
+		else if(ev.type == "onKeyDown" && ev.target === this)
+		{
+			// パッド入力に対応する処理
+			switch(ev.key)
+			{
+			case VK_PADLEFT:
+				yesButton.focus();
+				break;
+			case VK_PADRIGHT:
+				noButton.focus();
+				break;
+			case VK_PAD1:
+				if(focusedLayer == yesButton)
+				{
+					result = true;
+					close();
+				}
+				else if(focusedLayer == noButton)
+				{
+					result = false;
+					close();
+				}
+				break;
+			case VK_PAD2:
+				result = false;
+				close();
+				break;
+			}
+		}
+	}
+
+	function onKeyDown(key, shift)
+	{
+		super.onKeyDown(...);
+		if(key == VK_ESCAPE)
+		{
+			// ESC キーが押された
+			// 「いいえ」として処理
+			result = false;
+			close();
+		}
+	}
+}
+
+// Yes か No かはっきりさせる関数
+function askYesNo(message, caption = "確認")
+{
+	var win = new YesNoDialogWindow(message, caption);
+	win.showModal();
+	var res = win.result;
+	invalidate win;
+	return res;
+}

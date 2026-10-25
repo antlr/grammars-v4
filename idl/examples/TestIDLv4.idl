@@ -1,0 +1,112 @@
+// IDL v4.2 OMG formal/2018-01-05
+
+// 7.4.13 Building Block Extended Data-Types
+
+// 7.4.13.4.1 Extended Structs
+
+struct StructA {
+  long a;
+};
+
+struct StructB : StructA {
+  long b;
+};
+
+struct StructC : StructB {
+};
+
+// 7.4.13.4.2 Union Discriminators
+
+union UnionWC switch (wchar) {
+ case L'a':
+   long a;
+};
+
+union UnionOC switch (octet) {
+ case 42:
+   long a;
+};
+
+// 7.4.13.4.3.1 Maps
+
+typedef map<long, string> MapType;
+
+typedef map<long, string, 23> MapTypeBounded;
+
+// 7.4.13.4.3.2 Bit Sets
+
+bitset BitSet1 {
+  bitfield<1> bit0;
+  bitfield<1>; // skip bit1
+  bitfield<2, unsigned short> bits2_3;
+};
+
+bitset BitSet2 : BitSet1 {
+  bitfield<3>; // skip bits4-6
+  bitfield<1> bit7;
+};
+
+// 7.4.13.4.3.3 Bit Masks
+
+bitmask BitMask1 {
+  val0, val1, val2, val3
+};
+
+// 7.4.13.4.4 8-bit Integers
+
+typedef int8 ByteSigned;
+typedef uint8 ByteUnsigned;
+
+// 7.4.13.4.5 Alternate Names for Integer Types
+
+typedef int16 ShortSigned;
+typedef int32 LongSigned;
+typedef int64 LongLongSigned;
+typedef uint16 ShortUnsigned;
+typedef uint32 LongUnsigned;
+typedef uint64 LongLongUnsigned;
+
+// 7.4.14 Building Block Anonymous Types
+
+struct TestAnon {
+  sequence<string> a;
+  long b[4];
+};
+
+// 7.4.15 Building Block Annotations
+
+// 7.4.15.4.2 Applying Annotations
+
+const double dub = 6.78;
+
+@abc
+struct Annotated1 {
+
+  @def(1) octet a;
+  @ghi(2.3) octet b;
+  @jkl('m') octet c;
+  @nop(L'q') octet d;
+  @rst(TRUE) octet e;
+  @uvw("xyz") octet f;
+  @aa(L"bbcc") octet g;
+  @ddee(4 + 5) octet h;
+
+  @ffgg(dub) octet i;
+
+  @hhii(jj = FALSE) octet j;
+  @kkll(mm = 3, nn = 'o') octet k;
+};
+
+@bit_bound(8)
+bitmask BitMask2 {
+  @position(1) flag1
+};
+
+// 7.4.15.4.1 Defining Annotations
+// This should be able to be parsed but it will not effect anything except the
+// compiler will produce an warning that defining annotations will be ignored.
+// TODO: Make more cases
+@annotation Annotation1 {
+  short somevalue;
+};
+

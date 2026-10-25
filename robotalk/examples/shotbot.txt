@@ -1,0 +1,11 @@
+# ShotBot
+# Written 1/3/90 by David Harris
+Main:
+RANGE 0 > FireSub RotateSub IFE
+Main JUMP
+FireSub:
+20 FIRE' STORE
+RETURN
+RotateSub:
+5 AIM + AIM' STORE
+RETURN

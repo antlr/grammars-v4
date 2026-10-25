@@ -1,0 +1,64 @@
+#ifndef PLSQLPARSERBASE_H
+#define PLSQLPARSERBASE_H
+
+#include "antlr4-runtime.h"
+
+class PlSqlParserBase : public antlr4::Parser
+{
+    bool _isVersion12 = true;
+    bool _isVersion11 = true;
+    bool _isVersion10 = true;
+
+    bool _lastUnitWasPlsql = false;
+
+  public:
+    PlSqlParserBase(antlr4::TokenStream *input) : Parser(input) { }
+
+    void reset() override {
+        _lastUnitWasPlsql = false;
+        Parser::reset();
+    }
+
+    void setLastUnitPlsql() { _lastUnitWasPlsql = true; }
+    void setLastUnitSql()   { _lastUnitWasPlsql = false; }
+    bool isLastUnitSql()    { return !_lastUnitWasPlsql; }
+    bool isLastUnitPlsql()  { return _lastUnitWasPlsql; }
+
+    bool isSolidusSeparator();
+
+    bool isVersion12()
+    {
+        return _isVersion12;
+    }
+
+    void setVersion12(bool value)
+    {
+        _isVersion12 = value;
+    }
+
+    bool isVersion11()
+    {
+        return _isVersion11;
+    }
+
+    void setVersion11(bool value)
+    {
+        _isVersion11 = value;
+    }
+
+    bool isVersion10()
+    {
+        return _isVersion10;
+    }
+
+    void setVersion10(bool value)
+    {
+        _isVersion10 = value;
+    }
+
+    bool IsNotNumericFunction();
+
+    bool isNotStartOfJoin();
+};
+
+#endif

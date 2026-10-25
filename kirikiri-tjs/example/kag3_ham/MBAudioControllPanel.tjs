@@ -1,0 +1,533 @@
+/******************************************************************************
+	system_mb/mb/system/userpref/MBAudioControllPanel.tjs
+*******************************************************************************/
+
+class MBControllPanelAudioMuteButton extends MBControllPanelCheckBox
+{
+	
+	function MBControllPanelAudioMuteButton(win, par)
+	{
+		// コンストラクタ
+		
+		super.MBControllPanelCheckBox(win, par);
+	}
+	
+	function finalize()
+	{
+		// ファイナライザ
+		
+		super.finalize(...);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function callParentFunction()
+	{
+		// 親のメソッドを呼ぶ（完全上書き）
+		
+		changeState();
+		execParentFunction();
+	}
+}
+
+//==============================================================================
+
+class MBControllPanelAudioFader extends KAGLayer
+{
+	var ks = 3;	// 係数
+	
+	var blDragging;	// ドラッグ中フラグ
+	
+	
+	function MBControllPanelAudioFader(win, par)
+	{
+		// コンストラクタ
+		
+		super.KAGLayer(win, par);
+		
+		loadImages(sysfunc.getPathImage("userconf/audio_fader_button"));
+		setSizeToImageSize();
+		name = 'オーディオフェーダ';
+		focusable = true;
+		enabled = true;
+	}
+	
+	function finalize()
+	{
+		// ファイナライザ
+		
+		super.finalize(...);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function setPositionTo(x)
+	{
+		// 座標を変更
+		
+		if (x < 0) {
+			x = 0;
+		}
+		else if (x > 300) {
+			x = 300;
+		}
+		
+		left = x;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onMouseDown(x, y, button, shift)
+	{
+		if (button == mbRight)
+		{
+			parent.parent.onChildrenRightClick();
+		}
+		else if (button == mbLeft) {
+			hint = "";
+			blDragging = true;
+		}
+	}
+	
+	function onMouseUp(x, y, button, shift)
+	{
+		if (button == mbLeft) {
+			blDragging = false;
+			parent.execAfterAction();
+		}
+	}
+	
+	function onMouseMove(x, y, shift)
+	{
+		if (!blDragging) {
+			return;
+		}
+		
+		setPositionTo(parent.cursorX - 12);
+		parent.setVolume();
+	}
+	
+	function onMouseEnter()
+	{
+		cursor = crHandPoint;
+		hint = "ドラッグで音量変更";
+	}
+	
+	function onMouseLeave()
+	{
+		cursor = crDefault;
+		blDragging = false;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function getChangeValue(key)
+	{
+		// 変更量を返す
+		
+		var res = 0;
+		
+		if (key == VK_UP) {
+			res = 30;
+		}
+		else if (key == VK_DOWN) {
+			res = -30;
+		}
+		
+		return res;
+	}
+	
+	function onKeyDown(key, shift)
+	{
+		// キャンセルボタンの場合はゲージに処理を返す
+		
+		/*
+		if (key == VK_ESCAPE) {
+			parent.onEscapeKeyDown();
+			return;
+		}
+		
+		// 上下キーで音量操作
+		// 左右キーでフォーカスを渡す
+		var tmpMoveVal = left;
+		
+		switch (key) {
+			case VK_LEFT:
+				parent.passFocusToSectionSelector();
+				break;
+			
+			case VK_RIGHT:
+				parent.passFocusToMuteButton();
+				break;
+			
+			case VK_UP:
+			case VK_DOWN:
+				tmpMoveVal += getChangeValue(key);
+				setPositionTo(tmpMoveVal);
+				cursorX = width * 0.5;
+				cursorY = height * 0.5;
+				parent.setVolume();
+				break;
+		}
+		*/
+	}
+}
+
+
+//==============================================================================
+
+class MBControllPanelAudioFaderBox extends KAGLayer
+{
+	var faderType;	// BGMとSEのどっちを扱っているか（1:BGM, 2:SE）
+	var blSinging;	// 鳴っているかどうか
+	
+	var ptSectionSelector;	// セクションセレクタ参照
+	var ptMuteButton;	// ミュートボタン参照
+	
+	
+	function MBControllPanelAudioFaderBox(win, par)
+	{
+		super.KAGLayer(win, par);
+		
+		loadImages(sysfunc.getPathImage("userconf/audio_fader"));
+		setSizeToImageSize();
+		name = 'ボリュームゲージ';
+	}
+	
+	function finalize()
+	{
+		super.finalize(...);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onMouseDown(x, y, button, shift)
+	{
+		// クリック位置にボリュームを変更
+		
+		if (button == mbRight)
+		{
+			parent.parent.onChildrenRightClick();
+		}
+		
+		// ミュート時は変更しない
+		if (!parent.objAudioFader.visible) {
+			return;
+		}
+		
+		if (button == mbLeft) {
+			parent.setFaderPosition(x);
+			parent.setVolume();
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onEscapeKeyDown()
+	{
+		// エスケープキーの処理をコンパネに渡す
+		
+		parent.onEscapeKeyDown();
+	}
+	
+	function passFocusToMuteButton()
+	{
+		// ミュートボタンへフォーカスを渡す
+		
+		ptMuteButton.getCursorFromManager();
+	}
+	
+	function passFocusToSectionSelector()
+	{
+		// セクションセレクタへフォーカスを渡す
+		
+		ptSectionSelector.getCursorFromManager();
+	}
+}
+
+
+//==============================================================================
+
+class MBControllPanelAudioIcons extends KAGLayer
+{
+	var objSmallIcon;	// アイコン（小さく）
+	var objLargeIcon;	// アイコン（大きく）
+	
+	var isNewLayer;
+	
+	var owner;
+	
+	
+	function MBControllPanelAudioIcons(win, par, own)
+	{
+		// コンストラクタ
+		
+		super.KAGLayer(win, par);
+		
+		owner = own;
+		
+		width  = 374;
+		height = 17;
+		name   = "ボリュームアイコン";
+		
+		init();
+	}
+	
+	function finalize()
+	{
+		// ファイナライザ
+		
+		invalidate objSmallIcon if (objSmallIcon !== void);
+		invalidate objLargeIcon if (objLargeIcon !== void);
+		
+		super.finalize(...);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function init()
+	{
+		// 描画
+		
+		invalidate objSmallIcon     if (objSmallIcon !== void);
+		invalidate objLargeIcon     if (objLargeIcon !== void);
+		
+		objSmallIcon = new MBButton(window, this);
+		objSmallIcon.setImageSize(12, 17);
+		objSmallIcon.setSizeToImageSize();
+		objSmallIcon.loadImages(sysfunc.getPathImage('userconf/audio_smallicon'));
+		objSmallIcon.setPos(0, 0);
+		objSmallIcon.visible = true;
+		
+		objLargeIcon = new MBButton(window, this);
+		objLargeIcon.setImageSize(20, 17);
+		objLargeIcon.setSizeToImageSize();
+		objLargeIcon.loadImages(sysfunc.getPathImage('userconf/audio_largeicon'));
+		objLargeIcon.setPos(354, 0);
+		objLargeIcon.visible = true;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onSelectedItemClick(sender)
+	{
+		// ボタンが押されたときの動作
+		
+		var vol = 10;
+		
+		if (sender == objSmallIcon) {
+			vol = -10;
+		}
+		
+		owner.setVolumeAsRelative(vol);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onEscapeKeyDown(key)
+	{
+		// エスケープキーが押されたときの動作
+		
+		parent.onEscapeKeyDown(key);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onRightClickedOnChild()
+	{
+		parent.onChildrenRightClick();
+	}
+}
+
+//==============================================================================
+
+class MBControllPanelAudioPane extends KAGLayer
+{
+	var faderType;	// BGMとSEのどっちを扱っているか（1:BGM, 2:SE）
+	var blSinging;	// 鳴っているかどうか
+	
+	var objAudioFaderBox;	// 棒というかアレ
+	var objAudioFader;	// ツマミ
+	
+	var ptSectionSelector;	// セクションセレクタ参照
+	var ptMuteButton;	// ミュートボタン参照
+	
+	
+	function MBControllPanelAudioPane(win, par)
+	{
+		super.KAGLayer(win, par);
+		
+		width  = 332;
+		height = 32;
+		name = 'オーディオパネル';
+		
+		init();
+	}
+	
+	function finalize()
+	{
+		invalidate objAudioFaderBox if (objAudioFaderBox !== void);
+		invalidate objAudioFader    if (objAudioFader !== void);
+		
+		super.finalize(...);
+	}
+	
+	function init()
+	{
+		// 準備をする
+		
+		invalidate objAudioFaderBox if (objAudioFaderBox !== void);
+		invalidate objAudioFader    if (objAudioFader !== void);
+		objAudioFaderBox = new MBControllPanelAudioFaderBox(window, this);
+		objAudioFaderBox.setPos(16, 12);
+		objAudioFaderBox.visible = true;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function makeBGMFader()
+	{
+		// BGMフェーダを作る
+		
+		objAudioFader = new MBControllPanelAudioFader(window, this);
+		//objAudioFader.left = Math.floor(window.bgm.volume / 1000 * objAudioFader.ks);
+		objAudioFader.left = Math.floor(window.scflags.bgm.globalVolume / 1000 * objAudioFader.ks);
+		faderType = 1;
+		
+		changeState(true);
+	}
+	
+	function makeSEFader()
+	{
+		// SEフェーダを作る
+		
+		objAudioFader = new MBControllPanelAudioFader(window, this);
+		//objAudioFader.left = Math.floor(window.se[0].currentVolume * objAudioFader.ks);
+		objAudioFader.left = Math.floor(window.scflags.se[0].globalVolume / 1000 * objAudioFader.ks);
+		faderType = 2;
+		
+		changeState(true);
+	}
+	
+	function setFaderPosition(x)
+	{
+		// フェーダの位置を指定座標に変更
+		
+		objAudioFader.setPositionTo(x);
+	}
+	
+	function changeState(bl=true)
+	{
+		// 状態を変更
+		
+		objAudioFader.visible = bl;
+		blSinging = bl;
+	}
+	
+	function getCursorFromManager()
+	{
+		// フォーカスコントローラのエミュレータ
+		
+		if (blSinging) {
+			objAudioFader.cursorX = objAudioFader.width * 0.5;
+			objAudioFader.cursorY = objAudioFader.height * 0.5;
+			objAudioFader.cursor = crDefault;
+			objAudioFader.focus();
+		}
+		else {
+			passFocusToMuteButton();
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function setVolumeAsRelative(val)
+	{
+		// ボリュームを相対的に変える
+		
+		if (!objAudioFader.visible) {
+			return;
+		}
+		
+		var volume = objAudioFader.left + val;
+		
+		setFaderPosition(volume);
+		setVolume();
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function setVolume(val)
+	{
+		// ボリューム変更メソッドのラッパー
+		
+		if (val === void) {
+			val = objAudioFader.left \ objAudioFader.ks;
+		}
+		
+		switch (faderType) {
+			case 1:	// BGM
+				setBGMVolume(val);
+				break;
+			
+			case 2: // SE
+				setSEVolume(val);
+				break;
+		}
+	}
+	
+	function setBGMVolume(val)
+	{
+		// BGMの大域ボリュームを設定
+		
+		TAG.bgmopt(%[gvolume : val]);
+	}
+	
+	function setSEVolume(val)
+	{
+		// SEの大域ボリュームを設定（すべてのバッファ）
+		
+		var i;
+		for (i=0; i<window.se.count; i++) {
+			TAG.seopt(%[buf : i, gvolume : val]);
+		}
+		
+		if (!objAudioFader.blDragging) {
+			sndfunc.seSelect();
+		}
+	}
+	
+	function execAfterAction()
+	{
+		// フェーダを動かした後の処理
+		
+		if (faderType == 2) {
+			// SEの場合のみ
+			
+			sndfunc.seSelect();
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onEscapeKeyDown()
+	{
+		// エスケープキーの処理をコンパネに渡す
+		
+		parent.onEscapeKeyDown();
+	}
+	
+	function passFocusToMuteButton()
+	{
+		// ミュートボタンへフォーカスを渡す
+		
+		ptMuteButton.getCursorFromManager();
+	}
+	
+	function passFocusToSectionSelector()
+	{
+		// セクションセレクタへフォーカスを渡す
+		
+		ptSectionSelector.getCursorFromManager();
+	}
+}

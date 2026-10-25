@@ -1,0 +1,4 @@
+line 1:10 no viable alternative at input '{foo: bar baz'
+line 1:4 extraneous input ':' expecting {<EOF>, String, Bool, 'null', 'default', 'import', 'package', 'not', 'set(', '[', '{', '(', ArithOperator, UnsignedNumber, Name}
+line 1:13 extraneous input ':' expecting {<EOF>, String, Bool, 'null', 'default', 'import', 'package', 'not', 'set(', '[', '{', '(', ArithOperator, UnsignedNumber, Name}
+line 1:17 extraneous input '}' expecting {<EOF>, String, Bool, 'null', 'default', 'import', 'package', 'not', 'set(', '[', '{', '(', ArithOperator, UnsignedNumber, Name}

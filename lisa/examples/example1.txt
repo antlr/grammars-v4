@@ -1,0 +1,19 @@
+declare{
+//Where declaration take place
+ dfa my_dfa; //dfa type variable
+ nfa my_nfa; //nfa type variable
+ int index; //integer variable
+ }
+
+ program{
+ //Where program source code placed
+
+ //Assignment Expression Statement
+ index = 2+3;
+
+ //Function that returns dfa
+ my_dfa = readfile(dfa,"~/dfa.txt");
+
+ //Function that print my_dfa but doesn’t return anything
+ print(my_dfa);
+ }

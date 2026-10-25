@@ -1,0 +1,1225 @@
+// AnimationLayer.tjs - アニメーションを行うレイヤ
+// Copyright (C)2001-2009, W.Dee and contributors  改変・配布は自由です
+
+
+/*
+-- ２つのアニメーションの種類 ---------------------------------------------
+
+　KAGにアニメーションをさせるためには２つの種類があります。
+　一つは「セル画像」を用いるセルを基本としたアニメーションで、この場合、
+「ベース画像」の上に「セル画像」の各部分を切り取って順次貼り付けるような感
+じでアニメーションを行います。
+
+　もう一つは、KAG 3.05 beta 3 から使用可能になった クリッピングを基本とした
+アニメーション方法で、この場合はセル画像は必要ありません。
+　image タグに clipleft, cliptop, clipwidth, clipheight の４つの属性があり
+ますが、(概念的には)これを順次変えてやることで、大きな画像の一部分を順次表
+示するようなアニメーションを行います。表示する画像を何枚も横に並べ、それを
+順次表示するような用途に向いています。
+
+　負荷はクリッピングを基本としたアニメーション方式のほうが軽いです。デモ
+シーンにおいて、レイヤの全域を書き換えるようなアニメーションを行う場合はク
+リッピング方式のアニメーションのほうが良いでしょう。
+　逆に、目パチ、口パクのような用途にはセル方式のアニメーションの方が小回り
+が利いて使いやすいでしょう。
+
+
+-- セル方式のアニメーションの記述の仕方 -----------------------------------
+
+　まず、アニメーションを行わせるためには、「ベース画像」と「セル画像」が必
+要になります。ベース画像はアニメーションの下地となる画像です。セル画像はア
+ニメーションの「部品」が並べてある画像です。ベース画像の上にアニメーション
+画像を部分的にコピーして重ねていくという方法を用います。
+
+　ベース画像は image タグで読み込まれます (ここで用いるベースとは、KAGの背
+景レイヤの base とは違う意味です )。セル画像は、アニメーション定義ファイル
+内の loadcell タグで読み込みます。
+
+　アニメーション定義ファイルは、ベース画像とファイルが同じで、拡張子が asd
+のテキストファイルです。
+　アニメーション定義ファイルは KAG の文法で記述しますが、タグ体系は KAG の
+ものとは異なります。
+
+　アニメーションセグメントを用いない、簡単なアニメーションならば、KAG の
+System フォルダにある LineBreak や PageBreak が参考になると思います。
+　アニメーションセグメントを用いたサンプルは現在の所、吉里吉里ソースの中の
+environ/win32/kag3/scenario/animtest.ks にあります。
+
+-- セグメント -------------------------------------------------------------
+
+　セグメントは、一組のベース画像、セル画像、asdファイルで、複数のアニメー
+ションを同時進行させるための仕組みです。
+　セグメントにはレイヤごとに 0 番から始まる番号がついています。
+　セグメント 0 は特殊なセグメントでデフォルトセグメントと呼ばれ、画像の読
+み込みとともに実行が自動的に始まるセグメントです。system フォルダにある
+LineBreak や PageBreak はこのデフォルトセグメントのみを使用しています。簡
+単なアニメーションならばこれだけで十分だと思います。
+
+　口パクや目パチなどを一つの画像で行いたい場合、複数のセグメントを扱わなけ
+ればなりません。たとえば、目パチはデフォルトセグメントで常時アニメーション
+させておき、口パクはシナリオの制御によって開始させたり、停止させたりする、
+という用途です。
+
+　セグメントに対するアニメーションのスタートは KAG の通常のシナリオの
+animstart で行います。animstart は任意の ( デフォルトセグメント以外の ) セ
+グメントでアニメーションを開始します。
+
+　animstart タグの loop 属性が true のとき、このアニメーションはループして
+いないといけません。自動的にループするわけではないので、ループするように記
+述しなければなりません。
+　ループしていなくてもエラーになるわけではありませんが、栞を保存して読み込
+んだときに正しく画像が再現されない可能性があります。
+また、栞が読み込まれるときは、loop=true を指定した場合のみにアニメーション
+が再開されますが、かならず animstart で指定したasdファイルのラベルの最初か
+ら実行が始まります。
+
+　loop=false の時は、アニメーションはしますが、最終的に s タグで停止しなけ
+ればなりません。また、[s] タグで停止したときには、ベース画像と同じ状態に戻っ
+てなければなりません。単発のアニメーションを行わせたいときはこれを使います。
+
+　animstop はアニメーションを停止させますが、停止を待ちません。実際はアニメー
+ションが停止するためには @home タグを通過する必要があります。
+
+　wa は任意のセグメントのアニメーションの終了を待ちます。デフォルトセグメン
+トのアニメーションもまつことができます。animstart で loop=falseを指定したと
+きや、animstop でアニメーションを停止させた時のみ有効です。他の場合で wa を
+指定した場合は永遠に待つことになってしまいます。
+
+　栞に保存される情報は、アニメーションがどのセグメントでどの開始ラベルから
+始まったかという情報のみで、どのコマ位置まで進んでいるか、は記録されません。
+　また、ループ中のアニメーションのみが、栞を読み込んだときにアニメーション
+が再開されます。
+
+
+-- クリッピング方式のアニメーションの記述の仕方 ---------------------------
+
+　クリッピング方式でアニメーションを行う場合は、セル方式で行うときと異なり、
+コマ画像が横並びになった画像を一枚用意します。
+　たとえば、320x240 の画面で８枚の画像でアニメーションを行うならば、
+2560×240 の画像を用意します ( 2560 = 320 * 8 )。
+　画像を読み込むときは、最初のコマが表示されるように image タグを記述します。
+　たとえば、
+
+@image storage=anim page=fore layer=0 mode=rect clipleft=0 cliptop=0 clipwidth=320 clipheight=240
+
+　となります。
+　asd ファイルには、横に並んだ各コマ画像が順次表示されるように記述します。
+セル画像は用いないので、loadcell タグを記述する必要はありません。
+　たとえば、
+
+@wait time=80
+@clip left=320 top=0
+@wait time=80
+@clip left=640 top=0
+@wait time=80
+@clip left=960 top=0
+@wait time=80
+@clip left=1280 top=0
+@wait time=80
+@clip left=1600 top=0
+@wait time=80
+@clip left=1920 top=0
+@wait time=80
+@clip left=2240 top=0
+@wait time=80
+@s
+
+　見てお気づきかとは思いますが、実際は横に並んでいる必要はありません。
+　縦に並んでいても良いですが、png などで圧縮するときは横並びになっていた方
+が高い圧縮率を得られます。
+
+　クリッピング方式のアニメーションでは、栞には、そのレイヤがどのようにアニ
+メーションを行っていたかの情報が保存されません。次の「栞を保存可能なラベル」
+を通過するまでには、そのレイヤに別の画像を読み込むなどして、クリッピング方
+式のアニメーションの情報を無効にしてください。
+
+
+-- asdファイル中タグの説明 ------------------------------------------------
+
+
+■ loadcell
+
+・属性
+
+  storage (省略可)          読み込むセル画像ファイル名を指定します
+
+・説明
+
+　このタグはセル方式のアニメーションを行うときのみに使用します。
+　loadcell タグはアニメーションのセル画像を読み込みます。セル画像を読み込ま
+なければアニメーションができないので、asd ファイルの先頭には必ず記述します。
+storage 属性が省略された場合は、ベース画像のファイル名に _a を付加した画像
+が読み込まれます。
+　asd ファイルの先頭に記述しさえすれば OK で、セグメントの開始ラベルの次に
+記述する必要はありません。
+
+
+■ loop
+
+・属性
+
+  (なし)
+
+・説明
+
+　このタグはセル方式のアニメーションを行うときのみに使用します。
+　loop タグは、データがループを行うことを宣言するためのタグです。
+　このタグを宣言したからと言って自動的にデータがループするわけではありませ
+ん。ループするように記述してください。
+　このタグは、各セグメントでのループの開始を行う場合の、セグメントの入り口
+のラベルの次あたりに記述してください。最初のデフォルトセグメントの場合は
+loadcell の次あたりで OK です。
+
+■ copy
+
+・属性
+
+  dx                        転送先x座標
+  dy                        転送先y座標
+  sx                        転送元x座標
+  sy                        転送元y座標
+  sw                        幅
+  sh                        高さ
+
+・説明
+
+　このタグはセル方式のアニメーションを行うときのみに使用します。
+　セル画像からベース画像にコピーを行います。
+
+■ wait
+
+・属性
+
+  time                      待ち時間(ms)
+
+・説明
+
+　指定時間ウェイトをとります。
+　通常は、copy タグと wait タグの繰り返しになります。
+
+■ jump, if/endif, eval, iscript/endscript
+
+　KAG のシナリオと同様です。
+　ただし、複数が並列して実行される物なので、変数を操作する場合は使用する変
+数が重ならないようにするなど、注意してください。
+
+■ s
+
+・属性
+
+  (なし)
+
+・説明
+
+　通常の KAG と同じように、そこで実行を停止します。
+　アニメーションがループしない場合は、loop タグを書かずに、このタグで
+停止させてください。
+　画像が読み込まれた時点ではアニメーションをしたくないのならば、loadcell タ
+グの直後に s タグを書いて停止させてください。
+
+
+
+■ home
+
+・属性
+
+  (なし)
+
+・説明
+
+　このタグはセル方式のアニメーションを行うときのみに使用します。
+　animstop タグを指定した場合に停止する場所です。これを書かないと animstop
+では停止できません。animstop タグを使う場合は、ループの途中に必ず一カ所以上
+記述してください。
+
+
+
+■ clip
+
+・属性
+
+  left                      クリッピングを行う左端位置
+  top                       クリッピングを行う上端位置
+
+　このタグはクリッピング方式のアニメーションを行うときのみに使用します。
+　image タグにおける clipleft と cliptop 属性の値の効果と同じで、クリッピン
+グを行う位置を指定します。
+　クリッピングの幅と高さは変更できませんので、image タグで指定した幅と高さ
+を変えることはできません。
+
+*/
+
+
+class AnimationConductor extends BaseConductor
+{
+	var owner;
+	var number; // このコンダクタの番号
+	var looping = false;
+	var startLabel = "";
+	var stopping = false; // ストップを待っている状態か
+	var running = false; // 実行中か
+
+	function AnimationConductor(owner)
+	{
+		super.BaseConductor(); // スーパークラスのコンストラクタを呼ぶ
+		ignoreCR = true; // CR は無視
+		debugLevel = tkdlNone;
+//		debugLevel = tkdlVerbose;
+		this.owner = owner;
+	}
+
+	function finalize()
+	{
+		owner = void; // owner への参照を切る
+		super.finalize(...);
+	}
+
+	function onStop()
+	{
+		// 実行停止
+		var elm = %[];
+		elm.context = this;
+		owner.s(elm); // s タグを呼ぶ
+	}
+
+	function onTag(obj)
+	{
+		// タグが実行されるとき
+		var func = owner[obj.tagname];
+		if(func == void)
+		{
+			dm(Storages.extractFileName(curStorage) + " : 未知のタグ : " + obj.tagname);
+			return 0;
+		}
+		obj.context = this;
+		return func(obj);
+	}
+
+	function onScript(script, scriptname, lineofs)
+	{
+		// iscript が実行されるとき
+		try
+		{
+			Scripts.exec(script, scriptname, lineofs);
+		}
+		catch(e)
+		{
+			throw new Exception(scriptname + " の 行 " + lineofs + " から始まる"
+				" iscript ブロックでエラーが発生しました。"
+				"\n( 詳細はコンソールを参照してください )\n" + e.message);
+		}
+		return true;
+	}
+
+	function assign(src)
+	{
+		// src の状態をこのオブジェクトにコピー
+		super.assign(src);
+		looping = src.looping;
+		startLabel = src.startLabel;
+		stopping = src.stopping;
+		running = src.running;
+	}
+}
+
+
+class AnimationLayer extends KAGLayer
+{
+	var Anim_cellLayer; // セルレイヤ
+	var Anim_segments = []; // セグメントごとのコンダクタ
+	var Anim_storageName; // アニメーションデータファイル名
+	var Anim_loadParams = void; // 読み込み時に指定されたパラメータ
+	var Anim_partialImageInfo = void; // 画像の部分追加読み込みのパラメータ
+	var Anim_interrupted = false;// 中断中か
+
+	var Anim_defaultFontInfo = %[];
+
+
+	function AnimationLayer(win, par)
+	{
+		// AnimationLayer コンストラクタ
+		super.KAGLayer(...); // スーパークラスのコンストラクタを呼ぶ
+
+		Anim_defaultFontInfo.face = font.face; // デフォルトのフォント
+		Anim_defaultFontInfo.height = font.height; // デフォルトのフォントサイズ
+
+		Anim_segments[0] = new AnimationConductor(this); // デフォルトのコンダクタ
+		Anim_segments[0].number = 0;
+	}
+
+	function finalize()
+	{
+		clearAnim(); // アニメーション情報のクリア
+		invalidate Anim_segments[0]; // デフォルトのコンダクタを無効化
+		Anim_loadParams = void;
+		Anim_partialImageInfo = void;
+		super.finalize(...);
+	}
+
+	function clearImage(process = true)
+	{
+		// 表示を不可視(不可視にできれば)にし、
+		// レイヤをクリアする
+		// 必要に応じてオーバーライドすること
+		if(process)
+		{
+			visible = false;
+			setSize(32, 32);
+			setImageSize(32, 32);
+			face = dfAlpha;
+			fillRect(0, 0, 32, 32, 0);
+			type = ltOpaque;
+			face = dfAuto;
+		}
+	}
+
+	function freeImage()
+	{
+		// 画像を解放
+		clearAnim();
+		clearImage();
+		Anim_loadParams = void;
+		Anim_partialImageInfo = void;
+	}
+
+	function clearAnim()
+	{
+		// アニメーション情報のクリア
+		// アニメーションセグメントのクリア
+		// 各セグメント(デフォルトをのぞく)の削除
+		for(var i = Anim_segments.count -1; i>=1; i--)
+		{
+			var seg = Anim_segments[i];
+			invalidate Anim_segments[i] if seg !== void;
+		}
+		Anim_segments.count = 1;
+
+		// デフォルトのセグメントの停止
+		Anim_segments[0].stop();
+
+		// アニメーションセルレイヤの破棄
+		invalidate Anim_cellLayer if Anim_cellLayer !== void;
+		Anim_cellLayer = void;
+	}
+
+	function loadAnimInfo(segment, label)
+	{
+		// アニメーション情報を指定セグメントに読み込み、実行開始
+		// segment=セグメント番号 label=開始ラベル(空文字列ならば最初から)
+		// Anim_storageName に入っているファイル名のファイルを読み込む
+		if(Anim_storageName == '')
+			throw new Exception(
+				(Anim_loadParams !== void ? Anim_loadParams.storage + "に対する" : "") +
+				"アニメーション情報がありません");
+
+		var seg;
+		if(Anim_segments[segment] === void)
+		{
+			Anim_segments[segment] = seg = new AnimationConductor(this);
+			seg.number = segment;
+				// 新しいセグメント用にコンダクタを作成
+		}
+		else
+		{
+			// セグメントは停止
+			(seg = Anim_segments[segment]).stop();
+		}
+
+		seg.startLabel = label;
+		seg.stopping = false;
+		seg.running = true;
+		seg.clearCallStack();
+		seg.interrupted = Anim_interrupted;
+		seg.loadScenario(Anim_storageName);
+		if(label != '') seg.goToLabel(label);
+		seg.startProcess(true);
+	}
+
+	function startAnim(elm)
+	{
+		// elm に従ってアニメーションを開始する
+		loadAnimInfo(+elm.seg, elm.target);
+	}
+
+	function stopAnim(segment)
+	{
+		// segment で行われているアニメーションを停止する
+		var seg = Anim_segments[segment];
+		if(seg === void) return; // 停止できない
+		seg.stopping = true;
+	}
+
+	function canWaitAnimStop(segment)
+	{
+		// segment のアニメーションの終了を待てるかどうか
+		var seg = Anim_segments[segment];
+		if(seg === void) return false; // まてない
+		if(!seg.running) return false; // 実行中でないので待てない
+		if(seg.looping && !seg.stopping) return false; // ループ指定されていてかつストップ待ちでないのでまてない
+		return true;
+	}
+
+	function loadImages(elm)
+	{
+		// loadImages オーバーライド
+		// elm は読み込み情報
+		if(elm === void)
+		{
+			freeImage();
+			return;
+		}
+
+		Anim_loadParams = %[];
+		(Dictionary.assign incontextof Anim_loadParams)(elm);
+			// パラメータを待避
+
+		// アニメーション情報をクリア
+		clearAnim();
+
+		// 追加画像読み込みの情報をクリア
+		Anim_partialImageInfo = void;
+
+		// 画像を読み込む
+		var taginfo = super.loadImages(elm.storage, elm.key);
+
+		// 画像のタグ情報をデフォルト値として採用
+		if(taginfo)
+		{
+			(Dictionary.assign incontextof taginfo)(elm, false);
+			elm = taginfo;
+		}
+
+		// フリップ
+		var ud, lr;
+		if(elm.flipud !== void && +elm.flipud)
+		{
+			// 上下反転
+			flipUD();
+			ud = true;
+		}
+		else
+		{
+			ud = false;
+		}
+
+		if(elm.fliplr !== void && +elm.fliplr)
+		{
+			// 左右反転
+			flipLR();
+			lr = true;
+		}
+		else
+		{
+			lr = false;
+		}
+
+		// クリッピング
+		if(elm.clipleft !== void)
+		{
+			// クリッピングが指定されている
+			width = +elm.clipwidth;
+			height = +elm.clipheight;
+			var cl = elm.clipleft;
+			if(lr) cl = imageWidth - cl - width;
+			var ct = elm.cliptop;
+			if(ud) ct = imageHeight - ct - height;
+			imageLeft = -cl;
+			imageTop = -ct;
+		}
+		else
+		{
+			setSizeToImageSize();
+		}
+
+		// レイヤモード
+		{
+			var mode = ltAlpha;
+
+			if(elm.mode !== void)
+			{
+				var layertypeinfo = imageTagLayerType[elm.mode];
+				if(layertypeinfo !== void)
+					mode = layertypeinfo.type;
+			}
+
+			type = mode;
+		}
+
+		// 色補正
+		face = dfAuto;
+		applyColorCorrection(this, elm);
+
+		// 可視不可視、位置、不透明度、インデックス
+		if ( elm !== void && elm.pos !== void ) {
+			// ポジションに従って位置を決定
+			left= window.scPositionX[elm.pos] - width \ 2;
+			top = window.scHeight - height;
+		}
+		else
+		{
+			if(elm.left !== void) left = +elm.left;
+			if(elm.top !== void) top = +elm.top;
+		}
+		if(elm.visible !== void) visible = +elm.visible;
+		if(elm.opacity !== void) opacity = +elm.opacity;
+		absolute = +elm.index if elm.index !== void;
+
+		// アニメーション情報があれば、読み込む
+		Anim_storageName =
+			Storages.getPlacedPath(
+				Storages.chopStorageExt(elm.storage) + ".asd");
+		if(Anim_storageName != '')
+		{
+			// アニメーション情報があった!
+			// アニメーション情報をデフォルトのコンダクタに読み込む
+			loadAnimInfo(0, ''); // ついでにアニメーション開始(もし開始できれば)
+		}
+	}
+
+	function addPartialImageInfo(elm)
+	{
+		// elm を partialImageInfo に追加する
+		// Anim_partialImageInfo に情報を追加
+		if(Anim_partialImageInfo === void)
+			Anim_partialImageInfo = [];
+		var info = %[];
+		(Dictionary.assign incontextof info)(elm);
+		Anim_partialImageInfo.add(info);
+	}
+
+	function loadPartialImage(elm)
+	{
+		// 部分追加読み込みを行う
+		// この読み込みメソッドは レイヤそれ自体の
+		// 色調補正、フリップなどの設定に従う
+		// (従って pimage タグ自体には色調補正や
+		//  フリップ関連の属性はない )
+		// pimage タグでは、時間をずらして順次部分画像を読み込み、
+		// アニメーションを行っていくような用途には向いていない
+		// ( そのような場合はアニメーション機能を使うべき )
+		 if(elm.tagname === void) elm.tagname = "pimage";
+
+		// カラーキーの決定
+		var key;
+		if(elm.key !== void)
+		{
+			// key 指定がある
+			key = elm.key;
+		}
+		else
+		{
+			// key 指定がない
+			if(Anim_loadParams !== void)
+				key = Anim_loadParams.key; // loadParams の方の key を使う
+			else
+				key = void;
+		}
+
+		// 一時使用用のレイヤを得る
+		var temp = window.temporaryLayer;
+
+		// 一時レイヤに画像を読み込む
+		var taginfo = temp.loadImages(elm.storage, key);
+
+		// 画像のタグ情報をデフォルト値として採用
+		if(taginfo)
+		{
+			(Dictionary.assign incontextof taginfo)(elm, false);
+			elm = taginfo;
+		}
+
+		// レイヤモード
+		{
+			var mode = ltAlpha;
+
+			if(elm.mode !== void)
+			{
+				var layertypeinfo = imageTagLayerType[elm.mode];
+				if(layertypeinfo !== void)
+					mode = layertypeinfo.type;
+			}
+
+			temp.type = mode;
+		}
+
+		// 画像補整
+		var lr = false, ud = false;
+		if(Anim_loadParams !== void)
+		{
+			// 一時レイヤに対して色調補正
+			applyColorCorrection(temp, Anim_loadParams);
+
+			// フリップ
+			if(Anim_loadParams.flipud !== void && +Anim_loadParams.flipud)
+			{
+				// 上下反転
+				temp.flipUD();
+				ud = true;
+			}
+
+			if(Anim_loadParams.fliplr !== void && +Anim_loadParams.fliplr)
+			{
+				// 左右反転
+				temp.flipLR();
+				lr = true;
+			}
+		}
+
+		var dx = +elm.dx;
+		var dy = +elm.dy;
+		var sx = +elm.sx;
+		var sy = +elm.sy;
+		var sw = elm.sw === void ? temp.imageWidth : +elm.sw;
+		var sh = elm.sh === void ? temp.imageHeight : +elm.sh;
+		if(ud)
+		{
+			// 上下反転
+			dy = imageHeight - dy - sh;
+			sy = temp.imageHeight - sy - sh;
+		}
+		if(lr)
+		{
+			// 左右反転
+			dx = imageWidth - dx - sw;
+			sx = temp.imageWidth - sx - sw;
+		}
+
+		if(elm.mode == 'copy' || elm.mode == 'opaque')
+		{
+			// コピー
+			face = dfAlpha;
+			copyRect(dx, dy, temp, sx, sy, sw, sh);
+		}
+		else
+		{
+			// 重ね合わせ
+			var opa = elm.opacity === void ? 255 : +elm.opacity;
+
+			switch(elm.mode)
+			{
+			case '': // default
+			case 'pile':
+			case 'alpha':
+				holdAlpha = false;
+				face = dfAlpha;
+				break;
+			case 'addalpha':
+				holdAlpha = false;
+				face = dfAddAlpha;
+				break;
+			default:
+				holdAlpha = true;
+				face = dfOpaque;
+				break;
+			}
+			operateRect(dx, dy, temp, sx, sy, sw, sh, omAuto, opa);
+
+			face = dfAuto;
+		}
+
+		// Anim_partialImageInfo に情報を追加
+		addPartialImageInfo(elm);
+
+		return 0;
+	}
+
+	function drawReconstructibleText(elm)
+	{
+		 // (ロード時に)再現可能な形式でテキストを描画する
+		 // x, y = 座標
+		 // text = 描画する文字列
+		 // face = フォント, 省略時は デフォルトフォント名
+		 // size = フォントサイズ, 省略時はデフォルトフォントサイズ
+		 // color = 色 (デフォルト=0xffffff)
+		 // italic = 斜体かどうか (デフォルト=false)
+		 // shadow = 影つきかどうか (デフォルト=true)
+		 // edge = 縁取りかどうか (デフォルト=false)
+		 // shadowcolor = 影の色 (デフォルト=0)
+		 // edgecolor = 縁取りの色 (デフォルト=0)
+		 // bold = 太字にするかどうか (デフォルト=0)
+		 // vertical = 縦書きかどうか (デフォルト=false)
+		 // antialiased = アンチエイリアスするか (デフォルト=true)
+		 // angle = 描画角度 (デフォルト=縦書きならば2700, そうでなければ0)
+		 if(elm.tagname === void) elm.tagname = "ptext";
+
+		var vertical = elm.vertical === void ? false : +elm.vertical;
+
+		with(font)
+		{
+			var face = elm.face === void ? Anim_defaultFontInfo.face : elm.face;
+			if(vertical) face = '@' + face;
+			.face = face;
+			.height = elm.size === void ? Anim_defaultFontInfo.height : +elm.size;
+			.angle = elm.angle === void ? vertical ? 2700:0 : +elm.angle;
+			.italic = elm.italic === void ? false : +elm.italic;
+			.bold = elm.bold === void ? false: +elm.bold;
+		}
+
+		var edge = elm.edge === void ? false : +elm.edge;
+		var shadow = elm.shadow === void ? true : +elm.shadow;
+		var color = elm.color === void ? 0xffffff : +elm.color;
+		var antialiased = elm.antialiased === void ? true : +elm.antialiased;
+
+		face = dfAuto;
+
+		var x = +elm.x;
+		var y = +elm.y;
+
+		if(edge)
+		{
+			var bcolor = elm.edgecolor === void ? 0 : +elm.edgecolor;
+			drawText(x, y, elm.text, color, 255, antialiased, 512, bcolor, 1, 0, 0);
+		}
+		else if(shadow)
+		{
+			var bcolor = elm.shadowcolor === void ? 0 : +elm.shadowcolor;
+			drawText(x, y, elm.text, color, 255, antialiased, 255, bcolor, 0, 2, 2);
+		}
+		else
+		{
+			drawText(x, y, elm.text, color, 255, antialiased); // 文字
+		}
+
+		// Anim_partialImageInfo に情報を追加
+		addPartialImageInfo(elm);
+
+		return 0;
+	}
+
+	function applyColorCorrection(layer, param)
+	{
+		// layer に対して色補正を行う
+		var orgface = layer.face;
+		var orgholdlpha = layer.holdAlpha;
+		layer.face = dfAuto;
+		if(param.grayscale !== void && +param.grayscale) layer.doGrayScale();
+		layer.adjustGamma(
+			param.rgamma, param.rfloor, param.rceil,
+			param.ggamma, param.gfloor, param.gceil,
+			param.bgamma, param.bfloor, param.bceil);
+		if(param.mcolor !== void)
+		{
+			// 色重ね合わせ
+			layer.face = dfOpaque;
+			layer.holdAlpha = true;
+			layer.colorRect(0, 0, layer.imageWidth, layer.imageHeight, +param.mcolor,
+				+param.mopacity);
+		}
+		if (param.lightcolor !== void) {
+			// レイヤ合成
+			var mode = ltAlpha;
+			if(param.lighttype !== void)
+			{
+				var layertypeinfo = imageTagLayerType[param.lighttype];
+				if(layertypeinfo !== void)
+					mode = layertypeinfo.type;
+			}
+			layer.holdAlpha = true;
+			layer.fillOperateRect(0,0,layer.imageWidth, layer.imageHeight,
+								  +param.lightcolor,
+								  mode);
+		}
+		if (param.shadow !== void) {
+			// 影つけ
+			var dx = param.shadowx !== void ? +param.shadowx : 10;
+			var dy = param.shadowy !== void ? +param.shadowy : 10;
+			var blur = param.shadowblur !== void ? +param.shadowblur : 3;
+			var color = param.shadow === true ? 0 : +param.shadow;
+			var opacity = param.shadowopacity !== void ? +param.shadowopacity : 200;
+			layer.doDropShadow(dx, dy, blur, color, opacity);
+		}
+		layer.face = orgface;
+		layer.holdAlpha = orgholdlpha;
+	}
+
+	property interrupted
+	{
+		// すべてのセグメントに interrupted を設定する
+		getter() { return Anim_interrupted; }
+		setter(x)
+		{
+			if(Anim_interrupted != x)
+			{
+				for(var i = Anim_segments.count -1; i>=0; i--)
+				{
+					Anim_segments[i].interrupted = x;
+				}
+				Anim_interrupted = x;
+			}
+		}
+	}
+
+	function assign(src)
+	{
+		// レイヤの情報をコピー
+		// ただし 位置、透明度、サイズ、レイヤ内画像位置はコピーしない
+		// (コピーしたい場合は KAGLayer.assignVisibleState を呼ぶこと)
+		super.assignImages(src);
+
+		// アニメーションセルレイヤのコピー
+		if(src.Anim_cellLayer !== void)
+		{
+			if(Anim_cellLayer === void)
+				Anim_cellLayer = new global.KAGLayer(window, this);
+			Anim_cellLayer.assignImages(src.Anim_cellLayer);
+		}
+		else
+		{
+			invalidate Anim_cellLayer if Anim_cellLayer !== void;
+			Anim_cellLayer = void;
+		}
+
+		// 画像読み込み情報のコピー
+		if(src.Anim_loadParams !== void)
+		{
+			Anim_loadParams = %[];
+			(Dictionary.assign incontextof Anim_loadParams)(src.Anim_loadParams);
+		}
+		else
+		{
+			Anim_loadParams = void;
+		}
+
+		// 部分追加読み込みの情報のコピー
+		if(src.Anim_partialImageInfo !== void)
+		{
+			var destinfo;
+			Anim_partialImageInfo = destinfo = [];
+			var srcinfo = src.Anim_partialImageInfo;
+			var count = srcinfo.count;
+			for(var i = 0; i < count; i++)
+			{
+				var info = %[];
+				(Dictionary.assign incontextof info)(srcinfo[i]);
+				destinfo.add(info);
+			}
+		}
+		else
+		{
+			Anim_partialImageInfo = void;
+		}
+
+		// アニメーションセグメント情報のコピー
+
+		// いったん現在のセグメントをクリア
+		for(var i = Anim_segments.count -1; i>=0; i--)
+		{
+			var seg = Anim_segments[i];
+			invalidate Anim_segments[i] if seg !== void;
+		}
+
+		var srcanimseg = src.Anim_segments; // エイリアス
+		var src_animseg_count = srcanimseg.count;
+		var animseg = Anim_segments; // エイリアス
+
+		for(var i = src_animseg_count-1; i>=0; i--)
+		{
+			var seg = srcanimseg[i];
+			animseg[i] = void;
+			if(seg !== void)
+			{
+				animseg[i] = new AnimationConductor(this);
+				animseg[i].number = i;
+				animseg[i].assign(seg); // アサイン
+			}
+		}
+
+		animseg.count = src_animseg_count;
+
+		// その他
+		Anim_interrupted = src.Anim_interrupted;
+		Anim_storageName = src.Anim_storageName;
+	}
+
+	function store()
+	{
+		// 情報を辞書配列に記録
+		var dic = super.store();
+
+		// 読み込みパラメータ
+		if(Anim_loadParams !== void)
+		{
+			dic.loadParams = %[];
+			(Dictionary.assign incontextof dic.loadParams)(Anim_loadParams);
+		}
+		else
+		{
+			dic.loadParams = void;
+		}
+
+		// 部分追加読み込みの情報
+		if(Anim_partialImageInfo !== void)
+		{
+			var dest;
+			dic.partialImageInfo = dest = [];
+			var src = Anim_partialImageInfo;
+			var count = src.count;
+			for(var i = 0; i < count; i++)
+			{
+				var info = %[];
+				(Dictionary.assign incontextof info)(src[i]);
+				dest.add(info);
+			}
+		}
+		else
+		{
+			dic.partialImageInfo = void;
+		}
+
+		// アニメーションセグメントの情報を記録
+		dic.segments = [];
+		var animseg = Anim_segments; // エイリアス
+		var animsegcount = animseg.count;
+		for(var i = 1; i<animsegcount; i++)
+		{
+			var seg = animseg[i];
+			if(seg !== void)
+			{
+				if(seg.looping && !seg.stopping && seg.running)
+				{
+					// ループ中でかつ停止していなくて停止待ちでもない場合
+					var dat = %[];
+					dat.label = seg.startLabel;
+					dic.segments[i] = dat;
+				}
+			}
+		}
+
+		return dic;
+	}
+
+	function restore(dic)
+	{
+		// dic から情報を読み出す
+		loadImages(dic.loadParams);
+		if(dic.loadParams !== void)
+		{
+			// アニメーションセグメントの情報を復元
+			var dicsegments = dic.segments;
+			if(dicsegments !== void)
+			{
+				var dicsegmentscount = dicsegments.count;
+				for(var i = 1; i < dicsegmentscount; i++)
+				{
+					var seg = dicsegments[i];
+					if(seg !== void)
+						loadAnimInfo(i, seg.label, true);
+				}
+			}
+		}
+
+		// 部分追加読み込みの情報を復元
+		if(dic.partialImageInfo !== void)
+		{
+			var src = dic.partialImageInfo;
+			var count = src.count;
+			for(var i = 0; i < count; i++)
+			{
+				var o = src[i];
+				var tagname = o.tagname;
+				dm(tagname);
+				var handler = global.AnimationLayer.Anim_reconstructHandlers[tagname];
+				dm(handler);
+				if(handler !== void)
+					(handler incontextof this)(o);
+			}
+		}
+		else
+		{
+			Anim_partialImageInfo = void;
+		}
+
+		super.restore(dic);
+	}
+
+	/*タグハンドラ*/function loadcell(elm)
+	{
+		// セルレイヤにセル画像を読み込む
+
+		// セルレイヤの確保
+		if(Anim_cellLayer === void)
+			Anim_cellLayer = new global.KAGLayer(window, this); // レイヤを作成
+
+		// カラーキーの決定
+		var key;
+		if(elm.key !== void)
+		{
+			// key 指定がある
+			key = elm.key;
+		}
+		else
+		{
+			// key 指定がない
+			key = Anim_loadParams.key; // loadParams の方の key を使う
+		}
+
+		// ストレージ名の決定
+		var storage;
+		if(elm.storage !== void)
+		{
+			// storage 指定がある
+			storage = elm.storage;
+		}
+		else
+		{
+			// storage 指定がない
+			storage = Storages.chopStorageExt(Anim_loadParams.storage) + "_a";
+				// loadParams の storage を使う
+		}
+
+		// セルレイヤに画像を読み込む
+		Anim_cellLayer.loadImages(storage, key);
+
+		// セルレイヤに対して色調補正
+		applyColorCorrection(Anim_cellLayer, Anim_loadParams);
+
+		// フリップ
+		if(Anim_loadParams.flipud !== void && +Anim_loadParams.flipud)
+		{
+			// 上下反転
+			Anim_cellLayer.flipUD();
+		}
+		if(Anim_loadParams.fliplr !== void && +Anim_loadParams.fliplr)
+		{
+			// 左右反転
+			Anim_cellLayer.flipLR();
+		}
+
+		return 0;
+	}
+
+	/*タグハンドラ*/function copy(elm)
+	{
+		var lp = Anim_loadParams;
+		if(lp === void) return -1;
+		var f;
+		f = lp.flipud;
+		var dx = +elm.dx;
+		var dy = +elm.dy;
+		var sx = +elm.sx;
+		var sy = +elm.sy;
+		var sw = +elm.sw;
+		var sh = +elm.sh;
+		var cl = Anim_cellLayer;
+		if(f !== void && +f)
+		{
+			// 上下反転
+			dy = imageHeight - dy - sh;
+			sy = cl.imageHeight - sy - sh;
+		}
+		f = lp.fliplr;
+		if(f !== void && +f)
+		{
+			// 左右反転
+			dx = imageWidth - dx - sw;
+			sx = cl.imageWidth - sx - sw;
+		}
+
+		face = dfAuto;
+		copyRect(dx, dy, cl, sx, sy, sw, sh);
+
+		return 0;
+	}
+
+	/*タグハンドラ*/function s(elm)
+	{
+		// 停止
+		elm.context.running = false;
+		window.onAnimationStopped(name, elm.context.number);
+		return -1; // 停止
+	}
+
+	/*タグハンドラ*/function loop(elm)
+	{
+		// ループを行うことを宣言する
+		elm.context.looping = true;
+		return 0;
+	}
+
+	/*タグハンドラ*/function home(elm)
+	{
+		// ホームポジション
+		return elm.context.stopping?-1:0; // stopping に従って停止
+	}
+
+	/*タグハンドラ*/function clip(elm)
+	{
+		// cliprect の変更
+		setImagePos(-elm.left, -elm.top);
+		return 0;
+	}
+
+	/*タグハンドラ*/function wait(elm)
+	{
+		return elm.time; // 指定時間だけ停止
+	}
+
+	/*タグハンドラ*/function eval(elm)
+	{
+		Scripts.eval(elm.exp); // elm.exp を式として実行
+		return 0;
+	}
+}
+
+
+// pimage, ptext タグのように、栞の読み込み時に再構築
+// 可能な情報を復元する際に用いるハンドラ
+// (タグ名と、それに対応するハンドラを記述する)
+AnimationLayer.Anim_reconstructHandlers =
+	%[
+		pimage	:	AnimationLayer.loadPartialImage,
+		ptext	:	AnimationLayer.drawReconstructibleText
+	];
+
+
+class ClickGlyphLayer extends AnimationLayer
+{
+	// クリック待ち記号レイヤ
+	var loadedImage; // 現在読み込まれている画像
+	var loadedKey; // 現在読み込まれているキー
+
+	function ClickGlyphLayer(win, par)
+	{
+		// コンストラクタ
+		super.AnimationLayer(win, par);
+		hitType = htMask;
+		hitThreshold = 256; // マウスメッセージは完全に透過
+	}
+
+	function finalize()
+	{
+		// finalize()
+		super.finalize(...);
+	}
+
+	function loadImages(storage, key)
+	{
+		// loadImage オーバーライド
+		if(loadedImage !== storage || loadedKey !== key)
+		{
+			super.loadImages(%[storage : storage, key : key]);
+			loadedImage = storage;
+			loadedKey = key;
+		}
+	}
+
+	property visible
+	{
+		// visible オーバーライド
+		getter()
+		{
+			return super.visible;
+		}
+		setter(x)
+		{
+			super.visible = x;
+			// 非表示の時は動作を停止しているように
+			if(x)
+				interrupted = false;
+			else
+				interrupted = true;
+		}
+	}
+}
+
+

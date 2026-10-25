@@ -1,0 +1,82 @@
+program ::=
+	{definition}0
+
+definition ::=
+	name {[ {constant}01 ]}01 {ival {, ival}0}01 ;
+	name ( {name {, name}0}01 ) statement
+
+ival ::=
+	constant
+	name
+
+statement ::=
+	auto name {constant}01 {, name {constant}01}0 ;  statement
+	extrn name {, name}0 ; statement
+	name : statement
+	case constant : statement
+	{ {statement}0 }
+	if ( rvalue ) statement {else statement}01
+	while ( rvalue ) statement
+	switch rvalue statement
+	goto rvalue ;
+	return {( rvalue )}01 ;
+	{rvalue}01 ;
+
+rvalue ::=
+	( rvalue )
+	lvalue
+	constant
+	lvalue assign rvalue
+	inc-dec lvalue
+	lvalue inc-dec
+	unary rvalue
+	& lvalue
+	rvalue binary rvalue
+	rvalue ? rvalue : rvalue
+	rvalue ( {rvalue {, rvalue}0 }01 )
+
+assign ::=
+	= {binary}01
+
+inc-dec ::=
+	++
+	--
+	
+unary ::=
+	-
+	!
+
+binary ::=
+	|
+	&
+	==
+	!=
+	<
+	<=
+	>
+	>=
+	<<
+	>>
+	-
+	+
+	%
+	*
+	/
+
+lvalue ::=
+	name
+	* rvalue
+	rvalue [ rvalue ]
+
+constant ::=
+	{digit}1
+	' {char}12 '
+	" {char}0 "
+
+name ::=
+	alpha {alpha-digit}07
+
+alpha-digit ::=
+	alpha
+	digit
+	

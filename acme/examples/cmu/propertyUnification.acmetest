@@ -1,0 +1,26 @@
+family propTestFam = {
+	component type CT1 = {
+	   property p;
+	}
+	
+	component type CT2 extends CT1 with {
+	   property p : int;
+	}
+	
+	component type CT3 extends CT1 with {
+	   property p : float;
+	}
+}
+
+system propTestSys : propTestFam = {
+	component c1 : CT1 = new CT1 extended with {
+		property p : string = "Hi";
+	}
+	
+	component c2 : CT2 = new CT2 extended with {
+	   property p : int = 1;
+	}
+	
+	component c3 : CT1 = new CT1 extended with {}
+
+}
