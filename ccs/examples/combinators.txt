@@ -1,0 +1,4 @@
+panel > button { color: #fff; };
+heading + paragraph { opacity: 1; };
+heading ~ paragraph { opacity: .5; };
+(.left | .right) { width: 50%; };
