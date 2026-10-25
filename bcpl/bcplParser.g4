@@ -110,7 +110,7 @@ manifest_item
     ;
 
 manifest_list
-    : manifest_item (semi manifest_item)*
+    : manifest_item ({IsNotCB()}? semi manifest_item)*
     ;
 
 manifest_declaration
@@ -126,7 +126,7 @@ global_item
     ;
 
 global_list
-    : global_item (semi global_item)*
+    : global_item ({IsNotCB()}? semi global_item)*
     ;
 
 global_declaration
@@ -293,11 +293,11 @@ command
 
 // 8.8.10 Blocks and compound commands
 command_list
-    : command (semi command)*
+    : command ({IsNotCB()}? semi command)*
     ;
 
 declaration_part
-    : declaration (semi declaration)*
+    : declaration ({IsDeclarationStart()}? semi declaration)*
     ;
 
 semi

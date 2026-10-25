@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar plus;
 
 program
-   : statement_list
+   : statement_list EOF
    ;
 
 statement_list
