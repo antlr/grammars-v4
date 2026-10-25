@@ -1,0 +1,2 @@
+equate Y to X as (0 to 100);
+open Z as (0 to 100);

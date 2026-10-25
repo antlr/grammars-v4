@@ -10,7 +10,6 @@
 		<version>1.0-SNAPSHOT</version>
 	</parent>
 	<build>
-		<sourceDirectory>Java</sourceDirectory>
 		<plugins>
 			<plugin>
 				<groupId>org.antlr</groupId>
@@ -22,6 +21,10 @@
 						<include>PlSqlLexer.g4</include>
 						<include>PlSqlParser.g4</include>
 					</includes>
+					<arguments>
+						<argument>-package</argument>
+						<argument>${packageName}</argument>
+					</arguments>
 					<visitor>true</visitor>
 					<listener>true</listener>
 				</configuration>
@@ -37,21 +40,7 @@
 				<groupId>com.khubla.antlr</groupId>
 				<artifactId>antlr4test-maven-plugin</artifactId>
 				<version>${antlr4test-maven-plugin.version}</version>
-				<configuration>
-					<verbose>false</verbose>
-					<showTree>false</showTree>
-					<entryPoint>sql_script</entryPoint>
-					<grammarName>PlSql</grammarName>
-					<caseInsensitiveType>UPPER</caseInsensitiveType>
-					<packageName></packageName>
-					<exampleFiles>examples/</exampleFiles>
-				</configuration>
 				<executions>
-					<execution>
-						<goals>
-							<goal>test</goal>
-						</goals>
-					</execution>
 					<execution>
 						<id>test-examples-sql-script</id>
 						<goals>
@@ -62,9 +51,23 @@
 							<showTree>false</showTree>
 							<entryPoint>sql_script</entryPoint>
 							<grammarName>PlSql</grammarName>
-							<caseInsensitiveType>UPPER</caseInsensitiveType>
-							<packageName></packageName>
-							<exampleFiles>examples-sql-script/</exampleFiles>
+							<packageName>${packageName}</packageName>
+							<exampleFiles>examples/</exampleFiles>
+						</configuration>
+					</execution>
+					<execution>
+						<id>test-more-sql-script</id>
+						<goals>
+							<goal>test</goal>
+						</goals>
+						<configuration>
+							<verbose>false</verbose>
+							<showTree>false</showTree>
+							<entryPoint>sql_script</entryPoint>
+							<grammarName>PlSql</grammarName>
+							<packageName>${packageName}</packageName>
+							<exampleFiles>more/</exampleFiles>
+							<testFileExtension>.sql</testFileExtension>
 						</configuration>
 					</execution>
 				</executions>

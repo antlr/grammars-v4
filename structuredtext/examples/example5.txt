@@ -1,0 +1,7 @@
+CASE x OF
+    1: y := 1;
+    2, 3: y := 2;
+    4..6: y := 3;
+    ELSE
+        y := 0;
+END_CASE;

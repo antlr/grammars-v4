@@ -1,0 +1,7 @@
+!Type:Bank
+D12/03/95
+T4,706.57
+CX
+POpening Balance
+L[New Bank]
+^

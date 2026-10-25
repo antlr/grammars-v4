@@ -1,8 +1,7 @@
 import antlr4 from 'antlr4';
-import JavaScriptLexer from './JavaScriptLexer.js';
 import JavaScriptParser from './JavaScriptParser.js';
 
-export default class JavaScriptLexerBase extends antlr4.Parser {
+export default class JavaScriptParserBase extends antlr4.Parser {
 
     constructor(input) {
         super(input);
@@ -19,7 +18,7 @@ export default class JavaScriptLexerBase extends antlr4.Parser {
     // Short form for next(String str)
     n(str)
     {
-        return next(str);
+        return this.next(str);
     }
 
     // Whether the next token value equals to @param str
@@ -29,7 +28,7 @@ export default class JavaScriptLexerBase extends antlr4.Parser {
     }
 
     notLineTerminator() {
-        return !this.here(JavaScriptParser.LineTerminator);
+        return !this.lineTerminatorAhead();
     }
 
     notOpenBraceAndNotFunction() {
@@ -44,14 +43,9 @@ export default class JavaScriptLexerBase extends antlr4.Parser {
         return this._input.LT(1).type === JavaScriptParser.CloseBrace;
     }
 
-    here(type) {
-        const possibleIndexEosToken = this.getCurrentToken().tokenIndex - 1;
-        const ahead = this._input.get(possibleIndexEosToken);
-        return ahead.channel === antlr4.Lexer.HIDDEN && ahead.type === type;
-    }
-
     lineTerminatorAhead() {
         let possibleIndexEosToken = this.getCurrentToken().tokenIndex - 1;
+        if (possibleIndexEosToken < 0) return false;
         let ahead = this._input.get(possibleIndexEosToken);
         if (ahead.channel !== antlr4.Lexer.HIDDEN) {
             return false;
@@ -61,6 +55,7 @@ export default class JavaScriptLexerBase extends antlr4.Parser {
         }
         if (ahead.type === JavaScriptParser.WhiteSpaces) {
             possibleIndexEosToken = this.getCurrentToken().tokenIndex - 2;
+            if (possibleIndexEosToken < 0) return false;
             ahead = this._input.get(possibleIndexEosToken);
         }
         const text = ahead.text;

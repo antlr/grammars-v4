@@ -37,8 +37,8 @@
 				<version>${antlr4test-maven-plugin.version}</version>
 				<configuration>
 					<verbose>false</verbose>
-					<showTree>true</showTree>
-					<entryPoint>filter_</entryPoint>
+					<showTree>false</showTree>
+					<entryPoint>file_</entryPoint>
 					<grammarName>filter</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>

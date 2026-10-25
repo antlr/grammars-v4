@@ -5,6 +5,8 @@ drop temporary table `some_temp_table`;
 -- drop table if exists `one_more 1343 *&&^ table`;
 drop table antlr_all_tokens, antlr_function_tokens, antlr_keyword_tokens, antlr_tokens, childtable, guns, log_table, new_t, parenttable, ship_class, ships, ships_guns, t1, t2, t3, t4, tab1;
 drop table if exists order;
+drop index index1 on t1;
+drop table tbl_name;
 #end
 #begin
 -- Drop database
@@ -66,4 +68,9 @@ drop procedure some_proc;
 drop function if exists foo;
 drop function bar;
 
+#end
+#begin
+-- Drop Role
+DROP ROLE 'admin', 'developer';
+DROP ROLE 'webapp'@'localhost';
 #end

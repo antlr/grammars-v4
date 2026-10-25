@@ -1,0 +1,5 @@
+FOR i IN 1..1000
+  UPSERT { _key: CONCAT('test', i)}
+    INSERT {foobar: false}
+    UPDATE {_rev: "1287623", foobar: true }
+  IN users OPTIONS { ignoreRevs: false }

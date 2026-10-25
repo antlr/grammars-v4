@@ -1,0 +1,8 @@
+LDFLAGS += -lm
+LIBS = -lpthread -ldl
+
+app: app.o
+	gcc $(LDFLAGS) $(LIBS) -o app app.o
+
+clean:
+	rm -f app app.o
