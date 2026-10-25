@@ -222,7 +222,11 @@
 				<module>esolang</module>
 				<module>euler</module>
 				<module>evm-bytecode</module>
+<<<<<<< Updated upstream
                 <module>fantom</module>
+=======
+				<module>falcon</module>
+>>>>>>> Stashed changes
 				<module>fasta</module>
 				<module>fdo91</module>
 				<module>fen</module>

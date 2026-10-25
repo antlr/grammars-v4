@@ -1,0 +1,3 @@
+for item in collection
+    print_item(item)
+end

@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2023, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -32,358 +32,388 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 grammar falcon;
 
-program_ : [interpreter marker, EOL ], { module level statement | statement} EOF;
-
-interpreter_marker : ? unix/sh She-bang interpreter directive ?	 ;
-
-module_level_statement :
-	load_statement |
-	import_statement |
-	export_statement |
-	compiler_directive |
-	declaration_statement;
-
-statement : autoexpression |
-		  if_statement |
-		  while_statement |
-		  forto_statement |
-		  forin_statement |
-		  loop_statement |
-		  switch_statement |
-		  select_statement |
-		  try_statement |
-		  const_statement |
-		  def_statement |
-		  empty;
-
-empty : terminator; 
-
-
-terminator : ';' | EOL;
-
-EOL : ? any valid end-of-line sequence in any served system ?
- 				  
-white space : ? ASCII space, tab, fixed-width unicode space & similar ?
-
-
-load statement : 'load', ( module name | module path );
-
-import statement : 
-        'import', [name list], terminator |
-	'import', [name list], 'from', ( module name | module path ), ['in', 'self' | namespace ], terminator |
-	'import', [name], 'from', ( module name | module path ) , [ 'as', name ], terminator;
-
-module name : ['self.' | '.' ] , name { '.' , name };
-module path : ? a string representing a complete URI, in single or double quotes ?;
- 
-export statement : 'export', name list, terminator;
-	
-compiler directive : 'directive' { 
-		('lang', '=' , language code ) |
-		('strict' , '=' , 'on' | 'off' ) |
-		('version', '=' , integer number ) };
-
-name list : name { ',' , name };
-
-name : ? sequence of any printable UNICODE character NOT STARTING with ciphers '0'..'9' ?
-
-language code : ? ISO 5 chars language code in format xx_XX ?
-
-
-autoexpression : (assignment expression | call expression | incdec expression), terminator;
-
-expression : 
-   immediate |
-   lvalue |
-   compare expression |
-   incdec expression |
-   call expression |
-   math expression |
-   out of band expression |
-   logic expression |
-   string expression |
-   choice expression |
-   reference expression |
-   array declaration |
-   dictionary declaration |
-   anonymous function declaration |
-   fast eval |
-   '(', expression, ')';
-
-immediate : number | string | value token;
-
-(* Rules for number parsing are complex, but completely resolved at lexer level *)
-number : ? any number in decimal, binary, octal or hexadecimal notation, with "_" separator, or in scientific 'e' notation ?
-
-(* Rules for string parsing are complex, but completely resolved at lexer level *)
-string : ? Sequence of possibly escaped characters enclosed in '"' or single quote ?
-
-value token : 'nil' | 'true' | 'false' | 'self' | 'fself';
-
-lvalue : 
-	name |
-	assignment expression |
-	access expression;
-
-assignment expression : 
-	simple assignment |
-	auto assignment;
-	
-simple assignment : ( lvalue | lvalue list ), ':', expression , { ',' , expression };  
-
-access expression :
-	lvalue, '.', name |				(* dot accessor *)
-	lvalue, '[', expression ,']';    (* array accessor *)
-	
-lvalue list : lvalue , ',' , lvalue, { [ ',' ,  lvalue ] };
-
-auto assignment :
-	lvalue, '+=', expression |    (* auto add *)
-	lvalue, '-=', expression |    (* auto subtract *)
-	lvalue, '*=', expression |    (* auto multiply *)
-	lvalue, '/=', expression |    (* auto divide *)
-	lvalue, '**=', expression |   (* auto power *)
-	lvalue, '%=', expression |    (* auto modulo *)
-	lvalue, '>>=', expression |   (* auto shift left *)
-	lvalue, '<<=', expression |   (* auto shift right *)
-	lvalue, '^&=', expression |   (* auto binary and *)
-	lvalue, '^|=', expression |   (* auto or *)
-	lvalue, '^^=', expression |   (* auto xor *)
-	lvalue, '^=', expression;    (* auto not *)
-
-compare expression :
-	expression, '==', expression |
-	expression, '!=', expression |
-	expression, '>', expression |
-	expression, '<', expression |
-	expression, '>=', expression |
-	expression, '<=', expression;
-	
-incdec expression :
-	'++', expression |		(* increment value and return it *)
-	expression, '++' | 		(* return the value, then increment it *)
-	'--', expression |		(* decrement the value, then return it *)
-	expression --;			(* return the value, then decrement it *)
-	  				  
-call expression : expression, '(', expression list, ')';
-
-(* it's a possibly empty list of comma-separated expressions *)
-expression list : [ expression, { ',', expression } ];
- 
-math expression :
-	expression, '+', expression |
-	expression, '-', expression |
-	'-', expression |			(* unary minus; - -12 is valid and resolves in 12 *)
-	expression, '*', expression |
-	expression, '/', expression |
-	expression, '**', expression |
-	expression, '%', expression |
-	expression, '>>', expression |
-	expression, '<<', expression |
-	expression, '^&', expression |		(* bitfield and *)
-	expression, '^|', expression |		(* bitfield or *)
-	expression, '^^', expression |		(* bitfield xor *)
-	'^~', expression |			(* bitfield not *)
-
-out of band expression :
-	'^?' , expression |		(* Is out of band? *)
-	'^+' , expression |		(* Set out of band *)
-	'^-' , expression |		(* Reset out of band *)
-	'^%' , expression;              (* Switch out of band *)
-
-string expression :
-	'@' , expression |			(* String expansion ($name) *)
-	'#' , expression;			(* Indirect operator *)
-	
-logic expression :
-	expression, 'and', expression |
-	expression, 'or', expression |
-	expression, 'in', expression |
-	expression, 'notin', expression |
-        expression, 'provides', expression |
-	'not', expression ;							
-
-choice expression : expression, '?', expression , ':' , expression;
-
-reference expression : 
-	'$', '0' |			(* Break reference *) 
-	'$', lvalue |			(* References an lvalue *)
-        '&', name ;			(* Symbol item, like LISP 'name *)
-
-fast eval : '^*', expression;        (* Equivalent to eval(expression) *)	
-
-array declaration : 
-	'[', expression list, ']' |
-	'.[', expression sequence , ']';
-
-(* List of whitespace separated expressions *)
-expression sequence : [ expression, { expression } ];
-
-(* '^[' and '^.[' declare blessed dictionaries *)
-
-dictionary declaration : 
-    ( '[' | '^[' | '.[' | '^.[' ) , '=>' , ']' | 					(* Empty dictionary *)
-	 ( '[' | '^[' )  expression pair list ']' |
-	 ( '.[' | '^.[' )  expression pair sequence ']';
-	 
-(* List of comma separated pairs of expressions *) 
-expression pair list : expression pair , { ',', expression pair };
-
-(* List of white space separated pairs of expressions *) 
-expression pair sequence : expression pair , { expression pair };
-
-expression pair : expression , '=>' , expression;
-
-anonymous function declaration :
-	'function', '(', [ name list ], ')', terminator, { statement }, 'end' |
-	'{', [ name list ], '=>', expression , '}' 				(* Automatically returns the value of the expression *)
-	'{', [ name list ], '=>', { statement } , '}';
-	
-
-
-declaration statement :
-	function declaration |
-	class declaration |
-	enum declaration |
-	object declaration;
-	
-function declaration : 
-	'function' , name, '(', [ name list ] , ')', terminator
-		{statement}
-	'end', terminator | 
-	
-	'function' , name, '(', [ name list ] , ')', ':', statement;
-
-enum declaration :
-	'enum', name, terminator
-		enum entry list , terminator
-	'end', terminator;
-	
-enum entry list :  [ name , [ '=', immediate ] , { ',' , [terminator] , name , [ '=', immediate ] } 
-
-class declaration :
-	'class' , name , ['(', name list , ')'] ,  [from clause] , terminator,
-		{class element declaration}
-	'end' , terminator
-	
-from clause : 
-	'from' , 
-		namespaced name , ['(' , expression list , ')'] , 
-		{ ',' , namespaced name, ['(' , expression list , ')'] };
-		
-namespaced name :
-	name , {'.' , name };
-	
-class element declaration : 
-	init declaration |
-	property declaration |
-	function declaration |
-        state declaration;
-	
-init declaration :
-	'init', terminator ,
-		{statement},
-	'end', terminator |
-	'init', ':' , statement;
-
-property declaration : name , '=' , expression, terminator;
-
-state declaration : '[' , name , ']', terminator,
-      {function declaration},
-      'end', terminator; 
-
-
-if statement :
-	'if' , expression , ':' , statement  |
-	'if' , expression , terminator,
-		{statement},
-	['elif' , expression, terminator,
-		{statement} ,
-	],
-	[ 'else', terminator, 
-		{statement}, 
-	],
-	'end', terminator;
-	
-
-while statement :
-	'while' , expression , ( ':' , statement |
-                terminator, {statement in loop} , 'end', terminator );
-
-forto statement :
-	forto heading, ( ':', statement |
-               terminator, {statement in for } , 'end', terminator );
-	
-forto heading : 'for' , name , '=' , number , 'to' , number , ['step', number ];
-
-forin statement :
-	'for' , name list , 'in' , expression, 
-           (':', statement |
-	    terminator , {statement in for } , 'end', terminator);
-
-loop statement :
-	'loop', terminator,
-		{statement in loop} ,
-	'end', [expression], terminator;
-		
-
-statement in loop : 
-    statement |
-    'continue' |
-    'break';
-
-statement in for :
-    forfirst block | formiddle block | forlast block |
-    {statement in loop};
-
-forfirst block : 'forfirst' ,
-         ( ':', statement in loop | 
-            terminator , { statement in loop }, end , terminator )
-
-formiddle block : 'formiddle' ,
-         ( ':', statement in loop | 
-            terminator , { statement in loop }, end , terminator )
-
-forlast block : 'forlast' ,
-         ( ':', statement in loop | 
-            terminator , { statement in loop }, end , terminator )
-
-switch statement :
-	'switch', expression, terminator,
-		{case statements},
-		[default statement],
-	'end', terminator;
-	
-select statement :
-	'select', expression, terminator,
-		{case statement},
-		[default statement],
-	'end', terminator;
-
-case statement :
-	'case' , case limits , (':', statement | terminator, {statement});
-
-case limits : 
-	'expression' | 
-	'expression', 'to', 'expression' , { ',' , case limits };
-	
-
-try statement :
-	'try', terminator
-		{statement},
-	{'catch' , [ name ] , [ 'in' , name ], terminator, 
-		{statement}},
-	'end', terminator;
-
-
-const statement : 'const', multiple assignment, terminator;
-
-def statement : 'def', multiple assignment, terminator;
-
-multiple assignment : name, '=', expression, { ',' , name, '=', expression};
- 
-
+program_
+   : NEWLINE* (module_level_statement | statement)* EOF
+   ;
+
+module_level_statement
+   : load_statement
+   | import_statement
+   | export_statement
+   | compiler_directive
+   | declaration_statement
+   ;
+
+statement
+   : assignment_statement terminator
+   | return_statement
+   | expression terminator
+   | if_statement
+   | while_statement
+   | forto_statement
+   | forin_statement
+   | loop_statement
+   | switch_statement
+   | select_statement
+   | try_statement
+   | const_statement
+   | def_statement
+   | declaration_statement
+   | empty
+   ;
+
+empty
+   : terminator
+   ;
+
+terminator
+   : ';'
+   | NEWLINE+
+   ;
+
+load_statement
+   : 'load' (module_name | module_path) terminator
+   ;
+
+import_statement
+   : 'import' name_list terminator
+   | 'import' name_list 'from' (module_name | module_path) ('in' ('self' | NAME))? terminator
+   | 'import' NAME 'from' (module_name | module_path) ('as' NAME)? terminator
+   ;
+
+module_name
+   : ('self' '.' | '.')? NAME ('.' NAME)*
+   ;
+
+module_path
+   : STRING
+   ;
+
+export_statement
+   : 'export' name_list terminator
+   ;
+
+compiler_directive
+   : 'directive' ('lang' '=' language_code | 'strict' '=' ('on' | 'off') | 'version' '=' NUMBER)* terminator
+   ;
+
+name_list
+   : NAME (',' NAME)*
+   ;
+
+language_code
+   : NAME
+   ;
+
+assignment_statement
+   : lvalue_list ':' expression_list                                                              # simpleAssign
+   | lvalue op = ('+=' | '-=' | '*=' | '/=' | '**=' | '%=' | '>>=' | '<<=' | '^&=' | '^|=' | '^^=' | '^=') expression   # autoAssign
+   ;
+
+lvalue
+   : (NAME | 'self' | 'fself') ('.' NAME | '[' expression ']')*
+   ;
+
+lvalue_list
+   : lvalue (',' lvalue)*
+   ;
+
+expression
+   : expression '.' NAME                                                                 # accessExpr
+   | expression '[' expression ']'                                                       # indexExpr
+   | expression '(' expression_list ')'                                                  # callExpr
+   | expression op = ('++' | '--')                                                       # postIncDecExpr
+   | op = ('++' | '--') expression                                                       # preIncDecExpr
+   | '-' expression                                                                       # unaryMinusExpr
+   | '^~' expression                                                                       # bitNotExpr
+   | op = ('^?' | '^+' | '^-' | '^%') expression                                          # outOfBandExpr
+   | '@' expression                                                                        # stringExpansionExpr
+   | '#' expression                                                                        # indirectExpr
+   | '^*' expression                                                                        # fastEvalExpr
+   | 'not' expression                                                                        # notExpr
+   | '$' expression                                                                           # referenceExpr
+   | '&' NAME                                                                                 # symbolExpr
+   | expression '**' expression                                                               # powerExpr
+   | expression op = ('*' | '/' | '%') expression                                             # mulDivModExpr
+   | expression op = ('+' | '-') expression                                                    # addSubExpr
+   | expression op = ('>>' | '<<') expression                                                  # shiftExpr
+   | expression op = ('^&' | '^|' | '^^') expression                                            # bitwiseExpr
+   | expression op = ('==' | '!=' | '>' | '<' | '>=' | '<=') expression                          # compareExpr
+   | expression op = ('and' | 'or' | 'in' | 'notin' | 'provides') expression                     # logicExpr
+   | expression '?' expression ':' expression                                                     # choiceExpr
+   | immediate                                                                                      # immediateExpr
+   | NAME                                                                                           # nameExpr
+   | array_declaration                                                                              # arrayDeclExpr
+   | dictionary_declaration                                                                         # dictDeclExpr
+   | anonymous_function_declaration                                                                 # anonFuncExpr
+   | '(' expression ')'                                                                             # parenExpr
+   ;
+
+expression_list
+   : (expression (',' expression)*)?
+   ;
+
+immediate
+   : NUMBER
+   | STRING
+   | value_token
+   ;
+
+value_token
+   : 'nil'
+   | 'true'
+   | 'false'
+   | 'self'
+   | 'fself'
+   ;
+
+array_declaration
+   : '[' expression_list ']'
+   | '.[' expression_sequence ']'
+   ;
+
+expression_sequence
+   : expression*
+   ;
+
+dictionary_declaration
+   : ('[' | '^[' | '.[' | '^.[') '=>' ']'
+   | ('[' | '^[') expression_pair_list ']'
+   | ('.[' | '^.[') expression_pair_sequence ']'
+   ;
+
+expression_pair_list
+   : expression_pair (',' expression_pair)*
+   ;
+
+expression_pair_sequence
+   : expression_pair+
+   ;
+
+expression_pair
+   : expression '=>' expression
+   ;
+
+anonymous_function_declaration
+   : 'function' '(' name_list? ')' terminator statement* 'end'
+   | '{' name_list? '=>' expression '}'
+   | '{' name_list? '=>' statement* '}'
+   ;
+
+declaration_statement
+   : function_declaration
+   | class_declaration
+   | enum_declaration
+   | object_declaration
+   ;
+
+function_declaration
+   : 'function' NAME '(' name_list? ')' terminator statement* 'end' terminator
+   | 'function' NAME '(' name_list? ')' ':' statement
+   ;
+
+enum_declaration
+   : 'enum' NAME terminator enum_entry_list terminator 'end' terminator
+   ;
+
+enum_entry_list
+   : enum_entry (',' terminator? enum_entry)*
+   ;
+
+enum_entry
+   : NAME ('=' immediate)?
+   ;
+
+class_declaration
+   : 'class' NAME ('(' name_list? ')')? from_clause? terminator class_element_declaration* 'end' terminator
+   ;
+
+from_clause
+   : 'from' namespaced_name ('(' expression_list ')')? (',' namespaced_name ('(' expression_list ')')?)*
+   ;
+
+namespaced_name
+   : NAME ('.' NAME)*
+   ;
+
+class_element_declaration
+   : init_declaration
+   | property_declaration
+   | function_declaration
+   | state_declaration
+   ;
+
+init_declaration
+   : 'init' terminator statement* 'end' terminator
+   | 'init' ':' statement
+   ;
+
+property_declaration
+   : NAME '=' expression terminator
+   ;
+
+state_declaration
+   : '[' NAME ']' terminator function_declaration* 'end' terminator
+   ;
+
+object_declaration
+   : 'object' NAME from_clause? terminator class_element_declaration* 'end' terminator
+   ;
+
+if_statement
+   : 'if' expression ':' statement
+   | 'if' expression terminator statement* ('elif' expression terminator statement*)* ('else' terminator statement*)? 'end' terminator
+   ;
+
+while_statement
+   : 'while' expression ':' statement
+   | 'while' expression terminator statement_in_loop* 'end' terminator
+   ;
+
+forto_statement
+   : forto_heading ':' statement
+   | forto_heading terminator statement_in_for* 'end' terminator
+   ;
+
+forto_heading
+   : 'for' NAME '=' NUMBER 'to' NUMBER ('step' NUMBER)?
+   ;
+
+forin_statement
+   : 'for' name_list 'in' expression ':' statement
+   | 'for' name_list 'in' expression terminator statement_in_for* 'end' terminator
+   ;
+
+loop_statement
+   : 'loop' terminator statement_in_loop* 'end' expression? terminator
+   ;
+
+statement_in_loop
+   : statement
+   | 'continue' terminator
+   | 'break' terminator
+   ;
+
+statement_in_for
+   : forfirst_block
+   | formiddle_block
+   | forlast_block
+   | statement_in_loop
+   ;
+
+forfirst_block
+   : 'forfirst' ':' statement_in_loop
+   | 'forfirst' terminator statement_in_loop* 'end' terminator
+   ;
+
+formiddle_block
+   : 'formiddle' ':' statement_in_loop
+   | 'formiddle' terminator statement_in_loop* 'end' terminator
+   ;
+
+forlast_block
+   : 'forlast' ':' statement_in_loop
+   | 'forlast' terminator statement_in_loop* 'end' terminator
+   ;
+
+switch_statement
+   : 'switch' expression terminator case_statement* default_statement? 'end' terminator
+   ;
+
+select_statement
+   : 'select' expression terminator case_statement* default_statement? 'end' terminator
+   ;
+
+case_statement
+   : 'case' case_limits ':' statement
+   | 'case' case_limits terminator statement*
+   ;
+
+default_statement
+   : 'default' ':' statement
+   | 'default' terminator statement*
+   ;
+
+case_limits
+   : case_limit (',' case_limit)*
+   ;
+
+case_limit
+   : expression ('to' expression)?
+   ;
+
+try_statement
+   : 'try' terminator statement* ('catch' NAME? ('in' NAME)? terminator statement*)* 'end' terminator
+   ;
+
+const_statement
+   : 'const' multiple_assignment terminator
+   ;
+
+def_statement
+   : 'def' multiple_assignment terminator
+   ;
+
+return_statement
+   : 'return' expression? terminator
+   ;
+
+multiple_assignment
+   : NAME '=' expression (',' NAME '=' expression)*
+   ;
+
+NAME
+   : [a-zA-Z_] [a-zA-Z_0-9]*
+   ;
+
+NUMBER
+   : '0x' HEXDIGIT ('_'? HEXDIGIT)*
+   | '0o' OCTDIGIT ('_'? OCTDIGIT)*
+   | '0b' BINDIGIT ('_'? BINDIGIT)*
+   | DIGIT ('_'? DIGIT)* ('.' DIGIT ('_'? DIGIT)*)? ([eE] [+-]? DIGIT+)?
+   ;
+
+STRING
+   : '"' (ESC | ~["\\])* '"'
+   | '\'' (ESC | ~['\\])* '\''
+   ;
+
+fragment ESC
+   : '\\' .
+   ;
+
+fragment HEXDIGIT
+   : [0-9a-fA-F]
+   ;
+
+fragment OCTDIGIT
+   : [0-7]
+   ;
+
+fragment BINDIGIT
+   : [01]
+   ;
+
+fragment DIGIT
+   : [0-9]
+   ;
+
+SHEBANG
+   : '#!' ~[\r\n]* -> skip
+   ;
+
+LINE_COMMENT
+   : '//' ~[\r\n]* -> skip
+   ;
+
+BLOCK_COMMENT
+   : '/*' .*? '*/' -> skip
+   ;
+
+NEWLINE
+   : '\r'? '\n'
+   ;
 
 WS
-   : [ \r\n\t] + -> skip
+   : [ \t] + -> skip
    ;
