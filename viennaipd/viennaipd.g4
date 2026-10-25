@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2021, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -32,11 +32,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar viennaipd;
 
 file_
-   : section* EOF
+   : (decl | section)* EOF
    ;
 
 section
-   : section_name '{' (decl | section)* '}'
+   : section_name (':' base_section (',' base_section)*)? '{' (decl | section)* '}'
+   | section_name ':' base_section (',' base_section)* ';'
+   ;
+
+base_section
+   : reference ('?' expression)?
    ;
 
 section_name
@@ -48,7 +53,7 @@ decl
    ;
 
 variable
-   : TYPE variable_name '=' expression
+   : TYPE? variable_name '=' expression ';'
    ;
 
 variable_name
@@ -56,29 +61,63 @@ variable_name
    ;
 
 expression
-   : BOOLEAN
-   | INTEGER
-   | REAL
-   | complex
-   | quantity
-   | STRING
-   | array
+   : logical_or
    ;
 
-complex
-   : (INTEGER | REAL) '+' (INTEGER | REAL) 'j'
+logical_or
+   : logical_and ('||' logical_and)*
+   ;
+
+logical_and
+   : equality ('&&' equality)*
+   ;
+
+equality
+   : comparison (('==' | '!=') comparison)*
+   ;
+
+comparison
+   : additive (('<' | '<=' | '>' | '>=') additive)*
+   ;
+
+additive
+   : multiplicative (('+' | '-') multiplicative)*
+   ;
+
+multiplicative
+   : unary (('*' | '/' | '%') unary)*
+   ;
+
+unary
+   : ('+' | '-' | '!') unary
+   | primary
+   ;
+
+primary
+   : BOOLEAN
+   | quantity
+   | INTEGER
+   | REAL
+   | STRING
+   | array
+   | reference ('(' (expression (',' expression)*)? ')')?
+   | '(' expression ')'
    ;
 
 quantity
-   : REAL STRING
+   : (INTEGER | REAL) (STRING | ID)
    ;
 
 array
-   : '[' expression ']'
+   : '[' (expression (',' expression)*)? ']'
+   ;
+
+reference
+   : '~'? ID ('.' ID)*
    ;
 
 STRING
-   : '"' ~ '"'* '"'
+   : '"' ('\\' . | ~["\\\r\n])* '"'
    ;
 
 TYPE
@@ -97,14 +136,26 @@ INTEGER
    ;
 
 REAL
-   : [0-9]+ '.' [0-9]+
+   : ([0-9]+ '.' [0-9]* | '.' [0-9]+) EXPONENT?
+   | [0-9]+ EXPONENT
+   ;
+
+fragment EXPONENT
+   : [eE] [+-]? [0-9]+
    ;
 
 ID
-   : [a-zA-Z] [a-zA-Z0-9_]
+   : [a-zA-Z_] [a-zA-Z0-9_]*
+   ;
+
+LINE_COMMENT
+   : '//' ~[\r\n]* -> skip
+   ;
+
+BLOCK_COMMENT
+   : '/*' .*? '*/' -> skip
    ;
 
 WS
    : [ \r\n\t]+ -> skip
    ;
-

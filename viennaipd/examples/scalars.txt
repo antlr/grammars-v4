@@ -1,0 +1,5 @@
+enabled = true;
+key disabled = false;
+ext count = 32;
+aux negative = -3;
+some_long_identifier = 3.1415;

@@ -1,0 +1,4 @@
+current = 3.0 A;
+power = 5.5 "V * A";
+momentum = 4.2 "kg m/s s";
+negative_voltage = -2 "V";

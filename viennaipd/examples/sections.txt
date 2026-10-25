@@ -1,0 +1,9 @@
+BaseSection {
+    ext x = 1;
+    SubSection {
+        SubSubSection {
+            value = 2;
+        }
+    }
+}
+result = ~BaseSection.x + BaseSection.SubSection.SubSubSection.value;

@@ -1,0 +1,4 @@
+BaseSection1 { a = 1; }
+BaseSection2 { b = 3; }
+DerivedSection : BaseSection1, BaseSection2;
+ModifiedSection : BaseSection1 { a = 4; }

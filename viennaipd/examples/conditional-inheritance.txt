@@ -1,0 +1,12 @@
+// Select base sections using expressions.
+Switch = 0;
+BaseSection1 { x = 1; }
+BaseSection2 { y = 2; }
+BaseSection3 { z = 3; }
+DerivedSection : BaseSection1,
+                 BaseSection2 ? (Switch > -1),
+                 BaseSection3 ? (Switch < 1) {
+    /* Local settings can use Boolean and arithmetic expressions. */
+    active = Switch == 0 && !(Switch != 0) || false;
+    remainder = (5 + 2) % 3;
+}

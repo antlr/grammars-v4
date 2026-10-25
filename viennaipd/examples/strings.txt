@@ -1,0 +1,4 @@
+title = "Simulation input";
+empty = "";
+quoted = "A \"quoted\" value";
+path = "results\\output";

@@ -1,0 +1,6 @@
+Solve {
+    maxStepSize = 1e30;
+    tolerance = 2.5E-8;
+    lower = -.5;
+    upper = +4.;
+}
