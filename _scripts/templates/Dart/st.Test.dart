@@ -63,6 +63,7 @@ var prefix = "";
 var quiet = false;
 var perf = false;
 var per_file = false;
+var sll = false;
 var total_tokens = 0;
 var total_parse_seconds = 0.0;
 var first_file_tokens = 0;
@@ -124,6 +125,10 @@ void main(List\<String> args) async {
         else if (args[i] == "--per-file")
         {
             per_file = true;
+        }
+        else if (args[i] == "--sll")
+        {
+            sll = true;
         }
         else if (args[i] == "-trace")
         {
@@ -220,7 +225,7 @@ Future\<void> DoParse(CharStream str, String input_name, int row_number) async
     String out_name = input_name;
     if (output_dir != "") {
         String absPath = File(input_name).absolute.path;
-        String root = Directory('../<example_dir_unix>').absolute.path;
+        String root = Directory('<source_example_dir_unix>').absolute.path;
         String rootPrefix = root.endsWith(Platform.pathSeparator)
             ? root : root + Platform.pathSeparator;
         String rootless = absPath.startsWith(rootPrefix)
@@ -248,6 +253,7 @@ Future\<void> DoParse(CharStream str, String input_name, int row_number) async
     }
     var tokens = CommonTokenStream(lexer);
     var parser = <parser_name>(tokens);
+    if (sll) parser.interpreter!.predictionMode = PredictionMode.SLL;
     IOSink output;
     if (tee)
     {

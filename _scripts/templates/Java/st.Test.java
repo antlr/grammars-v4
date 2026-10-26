@@ -37,6 +37,7 @@ public class Test {
     static boolean quiet = false;
     static boolean perf = false;
     static boolean per_file = false;
+    static boolean sll = false;
     static long total_tokens = 0;
     static double total_parse_seconds = 0;
     static long first_file_tokens = 0;
@@ -110,6 +111,10 @@ public class Test {
             else if (args[i].equals("--per-file"))
             {
                 per_file = true;
+            }
+            else if (args[i].equals("--sll"))
+            {
+                sll = true;
             }
             else if (args[i].equals("-trace"))
             {
@@ -212,10 +217,12 @@ public class Test {
         }
         var tokens = new CommonTokenStream(lexer);
         <parser_name> parser = new <parser_name>(tokens);
+        if (sll)
+            parser.getInterpreter().setPredictionMode(PredictionMode.SLL);
         String out_name = input_name;
         if (output_dir != null) {
             File abs = new File(input_name).getAbsoluteFile();
-            File root = new File("../<example_dir_unix>").getAbsoluteFile();
+            File root = new File("<source_example_dir_unix>").getAbsoluteFile();
             String rootless;
             try {
                 rootless = root.toPath().normalize().relativize(abs.toPath().normalize()).toString();

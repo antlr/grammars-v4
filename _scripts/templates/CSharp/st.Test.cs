@@ -44,6 +44,8 @@ public class Program
         ((CodePointCharStream)(lexer.InputStream)).name = fn;
         var parser = new MyParser(tokens);
         Parser = parser;
+        if (Environment.GetCommandLineArgs().Contains("--sll"))
+            parser.Interpreter.PredictionMode = PredictionMode.SLL;
         var listener_lexer = new ErrorListener\<int>(false, false, System.Console.Error);
         var listener_parser = new ErrorListener\<IToken>(false, false, System.Console.Error);
         LexerErrorListener = listener_lexer;
@@ -192,6 +194,7 @@ public class Program
     static bool quiet = false;
     static bool perf = false;
     static bool per_file = false;
+    static bool sll = false;
     static string output_dir = null;
     static int limit = 0; // 0 = unlimited
     static bool count_ambig = false;
@@ -303,6 +306,10 @@ public class Program
             else if (args[i] == "--per-file")
             {
                 per_file = true;
+            }
+            else if (args[i] == "--sll")
+            {
+                sll = true;
             }
             else if (args[i] == "-trace")
             {
@@ -456,10 +463,12 @@ public class Program
             tokens = new CommonTokenStream(lexer);
         }
         var parser = new MyParser(tokens);
+        if (sll)
+            parser.Interpreter.PredictionMode = PredictionMode.SLL;
         string out_name;
         if (output_dir != null) {
             var abs = System.IO.Path.GetFullPath(input_name);
-            var root = System.IO.Path.GetFullPath(System.IO.Path.Combine("..", "<example_dir_unix>"));
+            var root = System.IO.Path.GetFullPath("<source_example_dir_unix>");
             var rootless = System.IO.Path.GetRelativePath(root, abs);
             if (rootless == ".." || rootless.StartsWith(".." + System.IO.Path.DirectorySeparatorChar))
                 rootless = System.IO.Path.GetFileName(abs);
