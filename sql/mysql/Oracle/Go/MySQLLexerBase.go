@@ -216,7 +216,7 @@ func (m *MySQLLexerBase) checkMySQLVersion(text string) bool {
     }
 
     if version <= StaticMySQLLexerBase.serverVersion {
-        StaticMySQLLexerBase.inVersionComment = true
+        m.inVersionComment = true
         return true
     }
 
