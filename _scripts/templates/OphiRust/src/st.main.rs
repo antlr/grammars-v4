@@ -7,7 +7,8 @@ use std::sync::{Arc, Mutex};
 use std::time::Instant;
 
 use antlr4_runtime::{
-    CommonTokenStream, ErrorListener, InputStream, IntStream, Recognizer, SyntaxErrorEvent,
+    CommonTokenStream, ErrorListener, InputStream, IntStream, Parser, PredictionMode,
+    Recognizer, SyntaxErrorEvent,
 };
 
 mod lexer_base;
@@ -58,6 +59,7 @@ struct Flags {
     quiet: bool,
     perf: bool,
     per_file: bool,
+    sll: bool,
     output_dir: Option\<String>,
 }
 
@@ -69,8 +71,8 @@ fn parse_input(
     let out_name: String = if let Some(ref odir) = flags.output_dir {
         let abs = std::fs::canonicalize(input_name)
             .unwrap_or_else(|_| std::env::current_dir().unwrap_or_default().join(input_name));
-        let root = std::fs::canonicalize("../<example_dir_unix>")
-            .unwrap_or_else(|_| std::env::current_dir().unwrap_or_default().join("../<example_dir_unix>"));
+        let root = std::fs::canonicalize("<source_example_dir_unix>")
+            .unwrap_or_else(|_| std::env::current_dir().unwrap_or_default().join("<source_example_dir_unix>"));
         let rootless = abs.strip_prefix(&root)
             .map(std::path::PathBuf::from)
             .unwrap_or_else(|_| abs.file_name().map(std::path::PathBuf::from).unwrap_or_default());
@@ -121,6 +123,9 @@ fn parse_input(
         token_stream,
         <ophirust_parser_name>TypedHooks::new(parser_base::ParserBase::new()),
     );<else>let mut parser = <ophirust_parser_name>::new(token_stream);<endif>
+    if flags.sll {
+        parser.set_prediction_mode(PredictionMode::Sll);
+    }
     parser.remove_error_listeners();
     parser.add_error_listener(CountingErrorListener {
         quiet: flags.quiet,
@@ -199,6 +204,7 @@ fn main() {
         quiet: false,
         perf: false,
         per_file: false,
+        sll: false,
         output_dir: None,
     };
 
@@ -226,6 +232,7 @@ fn main() {
             "-q" => flags.quiet = true,
             "--perf" => flags.perf = true,
             "--per-file" => flags.per_file = true,
+            "--sll" => flags.sll = true,
             "-trace" => flags.show_trace = true,
             "-x" => {
                 let stdin = io::stdin();

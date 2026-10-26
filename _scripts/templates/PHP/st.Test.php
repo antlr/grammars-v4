@@ -216,8 +216,8 @@ function DoParse($str, $input_name, $row_number) {
     if ($output_dir != "") {
         $abs_path = realpath($input_name);
         if ($abs_path === false) $abs_path = $input_name;
-        $root = realpath('../<example_dir_unix>');
-        if ($root === false) $root = '../<example_dir_unix>';
+        $root = realpath('<source_example_dir_unix>');
+        if ($root === false) $root = '<source_example_dir_unix>';
         $root_prefix = rtrim($root, '/'.chr(92)) . DIRECTORY_SEPARATOR;
         $rootless = strncmp($abs_path, $root_prefix, strlen($root_prefix)) === 0
             ? substr($abs_path, strlen($root_prefix))
