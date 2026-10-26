@@ -4807,7 +4807,7 @@ default_settings_clause
     ;
 
 set_time_zone_clause
-    : SET TIMEZONE EQUALS_OP CHAR_STRING
+    : SET TIME_ZONE EQUALS_OP CHAR_STRING
     ;
 
 instance_clauses
@@ -7003,7 +7003,7 @@ json_value_return_type
     | CLOB
     | DATE
     | NUMBER ('(' INTEGER (',' INTEGER)? ')')?
-    | TIMESTAMP (WITH TIMEZONE)?
+    | TIMESTAMP (WITH TIME ZONE)?
     | SDO_GEOMETRY
     | expression (USING CASESENSITIVE MAPPING)?
     ;
