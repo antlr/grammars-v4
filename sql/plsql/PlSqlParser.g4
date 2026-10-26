@@ -6858,7 +6858,7 @@ atom
     | constant
     | inquiry_directive
     | general_element outer_join_sign?
-    | '(' subquery ')' subquery_operation_part*
+    | '(' subquery ')'
     | '(' expression ')' ('.' general_element_part)*
     | '(' expressions_ ')'
     ;
