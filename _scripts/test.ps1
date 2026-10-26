@@ -71,10 +71,10 @@ function Test-Grammar {
     Write-Host "Building"
     # codegen
     Write-Host "dotnet trash gen -t $Target --template-sources-directory $templates"
-    $(& dotnet trash gen -t $Target --template-sources-directory $templates; $status = $LASTEXITCODE) | Write-Host
+    $(& dotnet trash gen -t $Target --template-sources-directory $templates 2>&1; $status = $LASTEXITCODE) | Write-Host
     if ($status -ne 0) {
         $failStage = [FailStage]::CodeGeneration
-        Write-Host "trgen failed" -ForegroundColor Red
+        Write-Host "trgen failed with exit code $status" -ForegroundColor Red
         Set-Location $cwd
         return @{
             Success     = $false
