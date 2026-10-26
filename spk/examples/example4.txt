@@ -1,0 +1,8 @@
+MAIN: PROCEDURE OPTIONS(MAIN);
+    DECLARE I FIXED;
+    I = 0;
+    DO WHILE (I < 5);
+        PUT LIST(I);
+        I = I + 1;
+    END;
+END;

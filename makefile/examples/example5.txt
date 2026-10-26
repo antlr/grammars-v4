@@ -1,0 +1,5 @@
+main.o: main.c main.h
+	gcc -c main.c -o main.o
+
+util.o: util.c util.h
+	gcc -c util.c -o util.o

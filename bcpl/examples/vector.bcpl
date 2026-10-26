@@ -1,0 +1,21 @@
+GET "libhdr"
+
+LET sum(v, n) = VALOF
+{ LET total = 0
+  LET i = 0
+  WHILE i < n DO
+  { total := total + v!i
+    i := i + 1
+  }
+  RESULTIS total
+}
+
+LET start() = VALOF
+{ LET v = VEC 4
+  v!0 := 1
+  v!1 := 2
+  v!2 := 3
+  v!3 := 4
+  writef("sum = %n*n", sum(v, 4))
+  RESULTIS 0
+}

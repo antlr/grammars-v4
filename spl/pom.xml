@@ -33,13 +33,13 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>com.clemenssageder</groupId>
+				<groupId>com.khubla.antlr</groupId>
 				<artifactId>antlr4test-maven-plugin</artifactId>
 				<version>${antlr4test-maven-plugin.version}</version>
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>expression</entryPoint>
+					<entryPoint>query</entryPoint>
 					<grammarName>SPL</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>

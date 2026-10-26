@@ -69,6 +69,7 @@ export default abstract class Protobuf3ParserBase extends Parser {
         }
         if (!ctx) throw new Error();
         const newScope = this.symbolTable.resolve(ctx);
+        if (!newScope) throw new Error();
         if (this.debug) console.log(this.prefix + "EnterBlock " + newScope?.toString());
         this.symbolTable.enterScope(newScope);
     }
@@ -143,7 +144,7 @@ export default abstract class Protobuf3ParserBase extends Parser {
         const _ctx = parser._ctx;
         parser.proto();
         parser.reset();
-	_ctx.children.shift();
+	_ctx.children?.shift();
 //        _ctx.removeLastChild();  // Warning: assumes removeLastChild() exists
         parser._ctx = _ctx;
     }

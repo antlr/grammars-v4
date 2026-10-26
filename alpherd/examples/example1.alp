@@ -1,0 +1,9 @@
+begin
+    var x:int = 5;
+    @:=(x, 10);
+    if @<(x, 20) then
+        @:=(x, 1)
+    else
+        @:=(x, 0)
+    fi
+end

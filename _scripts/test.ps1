@@ -21,7 +21,7 @@ function Get-GrammarSkip {
         Write-Host "Intentionally skipping grammar $Grammar target $Target."
         return $True
     }
-    $desc_targets = dotnet trxml2 "$Grammar/desc.xml" | Select-String '/desc/targets'
+    $desc_targets = dotnet trash xml2 "$Grammar/desc.xml" | Select-String '/desc/targets'
     if ($LASTEXITCODE -ne 0) {
         Write-Host "The desc.xml for $testname is malformed. Skipping."
         return $True
@@ -67,15 +67,32 @@ function Test-Grammar {
     
     $success = $true
     $start = Get-Date
+
     Write-Host "Building"
     # codegen
-    Write-Host "dotnet trgen -t $Target --template-sources-directory $templates"
-    $(& dotnet trgen -t $Target --template-sources-directory $templates; $status = $LASTEXITCODE) | Write-Host
+    Write-Host "dotnet trash gen -t $Target --template-sources-directory $templates"
+    $(& dotnet trash gen -t $Target --template-sources-directory $templates 2>&1; $status = $LASTEXITCODE) | Write-Host
     if ($status -ne 0) {
         $failStage = [FailStage]::CodeGeneration
-        Write-Host "trgen failed" -ForegroundColor Red
+        Write-Host "trgen failed with exit code $status" -ForegroundColor Red
+        Set-Location $cwd
+        return @{
+            Success     = $false
+            Stage       = $failStage
+            FailedCases = @()
+        }
     }
-    $dirs = Get-ChildItem -Path "Generated-$Target*"
+    $dirs = @(Get-ChildItem -Path "Generated-$Target*")
+    if ($dirs.Count -eq 0) {
+        $failStage = [FailStage]::CodeGeneration
+        Write-Host "No code generated" -ForegroundColor Red
+        Set-Location $cwd
+        return @{
+            Success     = $false
+            Stage       = $failStage
+            FailedCases = @()
+        }
+    }
     foreach ($m in $dirs) {
         $targetgenerated = $m.Name
         Write-Host "targetgenerated is $targetgenerated"

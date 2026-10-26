@@ -1,0 +1,4 @@
+// Escape Codes Example
+
+escape_examples1 = C"This string contains: \\, \', \", \?, \a, \b, \f, \n, \r, \t, \v"
+escape_examples2 = C'This string contains: \\, \', \", \?, \a, \b, \f, \n, \r, \t, \v'

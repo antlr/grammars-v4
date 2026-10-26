@@ -1,0 +1,6 @@
+environ
+begin
+definition
+ mode @ is % ;
+end;
+.

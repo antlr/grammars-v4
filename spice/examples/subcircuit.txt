@@ -1,0 +1,11 @@
+* Subcircuit and continuation lines
+.subckt divider input output ground
+R1 input output 1k
+R2 output ground 1k
+.ends divider
+V1 in 0 DC 10
+X1 in out 0 divider
+.param first=1
++ second=2
+.include "models.lib"
+.end

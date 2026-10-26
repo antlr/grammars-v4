@@ -10,6 +10,10 @@ This grammar is set to recognize version "8.0.200".
 
 Includes updates to commit https://github.com/mysql/mysql-shell-plugins/commit/d0271b1244d9686c30ce95bae92f4cf4c135d36d.
 
+## Reference
+* [pldb](http://pldb.info/concepts/oracle)
+
+
 ## License
 
 * [BSD3](https://opensource.org/license/bsd-3-clause)

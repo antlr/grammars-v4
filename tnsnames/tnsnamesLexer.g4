@@ -1,7 +1,7 @@
 // -------------------------------------------------------------------
 // Definition of a grammar to parse a tnsnames.ora file.
 // Specification as per Oracle 11g Release 2 Network Reference manual
-// http://docs.oracle.com/cd/E11882_01/network.112/e10835/tnsnames.htm
+// https://web.archive.org/web/20150612014817/http://www.toadworld.com/platforms/oracle/w/wiki/5484.defining-tnsname-addresses.aspx
 // -------------------------------------------------------------------
 // Norman Dunbar.
 // Email: norman@dunbar-it.co.uk
@@ -17,7 +17,7 @@
 // MAYBE TODO:
 //
 // PROTOCOL_STACK??? - I've never seen this in the wild! Only on
-// http://www.toadworld.com/platforms/oracle/w/wiki/5484.defining-tnsname-addresses.aspx
+// www.toadworld.com/platforms/oracle/w/wiki/5484.defining-tnsname-addresses.aspx
 //
 // Add IP V6 lever rule. Currently only copes with IP V4.
 //--------------------------------------------------------------------

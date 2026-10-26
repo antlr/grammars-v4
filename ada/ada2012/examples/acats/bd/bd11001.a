@@ -1,0 +1,273 @@
+-- BD11001.A
+--
+--                                     Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                                DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                                 Notice
+--
+--     The ACAA has created and maintains the Ada Conformity Assessment Test
+--     Suite for the purpose of conformity assessments conducted in accordance
+--     with the International Standard ISO/IEC 18009 - Ada: Conformity
+--     assessment of a language processor. This test suite should not be used
+--     to make claims of conformance unless used in accordance with
+--     ISO/IEC 18009 and any applicable ACAA procedures.
+--*
+-- OBJECTIVE:
+--     Check that violations of the legality rules for aspect specifications
+--     are detected.
+--
+-- TEST DESCRIPTION:
+--
+--     This test checks the global rules for aspect specifications given
+--     in 13.1.1 - it does not check requirements for specific aspects.
+--     Note that the language sometimes overrides the 13.1.1 rules for
+--     specific aspects -- these do not apply to evey possible aspect,
+--     but do apply to most.
+--
+--     We check that each of the following requirements on an aspect
+--     specification are enforced:
+--       (A) An aspect_declaration is illegal if any usage name resolves
+--           differently at the first freezing point of the associated
+--           entity and at the end of the immediately enclosing declaration
+--           list; 13.1.1(13/3)
+--       (B) The Aspect_Mark must identify an aspect of the associated entity;
+--           13.1.1(14/3)
+--       (C) Multiple occurrences of an aspect are not allowed in a single
+--           aspect specification; 13.1.1(14/3)
+--       (D) The aspect_definition cannot be omitted for a non-boolean aspect;
+--           13.1.1(15/3)
+--       (E) An aspect cannot include 'Class unless it applies to a tagged type
+--           or primitive subprogram of a tagged type; 13.1.1(16/3)
+--       (F) No language-defined aspects can be specified on a
+--           renaming_declaration or a generic_formal_parameter_declaration;
+--           13.1.1(17/3)
+--       (G) A language-defined aspect cannot be specified on the completion
+--           of a subprogram; 13.1.1(18/3).
+--
+-- PASS/FAIL CRITERIA:
+--     This test contains several lines marked POSSIBLE ERROR: [Setnn].
+--     For each value of n, the implementation must detect one or more of
+--     these possible errors. For instance, an error must be detected on
+--     at least one of the lines labeled POSSIBLE ERROR: [Set1] for an
+--     implementation to pass.
+--
+-- CHANGE HISTORY:
+--     11 Jan 12   SWB     Initial pre-release version.
+--     30 Jan 12   SWB     Restructured test to have main subprogram.
+--     25 Apr 14   RLB     Changes to issue in ACATS 4.0; reorganized test
+--                         cases and added several additional test cases.
+--     22 Apr 21   RLB     Added error location indicators, and set error
+--                         tags for freezing checks.
+--!
+
+procedure BD11001 is
+
+    package Pkg0 is
+        Default_Vector_Element_Value : constant := 123;
+    end Pkg0;
+
+    package Pkg1 is
+        -- Use clause subtest:
+        use Pkg0;
+
+        type Bad_Vector is array (Positive range <>) of Integer with
+          Default_Component_Value => 
+              Default_Vector_Element_Value;  -- POSSIBLE ERROR: [Set1] {2:11;1}
+        type Good_Vector is array (Positive range <>) of Integer with
+          Default_Component_Value => 
+              Default_Vector_Element_Value;  -- OK. {1:11;1}
+
+        Bad_Freezer : constant Bad_Vector := 
+                              (1, 2, 3);  -- POSSIBLE ERROR: (A) [Set1] {1:9;1}
+         -- Name "Default_Vector_Element_Value" does not resolve to
+         -- the same entity here as it does at the end of Pkg1.
+
+        Default_Vector_Element_Value : constant := 
+                                 456;     -- POSSIBLE ERROR: (A) [Set1] {1:9;1}
+
+        Good_Freezer : constant Good_Vector := (1, 2, 3);
+
+        Some_Value : constant := 12;
+
+        package Nested is
+           -- Direct visibility subtest:
+           type Bad_Int is range 0 .. 1000
+              with Default_Value => 
+                            Some_Value; -- POSSIBLE ERROR: (A) [Set2] {2:15;1} 
+           type Good_Int is range 0 .. 1000
+              with Default_Value => 
+                            Some_Value; -- OK. {1:15;1}
+
+           Bad_Freezer : constant Bad_Int :=
+                                  18;   -- POSSIBLE ERROR: (A) [Set2] {1:12;1} 
+              -- Name "Some_Value" does not resolve to
+              -- the same entity here as it does at the end of Pkg1.Nested.
+
+           Some_Value : constant := 52; -- POSSIBLE ERROR: (A) [Set2] {12;1}
+
+           Good_Freezer : constant Good_Int := 26;
+        end Nested;
+    end Pkg1;
+
+    package Pkg2 is
+        Integer_Variable : Integer := 1
+           with Dynamic_Predicate => 
+                            Integer_Variable /= 0;       -- ERROR: (B) {2:12;1}
+             -- Not an aspect of an object.
+
+        package Nested is
+            type Priv is private
+               with Default_Component_Value => 123;      -- ERROR: (B) {1:16;1}
+             -- Not an aspect of a private type.
+        private
+            type Priv is array (Character) of Integer;
+        end Nested;
+
+        type Bad_Flags is array (1 .. 32) of Boolean
+           with Pack => True, Size => 32,
+                Component_Size => 1, Pack => True;       -- ERROR: (C) {1:12;1}
+            -- Aspect "Pack" specified more than once.
+
+        type Good_Flags is array (1 .. 32) of Boolean
+           with Size => 32, Component_Size => 1, Pack;   -- OK. {1:12;1}
+
+        procedure Proc (A, B : Natural)
+           with Pre => A > 10,
+                Pre => B > A;                            -- ERROR: (C) {1:12;1}
+            -- Aspect "Pre" specified more than once.
+
+        subtype Large_Even is Natural
+           with Dynamic_Predicate => Large_Even mod 2 = 0,
+                Dynamic_Predicate => Large_Even >= 10000;-- ERROR: (C) {1:12;1}
+    end Pkg2;
+
+    package body Pkg2 is
+        procedure Proc (A, B : Natural) is
+        begin
+            null;
+        end Proc;
+    end Pkg2;
+
+    package Pkg3 is
+        type Bad_Predicate is new Integer
+           with Dynamic_Predicate;                       -- ERROR: (D) {1:12;1}
+
+        type Bad_Value is digits 3
+           with Default_Value;                           -- ERROR: (D) {1:12;1}
+
+        type Bad_Access is access Natural
+           with Storage_Size;                            -- ERROR: (D) {1:12;1}
+
+        function Foo (A, B : Natural) return Natural
+           with Convention;                              -- ERROR: (D) {1:12;1}
+
+        type Has_Untagged_View is private;
+
+        procedure Primitive_Op
+          (X : Has_Untagged_View; A, B : Integer)
+           with Pre'Class => A <= B;                     -- ERROR: (E) {2:12;1}
+           -- Must be a primitive operation of a tagged type.
+
+        type Untagged_Type is private
+           with Type_Invariant'Class => True;            -- ERROR: (E) {1:12;1}
+
+    private
+        type Has_Untagged_View is tagged null record;
+
+        type Untagged_Type is null record;
+    end Pkg3;
+
+    package body Pkg3 is
+        procedure Primitive_Op
+          (X : Has_Untagged_View; A, B : Integer) is null;
+
+        function Foo (A, B : Natural) return Natural is
+        begin
+           return A + B;
+        end Foo;
+    end Pkg3;
+
+    package Pkg4 is
+        procedure Overloaded (X : Integer);
+        procedure Overloaded (X, Y : Integer);
+        procedure Unary (Z : Integer) renames Overloaded
+           with Inline;                                  -- ERROR: (F) {1:12;1}
+           -- No language-defined aspects allowed on renames.
+
+        procedure Any  (N : Natural);
+        procedure Even (N : Natural) renames Any
+           with Pre => N mod 2 = 0;                      -- ERROR: (F) {1:12;1}
+
+        generic
+           type Formal_Array_Type is array (Character) of Boolean
+              with Pack;                                 -- ERROR: (F) {1:15;1}
+              -- Most language-defined aspects not allowed on a formal type.
+        package Generic_Pkg is
+        end Generic_Pkg;
+    end Pkg4;
+
+    package body Pkg4 is
+        procedure Overloaded (X : Integer) is null;
+        procedure Overloaded (X, Y : Integer) is null;
+        procedure Any  (N : Natural) is
+        begin
+            null;
+        end Any;
+    end Pkg4;
+
+    package Pkg5 is
+        type Enum is (Aaa, Bbb, Ccc)
+           with Unrecognized_Aspect_Name_Xyzzy => True;  -- ERROR: (B) {12;1}
+              -- This doesn't identify any aspect.
+    end Pkg5;
+
+    package Pkg6 is
+        type Priv is tagged private;
+        procedure Prim1 (A : in out Priv);
+        procedure Prim2 (B : in out Priv);
+        function Prim3 (C : in Priv) return Natural;
+    private
+        type Priv is tagged record
+           I : Integer;
+        end record;
+    end Pkg6;
+
+    package body Pkg6 is
+        procedure Prim1 (A : in out Priv)
+           with Pre => A.I >= 0 is                       -- ERROR: (G) {1:12;1}
+        begin
+           A.I := A.I / 2;
+        end Prim1;
+
+        procedure Prim2 (B : in out Priv) is null
+           with Post'Class => B.I = B'Old.I;             -- ERROR: (G) {1:12;1}
+           -- Null subprogram acting as a completion.
+
+        function Prim3 (C : in Priv) return Natural is (C.I)
+           with Post => C'Old.I = Prim3'Result;          -- ERROR: (G) {1:12;1}
+           -- Expression function acting as a completion.
+
+    end Pkg6;
+
+begin
+    null;
+end BD11001;

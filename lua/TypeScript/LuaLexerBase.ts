@@ -2,8 +2,8 @@ import { CommonToken, Lexer, CharStream, Token } from "antlr4";
 import LuaLexer from './LuaLexer';
 
 export default abstract class LuaLexerBase extends Lexer {
-    start_line: number;
-    start_col: number;
+    start_line: number = 0;
+    start_col: number = 0;
 
     constructor(input: CharStream) {
         super(input);

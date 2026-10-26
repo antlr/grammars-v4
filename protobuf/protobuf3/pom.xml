@@ -41,6 +41,7 @@
 					<entryPoint>proto</entryPoint>
 					<grammarName>Protobuf3</grammarName>
 					<packageName></packageName>
+					<testFileExtension>.proto</testFileExtension>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
 				<executions>

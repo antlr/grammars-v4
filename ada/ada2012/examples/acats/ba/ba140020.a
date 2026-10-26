@@ -1,0 +1,145 @@
+-- BA140020.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--    The ACAA has created and maintains the Ada Conformity Assessment Test
+--    Suite for the purpose of conformity assessments conducted in accordance
+--    with the International Standard ISO/IEC 18009 - Ada: Conformity
+--    assessment of a language processor. This test suite should not be used
+--    to make claims of conformance unless used in accordance with
+--    ISO/IEC 18009 and any applicable ACAA procedures.
+--
+--*
+--
+-- OBJECTIVE:
+--    Check that a compilation unit is illegal if it depends on an earlier
+--    version of itself. Part 2: private with.
+--
+-- TEST DESCRIPTION:
+--    This checks the last portion of 10.1.4(5). This rule essentially says
+--    that a compilation unit cannot with itself, directly or indirectly.
+--
+--    As is usual for clause 10 tests, the source files after the first
+--    represent later edits of the source code by the programmer. Test
+--    scripts need to take care that the files are presented to the compiler
+--    one at a time, not all at the same time.
+--
+--    We test mostly specifications that don't require bodies, but we use
+--    subprogram bodies to ensure that replacement is not involved. Note that
+--    there is no significant use for a private with on a subprogam
+--    specification (of any kind), a renames or a generic instantiation
+--    so we don't test such cases.
+--
+-- TEST FILES:
+--      This test consists of the following files:
+--      -> BA140020.A
+--         BA140021.A
+--         BA140022.A
+--         BA140023.A
+--         BA140024.A
+--         BA140025.A
+--         BA140026.A
+--         BA140027.A
+--
+-- PASS/FAIL CRITERIA:
+--      Files BA140021.A, BA140022.A, BA140023.A, BA140024.A, BA140025.A,
+--      BA140026.A, and BA140027.A contain errors. All errors in these files
+--      must be detected to pass the test.
+--      Compiling the generic subprogram body BA14002H is optional.
+--
+-- CHANGE HISTORY:
+--    15 Feb 2018  RLB  Created test from test BA14001.
+--
+--!
+
+package BA14002A is
+   A : Natural;
+end BA14002A;
+
+----
+
+generic
+package BA14002B is
+   B : Natural;
+end BA14002B;
+
+---
+
+package BA14002A.Child is
+   A : Natural;
+end BA14002A.Child;
+
+---
+
+package BA14002C is
+   C : Natural;
+end BA14002C;
+
+---
+
+procedure BA14002D is
+begin
+   null;
+end BA14002D;
+
+---
+
+generic
+package BA14002E is
+   G : Natural;
+end BA14002E;
+
+---
+
+generic
+procedure BA14002H;
+
+---
+
+package BA14002A.Son is
+   R : Natural;
+end BA14002A.Son;
+
+---
+
+package BA14002A.Daughter is
+   B : Natural;
+end BA14002A.Daughter;
+
+---
+
+-- Check for indirect dependence:
+
+package BA14002J is
+   R : Natural := 0;
+end BA14002J;
+
+private with BA14002J;
+package BA14002K is
+   D : Natural := 0;
+private
+   F : Natural := BA14002J.R;
+end BA14002K;
+

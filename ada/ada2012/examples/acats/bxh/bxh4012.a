@@ -1,0 +1,103 @@
+-- BXH4012.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE
+--     Check pragma Restrictions.
+--     Check that the application of the configuration pragma Restrictions
+--     with the specific restriction:
+--       No_IO
+--     rejects any semantic dependence on Sequential_IO, Direct_IO, Text_IO,
+--     Wide_Text_IO or Stream_IO.
+--
+-- TEST DESCRIPTION
+--     The test requires that the configuration pragma
+--     Restrictions(No_IO) be processed.  Semantic dependence on any of the
+--     predefined IO packages should be disallowed.
+--     Specifically, Sequential_IO, Direct_IO, Text_IO, Wide_Text_IO and
+--     Stream_IO.  The test checks for both the Text_IO and Ada.Text_IO forms.
+--
+-- APPLICABILITY CRITERIA:
+--      This test is only applicable for a compiler attempting validation
+--      for the Safety and Security Annex.
+--
+-- SPECIAL REQUIREMENTS
+--      The implementation must process a configuration pragma which is not
+--      part of any Compilation Unit; the method employed is implementation
+--      defined.
+--
+--
+-- CHANGE HISTORY:
+--      26 OCT 95   SAIC   Initial version
+--
+--!
+
+---------------------------- CONFIGURATION PRAGMAS -----------------------
+
+pragma Restrictions(No_IO);                                       -- OK
+                                                -- configuration pragma
+
+------------------------ END OF CONFIGURATION PRAGMAS --------------------
+------------------------------------------------------------------- BXH4012
+
+with Sequential_IO;                                               -- ERROR:
+                                     -- pragma Restrictions(No_IO) in force
+
+with Direct_IO;                                                   -- ERROR:
+                                     -- pragma Restrictions(No_IO) in force
+
+with Text_IO;                                                     -- ERROR:
+                                     -- pragma Restrictions(No_IO) in force
+
+package BXH4012_0 is
+
+  type Holder is (Up, Down);
+
+end BXH4012_0;
+
+------------------------------------------------------------------- BXH4012
+
+with Ada.Sequential_IO;                                           -- ERROR:
+                                     -- pragma Restrictions(No_IO) in force
+
+with Ada.Direct_IO;                                               -- ERROR:
+                                     -- pragma Restrictions(No_IO) in force
+
+with Ada.Text_IO;                                                 -- ERROR:
+                                     -- pragma Restrictions(No_IO) in force
+
+with Ada.Wide_Text_IO;                                            -- ERROR:
+                                     -- pragma Restrictions(No_IO) in force
+
+with Ada.Streams.Stream_IO;                                       -- ERROR:
+                                     -- pragma Restrictions(No_IO) in force
+
+
+procedure BXH4012 is
+
+begin  -- Main test procedure.
+
+  null;
+
+end BXH4012;

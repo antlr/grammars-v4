@@ -1,0 +1,14 @@
+GET "libhdr"
+
+GLOBAL { count : 200 }
+
+LET countdown(n) BE
+{ count := n
+  count := count - 1 REPEATUNTIL count = 0
+  TEST count = 0 THEN writes("done*n") ELSE writes("oops*n")
+}
+
+LET start() = VALOF
+{ countdown(5)
+  RESULTIS 0
+}

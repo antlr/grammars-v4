@@ -885,7 +885,7 @@ localClassOrInterfaceDeclaration
 // --------------
 
 localVariableDeclaration
-    : variableModifier* localVariableType variableDeclaratorList?
+    : variableModifier* localVariableType variableDeclaratorList
     ;
 
 localVariableType

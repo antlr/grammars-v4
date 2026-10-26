@@ -2380,6 +2380,25 @@
   ]
  },
  {
+  "name": "Miniscript",
+  "lexer": "",
+  "parser": "https://raw.githubusercontent.com/antlr/grammars-v4/master/miniscript/Miniscript.g4",
+  "start": "miniscript",
+  "example": [
+   "basic.ms",
+   "descriptor-keys.ms",
+   "digit-only-hash.ms",
+   "multisig.ms",
+   "operators.ms",
+   "sugar.ms",
+   "taproot.ms",
+   "threshold-single.ms",
+   "threshold.ms",
+   "uncompressed-key.ms",
+   "wrappers.ms"
+  ]
+ },
+ {
   "name": "modelica",
   "lexer": "",
   "parser": "https://raw.githubusercontent.com/antlr/grammars-v4/master/modelica/modelica.g4",

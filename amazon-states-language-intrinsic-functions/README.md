@@ -1,4 +1,4 @@
-# Amazon States Language Intrinsic Functions ANTLR4 Grammar
+# Amazon States Language Intrinsic Functions Grammar
 
 The ANTLR4 grammar for the Intrinsic Functions of Amazon States Language (ASL), initially developed by 
 [LocalStack](github.com/localstack/localstack).
@@ -24,7 +24,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ```
 
-## Links
+## Reference
 
 * [LocalStack](https://github.com/localstack/localstack) - LocalStack, the project 
 that developed the grammar and an Amazon States Language interpreter.

@@ -34,7 +34,9 @@ SELECT SPLIT(C1,';') FROM T1;
 SELECT SPLIT_PART(C1,';',1) FROM T1;
 SELECT C1 FROM T1 WHERE NOT C2;
 SELECT C1, LAG(C1) OVER (PARTITION BY C2);
+SELECT C1, LAG(C1, 3) OVER (PARTITION BY C2);
 SELECT C1, LEAD(C1,1,2) OVER (PARTITION BY C2);
+SELECT C1, LEAD(C1, 2) OVER (PARTITION BY C2);
 SELECT NVL2(C1, 1, 2);
 SELECT * FROM monthly_sales PIVOT(SUM(amount) FOR MONTH IN ('JAN', 'FEB', 'MAR', 'APR')) AS p (EMP_ID_renamed, JAN, FEB, MAR, APR) ORDER BY EMP_ID_renamed;
 SELECT * FROM monthly_sales PIVOT(SUM(amount) FOR MONTH IN ('JAN', 'FEB', 'MAR', 'APR')) AS p ORDER BY EMP_ID_renamed;
@@ -140,3 +142,44 @@ select * from t2;
 select * from t1
 union by name
 select * from t2;
+
+select *
+from t
+where c1 is distinct from c2;
+
+select *
+from t
+where c1 is not distinct from c2;
+
+show warehouses
+->> select * from $1;
+
+SELECT 0 as c
+->> SELECT c FROM $1
+->> SELECT c FROM $2
+->> SELECT c FROM $3;
+
+SELECT * FROM t PIVOT(SUM(amount) FOR quarter IN (ANY ORDER BY c1 desc)) ORDER BY empid;
+SELECT * FROM t PIVOT(SUM(amount) FOR quarter IN (ANY));
+SELECT * FROM t PIVOT(SUM(amount) FOR quarter IN (
+      SELECT DISTINCT quarter
+        FROM t2
+        WHERE television = TRUE
+        ORDER BY quarter))
+  ORDER BY empid;
+  SELECT * FROM t PIVOT(SUM(amount) FOR quarter IN (ANY) DEFAULT ON NULL (IFF(c3 % 2 = 0 ,1,-1)));
+
+WITH LOCATION as ( SELECT 1 as LOCATION)
+SELECT LOCATION.LOCATION as LOCATION
+FROM LOCATION;
+
+SELECT COUNT(accounts.account_id) FROM accounts;
+SELECT accounts.name FROM db1.public.accounts AS accounts WHERE accounts.id > 0;
+
+SELECT geo, origin, returns, suspended, system, transactions FROM t;
+SELECT COUNT(transactions.id), SUM(transactions.amount) FROM db1.public.transactions AS transactions;
+SELECT returns.order_id, origin.name AS origin FROM returns JOIN origin ON returns.origin_id = origin.id;
+SELECT geo.name, IFF(geo.suspended, 'off', 'on') AS state FROM geo WHERE geo.region = 'EU';
+SELECT system.id FROM system;
+SELECT * FROM t SAMPLE SYSTEM (10);
+SELECT * FROM t AS system TABLESAMPLE SYSTEM (10) SEED (42);
