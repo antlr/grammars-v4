@@ -2567,13 +2567,14 @@ INTRODUCER: '_';
 
 SINGLE_LINE_COMMENT : '--' ~('\r' | '\n')* NEWLINE_EOF -> channel(HIDDEN);
 MULTI_LINE_COMMENT  : '/*' .*? '*/'                    -> channel(HIDDEN);
+// SQL*Plus separates a command word from its arguments with a space or a tab.
 // https://docs.oracle.com/cd/E11882_01/server.112/e16604/ch_twelve034.htm#SQPUG054
 REMARK_COMMENT:
-    'REM' {this.IsNewlineAtPos(-4)}? 'ARK'? (' ' ~('\r' | '\n')*)? NEWLINE_EOF -> channel(HIDDEN)
+    'REM' {this.IsNewlineAtPos(-4)}? 'ARK'? ([ \t] ~('\r' | '\n')*)? NEWLINE_EOF -> channel(HIDDEN)
 ;
 
 // https://docs.oracle.com/cd/E11882_01/server.112/e16604/ch_twelve032.htm#SQPUG052
-PROMPT_MESSAGE: 'PRO' {this.IsNewlineAtPos(-4)}? 'MPT'? (' ' ~('\r' | '\n')*)? NEWLINE_EOF;
+PROMPT_MESSAGE: 'PRO' {this.IsNewlineAtPos(-4)}? 'MPT'? ([ \t] ~('\r' | '\n')*)? NEWLINE_EOF;
 
 REGULAR_ID: SIMPLE_LETTER (SIMPLE_LETTER | '$' | '_' | '#' | [0-9])*;
 
