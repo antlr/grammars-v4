@@ -20,6 +20,19 @@ bool PlSqlParserBase::isSolidusSeparator() {
     return true;
 }
 
+bool PlSqlParserBase::isLineStart() {
+    auto* stream = dynamic_cast<antlr4::CommonTokenStream*>(getTokenStream());
+    auto* token = stream->LT(1);
+    if (token == nullptr)
+        return false;
+
+    auto* prev = stream->LT(-1);
+    if (prev == nullptr || prev->getType() == antlr4::Token::EOF)
+        return true;
+
+    return prev->getLine() < token->getLine();
+}
+
 bool PlSqlParserBase::IsNotNumericFunction() {
     auto* stream = dynamic_cast<antlr4::CommonTokenStream*>(getTokenStream());
     auto* lt1 = stream->LT(1);

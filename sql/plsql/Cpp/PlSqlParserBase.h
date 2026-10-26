@@ -26,6 +26,9 @@ class PlSqlParserBase : public antlr4::Parser
 
     bool isSolidusSeparator();
 
+    // True when the current token is the first significant token on its line.
+    bool isLineStart();
+
     bool isVersion12()
     {
         return _isVersion12;
