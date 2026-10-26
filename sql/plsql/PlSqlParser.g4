@@ -1296,9 +1296,9 @@ dim_by_clause
 
 dim_key
     : dim_ref classification_clause* KEY (
-        '(' (a = id_expression '.')? f = column_name (',' (a = id_expression '.')? f = column_name)* ')'
-        | (a = id_expression '.')? f = column_name
-    ) REFERENCES DISTINCT? ('(' attribute_name (',' attribute_name) ')' | attribute_name) HIERARCHIES '(' hier_ref (
+        '(' (a += id_expression '.')? f += column_name (',' (a += id_expression '.')? f += column_name)* ')'
+        | (a += id_expression '.')? f += column_name
+    ) REFERENCES DISTINCT? ('(' attribute_name (',' attribute_name)* ')' | attribute_name) HIERARCHIES '(' hier_ref (
         ',' hier_ref
     )* ')'
     ;
