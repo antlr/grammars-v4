@@ -4962,16 +4962,12 @@ subquery
     : query_statement
     ;
 
+// expr already covers IS, IN, LIKE/ILIKE, RLIKE and LIKE ANY; listing them here too made predicate ambiguous with its bare expr alternative.
+// For the same reason the quantified-subquery comparison is an optional suffix of that alternative rather than an alternative of its own.
 predicate
     : EXISTS LR_BRACKET subquery RR_BRACKET
-    | expr comparison_operator (ALL | SOME | ANY) '(' subquery ')'
     | expr NOT? BETWEEN expr AND expr
-    | expr NOT? IN '(' (subquery | expr_list) ')'
-    | expr NOT? (LIKE | ILIKE) expr (ESCAPE expr)?
-    | expr NOT? RLIKE expr
-    | expr NOT? (LIKE | ILIKE) ANY LR_BRACKET expr (COMMA expr)* RR_BRACKET (ESCAPE expr)?
-    | expr IS null_not_null
-    | expr
+    | expr (comparison_operator (ALL | SOME | ANY) LR_BRACKET subquery RR_BRACKET)?
     ;
 
 where_clause
