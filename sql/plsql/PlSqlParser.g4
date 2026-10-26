@@ -5048,15 +5048,29 @@ role_identified_clause
     ;
 
 alter_table
-    : ALTER TABLE tableview_name memoptimize_read_write_clause* (
-        | alter_table_properties
-        | constraint_clauses
-        | column_clauses
-        | alter_table_partitioning
-        //TODO      | alter_external_table
-        | move_table_clause
-        | modify_to_partitioned
-    ) ((enable_disable_clause | enable_or_disable (TABLE LOCK | ALL TRIGGERS))+)?
+    : ALTER TABLE tableview_name (
+        memoptimize_read_write_clause+ alter_table_body?
+        | alter_table_body
+    )
+    ;
+
+alter_table_body
+    : alter_table_action enable_disable_clauses?
+    | enable_disable_clauses
+    ;
+
+alter_table_action
+    : alter_table_properties
+    | constraint_clauses
+    | column_clauses
+    | alter_table_partitioning
+    //TODO      | alter_external_table
+    | move_table_clause
+    | modify_to_partitioned
+    ;
+
+enable_disable_clauses
+    : (enable_disable_clause | enable_or_disable (TABLE LOCK | ALL TRIGGERS))+
     ;
 
 memoptimize_read_write_clause
