@@ -39,7 +39,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>start</entryPoint>
+					<entryPoint>program</entryPoint>
 					<grammarName>l</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>

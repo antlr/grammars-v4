@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 grammar l;
 
-start
+program
    : series
    | statement
    ;
@@ -85,15 +85,15 @@ secondary
    ;
 
 subExpression
-   : '(' start ')'
+   : '(' program ')'
    ;
 
 record
-   : '{' start '}'
+   : '{' program '}'
    ;
 
 block
-   : '[' start ']'
+   : '[' program ']'
    ;
 
 name
