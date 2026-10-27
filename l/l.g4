@@ -59,7 +59,6 @@ expression
 apply
    : adjacentApply
    | dotApply
-   | spacedApply
    ;
 
 adjacentApply
@@ -70,11 +69,6 @@ adjacentApply
 dotApply
    : secondary '.' secondary
    | dotApply '.' secondary
-   ;
-
-spacedApply
-   : tertiary SPACE tertiary
-   | spacedApply SPACE tertiary
    ;
 
 primary
@@ -88,11 +82,6 @@ primary
 secondary
    : adjacentApply
    | primary
-   ;
-
-tertiary
-   : dotApply
-   | secondary
    ;
 
 subExpression
@@ -123,15 +112,11 @@ integer
    ;
 
 string
-   : '`' CHARACTERS '`'
+   : STRING
    ;
 
 symbol
    : '\'' name
-   ;
-
-comment
-   : '"' CHARACTERS '"'
    ;
 
 LETTERS
@@ -143,10 +128,18 @@ DIGITS
    ;
 
 SYMBOLS
-   : [!@#$%^&*()]
+   : [!@#$%^&*()+\-=<>/.,:;?]
    ;
 
-SPACE
-   : [ \t\r\n]
+STRING
+   : '`' ~'`'* '`'
+   ;
+
+COMMENT
+   : '"' ~'"'* '"' -> skip
+   ;
+
+WS
+   : [ \t\r\n]+ -> skip
    ;
 
