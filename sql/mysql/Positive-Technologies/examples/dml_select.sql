@@ -23,6 +23,7 @@ select * from `select` where `varchar` = 'abc \' ' and `varchar2` = '\'bca';
 #begin
 -- -- -- Number literal
 SELECT 1;
+SELECT 1.;
 select 1.e-3 as 123e;
 select del1.e123 as c from del1;
 select -1, 3e-2, 2.34E0;
@@ -31,6 +32,7 @@ SELECT .1e10;
 SELECT -.1e10;
 select 15e3, .2e5 as col1;
 select .2e3 c1, .2e-4 as c5;
+select * from tab where `field` = 1.;
 #end
 #begin
 -- -- -- Number float collision test
@@ -116,6 +118,8 @@ order by ship_power.ship_name;
 select * from t1 inner join (t1 as tt1, t2 as tt2) on t1.col1 = tt1.col1;
 select * from  (t1 as tt1, t2 as tt2) inner join t1 on t1.col1 = tt1.col1;
 select * from  t1 as tt1, t2 as tt2 inner join t1 on true;
+SELECT * FROM test_table_1 t1 LEFT JOIN test_table_2 t2 JOIN test_table_3 t3 ON t3.id=t2.id ON t1.id=t2.id;
+SELECT * FROM TABLE1 T1 STRAIGHT_JOIN TABLE2 T2 STRAIGHT_JOIN TABLE3 T3 ON T3.ID=T2.ID ON T1.ID=T2.ID;
 #end
 #begin
 -- where_condition test
@@ -131,6 +135,18 @@ select 1 as 123e;
 select CONVERT( LEFT( CONVERT( '自動下書き' USING binary ), 100 ) USING utf8 ) AS x_0;
 select CONVERT( LEFT( CONVERT( '自動' USING binary ), 6 ) USING utf8 ) AS x_0;
 select  t.*, tt.* FROM wptests_terms AS t  INNER JOIN wptests_term_taxonomy AS tt ON t.term_id = tt.term_id WHERE tt.taxonomy IN ('category') AND t.name IN ('远征手记') ORDER BY t.name ASC;
+#end
+#begin
+-- cast as integer
+SELECT CAST('1' AS INT);
+SELECT CAST('1' AS INTEGER);
+SELECT CAST('1' AS SIGNED INTEGER);
+SELECT CAST('1' AS UNSIGNED INTEGER);
+SELECT CAST('1' AS SIGNED INT);
+SELECT CAST('1' AS UNSIGNED INT);
+-- cast as decimal
+SELECT CAST('1' AS DECIMAL);
+SELECT CAST('1' AS DEC);
 #end
 #begin
 -- JSON functions
@@ -164,19 +180,36 @@ SELECT JSON_STORAGE_FREE(jcol), JSON_STORAGE_FREE(jcol) FROM jtable;
 SELECT o_id, JSON_ARRAYAGG(attribute) AS attributes FROM t3 GROUP BY o_id;
 SELECT o_id, JSON_OBJECTAGG(attribute, value) FROM t3 GROUP BY o_id;
 #end
+#begin
+-- VECTOR
+SELECT DISTANCE(b1, b2, "COSINE"), STRING_TO_VECTOR('[]'), VECTOR_DIM(b1), VECTOR_TO_STRING(b1) FROM a;
+#end
 SELECT trigger.num FROM test `trigger`;
 -- Valid when SELECT is in stored procedure
 SELECT * FROM test LIMIT LIMIT1,LIMIT2;
 -- SCHEMA as a function name
 SELECT SCHEMA();
 -- Functions
-SELECT mod(3,2);SELECT * FROM TEST WHERE TB_SCHEMA = SCHEMA();
+SELECT REPEAT('X',2);
+SELECT mod(3,2);
+SELECT * FROM TEST WHERE TB_SCHEMA = SCHEMA();
 -- Group By with computed column
 SELECT 1 AS col1, t1.Id FROM t1 GROUP BY col1;
 -- Non Aggregate Functions
 SELECT pk, LEAD(pk) OVER (ORDER BY pk) AS l;
 SELECT COALESCE(LAG(last_eq.end_variation) OVER (PARTITION BY eq.account_id, eq.execution_name_id, eq.currency ORDER BY eq.start_date), 0) AS start_variation FROM t1;
 -- Window Functions
+SELECT
+  year, country, product, profit,
+  SUM(profit) OVER() AS total_profit,
+  SUM(profit) OVER(PARTITION BY country) AS country_profit
+FROM sales
+  ORDER BY country, year, product, profit;
+SELECT
+  year, country, product, profit,
+  ROW_NUMBER() OVER(PARTITION BY country) AS row_num1,
+  ROW_NUMBER() OVER(PARTITION BY country ORDER BY year, product) AS row_num2
+FROM sales;
 SELECT
     e.id,
     SUM(e.bin_volume) AS bin_volume,
@@ -199,6 +232,21 @@ SELECT
 FROM table2
     WINDOW w AS (PARTITION BY id, bin_volume ORDER BY id ROWS UNBOUNDED PRECEDING),
            w2 AS (PARTITION BY id, bin_volume ORDER BY id DESC ROWS 10 PRECEDING);
+#begin
+-- https://dev.mysql.com/doc/refman/8.0/en/lateral-derived-tables.html
+SELECT
+  salesperson.name,
+  max_sale.amount,
+  max_sale.customer_name
+FROM
+  salesperson,
+  LATERAL
+  (SELECT amount, customer_name
+    FROM all_sales
+    WHERE all_sales.salesperson_id = salesperson.id
+    ORDER BY amount DESC LIMIT 1)
+  AS max_sale;
+#end
 -- Index hints: https://dev.mysql.com/doc/refman/5.7/en/index-hints.html
 SELECT * FROM table1 USE INDEX (col1_index,col2_index) WHERE col1=1 AND col2=2 AND col3=3;
 SELECT * FROM table1 FORCE INDEX (col1_index,col2_index) WHERE col1=1 AND col2=2 AND col3=3;
@@ -220,4 +268,19 @@ SELECT *
            NESTED PATH '$.b[*]' COLUMNS (b INT PATH '$')
          )
         ) AS tt;
+SELECT !(1 + @sum:=1) AS ss;
+SELECT (@sum:=1 + 1) AS ss;
+SELECT 1 + @sum:=1 AS ss;
+SELECT 100 >> @sum:=1 AS ss;
+SELECT @sum:=1 < 100 AS ss;
+SELECT 100 and @sum:=1 AS ss;
+SELECT
+    @sum := @sum + column_name AS running_sum
+FROM
+    your_table,
+    (SELECT @sum := 0) AS init
+ORDER BY
+    some_order_column;
 
+--- statement is supported as the field name
+SELECT REPLACE(statement, ' ','') as statement from your_table;

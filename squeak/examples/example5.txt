@@ -1,0 +1,9 @@
+proc Roam(m, sel) =
+    < E?r . {highlight(r)}? . Roam(m, resel(r))
+    :: L?r . {lowlight(r)}? . Roam(m, -1)
+    :: UP? . {erasemenu(m)}? . RES!sel . Menu >
+
+proc Menu =
+    ARG?menu . {drawmenu(menu)}? . Roam(menu, -1)
+
+simpleMenu = Menu

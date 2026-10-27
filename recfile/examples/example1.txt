@@ -1,0 +1,20 @@
+# This is a recfile document.
+
+%rec: Texts
+%type: Year int
+
+Author: Doug McIlroy
+Year: 1964
+Note: The Origin of Unix Pipes
+
+Title: Unix Text Processing
+Author: Dale Dougherty
+Author: Tim O'Reilly
+Year: 1987
+Publisher: Hayden Books
+
+Author: William Shakespeare
+Title: Hamlet
+Year: 1599
+Year: 1600
+Year: 1601

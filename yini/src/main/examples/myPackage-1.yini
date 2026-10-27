@@ -1,0 +1,22 @@
+/*
+    Example 1 of a package yini - a more simpler version.
+*/
+
+^ myPackage
+name = "SomeName"
+description = "Some description of something."
+version = "1.8.4"
+authors = [
+    "Mark O. Smith",
+    "Gandalf Olórin, the Grey<something@domain.com>",
+    "Galadriel",
+]
+exclude = [
+    "build",
+    "docs",
+    "examples",
+    "packages",
+]
+
+^ devDependencies
+tester = "bin/tester@1.1.4"

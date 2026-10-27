@@ -1,0 +1,20 @@
+:NUM:       // set mode to NUM
+{0[+7]}      // set cell 0 to 7
+{1[+3]}      // set cell 1 to 3
+
+{2[+43]}     // set cell 2 to 43
+{3[+61]}     // set cell 3 to 61
+|0|         // print cell 0
+:ASC:
+|2|         // print cell 2 (+)
+:NUM:
+|1|         // print cell 1
+{0{         // while cell 0 is not 0
+  {0[-1]}   // subtract cell 0 by 1
+  {1[+1]}   // add 1 to cell 1
+}}          // end while
+:ASC:
+|3|         // print cell 3 (=)
+:NUM:
+|1|         // print cell 1 (10)
+

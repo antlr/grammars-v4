@@ -1,0 +1,12 @@
+PolicyStatement : [
+{
+  "Id" : "Policy7",
+  "Type": "O+",
+  "Who": "Manager",
+  "Action": ["APPROVE", "REJECT"],
+  "What" : {"Resource": "Requests"},
+  "Trigger" : "OnSubmit",
+  "Why" : "approval workflow",
+  "How" : "web portal"
+}
+]

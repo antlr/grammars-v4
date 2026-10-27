@@ -1,0 +1,18 @@
+digraph ATN {
+rankdir=LR;
+s9[fontsize=11, label="9", shape=doublecircle, fixedsize=true, width=.6];
+s816[fontsize=11,label="{&rarr;\n816\nd=3|{<p0>|<p1>|<p2>}}", shape=record, fixedsize=false, peripheries=1];
+s817[fontsize=11,label="&larr;\n817", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s8[fontsize=11,label="8", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s813[fontsize=11,label="813", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s814[fontsize=11,label="814", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s815[fontsize=11,label="815", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s8 -> s816 [fontname="Times-Italic", label="&epsilon;"];
+s816:p0 -> s813 [fontname="Times-Italic", label="&epsilon;"];
+s816:p1 -> s814 [fontname="Times-Italic", label="&epsilon;"];
+s816:p2 -> s815 [fontname="Times-Italic", label="&epsilon;"];
+s813 -> s817 [fontsize=11, fontname="Courier", arrowsize=.7, label = "Whitespace", arrowhead = normal];
+s814 -> s817 [fontsize=11, fontname="Courier", arrowsize=.7, label = "Comment", arrowhead = normal];
+s815 -> s817 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<token>", arrowhead = normal];
+s817 -> s9 [fontname="Times-Italic", label="&epsilon;"];
+}

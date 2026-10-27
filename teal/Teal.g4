@@ -1,4 +1,8 @@
 // Project: https://github.com/teal-language/tl
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar Teal;
 
 chunk
@@ -10,26 +14,26 @@ block
     ;
 
 stat
-    : ';'                                                                       # SemiStat
-    | varlist '=' explist                                                       # AssignStat
-    | functioncall                                                              # FuncCallStat
-    | label                                                                     # LabelStat
-    | 'break'                                                                   # BreakStat
-    | 'goto' NAME                                                               # GotoStat
-    | 'do' block 'end'                                                          # DoStat
-    | 'while' exp 'do' block 'end'                                              # WhileStat
-    | 'repeat' block 'until' exp                                                # RepeatStat
-    | 'if' exp 'then' block ('elseif' exp 'then' block)* ('else' block)? 'end'  # IfStat
-    | 'for' NAME '=' exp ',' exp (',' exp)? 'do' block 'end'                    # ForStat
-    | 'for' namelist 'in' explist 'do' block 'end'                              # ForInStat
-    | 'function' funcname funcbody                                              # FuncStat
-    | 'local' 'function' NAME funcbody                                          # LocalFuncStat
-    | 'local' attnamelist (':' typelist)? ('=' explist)?                        # LocalAttrAssignStat
-    | 'local' NAME '=' newtype                                                  # LocalNewTypeStat
-    | 'global' 'function' NAME funcbody                                         # GlobalFuncStat
-    | 'global' attnamelist ':' typelist                                         # GlobalAttrStat
-    | 'global' attnamelist (':' typelist)? '=' explist                          # GlobalAttrAssignStat
-    | 'global' NAME '=' newtype                                                 # GlobalAssignStat
+    : ';'                                                                      # SemiStat
+    | varlist '=' explist                                                      # AssignStat
+    | functioncall                                                             # FuncCallStat
+    | label                                                                    # LabelStat
+    | 'break'                                                                  # BreakStat
+    | 'goto' NAME                                                              # GotoStat
+    | 'do' block 'end'                                                         # DoStat
+    | 'while' exp 'do' block 'end'                                             # WhileStat
+    | 'repeat' block 'until' exp                                               # RepeatStat
+    | 'if' exp 'then' block ('elseif' exp 'then' block)* ('else' block)? 'end' # IfStat
+    | 'for' NAME '=' exp ',' exp (',' exp)? 'do' block 'end'                   # ForStat
+    | 'for' namelist 'in' explist 'do' block 'end'                             # ForInStat
+    | 'function' funcname funcbody                                             # FuncStat
+    | 'local' 'function' NAME funcbody                                         # LocalFuncStat
+    | 'local' attnamelist (':' typelist)? ('=' explist)?                       # LocalAttrAssignStat
+    | 'local' NAME '=' newtype                                                 # LocalNewTypeStat
+    | 'global' 'function' NAME funcbody                                        # GlobalFuncStat
+    | 'global' attnamelist ':' typelist                                        # GlobalAttrStat
+    | 'global' attnamelist (':' typelist)? '=' explist                         # GlobalAttrAssignStat
+    | 'global' NAME '=' newtype                                                # GlobalAssignStat
     ;
 
 attnamelist
@@ -47,8 +51,12 @@ typ
     ;
 
 basetype
-    : 'string' | 'boolean' | 'nil' | 'number'
-    | '{' typ '}' | '{' typ ':' typ '}'
+    : 'string'
+    | 'boolean'
+    | 'nil'
+    | 'number'
+    | '{' typ '}'
+    | '{' typ ':' typ '}'
     | 'function' functiontype
     | NAME typeargs?
     ;
@@ -63,13 +71,13 @@ retlist
     ;
 
 typeargs
-    : '<' NAME (',' NAME )* '>'
+    : '<' NAME (',' NAME)* '>'
     ;
 
 newtype
-    : 'record' typeargs? ('{' typ '}')? (NAME '=' newtype)* (NAME ':' typ)* 'end'   # RecordNewType
-    | 'enum' str* 'end'                                                             # EnumNewType
-    | 'functiontype' functiontype                                                   # FuncNewType
+    : 'record' typeargs? ('{' typ '}')? (NAME '=' newtype)* (NAME ':' typ)* 'end' # RecordNewType
+    | 'enum' str* 'end'                                                           # EnumNewType
+    | 'functiontype' functiontype                                                 # FuncNewType
     ;
 
 functiontype
@@ -93,7 +101,7 @@ parname
     ;
 
 retstat
-    : 'return' explist? ';'?                                                    # ReturnStat
+    : 'return' explist? ';'? # ReturnStat
     ;
 
 label
@@ -117,7 +125,9 @@ explist
     ;
 
 exp
-    : 'nil' | 'false' | 'true'
+    : 'nil'
+    | 'false'
+    | 'true'
     | number
     | str
     | '...'
@@ -125,11 +135,11 @@ exp
     | prefixexp
     | tableconstructor
     | exp 'as' typ
-    | <assoc=right>  exp operatorPower exp
+    | <assoc = right> exp operatorPower exp
     | operatorUnary exp
     | exp operatorMulDivMod exp
     | exp operatorAddSub exp
-    | <assoc=right> exp operatorStrcat exp
+    | <assoc = right> exp operatorStrcat exp
     | exp operatorComparison exp
     | NAME 'is' typ
     | exp operatorAnd exp
@@ -146,7 +156,8 @@ functioncall
     ;
 
 varOrExp
-    : variable | '(' exp ')'
+    : variable
+    | '(' exp ')'
     ;
 
 // we rename `var` to `variable` because of keyword `var`
@@ -163,7 +174,9 @@ nameAndArgs
     ;
 
 args
-    : '(' explist? ')' | tableconstructor | str
+    : '(' explist? ')'
+    | tableconstructor
+    | str
     ;
 
 functiondef
@@ -175,8 +188,10 @@ funcbody
     ;
 
 parlist
-    : namelist (',' '...')? | '...'
-    | parnamelist (',' '...' (':' typ)?)? | '...' (':' typ)?
+    : namelist (',' '...')?
+    | '...'
+    | parnamelist (',' '...' (':' typ)?)?
+    | '...' (':' typ)?
     ;
 
 tableconstructor
@@ -188,49 +203,80 @@ fieldlist
     ;
 
 field
-    : '[' exp ']' '=' exp                           # BracketAssginField
-    | NAME (':' typ)? '=' exp                       # AssignField
-    | NAME '=' newtype                              # AssignNewTypeField
-    | exp                                           # ExprField
+    : '[' exp ']' '=' exp     # BracketAssginField
+    | NAME (':' typ)? '=' exp # AssignField
+    | NAME '=' newtype        # AssignNewTypeField
+    | exp                     # ExprField
     ;
 
 fieldsep
-    : ',' | ';'
+    : ','
+    | ';'
     ;
 
 operatorOr
-	: 'or';
+    : 'or'
+    ;
 
 operatorAnd
-	: 'and';
+    : 'and'
+    ;
 
 operatorComparison
-	: '<' | '>' | '<=' | '>=' | '~=' | '==';
+    : '<'
+    | '>'
+    | '<='
+    | '>='
+    | '~='
+    | '=='
+    ;
 
 operatorStrcat
-	: '..';
+    : '..'
+    ;
 
 operatorAddSub
-	: '+' | '-';
+    : '+'
+    | '-'
+    ;
 
 operatorMulDivMod
-	: '*' | '/' | '%' | '//';
+    : '*'
+    | '/'
+    | '%'
+    | '//'
+    ;
 
 operatorBitwise
-	: '&' | '|' | '~' | '<<' | '>>';
+    : '&'
+    | '|'
+    | '~'
+    | '<<'
+    | '>>'
+    ;
 
 operatorUnary
-    : 'not' | '#' | '-' | '~';
+    : 'not'
+    | '#'
+    | '-'
+    | '~'
+    ;
 
 operatorPower
-    : '^';
+    : '^'
+    ;
 
 number
-    : INT | HEX | FLOAT | HEX_FLOAT
+    : INT
+    | HEX
+    | FLOAT
+    | HEX_FLOAT
     ;
 
 str
-    : NORMALSTRING | CHARSTRING | LONGSTRING
+    : NORMALSTRING
+    | CHARSTRING
+    | LONGSTRING
     ;
 
 // LEXER
@@ -240,19 +286,18 @@ NAME
     ;
 
 NORMALSTRING
-    : '"' ( EscapeSequence | ~('\\'|'"') )* '"'
+    : '"' (EscapeSequence | ~('\\' | '"'))* '"'
     ;
 
 CHARSTRING
-    : '\'' ( EscapeSequence | ~('\''|'\\') )* '\''
+    : '\'' (EscapeSequence | ~('\'' | '\\'))* '\''
     ;
 
 LONGSTRING
     : '[' NESTED_STR ']'
     ;
 
-fragment
-NESTED_STR
+fragment NESTED_STR
     : '=' NESTED_STR '='
     | '[' .*? ']'
     ;
@@ -277,18 +322,15 @@ HEX_FLOAT
     | '0' [xX] HexDigit+ HexExponentPart
     ;
 
-fragment
-ExponentPart
+fragment ExponentPart
     : [eE] [+-]? Digit+
     ;
 
-fragment
-HexExponentPart
+fragment HexExponentPart
     : [pP] [+-]? Digit+
     ;
 
-fragment
-EscapeSequence
+fragment EscapeSequence
     : '\\' [abfnrtvz"'\\]
     | '\\' '\r'? '\n'
     | DecimalEscape
@@ -296,30 +338,25 @@ EscapeSequence
     | UtfEscape
     ;
 
-fragment
-DecimalEscape
+fragment DecimalEscape
     : '\\' Digit
     | '\\' Digit Digit
     | '\\' [0-2] Digit Digit
     ;
 
-fragment
-HexEscape
+fragment HexEscape
     : '\\' 'x' HexDigit HexDigit
     ;
 
-fragment
-UtfEscape
+fragment UtfEscape
     : '\\' 'u{' HexDigit+ '}'
     ;
 
-fragment
-Digit
+fragment Digit
     : [0-9]
     ;
 
-fragment
-HexDigit
+fragment HexDigit
     : [0-9a-fA-F]
     ;
 
@@ -329,13 +366,12 @@ COMMENT
     ;
 
 LINE_COMMENT
-    : '--'
-    (                                               // --
-    | '[' '='*                                      // --[==
-    | '[' '='* ~('='|'['|'\r'|'\n') ~('\r'|'\n')*   // --[==AA
-    | ~('['|'\r'|'\n') ~('\r'|'\n')*                // --AAA
-    ) ('\r\n'|'\r'|'\n'|EOF)
-    -> channel(HIDDEN)
+    : '--' (
+        // --
+        | '[' '='*                                            // --[==
+        | '[' '='* ~('=' | '[' | '\r' | '\n') ~('\r' | '\n')* // --[==AA
+        | ~('[' | '\r' | '\n') ~('\r' | '\n')*                // --AAA
+    ) ('\r\n' | '\r' | '\n' | EOF) -> channel(HIDDEN)
     ;
 
 WS
@@ -343,6 +379,5 @@ WS
     ;
 
 SHEBANG
-    : '#' '!' ~('\n'|'\r')* -> channel(HIDDEN)
+    : '#' '!' ~('\n' | '\r')* -> channel(HIDDEN)
     ;
-

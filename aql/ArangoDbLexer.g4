@@ -21,123 +21,133 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine true, allowShortBlocksOnASingleLine true, minEmptyLines 0, alignSemicolons ownLine
+// $antlr-format alignColons trailing, singleLineOverrulesHangingColon true, alignLexerCommands true, alignLabels true, alignTrailers true
+
 lexer grammar ArangoDbLexer;
 
-options { caseInsensitive = true; }
+options {
+    caseInsensitive = true;
+}
 
 //keywrods
-COLLECT:                  'COLLECT';
-FILTER:                   'FILTER';
-FOR:                      'FOR';
-INSERT:                   'INSERT';
-LET:                      'LET';
-LIMIT:                    'LIMIT';
-REMOVE:                   'REMOVE';
-REPLACE:                  'REPLACE';
-RETURN:                   'RETURN';
-SEARCH:                   'SEARCH';
-SORT:                     'SORT';
-UPDATE:                   'UPDATE';
-UPSERT:                   'UPSERT';
-WINDOW:                   'WINDOW';
-WITH:                     'WITH';
+COLLECT : 'COLLECT';
+FILTER  : 'FILTER';
+FOR     : 'FOR';
+INSERT  : 'INSERT';
+LET     : 'LET';
+LIMIT   : 'LIMIT';
+REMOVE  : 'REMOVE';
+REPLACE : 'REPLACE';
+RETURN  : 'RETURN';
+SEARCH  : 'SEARCH';
+SORT    : 'SORT';
+UPDATE  : 'UPDATE';
+UPSERT  : 'UPSERT';
+WINDOW  : 'WINDOW';
+WITH    : 'WITH';
 
-AGGREGATE:                'AGGREGATE';
-ALL:                      'ALL';
-AND:                      'AND';
-ANY:                      'ANY';
-ASC:                      'ASC';
-DESC:                     'DESC';
-DISTINCT:                 'DISTINCT';
-FALSE:                    'FALSE';
-GRAPH:                    'GRAPH';
-IN:                       'IN';
-INBOUND:                  'INBOUND';
-INTO:                     'INTO';
-K_PATHS:                  'K_PATHS';
-K_SHORTEST_PATHS:         'K_SHORTEST_PATHS';
-LIKE:                     'LIKE';
-NONE:                     'NONE';
-NOT:                      'NOT';
-NULL_:                    'NULL';
-OR:                       'OR';
-OUTBOUND:                 'OUTBOUND';
-SHORTEST_PATH:            'SHORTEST_PATH';
-TRUE:                     'TRUE';
+AGGREGATE        : 'AGGREGATE';
+ALL              : 'ALL';
+AND              : 'AND';
+ANY              : 'ANY';
+ASC              : 'ASC';
+DESC             : 'DESC';
+DISTINCT         : 'DISTINCT';
+FALSE            : 'FALSE';
+GRAPH            : 'GRAPH';
+IN               : 'IN';
+INBOUND          : 'INBOUND';
+INTO             : 'INTO';
+K_PATHS          : 'K_PATHS';
+K_SHORTEST_PATHS : 'K_SHORTEST_PATHS';
+LIKE             : 'LIKE';
+NONE             : 'NONE';
+NOT              : 'NOT';
+NULL_            : 'NULL';
+OR               : 'OR';
+OUTBOUND         : 'OUTBOUND';
+SHORTEST_PATH    : 'SHORTEST_PATH';
+TRUE             : 'TRUE';
 
-KEEP: 'KEEP';
-COUNT: 'COUNT';
-OPTIONS: 'OPTIONS';
-PRUNE: 'PRUNE';
-TO: 'TO';
+KEEP    : 'KEEP';
+COUNT   : 'COUNT';
+OPTIONS : 'OPTIONS';
+PRUNE   : 'PRUNE';
+TO      : 'TO';
 
 //case-sensitive:
 //CURRENT – available in array inline expressions
 //NEW     – available after INSERT / UPDATE / REPLACE / UPSERT operation
 //OLD     – available after UPDATE / REPLACE / UPSERT / REMOVE operation
-CURRENT options { caseInsensitive = false; }: 'CURRENT';
-NEW     options { caseInsensitive = false; }: 'NEW';
-OLD     options { caseInsensitive = false; }: 'OLD';
+CURRENT options {
+    caseInsensitive = false;
+}: 'CURRENT';
+NEW options {
+    caseInsensitive = false;
+}: 'NEW';
+OLD options {
+    caseInsensitive = false;
+}: 'OLD';
 
 DOCUMENT: 'DOCUMENT';
 
+SEMI  : ';';
+L_AND : '&&';
+L_OR  : '||';
+L_NOT : '!';
 
-SEMI: ';';
-L_AND: '&&';
-L_OR: '||';
-L_NOT: '!';
+EQ : '==';
+NE : '!=';
+LT : '<';
+LE : '<=';
+GT : '>';
+GE : '>=';
 
-EQ: '==';
-NE: '!=';
-LT: '<';
-LE: '<=';
-GT: '>';
-GE: '>=';
+PLUS  : '+';
+MINUS : '-';
+STAR  : '*';
+DIV   : '/';
+MOD   : '%';
 
-PLUS: '+';
-MINUS: '-';
-STAR: '*';
-DIV: '/';
-MOD: '%';
+QM    : '?';
+COLON : ':';
+RANGE : '..';
 
-QM: '?';
-COLON: ':';
-RANGE: '..';
+ASSIGN : '=';
+COMMA  : ',';
+SCOPE  : '::';
+ACCESS : '.';
 
-ASSIGN: '=';
-COMMA: ',';
-SCOPE: '::';
-ACCESS: '.';
+REGEX_MATCH     : '=~';
+REGEX_NON_MATCH : '!~';
 
-REGEX_MATCH: '=~';
-REGEX_NON_MATCH: '!~';
+LRB : '(';
+RRB : ')';
+LSB : '[';
+RSB : ']';
+LCB : '{';
+RCB : '}';
 
-LRB: '(';
-RRB: ')';
-LSB: '[';
-RSB: ']';
-LCB: '{';
-RCB: '}';
+WHITE_SPACE: [ \t\r\n]+ -> channel(HIDDEN);
 
-WHITE_SPACE                   : [ \t\r\n]+                   -> channel(HIDDEN);
+SQL_COMMENT  : '/*' (SQL_COMMENT | .)*? '*/' -> channel(HIDDEN);
+LINE_COMMENT : '//' ~[\r\n]*                 -> channel(HIDDEN);
 
-SQL_COMMENT                   : '/*' (SQL_COMMENT | .)*? '*/' -> channel(HIDDEN);
-LINE_COMMENT                  : '//' ~[\r\n]*                 -> channel(HIDDEN);
+ID                  : [A-Z_] [A-Z0-9_]*;
+BIND_PARAMETER      : '@' [A-Z0-9][A-Z0-9_]*;
+BIND_PARAMETER_COLL : '@@' [A-Z0-9][A-Z0-9_]*;
 
-ID                            : [A-Z_] ( [A-Z0-9_] )*;
-BIND_PARAMETER                : '@' [A-Z0-9][A-Z0-9_]*;
-BIND_PARAMETER_COLL           : '@@' [A-Z0-9][A-Z0-9_]*;
+STRING_LITERAL               : '\'' (~'\'' | '\'\'')* '\'';
+DOUBLE_QUOTED_STRING_LITERAL : '"' ~'"'+ '"';
+BACKSTICK_STRING_LITERAL     : '`' ~'`'+ '`';
 
-STRING_LITERAL                : '\'' (~'\'' | '\'\'')* '\'';
-DOUBLE_QUOTED_STRING_LITERAL  : '"' ~'"'+ '"';
-BACKSTICK_STRING_LITERAL      : '`' ~'`'+ '`';
+DECIMAL_LITERAL : DEC_DIGIT+;
+FLOAT_LITERAL   : DEC_DOT_DEC;
+REAL_LITERAL    : (DECIMAL_LITERAL | DEC_DOT_DEC) 'E' [+-]? DEC_DIGIT+;
 
-DECIMAL_LITERAL               : DEC_DIGIT+;
-FLOAT_LITERAL                 : DEC_DOT_DEC;
-REAL_LITERAL                  : (DECIMAL_LITERAL | DEC_DOT_DEC) ('E' [+-]? DEC_DIGIT+);
-
-
-fragment HexDigit             : [0-9a-f];
-fragment LETTER               : [A-Z_];
-fragment DEC_DOT_DEC          : (DEC_DIGIT+ '.' DEC_DIGIT+ |  '.' DEC_DIGIT+);
-fragment DEC_DIGIT            : [0-9];
+fragment HexDigit    : [0-9a-f];
+fragment LETTER      : [A-Z_];
+fragment DEC_DOT_DEC : DEC_DIGIT+ '.' DEC_DIGIT+ | '.' DEC_DIGIT+;
+fragment DEC_DIGIT   : [0-9];

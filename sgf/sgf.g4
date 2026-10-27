@@ -5,135 +5,166 @@
     See agpl-3.0.txt for legal details.
  */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar sgf;
 
-collection      :   gameTree+ EOF;
-gameTree        :   '(' sequence gameTree* ')';
-sequence        :   node+;
-node            :   ';' property_*;
-property_        :
-                    move
-                |   setup
-                |   nodeAnnotation
-                |   moveAnnotation
-                |   markup
-                |   root
-                |   gameInfo
-                |   timing
-                |   misc
-                |   loa
-                |   go_
-                |   privateProp
-                ;
+collection
+    : gameTree+ EOF
+    ;
 
-move            :
-                    COLOR (NONE | TEXT)
-                |   'KO' NONE
-                |   'MN' TEXT
-                ;
+gameTree
+    : '(' sequence gameTree* ')'
+    ;
 
-setup           :
-                    'AB' TEXT+
-                |   'AE' TEXT+
-                |   'AW' TEXT+
-                |   'PL' TEXT
-                ;
+sequence
+    : node+
+    ;
 
-nodeAnnotation  :
-                    'C'  TEXT
-                |   'DM' TEXT
-                |   'GB' TEXT
-                |   'GW' TEXT
-                |   'HO' TEXT
-                |   'N'  TEXT
-                |   'UC' TEXT
-                |   'V'  TEXT
-                ;
+node
+    : ';' property_*
+    ;
 
-moveAnnotation:
-                    'BM' TEXT
-                |   'DO' NONE
-                |   'IT' NONE
-                |   'TE' TEXT
-                ;
+property_
+    : move
+    | setup
+    | nodeAnnotation
+    | moveAnnotation
+    | markup
+    | root
+    | gameInfo
+    | timing
+    | misc
+    | loa
+    | go_
+    | privateProp
+    ;
 
-markup          :
-                    'AR' TEXT+
-                |   'CR' TEXT+
-                |   'DD' (NONE | TEXT+)
-                |   'LB' TEXT+
-                |   'LN' TEXT+
-                |   'MA' TEXT+
-                |   'SL' TEXT+
-                |   'SQ' TEXT+
-                |   'TR' TEXT+
-                ;
+move
+    : COLOR (NONE | TEXT)
+    | 'KO' NONE
+    | 'MN' TEXT
+    ;
 
-root            :   'AP' TEXT
-                |   'CA' TEXT
-                |   'FF' TEXT
-                |   'GM' TEXT
-                |   'ST' TEXT
-                |   'SZ' TEXT
-                ;
+setup
+    : 'AB' TEXT+
+    | 'AE' TEXT+
+    | 'AW' TEXT+
+    | 'PL' TEXT
+    ;
 
-gameInfo        :
-                    'AN' TEXT
-                |   'BR' TEXT
-                |   'BT' TEXT
-                |   'CP' TEXT
-                |   'DT' TEXT
-                |   'EV' TEXT
-                |   'GN' TEXT
-                |   'GC' TEXT
-                |   'ON' TEXT
-                |   'OT' TEXT
-                |   'PB' TEXT
-                |   'PC' TEXT
-                |   'PW' TEXT
-                |   'RE' TEXT
-                |   'RO' TEXT
-                |   'RU' TEXT
-                |   'SO' TEXT
-                |   'TM' TEXT
-                |   'US' TEXT
-                |   'WR' TEXT
-                |   'WT' TEXT
-                ;
+nodeAnnotation
+    : 'C' TEXT
+    | 'DM' TEXT
+    | 'GB' TEXT
+    | 'GW' TEXT
+    | 'HO' TEXT
+    | 'N' TEXT
+    | 'UC' TEXT
+    | 'V' TEXT
+    ;
 
-timing        :
-                    'BL' TEXT
-                |   'OB' TEXT
-                |   'OW' TEXT
-                |   'WL' TEXT
-                ;
+moveAnnotation
+    : 'BM' TEXT
+    | 'DO' NONE
+    | 'IT' NONE
+    | 'TE' TEXT
+    ;
 
-misc            :
-                    'FG' (NONE | TEXT)
-                |   'PM' TEXT
-                |   'VW' TEXT+
-                ;
+markup
+    : 'AR' TEXT+
+    | 'CR' TEXT+
+    | 'DD' (NONE | TEXT+)
+    | 'LB' TEXT+
+    | 'LN' TEXT+
+    | 'MA' TEXT+
+    | 'SL' TEXT+
+    | 'SQ' TEXT+
+    | 'TR' TEXT+
+    ;
 
-loa             :
-                    'AS' TEXT
-                |   'IP' TEXT
-                |   'IY' TEXT
-                |   'SE' TEXT
-                |   'SU' TEXT
-                ;
+root
+    : 'AP' TEXT
+    | 'CA' TEXT
+    | 'FF' TEXT
+    | 'GM' TEXT
+    | 'ST' TEXT
+    | 'SZ' TEXT
+    ;
 
-go_              :
-                    'HA' TEXT
-                |   'KM' TEXT
-                |   'TB' (NONE | TEXT+)
-                |   'TW' (NONE | TEXT+)
-                ;
+gameInfo
+    : 'AN' TEXT
+    | 'BR' TEXT
+    | 'BT' TEXT
+    | 'CP' TEXT
+    | 'DT' TEXT
+    | 'EV' TEXT
+    | 'GN' TEXT
+    | 'GC' TEXT
+    | 'ON' TEXT
+    | 'OT' TEXT
+    | 'PB' TEXT
+    | 'PC' TEXT
+    | 'PW' TEXT
+    | 'RE' TEXT
+    | 'RO' TEXT
+    | 'RU' TEXT
+    | 'SO' TEXT
+    | 'TM' TEXT
+    | 'US' TEXT
+    | 'WR' TEXT
+    | 'WT' TEXT
+    ;
 
-privateProp     :   UCLETTER (NONE | TEXT+);
+timing
+    : 'BL' TEXT
+    | 'OB' TEXT
+    | 'OW' TEXT
+    | 'WL' TEXT
+    ;
 
-COLOR           :   ('W'|'B');
-UCLETTER        :   'A'..'Z' 'A'..'Z'+;
-NONE            :   '[]';
-TEXT            :   '['('\\]'|.)*?']';
+misc
+    : 'FG' (NONE | TEXT)
+    | 'PM' TEXT
+    | 'VW' TEXT+
+    ;
 
-WS              :   [ \n\r\t]+ -> skip;
+loa
+    : 'AS' TEXT
+    | 'IP' TEXT
+    | 'IY' TEXT
+    | 'SE' TEXT
+    | 'SU' TEXT
+    ;
+
+go_
+    : 'HA' TEXT
+    | 'KM' TEXT
+    | 'TB' (NONE | TEXT+)
+    | 'TW' (NONE | TEXT+)
+    ;
+
+privateProp
+    : UCLETTER (NONE | TEXT+)
+    ;
+
+COLOR
+    : ('W' | 'B')
+    ;
+
+UCLETTER
+    : 'A' ..'Z' 'A' ..'Z'+
+    ;
+
+NONE
+    : '[]'
+    ;
+
+TEXT
+    : '[' ('\\]' | .)*? ']'
+    ;
+
+WS
+    : [ \n\r\t]+ -> skip
+    ;

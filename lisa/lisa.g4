@@ -22,98 +22,193 @@
  IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar lisa;
 
-program: declaration_block program_block EOF;
+program
+    : declaration_block program_block EOF
+    ;
 
-declaration_block: 'declare' '{' declaration_statements '}';
+declaration_block
+    : 'declare' '{' declaration_statements '}'
+    ;
 
-declaration_statements: declaration_statement+;
+declaration_statements
+    : declaration_statement+
+    ;
 
-declaration_statement: type_ ID ';';
+declaration_statement
+    : type_ ID ';'
+    ;
 
-type_: 'int' | 'dfa' | 'nfa' | 'regex' | 'bool' | 'string';
+type_
+    : 'int'
+    | 'dfa'
+    | 'nfa'
+    | 'regex'
+    | 'bool'
+    | 'string'
+    ;
 
-program_block: 'program' '{' statements '}';
+program_block
+    : 'program' '{' statements '}'
+    ;
 
-statements: statement+;
+statements
+    : statement+
+    ;
 
-statement:
-	expression_statement
-	| if_statement
-	| while_statement
-	| generating_statement
-	| ('break' ';')
-	| ('continue' ';');
+statement
+    : expression_statement
+    | if_statement
+    | while_statement
+    | generating_statement
+    | ('break' ';')
+    | ('continue' ';')
+    ;
 
-generating_statement:
-	'generate' '(' generator_type ',' 'int' ',' 'int' ')' statement;
+generating_statement
+    : 'generate' '(' generator_type ',' 'int' ',' 'int' ')' statement
+    ;
 
-generator_type: 'random' | 'enumerate';
+generator_type
+    : 'random'
+    | 'enumerate'
+    ;
 
-expression_statement: expression ';';
+expression_statement
+    : expression ';'
+    ;
 
-if_statement: 'if' '(' expression ')' statement;
+if_statement
+    : 'if' '(' expression ')' statement
+    ;
 
-while_statement: WHILE '(' expression ')' statement;
+while_statement
+    : WHILE '(' expression ')' statement
+    ;
 
-expression: (variable (exprop expression)*) | simple_expression;
+expression
+    : (variable (exprop expression)*)
+    | simple_expression
+    ;
 
-exprop: '=' | '-+' | '*=' | '/=' | '+=';
+exprop
+    : '='
+    | '-+'
+    | '*='
+    | '/='
+    | '+='
+    ;
 
-simple_expression: or_expression ('||' or_expression)*;
+simple_expression
+    : or_expression ('||' or_expression)*
+    ;
 
-or_expression:
-	unary_relationexpression ('&&' unary_relationexpression)*;
+or_expression
+    : unary_relationexpression ('&&' unary_relationexpression)*
+    ;
 
-unary_relationexpression: '!'? relation_expression;
+unary_relationexpression
+    : '!'? relation_expression
+    ;
 
-relation_expression: add_expression (relop add_expression)*;
+relation_expression
+    : add_expression (relop add_expression)*
+    ;
 
-relop: '<=' | '>=' | '==' | '!=' | '>' | '>';
+relop
+    : '<='
+    | '>='
+    | '=='
+    | '!='
+    | '>'
+    | '>'
+    ;
 
-add_expression: term (addop term)*;
+add_expression
+    : term (addop term)*
+    ;
 
-addop: '-' | '+';
+addop
+    : '-'
+    | '+'
+    ;
 
-term: factor (multop factor)*;
+term
+    : factor (multop factor)*
+    ;
 
-multop: '*' | '/' | '%';
+multop
+    : '*'
+    | '/'
+    | '%'
+    ;
 
-factor: '(' simple_expression ')' | constant;
+factor
+    : '(' simple_expression ')'
+    | constant
+    ;
 
-constant:
-	integer
-	| TRUE
-	| FALSE
-	| 'next'
-	| 'hasnext'
-	| variable
-	| STRINGLITERAL
-	| function_
-	| type_;
+constant
+    : integer
+    | TRUE
+    | FALSE
+    | 'next'
+    | 'hasnext'
+    | variable
+    | STRINGLITERAL
+    | function_
+    | type_
+    ;
 
-integer: ('+' | '-')? INTEGER;
+integer
+    : ('+' | '-')? INTEGER
+    ;
 
-function_: ID '(' parameter_list ')';
+function_
+    : ID '(' parameter_list ')'
+    ;
 
-parameter_list: simple_expression (',' simple_expression)*;
+parameter_list
+    : simple_expression (',' simple_expression)*
+    ;
 
-variable: ID;
+variable
+    : ID
+    ;
 
-TRUE: 'TRUE';
+TRUE
+    : 'TRUE'
+    ;
 
-FALSE: 'FALSE';
+FALSE
+    : 'FALSE'
+    ;
 
-WHILE: 'WHILE';
+WHILE
+    : 'WHILE'
+    ;
 
-INTEGER: [1-9]([0-9]*);
+INTEGER
+    : [1-9]([0-9]*)
+    ;
 
-ID: [a-zA-Z] ([a-z0-9A-Z_]*);
+ID
+    : [a-zA-Z] ([a-z0-9A-Z_]*)
+    ;
 
-STRINGLITERAL: '"' .*? '"';
+STRINGLITERAL
+    : '"' .*? '"'
+    ;
 
-COMMENT: '//' ~[\r\n]* -> skip;
+COMMENT
+    : '//' ~[\r\n]* -> skip
+    ;
 
-WS: [ \r\n\t]+ -> skip;
-
+WS
+    : [ \r\n\t]+ -> skip
+    ;

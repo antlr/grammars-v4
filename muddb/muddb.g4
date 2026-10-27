@@ -30,108 +30,107 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar muddb;
 
 db
-   : room* END EOL* EOF
-   ;
+    : room* END EOL* EOF
+    ;
 
 room
-   : roomno name description location contents exits next_ key fail_message succ_message ofail osuccess owner pennies flags password
-   ;
+    : roomno name description location contents exits next_ key fail_message succ_message ofail osuccess owner pennies flags password
+    ;
 
 roomno
-   : STRING EOL
-   ;
+    : STRING EOL
+    ;
 
 name
-   : string
-   ;
+    : string
+    ;
 
 description
-   : string
-   ;
+    : string
+    ;
 
 location
-   : ref
-   ;
+    : ref
+    ;
 
 contents
-   : ref
-   ;
+    : ref
+    ;
 
 exits
-   : ref
-   ;
+    : ref
+    ;
 
 next_
-   : ref
-   ;
+    : ref
+    ;
 
 key
-   : bool_
-   ;
+    : bool_
+    ;
 
 fail_message
-   : string
-   ;
+    : string
+    ;
 
 succ_message
-   : string
-   ;
+    : string
+    ;
 
 ofail
-   : string
-   ;
+    : string
+    ;
 
 osuccess
-   : string
-   ;
+    : string
+    ;
 
 owner
-   : ref
-   ;
+    : ref
+    ;
 
 pennies
-   : ref
-   ;
+    : ref
+    ;
 
 flags
-   : ref
-   ;
+    : ref
+    ;
 
 password
-   : string
-   ;
+    : string
+    ;
 
 string
-   : STRING? EOL
-   ;
+    : STRING? EOL
+    ;
 
 ref
-   : NUM? EOL
-   ;
+    : NUM? EOL
+    ;
 
 bool_
-   : NUM? EOL
-   ;
-
+    : NUM? EOL
+    ;
 
 END
-   : '***END OF DUMP***'
-   ;
-
+    : '***END OF DUMP***'
+    ;
 
 NUM
-   : '-'? [0-9] +
-   ;
-
+    : '-'? [0-9]+
+    ;
 
 STRING
-   : [a-zA-Z0-9,;:'.* \t!<>{}()[\]@?=_"`+\-/#]+
-   ;
-
+    : [a-zA-Z0-9,;:'.* \t!<>{}()[\]@?=_"`+\-/#]+
+    ;
 
 EOL
-   : ('\r' '\n' | '\n' | '\r')
-   ;
+    : ('\r' '\n' | '\n' | '\r')
+    ;

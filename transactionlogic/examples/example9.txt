@@ -1,0 +1,5 @@
+% a simple fact with no body
+account(checking).
+
+% a rule combining classical and serial connectives
+openAccount(Name) <- -account(Name) (x) tinsert(account(Name)).

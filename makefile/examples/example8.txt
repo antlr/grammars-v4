@@ -1,0 +1,5 @@
+test: build
+	./run_tests.sh
+
+build:
+	make -C src all

@@ -1,0 +1,1 @@
+data numtree == empty ++ tip(num) ++ node(numtree#numtree);

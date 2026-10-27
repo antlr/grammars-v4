@@ -1,75 +1,84 @@
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar stellaris;
 
-content: 
-   expr+ EOF
-   ;
+content
+    : expr+ EOF
+    ;
 
-expr: 
-   keyval+
-   ;
+expr
+    : keyval+
+    ;
 
-keyval:
-   key ('=' | '>' | '<')+ val
-   ;
+keyval
+    : key ('=' | '>' | '<')+ val
+    ;
 
-key: 
-   id_ | attrib
-   ;
+key
+    : id_
+    | attrib
+    ;
 
-val: 
-   id_ | attrib | group
-   ;
+val
+    : id_
+    | attrib
+    | group
+    ;
 
-attrib: 
-   id_ accessor (attrib| id_)
-   ;
+attrib
+    : id_ accessor (attrib | id_)
+    ;
 
-accessor: 
-   '.'|'@'|':'
-   ;
+accessor
+    : '.'
+    | '@'
+    | ':'
+    ;
 
-group: 
-   '{' (expr* | id_) '}'
-   ;
+group
+    : '{' (expr* | id_) '}'
+    ;
 
-id_: 
-   IDENTIFIER | STRING | INTEGER
-   ;
+id_
+    : IDENTIFIER
+    | STRING
+    | INTEGER
+    ;
 
-IDENTIFIER: 
-   IDENITIFIERHEAD IDENITIFIERBODY*
-   ;
+IDENTIFIER
+    : IDENITIFIERHEAD IDENITIFIERBODY*
+    ;
 
-INTEGER: 
-   [+-]? INTEGERFRAG
-   ;
+INTEGER
+    : [+-]? INTEGERFRAG
+    ;
 
-fragment INTEGERFRAG: 
-   [0-9]+
-   ;
+fragment INTEGERFRAG
+    : [0-9]+
+    ;
 
-fragment IDENITIFIERHEAD: 
-   [a-zA-Z]
-   ;
+fragment IDENITIFIERHEAD
+    : [a-zA-Z]
+    ;
 
 fragment IDENITIFIERBODY
-   : IDENITIFIERHEAD | [0-9_]
-   ;
+    : IDENITIFIERHEAD
+    | [0-9_]
+    ;
 
-STRING: 
-   '"' ~["\r\n]* '"'
-   ;
+STRING
+    : '"' ~["\r\n]* '"'
+    ;
 
-COMMENT: 
-   '#' ~[\r\n]* -> channel(HIDDEN)
-   ;
+COMMENT
+    : '#' ~[\r\n]* -> channel(HIDDEN)
+    ;
 
-SPACE: 
-   [ \t\f] -> channel(HIDDEN)
-   ;
+SPACE
+    : [ \t\f] -> channel(HIDDEN)
+    ;
 
-NL: 
-   [\r\n] -> channel(HIDDEN)
-   ;
-
-
+NL
+    : [\r\n] -> channel(HIDDEN)
+    ;

@@ -1,0 +1,20 @@
+# Arithmetic, comparison and logic operators, including a negative
+# number literal (-8) versus the subtraction operator (9 3 -).
+4 5 +
+9 3 -
+2 4 *
+22 3 /
+10 3 MOD
+-8 ABS
+4 8 MAX
+4 8 MIN
+3 CHS
+2 2 =
+5 5 !
+5 4 >
+7 3 <
+2 3 AND
+0 4 OR
+4 NOT
+1 1 XOR
+1 1 EOR

@@ -18,7 +18,8 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
-					   <include>ASN_3gpp.g4</include>
+					   <include>ASN_3gppLexer.g4</include>
+					   <include>ASN_3gppParser.g4</include>
 					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
@@ -38,7 +39,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>moduleDefinition</entryPoint>
+					<entryPoint>modules</entryPoint>
 					<grammarName>ASN_3gpp</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>

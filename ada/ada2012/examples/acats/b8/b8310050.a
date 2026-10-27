@@ -1,0 +1,130 @@
+-- B8310050.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--    The ACAA has created and maintains the Ada Conformity Assessment Test
+--    Suite for the purpose of conformity assessments conducted in accordance
+--    with the International Standard ISO/IEC 18009 - Ada: Conformity
+--    assessment of a language processor. This test suite should not be used
+--    to make claims of conformance unless used in accordance with
+--    ISO/IEC 18009 and any applicable ACAA procedures.
+--
+--*
+--
+-- OBJECTIVE:
+--    Check that an operation with the indicator of overriding is illegal
+--    if it is primitive for a type derived from a generic formal type and
+--    the operation does not inherit a homograph. (Part B: package
+--    bodies)
+--
+--    Check that an operation with the indicator of not overriding is illegal
+--    if it is primitive for a type derived from a generic formal type and
+--    the operation inherits a homograph in either the generic or the instance.
+--    (Part B: package bodies)
+--
+-- TEST DESCRIPTION
+--    We only test untagged types in this test, as deriving from a tagged
+--    type is illegal in a generic body. Additionally, there are no rechecks
+--    of Legality Rules in generic bodies, so we don't need any checks of
+--    instances. We do make a couple of bonus checks to ensure that the rules
+--    are enforced the same way for compilation units (as in this test) as for
+--    nested units (as in B831004). Also, we test some new operations in
+--    a handful of cases; but these aren't very interesting as it is not
+--    possible to declare new primitive operations for a type declared in
+--    a body (or declarative part). Since overriding indicators
+--    are only allowed on primitive operations, tests of new operations
+--    mainly test that indicators are not allowed at all on such operations.
+--
+-- TEST FILES:
+--      This test consists of the following files:
+--      -> B8310050.A
+--         B8310051.A
+--         B8310052.A
+--         B8310053.A
+--
+-- PASS/FAIL CRITERIA:
+--      Files B8310051.A, B8310052.A, and B8310053.A contain errors.
+--      All errors in these files must be detected to pass the test.
+--
+-- CHANGE HISTORY:
+--   16 Apr 2015   RLB   Created test similar to B831004.
+--
+--!
+package B8310050 is
+   type R is record
+      Comp : Character;
+   end record;
+   procedure E (X : in out R);
+   function G (X : Character) return R;
+end B8310050;
+
+
+with B8310050;
+generic
+   type F is new B8310050.R;
+package B8310050_G1 is
+   type T is new F;
+
+   overriding
+   procedure E (X : in out T);                             -- OK.
+
+   overriding
+   function G (X : Character) return T;                    -- OK.
+
+end B8310050_G1;
+
+with B8310050;
+generic
+   type F is new B8310050.R;
+package B8310050_G2 is
+   procedure Do_Something (A : in out F);
+end B8310050_G2;
+
+package body B8310050_G2 is
+
+   type T is new F;
+
+   overriding
+   procedure E (X : in out T) is null;                     -- OK.
+
+   overriding
+   function G (X : Character) return T is (Comp => X);     -- OK.
+
+   procedure Do_Something (A : in out F) is null;
+end B8310050_G2;
+
+with B8310050;
+generic
+   type F is new B8310050.R;
+package B8310050_G3 is
+   procedure Do_Something (A : in out F);
+end B8310050_G3;
+
+generic
+   type F is private;
+package B8310050_G4 is
+   procedure Do_Something (A : in out F);
+end B8310050_G4;
+
