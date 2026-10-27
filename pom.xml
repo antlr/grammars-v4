@@ -288,6 +288,7 @@
 				<module>kql</module>
 				<module>kuka</module>
 				<module>kquery</module>
+				<module>l</module>
 				<module>lambda</module>
 				<module>lark</module>
                 <module>lazyk</module>
