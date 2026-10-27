@@ -54,6 +54,23 @@ func (p *PlSqlParserBase) isSolidusSeparator() bool {
     return true
 }
 
+// isLineStart reports whether the current token is the first significant token
+// on its line.
+func (p *PlSqlParserBase) isLineStart() bool {
+    stream := p.GetTokenStream().(*antlr.CommonTokenStream)
+    token := stream.LT(1)
+    if token == nil {
+        return false
+    }
+
+    prev := stream.LT(-1)
+    if prev == nil || prev.GetTokenType() == antlr.TokenEOF {
+        return true
+    }
+
+    return prev.GetLine() < token.GetLine()
+}
+
 func (p *PlSqlParserBase) isVersion12() bool {
     return StaticConfig._isVersion12;
 }

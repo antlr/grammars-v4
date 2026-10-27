@@ -51,6 +51,20 @@ public abstract class PlSqlParserBase extends Parser
         return true;
     }
 
+    /** True when the current token is the first significant token on its line. */
+    public boolean isLineStart()
+    {
+        Token token = _input.LT(1);
+        if (token == null)
+            return false;
+
+        Token prev = _input.LT(-1);
+        if (prev == null || prev.getType() == Token.EOF)
+            return true;
+
+        return prev.getLine() < token.getLine();
+    }
+
     public boolean isVersion12() {
         return _isVersion12;
     }

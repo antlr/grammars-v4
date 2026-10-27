@@ -7273,6 +7273,14 @@ sql_plus_command
     | start_command
     | set_command
     | clear_command
+    | execute_command
+    ;
+
+// SQL*Plus EXEC[UTE] executes a single PL/SQL statement. The command word must
+// start a line so that `EXEC` used as an identifier and PL/SQL `EXECUTE
+// IMMEDIATE` keep their normal meaning.
+execute_command
+    : {this.isLineStart()}? (EXEC | EXECUTE) statement
     ;
 
 start_command
@@ -7883,6 +7891,7 @@ regular_id
     | EXCEPTION_INIT
     | EXCEPTIONS
     | EXISTS
+    | EXEC
     | EXIT
     | EXTEND
     | FIELDS
