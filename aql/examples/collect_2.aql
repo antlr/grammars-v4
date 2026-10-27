@@ -1,0 +1,8 @@
+FOR u IN users
+  LET name = u.name
+  LET someCalculation = u.value1 + u.value2
+  COLLECT city = u.city INTO groups KEEP name
+  RETURN {
+    "city" : city,
+    "userNames" : groups[*].name
+  }

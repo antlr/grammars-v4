@@ -1,0 +1,9 @@
+--algorithm Semaphore {
+  variables sem = 1;
+  process (proc \in {0, 1}) {
+    p1: await sem > 0;
+    p2: sem := sem - 1;
+    cs: skip;
+    p3: sem := sem + 1;
+  }
+}

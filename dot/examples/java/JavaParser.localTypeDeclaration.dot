@@ -1,0 +1,34 @@
+digraph ATN {
+rankdir=LR;
+s169[fontsize=11, label="169", shape=doublecircle, fixedsize=true, width=.6];
+s1158[fontsize=11,label="1158", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1159[fontsize=11,label="&rarr;\n1159*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s168[fontsize=11,label="168", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1160[fontsize=11,label="&larr;\n1160", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1161[fontsize=11,label="{1161*\nd=137|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1162[fontsize=11,label="1162", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1163[fontsize=11,label="1163*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1164[fontsize=11,label="1164", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1165[fontsize=11,label="1165", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1166[fontsize=11,label="1166", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1167[fontsize=11,label="1167", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1168[fontsize=11,label="{&rarr;\n1168\nd=138|{<p0>|<p1>|<p2>|<p3>}}", shape=record, fixedsize=false, peripheries=1];
+s1169[fontsize=11,label="&larr;\n1169", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s168 -> s1161 [fontname="Times-Italic", label="&epsilon;"];
+s1161:p0 -> s1159 [fontname="Times-Italic", label="&epsilon;"];
+s1161:p1 -> s1162 [fontname="Times-Italic", label="&epsilon;"];
+s1159 -> s1158 [fontname="Times-Italic", label="&epsilon;"];
+s1162 -> s1168 [fontname="Times-Italic", label="&epsilon;"];
+s1158 -> s1160 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<classOrInterfaceModifier>", arrowhead = normal];
+s1168:p0 -> s1164 [fontname="Times-Italic", label="&epsilon;"];
+s1168:p1 -> s1165 [fontname="Times-Italic", label="&epsilon;"];
+s1168:p2 -> s1166 [fontname="Times-Italic", label="&epsilon;"];
+s1168:p3 -> s1167 [fontname="Times-Italic", label="&epsilon;"];
+s1160 -> s1163 [fontname="Times-Italic", label="&epsilon;"];
+s1164 -> s1169 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<classDeclaration>", arrowhead = normal];
+s1165 -> s1169 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<interfaceDeclaration>", arrowhead = normal];
+s1166 -> s1169 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<recordDeclaration>", arrowhead = normal];
+s1167 -> s1169 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<enumDeclaration>", arrowhead = normal];
+s1163 -> s1161 [fontname="Times-Italic", label="&epsilon;", style="dashed"];
+s1169 -> s169 [fontname="Times-Italic", label="&epsilon;"];
+}

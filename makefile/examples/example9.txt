@@ -1,0 +1,5 @@
+# This is a comment
+TARGET = app
+
+$(TARGET): main.o
+	gcc -o $(TARGET) main.o

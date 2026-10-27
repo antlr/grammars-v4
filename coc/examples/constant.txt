@@ -1,0 +1,1 @@
+lambda A : Prop . lambda B : Prop . lambda x : A . lambda y : B . x

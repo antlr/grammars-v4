@@ -1,0 +1,32 @@
+MODULE GLOBAL_VARIABLES;
+/*
+/*  Copyright © 1996, Digital Equipment Corporation.
+/*
+/* define the global structure for the entire compiler.
+/* These variables are global to all phases of the compiler.
+/*
+/*
+/* Modifications:
+/*
+/*	001	Tom Benson	13-Feb-1984	(003 VCG)
+/*
+/*		Added modification history.
+/*
+/*
+
+#line_size = 132;
+
+ITEM vcg$gl_total_operators	LONGWORD GLOBAL;
+ITEM vcg$gl_lab_init		ADDRESS GLOBAL;
+ITEM vcg$gl_cur_list_page	LONGWORD GLOBAL;
+ITEM vcg$$ga_bound_label_head	ADDRESS GLOBAL;
+ITEM vcg$$gl_environment_index	LONGWORD GLOBAL;
+
+CONSTANT vcg$k_max_obj_rec EQUALS 512;
+
+ENTRY vcg$read_line PARAMETER(LONGWORD,CHARACTER LENGTH #line_size VARYING)
+	RETURNS LONGWORD;
+ENTRY vcg$printops PARAMETER(LONGWORD VALUE,ADDRESS VALUE);
+ENTRY vcg$write_line PARAMETER(LONGWORD,ADDRESS VALUE) RETURNS LONGWORD;
+ENTRY debug PARAMETER(WORD,WORD,CHARACTER LENGTH 135 VARYING);
+END_MODULE;

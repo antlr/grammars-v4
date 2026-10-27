@@ -1,0 +1,28 @@
+#N canvas 153 23 963 466 10;
+#X obj 829 383 audioOnOff;
+#X obj 829 359 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+1;
+#X obj 829 334 loadbang;
+#X msg 82 74 play;
+#X msg 131 74 stop;
+#X text 173 23 PLAYING AN AUDIO FILE IN PURE DATA;
+#X obj 153 312 output~;
+#X text 488 109 << You can change the file by specifing a different
+name (i.e. synthLoop0.wav).;
+#X obj 211 87 vsl 15 128 0 127 0 0 empty empty Volume 0 -9 0 10 -262144
+-1 -1 0 1;
+#X obj 267 87 vsl 15 128 0 127 0 0 empty empty Pitch 0 -9 0 10 -262144
+-1 -1 0 1;
+#X msg 399 74 vocal0.wav;
+#X obj 153 282 playAudioFile~;
+#X text 488 73 << Click on the name of the file that we want to load.
+;
+#X text 488 159 << Then click on play and stop.;
+#X connect 1 0 0 0;
+#X connect 2 0 1 0;
+#X connect 3 0 11 0;
+#X connect 4 0 11 1;
+#X connect 8 0 11 2;
+#X connect 9 0 11 3;
+#X connect 10 0 11 4;
+#X connect 11 0 6 0;

@@ -1,0 +1,2 @@
+-- The same choice, written with the traditional box operator.
+VM = coin -> (tea -> SKIP □ coffee -> SKIP)

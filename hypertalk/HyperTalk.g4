@@ -22,30 +22,41 @@
  * SOFTWARE.
  */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar HyperTalk;
 
 // Start symbol accepting only well-formed HyperTalk scripts that consist of handlers, functions, whitespace and
 // comments (representing scripts that are assignable to objects like buttons, fields and cards). Disallows statements or
 // expressions that are not inside of a handler or function block.
+start_script
+    : script EOF
+    ;
+
+start_scriptlet
+    : scriptlet EOF
+    ;
+
 script
     : handler script
     | function_ script
     | NEWLINE script
-    | EOF
+    |
     ;
 
 // Start symbol accepting any sequence of HyperTalk statements, expressions, whitespace and comments. Suitable when
 // evaluating the message box or HyperTalk strings via the 'do' command and 'value of' function.
 scriptlet
-    : statement EOF
+    : statement
     | multilineScriptlet
     ;
 
 multilineScriptlet
     : statement NEWLINE multilineScriptlet
-    | statement EOF
+    | statement
     | NEWLINE multilineScriptlet
-    | EOF
+    |
     ;
 
 handler
@@ -60,7 +71,7 @@ function_
 
 handlerName
     : ID
-    | commandName   // Handlers can take the name of a command keyword (other keywords are disallowed)
+    | commandName // Handlers can take the name of a command keyword (other keywords are disallowed)
     ;
 
 parameterList
@@ -210,7 +221,7 @@ commandStmnt
     | 'sort' 'the'? cards of expression sortDirection sortStyle 'by' expression
     | 'sort' 'the'? 'marked' cards of expression sortDirection sortStyle 'by' expression
     | 'speak' expression
-    | 'speak' expression 'with' gender=('male'|'female'|'neuter'|'robotic') 'voice'
+    | 'speak' expression 'with' gender = ('male' | 'female' | 'neuter' | 'robotic') 'voice'
     | 'speak' expression 'with' 'voice' expression
     | 'subtract' expression 'from' expression
     | 'type' expression
@@ -416,13 +427,29 @@ expression
     : factor
     | 'not' expression
     | '-' expression
-    | op=('there is a'|'there is an'|'there is no'|'there is not a'|'there is not an') expression
+    | op = ('there is a' | 'there is an' | 'there is no' | 'there is not a' | 'there is not an') expression
     | expression '^' expression
-    | expression op=('mod'| 'div'| '/'| '*') expression
-    | expression op=('+'| '-') expression
-    | expression op=('&&'| '&') expression
-    | expression op=('>='|'<='|'≤'|'≥'|'<'|'>'|'contains'|'is in'|'is not in'|'is a'|'is an'|'is not a'|'is not an'|'is within'|'is not within') expression
-    | expression op=('='|'is not'|'is'|'<>'|'≠') expression
+    | expression op = ('mod' | 'div' | '/' | '*') expression
+    | expression op = ('+' | '-') expression
+    | expression op = ('&&' | '&') expression
+    | expression op = (
+        '>='
+        | '<='
+        | '≤'
+        | '≥'
+        | '<'
+        | '>'
+        | 'contains'
+        | 'is in'
+        | 'is not in'
+        | 'is a'
+        | 'is an'
+        | 'is not a'
+        | 'is not an'
+        | 'is within'
+        | 'is not within'
+    ) expression
+    | expression op = ('=' | 'is not' | 'is' | '<>' | '≠') expression
     | expression 'and' expression
     | expression 'or' expression
     ;
@@ -815,7 +842,7 @@ position
     ;
 
 message
-    : 'the'? ('message' | 'msg') ('box' | 'window' | )
+    : 'the'? ('message' | 'msg') ('box' | 'window' |)
     ;
 
 cards

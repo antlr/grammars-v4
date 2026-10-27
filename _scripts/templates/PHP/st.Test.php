@@ -1,0 +1,296 @@
+\<?php
+// Generated from trgen <version>
+
+require_once 'vendor/autoload.php';
+<tool_grammar_tuples:{x | require_once './<x.GeneratedFileName>';
+} >
+require __DIR__ . '/vendor/autoload.php';
+
+use SebastianBergmann\Timer\Timer;
+use Antlr\Antlr4\Runtime\CommonTokenStream;
+use Antlr\Antlr4\Runtime\Error\Listeners\DiagnosticErrorListener;
+//use Antlr\Antlr4\Runtime\Error\Listeners\ConsoleErrorListener;
+use Antlr\Antlr4\Runtime\Error\Listeners\BaseErrorListener;
+use Antlr\Antlr4\Runtime\Recognizer;
+use Antlr\Antlr4\Runtime\Error\Exceptions\RecognitionException;
+use Antlr\Antlr4\Runtime\InputStream;
+use Antlr\Antlr4\Runtime\ParserRuleContext;
+use Antlr\Antlr4\Runtime\Tree\ErrorNode;
+use Antlr\Antlr4\Runtime\Tree\ParseTreeListener;
+use Antlr\Antlr4\Runtime\Tree\ParseTreeWalker;
+use Antlr\Antlr4\Runtime\Tree\TerminalNode;
+use Antlr\Antlr4\Runtime\Token;
+use Antlr\Antlr4\Runtime\CommonToken;
+
+final class TreeShapeListener implements ParseTreeListener {
+    public function visitTerminal(TerminalNode $node) : void {}
+    public function visitErrorNode(ErrorNode $node) : void {}
+    public function exitEveryRule(ParserRuleContext $ctx) : void {}
+
+    public function enterEveryRule(ParserRuleContext $ctx) : void {
+        echo $ctx->getText();
+    }
+}
+
+// TODO: should ConsoleErrorListener be final?
+class MyErrorListener extends BaseErrorListener /*extends ConsoleErrorListener*/ {
+    public bool $had_error;
+    public bool $quiet;
+    public bool $tee;
+    public mixed $output;
+    public function __construct($q, $t, $o) {
+        $this->output = $o;
+        $this->quiet = $q;
+    $this->tee = $t;
+        $this->had_error = false;
+    }
+    public function syntaxError(
+        Recognizer $recognizer,
+        ?object $offendingSymbol,
+        int $line,
+        int $charPositionInLine,
+        string $msg,
+        ?RecognitionException $e
+    ) : void {
+        $this->had_error = true;
+        if ($this->tee) {
+            fwrite($this->output, sprintf("line %d:%d %s\n", $line, $charPositionInLine, $msg));
+        }
+        if (! $this->quiet) {
+            fwrite(STDERR, sprintf("line %d:%d %s\n", $line, $charPositionInLine, $msg));
+        }
+    }
+}
+
+$tee = false;
+$output_dir = "";
+$show_profile = false;
+$show_tree = false;
+$show_tokens = false;
+$show_trace = false;
+$inputs = array();
+$is_fns = array();
+$error_code = 0;
+$string_instance = 0;
+$prefix = "";
+$quiet = false;
+$perf = false;
+$per_file = false;
+$total_tokens = 0;
+$total_parse_seconds = 0;
+$first_file_tokens = 0;
+$first_file_parse_seconds = 0;
+
+function main($argv) : void {
+    global $tee;
+    global $output_dir;
+    global $show_profile;
+    global $show_tree;
+    global $show_tokens;
+    global $show_trace;
+    global $inputs;
+    global $is_fns;
+    global $error_code;
+    global $prefix;
+    global $quiet;
+    global $perf;
+    global $per_file;
+    global $total_tokens;
+    global $total_parse_seconds;
+    global $first_file_tokens;
+    global $first_file_parse_seconds;
+    for ($i = 1; $i \< count($argv); $i++) {
+        if ($argv[$i] == "-tokens") {
+            $show_tokens = true;
+        } else if ($argv[$i] == "-tree") {
+            $show_tree = true;
+        } else if ($argv[$i] == "-prefix") {
+            $prefix = $argv[++$i] . " ";
+        } else if ($argv[$i] == "-input") {
+            array_push($inputs, $argv[++$i]);
+            array_push($is_fns, false);
+        } else if ($argv[$i] == "-tee") {
+            $tee = true;
+        } else if ($argv[$i] == "-o") {
+            $output_dir = $argv[++$i];
+            $tee = true;
+        } else if ($argv[$i] == "-x") {
+            while($f = fgets(STDIN)){
+                $f = trim($f);
+                array_push($inputs, $f);
+                array_push($is_fns, true);
+            }
+        } else if ($argv[$i] == "-q") {
+            $quiet = true;
+        } else if ($argv[$i] == "--perf") {
+            $perf = true;
+        } else if ($argv[$i] == "--per-file") {
+            $per_file = true;
+        } else if ($argv[$i] == "-trace") {
+            $show_trace = true;
+        } else if ($argv[$i][0] == "-") {
+        } else {
+            array_push($inputs, $argv[$i]);
+            array_push($is_fns, true);
+        }
+    }
+    if (count($inputs) == 0) {
+        ParseStdin();
+    }
+    else {
+        $timer = new Timer;
+        $timer->start();
+        for ($f = 0; $f \< count($inputs); ++$f)
+        {
+            if ($is_fns[$f])
+                ParseFilename($inputs[$f], $f);
+            else
+                ParseString($inputs[$f], $f);
+        }
+        $duration = $timer->stop();
+        if (! $quiet) {
+            $overall_seconds = $duration->asSeconds();
+            if (! $perf) {
+                fwrite(STDERR, $prefix . "TT: " . $overall_seconds . "\n");
+            } else {
+            $warm_tokens = $total_tokens - $first_file_tokens;
+            $warm_seconds = $total_parse_seconds - $first_file_parse_seconds;
+            $warm_tps = (count($inputs) > 1 && $warm_seconds > 0)
+                ? strval((int)($warm_tokens / $warm_seconds))
+                : "n.a.";
+            $first_tps = $first_file_parse_seconds > 0 ? ($first_file_tokens / $first_file_parse_seconds) : 0;
+            $speedup = (count($inputs) > 1 && $warm_seconds > 0 && $first_tps > 0)
+                ? number_format(($warm_tokens / $warm_seconds) / $first_tps, 2)
+                : "n.a.";
+            fwrite(STDERR, $prefix . "PT: " . $total_parse_seconds . "\n");
+            fwrite(STDERR, $prefix . "OT: " . ($overall_seconds - $total_parse_seconds) . "\n");
+            fwrite(STDERR, $prefix . "TT: " . $overall_seconds . "\n");
+            fwrite(STDERR, $prefix . "PR: " . (int)($total_tokens / $total_parse_seconds) . "\n");
+            fwrite(STDERR, $prefix . "Post-warmup PR: " . $warm_tps . "\n");
+            fwrite(STDERR, $prefix . "Post-warmup speed up: " . $speedup . "\n");
+            }
+        }
+    }
+    exit($error_code);
+}   
+
+function ParseStdin() {
+    $in = fopen("php://stdin", "r");
+    $s = '';
+    while (!feof($in)) {
+        $s .= fread($in,65536);
+    }
+    $str = InputStream::fromString($s);
+    fclose($in);
+    DoParse($str, "stdin", 0);
+}
+
+function ParseString($input, $row_number) {
+    global $string_instance;
+    $str = InputStream::fromString($input);
+    DoParse($str, "string" . $string_instance++, $row_number);
+}
+
+function ParseFilename($input, $row_number) {
+    $str = InputStream::fromPath($input);
+    DoParse($str, $input, $row_number);
+}
+
+function DoParse($str, $input_name, $row_number) {
+    global $tee;
+    global $output_dir;
+    global $show_tree;
+    global $show_tokens;
+    global $show_trace;
+    global $inputs;
+    global $is_fns;
+    global $error_code;
+    global $prefix;
+    global $quiet;
+    global $per_file;
+    global $total_tokens;
+    global $total_parse_seconds;
+    global $first_file_tokens;
+    global $first_file_parse_seconds;
+    $out_name = $input_name;
+    if ($output_dir != "") {
+        $abs_path = realpath($input_name);
+        if ($abs_path === false) $abs_path = $input_name;
+        $root = realpath('<source_example_dir_unix>');
+        if ($root === false) $root = '<source_example_dir_unix>';
+        $root_prefix = rtrim($root, '/'.chr(92)) . DIRECTORY_SEPARATOR;
+        $rootless = strncmp($abs_path, $root_prefix, strlen($root_prefix)) === 0
+            ? substr($abs_path, strlen($root_prefix))
+            : basename($abs_path);
+        $out_name = $output_dir . '/' . $rootless;
+        $dir = dirname($out_name);
+        if (!is_dir($dir)) mkdir($dir, 0755, true);
+    }
+    $lexer = new <lexer_name>($str);
+    if ($show_tokens) {
+        for ($i=0;  ; $i++) {
+            $token = $lexer->nextToken();
+            $token->setTokenIndex($i);
+            fwrite(STDERR, $token . PHP_EOL);
+            if ($token->getType() == Token::EOF){
+                break;
+            }
+        }
+        $lexer->reset();
+    }
+
+    if ( $tee ) {
+        $output = fopen($out_name . ".errors", "w");
+    } else {
+        $output = STDERR;
+    }
+    $lexerErrorListener = new MyErrorListener($quiet, $tee, $output);
+    $lexer->removeErrorListeners();
+    $lexer->addErrorListener($lexerErrorListener);
+    $tokens = new CommonTokenStream($lexer);
+    $parser = new <parser_name>($tokens);
+    $parserErrorListener = new MyErrorListener($quiet, $tee, $output);
+    $parser->removeErrorListeners();
+    $parser->addErrorListener($parserErrorListener);
+    if ($show_trace) {
+        $parser->setTrace(true);
+        Antlr\Antlr4\Runtime\Atn\ParserATNSimulator::$traceAtnSimulation = true;
+    }
+    $timer2 = new Timer;
+    $timer2->start();
+    $tree = $parser-><start_symbol>();
+    $duration = $timer2->stop();
+    $parse_seconds = $duration->asSeconds();
+    $total_parse_seconds += $parse_seconds;
+    $token_count = $tokens->count();
+    $total_tokens += $token_count;
+    if ($row_number == 0) {
+        $first_file_tokens = $token_count;
+        $first_file_parse_seconds = $parse_seconds;
+    }
+    $result = "";
+    if ($parserErrorListener->had_error || $lexerErrorListener->had_error) {
+        $result = "fail";
+        $error_code = 1;
+    }
+    else {
+        $result = "success";
+    }
+    if ($show_tree) {
+        if ($tee) {
+            $handle = fopen($out_name . ".tree", "w");
+            fprintf($handle, "%s", $tree->toStringTree($parser->getRuleNames()));
+            fclose($handle);
+        } else {
+            fwrite(STDERR, $tree->toStringTree($parser->getRuleNames()));
+        }
+    }
+    if ( ! $quiet && $per_file ) {
+        fwrite(STDERR, $prefix . "PHP " . $row_number . " " . $input_name . " " . $result . " " . $parse_seconds . " s " . $token_count . " tokens " . (int)($token_count / $parse_seconds) . " pr\n");
+    }
+    if ( $tee ) {
+        fclose($output);
+    }
+}
+
+main($argv);

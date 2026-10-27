@@ -1,0 +1,8 @@
+val negative = ~12
+val hex = 0xFF
+val word = 0w42
+val hexword = 0wxFF
+val real = 3.14
+val exponent = 1.0E~3
+val text = "Hello, \"Standard ML\"\n"
+val character = #"a"

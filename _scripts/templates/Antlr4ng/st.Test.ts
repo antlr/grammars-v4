@@ -1,0 +1,329 @@
+// Generated from trgen <version>
+
+import { ATNSimulator } from 'antlr4ng';
+import { BaseErrorListener } from 'antlr4ng';
+import { CharStream } from 'antlr4ng';
+import { CommonTokenStream } from 'antlr4ng';
+import { ConsoleErrorListener } from 'antlr4ng';
+import { ErrorNode } from 'antlr4ng';
+//import { InputStream } from 'antlr4ng';
+import { Parser } from 'antlr4ng';
+import { PredictionMode } from 'antlr4ng';
+import { ParserRuleContext } from 'antlr4ng';
+import { ParseTree } from 'antlr4ng';
+import { Recognizer } from 'antlr4ng';
+import { RecognitionException } from 'antlr4ng';
+import { TerminalNode } from 'antlr4ng';
+import { Token } from 'antlr4ng';
+import { Trees } from 'antlr4ng';
+import { escapeWhitespace } from 'antlr4ng';
+import { readFileSync } from 'fs';
+import { writeFileSync } from 'fs';
+import { mkdirSync } from 'fs';
+import { openSync } from 'fs';
+import { readSync } from 'fs';
+import { writeSync } from 'fs';
+import { closeSync } from 'fs';
+import { readFile } from 'fs/promises'
+import { join as pathJoin, dirname as pathDirname, resolve as pathResolve, relative as pathRelative, sep as pathSep, isAbsolute as pathIsAbsolute, basename as pathBasename } from 'path';
+import { isToken } from 'antlr4ng';
+import { BinaryCharStream } from './BinaryCharStream.js';
+import { ErrorListener } from './ErrorListener.js';
+
+<tool_grammar_tuples: {x | import { <x.GrammarAutomName> \} from './<x.GrammarAutomName>.js';
+} >
+import { StringBuilder, emptyString, joinString, formatString, isNullOrWhiteSpace } from 'typescript-string-operations';
+import { Timer, Time, TimerOptions } from 'timer-node';
+
+
+function getChar() {
+    let buffer = Buffer.alloc(1);
+    var xx = 0;
+    try {
+        xx = readSync(0, buffer, 0, 1, null);
+    } catch (err) {
+    }
+    if (xx === 0) {
+        return '';
+    }
+    return buffer.toString('utf8');
+}
+
+var tee = false;
+var output_dir = '';
+var show_profile = false;
+var show_tree = false;
+var show_tokens = false;
+var show_trace = false;
+var error_code = 0;
+var quiet = false;
+var perf = false;
+var per_file = false;
+var sll = false;
+var enc = '<file_encoding>';
+var binary = <binary>;
+var string_instance = 0;
+var prefix = '';
+var total_tokens = 0;
+var total_parse_seconds = 0;
+var first_file_tokens = 0;
+var first_file_parse_seconds = 0;
+var inputs: string[] = [];
+var is_fns: boolean[] = [];
+
+function splitLines(t: string) { return t.split(/\r\n|\r|\n/); }
+
+function main() {
+    for (let i = 2; i \<process.argv.length; ++i)
+    {
+        switch (process.argv[i]) {
+            case '-tokens':
+                show_tokens = true;
+                break;
+            case '-tree':
+                show_tree = true;
+                break;
+            case '-prefix':
+                prefix = process.argv[++i] + ' ';
+                break;
+            case '-input':
+                inputs.push(process.argv[++i]);
+                is_fns.push(false);
+                break;
+            case '-tee':
+                tee = true;
+                break;
+            case '-o':
+                output_dir = process.argv[++i];
+                tee = true;
+                break;
+            case '-encoding':
+                enc = process.argv[++i];
+                break;
+            case '-x':
+                var sb = new StringBuilder();
+                var ch;
+                while ((ch = getChar()) != '') {
+                    sb.Append(ch);
+                }
+                var input = sb.ToString();
+                var sp = splitLines(input);
+                for (var ii of sp) {
+                    if (ii == '') continue;
+                    inputs.push(ii);
+                    is_fns.push(true);
+                }
+                break;
+            case '-q':
+                quiet = true;
+                break;
+            case '--perf':
+                perf = true;
+                break;
+            case '--per-file':
+                per_file = true;
+                break;
+            case '--sll':
+                sll = true;
+                break;
+            case '-trace':
+                show_trace = true;
+                break;
+            default:
+                if (process.argv[i][0] !== '-') {
+                    inputs.push(process.argv[i]);
+                    is_fns.push(true);
+                }
+                break;
+        }
+    }
+    if (inputs.length == 0) {
+        ParseStdin();
+    }
+    else {
+        const timer = new Timer({ label: 'test-timer' });
+        timer.start();
+        for (var f = 0; f \<inputs.length; ++f)
+        {
+            if (is_fns[f])
+                ParseFilename(inputs[f], f);
+            else
+                ParseString(inputs[f], f);
+        }
+        timer.stop();
+        var t = timer.time().m * 60 + timer.time().s + timer.time().ms / 1000;
+        if (!quiet) {
+            if (!perf) {
+                console.error(prefix + 'TT: ' + t);
+            } else {
+            var warm_tokens = total_tokens - first_file_tokens;
+            var warm_seconds = total_parse_seconds - first_file_parse_seconds;
+            var warm_tps = (inputs.length > 1 && warm_seconds > 0)
+                ? Math.round(warm_tokens / warm_seconds).toString()
+                : 'n.a.';
+            var first_tps = first_file_parse_seconds > 0 ? (first_file_tokens / first_file_parse_seconds) : 0;
+            var speedup = (inputs.length > 1 && warm_seconds > 0 && first_tps > 0)
+                ? ((warm_tokens / warm_seconds) / first_tps).toFixed(2)
+                : 'n.a.';
+            console.error(prefix + 'PT: ' + total_parse_seconds);
+            console.error(prefix + 'OT: ' + (t - total_parse_seconds));
+            console.error(prefix + 'TT: ' + t);
+            console.error(prefix + 'PR: ' + Math.round(total_tokens / total_parse_seconds));
+            console.error(prefix + 'Post-warmup PR: ' + warm_tps);
+            console.error(prefix + 'Post-warmup speed up: ' + speedup);
+            }
+        }
+    }
+    process.exitCode = error_code;
+}
+
+function ParseStdin() {
+    var sb = new StringBuilder();
+    var ch;
+    while ((ch = getChar()) != '') {
+        sb.Append(ch);
+    }
+    var input = sb.ToString();
+    var str = CharStream.fromString(input);
+    str.name = "stdin";
+    DoParse(str, "stdin", 0);
+}
+
+function ParseString(input: string, row_number: number) {
+    var str = CharStream.fromString(input);
+    str.name = "string";
+    DoParse(str, "string" + string_instance++, row_number);
+}
+
+function ParseFilename(input: string, row_number: number) {
+    if (enc === '') enc = 'utf8';
+    var buffer = readFileSync(input, { encoding: enc as BufferEncoding });
+    var str = CharStream.fromString(buffer);
+    str.name = input;
+    DoParse(str, input, row_number);
+}
+
+function DoParse(str: CharStream, input_name: string, row_number: number) {
+    let out_name = input_name;
+    if (output_dir) {
+        const absPath = pathResolve(input_name);
+        const root = pathResolve('<source_example_dir_unix>');
+        let rootless = pathRelative(root, absPath);
+        if (rootless === '..' || rootless.startsWith('..' + pathSep) || pathIsAbsolute(rootless))
+            rootless = pathBasename(absPath);
+        out_name = pathJoin(output_dir, rootless);
+        mkdirSync(pathDirname(out_name), { recursive: true });
+    }
+    if (binary) str = new BinaryCharStream(str);
+    const lexer = new <lexer_name>(str);
+    const tokens = new CommonTokenStream(lexer);
+    const parser = new <parser_name>(tokens);
+    if (sll) parser.interpreter.predictionMode = PredictionMode.SLL;
+    lexer.removeErrorListeners();
+    parser.removeErrorListeners();
+    var output = tee ? openSync(out_name + ".errors", 'w') : 1;
+    var listener_parser = new ErrorListener(quiet, tee, output);
+    var listener_lexer = new ErrorListener(quiet, tee, output);
+    parser.addErrorListener(listener_parser);
+    lexer.addErrorListener(listener_lexer);
+    if (show_tokens) {
+        for (var i = 0; ; ++i) {
+            var ro_token = lexer.nextToken();
+            var token = ro_token;
+            token.tokenIndex = i;
+            console.error(token.toString());
+            if (token.type === Token.EOF)
+                break;
+        }
+//        lexer.reset();
+    }
+    if (show_trace) {
+//       parser._interp.trace_atn_sim = true;
+    }
+    const timer = new Timer({ label: 'test-timer2' });
+    timer.start();
+    const tree = parser.<start_symbol>();
+    timer.stop();
+    var token_count = tokens.size;
+    total_tokens += token_count;
+    var result = "";
+    if (listener_parser.had_error || listener_lexer.had_error) {
+        result = 'fail';
+        error_code = 1;
+    }
+    else {
+        result = 'success';
+    }
+    var t = timer.time().m * 60 + timer.time().s + timer.time().ms / 1000;
+    total_parse_seconds += t;
+    if (row_number == 0) {
+        first_file_tokens = token_count;
+        first_file_parse_seconds = t;
+    }
+    if (show_tree) {
+        if (tee) {
+            writeFileSync(out_name + ".tree", tree.toStringTree(parser.ruleNames, parser));
+        } else {
+            console.error(tree.toStringTree(parser.ruleNames, parser));
+        }
+    }
+    if (!quiet && per_file) {
+        console.error(prefix + 'TypeScript ' + row_number + ' ' + input_name + ' ' + result + ' ' + t + ' s ' + token_count + ' tokens ' + Math.round(token_count / t) + ' pr');
+    }
+    if (tee) {
+        closeSync(output);
+    }
+}
+
+function toStringTree(tree: ParseTree, recog?: Parser | null): string {
+    var sb = new StringBuilder();
+    let ruleNames = recog?.ruleNames ?? null;
+    toStringTree2(sb, tree, 0, ruleNames);
+    return sb.toString();
+}
+
+function toStringTree2(sb: StringBuilder, tree: ParseTree, indent: number, ruleNames: string[] | null): void {
+    let s = getNodeText(tree, ruleNames);
+    s = escapeWhitespace(s!, false);
+    const c = tree.getChildCount();
+    if (c === 0) {
+        for (let i = 0; i \< indent; ++i) sb.Append(" ");
+        sb.Append(s); sb.AppendLine("");
+        return;
+    }
+    for (let i = 0; i \< indent; ++i) sb.Append(" ");
+    sb.Append(s); sb.AppendLine("");
+    for (let i = 0; i \< c; i++) {
+        toStringTree2(sb, tree.getChild(i)!, indent+1, ruleNames);
+    }
+}
+
+function getNodeText(t: ParseTree, ruleNames: string[] | null, recog?: Parser | null): string | undefined {
+    if (ruleNames !== null) {
+        if (t instanceof ParserRuleContext) {
+            const context = t.ruleContext;
+            const altNumber = context.getAltNumber();
+            // use const value of ATN.INVALID_ALT_NUMBER to avoid circular dependency
+            if (altNumber !== 0) {
+                return ruleNames[t.ruleIndex] + ":" + altNumber;
+            }
+
+            return ruleNames[t.ruleIndex];
+        } else if (t instanceof ErrorNode) {
+            return t.toString();
+        } else if (t instanceof TerminalNode) {
+            if (t.symbol !== null) {
+                return t.symbol.text;
+            }
+        }
+    }
+    const payload = t.getPayload();
+    if (isToken(payload)) {
+        return payload.text;
+    }
+
+    return String(t.getPayload());
+}
+
+
+main()

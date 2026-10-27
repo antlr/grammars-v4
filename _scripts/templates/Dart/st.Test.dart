@@ -1,0 +1,324 @@
+// Generated from trgen <version>
+
+import 'package:antlr4/antlr4.dart';
+<tool_grammar_tuples:{x | import '<x.GeneratedFileName>';
+} >
+import 'Args.dart' as args_holder;
+import 'MyErrorListener.dart';
+import 'dart:io';
+import 'dart:convert';
+import 'BinaryCharStream.dart';
+
+// Wrapper to fix InputStream.sourceName always returning '\<unknown>'
+class NamedCharStream extends CharStream {
+  final CharStream _inner;
+  final String _name;
+
+  NamedCharStream(this._inner, this._name);
+
+  @override
+  String get sourceName => _name;
+
+  @override
+  int get index => _inner.index;
+
+  @override
+  int get size => _inner.size;
+
+  @override
+  void consume() => _inner.consume();
+
+  @override
+  int? LA(int offset) => _inner.LA(offset);
+
+  @override
+  int mark() => _inner.mark();
+
+  @override
+  void release(int marker) => _inner.release(marker);
+
+  @override
+  void seek(int _index) => _inner.seek(_index);
+
+  @override
+  String getText(Interval interval) => _inner.getText(interval);
+
+  @override
+  String toString() => _inner.toString();
+}
+
+
+var tee = false;
+var output_dir = "";
+var show_tree = false;
+var show_tokens = false;
+var show_trace = false;
+var inputs = List\<String>.empty(growable: true);
+var is_fns = List\<bool>.empty(growable: true);
+var file_encoding = "<file_encoding>";
+var binary = <binary>;
+var error_code = 0;
+var string_instance = 0;
+var prefix = "";
+var quiet = false;
+var perf = false;
+var per_file = false;
+var sll = false;
+var total_tokens = 0;
+var total_parse_seconds = 0.0;
+var first_file_tokens = 0;
+var first_file_parse_seconds = 0.0;
+
+void main(List\<String> args) async {
+    // Set command-line args before anything else.
+    args_holder.commandLineArgs = args;
+    for (int i = 0; i \< args.length; ++i)
+    {
+        if (args[i] == "-tokens")
+        {
+            show_tokens = true;
+        }
+        else if (args[i] == "-tree")
+        {
+            show_tree = true;
+        }
+        else if (args[i] == "-prefix")
+        {
+            prefix = args[++i] + " ";
+        }
+        else if (args[i] == "-input")
+        {
+            inputs.add(args[++i]);
+            is_fns.add(false);
+        }
+        else if (args[i] == "-tee")
+        {
+            tee = true;
+        }
+        else if (args[i] == "-o")
+        {
+            output_dir = args[++i];
+            tee = true;
+        }
+        else if (args[i] == "-x")
+        {
+            for (; ; )
+            {
+                String? line = stdin.readLineSync(encoding: utf8);
+                line = line?.trim();
+                if (line == null || line == "")
+                {
+                    break;
+                }
+                inputs.add(line);
+                is_fns.add(true);
+            }
+        }
+        else if (args[i] == "-q")
+        {
+            quiet = true;
+        }
+        else if (args[i] == "--perf")
+        {
+            perf = true;
+        }
+        else if (args[i] == "--per-file")
+        {
+            per_file = true;
+        }
+        else if (args[i] == "--sll")
+        {
+            sll = true;
+        }
+        else if (args[i] == "-trace")
+        {
+            show_trace = true;
+        }
+        else if (args[i][0] == '-')
+        {
+            // Ignore unknown option.
+        }
+        else
+        {
+            inputs.add(args[i]);
+            is_fns.add(true);
+        }
+    }
+    if (inputs.length == 0)
+    {
+        await ParseStdin();
+    }
+    else
+    {
+        Stopwatch s = new Stopwatch();
+        s.start();
+        for (int f = 0; f \< inputs.length; ++f)
+        {
+            if (is_fns[f])
+                await ParseFilename(inputs[f], f);
+            else
+                await ParseString(inputs[f], f);
+        }
+        s.stop();
+        var et = s.elapsedMilliseconds / 1000.0;
+        if (!quiet) {
+            if (!perf) {
+                stderr.writeln(prefix + "TT: " + et.toString());
+            } else {
+            var warm_tokens = total_tokens - first_file_tokens;
+            var warm_seconds = total_parse_seconds - first_file_parse_seconds;
+            var warm_tps = (inputs.length > 1 && warm_seconds > 0)
+                ? (warm_tokens / warm_seconds).round().toString()
+                : "n.a.";
+            var first_tps = first_file_parse_seconds > 0 ? (first_file_tokens / first_file_parse_seconds) : 0.0;
+            var speedup = (inputs.length > 1 && warm_seconds > 0 && first_tps > 0)
+                ? ((warm_tokens / warm_seconds) / first_tps).toStringAsFixed(2)
+                : "n.a.";
+            stderr.writeln(prefix + "PT: " + total_parse_seconds.toString());
+            stderr.writeln(prefix + "OT: " + (et - total_parse_seconds).toString());
+            stderr.writeln(prefix + "TT: " + et.toString());
+            stderr.writeln(prefix + "PR: " + (total_parse_seconds > 0 ? (total_tokens / total_parse_seconds).round().toString() : "0"));
+            stderr.writeln(prefix + "Post-warmup PR: " + warm_tps);
+            stderr.writeln(prefix + "Post-warmup speed up: " + speedup);
+            }
+        }
+    }
+    exit(error_code);
+}
+
+Future\<void> ParseStdin() async
+{
+    final List\<int> bytes = \<int>[];
+    int byte = stdin.readByteSync();
+    while (byte >= 0) {
+        bytes.add(byte);
+        byte = stdin.readByteSync();
+    }
+    var input = utf8.decode(bytes);
+    var str = await InputStream.fromString(input);
+    await DoParse(str, "stdin", 0);
+}
+
+Future\<void> ParseString(String input, int row_number) async
+{
+    var str = await InputStream.fromString(input);
+    await DoParse(str, "string" + string_instance.toString(), row_number);
+    string_instance++;
+}
+
+Future\<void> ParseFilename(String input, int row_number) async
+{
+    if (file_encoding == "") {
+        var str = await InputStream.fromPath(input);
+        var namedStr = NamedCharStream(str, input);
+        await DoParse(namedStr, input, row_number);
+    } else {
+        var enc = Encoding.getByName(file_encoding);
+        var str = await InputStream.fromPath(input, encoding: enc!);
+        var namedStr = NamedCharStream(str, input);
+        await DoParse(namedStr, input, row_number);
+    }
+}
+
+Future\<void> DoParse(CharStream str, String input_name, int row_number) async
+{
+    String out_name = input_name;
+    if (output_dir != "") {
+        String absPath = File(input_name).absolute.path;
+        String root = Directory('<source_example_dir_unix>').absolute.path;
+        String rootPrefix = root.endsWith(Platform.pathSeparator)
+            ? root : root + Platform.pathSeparator;
+        String rootless = absPath.startsWith(rootPrefix)
+            ? absPath.substring(rootPrefix.length)
+            : absPath.split(Platform.pathSeparator).last;
+        out_name = output_dir + '/' + rootless;
+        await Directory(File(out_name).parent.path).create(recursive: true);
+    }
+    if (binary) str = new BinaryCharStream(str);
+    <tool_grammar_tuples:{x|<x.GrammarAutomName>.checkVersion();
+    }>
+    var lexer = <lexer_name>(str);
+    if (show_tokens)
+    {
+        for (int i = 0; ; ++i)
+        {
+            var token = lexer.nextToken();
+            var wtoken = token as CommonToken;
+            wtoken.tokenIndex = i;
+            stderr.writeln(token.toString());
+            if (token.type == -1)
+                break;
+        }
+        lexer.reset(true);
+    }
+    var tokens = CommonTokenStream(lexer);
+    var parser = <parser_name>(tokens);
+    if (sll) parser.interpreter!.predictionMode = PredictionMode.SLL;
+    IOSink output;
+    if (tee)
+    {
+        output =  File(out_name + ".errors").openWrite();
+    }
+    else
+    {
+        output = stderr;
+    }
+    var listener_lexer = new MyErrorListener(quiet, tee, output);
+    var listener_parser = new MyErrorListener(quiet, tee, output);
+    lexer.removeErrorListeners();
+    parser.removeErrorListeners();
+    lexer.addErrorListener(listener_lexer);
+    parser.addErrorListener(listener_parser);
+    if (show_trace)
+    {
+        parser.setTrace(true);
+        // Missing ATN trace.
+    }
+    Stopwatch s = new Stopwatch();
+    s.start();
+    var tree = parser.<start_symbol>();
+    s.stop();
+    var token_count = tokens.size;
+    total_tokens += token_count;
+    var et = s.elapsedMilliseconds / 1000.0;
+    total_parse_seconds += et;
+    if (row_number == 0) {
+        first_file_tokens = token_count;
+        first_file_parse_seconds = et;
+    }
+    var result = "";
+    if (parser.numberOfSyntaxErrors > 0)
+    {
+        result = "fail";
+        error_code = 1;
+    }
+    else
+    {
+        result = "success";
+    }
+    if (show_tree)
+    {
+        if (tee)
+        {
+            try {
+                final fn = out_name + ".tree";
+                final File file = File(fn);
+                await file.writeAsString(tree.toStringTree(parser: parser));
+            } catch (e) {
+            }
+        }
+        else
+        {
+            stderr.writeln(tree.toStringTree(parser: parser));
+        }
+    }
+    if (!quiet && per_file)
+    {
+        stderr.writeln(prefix + "Dart " + row_number.toString() + " " + input_name + " " + result + " " + et.toString() + " s " + token_count.toString() + " tokens " + (et > 0 ? (token_count / et).round().toString() : "0") + " pr");
+    }
+    if (tee)
+    {
+        await output.flush();
+        await output.close();
+    }
+}

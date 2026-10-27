@@ -1,0 +1,8 @@
+#TITLE Empty Channel Demo
+#ARTIST Example
+#BPM 120
+#WAV01 1.wav
+
+#00111:
+#00121:01000000
+#00211:

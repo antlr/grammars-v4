@@ -247,3 +247,8 @@ AS
                    );
     END CATCH
 GO
+
+CHECKPOINT;
+GO
+CHECKPOINT 100;
+GO

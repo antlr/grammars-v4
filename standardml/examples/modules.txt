@@ -1,0 +1,10 @@
+signature COUNTER = sig
+  type t
+  val initial : t
+  val next : t -> t
+end
+structure Counter :> COUNTER = struct
+  type t = int
+  val initial = 0
+  fun next x = x + 1
+end
