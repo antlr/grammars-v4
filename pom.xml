@@ -204,7 +204,7 @@
 				<module>ctl</module>
 				<module>cto</module>
 				<module>cypher</module>
-                <module>d2</module>
+				<module>d2</module>
 				<module>dart2</module>
 				<module>databank</module>
 				<module>datalog</module>
@@ -242,6 +242,7 @@
                 <module>geekcode</module>
 				<module>gerber</module>
 				<module>gff3</module>
+				<module>gherkin</module>
 				<module>gql</module>
 				<module>glsl</module>
 				<module>gml</module>
