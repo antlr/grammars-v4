@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2023, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -32,16 +32,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar kql;
 
 kql_expression
-   : (operator_expression | expression_list) EOF
-   ;
-
-expression_list
-   : (operator_expression operator_expression)
-   | (expression_list operator_expression)
+   : operator_expression EOF
    ;
 
 operator_expression
-   : (all | and | any | near | none | not | onear | or | words | xrank | basic_expression | paren_expression)
+   : operator_expression operator_expression                                 # implicitAndExpression
+   | operator_expression 'AND' operator_expression                           # andExpression
+   | operator_expression 'OR' operator_expression                            # orExpression
+   | operator_expression 'NEAR' proximity_param? operator_expression         # nearExpression
+   | operator_expression 'ONEAR' proximity_param? operator_expression        # onearExpression
+   | operator_expression 'XRANK' '(' xrank_param_list ')' operator_expression # xrankExpression
+   | 'NOT' operator_expression                                               # notExpression
+   | 'ALL' '(' string_value+ ')'                                             # allExpression
+   | 'ANY' '(' string_value+ ')'                                             # anyExpression
+   | 'NONE' '(' string_value+ ')'                                            # noneExpression
+   | 'WORDS' '(' words_param_list ')'                                        # wordsExpression
+   | basic_expression                                                        # basicExpression
+   | paren_expression                                                        # parenExpression
    ;
 
 paren_expression
@@ -51,48 +58,13 @@ paren_expression
 basic_expression
    : (QUALIFICATION? UNQUOTED_STRING_VALUE)
    | (QUALIFICATION? QUOTED_STRING_VALUE)
+   | (QUALIFICATION? PROPERTY_TOKEN)
    | property_restriction
    ;
    // Operator expressions
-   
-all
-   : 'ALL' '(' STRING_VALUE+ ')'
-   ;
-
-and
-   : operator_expression 'AND' operator_expression
-   ;
-
-any
-   : 'ANY' '(' STRING_VALUE+ ')'
-   ;
-
-none
-   : 'NONE' '(' STRING_VALUE+ ')'
-   ;
-
-not
-   : 'NOT' operator_expression
-   ;
-
-or
-   : operator_expression 'OR' operator_expression
-   ;
-
-near
-   : operator_expression 'NEAR' proximity_param? operator_expression
-   ;
-
-onear
-   : operator_expression 'ONEAR' proximity_param? operator_expression
-   ;
 
 proximity_param
    : '(' (('N' '=')? INTEGER_VALUE)? ')'
-   ;
-
-words
-   : 'WORDS' '(' words_param_list ')'
    ;
 
 words_param_list
@@ -100,11 +72,12 @@ words_param_list
    ;
 
 words_param
-   : QUALIFICATION? STRING_VALUE
+   : QUALIFICATION? string_value
    ;
 
-xrank
-   : operator_expression 'XRANK' '(' xrank_param_list ')' operator_expression
+string_value
+   : QUOTED_STRING_VALUE
+   | UNQUOTED_STRING_VALUE
    ;
 
 xrank_param_list
@@ -121,9 +94,9 @@ xrank_param
    | ('n' '=' INTEGER_VALUE)
    ;
    // Property restriction
-   
+
 property_restriction
-   : QUALIFICATION? property_name PROPERTY_OPERATOR PROPERTY_VALUE
+   : QUALIFICATION? property_name PROPERTY_OPERATOR property_value
    ;
 
 property_name
@@ -131,33 +104,45 @@ property_name
    | QUOTED_STRING_VALUE
    ;
 
+INTEGER_VALUE
+   : [0-9]+
+   ;
+
+FLOAT_VALUE
+   : [0-9]+ '.' [0-9]*
+   ;
+
 PROPERTY_TOKEN
    : ('\u0030' .. '\u0039' | '\u0041' .. '\u005a' | '\u005f' | '\u0061' .. '\u007a' | '\u00aa' | '\u00b5' | '\u00ba' | '\u00c0' .. '\u00d6' | '\u00e0' .. '\uffff')+
    ;
 
-PROPERTY_VALUE
-   : PROPERTY_TYPED_VALUE
+property_value
+   : property_typed_value
    | UNQUOTED_PROPERTY_TOKEN
+   | PROPERTY_TOKEN
    | QUOTED_STRING_VALUE
    ;
 
 UNQUOTED_PROPERTY_TOKEN
-   : ('\u0001' .. '\u0008' | '\u000b' .. '\u000c' | '\u000e' .. '\u001f' | '\u0021' | '\u0023' .. '\u0027' | '\u002a' .. '\u003b' | '\u003d' | '\u003f' .. '\uffff')+
+   : ('\u0001' .. '\u0008' | '\u000b' .. '\u000c' | '\u000e' .. '\u001f' | '\u0021' | '\u0023' .. '\u0027' | '\u002a' .. '\u0039' | '\u003b' | '\u003f' .. '\uffff')+
    ;
 
-PROPERTY_TYPED_VALUE
-   : BOOLEAN_VALUE
-   | '\u0022' BOOLEAN_VALUE '\u0022'
+property_typed_value
+   : boolean_value
+   | '\u0022' boolean_value '\u0022'
    | FLOAT_VALUE ('..' FLOAT_VALUE)?
    | '\u0022' FLOAT_VALUE ('..' FLOAT_VALUE)? '\u0022'
    | INTEGER_VALUE ('..' INTEGER_VALUE)?
    | '\u0022' INTEGER_VALUE ('..' INTEGER_VALUE)? '\u0022'
-   | DATE_NAMED
-   | DATE_VALUE_NO_WS ('..' DATE_VALUE_NO_WS)?
-   | '\u0022' DATE_VALUE ('..' DATE_VALUE)? '\u0022'
+   | date_named
    ;
 
-DATE_NAMED
+boolean_value
+   : 'true'
+   | 'false'
+   ;
+
+date_named
    : 'today'
    | '\u0022' 'today' '\u0022'
    | 'yesterday'
@@ -179,65 +164,34 @@ PROPERTY_OPERATOR
    | '<='
    ;
 
-INTEGER_VALUE
-   : [0-9]+
-   ;
-
-FLOAT_VALUE
-   : [0-9]+ '.' [0-9]*
-   ;
-
-BOOLEAN_VALUE
-   : 'true'
-   | 'false'
-   ;
    // The following are culture dependent and are not specified here:
-   
+
    // float_value, integer_value, date-value, date-value-no-ws
-   
-DATE_VALUE_NO_WS
-   : INTEGER_VALUE
-   ;
 
-DATE_VALUE
-   : DATE_VALUE_NO_WS
-   ;
-
-STRING_VALUE
-   : QUOTED_STRING_VALUE
-   | UNQUOTED_STRING_VALUE
-   ;
    // <QUOTED_STRING_VALUE> can contain any characters, but a double quotation
-   
+
    // mark within the quoted string MUST be represented by two double quotation marks.
-   
+
 QUOTED_STRING_VALUE
    : DQUOTE ('\u0000' .. '\u0021' | DQUOTE DQUOTE | '\u0023' .. '\uffff')+ DQUOTE
    ;
    // <unQUOTED_STRING_VALUE> cannot contain white space,
-   
-   // double quotation mark, and parentheses.
-   
-   // <unQUOTED_STRING_VALUE> can contain property-chars in the beginning or at
-   
-   // the end, but not in the middle
-   
-UNQUOTED_STRING_VALUE
-   : PROPERTY_CHARS* ('\u0001' .. '\u0008' | '\u000b' .. '\u000c' | '\u000e' .. '\u001f' | '\u0021' | '\u0023' .. '\u0027' | '\u002a' .. '\u0039' | '\u003b' | '\u003f' .. '\uffff')+ PROPERTY_CHARS*
-   ;
 
-PROPERTY_CHARS
-   : ':'
-   | '='
-   | '>'
-   | '<'
+   // double quotation mark, and parentheses.
+
+   // <unQUOTED_STRING_VALUE> can contain property-chars in the beginning or at
+
+   // the end, but not in the middle
+
+UNQUOTED_STRING_VALUE
+   : ('\u0001' .. '\u0008' | '\u000b' .. '\u000c' | '\u000e' .. '\u001f' | '\u0021' | '\u0023' .. '\u0027' | '\u002a' .. '\u0039' | '\u003b' | '\u003f' .. '\uffff')+
    ;
 
 DQUOTE
    : '"'
    ;
    // General syntax element
-   
+
 QUALIFICATION
    : '+'
    | '-'
