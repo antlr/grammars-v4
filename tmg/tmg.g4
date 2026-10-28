@@ -25,7 +25,7 @@
 grammar tmg;
 
 program
-   : statement*
+   : statement* EOF
    ;
 
 statement
