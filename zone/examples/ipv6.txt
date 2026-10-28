@@ -1,0 +1,3 @@
+$ORIGIN example.test.
+www 300 IN AAAA 2001:db8::1
+    AAAA 2001:db8::2

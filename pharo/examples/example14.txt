@@ -1,0 +1,4 @@
+| stack |
+stack := OrderedCollection new.
+stack addFirst: 1; addFirst: 2; addFirst: 3.
+Transcript showCr: stack printString.

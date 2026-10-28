@@ -39,7 +39,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>module</entryPoint>
+					<entryPoint>module_</entryPoint>
 					<grammarName>abb</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>

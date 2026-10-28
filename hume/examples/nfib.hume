@@ -1,0 +1,8 @@
+-- the ubiquitous nfib function, using the "expression" shorthand
+
+nfib :: int 32 -> int 32;
+nfib 0 = 1;
+nfib 1 = 1;
+nfib n = 1 + nfib(n-1) + nfib(n-2);
+
+expression nfib 10;

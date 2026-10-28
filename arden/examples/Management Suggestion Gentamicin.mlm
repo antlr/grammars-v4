@@ -1,0 +1,77 @@
+maintenance:
+title: Dosing for gentamicin in renal failure;;
+mlmname: gentamicin_dosing;;
+arden: Version 3;;
+version: 1.00;;
+institution: Columbia-Presbyterian Medical Center;;
+author: George Hripcsak, M.D.;;
+specialist: ;;
+date: 1991-03-18;;
+validation: testing;;
+library:
+purpose:
+Suggest an appropriate gentamicin dose in the setting of renal
+insufficiency. (This MLM demonstrates a management suggestion.);;
+explanation:
+Patients with renal insufficiency require the same loading dose of
+gentamicin as those with normal renal function, but they require a
+reduced daily dose. The creatinine clearance is calculated by serum
+creatinine, age, and weight. If it is less than 30 ml/min, then an
+appropriate dose is calculated based on the clearance. If the
+ordered dose differs from the calculated dose by more than 20 %,
+then an alert is generated.;;
+keywords: gentamicin; dosing;;
+citations: ;;
+knowledge:
+type: data-driven;;
+data: /* an order for gentamicin evokes this MLM */
+gentamicin_order := event {medication_order where
+class = gentamicin};
+/* gentamicin doses */
+(loading_dose, periodic_dose, periodic_interval) :=
+read last {medication_order initial dose,
+periodic dose, interval};
+/* serum creatinine mg/dl */
+serum_creatinine := read last {serum_creatinine}
+where it occurred within the past 1 week;
+/* birthdate */
+birthdate := read last {birthdate};
+/* weight kg */
+weight := read last {weight}
+where it occurred within the past 3 months;
+;;
+evoke:
+gentamicin_order;
+;;
+logic: age := (now - birthdate) / 1 year;
+creatinine_clearance := (140 - age) * (weight) /
+(72 * serum_creatinine);
+/* the algorithm can be adjusted to handle higher clearances */
+if creatinine_clearance < 30 then
+calc_loading_dose := 1.7 * weight;
+calc_daily_dose := 3 * (0.05 + creatinine_clearance / 100);
+ordered_daily_dose := periodic_dose *
+periodic_interval /(1 day);
+/* check whether order is appropriate */
+if (abs(loading_dose - calc_loading_dose) /
+calc_loading_dose > 0.2)
+or
+(abs(ordered_daily_dose - calc_daily_dose) /
+calc_daily_dose > 0.2) then
+conclude true;
+endif;
+endif;
+;;
+action: write "Due to renal insufficiency, the dose of gentamicin " ||
+"should be adjusted. The patient's calculated " ||
+"creatinine clearance is " || creatinine_clearance ||
+" ml/min. A single loading dose of " ||
+calc_loading_dose || " mg should be given, followed by " ||
+calc_daily_dose || " mg daily. Note that dialysis may " ||
+"necessitate additional loading doses.";
+;;
+urgency: 50;;
+resources:
+default: en;;
+language: en;;
+end:

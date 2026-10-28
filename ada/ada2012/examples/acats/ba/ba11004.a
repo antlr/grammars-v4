@@ -1,0 +1,176 @@
+-- BA11004.A
+ --
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+ --
+ -- OBJECTIVE:
+ --      Check that a child library subprogram is not primitive subprogram
+ --      (i.e, is not inherited by types derived from a type declared in
+ --      the parent).
+ --
+ -- TEST DESCRIPTION:
+ --      Declare a type and two primitive subprograms in the parent package.
+ --      Declare public child subprograms that have the same profiles as the
+ --      the subprograms from the parent package.  In another package, derive 
+ --      a new type from the parent's type.
+ --      
+ --      In the main program, declare a new type.  Call the inherited 
+ --      operations from the parent.  Call the children subprograms.
+ --
+ --
+-- CHANGE HISTORY:
+--      06 Dec 94   SAIC    ACVC 2.0
+--
+ --!
+ 
+ package BA11004_0 is
+ 
+    type Visible_Integer is range 1..100;
+ 
+    function Inherited_Function (I : Visible_Integer) 
+      return Visible_Integer;                  
+ 
+    procedure Inherited_Procedure (I : in     Visible_Integer;
+                                   R :    out Visible_Integer);
+ 
+ end BA11004_0;
+ 
+      --=================================================================--
+ 
+ package body BA11004_0 is
+ 
+    function Inherited_Function (I : Visible_Integer) 
+      return Visible_Integer is
+ 
+    begin
+ 
+       -- Real body of function goes here.
+ 
+       return (I / 2);
+ 
+    end Inherited_Function;
+ 
+    ----------------------------------------------------
+ 
+    procedure Inherited_Procedure (I : in     Visible_Integer;
+                                   R :    out Visible_Integer) is
+    begin
+ 
+       -- Real body of procedure goes here.
+ 
+       R := I - 2;
+ 
+    end Inherited_Procedure;
+ 
+ end BA11004_0;
+ 
+      --=================================================================--
+ 
+ -- Public child function.  This child function is NOT inherited.
+ 
+ function BA11004_0.Not_Inherited_Func (I : Visible_Integer) 
+   return Visible_Integer is
+ 
+ begin
+ 
+    -- Real body of child function goes here.
+ 
+    return I/2;
+ 
+ end BA11004_0.Not_Inherited_Func;
+ 
+      --=================================================================--
+ 
+ -- Public child procedure.  This child procedure is NOT inherited.
+ 
+ procedure BA11004_0.Not_Inherited_Proc (I : in     Visible_Integer;
+                                         R :    out Visible_Integer) is
+ begin
+ 
+    -- Real body of child procedure goes here.
+ 
+    R := I - 2;
+ 
+ end BA11004_0.Not_Inherited_Proc;
+ 
+      --=================================================================--
+ 
+ with BA11004_0;     -- Parent package.
+ 
+ package BA11004_2 is
+ 
+    type New_Visible_Int is new BA11004_0.Visible_Integer;  
+ 
+    -- Inherits function Inherited_Function.
+    -- Inherits procedure Inherited_Procedure.
+ 
+ end BA11004_2;
+ 
+ -- No body for BA11004_2.
+ 
+      --=================================================================--
+ 
+ with BA11004_2;
+ use  BA11004_2;              -- New_Visible_Int directly visible,
+                              -- Inherited_Function directly visible,
+                              -- Inherited_Procedure directly visible.
+ with BA11004_0.Not_Inherited_Proc;
+ with BA11004_0.Not_Inherited_Func; 
+ 
+ use BA11004_0;
+ 
+ procedure BA11004 is
+ 
+    Client_Integer1 : New_Visible_Int := 36;
+ 
+    Client_Integer2 : New_Visible_Int;
+ 
+    Client_Integer3 : New_Visible_Int  
+                    := Inherited_Function (Client_Integer1);   -- OK
+ 
+    Client_Integer4 : New_Visible_Int  
+                    := Not_Inherited_Func (Client_Integer1);   -- ERROR:
+                                  -- function not defined for this type
+ 
+    Parent_Integer1 : Visible_Integer := 36;
+ 
+    Parent_Integer2 : Visible_Integer;
+ 
+    Parent_Integer3 : Visible_Integer
+                    := Inherited_Function (Parent_Integer1);   -- OK
+ 
+    Parent_Integer4 : Visible_Integer
+                    := Not_Inherited_Func (Parent_Integer1);   -- OK
+ begin      
+ 
+    Inherited_Procedure (Client_Integer1, Client_Integer2);    -- OK
+ 
+    Not_Inherited_Proc (Client_Integer1, Client_Integer2);     -- ERROR:
+                                 -- procedure not defined for this type
+ 
+    Inherited_Procedure (Parent_Integer1, Parent_Integer2);    -- OK
+ 
+    Not_Inherited_Proc (Parent_Integer1, Parent_Integer2);     -- OK 
+ 
+ end BA11004;
+ 

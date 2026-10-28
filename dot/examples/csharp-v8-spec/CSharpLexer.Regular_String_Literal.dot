@@ -1,0 +1,25 @@
+digraph ATN {
+rankdir=LR;
+s412[fontsize=11, label="412", shape=doublecircle, fixedsize=true, width=.6];
+s1760[fontsize=11,label="&rarr;\n1760*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1761[fontsize=11,label="&larr;\n1761", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1762[fontsize=11,label="{1762*\nd=56|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1763[fontsize=11,label="1763", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1764[fontsize=11,label="1764*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1765[fontsize=11,label="1765", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1766[fontsize=11,label="1766", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s411[fontsize=11,label="411", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1758[fontsize=11,label="1758", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1759[fontsize=11,label="1759", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s411 -> s1758 [fontname="Times-Italic", label="&epsilon;"];
+s1758 -> s1762 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'\\\"'", arrowhead = normal];
+s1762:p0 -> s1760 [fontname="Times-Italic", label="&epsilon;"];
+s1762:p1 -> s1763 [fontname="Times-Italic", label="&epsilon;"];
+s1760 -> s1759 [fontname="Times-Italic", label="&epsilon;"];
+s1763 -> s1765 [fontname="Times-Italic", label="&epsilon;"];
+s1759 -> s1761 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<Regular_String_Literal_Character>", arrowhead = normal];
+s1765 -> s1766 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'\\\"'", arrowhead = normal];
+s1761 -> s1764 [fontname="Times-Italic", label="&epsilon;"];
+s1766 -> s412 [fontname="Times-Italic", label="&epsilon;"];
+s1764 -> s1762 [fontname="Times-Italic", label="&epsilon;", style="dashed"];
+}

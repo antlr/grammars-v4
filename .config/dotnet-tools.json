@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "trash": {
+      "version": "4.8.0",
+      "commands": [
+        "trash"
+      ],
+      "rollForward": false
+    }
+  }
+}

@@ -1,0 +1,61 @@
+MODULE $vcgerrdef;
+/*
+/*  Copyright © 1996, Digital Equipment Corporation.
+/*
+/*
+/* Modifications:
+/*
+/*	006	Keith Knowles	 6-Aug-1985	(035 SVCG M)
+/*
+/*		Added diagn_v_abort_error flag.
+/*
+/* 	005	Tom Benson	07-Mar-1985	(180 VCG)
+/*
+/*		Eliminated declarations of the VCG$_ and SHR$_
+/*		error constants from this file, so that it now declares ONLY
+/*		the DIAGN_ structure, and those VCG$$_ constants actually used
+/*		(by the .TBL code). The VCG$ error constants only need to be 
+/*		declared for .PLI modules, and they should only be declared
+/*		there as GLOBALREF VALUEs, not as literals. The new file 
+/*		ERRORDEF.SRC has been created which declares them. Special case
+/*		code has been added to VCGSRCLIB.COM to append ERRORDEF.SRC to 
+/*		VCGERRDEF.SRC and replace the result in VCGSRCLIB.TLB. If SDL is
+/*		someday enhanced to support the declaration of external 
+/*		constants, this	special case code can be removed. 
+/*
+/*	004	Keith Knowles	14-Feb-1985	(173 VCG)
+/*
+/*		Corrected spelling of SUPWN (misspelled SUBWN).
+/*
+/*	003	Tom Benson	16-May-1984	(039 VCG)
+/*
+/*		Added UNLINKED_OPCODE error constants.
+/*
+/*	002	Caroline Davidson 16-Apr-1984	(025 VCG)
+/*
+/*		Added bitfield to vcg$gl_diag_control for the PSE data file.
+/*		Modified the meaning of "diagn_v_skip_listing", it will now
+/*		control the o/p to files which are not SYS$ERROR or SYS$OUTPUT.
+/*
+/*	001	Tom Benson	13-Feb-1984	(003 VCG)
+/*
+/*		Added modification history.
+/*
+/*
+AGGREGATE vcg$gl_diagn_control	STRUCTURE GLOBAL PREFIX diagn_ ;
+		nosrc_corrlat	BITFIELD MASK;
+		skip_listing	BITFIELD MASK;  /* M002
+		abort_listing	BITFIELD MASK;
+		abort_pse_file	BITFIELD MASK;	/* A002
+		abort_error	BITFIELD MASK;  /* A006
+		bit_spare	BITFIELD LENGTH 3;
+		END;
+/*
+/*  Declare VCG$$_ constants used in the TBL code. NOTE: Hex values used
+/*  MUST equal VCG$_BADCODE, VCG$_NO_ADA_EXP, AND VCG$_UNLINKED_OPCODE, 
+/*  respectively.
+/*
+CONSTANT vcg$$_badcode EQUALS ((%x10b8034@-3) & %xfff);
+CONSTANT vcg$$_no_ada_exp EQUALS ((%x10b8114@-3) & %xfff);
+CONSTANT vcg$$_unlinked_opcode EQUALS ((%x10b811c@-3) & %xfff);
+END_MODULE;

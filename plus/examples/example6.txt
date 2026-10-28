@@ -1,0 +1,6 @@
+select X from
+  case 1: Y := 10;
+  case 2: Y := 20;
+else
+  Y := 0;
+end select;

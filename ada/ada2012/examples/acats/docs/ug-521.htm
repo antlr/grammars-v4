@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>ImpDef Customization</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    DIV.Indented1 {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 2.0em; margin-bottom: 0.6em}
+    DIV.Bulleted-NoPrefix {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 2.0em; margin-right: 2.0em; margin-top: 0em; margin-bottom: 0.5em}
+    DIV.Bulleted {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 2.0em; margin-right: 2.0em; margin-top: 0em; margin-bottom: 0.5em; display: list-item; list-style-type: disc}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-52.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-522.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>5.2.1 ImpDef Customization</H1>
+<div class="Indented1"><SPAN STYLE="color: rgb(153,0,0)"><I>For ACATS 
+4.2, there are no changes to Impdef or any of its children from ACATS 
+4.1 to ACATS 4.2. A version of any of these packages that was tailored 
+for ACATS 4.1 should be valid for ACATS 4.2 unless some implementation 
+characteristics have changed.</I></SPAN>&nbsp;</div>
+<div class="Normal">ACATS tests use the entities in ImpDef to control 
+test execution. Much of the information in ImpDef relates to the timing 
+of running code; for example, the minimum time required to allow a task 
+switch may be used by a test as a parameter to a delay statement. The 
+time to use is obtained as an ImpDef constant.</div>
+<div class="Normal"><TT>impdef.a</TT> was added as a new feature to ACATS 
+2.0 suite. It is related to <TT>macro.dfs</TT> in that it must be customized 
+with values specific to an implementation and ACATS tests will rely on 
+these values. ImpDef is different in the following respects:</div>
+<div class="Bulleted">Defaults are provided. Some implementations may 
+be able to rely entirely on the default values and subprograms, so no 
+customization would be necessary.</div>
+<div class="Bulleted">Some implementations may choose to provide bodies 
+for procedures and/or functions. Bodies so provided must satisfy requirements 
+stated in ImpDef.</div>
+<div class="Bulleted">Tests depending on Impdef do not need customization 
+(macro substitution). Instead, ImpDef must be available at compile time 
+(that is, included in the environment) for tests that rely upon it. This 
+simplifies the customization process and management and also is similar 
+to the way that Ada projects typically manage configuration parameters. 
+</div>
+<div class="Normal">There are child packages of ImpDef for each of the 
+Specialized Needs Annexes. An implementation that uses one or more of 
+the Specialized Needs Annexes in its conformity assessment must customize 
+the associated ImpDef child packages (or rely on their defaults) and 
+must set the appropriate Booleans in impdef.a. It is not necessary to 
+customize Impdef children for Specialized Needs Annexes that are not 
+included in a particular conformity assessment.</div>
+<div class="Normal">Specific instructions for the values required by 
+ImpDef and its children are included in <TT>impdef.a</TT>, <TT>impdefc.a</TT>, 
+<TT>impdefd.a</TT>, <TT>impdefe.a</TT>, <TT>impdefg.a</TT>, and <TT>impdefh.a</TT>. 
+(Note that <TT>impdefc</TT>, for example, refers to Annex C.) An excerpt 
+from ImpDef is included in <A HREF="UG-B.HTM">Annex B</A>, &ldquo;<A HREF="UG-B.HTM">Parameterization 
+Files</A>&rdquo;.</div>
+<div class="Indented1"><SPAN STYLE="color: rgb(153,0,0)"><I>All implementations 
+must customize&nbsp;</I></SPAN><TT><SPAN STYLE="color: rgb(153,0,0)"><I>impdef.a</I></SPAN></TT><SPAN STYLE="color: rgb(153,0,0)"><I>&nbsp;unless they wish to rely on the defaults provided. ImpDef must be part 
+of the environment whenever a test that depends on it is processed. Similarly, 
+the child of Impdef corresponding to each Specialized Needs Annex that 
+the implementer intends to test during a conformity assessment must be 
+customized and be part of the environment when the Annex tests are processed.</I></SPAN> 
+</div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-52.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-522.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>

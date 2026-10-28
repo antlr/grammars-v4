@@ -1,0 +1,178 @@
+-- B431004
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--    The ACAA has created and maintains the Ada Conformity Assessment Test
+--    Suite for the purpose of conformity assessments conducted in accordance
+--    with the International Standard ISO/IEC 18009 - Ada: Conformity
+--    assessment of a language processor. This test suite should not be used
+--    to make claims of conformance unless used in accordance with
+--    ISO/IEC 18009 and any applicable ACAA procedures.
+--
+--*
+--
+-- OBJECTIVE:
+--    Check that legality rules for record component associations are
+--    enforced for an extension aggregate. Specifically:
+--      (A) The selector names can only name components and discriminants
+--          of the record extension, and cannot name components of
+--          other variants or of the type of the ancestor part;
+--      (B) A component association (other than others => <>) is illegal
+--          if it does not have an associated component;
+--      (C) The aggregate is illegal if it has needed components that are
+--          not associated with any component associations;
+--      (D) The aggregate is illegal if it has a needed component that is
+--          associated with more than one component association;
+--      (E) A component association with an expression cannot have two or
+--          more associated components of different types.
+--
+--    This test may appear to belong to 4.3.2 (which defines extension
+--    aggregates), but the rules being tested are for record component
+--    associations, and those are given in 4.3.1. Thus the test is
+--    named as part of 4.3.1.
+--
+-- CHANGE HISTORY:
+--    26 Apr 2007   RLB   Created test from outline of existing ACATS test.
+--!
+
+package B431004_Root is
+
+   type Base is tagged record
+      A : Integer := 11;
+      C : Character := 'C';
+   end record;
+
+end B431004_Root;
+
+
+with B431004_Root;
+package B431004_B is
+   type Short_Int is range 0 .. 99;
+   type Der2 is new B431004_Root.Base with record
+      B : Short_Int := 0;
+   end record;
+end B431004_B;
+
+
+with B431004_B;
+package B431004_C is
+    type Der3 is new B431004_B.Der2 with record
+        D : Character := 'E';
+        E : Integer := 92;
+    end record;
+end B431004_C;
+
+
+with B431004_C;
+package B431004_D is
+    type Der4 (Which : Boolean) is new B431004_C.Der3 with record
+        case Which is
+            when True =>
+               T : Character := 'T';
+            when False =>
+               F : Character := 'F';
+        end case;
+    end record;
+end B431004_D;
+
+
+with B431004_Root, B431004_B, B431004_C, B431004_D;
+procedure B431004 is
+    Bn : B431004_Root.Base := (A => 1, C => 'A');
+    BD2: B431004_B.Der2 := (A => 1, C => 'A', B => 10);
+
+    -- (A) The selector names can only name components and discriminants
+    --     of the record extension, and cannot name components of
+    --     other variants or of the type of the ancestor part;
+    -- Case 1: Components of other types.
+    A1 : B431004_B.Der2 := (Bn with 2, D => <>);                -- ERROR: D
+    A2 : B431004_B.Der2 := (B431004_Root.Base with
+                              B => 81, D => True);              -- ERROR: D
+    -- Case 2: Components of the wrong variant.
+    A3 : B431004_D.Der4 := (B431004_C.Der3 with
+                           Which => True, T => <>);             -- OK.
+    A4 : B431004_D.Der4 := (B431004_C.Der3 with
+                           Which => False, T => 'A');           -- ERROR: T
+    -- Case 3: Components of the ancestor.
+    A5 : B431004_C.Der3 := (Bn with 2, 'E', 4);                 -- OK.
+    A6 : B431004_C.Der3 := (B431004_Root.Base with
+                            B => 2, C => 'W', D => 'A', E => 4);-- ERROR: C
+    A7 : B431004_C.Der3 := (Bn with A => 13, others => <>);     -- ERROR: A
+    A8 : B431004_C.Der3 := (B431004_Root.Base with
+                            2, 'A', 4, A => <>);                -- ERROR: A
+
+    -- (B) A component association (other than others => <>) is illegal
+    --     if it does not have an associated component;
+    -- Case 1: others => expr.
+    B1 : B431004_B.Der2 := (Bn with 2, others => True);     -- ERROR: others
+    B2 : B431004_B.Der2 := (B431004_Root.Base with
+                             B => 19, others => 'A');       -- ERROR: others
+    -- Case 2: Too many positional components.
+    B3 : B431004_B.Der2 := (Bn with 2, True);               -- ERROR: True
+    B4 : B431004_C.Der3 := (Bn with 2, 'E', 4, 'A');        -- ERROR: 'A'
+
+    -- (C) The aggregate is illegal if it has needed components that are
+    --     not associated with any component associations;
+    C1 : B431004_C.Der3 := (Bn with D => 'E', E => 4);      -- ERROR: B needed
+    C2 : B431004_C.Der3 := (Bn with D | E => <>);           -- ERROR: B needed
+    C3 : B431004_C.Der3 := (B431004_Root.Base with 2, 'E'); -- ERROR: E needed
+    C4 : B431004_C.Der3 := (BD2 with D | E => <>);          -- OK.
+    C5 : B431004_C.Der3 := (B431004_B.Der2 with 'E', 2);    -- OK.
+
+    -- (D) The aggregate is illegal if it has a needed component that is
+    --     associated with more than one component association;
+    -- Case 1: The same component is named twice.
+    D1 : B431004_C.Der3 := (B431004_Root.Base with
+                            B => 2, D => 'W', D => 'A', E => 4);-- ERROR: D
+    D2 : B431004_C.Der3 := (Bn with B => 2,
+                              D => <>, E => 4, B => <>);        -- ERROR: B
+    -- Case 2: A component is included positionally, and then named.
+    D3 : B431004_C.Der3 := (Bn with 2, 'D', E => 4, B => <>);   -- ERROR: B
+    D4 : B431004_C.Der3 := (B431004_Root.Base with
+                              2, 'W', D => 'A', E => 4);        -- ERROR: D
+
+    -- (E) A component association with an expression cannot have two or
+    --     more associated components of different types.
+    -- Case 1: A named component with two component names.
+    E1 : B431004_C.Der3 := (Bn with B | E => 2, D => 'X');    -- ERROR: B | E
+    E2 : B431004_C.Der3 := (B431004_Root.Base with
+                              D => 'W', B | E => 6);          -- ERROR: B | E
+    E3 : B431004_C.Der3 := (B431004_Root.Base with
+                              D => 'W', B | E => <>);         -- OK.
+    E4 : B431004_D.Der4 := (B431004_Root.Base with Which => True,
+                              D | T => 'A', B => 6, E => 6);  -- OK.
+    -- Case 2: others => expr.
+    E5 : B431004_C.Der3 := (Bn with D => 'X', others => 18);  -- ERROR: others
+    E6 : B431004_C.Der3 := (B431004_Root.Base with
+                              D => 'W', others => 26);        -- ERROR: others
+    E7 : B431004_C.Der3 := (B431004_Root.Base with
+                              D => 'W', others => <>);        -- OK.
+    E8 : B431004_D.Der4 := (B431004_Root.Base with Which => True,
+                              B => 6, E => 6, others => 'R'); -- OK.
+
+begin
+    null;
+end B431004;
+

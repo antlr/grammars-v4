@@ -1,0 +1,101 @@
+-- BA110130.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--     The ACAA has created and maintains the Ada Conformity Assessment Test
+--     Suite for the purpose of conformity assessments conducted in accordance
+--     with the International Standard ISO/IEC 18009 - Ada: Conformity
+--     assessment of a language processor. This test suite should not be used
+--     to make claims of conformance unless used in accordance with
+--     ISO/IEC 18009 and any applicable ACAA procedures.
+--*
+--
+-- OBJECTIVE
+--     Check that private child subprograms must have a specification.
+--     Check that package bodies cannot be declared private.
+--     Check that subunits cannot be declared private.
+--
+-- TEST DESCRIPTION
+--     This is technically a syntax test, which we usually don't test.
+--     However, the Ada grammar requires two token lookahead to
+--     differentiate between a private with clause and the start of a
+--     private unit. A two token lookahead is beyond the
+--     capabilities of most automated parser generators. Thus, it is likely
+--     that this check will be implemented outside of the syntax; in that
+--     case it would be easy to omit.
+--
+-- TEST FILES:
+--      This test consists of the following files:
+--      -> BA110130.A
+--         BA110131.A
+--         BA110132.A
+--         BA110133.A
+--         BA110134.AM
+--
+-- PASS/FAIL CRITERIA:
+--      Files BA110131.A, BA110132.A, and BA110133.A contain errors.
+--      All errors in these files must be detected to pass the test. Compiling
+--      the body file BA110134.AM (which contains two bodies) is optional.
+--
+-- CHANGE HISTORY:
+--      21 Mar 2007   RLB   Created test from submitted test.
+--      13 Feb 2018   RLB   Updated Pass/Fail criteria to note that processing
+--                          the last source file is optional (it is unnecessary
+--                          to test the objective). Added error location
+--                          indicators.
+--
+--!
+package BA11013A is
+
+    pragma Elaborate_Body (BA11013A); -- Force a body.
+
+    package Pack1 is
+        Global_Result1 : Integer := 0;
+    end Pack1;
+
+    Global_Result2 : Integer := 0;
+
+private
+    Global_Result3 : Integer := 0;
+end BA11013A;
+
+--------------------------
+
+private procedure BA11013A.Child1;                -- OK. {1;1}
+
+procedure BA11013A.Child1 is                      -- OK. {1}
+    procedure Stub is separate;
+begin
+    null;
+end BA11013A.Child1;
+
+--------------------------
+
+private package BA11013A.Child3 is                -- OK. {1}
+    procedure Dummy;
+end BA11013A.Child3;
+
+--------------------------
+

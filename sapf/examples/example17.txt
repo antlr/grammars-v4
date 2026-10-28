@@ -1,0 +1,2 @@
+{analog_bubbles :rate1 -.2 :decay 8}.out play	; change parameters
+

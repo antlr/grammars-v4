@@ -1,0 +1,4 @@
+size = 2 + 3 * 4;
+ratio = (10 - 2) / 4;
+offset = -2.5;
+panel { width: $size; };

@@ -1,0 +1,935 @@
+-- CXC7006.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check the functionality of Ada.Task_Termination.
+--
+-- TEST DESCRIPTION:
+--      This test creates tasks and sets up termination handlers for those
+--      tasks with Set_Dependents_Fallback_Handler or Set_Specific_Handler.
+--      The test makes sure that a handler is called for every task that
+--      terminates, that the correct handler is called when more than one
+--      handler could apply, and that the parameters to the handler are
+--      correct.  The test also tries cases when an exception is propagated
+--      out of a user-defined finalization routine when the task is being
+--      finalized, and when an unhandled exception is propagated during
+--      task elaboration.
+--
+-- APPLICABILITY CRITERIA:
+--      This test is only applicable for a compiler attempting validation
+--      for the Systems Programming Annex.
+--
+-- CHANGE HISTORY:
+--      23 Nov 2009   AJB   Initial version.
+--      01 Jan 2010   AJB   Fixed some illegal uses of "=" on
+--                          Exception_Occurrence.
+--      11 Jul 2012   AJB   Changes to Test_5 for AI05-0202.
+--      18 Jul 2012   RLB   Renamed; minor changes to formatting of test.
+--      20 Jul 2012   AJB   Fixed problem in which Exception_Message was
+--                          tested for correctness after Program_Error was
+--                          raised.
+--      20 Jan 2014   RLB   Added missing Applicability Criteria.
+
+with Ada.Task_Identification;
+with Ada.Task_Termination;
+with Ada.Exceptions;
+package CXC7006_1 is
+
+   package ATI renames Ada.Task_Identification;
+   package ATT renames Ada.Task_Termination;
+   package AE renames Ada.Exceptions;
+
+   type String_Acc is access all String;
+
+   type Task_ID_Array is array (Natural range <>) of ATI.Task_ID;
+   type Cause_Array is array (Natural range <>) of ATT.Cause_Of_Termination;
+   type Exception_Array is array (Natural range <>) of
+           AE.Exception_ID;
+
+   subtype Handler_ID is Integer range 0 .. 3;
+   type Handler_ID_Array is array (Natural range <>) of Handler_ID;
+
+   procedure Start_Test (Name : String);
+   procedure Set_Task_IDs (IDs : Task_ID_Array);
+   procedure Set_Expected_Causes (Causes : Cause_Array);
+   procedure Set_Expected_Handlers (IDs : Handler_ID_Array);
+   procedure Set_Expected_Message (Message : String);
+   procedure Set_Expected_Exception (ID : AE.Exception_ID);
+   procedure Set_Expected_Exceptions (IDs : Exception_Array);
+
+   type Handler_Test_Procedure is access procedure
+           (Param   : in Integer;
+            OK      : out Boolean;
+            Err_Msg : out String_Acc);
+   procedure Set_Handler_Test (Index     : in Integer;
+                               Test_Proc : in Handler_Test_Procedure;
+                               Param     : in Integer);
+
+   function The_Handler (Which : Handler_ID) return ATT.Termination_Handler;
+
+   procedure Test_All_Handlers_Called;
+
+end CXC7006_1;
+
+with Report;
+package body CXC7006_1 is
+
+   type Bool_Array is array (Natural range <>) of Boolean;
+   type Test_Proc_Array is array (Natural range <>) of Handler_Test_Procedure;
+   type Int_Array is array (Natural range <>) of Integer;
+
+   type Task_ID_Array_Acc is access all Task_ID_Array;
+   type Cause_Array_Acc is access all Cause_Array;
+   type Handler_ID_Array_Acc is access all Handler_ID_Array;
+   type Bool_Array_Acc is access all Bool_Array;
+   type Test_Proc_Array_Acc is access all Test_Proc_Array;
+   type Int_Array_Acc is access all Int_Array;
+   type Exception_Array_Acc is access all Exception_Array;
+
+   Test_Name : String_Acc;
+   ID_Array : Task_ID_Array_Acc;
+   Expected_Cause : Cause_Array_Acc;
+   Expected_Handler : Handler_ID_Array_Acc;
+   Handler_Called : Bool_Array_Acc;
+   Which_Handler : Handler_ID_Array_Acc;
+   Expected_Message : String_Acc;
+   Expected_Exception : AE.Exception_ID;
+   Expected_Exceptions : Exception_Array_Acc;
+      -- if null, then exceptions are checked against Expected_Exception
+   Test_Procs : Test_Proc_Array_Acc;
+   Test_Proc_Params : Int_Array_Acc;
+
+   procedure Start_Test (Name : String) is
+   begin
+      Report.Comment ("Starting test: " & Name);
+      Test_Name := new String' (Name);
+      ID_Array := null;
+      Expected_Cause := null;
+      Handler_Called := null;
+      Expected_Handler := null;
+      Expected_Message := null;
+      Test_Procs := null;
+      Test_Proc_Params := null;
+   end Start_Test;
+
+   procedure Set_Task_IDs (IDs : Task_ID_Array) is
+   begin
+      ID_Array := new Task_ID_Array' (IDs);
+      Handler_Called := new Bool_Array (IDs'range);
+      Handler_Called.all := (others => False);
+      Which_Handler := new Handler_ID_Array (IDs'range);
+      Which_Handler.all := (others => 0);
+      Expected_Handler := new Handler_ID_Array (IDs'range);
+      Expected_Handler.all := (others => 0);
+      Test_Procs := new Test_Proc_Array (IDs'range);
+      Test_Procs.all := (others => null);
+      Test_Proc_Params := new Int_Array (IDs'range);
+   end Set_Task_IDs;
+
+   procedure Set_Expected_Causes (Causes : Cause_Array) is
+   begin
+      Expected_Cause := new Cause_Array' (Causes);
+   end Set_Expected_Causes;
+
+   procedure Set_Expected_Handlers (IDs : Handler_ID_Array) is
+   begin
+      Expected_Handler.all := IDs;
+   end Set_Expected_Handlers;
+
+   procedure Set_Expected_Message (Message : String) is
+   begin
+      Expected_Message := new String' (Message);
+   end Set_Expected_Message;
+
+   procedure Set_Expected_Exception (ID : AE.Exception_ID) is
+   begin
+      Expected_Exception := ID;
+      Expected_Exceptions := null;
+   end Set_Expected_Exception;
+
+   procedure Set_Expected_Exceptions (IDs : Exception_Array) is
+   begin
+      Expected_Exceptions := new Exception_Array' (IDs);
+   end Set_Expected_Exceptions;
+
+   procedure Set_Handler_Test (Index     : in Integer;
+                               Test_Proc : in Handler_Test_Procedure;
+                               Param     : in Integer) is
+   begin
+      if Index in Test_Procs'range then
+         Test_Procs (Index) := Test_Proc;
+         Test_Proc_Params (Index) := Param;
+      end if;
+   end Set_Handler_Test;
+
+   protected PT is
+      procedure Handler_0
+          (Cause : in Ada.Task_Termination.Cause_Of_Termination;
+           T     : in Ada.Task_Identification.Task_ID;
+           X     : in Ada.Exceptions.Exception_Occurrence);
+      procedure Handler_1
+          (Cause : in Ada.Task_Termination.Cause_Of_Termination;
+           T     : in Ada.Task_Identification.Task_ID;
+           X     : in Ada.Exceptions.Exception_Occurrence);
+      procedure Handler_2
+          (Cause : in Ada.Task_Termination.Cause_Of_Termination;
+           T     : in Ada.Task_Identification.Task_ID;
+           X     : in Ada.Exceptions.Exception_Occurrence);
+      procedure Handler_3
+          (Cause : in Ada.Task_Termination.Cause_Of_Termination;
+           T     : in Ada.Task_Identification.Task_ID;
+           X     : in Ada.Exceptions.Exception_Occurrence);
+   end PT;
+
+   function The_Handler (Which : Handler_ID) return ATT.Termination_Handler is
+   begin
+      case Which is
+         when 0 => return PT.Handler_0'access;
+         when 1 => return PT.Handler_1'access;
+         when 2 => return PT.Handler_2'access;
+         when 3 => return PT.Handler_3'access;
+      end case;
+   end The_Handler;
+
+   protected body PT is
+
+      procedure Handler (ID    : in Handler_ID;
+                         Cause : in Ada.Task_Termination.Cause_Of_Termination;
+                         T     : in Ada.Task_Identification.Task_ID;
+                         X     : in Ada.Exceptions.Exception_Occurrence) is
+         use type ATT.Cause_Of_Termination;
+         use type ATI.Task_ID;
+         use type AE.Exception_Occurrence;
+         use type AE.Exception_ID;
+         OK : Boolean;
+         Err_Msg : String_Acc;
+      begin
+         for I in ID_Array'range loop
+            if T = ID_Array (I) then
+               if Handler_Called (I) then
+                  Report.Failed
+                     (Test_Name.all & ": Handler called twice for same task");
+               end if;
+               Handler_Called (I) := True;
+               Which_Handler (I) := ID;
+               if Cause /= Expected_Cause (I) then
+                  Report.Failed
+                     (Test_Name.all & ": Handler called with wrong Cause");
+               end if;
+               if Cause = ATT.Unhandled_Exception then
+                  if AE.Exception_Identity(X) = AE.Null_ID then
+                     Report.Failed (Test_Name.all &
+                        ": Unhandled_Exception handler called with " &
+                          "null occurrence");
+                  elsif (Expected_Exceptions = null and then
+                         AE.Exception_Identity (X) /= Expected_Exception)
+                             or else
+                        (Expected_Exceptions /= null and then
+                         AE.Exception_Identity (X) /= Expected_Exceptions (I))
+                             then
+                     Report.Failed (Test_Name.all &
+                        ": Unhandled_Exception occurrence has wrong exception");
+                  elsif AE.Exception_Identity (X) /= Program_Error'Identity
+                           and then
+                        AE.Exception_Message (X) /= Expected_Message.all then
+                     Report.Failed (Test_Name.all &
+                        ": Unhandled_Exception occurrence has wrong message");
+                  end if;
+               else
+                  if AE.Exception_Identity(X) /= AE.Null_ID then
+                     Report.Failed (Test_Name.all &
+                         ": Normal or Abnormal handler called with " &
+                           "non-null occurrence");
+                  end if;
+               end if;
+               if Test_Procs (I) /= null then
+                  Test_Procs (I).all (Test_Proc_Params (I), OK, Err_Msg);
+                  if not OK then
+                     Report.Failed (Test_Name.all & ": " & Err_Msg.all);
+                  end if;
+               end if;
+            end if;
+         end loop;
+      end Handler;
+
+      procedure Handler_0
+          (Cause : in Ada.Task_Termination.Cause_Of_Termination;
+           T     : in Ada.Task_Identification.Task_ID;
+           X     : in Ada.Exceptions.Exception_Occurrence) is
+      begin
+         Handler (0, Cause, T, X);
+      end Handler_0;
+
+      procedure Handler_1
+          (Cause : in Ada.Task_Termination.Cause_Of_Termination;
+           T     : in Ada.Task_Identification.Task_ID;
+           X     : in Ada.Exceptions.Exception_Occurrence) is
+      begin
+         Handler (1, Cause, T, X);
+      end Handler_1;
+
+      procedure Handler_2
+          (Cause : in Ada.Task_Termination.Cause_Of_Termination;
+           T     : in Ada.Task_Identification.Task_ID;
+           X     : in Ada.Exceptions.Exception_Occurrence) is
+      begin
+         Handler (2, Cause, T, X);
+      end Handler_2;
+
+      procedure Handler_3
+          (Cause : in Ada.Task_Termination.Cause_Of_Termination;
+           T     : in Ada.Task_Identification.Task_ID;
+           X     : in Ada.Exceptions.Exception_Occurrence) is
+      begin
+         Handler (3, Cause, T, X);
+      end Handler_3;
+
+   end PT;
+
+   procedure Test_All_Handlers_Called is
+      Not_Called : Boolean := False;
+   begin
+      for I in Handler_Called'range loop
+         if not Handler_Called (I) then
+            if not Not_Called then
+               Report.Failed (Test_Name.all &
+                  ": Termination handler not called for all tasks");
+               Not_Called := True;
+            end if;
+         elsif Which_Handler (I) /= Expected_Handler (I) then
+            Report.Failed (Test_Name.all &
+               ": Wrong handler called: expected " &
+               Integer'Image (Expected_Handler (I)) & ", got " &
+               Integer'Image (Which_Handler (I)));
+         end if;
+      end loop;
+   end Test_All_Handlers_Called;
+
+end CXC7006_1;
+
+with Ada.Finalization;
+with CXC7006_1;
+package CXC7006_2 is
+   type Fin_Type is new Ada.Finalization.Controlled with record
+      Raise_Exc : Boolean := False;
+      Fin_ID    : Integer := -1;
+   end record;
+
+   Fin_Exception : exception;
+
+   overriding
+   procedure Finalize (Obj : in out Fin_Type);
+
+   procedure Clear_Fin_Array;
+
+   procedure Test_Finalized (ID        : in Integer;
+                             Finalized : out Boolean;
+                             Err_Msg   : out CXC7006_1.String_Acc);
+
+end CXC7006_2;
+
+package body CXC7006_2 is
+
+   Fin_Array : array (1 .. 10) of Boolean := (others => False);
+
+   overriding
+   procedure Finalize (Obj : in out Fin_Type) is
+   begin
+      if Obj.Fin_ID in Fin_Array'range then
+         Fin_Array (Obj.Fin_ID) := True;
+      end if;
+      if Obj.Raise_Exc then
+         raise Fin_Exception;
+      end if;
+   end Finalize;
+
+   procedure Clear_Fin_Array is
+   begin
+      Fin_Array := (others => False);
+   end Clear_Fin_Array;
+
+   procedure Test_Finalized (ID        : in Integer;
+                             Finalized : out Boolean;
+                             Err_Msg   : out CXC7006_1.String_Acc) is
+   begin
+      if ID not in Fin_Array'range then
+         Finalized := False;
+         Err_Msg := new String' ("Fin_Type ID not set up correctly");
+      elsif not Fin_Array (ID) then
+         Finalized := False;
+         Err_Msg := new String' ("Fin_Type object not yet finalized");
+      else
+         Finalized := True;
+      end if;
+   end Test_Finalized;
+
+end CXC7006_2;
+
+with Report;
+with Ada.Task_Identification;
+with Ada.Task_Termination;
+with Ada.Exceptions;
+with CXC7006_1;
+with CXC7006_2;
+procedure CXC7006 is
+   package ATI renames Ada.Task_Identification;
+   package ATT renames Ada.Task_Termination;
+   package AE renames Ada.Exceptions;
+
+   Exception_1 : exception;
+   Exception_2 : exception;
+
+   Which_Exception : Integer;
+
+   procedure Do_Raise (Code : String) is
+   begin
+      if Which_Exception = 1 then
+         raise Exception_1 with "Do_Raise called: " & Code;
+      else
+         raise Exception_2 with "Do_Raise called: " & Code;
+      end if;
+   end Do_Raise;
+
+begin
+   Report.Test ("CXC7006", "Test Ada.Task_Termination");
+
+   Test_1:
+      -- Test fallback handler.
+   declare
+      Raise_Code : constant String := "first";
+   begin
+      declare
+         task type TT is
+            entry Which_Test (Cause : ATT.Cause_Of_Termination);
+            entry Stall;
+         end TT;
+
+         TT_Array : array (1 .. 3) of TT;
+         ID_Array : CXC7006_1.Task_ID_Array (TT_Array'range);
+         Expected_Cause : CXC7006_1.Cause_Array (TT_Array'range);
+
+         task body TT is
+            The_Cause : ATT.Cause_Of_Termination;
+         begin
+            accept Which_Test (Cause : ATT.Cause_Of_Termination) do
+               The_Cause := Cause;
+            end Which_Test;
+            case The_Cause is
+               when ATT.Normal =>
+                  delay 1.0;
+                  abort TT_Array (2);
+               when ATT.Abnormal =>
+                  accept Stall;
+               when ATT.Unhandled_Exception =>
+                  Do_Raise (Raise_Code);
+            end case;
+         end TT;
+      begin
+         CXC7006_1.Start_Test ("Test_1");
+         CXC7006_1.Set_Expected_Message ("Do_Raise called: " & Raise_Code);
+         Which_Exception := 1;
+         CXC7006_1.Set_Expected_Exception (Exception_1'Identity);
+         ATT.Set_Dependents_Fallback_Handler (CXC7006_1.The_Handler (0));
+
+         for I in ID_Array'range loop
+            ID_Array(I) := TT_Array(I)'Identity;
+         end loop;
+         CXC7006_1.Set_Task_IDs (ID_Array);
+
+         Expected_Cause := (ATT.Normal, ATT.Abnormal, ATT.Unhandled_Exception);
+         CXC7006_1.Set_Expected_Causes (Expected_Cause);
+
+         for I in TT_Array'range loop
+            TT_Array (I).Which_Test (Expected_Cause (I));
+         end loop;
+         -- now wait for all tasks to terminate
+      end;
+
+      CXC7006_1.Test_All_Handlers_Called;
+
+   end Test_1;
+
+   Test_2:
+      -- Test fallback handler set up by a task that is not the direct
+      -- master of the tasks that are terminating.
+   declare
+      Raise_Code : constant String := "second";
+   begin
+      declare
+         ID_Array : CXC7006_1.Task_ID_Array (1 .. 5);
+         Expected_Cause : CXC7006_1.Cause_Array (1 .. 5);
+
+         task Grandparent is
+            entry Wait_Until_Ready;
+            entry Start_Up;
+         end Grandparent;
+
+         task body Grandparent is
+
+            task Parent is
+               entry Wait_Until_Ready;
+               entry Start_Up;
+            end Parent;
+
+            task body Parent is
+
+               task type TT is
+                  entry Which_Test (Cause : ATT.Cause_Of_Termination);
+                  entry Stall;
+               end TT;
+
+               TT_Array : array (3 .. 5) of TT;
+
+               task body TT is
+                  The_Cause : ATT.Cause_Of_Termination;
+               begin
+                  accept Which_Test (Cause : ATT.Cause_Of_Termination) do
+                     The_Cause := Cause;
+                  end Which_Test;
+                  case The_Cause is
+                     when ATT.Normal =>
+                        delay 1.0;
+                        abort TT_Array (4);
+                     when ATT.Abnormal =>
+                        accept Stall;
+                     when ATT.Unhandled_Exception =>
+                        Do_Raise (Raise_Code);
+                  end case;
+               end TT;
+
+            begin
+               for I in TT_Array'range loop
+                  ID_Array(I) := TT_Array(I)'Identity;
+               end loop;
+               accept Wait_Until_Ready;
+               accept Start_Up;
+               for I in TT_Array'range loop
+                  TT_Array (I).Which_Test (Expected_Cause (I));
+               end loop;
+               -- now wait for all tasks to terminate
+            end Parent;
+
+         begin
+            ID_Array(2) := Parent'Identity;
+            Parent.Wait_Until_Ready;
+            accept Wait_Until_Ready;
+            accept Start_Up;
+            Parent.Start_Up;
+            -- now wait for all tasks to terminate
+         end Grandparent;
+
+      begin
+         CXC7006_1.Start_Test ("Test_2");
+         CXC7006_1.Set_Expected_Message ("Do_Raise called: " & Raise_Code);
+         Which_Exception := 2;
+         CXC7006_1.Set_Expected_Exception (Exception_2'Identity);
+         ATT.Set_Dependents_Fallback_Handler (CXC7006_1.The_Handler (0));
+
+         ID_Array(1) := Grandparent'Identity;
+         Grandparent.Wait_Until_Ready;
+         CXC7006_1.Set_Task_IDs (ID_Array);
+
+         Expected_Cause := (ATT.Normal, ATT.Normal,
+                            ATT.Normal, ATT.Abnormal,
+                            ATT.Unhandled_Exception);
+         CXC7006_1.Set_Expected_Causes (Expected_Cause);
+
+         Grandparent.Start_Up;
+         -- now wait for all tasks to terminate
+      end;
+
+      CXC7006_1.Test_All_Handlers_Called;
+
+   end Test_2;
+
+   Test_3:
+      -- Test fallback handler when fallback handlers are set up by
+      -- multiple "ancestors" of a task; make sure the correct handler is
+      -- called.
+   declare
+      Raise_Code : constant String := "third";
+   begin
+      declare
+         ID_Array : CXC7006_1.Task_ID_Array (1 .. 5);
+         Expected_Cause : CXC7006_1.Cause_Array (1 .. 5);
+         Expected_Handler : CXC7006_1.Handler_ID_Array (1 .. 5);
+
+         task Grandparent is
+            entry Wait_Until_Ready;
+            entry Start_Up;
+         end Grandparent;
+
+         task body Grandparent is
+
+            task Parent is
+               entry Wait_Until_Ready;
+               entry Start_Up;
+            end Parent;
+
+            task body Parent is
+
+               task type TT is
+                  entry Which_Test (Cause : ATT.Cause_Of_Termination);
+                  entry Stall;
+               end TT;
+
+               TT_Array : array (3 .. 5) of TT;
+
+               task body TT is
+                  The_Cause : ATT.Cause_Of_Termination;
+               begin
+                  accept Which_Test (Cause : ATT.Cause_Of_Termination) do
+                     The_Cause := Cause;
+                  end Which_Test;
+                  case The_Cause is
+                     when ATT.Normal =>
+                        delay 1.0;
+                        abort TT_Array (4);
+                     when ATT.Abnormal =>
+                        accept Stall;
+                     when ATT.Unhandled_Exception =>
+                        Do_Raise (Raise_Code);
+                  end case;
+               end TT;
+
+            begin
+               ATT.Set_Dependents_Fallback_Handler (CXC7006_1.The_Handler (0));
+               for I in TT_Array'range loop
+                  ID_Array(I) := TT_Array(I)'Identity;
+               end loop;
+               accept Wait_Until_Ready;
+               accept Start_Up;
+               for I in TT_Array'range loop
+                  TT_Array (I).Which_Test (Expected_Cause (I));
+               end loop;
+               -- now wait for all tasks to terminate
+            end Parent;
+
+         begin
+            ATT.Set_Dependents_Fallback_Handler (CXC7006_1.The_Handler (1));
+            ID_Array(2) := Parent'Identity;
+            Parent.Wait_Until_Ready;
+            accept Wait_Until_Ready;
+            accept Start_Up;
+            Parent.Start_Up;
+            -- now wait for all tasks to terminate
+         end Grandparent;
+
+      begin
+         CXC7006_1.Start_Test ("Test_3");
+         CXC7006_1.Set_Expected_Message ("Do_Raise called: " & Raise_Code);
+         Which_Exception := 2;
+         CXC7006_1.Set_Expected_Exception (Exception_2'Identity);
+         ATT.Set_Dependents_Fallback_Handler (CXC7006_1.The_Handler (2));
+
+         ID_Array(1) := Grandparent'Identity;
+         Grandparent.Wait_Until_Ready;
+         CXC7006_1.Set_Task_IDs (ID_Array);
+
+         Expected_Cause := (ATT.Normal, ATT.Normal,
+                            ATT.Normal, ATT.Abnormal,
+                            ATT.Unhandled_Exception);
+         CXC7006_1.Set_Expected_Causes (Expected_Cause);
+
+         Expected_Handler := (1 => 2, 2 => 1, others => 0);
+         CXC7006_1.Set_Expected_Handlers (Expected_Handler);
+
+         Grandparent.Start_Up;
+         -- now wait for all tasks to terminate
+      end;
+
+      CXC7006_1.Test_All_Handlers_Called;
+
+   end Test_3;
+
+   Test_4:
+      -- Test Set_Specific_Handler.
+   declare
+      Raise_Code : constant String := "fourth";
+   begin
+      declare
+
+         ID_Array : CXC7006_1.Task_ID_Array (1 .. 14);
+         Expected_Cause : CXC7006_1.Cause_Array (1 .. 14);
+         Expected_Handler : CXC7006_1.Handler_ID_Array (1 .. 14);
+
+         Delay_Amounts : constant array (1 .. 8) of Duration :=
+            (1.5, 2.7, 2.1, 3.1, 1.3, 2.2, 1.8, 2.9);
+
+         protected Delay_Amount is
+            procedure Next_Delay (D : out Duration);
+         private
+            Index : Integer := Delay_Amounts'First;
+         end Delay_Amount;
+
+         protected body Delay_Amount is
+
+            procedure Next_Delay (D : out Duration) is
+            begin
+               D := Delay_Amounts (Index);
+               Index := Index + 1;
+               if Index > Delay_Amounts'Last then
+                  Index := Delay_Amounts'First;
+               end if;
+            end Next_Delay;
+
+         end Delay_Amount;
+
+         task type TT1 is
+            entry Set_Up_IDs (Start_TT2, Start_TT3 : Integer);
+            entry Start_Up;
+         end TT1;
+
+         task body TT1 is
+
+            task type TT2 is
+               entry Set_Up_IDs (Start_TT3 : Integer);
+               entry Start_Up;
+            end TT2;
+
+            task body TT2 is
+
+               task type TT3 is
+                  entry Which_Test (Cause : ATT.Cause_Of_Termination);
+               end TT3;
+
+               task body TT3 is
+                  The_Cause : ATT.Cause_Of_Termination;
+                  D         : Duration;
+               begin
+                  accept Which_Test (Cause : ATT.Cause_Of_Termination) do
+                     The_Cause := Cause;
+                  end Which_Test;
+                  Delay_Amount.Next_Delay (D);
+                  delay D;
+                  case The_Cause is
+                     when ATT.Normal =>
+                        null;
+                     when ATT.Abnormal =>
+                        raise Program_Error;  -- won't happen in this test
+                     when ATT.Unhandled_Exception =>
+                        Do_Raise (Raise_Code);
+                  end case;
+               end TT3;
+
+               TT3_1 : TT3;
+               TT3_2 : TT3;
+            begin
+               accept Set_Up_IDs (Start_TT3 : Integer) do
+                  ID_Array(Start_TT3)     := TT3_1'Identity;
+                  ID_Array(Start_TT3 + 1) := TT3_2'Identity;
+               end Set_Up_IDs;
+               TT3_1.Which_Test (ATT.Normal);
+               TT3_2.Which_Test (ATT.Unhandled_Exception);
+               accept Start_Up;
+            end TT2;
+
+            TT2_1 : TT2;
+            TT2_2 : TT2;
+         begin
+            accept Set_Up_IDs (Start_TT2, Start_TT3 : Integer) do
+               ID_Array(Start_TT2)     := TT2_1'Identity;
+               ID_Array(Start_TT2 + 1) := TT2_2'Identity;
+               TT2_1.Set_Up_IDs (Start_TT3);
+               TT2_2.Set_Up_IDs (Start_TT3 + 2);
+            end Set_Up_IDs;
+            accept Start_Up;
+            TT2_1.Start_Up;
+            TT2_2.Start_Up;
+         end TT1;
+
+         TT1_1 : TT1;
+         TT1_2 : TT1;
+      begin
+         CXC7006_1.Start_Test ("Test_4");
+         CXC7006_1.Set_Expected_Message ("Do_Raise called: " & Raise_Code);
+         Which_Exception := 1;
+         CXC7006_1.Set_Expected_Exception (Exception_1'Identity);
+         ATT.Set_Dependents_Fallback_Handler (CXC7006_1.The_Handler (0));
+
+         ID_Array(1) := TT1_1'Identity;
+         ID_Array(2) := TT1_2'Identity;
+         TT1_1.Set_Up_IDs (3, 7);
+         TT1_2.Set_Up_IDs (5, 11);
+         CXC7006_1.Set_Task_IDs (ID_Array);
+
+         ATT.Set_Specific_Handler (ID_Array(1), CXC7006_1.The_Handler (1));
+         ATT.Set_Specific_Handler (ID_Array(3), CXC7006_1.The_Handler (2));
+         ATT.Set_Specific_Handler (ID_Array(5), CXC7006_1.The_Handler (3));
+         ATT.Set_Specific_Handler (ID_Array(7), CXC7006_1.The_Handler (2));
+         ATT.Set_Specific_Handler (ID_Array(9), CXC7006_1.The_Handler (1));
+         ATT.Set_Specific_Handler (ID_Array(11), CXC7006_1.The_Handler (3));
+         ATT.Set_Specific_Handler (ID_Array(13), CXC7006_1.The_Handler (2));
+         Expected_Handler := (1 => 1, 3 => 2, 5 => 3, 7 => 2,
+                              9 => 1, 11 => 3, 13 => 2, others => 0);
+         CXC7006_1.Set_Expected_Handlers (Expected_Handler);
+
+         Expected_Cause := (8 | 10 | 12 | 14 => ATT.Unhandled_Exception,
+                            others           => ATT.Normal);
+         CXC7006_1.Set_Expected_Causes (Expected_Cause);
+
+         TT1_1.Start_Up;
+         TT1_2.Start_Up;
+         -- wait for all tasks to complete
+      end;
+
+      CXC7006_1.Test_All_Handlers_Called;
+
+   end Test_4;
+
+   Test_5:
+      -- Make sure behavior is correct when tasks that terminate also have
+      -- controlled local variables.  Make sure that (1) local variables are
+      -- finalized before the termination handler is called; (2) if
+      -- the task terminates normally but finalization raises an exception,
+      -- the termination handler is still called with
+      -- Cause=Unhandled_Exception; (3) if the task terminates because of an
+      -- unhandled exception, and the finalization then raises the exception,
+      -- the termination handler is called with an Exception_Occurrence that
+      -- identifies Program_Error (AI05-0202).
+   declare
+      Raise_Code : constant String := "fifth";
+   begin
+      declare
+
+         type Test_Type is (Body_Exception, Fin_Exception, Both);
+
+         task type TT is
+            entry Which_Test (Obj_ID : Integer;  T : Test_Type);
+         end TT;
+
+         TT_Array : array (1 .. 3) of TT;
+         ID_Array : CXC7006_1.Task_ID_Array (TT_Array'range);
+         Expected_Cause : CXC7006_1.Cause_Array (TT_Array'range);
+         Expected_Exceptions : CXC7006_1.Exception_Array (TT_Array'range);
+
+         task body TT is
+            The_Type : Test_Type;
+            Obj      : CXC7006_2.Fin_Type;
+         begin
+            accept Which_Test (Obj_ID : Integer;  T : Test_Type) do
+               Obj.Fin_ID := Obj_ID;
+               The_Type := T;
+            end Which_Test;
+            if The_Type = Fin_Exception or else The_Type = Both then
+               Obj.Raise_Exc := True;
+            end if;
+            if The_Type = Body_Exception or else The_Type = Both then
+               Do_Raise (Raise_Code);
+            end if;
+         end TT;
+
+      begin
+         CXC7006_1.Start_Test ("Test_5");
+         CXC7006_1.Set_Expected_Message ("Do_Raise called: " & Raise_Code);
+         Which_Exception := 2;
+
+         ATT.Set_Dependents_Fallback_Handler (CXC7006_1.The_Handler (0));
+
+         for I in ID_Array'range loop
+            ID_Array(I) := TT_Array(I)'Identity;
+         end loop;
+         CXC7006_1.Set_Task_IDs (ID_Array);
+
+         Expected_Cause := (others => ATT.Unhandled_Exception);
+         CXC7006_1.Set_Expected_Causes (Expected_Cause);
+         Expected_Exceptions := (Exception_2'Identity,
+                                 Program_Error'Identity,
+                                 Program_Error'Identity);
+         CXC7006_1.Set_Expected_Exceptions (Expected_Exceptions);
+
+         for I in ID_Array'range loop
+            CXC7006_1.Set_Handler_Test (I, CXC7006_2.Test_Finalized'access, I);
+               -- Effect is that when termination handler is called, it will
+               -- call a procedure that makes sure that the local controlled
+               -- object has been finalized before the handler was called.
+         end loop;
+
+         TT_Array (1).Which_Test (1, Body_Exception);
+         TT_Array (2).Which_Test (2, Fin_Exception);
+         TT_Array (3).Which_Test (3, Both);
+         -- now wait for all tasks to terminate
+      end;
+
+      CXC7006_1.Test_All_Handlers_Called;
+
+   end Test_5;
+
+   Test_6:
+      -- Make sure behavior is correct when a task propagates an exception
+      -- during elaboration.
+   declare
+      Raise_Code : constant String := "sixth";
+   begin
+      CXC7006_1.Start_Test ("Test_6");
+      CXC7006_1.Set_Expected_Message ("Do_Raise called: " & Raise_Code);
+      Which_Exception := 1;
+      CXC7006_1.Set_Expected_Exception (Exception_1'Identity);
+      ATT.Set_Dependents_Fallback_Handler (CXC7006_1.The_Handler (0));
+
+      declare
+
+         function Set_Up_Task_ID (ID : ATI.Task_ID) return Integer is
+         begin
+            CXC7006_1.Set_Task_IDs ((1 => ID));
+            CXC7006_1.Set_Expected_Causes ((1 => ATT.Unhandled_Exception));
+            return 1;
+         end Set_Up_Task_ID;
+
+         function Will_Raise_Exception return Integer is
+         begin
+            Do_Raise (Raise_Code);
+            return 2;
+         end Will_Raise_Exception;
+
+         function Should_Not_Get_Here return Integer is
+         begin
+            Report.Failed ("Elaboration continued after exception");
+            return 3;
+         end Should_Not_Get_Here;
+
+         task TT;
+
+         task body TT is
+            V1 : Integer := Set_Up_Task_ID (TT'Identity);
+            V2 : Integer := Will_Raise_Exception;
+            V3 : Integer := Should_Not_Get_Here;
+         begin
+            null;
+         end TT;
+
+      begin
+         null;
+      exception
+         when Tasking_Error =>
+            null;
+      end;
+
+      CXC7006_1.Test_All_Handlers_Called;
+
+   end Test_6;
+
+   Report.Result;
+end CXC7006;

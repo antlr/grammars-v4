@@ -1,0 +1,7 @@
+CC = gcc
+CFLAGS = -Wall -O2
+SRCS = main.c util.c
+OBJS = main.o util.o
+
+main: $(OBJS)
+	$(CC) $(CFLAGS) -o main $(OBJS)

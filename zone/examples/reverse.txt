@@ -1,0 +1,3 @@
+$ORIGIN 2.0.192.in-addr.arpa.
+1 IN PTR ns.example.test.
+2 IN PTR www.example.test.

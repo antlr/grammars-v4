@@ -1,0 +1,24 @@
+digraph ATN {
+rankdir=LR;
+s139[fontsize=11, label="139", shape=doublecircle, fixedsize=true, width=.6];
+s1296[fontsize=11,label="&larr;\n1296", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1297[fontsize=11,label="1297", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1298[fontsize=11,label="{&rarr;\n1298\nd=67|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1299[fontsize=11,label="&larr;\n1299", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s138[fontsize=11,label="138", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1292[fontsize=11,label="1292", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1293[fontsize=11,label="1293", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1294[fontsize=11,label="1294", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1295[fontsize=11,label="{&rarr;\n1295\nd=66|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s138 -> s1292 [fontname="Times-Italic", label="&epsilon;"];
+s1292 -> s1295 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<expression>", arrowhead = normal];
+s1295:p0 -> s1293 [fontname="Times-Italic", label="&epsilon;"];
+s1295:p1 -> s1296 [fontname="Times-Italic", label="&epsilon;"];
+s1293 -> s1294 [fontsize=11, fontname="Courier", arrowsize=.7, label = "','", arrowhead = normal];
+s1296 -> s1298 [fontname="Times-Italic", label="&epsilon;"];
+s1294 -> s1296 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<interpolation_minimum_width>", arrowhead = normal];
+s1298:p0 -> s1297 [fontname="Times-Italic", label="&epsilon;"];
+s1298:p1 -> s1299 [fontname="Times-Italic", label="&epsilon;"];
+s1297 -> s1299 [fontsize=11, fontname="Courier", arrowsize=.7, label = "Regular_Interpolation_Format", arrowhead = normal];
+s1299 -> s139 [fontname="Times-Italic", label="&epsilon;"];
+}

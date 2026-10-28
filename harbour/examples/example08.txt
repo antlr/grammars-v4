@@ -1,0 +1,6 @@
+FUNCTION PrintEven( nLimit )
+   LOCAL nI
+   FOR nI := 0 TO nLimit STEP 2
+      ? nI
+   NEXT
+   RETURN NIL
