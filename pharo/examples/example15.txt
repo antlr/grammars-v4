@@ -1,0 +1,5 @@
+| dict |
+dict := Dictionary new.
+dict at: #name put: 'Pharo'.
+dict at: #year put: 2026.
+Transcript showCr: (dict at: #name).

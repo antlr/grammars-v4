@@ -350,6 +350,7 @@
 				<module>pf</module>
 				<module>pegen</module>
 				<module>pgn</module>
+				<module>pharo</module>
 				<module>php</module>
 				<module>pii</module>
 				<!-- <module>pike</module> -->
