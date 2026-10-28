@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2022, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -30,50 +30,52 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// A grammar for the Gopher protocol's directory listing ("menu") format,
+// as described in RFC 1436. A menu is a sequence of directory entries,
+// each one tab-separated line of (type+username, selector, host, port),
+// terminated by a line containing only a period.
 grammar gopher;
 
+menu
+   : directoryentry* LASTLINE EOF
+   ;
 
-menu      : directoryentry* LASTLINE;
+directoryentry
+   : type TAB selector TAB host TAB port CRLF
+   ;
 
-directoryentry :type username TAB selector TAB host TAB port CRLF
-          (REDTYPE username TAB selector TAB host TAB port CRLF)* EOF;
+type
+   : FIELD
+   ;
 
+selector
+   : FIELD?
+   ;
 
+host
+   : FIELD
+   ;
 
-textfile  : {TextBlock} Lastline;
-word      : {UNASCII - ' '};
-searchstr : word ((' ' BOOLOP)* ' ' word)*;
+port
+   : DIGITSEQ
+   ;
 
+DIGITSEQ
+   : [0-9]+
+   ;
 
-//TextBlock : Block of ASCII text not containing Lastline pattern.;
+CRLF
+   : '\r\n'
+   ;
 
-type      : UNASCII;
+LASTLINE
+   : '.' '\r\n'
+   ;
 
+TAB
+   : '\t'
+   ;
 
-
-host: UNASCII+;
-
-selector: UNASCII+;
-
-username: UNASCII;
-
-port      : DIGITSEQ;
-
-BOOLOP : 'and' | 'or' | 'not' | ' ';
-
-
-CRLF: '\r\n';
-
-UNASCII: [a-zA-Z];
-
-LASTLINE  : '.' '\r\n';
-
-TAB       : '\t';
-
-REDTYPE   : '+';
-
-DIGIT     : [0-9] ;
-
-DIGITSEQ  : DIGIT+;
-
-
+FIELD
+   : ~[\t\r\n]+
+   ;

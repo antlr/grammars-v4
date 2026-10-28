@@ -38,7 +38,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>gopher</entryPoint>
+					<entryPoint>menu</entryPoint>
 					<grammarName>gopher</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>

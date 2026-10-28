@@ -1,0 +1,2 @@
+7Search the archive	/search	gopher.example.com	70
+.

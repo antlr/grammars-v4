@@ -1,0 +1,2 @@
+hHomepage	URL:http://www.example.com/	gopher.example.com	70
+.
