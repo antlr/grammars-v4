@@ -504,6 +504,7 @@
 				<module>z</module>
 				<module>zig</module>
 				<module>zil</module>
+				<module>zone</module>
 				<module>xquery/xquery4</module>
 			</modules>
 		</profile>
