@@ -1,0 +1,2 @@
+1Internet Gopher Servers		gopher.example.com	70
+.

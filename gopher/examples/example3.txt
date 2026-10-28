@@ -1,0 +1,4 @@
+1Computer Science	/cs	gopher.floodgap.com	70
+1Physics	/physics	gopher.floodgap.com	70
+1Mathematics	/math	gopher.floodgap.com	70
+.

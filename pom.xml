@@ -247,6 +247,7 @@
 				<module>glsl</module>
 				<module>gml</module>
 				<module>golang</module>
+				<module>gopher</module>
 				<module>graphql</module>
 				<module>graphstream-dgs</module>
 				<module>gtin</module>

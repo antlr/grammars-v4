@@ -1,0 +1,2 @@
+Tremote login		telnet.example.com	23
+.
