@@ -1,0 +1,13 @@
+Defaults               syslog=auth, logfile=/var/log/sudo.log
+Defaults@SERVERS       log_year
+Defaults:ADMINS        !lecture
+Defaults!NETWORKING    insults
+Defaults>OP            !set_logname
+
+Host_Alias SERVERS = master, mail
+User_Alias ADMINS = alice, bob
+Cmnd_Alias NETWORKING = /sbin/ifconfig
+Runas_Alias OP = root
+
+alice   ALL = CWD=/tmp TIMEOUT=5 /usr/bin/ls
+bob     ALL = ROLE=sysadm_r /usr/bin/id

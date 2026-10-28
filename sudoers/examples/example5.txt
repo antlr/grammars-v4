@@ -1,0 +1,4 @@
+User_Alias	ADMINS = alice, bob, carol
+User_Alias	DEVS = dave, erin : INTERNS = frank, grace
+Runas_Alias	OP = root, operator
+Cmnd_Alias	NETWORKING = /sbin/ifconfig, /sbin/route, /sbin/iptables
