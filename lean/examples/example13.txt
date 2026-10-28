@@ -1,0 +1,3 @@
+instance : Monoid Nat where
+  mul := fun x y => x * y
+  one := 0

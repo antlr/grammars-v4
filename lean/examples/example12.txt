@@ -1,0 +1,3 @@
+class Monoid (α : Type) where
+  mul : α → α → α
+  one : α
