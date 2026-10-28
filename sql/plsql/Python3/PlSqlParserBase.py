@@ -44,6 +44,18 @@ class PlSqlParserBase(Parser):
 
         return True
 
+    def isLineStart(self):
+        """True when the current token is the first significant token on its line."""
+        token = self._input.LT(1)
+        if token is None:
+            return False
+
+        prev = self._input.LT(-1)
+        if prev is None or prev.type == Token.EOF:
+            return True
+
+        return prev.line < token.line
+
     def isVersion10(self):
         return self._isVersion10
 

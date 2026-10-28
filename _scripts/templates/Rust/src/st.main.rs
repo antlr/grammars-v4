@@ -31,8 +31,8 @@ fn parse_input(
     let out_name: String = if let Some(ref odir) = flags.output_dir {
         let abs = std::fs::canonicalize(input_name)
             .unwrap_or_else(|_| std::env::current_dir().unwrap_or_default().join(input_name));
-        let root = std::fs::canonicalize("../<example_dir_unix>")
-            .unwrap_or_else(|_| std::env::current_dir().unwrap_or_default().join("../<example_dir_unix>"));
+        let root = std::fs::canonicalize("<source_example_dir_unix>")
+            .unwrap_or_else(|_| std::env::current_dir().unwrap_or_default().join("<source_example_dir_unix>"));
         let rootless = abs.strip_prefix(&root)
             .map(std::path::PathBuf::from)
             .unwrap_or_else(|_| abs.file_name().map(std::path::PathBuf::from).unwrap_or_default());

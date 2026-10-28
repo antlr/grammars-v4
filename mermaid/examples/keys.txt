@@ -1,0 +1,12 @@
+erDiagram
+    %% Attribute keys and documentation
+    CUSTOMER {
+        int customer_id PK "Unique customer"
+        varchar(100) display_name
+    }
+    ORDER {
+        int order_id PK
+        int customer_id FK, UK "Customer reference"
+        string[] tags
+    }
+    CUSTOMER ||--o{ ORDER : places orders

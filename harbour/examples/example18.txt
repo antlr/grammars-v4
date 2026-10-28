@@ -1,0 +1,7 @@
+FUNCTION Average( aValues )
+   LOCAL nSum := 0
+   LOCAL nI
+   FOR nI := 1 TO Len( aValues )
+      nSum := nSum + aValues[ nI ]
+   NEXT
+   RETURN nSum / Len( aValues )

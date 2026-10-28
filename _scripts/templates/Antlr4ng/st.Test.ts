@@ -8,6 +8,7 @@ import { ConsoleErrorListener } from 'antlr4ng';
 import { ErrorNode } from 'antlr4ng';
 //import { InputStream } from 'antlr4ng';
 import { Parser } from 'antlr4ng';
+import { PredictionMode } from 'antlr4ng';
 import { ParserRuleContext } from 'antlr4ng';
 import { ParseTree } from 'antlr4ng';
 import { Recognizer } from 'antlr4ng';
@@ -58,6 +59,7 @@ var error_code = 0;
 var quiet = false;
 var perf = false;
 var per_file = false;
+var sll = false;
 var enc = '<file_encoding>';
 var binary = <binary>;
 var string_instance = 0;
@@ -120,6 +122,9 @@ function main() {
                 break;
             case '--per-file':
                 per_file = true;
+                break;
+            case '--sll':
+                sll = true;
                 break;
             case '-trace':
                 show_trace = true;
@@ -202,7 +207,7 @@ function DoParse(str: CharStream, input_name: string, row_number: number) {
     let out_name = input_name;
     if (output_dir) {
         const absPath = pathResolve(input_name);
-        const root = pathResolve('../<example_dir_unix>');
+        const root = pathResolve('<source_example_dir_unix>');
         let rootless = pathRelative(root, absPath);
         if (rootless === '..' || rootless.startsWith('..' + pathSep) || pathIsAbsolute(rootless))
             rootless = pathBasename(absPath);
@@ -213,6 +218,7 @@ function DoParse(str: CharStream, input_name: string, row_number: number) {
     const lexer = new <lexer_name>(str);
     const tokens = new CommonTokenStream(lexer);
     const parser = new <parser_name>(tokens);
+    if (sll) parser.interpreter.predictionMode = PredictionMode.SLL;
     lexer.removeErrorListeners();
     parser.removeErrorListeners();
     var output = tee ? openSync(out_name + ".errors", 'w') : 1;

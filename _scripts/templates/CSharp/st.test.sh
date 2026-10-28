@@ -22,12 +22,26 @@ esac
 # Get a list of test files from the test directory. Do not include any
 # .errors or .tree files. Pay close attention to remove only file names
 # that end with the suffix .errors or .tree.
-files2=`dotnet trash glob <glob_args_unix> | tr -d '\r' | grep -v '[.]errors$' | grep -v '[.]tree$' | grep -v '[.]trq$'`
+source_root='<source_root_unix>'
+if command -v cygpath >/dev/null 2>&1; then source_root=$(cygpath -u "$source_root"); fi
+source_examples="$source_root/<example_dir_unix>"
+generated_dir=$(pwd -P)
+output_dir="$generated_dir/examples"
+trash() { (cd "$source_root" && dotnet trash "$@"); }
+files2=`trash glob <source_glob_args_unix> | tr -d '\r' | grep -v '[.]errors$' | grep -v '[.]tree$' | grep -v '[.]trq$'`
 files=()
 for f in $files2
 do
-    if [ -d "$f" ]; then continue; fi
-        files+=( $f )
+    if [ -d "$source_root/$f" ]; then continue; fi
+        files+=( "$source_root/$f" )
+done
+parse_inputs=()
+for f in "${files[@]}"; do
+    if command -v cygpath >/dev/null 2>&1; then
+        parse_inputs+=( "$(cygpath -m "$f")" )
+    else
+        parse_inputs+=( "$f" )
+    fi
 done
 
 # People often specify a test file directory, but sometimes no
@@ -39,17 +53,17 @@ then
     exit 0
 fi
 
-# Before anything, clean out the testsuite directory of any previous
-# run.
-git clean -f ../<example_dir_unix>
+# Outputs belong to this generated app, never to the source examples.
+mkdir -p "$output_dir"
 
 # Parse all input files.
+runner=("$generated_dir/bin/Debug/net10.0/<if(os_win)>Test.exe<else>Test<endif>")
 <if(individual_parsing)>
 # Individual parsing.
 rm -f parse.txt
-for f in ${files[*]}
+for f in "${parse_inputs[@]}"
 do
-    dotnet trash wdog ./bin/Debug/net10.0/<if(os_win)>Test.exe<else>Test<endif> -q -tee -tree $f >> parse.txt 2>&1
+    trash wdog "${runner[@]}" -q -tee -tree -o "$output_dir" "$f" >> parse.txt 2>&1
     xxx="$?"
     if [ "$xxx" -ne 0 ]
     then
@@ -58,7 +72,7 @@ do
 done
 <else>
 # Group parsing.
-echo "${files[*]}" | dotnet trash wdog ./bin/Debug/net10.0/<if(os_win)>Test.exe<else>Test<endif> -q -x -tee -tree > parse.txt 2>&1
+echo "${parse_inputs[*]}" | trash wdog "${runner[@]}" -q -x -tee -tree -o "$output_dir" > parse.txt 2>&1
 status=$?
 <endif>
 
@@ -85,22 +99,19 @@ fi
 # to Unix style.
 if [[ "$machine" == "MinGw" || "$machine" == "Msys" || "$machine" == "Cygwin" || "#machine" == "Linux" ]]
 then
-    gen=`find ../<example_dir_unix> -type f -name '*.errors' -o -name '*.tree'`
-    if [ "$gen" != "" ]
-    then
-        dos2unix -f $gen
-    fi
+    find "$output_dir" -type f \( -name '*.errors' -o -name '*.tree' \) -exec dos2unix -q -f {} +
 fi
 
 # Validate parse trees via XQuery assertions.
+set -o pipefail
 echo "Checking any XQuery parse tree assertions..."
 assertions_err=0
-for file in `dotnet trash glob <glob_args_unix> | grep -v '[.]errors$' | grep -v '[.]tree$' | grep -v '[.]trq$'`
+for file in "${files[@]}"
 do
     trq=$file.trq
     if [ -f "$trq" ]
     then
-        assertion_output=$(dotnet trash parse "$file" | dotnet trash xquery -q "$trq")
+        assertion_output=$(trash parse -p "$generated_dir" "$file" | trash xquery -q "$trq")
         xxx=$?
         if [ "$xxx" -ne 0 ]
         then
@@ -114,101 +125,38 @@ do
 done
 echo "Finished checking XQuery parse tree assertions."
 
-old=`pwd`
-cd ..
-
-# Check if any files in the test files directory have changed.
-git config --global pager.diff false
-rm -f $old/updated.txt
-updated=0
-for f in `find . -name '*.errors'`
+# Compare generated results with the source examples without modifying them.
+difference=0
+for file in "${files[@]}"
 do
-    git diff --exit-code $f >> $old/updated.txt 2>&1
-    xxx=$?
-    if [ "$xxx" -ne 0 ]
-    then
-        updated=$xxx
+    relative=${file#"$source_examples"/}
+    if [ "$relative" = "$file" ]; then
+        echo "Input is outside the example directory: $file"
+        difference=1
+        continue
     fi
-done
-for f in `find . -name '*.tree'`
-do
-    git diff --exit-code $f >> $old/updated.txt 2>&1
-    xxx=$?
-    if [ "$xxx" -ne 0 ]
-    then
-        updated=$xxx
-    fi
-done
-
-# Check if any untracked .errors files.
-git ls-files --exclude-standard -o > $old/new_errors2.txt 2>&1
-new_errors=$?
-
-# Gather up all untracked .errors file output. These are new errors
-# and must be reported as a parse fail.
-rm -f $old/new_errors.txt
-touch $old/new_errors.txt
-for f in `cat $old/new_errors2.txt`
-do
-    ext=${f##*.}
-    ext=".$ext"
-    if [ "$ext" = ".errors" ]
-    then  
-        if [ -s $f ]
-        then
-            echo $f >> $old/new_errors.txt
-            cat $f >> $old/new_errors.txt
+    for extension in errors tree
+    do
+        expected="$file.$extension"
+        actual="$output_dir/$relative.$extension"
+        if [ -f "$expected" ]; then
+            if [ ! -f "$actual" ]; then
+                echo "Missing output: $actual (expected $expected)"
+                difference=1
+            elif ! diff -u --strip-trailing-cr -- "$expected" "$actual"; then
+                difference=1
+            fi
+        elif [ "$extension" = errors ] && [ -s "$actual" ]; then
+            echo "Unexpected parse errors for $file:"
+            cat -- "$actual"
+            difference=1
         fi
-    fi
+    done
 done
 
-# If "git diff" reported an exit code of 129, it is because
-# the directory containing the grammar is not in a repo. In this
-# case, assume parse error code as the defacto result.
-if [ "$updated" = "129" ]
-then
-    echo "Grammar outside a git repository. Assuming parse exit code."
-    if [ "$status" -eq 0 ]
-    then
-        echo "Test succeeded."
-    else
-        cat $old/new_errors.txt
-        echo "Test failed."
-    fi
-    rm -f $old/updated.txt $old/new_errors2.txt $old/new_errors.txt
-    exit $status
-fi
-
-# "Git diff" reported a difference. Redo the "git diff" to print out all
-# the differences. Also, output any untracked, non-zero length .errors files.
-if [ "$updated" = "1" ]
-then
-    echo "Difference in output."
-    git diff .
-    cat $old/new_errors.txt
-    echo "Test failed."
-    rm -f $old/updated.txt $old/new_errors2.txt $old/new_errors.txt
-    exit 1
-fi
-
-# If there's non-zero length .errors flies that are new, report them
-# as errors in the parse.
-if [ -s $old/new_errors.txt ]
-then
-    echo "New errors in output."
-    cat $old/new_errors.txt
-    echo "Test failed."
-    rm -f $old/updated.txt $old/new_errors2.txt $old/new_errors.txt
-    exit 1
-fi
-
-# Test assertions errors.
-if [ "$assertions_err" -ne 0 ]
-then
+if [ "$assertions_err" -ne 0 ] || [ "$difference" -ne 0 ]; then
     echo "Test failed."
     exit 1
 fi
-
 echo "Test succeeded."
-rm -f $old/updated.txt $old/new_errors2.txt $old/new_errors.txt
 exit 0

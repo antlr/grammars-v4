@@ -1,0 +1,4 @@
+PROCEDURE ShowValues()
+   LOCAL nX := 10, nY := 20
+   ? nX, nY, nX + nY
+   RETURN

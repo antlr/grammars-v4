@@ -45,6 +45,19 @@ abstract class PlSqlParserBase extends Parser
         return true;
     }
 
+    bool isLineStart() {
+        var stream = tokenStream as CommonTokenStream;
+        var token = stream.LT(1);
+        if (token == null)
+            return false;
+
+        var prev = stream.LT(-1);
+        if (prev == null || prev!.type == Token.EOF)
+            return true;
+
+        return prev!.line! < token!.line!;
+    }
+
     bool isVersion12() {
         return _isVersion12;
     }

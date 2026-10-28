@@ -45,6 +45,22 @@ export abstract class PlSqlParserBase extends Parser {
     return true;
   }
 
+  /** True when the current token is the first significant token on its line. */
+  isLineStart(): boolean {
+    const stream = this.tokenStream as CommonTokenStream;
+    const token = stream.LT(1);
+    if (token == null) {
+      return false;
+    }
+
+    const prev = stream.LT(-1);
+    if (prev == null || prev.type === Token.EOF) {
+      return true;
+    }
+
+    return prev.line < token.line;
+  }
+
   isVersion10(): boolean {
     return this._isVersion10;
   }

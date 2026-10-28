@@ -1,0 +1,13 @@
+signature VALUE = sig
+  type t
+  val value : t
+end
+functor Copy (X : VALUE) = struct
+  type t = X.t
+  val value = X.value
+end
+structure Original = struct
+  type t = int
+  val value = 42
+end
+structure Copied = Copy(Original)

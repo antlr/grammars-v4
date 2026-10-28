@@ -1,0 +1,11 @@
+FUNCTION Grade( nScore )
+   LOCAL cGrade
+   SWITCH nScore
+      CASE 100
+         cGrade := "perfect"
+      CASE 90
+         cGrade := "great"
+      OTHERWISE
+         cGrade := "ok"
+   END
+   RETURN cGrade

@@ -52,6 +52,21 @@ public abstract class PlSqlParserBase : Parser
         return true;
     }
 
+    /** True when the current token is the first significant token on its line. */
+    public bool isLineStart()
+    {
+        var stream = (CommonTokenStream)InputStream;
+        var token = stream.LT(1);
+        if (token == null)
+            return false;
+
+        var prev = stream.LT(-1);
+        if (prev == null || prev.Type == TokenConstants.EOF)
+            return true;
+
+        return prev.Line < token.Line;
+    }
+
     public bool isVersion10() => _isVersion10;
 
     public bool isVersion11() => _isVersion11;

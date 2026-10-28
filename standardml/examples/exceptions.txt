@@ -1,0 +1,6 @@
+exception EmptyInput
+exception BadValue of string
+exception Alias = EmptyInput
+fun require [] = raise EmptyInput
+  | require (x :: xs) = x
+val result = require [] handle EmptyInput => 0

@@ -1,0 +1,4 @@
+FUNCTION ApplyBlock()
+   LOCAL bSquare := {|x| x * x}
+   LOCAL bGreet := {|| "hello"}
+   RETURN Eval( bSquare, 5 ) + Len( Eval( bGreet ) )

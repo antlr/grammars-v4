@@ -1,0 +1,3 @@
+example (n : Nat) : n + 1 > n := by
+  have h : n + 1 = n + 1 := rfl
+  simp

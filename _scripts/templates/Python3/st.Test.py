@@ -3,6 +3,7 @@
 import os
 import sys
 from antlr4 import *
+from antlr4.atn.PredictionMode import PredictionMode
 from antlr4.error.ErrorListener import ErrorListener
 from readchar import readchar
 from <lexer_name> import <lexer_name>;
@@ -43,6 +44,7 @@ prefix = ""
 quiet = False
 perf = False
 per_file = False
+sll = False
 noop = False
 total_tokens = 0
 total_parse_seconds = 0
@@ -60,6 +62,7 @@ def main(argv):
     global quiet
     global perf
     global per_file
+    global sll
     global error_code
     global total_parse_seconds
     global first_file_tokens
@@ -102,6 +105,8 @@ def main(argv):
             perf = True
         elif arg == "--per-file":
             per_file = True
+        elif arg == "--sll":
+            sll = True
         elif arg == "-trace":
             show_trace = True
         elif arg[0] == "-":
@@ -182,7 +187,7 @@ def DoParse(str, input_name, row_number):
 
     if output_dir is not None:
         abs_name = os.path.abspath(input_name)
-        root = os.path.abspath('../<example_dir_unix>')
+        root = os.path.abspath('<source_example_dir_unix>')
         rootless = os.path.relpath(abs_name, root)
         if rootless == '..' or rootless.startswith('..' + os.sep) or os.path.isabs(rootless):
             rootless = os.path.basename(abs_name)
@@ -201,6 +206,8 @@ def DoParse(str, input_name, row_number):
     # lexer.strictMode = false
     tokens = CommonTokenStream(lexer)
     parser = <parser_name>(tokens)
+    if sll:
+        parser._interp.predictionMode = PredictionMode.SLL
     parser.removeErrorListeners()
     listener_parser = MyErrorListener(quiet, tee, output)
     parser.addErrorListener(listener_parser)

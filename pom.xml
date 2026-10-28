@@ -180,6 +180,7 @@
 				<module>cerbac</module>
                 <module>chip8</module>
                 <module>chip8octo</module>
+				<module>clazz</module>
 				<module>clf</module>
 				<module>clif</module>
 				<module>clojure</module>
@@ -203,7 +204,7 @@
 				<module>ctl</module>
 				<module>cto</module>
 				<module>cypher</module>
-                <module>d2</module>
+				<module>d2</module>
 				<module>dart2</module>
 				<module>databank</module>
 				<module>datalog</module>
@@ -241,6 +242,7 @@
                 <module>geekcode</module>
 				<module>gerber</module>
 				<module>gff3</module>
+				<module>gherkin</module>
 				<module>gql</module>
 				<module>glsl</module>
 				<module>gml</module>
@@ -251,6 +253,7 @@
 				<module>guido</module>
 				<module>guitartab</module>
                 <module>hals</module>
+				<module>harbour</module>
 				<module>haskell</module>
 				<module>hexpat</module>
 				<module>hope</module>
@@ -283,12 +286,15 @@
 				<module>karel</module>
 				<module>kirikiri-tjs</module>
 				<module>kotlin</module>
+				<module>kql</module>
 				<module>kuka</module>
 				<module>kquery</module>
+				<module>l</module>
 				<module>lambda</module>
 				<module>lark</module>
                 <module>lazyk</module>
 				<module>lcc</module>
+				<module>lean</module>
 				<module>less</module>
                 <module>lil</module>
 				<module>limbo</module>
@@ -307,6 +313,7 @@
 				<module>mckeeman-form</module>
 				<module>mdx</module>
 				<module>memcached_protocol</module>
+				<module>mermaid</module>
 				<module>metamath</module>
 				<module>metric</module>
 				<module>microc</module>
@@ -337,12 +344,14 @@
 				<module>pascal</module>
 				<module>pbm</module>
 				<module>pcre</module>
+				<module>pdb</module>
 				<module>pddl</module>
 				<module>pdn</module>
 				<module>peoplecode</module>
 				<module>pf</module>
 				<module>pegen</module>
 				<module>pgn</module>
+				<module>pharo</module>
 				<module>php</module>
 				<module>pii</module>
 				<!-- <module>pike</module> -->
@@ -417,6 +426,7 @@
 				<module>solidity</module>
 				<module>sparql</module>
 				<module>spass</module>
+				<module>spice</module>
                 <module>spk</module>
                 <module>spl</module>
                 <module>squeak</module>
@@ -424,6 +434,7 @@
                 <module>squirrel</module>
 				<module>srt</module>
 				<module>stacktrace</module>
+				<module>standardml</module>
 				<module>star</module>
 				<module>stellaris</module>
 				<module>stl</module>
@@ -435,6 +446,7 @@
 				<module>swift-fin</module>
 				<module>sysml-v2</module>
 				<module>szf</module>
+				<module>tcpdump</module>
 				<module>tcpheader</module>
 				<module>teal</module>
 				<module>telephone</module>

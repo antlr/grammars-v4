@@ -1,0 +1,8 @@
+classDiagram
+    %% Composition, aggregation, dependency, and realization
+    class Engine
+    class Car
+    Car "1" *-- "1" Engine : contains
+    Fleet o-- Car
+    Car ..> Fuel : uses
+    Car ..|> Vehicle
