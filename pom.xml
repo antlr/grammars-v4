@@ -253,6 +253,7 @@
 				<module>guido</module>
 				<module>guitartab</module>
                 <module>hals</module>
+				<module>harbour</module>
 				<module>haskell</module>
 				<module>hexpat</module>
 				<module>hope</module>

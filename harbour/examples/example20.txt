@@ -1,0 +1,20 @@
+FUNCTION RunDemo()
+   LOCAL cMacro := "nX"
+   LOCAL nX := 5
+   LOCAL nY
+
+   PRIVATE nTotal
+   PUBLIC nGlobalCount
+   STATIC nCallCount
+
+   nY := &cMacro + 1
+   nTotal := nX + nY
+   ? "total:", nTotal
+
+   IF nY > nX
+      LOOP
+   ENDIF
+
+   EXIT
+
+   RETURN NIL
