@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2023, Tom Everett
+Copyright (c) 2026, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -32,7 +32,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar sudoers;
 
 file_
-   : alias* EOF
+   : (statement? NEWLINE)* statement? EOF
+   ;
+
+statement
+   : alias
+   | default_entry
+   | user_spec
    ;
 
 alias
@@ -76,29 +82,28 @@ cmnd_alias_spec
    ;
 
 user_list
-   : user
-   | user ',' user_list
+   : user (',' user)*
    ;
 
 user
    : '!'* user_name
-   | '!'* '#' uid
+   | '!'* HASH uid
    | '!'* '%' group
    | '!'* '%#' gid
    | '!'* '+' netgroup
    | '!'* '%:' nonunix_group
    | '!'* '%:#' nonunix_gid
    | '!'* user_alias
+   | '!'* 'ALL'
    ;
 
 runas_list
-   : runas_member
-   | runas_member ',' runas_list
+   : runas_member (',' runas_member)*
    ;
 
 runas_member
    : '!'* user_name
-   | '!'* '#' uid
+   | '!'* HASH uid
    | '!'* '%' group
    | '!'* '%#' gid
    | '!'* '%:' nonunix_group
@@ -109,13 +114,11 @@ runas_member
    ;
 
 host_list
-   : host
-   | host ',' host_list
+   : host (',' host)*
    ;
 
 host
    : '!'* host_name
-   | '!'* ip_addr
    | '!'* network ('/' netmask)?
    | '!'* '+' netgroup
    | '!'* host_alias
@@ -123,8 +126,7 @@ host
    ;
 
 cmnd_list
-   : cmnd
-   | cmnd ',' cmnd_list
+   : cmnd (',' cmnd)*
    ;
 
 command_name
@@ -138,6 +140,7 @@ cmnd
    | '!'* directory
    | '!'* 'sudoedit'
    | '!'* cmnd_alias
+   | '!'* 'ALL'
    ;
 
 default_type
@@ -157,8 +160,7 @@ parm
    ;
 
 parameter_list
-   : parameter
-   | parameter ',' parameter_list
+   : parameter (',' parameter)*
    ;
 
 parameter
@@ -173,12 +175,11 @@ user_spec
    ;
 
 cmnd_spec_list
-   : cmnd_spec
-   | cmnd_spec ',' cmnd_spec_list
+   : cmnd_spec (',' cmnd_spec)*
    ;
 
 cmnd_spec
-   : runas_spec? option_spec* (tag_spec ':')* cmnd
+   : runas_spec? option_spec* tag_spec* cmnd
    ;
 
 runas_spec
@@ -190,27 +191,30 @@ option_spec
    ;
 
 selinux_spec
-   : ('ROLE=role' | 'TYPE=type')
+   : 'ROLE=' NAME
+   | 'TYPE=' NAME
    ;
 
 solaris_priv_spec
-   : ('PRIVS=privset' | 'LIMITPRIVS=privset')
+   : 'PRIVS=' NAME
+   | 'LIMITPRIVS=' NAME
    ;
 
 date_spec
-   : ('NOTBEFORE=timestamp' | 'NOTAFTER=timestamp')
+   : 'NOTBEFORE=' NAME
+   | 'NOTAFTER=' NAME
    ;
 
 timeout_spec
-   : 'TIMEOUT=timeout'
+   : 'TIMEOUT=' NUM
    ;
 
 chdir_spec
-   : 'CWD=directory'
+   : 'CWD=' directory
    ;
 
 chroot_spec
-   : 'CHROOT=directory'
+   : 'CHROOT=' directory
    ;
 
 tag_spec
@@ -221,20 +225,18 @@ network
    : IP_ADDR
    ;
 
-ip_addr
-   : IP_ADDR
-   ;
-
 host_name
    : NAME ('.' NAME)*
    ;
 
 file_name
-   : NAME
+   : PATH
+   | NAME
    ;
 
 directory
-   : NAME
+   : PATH
+   | NAME
    ;
 
 user_name
@@ -251,6 +253,8 @@ group
 
 value
    : NAME
+   | PATH
+   | STRING
    ;
 
 gid
@@ -275,6 +279,7 @@ args
 
 netmask
    : NUM
+   | IP_ADDR
    ;
 
 IP_ADDR
@@ -286,10 +291,33 @@ NUM
    ;
 
 NAME
-   : [A-Z] ([A-Z] [0-9])*
+   : [a-zA-Z_] [a-zA-Z0-9_]*
+   ;
+
+PATH
+   : '/' [a-zA-Z_] (~[ \t\r\n,:=])*
+   ;
+
+STRING
+   : '"' (~["\r\n])* '"'
+   ;
+
+NEWLINE
+   : ('\r'? '\n')+
+   ;
+
+CONTINUATION
+   : '\\' '\r'? '\n' -> skip
+   ;
+
+COMMENT
+   : '#' ~[\r\n]* -> skip
+   ;
+
+HASH
+   : '#'
    ;
 
 WS
-   : [ \r\n\t]+ -> skip
+   : [ \t]+ -> skip
    ;
-

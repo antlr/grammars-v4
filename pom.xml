@@ -440,6 +440,7 @@
 				<module>stl</module>
 				<module>stringtemplate</module>
 				<module>structuredtext</module>
+				<module>sudoers</module>
 				<module>suokif</module>
 				<module>supercollider</module>
 				<module>swift</module>
