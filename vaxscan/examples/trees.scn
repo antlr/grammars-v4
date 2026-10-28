@@ -1,0 +1,84 @@
+MODULE tree_traversing;
+
+    !+
+    !   This program illustrates the use of SCAN trees.  It first
+    !   populates a 2 level tree with cities and states.  Then it
+    !   uses the SCAN builtin functions to traverse the tree.
+    !-
+
+    PROCEDURE main MAIN;
+	
+    	DECLARE pop_tree: TREE(STRING,STRING) of INTEGER;
+    	DECLARE ptr1: TREEPTR( STRING ) to TREE( STRING ) of INTEGER;
+    	DECLARE ptr2: TREEPTR( STRING ) to INTEGER;
+	DECLARE i: INTEGER;
+
+	pop_tree( 'nh',		'portsmouth') 	= 45000;
+	pop_tree( 'mass',	'concord') 	= 40000;
+	pop_tree( 'nh',		'nashua') 	= 70000;
+	pop_tree( 'vt',		'manchester') 	= 80000;
+	pop_tree( 'ny',		'utica') 	= 100000;
+	pop_tree( 'ny',		'syracuse') 	= 120000;
+	pop_tree( 'ny',		'albany') 	= 200000;
+	pop_tree( 'ny',		'buffalo') 	= 250000;
+	pop_tree( 'ny',		'watertown') 	= 30000;
+	pop_tree( 'mass',	'boston') 	= 750000;
+	pop_tree( 'mass',	'worcester') 	= 100000;
+	pop_tree( 'mass',	'hyannis') 	= 20000;
+	pop_tree( 'vt',		'wilmington') 	= 10000;
+	pop_tree( 'vt',		'brattleboro') 	= 20000;
+	pop_tree( 'vt',		'bennington') 	= 70000;
+
+	WRITE 'alphabetic order';
+	WRITE ''; 
+
+	ptr1 = FIRST( pop_tree() );
+	
+	WHILE ptr1 <> NIL;
+
+	    ptr2 = FIRST( ptr1 );
+
+	    WHILE ptr2 <> NIL;
+
+		i = value( ptr2 );
+
+		WRITE subscript( ptr2 ), ' ', subscript( ptr1 ), ' = ', i;
+
+		ptr2 = NEXT( ptr2 );
+
+		END WHILE;
+
+	    ptr1 = NEXT( ptr1 );
+
+	END WHILE;
+
+
+	WRITE '';
+	WRITE 'reverse alphabetic order';
+	WRITE '';
+
+	ptr1 = LAST( pop_tree() );
+	
+	WHILE ptr1 <> NIL;
+
+	    ptr2 = LAST( ptr1 );
+
+	    WHILE ptr2 <> NIL;
+
+		i = value( ptr2 );
+
+		WRITE subscript( ptr2 ), ' ', subscript( ptr1 ), ' = ', i;
+
+		ptr2 = PRIOR( ptr2 );
+
+		END WHILE;
+
+	    ptr1 = PRIOR( ptr1 );
+
+	END WHILE;
+
+
+    END PROCEDURE;
+
+END MODULE;
+

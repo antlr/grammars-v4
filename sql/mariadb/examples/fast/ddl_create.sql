@@ -19,6 +19,7 @@ CREATE USER 'jim' @localhost IDENTIFIED BY '123';
 create table new_t  (like t1);
 create table log_table(row varchar(512));
 create table log_table(row character(512));
+create table new_t (c national char);
 create table ships(name varchar(255), class_id int, id int);
 create table ships_guns(guns_id int, ship_id int);
 create table guns(id int, power decimal(7,2), callibr decimal(10,3));
@@ -179,6 +180,65 @@ CREATE TABLE `test_table\\`(id INT(11) NOT NULL, PRIMARY KEY (`id`)) ENGINE = IN
 CREATE TABLE `\\test_table`(id INT(11) NOT NULL, PRIMARY KEY (`id`)) ENGINE = INNODB;
 CREATE TABLE `\\test\\_table\\`(id INT(11) NOT NULL, PRIMARY KEY (`id`)) ENGINE = INNODB;
 
+-- Using string literal `PAGE_COMPRESSED` as `ON`
+CREATE TABLE `product_labels_relation` (
+  `id_label` int(11) NOT NULL,
+  `id_product` int(11) NOT NULL,
+  `generated` tinyint(4) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id_label`,`id_product`),
+  KEY `id_product` (`id_product`),
+  CONSTRAINT `product_labels_relation_ibfk_1` FOREIGN KEY (`id_label`) REFERENCES `labels` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `product_labels_relation_ibfk_2` FOREIGN KEY (`id_product`) REFERENCES `products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci `PAGE_COMPRESSED`= `ON`;
+
+-- Using boolean literal `PAGE_COMPRESSED`as ON
+CREATE TABLE `products_labels` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `description` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci `PAGE_COMPRESSED`= ON;
+
+-- Using boolean literal `PAGE_COMPRESSED` as OFF
+CREATE TABLE `products_labels` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `description` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci `PAGE_COMPRESSED`= OFF;
+
+-- Using `PAGE_COMPRESSED` as 1
+CREATE TABLE `products_labels` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `description` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci `PAGE_COMPRESSED`= 1;
+
+-- Using `PAGE_COMPRESSED` as 0
+CREATE TABLE `products_labels` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `description` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci `PAGE_COMPRESSED`= 0;
+
+-- Create Table with vector column
+CREATE TABLE VECTOR_TABLE (id INT AUTO_INCREMENT PRIMARY KEY, embedding1 VECTOR(3) DEFAULT NULL, embedding VECTOR(3));
+
+-- Create table with ROW START/END
+CREATE TABLE `rebate_account` (
+  `id` char(36) NOT NULL,
+  `ts` timestamp(6) GENERATED ALWAYS AS ROW START,
+  `te` timestamp(6) GENERATED ALWAYS AS ROW END,
+  `assigned_account_id` char(36) DEFAULT NULL,
+  `assigned_user_id` char(36) DEFAULT NULL,
+  PRIMARY KEY (`id`,`te`),
+  UNIQUE KEY `rebate_account_unique` (`account_id`,`te`),
+  KEY `idx` (`id`),
+  PERIOD FOR SYSTEM_TIME(`ts`, `te`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci WITH SYSTEM VERSIONING
+
 #end
 #begin
 -- Rename table
@@ -187,6 +247,7 @@ RENAME TABLE old_table TO tmp_table, new_table TO old_table, tmp_table TO new_ta
 RENAME TABLE table_b TO table_a;
 RENAME TABLE current_db.tbl_name TO other_db.tbl_name;
 rename table debezium_all_types_old to debezium_all_types, test_json_object_old wait 10 to test_json_object;
+RENAME TABLE IF EXISTS EMPLOYEE TO employee;
 #end
 #begin
 -- Truncate table
@@ -545,6 +606,96 @@ END IF;
 END
 #end
 #begin
+-- delimiter //
+CREATE DEFINER=`reportwriter`@`%` PROCEDURE `sp_ds_DAL_TX_Impoundment`(IN pDateFrom datetime, IN pDateTo datetime)
+BEGIN
+
+    SET @goliveDate = '2023-05-02 02:00:00';
+    set @pRegion = 'DAL-TX';
+-- set @pDateFrom = '2023-02-01 00:00:00';
+-- set @pDateTo = '2023-03-10 00:00:00';
+    set @pDateFrom = pDateFrom;
+    set @pDateTo = pDateTo;
+
+    set @contractAmount = 21.03;
+
+with
+Temp1 as
+(
+    select l.code                                                            as lotCode
+         , fi.Id                                                             AS FeeItemID
+         , fi.unitBillingPrice                                               as billingPrice
+         , eq.equipmentClass
+         , a.customerCode
+         , v.impoundStatus
+         , tc.companyCode                                                    AS impoundCompany
+         , b.companyCode                                                     AS towOperator
+         , v.id                                                              AS vehicleId
+         , re.reasoncode
+         , v.towReferenceNumber
+
+         , fn_CalculateTimeZoneOffset(regionCode, v.clearedDate, 'DISPLAY')  AS towDate
+         , fn_CalculateTimeZoneOffset(regionCode, v.releaseDate, 'DISPLAY')  AS releaseDate
+         , fn_CalculateTimeZoneOffset(regionCode, fi.createdDate, 'DISPLAY') AS feeDate
+
+         , f.code
+         , fi.totalBillingPricePretax
+
+    from ims_vehicle v
+             join ref_region r
+                  on v.regionId = r.regionId
+
+             INNER JOIN ims_fee_event fe ON v.id = fe.vehicleId
+             INNER JOIN ims_fee_item fi ON fe.id = fi.feeEventId
+             INNER JOIN ims_fee f ON fi.feeId = f.id
+             INNER JOIN ims_fee_category fc ON f.feeCategoryEnumCode = fc.enumcode
+
+             INNER JOIN ref_customer a ON v.accountId = a.customerId
+             INNER JOIN ref_reason re ON v.reasonId = re.reasonId
+             INNER JOIN ref_tow_company tc ON v.currentImpoundOperatorId = tc.towCompanyId
+
+             JOIN ref_tow_company b ON v.towOperatorId = b.towCompanyId
+             left join ref_lot l on v.currentLotId = l.id
+             join ref_equipment eq
+                  on v.equipmentId = eq.id
+
+    where r.regionCode = @pRegion
+      and v.releaseDate >= @pDateFrom
+      and v.releaseDate < @pDateTo
+      and v.clearedDate >= @goliveDate
+      and b.companyCode != 'ART-DAL-TX'
+      and v.impoundStatus = 'RELEASED'
+)
+
+    select lotCode
+         , Temp1.vehicleId         as "Vehicle ID"
+         , towReferenceNumber      as "Tow Reference Number"
+         , equipmentClass          as "Class"
+         , impoundStatus           as "Status"
+         , customerCode            as "Customer"
+         , impoundCompany          as "Impound Company"
+         , towOperator             as "Tow Operator"
+         , towDate                 as "Tow Date"
+         , releaseDate             as "Release Date"
+         , billingPrice            as "Auto Pound Authorized Fee"
+
+         , billingPrice - @contractAmount   as "rev threshold"
+
+-- ,DATEDIFF(s.timeTo, s.timeFrom) as "Storage Days"
+         , null                    as "Storage Days"
+         , null                    as timeFrom
+         , null                    as timeTo
+         , billingPrice            as "Authorized Impoundment Fee"
+
+         , (billingPrice - @contractAmount)/2 + @contractAmount as "rev share amount"
+    from Temp1
+
+    where code in ('ImpoundmentFee')
+      and lotCode like '%PEAKA%';
+
+END; -- //-- delimiter ;
+#end
+#begin
 -- Create Role
 create role 'RL_COMPLIANCE_NSA';
 create role if not exists 'RL_COMPLIANCE_NSA';
@@ -638,5 +789,15 @@ BEGIN
 SELECT
     @Ν_greece
      ,@N_latin;
+END
+#end
+
+#begin
+-- Create function with exit handler containing a bare RETURN statement
+-- src: https://mariadb.com/docs/server/reference/sql-statements/programmatic-compound-statements/declare-handler#syntax
+CREATE FUNCTION f() RETURNS INT
+BEGIN
+  DECLARE EXIT HANDLER FOR NOT FOUND RETURN NULL;
+  RETURN 0;
 END
 #end

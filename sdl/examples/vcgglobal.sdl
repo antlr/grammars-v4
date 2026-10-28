@@ -1,0 +1,136 @@
+MODULE $vcgglobal;
+/*
+/*  Copyright © 1996, Digital Equipment Corporation.
+/*
+/* Define VCG globals accessable by the front ends
+/*
+/*
+/* Modifications:
+/*
+/*	009D	Jeff Zeeb	18-Nov-1987	(410 SVCG D)
+/*
+/*		Added VCG$GL_AUDITTYP
+/*
+/*	008D	Tom Benson	03-Mar-1986	(180 SVCG D)
+/*
+/*		Added VCG$GL_STATEMENT_COUNT
+/*
+/*	007	Keith Knowles	24-Feb-1986	(179 SVCG D)
+/*
+/*		Added VCG$K_MAX_SCA_DATA for SCA support.
+/*
+/*	006	Tom Benson	08-Nov-1985	(116 SVCG M)
+/*
+/*		Added VCG$K_BYTE_INT_P
+/*
+/*	005	Ian Stocks	27-Jun-1985	(021 SVCG M)
+/*
+/*		Add comment on VCG$K_LINE_SIZE
+/*
+/*	004	Ian Stocks	30-Jan-1985	(162 VCG)
+/*
+/*		Added vcg$k_first_linker_index.
+/*
+/*	003	Caroline Davidson 07-Aug-1984	(069 VCG)
+/*
+/*		Commented out definition of VCG$GW_AUDIT_TRAIL which was
+/*		used to support /UPDATE.
+/*
+/*	002	Caroline Davidson 02-May-1984	(033 VCG)
+/*
+/*		Moved definition of phase constants to their own SDL file,
+/*		DEFPHASES.SDL.
+/*
+/*	001	Tom Benson	13-Feb-1984	(003 VCG)
+/*
+/*		Added modification history.
+/*
+/*
+
+CONSTANT vcg$k_hb_hash		EQUALS 60;
+CONSTANT vcg$k_hb_hash_table	EQUALS 510;
+CONSTANT vcg$k_max_integer   	EQUALS 2147483647;/* 2**31 - 1
+CONSTANT vcg$k_fixed_bin_dft_p	EQUALS 31;
+CONSTANT vcg$k_fixed_bin_max_p	EQUALS 31;
+CONSTANT vcg$k_float_bin_dft_p	EQUALS 24;
+CONSTANT vcg$k_double_bin_max_p	EQUALS 53;
+CONSTANT vcg$k_hughe_bin_max_p	EQUALS 113;
+CONSTANT vcg$k_fixed_dec_dft_p	EQUALS 10;
+CONSTANT vcg$k_fixed_dec_max_p	EQUALS 31;
+CONSTANT vcg$k_float_dec_dft_p	EQUALS 7;
+CONSTANT vcg$k_double_dec_max_p	EQUALS 15;
+CONSTANT vcg$k_hughe_dec_max_p	EQUALS 34;
+CONSTANT vcg$k_short_int_p	EQUALS 15;
+CONSTANT vcg$k_byte_int_p	EQUALS 7;
+CONSTANT vcg$k_bits_per_byte	EQUALS 8;
+CONSTANT vcg$k_bits_per_half	EQUALS 16;
+CONSTANT vcg$k_bits_per_word	EQUALS 32;
+CONSTANT vcg$k_bits_per_double	EQUALS 64;
+CONSTANT vcg$k_bytes_per_half	EQUALS 2;
+CONSTANT vcg$k_bytes_per_word	EQUALS 4;
+CONSTANT vcg$k_bytes_per_double	EQUALS 8;
+CONSTANT vcg$k_half_per_word	EQUALS 2;
+CONSTANT vcg$k_half_per_double	EQUALS 4;
+CONSTANT vcg$k_words_per_double	EQUALS 2;
+CONSTANT vcg$k_hb_nesting	EQUALS 64;       /* max block depth 
+CONSTANT vcg$k_hb_buffer	EQUALS 1023;      /* 2048 bytes, changed for vax 3/27
+CONSTANT vcg$k_void		EQUALS -1;
+CONSTANT vcg$k_first_linker_index EQUALS 511; 	/* A004
+constant vcg$k_max_sca_data	equals 300;
+
+CONSTANT vcg$k_line_size	EQUALS 132;
+{A005					{ THIS GLOBAL CONSTANT MUST HAVE THE
+					{ SAME VALUE AS THE LOCAL CONSTANTS OF
+					{ THE SAME NAME IN VCGDEBDEF.SDL AND
+					{ VCGMSGREC.SDL ....................
+
+/*
+ITEM vcg$gl_address_data_location	LONGWORD GLOBAL;
+ITEM vcg$ga_block_list_head		ADDRESS GLOBAL;{ Formerly block_list_id
+ITEM vcg$ga_buffer_header		ADDRESS(CHARACTER) GLOBAL;
+ITEM vcg$gb_previous_transfer_addr	BYTE GLOBAL;
+ITEM vcg$gl_code_location		LONGWORD GLOBAL;
+ITEM vcg$gl_statement_count		LONGWORD GLOBAL;  { A008D
+ITEM vcg$gl_dbg_lang_code		LONGWORD GLOBAL;
+ITEM vcg$gl_front_end_code		LONGWORD GLOBAL;
+ITEM vcg$ga_curr_src_line		ADDRESS GLOBAL;
+ITEM vcg$ga_external_block		ADDRESS GLOBAL; { Front end?
+ITEM vcg$ga_external_prefix		LONGWORD DIMENSION 0:5 GLOBAL;
+ITEM vcg$gl_hash			LONGWORD DIMENSION 0:60 GLOBAL;
+ITEM vcg$gl_hash_table			LONGWORD DIMENSION 0:510 GLOBAL;
+ITEM vcg$gl_high_loop_id		LONGWORD GLOBAL;{ Front end?
+ITEM vcg$ga_msg_list_head		ADDRESS GLOBAL;
+ITEM vcg$gw_phase			WORD GLOBAL;
+ITEM vcg$ga_replacement_token_list	ADDRESS GLOBAL;{ Front end?
+ITEM vcg$gb_size_of_context		BYTE DIMENSION 1:5 GLOBAL;{CTX_K_BYTE:CTX_K_OCTA
+ITEM vcg$gl_static_location		LONGWORD GLOBAL;
+ITEM vcg$ga_total_lines			ADDRESS GLOBAL;
+ITEM vcg$ga_pst_list			ADDRESS DIMENSION 0:255 GLOBAL;
+ITEM vcg$gat_logo			ADDRESS(CHARACTER) GLOBAL;
+ITEM vcg$gat_name			ADDRESS(CHARACTER) GLOBAL;
+ITEM vcg$gat_phases			ADDRESS(CHARACTER) GLOBAL;
+ITEM vcg$gw_prefix_size			WORD GLOBAL;
+ITEM vcg$gat_source_dna			ADDRESS(CHARACTER) GLOBAL;
+ITEM vcg$gat_version			ADDRESS(CHARACTER) GLOBAL;
+ITEM vcg$gb_source_dns			BYTE GLOBAL;
+ITEM vcg$gb_standard_trans		BYTE DIMENSION 0:255 GLOBAL;
+AGGREGATE vcg$gq_starttim		STRUCTURE GLOBAL;
+	vcg$gl_starttim			LONGWORD;
+	vcg$ga_starttim			ADDRESS;
+	END;
+ITEM vcg$gq_virt_range			QUADWORD GLOBAL;
+ITEM vcg$gvt_ident			CHARACTER LENGTH 32  VARYING GLOBAL;
+ITEM vcg$gvt_srcfil_hdr			CHARACTER LENGTH 280 VARYING GLOBAL;
+ITEM vcg$gvt_title			CHARACTER LENGTH 64  VARYING GLOBAL;
+{ D003: ITEM vcg$gw_audit_trail			WORD GLOBAL;
+ITEM vcg$gw_initial_mask		WORD GLOBAL;
+ITEM vcg$ga_src_list_head		ADDRESS GLOBAL;
+ITEM vcg$gw_status			WORD GLOBAL;
+ITEM vcg$gw_warncount			WORD GLOBAL;
+ITEM vcg$gw_errcount			WORD GLOBAL;
+ITEM vcg$gw_infocount			WORD GLOBAL;
+ITEM vcg$ga_cdd_audittyp		ADDRESS GLOBAL;	{ A009D
+ITEM vcg$gl_varianttyp			ADDRESS GLOBAL;
+ITEM vcg$gw_column_nbr			WORD GLOBAL;
+/*
+END_MODULE;

@@ -1,6 +1,11 @@
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar abbParser;
 
-options { tokenVocab = abbLexer; }
+options {
+    tokenVocab = abbLexer;
+}
 
 /*
     This grammar is still in development.
@@ -31,10 +36,7 @@ module_
     ;
 
 moduleData
-    : MODULE moduleName NEWLINE
-      dataList
-      NEWLINE*
-      ENDMODULE
+    : MODULE moduleName NEWLINE dataList NEWLINE* ENDMODULE
     ;
 
 moduleName
@@ -43,15 +45,11 @@ moduleName
     ;
 
 dataList
-    : (NEWLINE
-    | declaration NEWLINE
-    | procedure NEWLINE)*
+    : (NEWLINE | declaration NEWLINE | procedure NEWLINE)*
     ;
 
 procedure
-    : PROC procCall NEWLINE
-      (functionCall NEWLINE)*
-    ENDPROC
+    : PROC procCall NEWLINE (functionCall NEWLINE)* ENDPROC
     ;
 
 procCall
@@ -82,15 +80,21 @@ declaration
     ;
 
 type_
-    : TOOLDATA | WOBJDATA | SPEEDDATA | ZONEDATA | CLOCK | BOOL
+    : TOOLDATA
+    | WOBJDATA
+    | SPEEDDATA
+    | ZONEDATA
+    | CLOCK
+    | BOOL
     ;
 
 init_
-    : LOCAL? ( CONST | PERS | VAR )
+    : LOCAL? (CONST | PERS | VAR)
     ;
 
 expression
-    : array_ | primitive
+    : array_
+    | primitive
     ;
 
 array_

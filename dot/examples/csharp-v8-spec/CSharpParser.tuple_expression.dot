@@ -1,0 +1,34 @@
+digraph ATN {
+rankdir=LR;
+s151[fontsize=11, label="151", shape=doublecircle, fixedsize=true, width=.6];
+s1344[fontsize=11,label="1344", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1345[fontsize=11,label="1345", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1346[fontsize=11,label="{&rarr;\n1346\nd=75|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1347[fontsize=11,label="&larr;\n1347", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s150[fontsize=11,label="150", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1335[fontsize=11,label="1335", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1336[fontsize=11,label="1336", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1337[fontsize=11,label="1337", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1338[fontsize=11,label="1338", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1339[fontsize=11,label="&rarr;\n1339+", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1340[fontsize=11,label="&larr;\n1340", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1341[fontsize=11,label="{1341+\nd=74|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1342[fontsize=11,label="1342", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1343[fontsize=11,label="1343", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s150 -> s1346 [fontname="Times-Italic", label="&epsilon;"];
+s1346:p0 -> s1335 [fontname="Times-Italic", label="&epsilon;"];
+s1346:p1 -> s1345 [fontname="Times-Italic", label="&epsilon;"];
+s1335 -> s1336 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'('", arrowhead = normal];
+s1345 -> s1347 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<deconstruction_expression>", arrowhead = normal];
+s1336 -> s1339 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<tuple_element>", arrowhead = normal];
+s1347 -> s151 [fontname="Times-Italic", label="&epsilon;"];
+s1339 -> s1337 [fontname="Times-Italic", label="&epsilon;"];
+s1337 -> s1338 [fontsize=11, fontname="Courier", arrowsize=.7, label = "','", arrowhead = normal];
+s1338 -> s1340 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<tuple_element>", arrowhead = normal];
+s1340 -> s1341 [fontname="Times-Italic", label="&epsilon;"];
+s1341:p0 -> s1339 [fontname="Times-Italic", label="&epsilon;", style="dashed"];
+s1341:p1 -> s1342 [fontname="Times-Italic", label="&epsilon;"];
+s1342 -> s1343 [fontname="Times-Italic", label="&epsilon;"];
+s1343 -> s1344 [fontsize=11, fontname="Courier", arrowsize=.7, label = "')'", arrowhead = normal];
+s1344 -> s1347 [fontname="Times-Italic", label="&epsilon;"];
+}

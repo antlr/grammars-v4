@@ -1,37 +1,40 @@
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar BencodingParser;
 
 options {
-  tokenVocab=BencodingLexer;
+    tokenVocab = BencodingLexer;
 }
 
 // https://wiki.theory.org/BitTorrentSpecification#Bencoding
 data
- : values EOF
- ;
+    : values EOF
+    ;
 
 values
- : value*
- ;
+    : value*
+    ;
 
 value
- : integer
- | STRING
- | list
- | dict
- ;
+    : integer
+    | STRING
+    | list
+    | dict
+    ;
 
 integer
- : INT_START INTEGER END
- ;
+    : INT_START INTEGER END
+    ;
 
 list
- : LIST_START values END
- ;
+    : LIST_START values END
+    ;
 
 dict
- : DICT_START key_value* END
- ;
+    : DICT_START key_value* END
+    ;
 
 key_value
- : STRING value
- ;
+    : STRING value
+    ;

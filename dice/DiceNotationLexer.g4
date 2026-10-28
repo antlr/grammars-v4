@@ -17,6 +17,11 @@
 /** 
  * Dice notation lexical rules.
  */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine true, allowShortBlocksOnASingleLine true, minEmptyLines 0, alignSemicolons ownLine
+// $antlr-format alignColons trailing, singleLineOverrulesHangingColon true, alignLexerCommands true, alignLabels true, alignTrailers true
+
 lexer grammar DiceNotationLexer;
 
 /**
@@ -25,60 +30,28 @@ lexer grammar DiceNotationLexer;
 
 // Dice markers
 
-DSEPARATOR
-:
-   ( 'd' | 'D' )
-;
+DSEPARATOR: ( 'd' | 'D');
 
-DIGIT
-:
-   ('0'..'9')+
-;
+DIGIT: ('0' ..'9')+;
 
 // Operation tokens
 
-ADDOPERATOR
-:
-   ( ADD | SUB )
-;
+ADDOPERATOR: ( ADD | SUB);
 
-MULTOPERATOR
-:
-   ( MULT | DIV )
-;
+MULTOPERATOR: ( MULT | DIV);
 
-fragment ADD
-:
-   '+'
-;
+fragment ADD: '+';
 
-fragment SUB
-:
-   '-'
-;
+fragment SUB: '-';
 
-fragment MULT
-:
-   '*'
-;
+fragment MULT: '*';
 
-fragment DIV
-:
-   '/'
-;
+fragment DIV: '/';
 
-LPAREN
-:
-   '('
-;
+LPAREN: '(';
 
-RPAREN
-:
-   ')'
-;
+RPAREN: ')';
 
 // Skippable tokens
 
-WS:
-   [\t\r\n]+ -> skip
-;
+WS: [\t\r\n]+ -> skip;

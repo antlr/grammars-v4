@@ -1,6 +1,11 @@
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar jvmBasic;
 
-options { caseInsensitive = true; }
+options {
+    caseInsensitive = true;
+}
 
 /*
 [The "BSD licence"]
@@ -28,1115 +33,1010 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/// a program is a collection of lines
+*/ // a program is a collection of lines
 prog
-   : line + EOF
-   ;
+    : line+ EOF
+    ;
 
 // a line starts with an INT
 line
-   : linenumber (amprstmt (COLON amprstmt?)* | COMMENT | REM)
-   ;
+    : linenumber (amprstmt (COLON amprstmt?)* | COMMENT | REM)
+    ;
 
 amperoper
-   : AMPERSAND
-   ;
+    : AMPERSAND
+    ;
 
 linenumber
-   : NUMBER
-   ;
+    : NUMBER
+    ;
 
 amprstmt
-   : amperoper? statement
-   | COMMENT
-   | REM
-   ;
+    : amperoper? statement
+    | COMMENT
+    | REM
+    ;
 
 statement
-   : CLS | LOAD | SAVE | TRACE | NOTRACE | FLASH | INVERSE | GR | NORMAL | SHLOAD | CLEAR | RUN | STOP | TEXT | HOME | HGR | HGR2
-   | endstmt
-   | returnstmt
-   | restorestmt
-   | amptstmt
-   | popstmt
-   | liststmt
-   | storestmt
-   | getstmt
-   | recallstmt
-   | nextstmt
-   | instmt
-   | prstmt
-   | onerrstmt
-   | hlinstmt
-   | vlinstmt
-   | colorstmt
-   | speedstmt
-   | scalestmt
-   | rotstmt
-   | hcolorstmt
-   | himemstmt
-   | lomemstmt
-   | printstmt1
-   | pokestmt
-   | plotstmt
-   | ongotostmt
-   | ongosubstmt
-   | ifstmt
-   | forstmt1
-   | forstmt2
-   | inputstmt
-   | tabstmt
-   | dimstmt
-   | gotostmt
-   | gosubstmt
-   | callstmt
-   | readstmt
-   | hplotstmt
-   | vplotstmt
-   | vtabstmnt
-   | htabstmnt
-   | waitstmt
-   | datastmt
-   | xdrawstmt
-   | drawstmt
-   | defstmt
-   | letstmt
-   | includestmt
-   ;
+    : CLS
+    | LOAD
+    | SAVE
+    | TRACE
+    | NOTRACE
+    | FLASH
+    | INVERSE
+    | GR
+    | NORMAL
+    | SHLOAD
+    | CLEAR
+    | RUN
+    | STOP
+    | TEXT
+    | HOME
+    | HGR
+    | HGR2
+    | endstmt
+    | returnstmt
+    | restorestmt
+    | amptstmt
+    | popstmt
+    | liststmt
+    | storestmt
+    | getstmt
+    | recallstmt
+    | nextstmt
+    | instmt
+    | prstmt
+    | onerrstmt
+    | hlinstmt
+    | vlinstmt
+    | colorstmt
+    | speedstmt
+    | scalestmt
+    | rotstmt
+    | hcolorstmt
+    | himemstmt
+    | lomemstmt
+    | printstmt1
+    | pokestmt
+    | plotstmt
+    | ongotostmt
+    | ongosubstmt
+    | ifstmt
+    | forstmt1
+    | forstmt2
+    | inputstmt
+    | tabstmt
+    | dimstmt
+    | gotostmt
+    | gosubstmt
+    | callstmt
+    | readstmt
+    | hplotstmt
+    | vplotstmt
+    | vtabstmnt
+    | htabstmnt
+    | waitstmt
+    | datastmt
+    | xdrawstmt
+    | drawstmt
+    | defstmt
+    | letstmt
+    | includestmt
+    ;
 
 vardecl
-   : var_ (LPAREN exprlist RPAREN)*
-   ;
+    : var_ (LPAREN exprlist RPAREN)*
+    ;
 
 printstmt1
-   : (PRINT | QUESTION) printlist?
-   ;
+    : (PRINT | QUESTION) printlist?
+    ;
 
 printlist
-   : expression ((COMMA | SEMICOLON) expression?)*
-   ;
+    : expression ((COMMA | SEMICOLON) expression?)*
+    ;
 
 getstmt
-   : GET exprlist
-   ;
+    : GET exprlist
+    ;
 
 letstmt
-   : LET? variableassignment
-   ;
+    : LET? variableassignment
+    ;
 
 variableassignment
-   : vardecl EQ exprlist
-   ;
+    : vardecl EQ exprlist
+    ;
 
 relop
-   : GTE
-   | GT EQ
-   | EQ GT
-   | LTE
-   | LT EQ
-   | EQ LT
-   | neq
-   | EQ
-   | GT
-   | LT
-   ;
+    : GTE
+    | GT EQ
+    | EQ GT
+    | LTE
+    | LT EQ
+    | EQ LT
+    | neq
+    | EQ
+    | GT
+    | LT
+    ;
 
 neq
-   : LT GT
-   ;
+    : LT GT
+    ;
 
 ifstmt
-   : IF expression THEN? (statement | linenumber)
-   ;
+    : IF expression THEN? (statement | linenumber)
+    ;
 
 // for stmt 1 puts the for-next on one line
 forstmt1
-   : FOR vardecl EQ expression TO expression (STEP expression)? (statement NEXT vardecl?)?
-   ;
+    : FOR vardecl EQ expression TO expression (STEP expression)? (statement NEXT vardecl?)?
+    ;
 
 // for stmt 2 puts the for, the statment, and the next on 3 lines.  It needs "nextstmt"
 forstmt2
-   : FOR vardecl EQ expression TO expression (STEP expression)?
-   ;
+    : FOR vardecl EQ expression TO expression (STEP expression)?
+    ;
 
 nextstmt
-   : NEXT (vardecl (',' vardecl)*)?
-   ;
+    : NEXT (vardecl (',' vardecl)*)?
+    ;
 
 inputstmt
-   : INPUT (STRINGLITERAL (COMMA | SEMICOLON))? varlist
-   ;
+    : INPUT (STRINGLITERAL (COMMA | SEMICOLON))? varlist
+    ;
 
 readstmt
-   : READ varlist
-   ;
+    : READ varlist
+    ;
 
 dimstmt
-   : DIM varlist
-   ;
+    : DIM varlist
+    ;
 
 gotostmt
-   : GOTO linenumber
-   ;
+    : GOTO linenumber
+    ;
 
 gosubstmt
-   : GOSUB expression
-   ;
+    : GOSUB expression
+    ;
 
 pokestmt
-   : POKE expression COMMA expression
-   ;
+    : POKE expression COMMA expression
+    ;
 
 callstmt
-   : CALL exprlist
-   ;
+    : CALL exprlist
+    ;
 
 hplotstmt
-   : HPLOT (expression COMMA expression)? (TO expression COMMA expression)*
-   ;
+    : HPLOT (expression COMMA expression)? (TO expression COMMA expression)*
+    ;
 
 vplotstmt
-   : VPLOT (expression COMMA expression)? (TO expression COMMA expression)*
-   ;
+    : VPLOT (expression COMMA expression)? (TO expression COMMA expression)*
+    ;
 
 plotstmt
-   : PLOT expression COMMA expression
-   ;
+    : PLOT expression COMMA expression
+    ;
 
 ongotostmt
-   : ON expression GOTO linenumber (COMMA linenumber)*
-   ;
+    : ON expression GOTO linenumber (COMMA linenumber)*
+    ;
 
 ongosubstmt
-   : ON expression GOSUB linenumber (COMMA linenumber)*
-   ;
+    : ON expression GOSUB linenumber (COMMA linenumber)*
+    ;
 
 vtabstmnt
-   : VTAB expression
-   ;
+    : VTAB expression
+    ;
 
 htabstmnt
-   : HTAB expression
-   ;
+    : HTAB expression
+    ;
 
 himemstmt
-   : HIMEM COLON expression
-   ;
+    : HIMEM COLON expression
+    ;
 
 lomemstmt
-   : LOMEM COLON expression
-   ;
+    : LOMEM COLON expression
+    ;
 
 datastmt
-   : DATA datum (COMMA datum?)*
-   ;
+    : DATA datum (COMMA datum?)*
+    ;
 
 datum
-   : number
-   | STRINGLITERAL
-   ;
+    : number
+    | STRINGLITERAL
+    ;
 
 waitstmt
-   : WAIT expression COMMA expression (COMMA expression)?
-   ;
+    : WAIT expression COMMA expression (COMMA expression)?
+    ;
 
 xdrawstmt
-   : XDRAW expression (AT expression COMMA expression)?
-   ;
+    : XDRAW expression (AT expression COMMA expression)?
+    ;
 
 drawstmt
-   : DRAW expression (AT expression COMMA expression)?
-   ;
+    : DRAW expression (AT expression COMMA expression)?
+    ;
 
 defstmt
-   : DEF FN? var_ LPAREN var_ RPAREN EQ expression
-   ;
+    : DEF FN? var_ LPAREN var_ RPAREN EQ expression
+    ;
 
 tabstmt
-   : TAB LPAREN expression RPAREN
-   ;
+    : TAB LPAREN expression RPAREN
+    ;
 
 speedstmt
-   : SPEED EQ expression
-   ;
+    : SPEED EQ expression
+    ;
 
 rotstmt
-   : ROT EQ expression
-   ;
+    : ROT EQ expression
+    ;
 
 scalestmt
-   : SCALE EQ expression
-   ;
+    : SCALE EQ expression
+    ;
 
 colorstmt
-   : COLOR EQ expression
-   ;
+    : COLOR EQ expression
+    ;
 
 hcolorstmt
-   : HCOLOR EQ expression
-   ;
+    : HCOLOR EQ expression
+    ;
 
 hlinstmt
-   : HLIN expression COMMA expression AT expression
-   ;
+    : HLIN expression COMMA expression AT expression
+    ;
 
 vlinstmt
-   : VLIN expression COMMA expression AT expression
-   ;
+    : VLIN expression COMMA expression AT expression
+    ;
 
 onerrstmt
-   : ONERR GOTO linenumber
-   ;
+    : ONERR GOTO linenumber
+    ;
 
 prstmt
-   : PRNUMBER NUMBER
-   ;
+    : PRNUMBER NUMBER
+    ;
 
 instmt
-   : INNUMBER NUMBER
-   ;
+    : INNUMBER NUMBER
+    ;
 
 storestmt
-   : STORE vardecl
-   ;
+    : STORE vardecl
+    ;
 
 recallstmt
-   : RECALL vardecl
-   ;
+    : RECALL vardecl
+    ;
 
 liststmt
-   : LIST expression?
-   ;
+    : LIST expression?
+    ;
 
 popstmt
-   : POP (expression COMMA expression)?
-   ;
+    : POP (expression COMMA expression)?
+    ;
 
 amptstmt
-   : AMPERSAND expression
-   ;
+    : AMPERSAND expression
+    ;
 
 includestmt
-   : INCLUDE expression
-   ;
+    : INCLUDE expression
+    ;
 
 endstmt
-   : END
-   ;
+    : END
+    ;
 
 returnstmt
-   : RETURN
-   ;
+    : RETURN
+    ;
 
 restorestmt
-   : RESTORE
-   ;
+    : RESTORE
+    ;
 
 // expressions and such
 number
-   :  ('+' | '-')? (NUMBER | FLOAT)
-   ;
+    : ('+' | '-')? (NUMBER | FLOAT)
+    ;
 
 func_
-   : STRINGLITERAL
-   | number
-   | tabfunc
-   | vardecl
-   | chrfunc
-   | sqrfunc
-   | lenfunc
-   | strfunc
-   | ascfunc
-   | scrnfunc
-   | midfunc
-   | pdlfunc
-   | peekfunc
-   | intfunc
-   | spcfunc
-   | frefunc
-   | posfunc
-   | usrfunc
-   | leftfunc
-   | valfunc
-   | rightfunc
-   | fnfunc
-   | sinfunc
-   | cosfunc
-   | tanfunc
-   | atnfunc
-   | rndfunc
-   | sgnfunc
-   | expfunc
-   | logfunc
-   | absfunc
-   | LPAREN expression RPAREN
-   ;
+    : STRINGLITERAL
+    | number
+    | tabfunc
+    | vardecl
+    | chrfunc
+    | sqrfunc
+    | lenfunc
+    | strfunc
+    | ascfunc
+    | scrnfunc
+    | midfunc
+    | pdlfunc
+    | peekfunc
+    | intfunc
+    | spcfunc
+    | frefunc
+    | posfunc
+    | usrfunc
+    | leftfunc
+    | valfunc
+    | rightfunc
+    | fnfunc
+    | sinfunc
+    | cosfunc
+    | tanfunc
+    | atnfunc
+    | rndfunc
+    | sgnfunc
+    | expfunc
+    | logfunc
+    | absfunc
+    | LPAREN expression RPAREN
+    ;
 
 signExpression
-   : NOT? (PLUS | MINUS)? func_
-   ;
+    : NOT? (PLUS | MINUS)? func_
+    ;
 
 exponentExpression
-   : signExpression (EXPONENT signExpression)*
-   ;
+    : signExpression (EXPONENT signExpression)*
+    ;
 
 multiplyingExpression
-   : exponentExpression ((TIMES | DIV) exponentExpression)*
-   ;
+    : exponentExpression ((TIMES | DIV) exponentExpression)*
+    ;
 
 addingExpression
-   : multiplyingExpression ((PLUS | MINUS) multiplyingExpression)*
-   ;
+    : multiplyingExpression ((PLUS | MINUS) multiplyingExpression)*
+    ;
 
 relationalExpression
-   : addingExpression (relop addingExpression)?
-   ;
+    : addingExpression (relop addingExpression)?
+    ;
 
 expression
-   : func_
-   | relationalExpression ((AND | OR) relationalExpression)*
-   ;
+    : func_
+    | relationalExpression ((AND | OR) relationalExpression)*
+    ;
 
 // lists
 var_
-   : varname varsuffix?
-   ;
+    : varname varsuffix?
+    ;
 
 varname
-   : LETTERS (LETTERS | NUMBER)*
-   ;
+    : LETTERS (LETTERS | NUMBER)*
+    ;
 
 varsuffix
-   : DOLLAR | PERCENT
-   ;
+    : DOLLAR
+    | PERCENT
+    ;
 
 varlist
-   : vardecl (COMMA vardecl)*
-   ;
+    : vardecl (COMMA vardecl)*
+    ;
 
 exprlist
-   : expression (COMMA expression)*
-   ;
+    : expression (COMMA expression)*
+    ;
 
 // functions
 sqrfunc
-   : SQR LPAREN expression RPAREN
-   ;
+    : SQR LPAREN expression RPAREN
+    ;
 
 chrfunc
-   : CHR LPAREN expression RPAREN
-   ;
+    : CHR LPAREN expression RPAREN
+    ;
 
 lenfunc
-   : LEN LPAREN expression RPAREN
-   ;
+    : LEN LPAREN expression RPAREN
+    ;
 
 ascfunc
-   : ASC LPAREN expression RPAREN
-   ;
+    : ASC LPAREN expression RPAREN
+    ;
 
 midfunc
-   : MID LPAREN expression COMMA expression COMMA expression RPAREN
-   ;
+    : MID LPAREN expression COMMA expression COMMA expression RPAREN
+    ;
 
 pdlfunc
-   : PDL LPAREN expression RPAREN
-   ;
+    : PDL LPAREN expression RPAREN
+    ;
 
 peekfunc
-   : PEEK LPAREN expression RPAREN
-   ;
+    : PEEK LPAREN expression RPAREN
+    ;
 
 intfunc
-   : INTF LPAREN expression RPAREN
-   ;
+    : INTF LPAREN expression RPAREN
+    ;
 
 spcfunc
-   : SPC LPAREN expression RPAREN
-   ;
+    : SPC LPAREN expression RPAREN
+    ;
 
 frefunc
-   : FRE LPAREN expression RPAREN
-   ;
+    : FRE LPAREN expression RPAREN
+    ;
 
 posfunc
-   : POS LPAREN expression RPAREN
-   ;
+    : POS LPAREN expression RPAREN
+    ;
 
 usrfunc
-   : USR LPAREN expression RPAREN
-   ;
+    : USR LPAREN expression RPAREN
+    ;
 
 leftfunc
-   : LEFT LPAREN expression COMMA expression RPAREN
-   ;
+    : LEFT LPAREN expression COMMA expression RPAREN
+    ;
 
 rightfunc
-   : RIGHT LPAREN expression COMMA expression RPAREN
-   ;
+    : RIGHT LPAREN expression COMMA expression RPAREN
+    ;
 
 strfunc
-   : STR LPAREN expression RPAREN
-   ;
+    : STR LPAREN expression RPAREN
+    ;
 
 fnfunc
-   : FN var_ LPAREN expression RPAREN
-   ;
+    : FN var_ LPAREN expression RPAREN
+    ;
 
 valfunc
-   : VAL LPAREN expression RPAREN
-   ;
+    : VAL LPAREN expression RPAREN
+    ;
 
 scrnfunc
-   : SCRN LPAREN expression COMMA expression RPAREN
-   ;
+    : SCRN LPAREN expression COMMA expression RPAREN
+    ;
 
 sinfunc
-   : SIN LPAREN expression RPAREN
-   ;
+    : SIN LPAREN expression RPAREN
+    ;
 
 cosfunc
-   : COS LPAREN expression RPAREN
-   ;
+    : COS LPAREN expression RPAREN
+    ;
 
 tanfunc
-   : TAN LPAREN expression RPAREN
-   ;
+    : TAN LPAREN expression RPAREN
+    ;
 
 atnfunc
-   : ATN LPAREN expression RPAREN
-   ;
+    : ATN LPAREN expression RPAREN
+    ;
 
 rndfunc
-   : RND LPAREN expression RPAREN
-   ;
+    : RND LPAREN expression RPAREN
+    ;
 
 sgnfunc
-   : SGN LPAREN expression RPAREN
-   ;
+    : SGN LPAREN expression RPAREN
+    ;
 
 expfunc
-   : EXP LPAREN expression RPAREN
-   ;
+    : EXP LPAREN expression RPAREN
+    ;
 
 logfunc
-   : LOG LPAREN expression RPAREN
-   ;
+    : LOG LPAREN expression RPAREN
+    ;
 
 absfunc
-   : ABS LPAREN expression RPAREN
-   ;
+    : ABS LPAREN expression RPAREN
+    ;
 
 tabfunc
-   : TAB LPAREN expression RPAREN
-   ;
-
+    : TAB LPAREN expression RPAREN
+    ;
 
 DOLLAR
-   : '$'
-   ;
-
+    : '$'
+    ;
 
 PERCENT
-   : '%'
-   ;
-
+    : '%'
+    ;
 
 RETURN
-   : 'RETURN'
-   ;
-
+    : 'RETURN'
+    ;
 
 PRINT
-   : 'PRINT'
-   ;
-
+    : 'PRINT'
+    ;
 
 GOTO
-   : 'GOTO'
-   ;
-
+    : 'GOTO'
+    ;
 
 GOSUB
-   : 'GOSUB'
-   ;
-
+    : 'GOSUB'
+    ;
 
 IF
-   : 'IF'
-   ;
-
+    : 'IF'
+    ;
 
 NEXT
-   : 'NEXT'
-   ;
-
+    : 'NEXT'
+    ;
 
 THEN
-   : 'THEN'
-   ;
-
+    : 'THEN'
+    ;
 
 REM
-   : 'REM'
-   ;
-
+    : 'REM'
+    ;
 
 CHR
-   : 'CHR$'
-   ;
-
+    : 'CHR$'
+    ;
 
 MID
-   : 'MID$'
-   ;
-
+    : 'MID$'
+    ;
 
 LEFT
-   : 'LEFT$'
-   ;
-
+    : 'LEFT$'
+    ;
 
 RIGHT
-   : 'RIGHT$'
-   ;
-
+    : 'RIGHT$'
+    ;
 
 STR
-   : 'STR$'
-   ;
-
+    : 'STR$'
+    ;
 
 LPAREN
-   : '('
-   ;
-
+    : '('
+    ;
 
 RPAREN
-   : ')'
-   ;
-
+    : ')'
+    ;
 
 PLUS
-   : '+'
-   ;
-
+    : '+'
+    ;
 
 MINUS
-   : '-'
-   ;
-
+    : '-'
+    ;
 
 TIMES
-   : '*'
-   ;
-
+    : '*'
+    ;
 
 DIV
-   : '/'
-   ;
-
+    : '/'
+    ;
 
 CLEAR
-   : 'CLEAR'
-   ;
-
+    : 'CLEAR'
+    ;
 
 GTE
-   : '>: '
-   ;
-
+    : '>: '
+    ;
 
 LTE
-   : '<: '
-   ;
-
+    : '<: '
+    ;
 
 GT
-   : '>'
-   ;
-
+    : '>'
+    ;
 
 LT
-   : '<'
-   ;
-
+    : '<'
+    ;
 
 COMMA
-   : ','
-   ;
-
+    : ','
+    ;
 
 LIST
-   : 'LIST'
-   ;
-
+    : 'LIST'
+    ;
 
 RUN
-   : 'RUN'
-   ;
-
+    : 'RUN'
+    ;
 
 END
-   : 'END'
-   ;
-
+    : 'END'
+    ;
 
 LET
-   : 'LET'
-   ;
-
+    : 'LET'
+    ;
 
 EQ
-   : '='
-   ;
-
+    : '='
+    ;
 
 FOR
-   : 'FOR'
-   ;
-
+    : 'FOR'
+    ;
 
 TO
-   : 'TO'
-   ;
-
+    : 'TO'
+    ;
 
 STEP
-   : 'STEP'
-   ;
-
+    : 'STEP'
+    ;
 
 INPUT
-   : 'INPUT'
-   ;
-
+    : 'INPUT'
+    ;
 
 SEMICOLON
-   : ';'
-   ;
-
+    : ';'
+    ;
 
 DIM
-   : 'DIM'
-   ;
-
+    : 'DIM'
+    ;
 
 SQR
-   : 'SQR'
-   ;
-
+    : 'SQR'
+    ;
 
 COLON
-   : ':'
-   ;
-
+    : ':'
+    ;
 
 TEXT
-   : 'TEXT'
-   ;
-
+    : 'TEXT'
+    ;
 
 HGR
-   : 'HGR'
-   ;
-
+    : 'HGR'
+    ;
 
 HGR2
-   : 'HGR2'
-   ;
-
+    : 'HGR2'
+    ;
 
 LEN
-   : 'LEN'
-   ;
-
+    : 'LEN'
+    ;
 
 CALL
-   : 'CALL'
-   ;
-
+    : 'CALL'
+    ;
 
 ASC
-   : 'ASC'
-   ;
-
+    : 'ASC'
+    ;
 
 HPLOT
-   : 'HPLOT'
-   ;
-
+    : 'HPLOT'
+    ;
 
 VPLOT
-   : 'VPLOT'
-   ;
-
+    : 'VPLOT'
+    ;
 
 PRNUMBER
-   : 'PR#'
-   ;
-
+    : 'PR#'
+    ;
 
 INNUMBER
-   : 'IN#'
-   ;
-
+    : 'IN#'
+    ;
 
 VTAB
-   : 'VTAB'
-   ;
-
+    : 'VTAB'
+    ;
 
 HTAB
-   : 'HTAB'
-   ;
-
+    : 'HTAB'
+    ;
 
 HOME
-   : 'HOME'
-   ;
-
+    : 'HOME'
+    ;
 
 ON
-   : 'ON'
-   ;
-
+    : 'ON'
+    ;
 
 PDL
-   : 'PDL'
-   ;
-
+    : 'PDL'
+    ;
 
 PLOT
-   : 'PLOT'
-   ;
-
+    : 'PLOT'
+    ;
 
 PEEK
-   : 'PEEK'
-   ;
-
+    : 'PEEK'
+    ;
 
 POKE
-   : 'POKE'
-   ;
-
+    : 'POKE'
+    ;
 
 INTF
-   : 'INT'
-   ;
-
+    : 'INT'
+    ;
 
 STOP
-   : 'STOP'
-   ;
-
+    : 'STOP'
+    ;
 
 HIMEM
-   : 'HIMEM'
-   ;
-
+    : 'HIMEM'
+    ;
 
 LOMEM
-   : 'LOMEM'
-   ;
-
+    : 'LOMEM'
+    ;
 
 FLASH
-   : 'FLASH'
-   ;
-
+    : 'FLASH'
+    ;
 
 INVERSE
-   : 'INVERSE'
-   ;
-
+    : 'INVERSE'
+    ;
 
 NORMAL
-   : 'NORMAL'
-   ;
-
+    : 'NORMAL'
+    ;
 
 ONERR
-   : 'ONERR'
-   ;
-
+    : 'ONERR'
+    ;
 
 SPC
-   : 'SPC'
-   ;
-
+    : 'SPC'
+    ;
 
 FRE
-   : 'FRE'
-   ;
-
+    : 'FRE'
+    ;
 
 POS
-   : 'POS'
-   ;
-
+    : 'POS'
+    ;
 
 USR
-   : 'USR'
-   ;
-
+    : 'USR'
+    ;
 
 TRACE
-   : 'TRACE'
-   ;
-
+    : 'TRACE'
+    ;
 
 NOTRACE
-   : 'NOTRACE'
-   ;
-
+    : 'NOTRACE'
+    ;
 
 AND
-   : 'AND'
-   ;
-
+    : 'AND'
+    ;
 
 OR
-   : 'OR'
-   ;
-
+    : 'OR'
+    ;
 
 DATA
-   : 'DATA'
-   ;
-
+    : 'DATA'
+    ;
 
 WAIT
-   : 'WAIT'
-   ;
-
+    : 'WAIT'
+    ;
 
 READ
-   : 'READ'
-   ;
-
+    : 'READ'
+    ;
 
 XDRAW
-   : 'XDRAW'
-   ;
-
+    : 'XDRAW'
+    ;
 
 DRAW
-   : 'DRAW'
-   ;
-
+    : 'DRAW'
+    ;
 
 AT
-   : 'AT'
-   ;
-
+    : 'AT'
+    ;
 
 DEF
-   : 'DEF'
-   ;
-
+    : 'DEF'
+    ;
 
 FN
-   : 'FN'
-   ;
-
+    : 'FN'
+    ;
 
 VAL
-   : 'VAL'
-   ;
-
+    : 'VAL'
+    ;
 
 TAB
-   : 'TAB'
-   ;
-
+    : 'TAB'
+    ;
 
 SPEED
-   : 'SPEED'
-   ;
-
+    : 'SPEED'
+    ;
 
 ROT
-   : 'ROT'
-   ;
-
+    : 'ROT'
+    ;
 
 SCALE
-   : 'SCALE'
-   ;
-
+    : 'SCALE'
+    ;
 
 COLOR
-   : 'COLOR'
-   ;
-
+    : 'COLOR'
+    ;
 
 HCOLOR
-   : 'HCOLOR'
-   ;
-
+    : 'HCOLOR'
+    ;
 
 HLIN
-   : 'HLIN'
-   ;
-
+    : 'HLIN'
+    ;
 
 VLIN
-   : 'VLIN'
-   ;
-
+    : 'VLIN'
+    ;
 
 SCRN
-   : 'SCRN'
-   ;
-
+    : 'SCRN'
+    ;
 
 POP
-   : 'POP'
-   ;
-
+    : 'POP'
+    ;
 
 SHLOAD
-   : 'SHLOAD'
-   ;
-
+    : 'SHLOAD'
+    ;
 
 SIN
-   : 'SIN'
-   ;
-
+    : 'SIN'
+    ;
 
 COS
-   : 'COS'
-   ;
-
+    : 'COS'
+    ;
 
 TAN
-   : 'TAN'
-   ;
-
+    : 'TAN'
+    ;
 
 ATN
-   : 'ATN'
-   ;
-
+    : 'ATN'
+    ;
 
 RND
-   : 'RND'
-   ;
-
+    : 'RND'
+    ;
 
 SGN
-   : 'SGN'
-   ;
-
+    : 'SGN'
+    ;
 
 EXP
-   : 'EXP'
-   ;
-
+    : 'EXP'
+    ;
 
 LOG
-   : 'LOG'
-   ;
-
+    : 'LOG'
+    ;
 
 ABS
-   : 'ABS'
-   ;
-
+    : 'ABS'
+    ;
 
 STORE
-   : 'STORE'
-   ;
-
+    : 'STORE'
+    ;
 
 RECALL
-   : 'RECALL'
-   ;
-
+    : 'RECALL'
+    ;
 
 GET
-   : 'GET'
-   ;
-
+    : 'GET'
+    ;
 
 EXPONENT
-   : '^'
-   ;
-
+    : '^'
+    ;
 
 AMPERSAND
-   : '&'
-   ;
-
+    : '&'
+    ;
 
 GR
-   : 'GR'
-   ;
-
+    : 'GR'
+    ;
 
 NOT
-   : 'NOT'
-   ;
-
+    : 'NOT'
+    ;
 
 RESTORE
-   : 'RESTORE'
-   ;
-
+    : 'RESTORE'
+    ;
 
 SAVE
-   : 'SAVE'
-   ;
-
+    : 'SAVE'
+    ;
 
 LOAD
-   : 'LOAD'
-   ;
-
+    : 'LOAD'
+    ;
 
 QUESTION
-   : '?'
-   ;
-
+    : '?'
+    ;
 
 INCLUDE
-   : 'INCLUDE'
-   ;
-
+    : 'INCLUDE'
+    ;
 
 CLS
-   : 'CLS'
-   ;
-
+    : 'CLS'
+    ;
 
 COMMENT
-   : REM ~ [\r\n]*
-   ;
-
+    : REM ~ [\r\n]*
+    ;
 
 STRINGLITERAL
-   : '"' ~ ["\r\n]* '"'
-   ;
-
+    : '"' ~ ["\r\n]* '"'
+    ;
 
 LETTERS
-   : ('A' .. 'Z') +
-   ;
-
+    : ('A' .. 'Z')+
+    ;
 
 NUMBER
-   : ('0' .. '9') + ('E' NUMBER)*
-   ;
-
+    : ('0' .. '9')+ ('E' NUMBER)*
+    ;
 
 FLOAT
-   : ('0' .. '9')* '.' ('0' .. '9') + ('E' ('0' .. '9') +)*
-   ;
-
+    : ('0' .. '9')* '.' ('0' .. '9')+ ('E' ('0' .. '9')+)*
+    ;
 
 WS
-   : [ \r\n\t] + -> channel (HIDDEN)
-   ;
+    : [ \r\n\t]+ -> channel (HIDDEN)
+    ;

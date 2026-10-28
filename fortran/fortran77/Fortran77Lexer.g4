@@ -26,653 +26,285 @@
 /*
  * Updated by Tom Everett, 2018
  */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine true, allowShortBlocksOnASingleLine true, minEmptyLines 0, alignSemicolons ownLine
+// $antlr-format alignColons trailing, singleLineOverrulesHangingColon true, alignLexerCommands true, alignLabels true, alignTrailers true
+
 lexer grammar Fortran77Lexer;
 
-options { superClass = Fortran77LexerBase; } 
+options {
+    superClass = Fortran77LexerBase;
+}
 
 // Insert here @header for C++ lexer.
 
-PROGRAM
-   : 'program' | 'PROGRAM'
-   ;
+PROGRAM: 'program' | 'PROGRAM';
 
+ENTRY: 'entry' | 'ENTRY';
 
-ENTRY
-   : 'entry' | 'ENTRY'
-   ;
+FUNCTION: 'function' | 'FUNCTION';
 
+BLOCK: 'block' | 'BLOCK';
 
-FUNCTION
-   : 'function' | 'FUNCTION'
-   ;
+SUBROUTINE: 'subroutine' | 'SUBROUTINE';
 
+END: 'END' | 'end';
 
-BLOCK
-   : 'block' | 'BLOCK'
-   ;
+DIMENSION: 'dimension' | 'DIMENSION';
 
+REAL: 'REAL' | 'real';
 
-SUBROUTINE
-   : 'subroutine' | 'SUBROUTINE'
-   ;
+EQUIVALENCE: 'EQUIVALENCE' | 'equivalence';
 
+COMMON: 'common' | 'COMMON';
 
-END
-   : 'END' | 'end'
-   ;
+POINTER: 'pointer' | 'POINTER';
 
+IMPLICIT: 'implicit' | 'IMPLICIT';
 
-DIMENSION
-   : 'dimension' | 'DIMENSION'
-   ;
+NONE: 'none' | 'NONE';
 
+CHARACTER: 'character' | 'CHARACTER';
 
-REAL
-   : 'REAL' | 'real'
-   ;
+PARAMETER: 'parameter' | 'PARAMETER';
 
+EXTERNAL: 'external' | 'EXTERNAL';
 
-EQUIVALENCE
-   : 'EQUIVALENCE' | 'equivalence'
-   ;
+INTRINSIC: 'intrinsic' | 'INTRINSIC';
 
+SAVE: 'save' | 'SAVE';
 
-COMMON
-   : 'common' | 'COMMON'
-   ;
+DATA: 'data' | 'DATA';
 
+GO: 'GO' | 'go';
 
-POINTER
-   : 'pointer' | 'POINTER'
-   ;
+GOTO: 'GOTO' | 'goto';
 
+IF: 'IF' | 'if';
 
-IMPLICIT
-   : 'implicit' | 'IMPLICIT'
-   ;
+THEN: 'THEN' | 'then';
 
+ELSE: 'ELSE' | 'else';
 
-NONE
-   : 'none' | 'NONE'
-   ;
+ENDIF: 'ENDIF' | 'endif';
 
+ELSEIF: 'ELSEIF' | 'elseif';
 
-CHARACTER
-   : 'character' | 'CHARACTER'
-   ;
+DO: 'DO' | 'do';
 
+CONTINUE: 'CONTINUE' | 'continue';
 
-PARAMETER
-   : 'parameter' | 'PARAMETER'
-   ;
+STOP: 'STOP' | 'stop';
 
+ENDDO: 'ENDDO' | 'enddo';
 
-EXTERNAL
-   : 'external' | 'EXTERNAL'
-   ;
+PAUSE: 'pause' | 'PAUSE';
 
+WRITE: 'WRITE' | 'write';
 
-INTRINSIC
-   : 'intrinsic' | 'INTRINSIC'
-   ;
+READ: 'READ' | 'read';
 
+PRINT: 'PRINT' | 'print';
 
-SAVE
-   : 'save' | 'SAVE'
-   ;
+OPEN: 'OPEN' | 'open';
 
+FMT: 'FMT' | 'fmt';
 
-DATA
-   : 'data' | 'DATA'
-   ;
+UNIT: 'UNIT' | 'unit';
 
+ERR: 'err' | 'ERR';
 
-GO
-   : 'GO' | 'go'
-   ;
+IOSTAT: 'IOSTAT' | 'iostat';
 
+FORMAT: 'FORMAT' | 'format';
 
-GOTO
-   : 'GOTO' | 'goto'
-   ;
+LET: 'LET' | 'let';
 
+CALL: 'CALL' | 'call';
 
-IF
-   : 'IF' | 'if'
-   ;
+RETURN: 'RETURN' | 'return';
 
+CLOSE: 'CLOSE' | 'close';
 
-THEN
-   : 'THEN' | 'then'
-   ;
+DOUBLE: 'DOUBLE' | 'double';
 
+IOSTART: 'IOSTART' | 'iostart';
 
-ELSE
-   : 'ELSE' | 'else'
-   ;
+SEQUENTIAL: 'SEQUENTIAL' | 'sequential';
 
+LABEL: 'LABEL' | 'label';
 
-ENDIF
-   : 'ENDIF' | 'endif'
-   ;
+FILE: 'file' | 'FILE';
 
+STATUS: 'STATUS' | 'status';
 
-ELSEIF
-   : 'ELSEIF' | 'elseif'
-   ;
+ACCESS: 'ACCESS' | 'access';
 
+POSITION: 'POSITION' | 'position';
 
-DO
-   : 'DO' | 'do'
-   ;
+FORM: 'FORM' | 'form';
 
+RECL: 'RECL' | 'recl';
 
-CONTINUE
-   : 'CONTINUE' | 'continue'
-   ;
+BLANK: 'BLANK' | 'blank';
 
+EXIST: 'EXIST' | 'exist';
 
-STOP
-   : 'STOP' | 'stop'
-   ;
+OPENED: 'OPENED' | 'opened';
 
+NUMBER: 'NUMBER' | 'number';
 
-ENDDO
-   : 'ENDDO' | 'enddo'
-   ;
+NAMED: 'NAMED' | 'named';
 
+NAME_: 'NAME' | 'name';
 
-PAUSE
-   : 'pause' | 'PAUSE'
-   ;
+FORMATTED: 'FORMATTED' | 'formatted';
 
+UNFORMATTED: 'UNFORMATTED' | 'unformatted';
 
-WRITE
-   : 'WRITE' | 'write'
-   ;
+NEXTREC: 'NEXTREC' | 'nextrec';
 
+INQUIRE: 'INQUIRE' | 'inquire';
 
-READ
-   : 'READ' | 'read'
-   ;
+BACKSPACE: 'BACKSPACE' | 'backspace';
 
+ENDFILE: 'ENDFILE' | 'endfile';
 
-PRINT
-   : 'PRINT' | 'print'
-   ;
+REWIND: 'REWIND' | 'rewind';
 
+DOLLAR: '$';
 
-OPEN
-   : 'OPEN' | 'open'
-   ;
+COMMA: ',';
 
+LPAREN: '(';
 
-FMT
-   : 'FMT' | 'fmt'
-   ;
+RPAREN: ')';
 
+COLON: ':';
 
-UNIT
-   : 'UNIT' | 'unit'
-   ;
+ASSIGN: '=';
 
+MINUS: '-';
 
-ERR
-   : 'err' | 'ERR'
-   ;
+PLUS: '+';
 
+DIV: '/';
 
-IOSTAT
-   : 'IOSTAT' | 'iostat'
-   ;
+fragment STARCHAR: '*';
 
+POWER: '**';
 
-FORMAT
-   : 'FORMAT' | 'format'
-   ;
+LNOT: '.not.' | '.NOT.';
 
+LAND: '.and.' | '.AND.';
 
-LET
-   : 'LET' | 'let'
-   ;
+LOR: '.or.' | '.OR.';
 
+EQV: '.eqv.' | '.EQV.';
 
-CALL
-   : 'CALL' | 'call'
-   ;
+NEQV: '.neqv.' | '.NEQV.';
 
+XOR: '.xor.' | '.XOR.';
 
-RETURN
-   : 'RETURN' | 'return'
-   ;
+EOR: '.eor.' | '.EOR.';
 
+LT: '.lt.' | '.LT.';
 
-CLOSE
-   : 'CLOSE' | 'close'
-   ;
+LE: '.le.' | '.LE.';
 
+GT: '.gt.' | '.GT.';
 
-DOUBLE
-   : 'DOUBLE' | 'double'
-   ;
+GE: '.ge.' | '.GE.';
 
+NE: '.ne.' | '.NE.';
 
-IOSTART
-   : 'IOSTART' | 'iostart'
-   ;
+EQ: '.eq.' | '.EQ.';
 
+TRUE: '.true.' | '.TRUE.';
 
-SEQUENTIAL
-   : 'SEQUENTIAL' | 'sequential'
-   ;
+FALSE: '.false.' | '.FALSE.';
 
+XCON: 'XCON';
 
-LABEL
-   : 'LABEL' | 'label'
-   ;
+PCON: 'PCON';
 
+FCON: 'FCON';
 
-FILE
-   : 'file' | 'FILE'
-   ;
+CCON: 'CCON';
 
+HOLLERITH: 'HOLLERITH';
 
-STATUS
-   : 'STATUS' | 'status'
-   ;
+CONCATOP: 'CONCATOP';
 
+CTRLDIRECT: 'CTRLDIRECT';
 
-ACCESS
-   : 'ACCESS' | 'access'
-   ;
+CTRLREC: 'CTRLREC';
 
+TO: 'TO' | 'to';
 
-POSITION
-   : 'POSITION' | 'position'
-   ;
+SUBPROGRAMBLOCK: 'SUBPROGRAMBLOCK';
 
+DOBLOCK: 'DOBLOCK';
 
-FORM
-   : 'FORM' | 'form'
-   ;
+AIF: 'AIF';
 
+THENBLOCK: 'THENBLOCK';
 
-RECL
-   : 'RECL' | 'recl'
-   ;
+ELSEBLOCK: 'ELSEBLOCK';
 
+CODEROOT: 'CODEROOT';
 
-BLANK
-   : 'BLANK' | 'blank'
-   ;
+COMPLEX: 'COMPLEX' | 'complex';
 
+PRECISION: 'PRECISION' | 'precision';
 
-EXIST
-   : 'EXIST' | 'exist'
-   ;
+INTEGER: 'INTEGER' | 'integer';
 
+LOGICAL: 'LOGICAL' | 'logical';
 
-OPENED
-   : 'OPENED' | 'opened'
-   ;
+fragment CONTINUATION: ~ ('0' | ' ');
 
+fragment ALNUM: (ALPHA | NUM);
 
-NUMBER
-   : 'NUMBER' | 'number'
-   ;
+fragment HEX: (NUM | 'a' .. 'f');
 
+fragment SIGN: ('+' | '-');
 
-NAMED
-   : 'NAMED' | 'named'
-   ;
+fragment FDESC: ('i' | 'f' | 'd') (NUM)+ '.' (NUM)+ | ('e' | 'g') (NUM)+ '.' (NUM)+ ('e' (NUM)+)?;
 
+fragment EXPON: ('e' | 'E' | 'd' | 'D') (SIGN)? (NUM)+;
 
-NAME_
-   : 'NAME' | 'name'
-   ;
+fragment ALPHA: ('a' .. 'z') | ('A' .. 'Z');
 
-
-FORMATTED
-   : 'FORMATTED' | 'formatted'
-   ;
-
-
-UNFORMATTED
-   : 'UNFORMATTED' | 'unformatted'
-   ;
-
-
-NEXTREC
-   : 'NEXTREC' | 'nextrec'
-   ;
-
-
-INQUIRE
-   : 'INQUIRE' | 'inquire'
-   ;
-
-
-BACKSPACE
-   : 'BACKSPACE' | 'backspace'
-   ;
-
-
-ENDFILE
-   : 'ENDFILE' | 'endfile'
-   ;
-
-
-REWIND
-   : 'REWIND' | 'rewind'
-   ;
-
-
-DOLLAR
-   : '$'
-   ;
-
-
-COMMA
-   : ','
-   ;
-
-
-LPAREN
-   : '('
-   ;
-
-
-RPAREN
-   : ')'
-   ;
-
-
-COLON
-   : ':'
-   ;
-
-
-ASSIGN
-   : '='
-   ;
-
-
-MINUS
-   : '-'
-   ;
-
-
-PLUS
-   : '+'
-   ;
-
-
-DIV
-   : '/'
-   ;
-
-fragment STARCHAR
-   : '*'
-   ;
-
-
-
-POWER
-   : '**'
-   ;
-
-
-LNOT
-   : '.not.' | '.NOT.'
-   ;
-
-
-LAND
-   : '.and.' | '.AND.'
-   ;
-
-
-LOR
-   : '.or.' | '.OR.'
-   ;
-
-
-EQV
-   : '.eqv.' | '.EQV.'
-   ;
-
-
-NEQV
-   : '.neqv.' | '.NEQV.'
-   ;
-
-
-XOR
-   : '.xor.' | '.XOR.'
-   ;
-
-
-EOR
-   : '.eor.' | '.EOR.'
-   ;
-
-
-LT
-   : '.lt.' | '.LT.'
-   ;
-
-
-LE
-   : '.le.' | '.LE.'
-   ;
-
-
-GT
-   : '.gt.' | '.GT.'
-   ;
-
-
-GE
-   : '.ge.' | '.GE.'
-   ;
-
-
-NE
-   : '.ne.' | '.NE.'
-   ;
-
-
-EQ
-   : '.eq.' | '.EQ.'
-   ;
-
-
-TRUE
-   : '.true.' | '.TRUE.'
-   ;
-
-
-FALSE
-   : '.false.' | '.FALSE.'
-   ;
-
-
-XCON
-   : 'XCON'
-   ;
-
-
-PCON
-   : 'PCON'
-   ;
-
-
-FCON
-   : 'FCON'
-   ;
-
-
-CCON
-   : 'CCON'
-   ;
-
-
-HOLLERITH
-   : 'HOLLERITH'
-   ;
-
-
-CONCATOP
-   : 'CONCATOP'
-   ;
-
-
-CTRLDIRECT
-   : 'CTRLDIRECT'
-   ;
-
-
-CTRLREC
-   : 'CTRLREC'
-   ;
-
-
-TO
-   : 'TO' | 'to'
-   ;
-
-
-SUBPROGRAMBLOCK
-   : 'SUBPROGRAMBLOCK'
-   ;
-
-
-DOBLOCK
-   : 'DOBLOCK'
-   ;
-
-
-AIF
-   : 'AIF'
-   ;
-
-
-THENBLOCK
-   : 'THENBLOCK'
-   ;
-
-
-ELSEBLOCK
-   : 'ELSEBLOCK'
-   ;
-
-
-CODEROOT
-   : 'CODEROOT'
-   ;
-
-
-COMPLEX
-   : 'COMPLEX' | 'complex'
-   ;
-
-
-PRECISION
-   : 'PRECISION' | 'precision'
-   ;
-
-
-INTEGER
-   : 'INTEGER' | 'integer'
-   ;
-
-
-LOGICAL
-   : 'LOGICAL' | 'logical'
-   ;
-
-
-fragment CONTINUATION
-   : ~ ('0' | ' ')
-   ;
-
-
-fragment ALNUM
-   : (ALPHA | NUM)
-   ;
-
-
-fragment HEX
-   : (NUM | 'a' .. 'f')
-   ;
-
-
-fragment SIGN
-   : ('+' | '-')
-   ;
-
-
-fragment FDESC
-   : ('i' | 'f' | 'd') (NUM) + '.' (NUM) + | ('e' | 'g') (NUM) + '.' (NUM) + ('e' (NUM) +)?
-   ;
-
-
-fragment EXPON
-   : ('e' | 'E' | 'd' | 'D') (SIGN)? (NUM) +
-   ;
-
-
-fragment ALPHA
-   : ('a' .. 'z') | ('A' .. 'Z')
-   ;
-
-
-fragment NUM
-   : ('0' .. '9')
-   ;
+fragment NUM: ('0' .. '9');
 
 // '' is used to drop the charater when forming the lexical token
 // Strings are assumed to start with a single quote (') and two
 // single quotes is meant as a literal single quote
 
-SCON
-   : '\'' ('\'' '\'' | ~ ('\'' | '\n' | '\r') | (('\n' | '\r' ('\n')?) '     ' CONTINUATION) ('\n' | '\r' ('\n')?) '     ' CONTINUATION)* '\''
-   ;
+SCON:
+    '\'' (
+        '\'' '\''
+        | ~ ('\'' | '\n' | '\r')
+        | (('\n' | '\r' ('\n')?) '     ' CONTINUATION) ('\n' | '\r' ('\n')?) '     ' CONTINUATION
+    )* '\''
+;
 
-RCON
-   : NUM+ '.' NUM* EXPON?
-   ;
+RCON: NUM+ '.' NUM* EXPON?;
 
-ICON
-   : NUM+
-   ;
+ICON: NUM+;
 
-NAME
-   : (('i' | 'f' | 'd' | 'g' | 'e') (NUM) + '.') FDESC | (ALNUM +) (ALNUM)*
-   ;
+NAME: (('i' | 'f' | 'd' | 'g' | 'e') (NUM)+ '.') FDESC | (ALNUM+) (ALNUM)*;
 
+COMMENT: {this.IsColumnZero()}? ('c' | STARCHAR) (~ [\r\n])* EOL -> channel(HIDDEN);
 
-COMMENT
-   : {this.IsColumnZero()}? ('c' | STARCHAR) (~ [\r\n])* EOL -> channel(HIDDEN)
-   ;
+STAR: STARCHAR;
 
-STAR
-   : STARCHAR
-   ;
+STRINGLITERAL: '"' ~ ["\r\n]* '"';
 
+EOL: [\r\n]+;
 
-STRINGLITERAL
-   : '"' ~ ["\r\n]* '"'
-   ;
+LINECONT: ((EOL '     $') | (EOL '     +')) -> skip;
 
-EOL
-   : [\r\n] +
-   ;
-
-LINECONT
-   : ((EOL '     $') | (EOL '     +')) -> skip
-   ;
-   
-WS
-   : [\t ] + -> skip
-   ;
+WS: [\t ]+ -> skip;

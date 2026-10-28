@@ -1,0 +1,36 @@
+PolicyStatement : 
+[
+{
+   "Id": "ValidPolicy1",
+   "Type": "A+",
+  "Who": "Principal1",
+  "What": {"Platform": "GLOUD", "Resource" : "*"}
+},
+{
+   "Id": "ValidPolicy2",
+   "Type": "A-",
+  "Who": "Principal2",
+  "What": {"Platform": "AWS", "Resource" : "Storage"}
+},
+{
+   "Id": "ValidPolicy2",
+   "Type": "A-",
+  "Who": "Principal2",
+  "What": {"Platform": "AWS", "Resource" : "Storage"}
+},
+{
+   "Id": "ValidPolicy3",
+   "Type": "A-",
+  "Who": "Principal3",
+  "What": {"Platform": "AWS", "Resource" : "Storage"},
+  "Where": {"Origin": ["0.0.0.1", "0.0.0.2"]}
+},
+{
+   "Id": "ValidPolicy4",
+   "Type": "A+",
+  "Who": "Principal4",
+  "What": {"Platform": "AWS", "Resource" : "Storage"},
+  "Where": {"Target": ["0.0.0.1", "0.0.0.2"]}
+}
+]
+

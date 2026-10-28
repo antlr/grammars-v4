@@ -29,78 +29,81 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar microc;
 
 program
-   : statement+ EOF
-   ;
+    : statement+ EOF
+    ;
 
 statement
-   : ifstatement
-   | whilestatement
-   | blockstatement
-   | exprstatement
-   ;
+    : ifstatement
+    | whilestatement
+    | blockstatement
+    | exprstatement
+    ;
 
 ifstatement
-   : 'if' paren_expr statement ('else' statement)?
-   ;
+    : 'if' paren_expr statement ('else' statement)?
+    ;
 
 whilestatement
-   : 'while' paren_expr statement
-   ;
+    : 'while' paren_expr statement
+    ;
 
 blockstatement
-   : '{' statement* '}'
-   ;
+    : '{' statement* '}'
+    ;
 
 exprstatement
-   : expr ';'
-   ;
+    : expr ';'
+    ;
 
 paren_expr
-   : '(' expr ')'
-   ;
+    : '(' expr ')'
+    ;
 
 expr
-   : test
-   | id_ '=' expr
-   ;
+    : test
+    | id_ '=' expr
+    ;
 
 test
-   : sum_
-   | sum_ '<' sum_
-   ;
+    : sum_
+    | sum_ '<' sum_
+    ;
 
 sum_
-   : term
-   | sum_ '+' term
-   | sum_ '-' term
-   ;
+    : term
+    | sum_ '+' term
+    | sum_ '-' term
+    ;
 
 term
-   : id_
-   | integer
-   | paren_expr
-   ;
+    : id_
+    | integer
+    | paren_expr
+    ;
 
 id_
-   : STRING
-   ;
+    : STRING
+    ;
 
 integer
-   : INT
-   ;
+    : INT
+    ;
 
 STRING
-   : [a-z]+
-   ;
+    : [a-z]+
+    ;
 
 INT
-   : [0-9]+
-   ;
+    : [0-9]+
+    ;
 
 WS
-   : [ \r\n\t] -> skip
-   ;
-
+    : [ \r\n\t] -> skip
+    ;

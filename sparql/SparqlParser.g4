@@ -31,9 +31,12 @@
  * @author Michele Mostarda (michele)
  * @version $Id: Sparql.g 5 2007-10-30 17:20:36Z simone $
  */
- /*
+/*
  * Ported to Antlr4 by Tom Everett
  */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
 
 parser grammar SparqlParser;
 
@@ -266,7 +269,11 @@ numericExpression
     ;
 
 additiveExpression
-    : multiplicativeExpression (('+' | '-') multiplicativeExpression | numericLiteralPositive | numericLiteralNegative)*
+    : multiplicativeExpression (
+        ('+' | '-') multiplicativeExpression
+        | numericLiteralPositive
+        | numericLiteralNegative
+    )*
     ;
 
 multiplicativeExpression
@@ -366,5 +373,3 @@ blankNode
     : BLANK_NODE_LABEL
     | ANON
     ;
-
-

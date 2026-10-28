@@ -1,0 +1,14 @@
+CLASS Person
+   DATA cName
+   DATA nAge
+   METHOD New( cN, nA ) CONSTRUCTOR
+   METHOD Greet()
+ENDCLASS
+
+METHOD New( cN, nA ) CLASS Person
+   ::cName := cN
+   ::nAge := nA
+   RETURN Self
+
+METHOD Greet() CLASS Person
+   RETURN "Hello, " + ::cName

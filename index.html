@@ -1,0 +1,46 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>Grammars-V4 index</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+	<script>
+
+		$(function() {
+	
+	
+	   var people = [];
+	
+	   $.getJSON('grammars.json', function(data) {
+		   $.each(data.person, function(i, f) {
+			  var tblRow = "<tr>" + "<td>" + f.name + "</td>" +
+			    + "</tr>"
+			   $(tblRow).appendTo("#userdata tbody");
+		 });
+	
+	   });
+	
+	});
+	</script>
+
+</head>
+
+<body>
+
+<div class="wrapper">
+<div class="profile">
+   <table id= "userdata" border="2">
+  <thead>
+            <th>Name</th>
+        </thead>
+      <tbody>
+
+       </tbody>
+   </table>
+
+</div>
+</div>
+
+</body>
+
+</html>

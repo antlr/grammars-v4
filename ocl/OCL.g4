@@ -13,326 +13,253 @@
 * SPDX-License-Identifier: EPL-2.0
 * *****************************/
 
-grammar OCL;	
-	
-specification
-  : 'package' ID '{' classifier* '}' EOF
-  ;
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
 
-expressions
-  : expression (';' expression)* ';'? EOF
-  ;
+grammar OCL;
 
-classifier
-    : classDefinition
-    | interfaceDefinition
-    | usecaseDefinition
-    | enumeration
+multipleContextSpecifications
+    : (singleInvariant | singleDerivedAttribute)+ EOF
     ;
 
-interfaceDefinition
-    :	'interface' ID ('extends' ID)? '{' classBody? '}'
-    ; 
+contextSpecification
+    : (singleInvariant | singleDerivedAttribute) EOF
+    ;
 
-classDefinition
-    :	'class' ID ('extends' ID)? ('implements' idList)? '{' classBody? '}'
-    ; 
+singleInvariant
+    : 'context' ID 'inv' ID? ':' expression
+    ;
 
-classBody
-    : classBodyElement+
-    ; 
-
-classBodyElement
-    : attributeDefinition 
-    | operationDefinition
-    | invariant 
-    | stereotype
-    ; 
-
-attributeDefinition 
-    :  'attribute' ID ('identity' | 'derived')? ':' type ';' 
-    | 'static' 'attribute' ID ':' type ';'
-    ; 
-
-operationDefinition
-      : ('static')? 'operation' ID 
-        '(' parameterDeclarations? ')' ':' type 
-        'pre:' expression 'post:' expression 
-        ('activity:' statement)? ';'
-      ;
-
-parameterDeclarations
-      : (parameterDeclaration ',')* parameterDeclaration
-      ;
-
-parameterDeclaration
-      : ID ':' type
-      ;
-
-idList
-     : (ID ',')* ID
-     ; 
-
-usecaseDefinition
-      : 'usecase' ID (':' type)? '{' usecaseBody? '}' 
-      | 'usecase' ID '(' parameterDeclarations ')' (':' type)? '{' usecaseBody? '}'
-      ;
-
-usecaseBody
-      : usecaseBodyElement+
-      ; 
-
-usecaseBodyElement
-      : 'parameter' ID ':' type ';' 
-      | 'precondition' expression ';' 
-      | 'extends' ID ';' 
-      | 'extendedBy' ID ';' 
-      | 'activity:' statement ';' 
-      | '::' expression 
-      | stereotype
-      ;
-
-invariant
-      : 'invariant' expression ';'
-      ; 
-
-stereotype
-      : 'stereotype' ID ';'  
-      | 'stereotype' ID '=' STRING_LITERAL ';'  
-      | 'stereotype' ID '=' ID ';' 
-      ;
-
-enumeration 
-      : 'enumeration' ID '{' enumerationLiteral+ '}'
-      ;  
-
-enumerationLiteral
-      : 'literal' ID
-      ;
+singleDerivedAttribute
+    : 'context' qualified_name ':' type ('init:' expression)? 'derive:' expression
+    ;
 
 type
-    : 'Sequence' '(' type ')'  
-    | 'Set' '(' type ')'  
-    | 'Bag' '(' type ')' 
-    | 'OrderedSet' '(' type ')' 
-    | 'Map' '(' type ',' type ')' 
-    | 'Function' '(' type ',' type ')' 
-    | ID
-    ; 
-
+    : 'Sequence' '(' type ')'
+    | 'Set' '(' type ')'
+    | 'Bag' '(' type ')'
+    | 'OrderedSet' '(' type ')'
+    | 'Ref' '(' type ')'  
+    | 'Map' '(' type ',' type ')'
+    | 'Function' '(' type ',' type ')'
+    | identifier
+    ;
 
 expressionList
     : (expression ',')* expression
-    ; 
+    ;
 
 expression
-    : logicalExpression  
-    | conditionalExpression  
-    | lambdaExpression  
+    : logicalExpression
+    | conditionalExpression
     | letExpression
     ;
 
-
-// Basic expressions can appear on the LHS of . or ->
-
-basicExpression
-    : 'null' 
-    | basicExpression '.' ID 
-    | basicExpression '(' expressionList? ')'  
-    | basicExpression '[' expression ']' 
-    | ID '@pre'  
-    | INT  
-    | FLOAT_LITERAL
-    | STRING_LITERAL
-    | ID   
-    | '(' expression ')'
-    ; 
-
 conditionalExpression
     : 'if' expression 'then' expression 'else' expression 'endif'
-    ; 
-
-lambdaExpression 
-    : 'lambda' ID ':' type 'in' expression
-    ; 
-
-// A let is just an application of a lambda:
+    ;
 
 letExpression
-    : 'let' ID ':' type '=' expression 'in' expression
-    ; 
+    : 'let' letBinding (',' letBinding)* 'in' expression
+    ;
+
+letBinding
+    : ID (':' type)? '=' expression
+    ;
+
+
+basicExpression
+    : NULL_LITERAL
+    | BOOLEAN_LITERAL
+    | basicExpression '.' ID
+    | basicExpression '(' expressionList? ')'
+    | basicExpression '[' expression ']'
+    | INT
+    | FLOAT_LITERAL
+    | STRING1_LITERAL
+    | STRING2_LITERAL
+    | ENUMERATION_LITERAL
+    | ID
+    | '(' expression ')'
+    ;
+
+///////////////////////////////////////////////////////////////////////////////
+// Infix precedence:
+// Expression precedence levels (lowest precedence first)
+///////////////////////////////////////////////////////////////////////////////
 
 logicalExpression
-    : 'not' logicalExpression  
-    | logicalExpression 'and' logicalExpression  
-    | logicalExpression '&' logicalExpression 
-    | logicalExpression 'or' logicalExpression  
-    | logicalExpression 'xor' logicalExpression  
-    | logicalExpression '=>' logicalExpression  
-    | logicalExpression 'implies' logicalExpression  
-    | equalityExpression
-    ; 
+    : equalityExpression (('and' | '&' | 'or' | 'xor' | '=>' | 'implies') equalityExpression)* ;
 
-equalityExpression 
-    : additiveExpression 
-        ('=' | '<' | '>' | '>=' | '<=' | '/=' | '<>' |
-         ':'| '/:' | '<:') additiveExpression 
-    | additiveExpression
-    ; 
-
+equalityExpression
+    : additiveExpression (('=' | '<' | '>' | '>=' | '<=' | '/=' | '<>' | ':' | '/:' | '<:') additiveExpression)* ;
+    
 additiveExpression
-    : additiveExpression '+' additiveExpression 
-    | additiveExpression '-' factorExpression
-    | factorExpression ('..' | '|->') factorExpression 
-    | factorExpression
-    ; 
+    : multiplicativeExpression (('+' | '-' | '..' | '|->') multiplicativeExpression)* ;
 
-factorExpression 
-    : factor2Expression ('*' | '/' | 'mod' | 'div') 
-                                   factorExpression 
-    | factor2Expression
-    ; 
+multiplicativeExpression
+    : unaryExpression (('*' | '/' | 'mod' | 'div') unaryExpression)* ;
 
+unaryExpression
+    : ('not' | '-' | '+' | '?' | '!') unaryExpression
+    | navigationExpression
+    ;
 
-// factor2Expressions can appear on LHS of ->
+//////////////////////////////////////////////////////////////////////////////
+// Postfix chaning expression handling.
+// 'navigationExpression' is a postfix expression that 
+// is direct left recursive: it can appear on LHS of ->
 // ->subrange is used for ->substring and ->subSequence
+//////////////////////////////////////////////////////////////////////////////
 
-factor2Expression
-  : ('-' | '+') factor2Expression 
-  | factor2Expression '->size()' 
-  | factor2Expression '->copy()'  
-  | factor2Expression ('->isEmpty()' | 
-                       '->notEmpty()' | 
-                       '->asSet()' | '->asBag()' | 
-                       '->asOrderedSet()' | 
-                       '->asSequence()' | 
-                       '->sort()' ) 
-   | factor2Expression '->any()'   
-   | factor2Expression '->log()'  
-   | factor2Expression '->exp()' 
-   | factor2Expression '->sin()'  
-   | factor2Expression '->cos()' 
-   | factor2Expression '->tan()'  
-   | factor2Expression '->asin()'  
-   | factor2Expression '->acos()' 
-   | factor2Expression '->atan()'  
-   | factor2Expression '->log10()' 
-   | factor2Expression '->first()'  
-   | factor2Expression '->last()' 
-   | factor2Expression '->front()'  
-   | factor2Expression '->tail()' 
-   | factor2Expression '->reverse()'  
-   | factor2Expression '->tanh()'  
-   | factor2Expression '->sinh()' 
-   | factor2Expression '->cosh()' 
-   | factor2Expression '->floor()'  
-   | factor2Expression '->ceil()' 
-   | factor2Expression '->round()' 
-   | factor2Expression '->abs()' 
-   | factor2Expression '->oclType()' 
-   | factor2Expression '->allInstances()' 
-   | factor2Expression '->oclIsUndefined()' 
-   | factor2Expression '->oclIsInvalid()' 
-   | factor2Expression '->oclIsNew()' 
-   | factor2Expression '->sum()'  
-   | factor2Expression '->prd()'  
-   | factor2Expression '->max()'  
-   | factor2Expression '->min()'  
-   | factor2Expression '->sqrt()'  
-   | factor2Expression '->cbrt()'  
-   | factor2Expression '->sqr()' 
-   | factor2Expression '->characters()'  
-   | factor2Expression '->toInteger()'  
-   | factor2Expression '->toReal()' 
-   | factor2Expression '->toBoolean()' 
-   | factor2Expression '->toUpperCase()'  
-   | factor2Expression '->toLowerCase()' 
-   | factor2Expression ('->unionAll()' | '->intersectAll()' |
-                       '->concatenateAll()')
- 
-   | factor2Expression ('->pow' | '->gcd') '(' expression ')' 
-   | factor2Expression ('->at' | '->union' | '->intersection' 
-            | '->includes' | '->excludes' | '->including' 
-            | '->excluding' | '->includesAll'  
-            | '->symmetricDifference' 
-            | '->excludesAll' | '->prepend' | '->append'  
-            | '->count' | '->apply') 
-                                   '(' expression ')' 
-   | factor2Expression ('->hasMatch' | '->isMatch' |
-                       '->firstMatch' | '->indexOf' | 
-                       '->lastIndexOf' | '->split' | 
-                       '->hasPrefix' | 
-                       '->hasSuffix' | 
-                       '->equalsIgnoreCase' ) 
-                                    '(' expression ')' 
-   | factor2Expression ('->oclAsType' | '->oclIsTypeOf' | 
-                       '->oclIsKindOf' | 
-                       '->oclAsSet') '(' expression ')' 
-   | factor2Expression '->collect' '(' identifier '|' expression ')' 
-   | factor2Expression '->select' '(' identifier '|' expression ')' 
-   | factor2Expression '->reject' '(' identifier '|' expression ')' 
-   | factor2Expression '->forAll' '(' identifier '|' expression ')' 
-   | factor2Expression '->exists' '(' identifier '|' expression ')' 
-   | factor2Expression '->exists1' '(' identifier '|' expression ')' 
-   | factor2Expression '->one' '(' identifier '|' expression ')' 
-   | factor2Expression '->any' '(' identifier '|' expression ')' 
-   | factor2Expression '->closure' '(' identifier '|' expression ')' 
-   | factor2Expression '->sortedBy' '(' identifier '|' expression ')' 
-   | factor2Expression '->isUnique' '(' identifier '|' expression ')' 
+navigationExpression
+    : primaryFactor (postfixSuffix)* ;
 
-   | factor2Expression '->subrange' '(' expression ',' expression ')'  
-   | factor2Expression '->replace' '(' expression ',' expression ')'  
-   | factor2Expression '->replaceAll' '(' expression ',' expression ')' 
-   | factor2Expression '->replaceAllMatches' '(' expression ',' expression ')'  
-   | factor2Expression '->replaceFirstMatch' '(' expression ',' expression ')'  
-   | factor2Expression '->insertAt' '(' expression ',' expression ')'  
-   | factor2Expression '->insertInto' '(' expression ',' expression ')'  
-   | factor2Expression '->setAt' '(' expression ',' expression ')' 
-   | factor2Expression '->iterate' '(' identifier ';' identifier '=' expression '|' expression ')'  
-   | setExpression 
-   | basicExpression
-   ; 
+primaryFactor
+    : setExpression
+    | basicExpression
+    ;
 
-setExpression 
-    : 'OrderedSet{' expressionList? '}'  
-    | 'Bag{' expressionList? '}'  
-    | 'Set{' expressionList? '}' 
-    | 'Sequence{' expressionList? '}' 
+postfixSuffix
+    : '.' 'allInstances' '(' ')'
+    | '.' 'oclType' '(' ')'
+    | '.' 'oclIsUndefined' '(' ')'
+    | '.' 'oclIsInvalid' '(' ')'
+    | '.' 'oclIsNew' '(' ')'
+    | '.' 'oclAsSet' '(' ')'
+    | '.' 'oclIsTypeOf' '(' expression ')'
+    | '.' 'oclIsKindOf' '(' expression ')'
+    | '.' 'oclAsType' '(' expression ')' ('.' ID)?
+    | '.' 'size' '(' ')'
+    | '.' 'max' '(' ')'
+    | '.' 'min' '(' ')'
+    | '.' 'indexOf' '(' expression ')'
+    | '.' 'at' '(' expression ')' ('.' ID)?
+    | '.' ID '(' (expression (',' expression)*)? ')' ('.' ID)?  // Generic dot operation with optional args and chaining
+    | '.' ID
+    | '->' 'size' '(' ')'
+    | '->' 'isEmpty' '(' ')'
+    | '->' 'notEmpty' '(' ')'
+    | '->' 'asSet' '(' ')'
+    | '->' 'asBag' '(' ')'
+    | '->' 'asOrderedSet' '(' ')'
+    | '->' 'asSequence' '(' ')'
+    | '->' 'any' '(' ')' ('.' ID)?
+    | '->' 'first' '(' ')' ('.' ID)?
+    | '->' 'last' '(' ')' ('.' ID)?
+    | '->' 'reverse' '(' ')'
+    | '->' 'floor' '(' ')'
+    | '->' 'round' '(' ')'
+    | '->' 'abs' '(' ')'
+    | '->' 'oclType' '(' ')'
+    | '->' 'oclIsUndefined' '(' ')'
+    | '->' 'oclIsInvalid' '(' ')'
+    | '->' 'oclIsNew' '(' ')'
+    | '->' 'sum' '(' ')'
+    | '->' 'max' '(' ')'
+    | '->' 'min' '(' ')'
+    | '->' 'characters' '(' ')'
+    | '->' 'toInteger' '(' ')'
+    | '->' 'toReal' '(' ')'
+    | '->' 'toBoolean' '(' ')'
+    | '->' 'toUpperCase' '(' ')'
+    | '->' 'toLowerCase' '(' ')'
+    | '->' (
+        'union'
+        | 'intersection'
+        | 'includes'
+        | 'excludes'
+        | 'including'
+        | 'excluding'
+        | 'includesAll'
+        | 'symmetricDifference'
+        | 'excludesAll'
+        | 'prepend'
+        | 'append'
+        | 'count'
+        | 'indexOf'
+        | 'count'
+      ) '(' expression ')'
+    | '->' 'equalsIgnoreCase' '(' expression ')'
+    | '->' ('oclAsType' | 'at') '(' expression ')' ('.' ID)?
+    | '->' ('oclIsTypeOf' | 'oclIsKindOf' | 'oclAsSet') '(' expression ')'
+    | '->' 'collect' '(' (identOptType '|')? expression ')'
+    | '->' 'select' '(' (identOptType '|')? expression ')'
+    | '->' 'reject' '(' (identOptType '|')? expression ')'
+    | '->' 'forAll' '(' (identOptTypeList '|')? expression ')'
+    | '->' 'exists' '(' (identOptTypeList '|')? expression ')'
+    | '->' 'one' '(' (identOptType '|')? expression ')'
+    | '->' 'any' '(' (identOptType '|')? expression ')' ('.' ID)?
+    | '->' 'closure' '(' (identOptType '|')? expression ')'
+    | '->' 'sortedBy' '(' (identOptType '|')? expression ')'
+    | '->' 'isUnique' '(' (identOptType '|')? expression ')'
+    | '->' 'insertAt' '(' expression ',' expression ')'
+    | '->' 'iterate' '(' identifier ';' identOptType '=' expression '|' expression ')'
+    | '->' ID '(' (expression (',' expression)*)? ')' ('.' ID)?  // Generic arrow operation with optional args and chaining
+    ;
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+identOptType
+    : ID (':' type)?
+    ;
+
+identOptTypeList
+    : identOptType (',' identOptType)*
+    ;
+
+setExpression
+    : 'OrderedSet{' expressionList? '}'
+    | 'Bag{' expressionList? '}'
+    | 'Set{' expressionList? '}'
+    | 'Sequence{' expressionList? '}'
     | 'Map{' expressionList? '}'
-    ; 
+    ;
 
-statement 
-   : 'skip' 
-   | 'return' 
-   | 'continue'  
-   | 'break' 
-   | 'var' ID ':' type 
-   | 'if' expression 'then' statement 'else' statement  
-   | 'while' expression 'do' statement 
-   | 'for' ID ':' expression 'do' statement 
-   | 'return' expression 
-   | basicExpression ':=' expression 
-   | statement ';' statement  
-   | 'execute' expression 
-   | 'call' basicExpression 
-   | '(' statement ')'
-   ;  
+identifier
+    : ID
+    ;
 
-identifier: ID ;
+qualified_name
+    : ENUMERATION_LITERAL
+    ;
 
-FLOAT_LITERAL:  Digits '.' Digits ;
 
-STRING_LITERAL:     '"' (~["\\\r\n] | EscapeSequence)* '"';
+BOOLEAN_LITERAL
+    : ('true' | 'false')
+    ;
 
-NULL_LITERAL:       'null';
+FLOAT_LITERAL
+    : Digits '.' Digits
+    ;
 
-MULTILINE_COMMENT: '/*' .*? '*/' -> channel(HIDDEN);
+STRING1_LITERAL
+    : '"' (~["\\\r\n] | EscapeSequence)* '"'
+    ;
 
+STRING2_LITERAL
+    : '\'' (~['\\\r\n] | EscapeSequence)* '\'';
+
+ENUMERATION_LITERAL
+    : ID '::' ID
+    ;
+
+NULL_LITERAL
+    : 'null'
+    ;
+
+MULTILINE_COMMENT
+    : '/*' .*? '*/' -> channel(HIDDEN)
+    ;
+
+// Skip comments starting with '--'
+LINE_COMMENT: '--' ~[\r\n]* -> skip;
 
 fragment EscapeSequence
     : '\\' [btnfr"'\\]
     | '\\' ([0-3]? [0-7])? [0-7]
-    | '\\' 'u'+ HexDigit HexDigit HexDigit HexDigit
+    | '\\' 'u' HexDigit HexDigit HexDigit HexDigit
     ;
 
 fragment HexDigits
@@ -343,13 +270,22 @@ fragment HexDigit
     : [0-9a-fA-F]
     ;
 
-
 fragment Digits
     : [0-9]+
     ;
 
-NEWLINE : [\r\n]+ -> skip ;
-INT     : [0-9]+ ;
-ID  :   [a-zA-Z$]+[a-zA-Z0-9_$]* ;      // match identifiers
-WS  :   [ \t\n\r]+ -> skip ;
+NEWLINE
+    : [\r\n]+ -> skip
+    ;
 
+INT
+    : [0-9]+
+    ;
+
+ID
+    : [a-zA-Z_$]+ [a-zA-Z0-9_$@]*
+    ; // match identifiers
+
+WS
+    : [ \t\n\r]+ -> skip
+    ;

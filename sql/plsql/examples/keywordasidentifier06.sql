@@ -1,7 +1,4 @@
-SELECT * FROM PERIOD;
-CREATE PROCEDURE TEST AS
-BEGIN
-    IF A.EXISTS() THEN
-        NULL;
-    END IF;
-END;
+CREATE PACKAGE keyword_identifier_date AS
+    date VARCHAR2(10);
+END keyword_identifier_date;
+/

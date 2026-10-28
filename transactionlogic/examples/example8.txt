@@ -1,0 +1,1 @@
+safeMove(X,Y) <- pickup(X) (+) skip (x) putdown(X,Y).

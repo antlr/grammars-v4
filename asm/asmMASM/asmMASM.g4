@@ -30,259 +30,313 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar asmMASM;
 
-options { caseInsensitive=true; }
+options {
+    caseInsensitive = true;
+}
 
 prog
-   : line* EOF
-   ;
+    : line* EOF
+    ;
 
 line
-   : (lbl | endlbl)? (assemblerdirective | masmdirectives | instruction)? EOL
-   ;
+    : (lbl | endlbl)? (assemblerdirective | masmdirectives | instruction)? EOL
+    ;
 
 instruction
-   : rep? opcode expressionlist?
-   ;
+    : rep? opcode expressionlist?
+    ;
 
 lbl
-   : label ':'?
-   ;
+    : label ':'?
+    ;
 
 endlbl
-   : END name?
-   ;
+    : END name?
+    ;
 
 assemblerdirective
-   : org
-   | if_
-   | endif_
-   | equ
-   | db
-   | dw
-   | dm
-   | ds
-   | include
-   | includelib
-   | invoke
-   | option
-   | put
-   | assign
-   | segment
-   | endsegment
-   | group
-   | label_
-   | assume
-   | extern_
-   | public_
-   | type_ expressionlist+
-   ;
+    : org
+    | if_
+    | endif_
+    | equ
+    | db
+    | dw
+    | dm
+    | ds
+    | include
+    | includelib
+    | invoke
+    | option
+    | put
+    | assign
+    | segment
+    | endsegment
+    | group
+    | label_
+    | assume
+    | extern_
+    | public_
+    | type_ expressionlist+
+    ;
 
 masmdirectives
-   : masmdirective+
-   ;
+    : masmdirective+
+    ;
 
 masmdirective
-   : MASMDIRECTIVE expressionlist?
-   ;
+    : MASMDIRECTIVE expressionlist?
+    ;
 
 assume
-   : ASSUME register_ ':' name (',' register_ ':' name)*
-   ;
+    : ASSUME register_ ':' name (',' register_ ':' name)*
+    ;
 
 label_
-   : name LABEL type_
-   ;
+    : name LABEL type_
+    ;
 
 type_
-   : BYTE
-   | SBYTE
-   | WORD
-   | DWORD
-   ;
+    : BYTE
+    | SBYTE
+    | WORD
+    | DWORD
+    ;
 
 group
-   : name GROUP name (',' name)*
-   ;
+    : name GROUP name (',' name)*
+    ;
 
 segment
-   : name SEGMENT align?
-   ;
+    : name SEGMENT align?
+    ;
 
 endsegment
-   : name SEGMENTEND
-   ;
+    : name SEGMENTEND
+    ;
 
 align
-   : BYTE | WORD | DWORD | PARA | PAGE
-   | ALIGN '(' number ')'
-   ;
+    : BYTE
+    | WORD
+    | DWORD
+    | PARA
+    | PAGE
+    | ALIGN '(' number ')'
+    ;
 
 assign
-   : name ASSIGN expression
-   ;
+    : name ASSIGN expression
+    ;
 
 put
-   : PUT expressionlist
-   ;
+    : PUT expressionlist
+    ;
 
 include
-   : INCLUDE expressionlist
-   ;
+    : INCLUDE expressionlist
+    ;
 
 includelib
-   : INCLUDELIB expressionlist
-   ;
+    : INCLUDELIB expressionlist
+    ;
 
 invoke
-   : INVOKE expressionlist
-   ;
+    : INVOKE expressionlist
+    ;
 
 option
-   : OPTION expressionlist
-   ;
+    : OPTION expressionlist
+    ;
 
 ds
-   : DS expressionlist
-   ;
+    : DS expressionlist
+    ;
 
 dw
-   : DW expressionlist
-   ;
+    : DW expressionlist
+    ;
 
 db
-   : DB expressionlist
-   ;
+    : DB expressionlist
+    ;
 
 dm
-   : DM expressionlist
-   ;
+    : DM expressionlist
+    ;
 
 dup
-   : number DUP expression
-   ;
+    : number DUP expression
+    ;
 
 equ
-   : EQU expression
-   ;
+    : EQU expression
+    ;
 
 extern_
-   : EXTERN expression
-   ;
+    : EXTERN expression
+    ;
 
 public_
-   : PUBLIC expression
-   ;
+    : PUBLIC expression
+    ;
 
 if_
-   : IF expression
-   ;
+    : IF expression
+    ;
 
 endif_
-   : ENDIF
-   ;
+    : ENDIF
+    ;
 
 org
-   : ORG expression
-   ;
+    : ORG expression
+    ;
 
 expressionlist
-   : expression (',' expression)*
-   ;
+    : expression (',' expression)*
+    ;
 
 label
-   : name
-   | gross
-   ;
+    : name
+    | gross
+    ;
 
 expression
-   : multiplyingExpression (SIGN multiplyingExpression)*
-   ;
+    : multiplyingExpression (SIGN multiplyingExpression)*
+    ;
 
 multiplyingExpression
-   : argument (('*' | '/') argument)*
-   ;
+    : argument (('*' | '/') argument)*
+    ;
 
 argument
-   : number
-   | dollar
-   | ques
-   | register_
-   | (name ':')? name
-   | string
-   | '(' expression ')'
-   | '[' expression ']'
-   | NOT expression
-   | OFFSET expression
-   | gross
-   | dup
-   ;
+    : number
+    | dollar
+    | ques
+    | register_
+    | (name ':')? name
+    | string
+    | '(' expression ')'
+    | '[' expression ']'
+    | NOT expression
+    | OFFSET expression
+    | gross
+    | dup
+    ;
 
 /*
  MASM allows opcode names such as "RET" to be label names and also allows assemlber directives such as "PUT" as names
 */
 gross
-   : opcode
-   | grossrawassemblerdirective
-   ;
+    : opcode
+    | grossrawassemblerdirective
+    ;
 
 grossrawassemblerdirective
-   : PUT
-   | IF
-   | ENDIF
-   | ORG
-   | EQU
-   ;
+    : PUT
+    | IF
+    | ENDIF
+    | ORG
+    | EQU
+    ;
 
 dollar
-   : DOLLAR
-   ;
+    : DOLLAR
+    ;
 
 ques
-   : QUES
-   ;
+    : QUES
+    ;
 
 register_
-   : REGISTER
-   ;
+    : REGISTER
+    ;
 
 string
-   : STRING1
-   | STRING2
-   ;
+    : STRING1
+    | STRING2
+    ;
 
 name
-   : NAME
-   ;
+    : NAME
+    ;
 
 number
-   : SIGN? NUMBER
-   ;
+    : SIGN? NUMBER
+    ;
 
 opcode
-   : OPCODE
-   ;
+    : OPCODE
+    ;
 
 rep
-   : REP
-   ;
+    : REP
+    ;
 
-ORG: 'ORG';
-END: 'END';
-ENDIF: 'ENDIF';
-IF: 'IF';
-EQU: 'EQU';
-DW: 'DW';
-DB: 'DB';
-DM: 'DM';
-DS: 'DS';
-INCLUDE: 'INCLUDE';
-INCLUDELIB: 'INCLUDELIB';
-INVOKE: 'INVOKE';
-OPTION: 'OPTION';
-PUT: 'PUT';
-NOT: 'NOT';
+ORG
+    : 'ORG'
+    ;
+
+END
+    : 'END'
+    ;
+
+ENDIF
+    : 'ENDIF'
+    ;
+
+IF
+    : 'IF'
+    ;
+
+EQU
+    : 'EQU'
+    ;
+
+DW
+    : 'DW'
+    ;
+
+DB
+    : 'DB'
+    ;
+
+DM
+    : 'DM'
+    ;
+
+DS
+    : 'DS'
+    ;
+
+INCLUDE
+    : 'INCLUDE'
+    ;
+
+INCLUDELIB
+    : 'INCLUDELIB'
+    ;
+
+INVOKE
+    : 'INVOKE'
+    ;
+
+OPTION
+    : 'OPTION'
+    ;
+
+PUT
+    : 'PUT'
+    ;
+
+NOT
+    : 'NOT'
+    ;
+
 REGISTER
     : 'AH'
     | 'AL'
@@ -426,74 +480,123 @@ OPCODE
     | 'XOR'
     ;
 
-REP : 'REP'
+REP
+    : 'REP'
     | 'REPE'
     | 'REPNE'
     | 'REPNZ'
     | 'REPZ'
     ;
 
-OFFSET: 'OFFSET';
-SEGMENT: 'SEGMENT';
-SEGMENTEND: 'ENDS';
-GROUP: 'GROUP';
-BYTE: 'BYTE';
-SBYTE: 'SBYTE';
-WORD: 'WORD';
-DWORD: 'DWORD';
-PARA: 'PARA';
-PAGE: 'PAGE';
-ALIGN: 'ALIGN';
-LABEL: 'LABEL';
-DUP: 'DUP';
-ASSUME: 'ASSUME';
-EXTERN: 'EXTERN';
-PUBLIC: 'PUBLIC';
+OFFSET
+    : 'OFFSET'
+    ;
 
-ASSIGN: '=';
-DOLLAR: '$';
-QUES: '?';
+SEGMENT
+    : 'SEGMENT'
+    ;
 
+SEGMENTEND
+    : 'ENDS'
+    ;
+
+GROUP
+    : 'GROUP'
+    ;
+
+BYTE
+    : 'BYTE'
+    ;
+
+SBYTE
+    : 'SBYTE'
+    ;
+
+WORD
+    : 'WORD'
+    ;
+
+DWORD
+    : 'DWORD'
+    ;
+
+PARA
+    : 'PARA'
+    ;
+
+PAGE
+    : 'PAGE'
+    ;
+
+ALIGN
+    : 'ALIGN'
+    ;
+
+LABEL
+    : 'LABEL'
+    ;
+
+DUP
+    : 'DUP'
+    ;
+
+ASSUME
+    : 'ASSUME'
+    ;
+
+EXTERN
+    : 'EXTERN'
+    ;
+
+PUBLIC
+    : 'PUBLIC'
+    ;
+
+ASSIGN
+    : '='
+    ;
+
+DOLLAR
+    : '$'
+    ;
+
+QUES
+    : '?'
+    ;
 
 SIGN
-   : '+' | '-'
-   ;
-
+    : '+'
+    | '-'
+    ;
 
 MASMDIRECTIVE
-   : '.' [A-Z0-9] +
-   ;
-
+    : '.' [A-Z0-9]+
+    ;
 
 NAME
-   : [_A-Z] [A-Z0-9._@]*
-   ;
-
+    : [_A-Z] [A-Z0-9._@]*
+    ;
 
 NUMBER
-   : [0-9A-F] + 'H'?
-   ;
-
+    : [0-9A-F]+ 'H'?
+    ;
 
 STRING1
-   : '"' ~'"'* '"'
-   ;
-
+    : '"' ~'"'* '"'
+    ;
 
 STRING2
-   : '\u0027' ~'\u0027'* '\u0027'
-   ;
-
+    : '\u0027' ~'\u0027'* '\u0027'
+    ;
 
 COMMENT
-   : ';' ~ [\r\n]* -> skip
-   ;
+    : ';' ~ [\r\n]* -> skip
+    ;
 
 EOL
-   : [\r\n] +
-   ;
-
+    : [\r\n]+
+    ;
 
 WS
-   : [ \t] -> skip
-   ;
+    : [ \t] -> skip
+    ;

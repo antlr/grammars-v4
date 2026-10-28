@@ -1,0 +1,6 @@
+val unitValue = ()
+val empty = []
+val numbers = [1, 2, 3]
+val pair = (1, "one")
+val person = {name = "Ada", age = 36}
+val name = #name person

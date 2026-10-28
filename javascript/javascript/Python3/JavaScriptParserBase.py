@@ -29,7 +29,7 @@ class JavaScriptParserBase(Parser):
     def notLineTerminator(self) -> bool:
         JavaScriptParser = self.parser()
 
-        return not self.here(JavaScriptParser.LineTerminator)
+        return not self.lineTerminatorAhead()
 
     def notOpenBraceAndNotFunction(self) -> bool:
         JavaScriptParser = self.parser()
@@ -41,35 +41,6 @@ class JavaScriptParserBase(Parser):
         JavaScriptParser = self.parser()
 
         return self._input.LT(1).type == JavaScriptParser.CloseBrace
-
-    def here(self, tokenType: int) -> bool:
-        """
-        Returns {@code true} iff on the current index of the parser's
-        token stream a token of the given {@code type} exists on the
-        {@code HIDDEN} channel.
-        :param:type:
-                   the type of the token on the {@code HIDDEN} channel
-                   to check.
-        :return:{@code true} iff on the current index of the parser's
-            token stream a token of the given {@code type} exists on the
-            {@code HIDDEN} channel.
-        """
-        # Get the token ahead of the current index.
-        assert isinstance(self.getCurrentToken(), Token)
-
-        # Get the most recently emitted token.
-        currentToken: Token = self._input.LT(-1)
-
-        # Get the next token index.
-        nextTokenIndex = 0 if currentToken is None else currentToken.tokenIndex + 1
-
-        # Get the token after the `currentToken`. By using `_input.get(index)`,
-        # we also grab a token that is (possibly) on the HIDDEN channel.
-        nextToken: Token = self._input.get(nextTokenIndex)
-
-        # Check if the token resides on the HIDDEN channel and if it's of the
-        # provided type.
-        return (nextToken.channel == Lexer.HIDDEN) and (nextToken.type == tokenType)
 
     def lineTerminatorAhead(self) -> bool:
         """

@@ -33,103 +33,141 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 * http://fms.komkon.org/comp/CPUs/z80.txt
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar asmZ80;
 
-options { caseInsensitive = true; }
+options {
+    caseInsensitive = true;
+}
 
 prog
-   : EOL* ((line EOL)* line EOL*)? EOF
-   ;
+    : EOL* ((line EOL+)* line EOL*)? EOF
+    ;
 
 line
-   : lbl? (instruction | directive) comment?
-   | lbl comment?
-   | comment
-   ;
+    : lbl? (instruction | directive | macrocall) comment?
+    | lbl comment?
+    | comment
+    ;
 
 instruction
-   : opcode expressionlist?
-   ;
+    : opcode expressionlist?
+    ;
 
 opcode
-   : OPCODE
-   ;
+    : OPCODE
+    ;
 
 register_
-   : REGISTER
-   ;
+    : REGISTER
+    ;
 
 directive
-   : argument? assemblerdirective expressionlist
-   ;
+    : argument? assemblerdirective expressionlist?
+    ;
 
 assemblerdirective
-   : ASSEMBLER_DIRECTIVE
-   ;
+    : ASSEMBLER_DIRECTIVE
+    ;
+
+macrocall
+    : NAME expressionlist?
+    ;
 
 lbl
-   : label ':'?
-   ;
+    : label ':'?
+    ;
 
 expressionlist
-   : expression (',' expression)*
-   ;
+    : expression (',' expression)*
+    ;
 
 label
-   : name
-   ;
+    : name
+    ;
 
 expression
-   : multiplyingExpression (('+' | '-') multiplyingExpression)*
-   ;
+    : '-'? multiplyingExpression (('+' | '-') multiplyingExpression)*
+    ;
 
 multiplyingExpression
-   : argument (('*' | '/') argument)*
-   ;
+    : argument (('*' | '/') argument)*
+    ;
 
 argument
-   : number
-   | register_
-   | dollar
-   | name
-   | string_
-   | '(' expression ')'
-   ;
+    : number
+    | register_
+    | dollar
+    | name
+    | string_
+    | '(' expression ')'
+    ;
 
 dollar
-   : '$'
-   ;
+    : '$'
+    ;
 
 string_
-   : STRING
-   ;
+    : STRING
+    | DOUBLE_STRING
+    ;
 
 name
-   : NAME
-   ;
+    : NAME
+    | OPCODE
+    | ASSEMBLER_DIRECTIVE
+    ;
 
 number
-   : NUMBER
-   ;
+    : NUMBER
+    ;
 
 comment
-   : COMMENT
-   ;
+    : COMMENT
+    ;
 
 REGISTER
-   : 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'H' | 'L' | 'I' | 'R' | 'IXH' | 'IXL' | 'IYH' | 'IYL' | 'AF' | 'BC' | 'DE' | 'HL' | 'PC' | 'SP' | 'IX' | 'IY'
-   ;
+    : 'A'
+    | 'B'
+    | 'C'
+    | 'D'
+    | 'E'
+    | 'F'
+    | 'H'
+    | 'L'
+    | 'I'
+    | 'R'
+    | 'IXH'
+    | 'IXL'
+    | 'IYH'
+    | 'IYL'
+    | 'AF' '\''
+    | 'AF'
+    | 'BC'
+    | 'DE'
+    | 'HL'
+    | 'PC'
+    | 'SP'
+    | 'IX'
+    | 'IY'
+    ;
 
 ASSEMBLER_DIRECTIVE
     : 'ORG'
     | 'END'
     | 'EQU'
+    | 'DB'
     | 'DEFB'
+    | 'DW'
     | 'DEFW'
     | 'DS'
     | 'IF'
     | 'ENDIF'
     | 'SET'
+    | 'MACRO'
+    | 'ENDM'
     ;
 
 OPCODE
@@ -152,6 +190,7 @@ OPCODE
     | 'EI'
     | 'EX'
     | 'EXX'
+    | 'HALT'
     | 'IM'
     | 'IN'
     | 'INC'
@@ -200,28 +239,42 @@ OPCODE
     | 'SRL'
     | 'SUB'
     | 'XOR'
-   ;
+    ;
 
 NAME
-   : [A-Z] [A-Z0-9."]*
-   ;
+    : '.'? [A-Z] [A-Z0-9._"]*
+    ;
 
 NUMBER
-   : '$'? [0-9A-F]+ 'H'?
-   ;
+    : '$'? [0-9A-F]+ 'H'?
+    | '0x' [0-9A-F]+
+    ;
 
 COMMENT
-   : ';' ~ [\r\n]*
-   ;
+    : ';' ~ [\r\n]*
+    ;
 
+// Single-quoted string with backslash escapes (e.g. \'  inside a string).
 STRING
-   : '\u0027' ~'\u0027'* '\u0027'
-   ;
+    : '\'' ('\\' . | ~['\\\r\n])* '\''
+    ;
+
+// Double-quoted string with backslash escapes.
+DOUBLE_STRING
+    : '"' ('\\' . | ~["\\\r\n])* '"'
+    ;
+
+// Skip unterminated single-quoted content (e.g. Oshonsoft IDE metadata lines).
+// Uses ~['\r\n]* so it stops at any closing quote — STRING (which includes the
+// closing quote) will always be longer and win when a closing quote is present.
+METADATA
+    : '\'' ~['\r\n]* -> skip
+    ;
 
 EOL
-   : [\r\n] +
-   ;
+    : [\r\n]+
+    ;
 
 WS
-   : [ \t] -> skip
-   ;
+    : [ \t] -> skip
+    ;

@@ -30,236 +30,209 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar calculator;
 
 equation
-   : expression relop expression EOF
-   ;
+    : expression relop expression EOF
+    ;
 
 expression
-   : multiplyingExpression ((PLUS | MINUS) multiplyingExpression)*
-   ;
+    : multiplyingExpression ((PLUS | MINUS) multiplyingExpression)*
+    ;
 
 multiplyingExpression
-   : powExpression ((TIMES | DIV) powExpression)*
-   ;
+    : powExpression ((TIMES | DIV) powExpression)*
+    ;
 
 powExpression
-   : signedAtom (POW signedAtom)*
-   ;
+    : signedAtom (POW signedAtom)*
+    ;
 
 signedAtom
-   : PLUS signedAtom
-   | MINUS signedAtom
-   | func_
-   | atom
-   ;
+    : PLUS signedAtom
+    | MINUS signedAtom
+    | func_
+    | atom
+    ;
 
 atom
-   : scientific
-   | variable
-   | constant
-   | LPAREN expression RPAREN
-   ;
+    : scientific
+    | variable
+    | constant
+    | LPAREN expression RPAREN
+    ;
 
 scientific
-   : SCIENTIFIC_NUMBER
-   ;
+    : SCIENTIFIC_NUMBER
+    ;
 
 constant
-   : PI
-   | EULER
-   | I
-   ;
+    : PI
+    | EULER
+    | I
+    ;
 
 variable
-   : VARIABLE
-   ;
+    : VARIABLE
+    ;
 
 func_
-   : funcname LPAREN expression (COMMA expression)* RPAREN
-   ;
+    : funcname LPAREN expression (COMMA expression)* RPAREN
+    ;
 
 funcname
-   : COS
-   | TAN
-   | SIN
-   | ACOS
-   | ATAN
-   | ASIN
-   | LOG
-   | LN
-   | SQRT
-   ;
+    : COS
+    | TAN
+    | SIN
+    | ACOS
+    | ATAN
+    | ASIN
+    | LOG
+    | LN
+    | SQRT
+    ;
 
 relop
-   : EQ
-   | GT
-   | LT
-   ;
-
+    : EQ
+    | GT
+    | LT
+    ;
 
 COS
-   : 'cos'
-   ;
-
+    : 'cos'
+    ;
 
 SIN
-   : 'sin'
-   ;
-
+    : 'sin'
+    ;
 
 TAN
-   : 'tan'
-   ;
-
+    : 'tan'
+    ;
 
 ACOS
-   : 'acos'
-   ;
-
+    : 'acos'
+    ;
 
 ASIN
-   : 'asin'
-   ;
-
+    : 'asin'
+    ;
 
 ATAN
-   : 'atan'
-   ;
-
+    : 'atan'
+    ;
 
 LN
-   : 'ln'
-   ;
-
+    : 'ln'
+    ;
 
 LOG
-   : 'log'
-   ;
-
+    : 'log'
+    ;
 
 SQRT
-   : 'sqrt'
-   ;
-
+    : 'sqrt'
+    ;
 
 LPAREN
-   : '('
-   ;
-
+    : '('
+    ;
 
 RPAREN
-   : ')'
-   ;
-
+    : ')'
+    ;
 
 PLUS
-   : '+'
-   ;
-
+    : '+'
+    ;
 
 MINUS
-   : '-'
-   ;
-
+    : '-'
+    ;
 
 TIMES
-   : '*'
-   ;
-
+    : '*'
+    ;
 
 DIV
-   : '/'
-   ;
-
+    : '/'
+    ;
 
 GT
-   : '>'
-   ;
-
+    : '>'
+    ;
 
 LT
-   : '<'
-   ;
-
+    : '<'
+    ;
 
 EQ
-   : '='
-   ;
-
+    : '='
+    ;
 
 COMMA
-   : ','
-   ;
-
+    : ','
+    ;
 
 POINT
-   : '.'
-   ;
-
+    : '.'
+    ;
 
 POW
-   : '^'
-   ;
-
+    : '^'
+    ;
 
 PI
-   : 'pi'
-   ;
-
+    : 'pi'
+    ;
 
 EULER
-   : E2
-   ;
-
+    : E2
+    ;
 
 I
-   : 'i'
-   ;
-
+    : 'i'
+    ;
 
 VARIABLE
-   : VALID_ID_START VALID_ID_CHAR*
-   ;
-
+    : VALID_ID_START VALID_ID_CHAR*
+    ;
 
 fragment VALID_ID_START
-   : 'a' .. 'z' | 'A' .. 'Z' | '_'
-   ;
-
+    : 'a' .. 'z'
+    | 'A' .. 'Z'
+    | '_'
+    ;
 
 fragment VALID_ID_CHAR
-   : VALID_ID_START
-   | '0' .. '9'
-   ;
-
+    : VALID_ID_START
+    | '0' .. '9'
+    ;
 
 SCIENTIFIC_NUMBER
-   : NUMBER ((E1 | E2) SIGN? NUMBER)?
-   ;
-
+    : NUMBER ((E1 | E2) SIGN? NUMBER)?
+    ;
 
 fragment NUMBER
-   : '0'..'9'+ ('.' '0'..'9'+ )?
-   ;
-
+    : '0' ..'9'+ ('.' '0' ..'9'+)?
+    ;
 
 fragment E1
-   : 'E'
-   ;
-
+    : 'E'
+    ;
 
 fragment E2
-   : 'e'
-   ;
-
+    : 'e'
+    ;
 
 fragment SIGN
-   : '+' | '-'
-   ;
-
+    : '+'
+    | '-'
+    ;
 
 WS
-   : [ \r\n\t] + -> skip
-   ;
+    : [ \r\n\t]+ -> skip
+    ;

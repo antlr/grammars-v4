@@ -12,10 +12,8 @@ public:
     Fortran90LexerBase & self;
 
 public:
-    bool IsColumnZero()
-    {
-        return this->getCharPositionInLine() == 0;
-    }
+    bool IsColumnZero();
+    bool VerifyNotOperator();
 };
 
 #endif

@@ -1,0 +1,10 @@
+"   example4 -- subroutine calls and descriptor operands
+    name    example4
+    entry   clear_entry
+
+clear_entry:
+    tsx6    subroutine_save
+    eppbp   pds$apt_ptr,*
+    mlr     (),(pr),fill(0)         "zero out apte
+    epbpbb  tc_data$                "get pointer to base of tc_data
+    tra     0,7

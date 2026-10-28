@@ -21,153 +21,205 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine true, allowShortBlocksOnASingleLine true, minEmptyLines 0, alignSemicolons ownLine
+// $antlr-format alignColons trailing, singleLineOverrulesHangingColon true, alignLexerCommands true, alignLabels true, alignTrailers true
+
 lexer grammar AdaLexer;
 
-options { caseInsensitive = true; }
+options {
+    caseInsensitive = true;
+    superClass = AdaLexerBase;
+}
 
-ABORT             : 'abort';
-ABS               : 'abs';
-ABSTRACT          : 'abstract';
-ACCEPT_           : 'accept';
-ACCESS            : 'access';
-ALIASED           : 'aliased';
-ALL               : 'all';
-AND               : 'and';
-ARRAY             : 'array';
-AT                : 'at';
+channels { PRAGMA_CHANNEL }
 
-BEGIN             : 'begin';
-BODY_             : 'body';
+// Insert here @header for lexer.
 
-CASE              : 'case';
-CONSTANT          : 'constant';
+ABORT    : 'abort';
+ABS      : 'abs';
+ABSTRACT : 'abstract';
+ACCEPT_  : 'accept';
+ACCESS   : 'access';
+ALIASED  : 'aliased';
+ALL      : 'all';
+AND      : 'and';
+ARRAY    : 'array';
+AT       : 'at';
 
-DECLARE           : 'declare';
-DELAY             : 'delay';
-DELTA             : 'delta';
-DIGITS            : 'digits';
-DO                : 'do';
+BEGIN : 'begin';
+BODY_ : 'body';
 
-ELSE              : 'else';
-ELSIF             : 'elsif';
-END               : 'end';
-ENTRY             : 'entry';
-EXCEPTION         : 'exception';
-EXIT              : 'exit';
+CASE     : 'case';
+CONSTANT : 'constant';
 
-FOR               : 'for';
-FUNCTION          : 'function';
+DECLARE : 'declare';
+DELAY   : 'delay';
+DELTA   : 'delta';
+DIGITS  : 'digits';
+DO      : 'do';
 
-GENERIC           : 'generic';
-GOTO              : 'goto';
+ELSE      : 'else';
+ELSIF     : 'elsif';
+END       : 'end';
+ENTRY     : 'entry';
+EXCEPTION : 'exception';
+EXIT      : 'exit';
 
-IF                : 'if';
-IN                : 'in';
-INTERFACE         : 'interface';
-IS                : 'is';
+FOR      : 'for';
+FUNCTION : 'function';
 
-LIMITED           : 'limited';
-LOOP              : 'loop';
+GENERIC : 'generic';
+GOTO    : 'goto';
 
-MOD               : 'mod';
+IF        : 'if';
+IN        : 'in';
+INTERFACE : 'interface';
+IS        : 'is';
 
-NEW               : 'new';
-NOT               : 'not';
-NULL_             : 'null';
+LIMITED : 'limited';
+LOOP    : 'loop';
 
-OF                : 'of';
-OR                : 'or';
-OTHERS            : 'others';
-OUT               : 'out';
-OVERRIDING        : 'overriding';
-PACKAGE           : 'package';
-PRAGMA            : 'pragma';
-PRIVATE           : 'private';
-PROCEDURE         : 'procedure';
-PROTECTED         : 'protected';
+MOD: 'mod';
 
-RAISE             : 'raise';
-RANGE_            : 'range';
-RECORD            : 'record';
-REM               : 'rem';
-RENAMES           : 'renames';
-REQUEUE           : 'requeue';
-RETURN            : 'return';
-REVERSE           : 'reverse';
+NEW   : 'new';
+NOT   : 'not';
+NULL_ : 'null';
 
-SELECT            : 'select';
-SEPARATE          : 'separate';
-SOME              : 'some';
-SUBTYPE           : 'subtype';
-SYNCHRONIZED      : 'synchronized';
+OF         : 'of';
+OR         : 'or';
+OTHERS     : 'others';
+OUT        : 'out';
+OVERRIDING : 'overriding';
+PACKAGE    : 'package';
+PRAGMA     : 'pragma' -> channel(PRAGMA_CHANNEL), mode(PRAGMA_MODE);
+PRIVATE    : 'private';
+PROCEDURE  : 'procedure';
+PROTECTED  : 'protected';
 
-TAGGED            : 'tagged';
-TASK              : 'task';
-TERMINATE         : 'terminate';
-THEN              : 'then';
-TYPE              : 'type';
+RAISE   : 'raise';
+RANGE_  : 'range';
+RECORD  : 'record';
+REM     : 'rem';
+RENAMES : 'renames';
+REQUEUE : 'requeue';
+RETURN  : 'return';
+REVERSE : 'reverse';
 
-UNTIL             : 'until';
-USE               : 'use';
+SELECT       : 'select';
+SEPARATE     : 'separate';
+SOME         : 'some';
+SUBTYPE      : 'subtype';
+SYNCHRONIZED : 'synchronized';
 
-WHEN              : 'when';
-WHILE             : 'while';
-WITH              : 'with';
+TAGGED    : 'tagged';
+TASK      : 'task';
+TERMINATE : 'terminate';
+THEN      : 'then';
+TYPE      : 'type';
 
-XOR               : 'xor';
+UNTIL : 'until';
+USE   : 'use';
 
-CLASS__    options { caseInsensitive = false; }         : 'Class';
-ACCESS__   options { caseInsensitive = false; }         : 'Access';
-DELTA__    options { caseInsensitive = false; }         : 'Delta';
-DIGITS__   options { caseInsensitive = false; }         : 'Digits';
-MOD__      options { caseInsensitive = false; }         : 'Mod';
+WHEN  : 'when';
+WHILE : 'while';
+WITH  : 'with';
 
-WHITESPACE        : [ \t\r\n]+               -> channel(HIDDEN);
-LINE_COMMENT      : '--' ~[\r\n]*            -> channel(HIDDEN);
+XOR: 'xor';
 
-IDENTIFIER_       : LETTER+ [A-Z_0-9]*;
-NUMERIC_LITERAL_  : DECIMAL_LITERAL_ | BASED_LITERAL;
-DECIMAL_LITERAL_  : NUMERAL ('.' NUMERAL)? EXPONENT?;
-NUMERAL           : DIGIT+ ('_'? DIGIT)*;
-EXPONENT          : 'E' '+'? NUMERAL | 'E' '-' NUMERAL;
-BASED_LITERAL     : BASE '#' BASED_NUMERAL ('.' BASED_NUMERAL)? '#' EXPONENT?;
-BASED_NUMERAL     : EXTENDED_DIGIT ('_'? EXTENDED_DIGIT)*;
-EXTENDED_DIGIT    : DIGIT | [A-F];
-BASE              : NUMERAL;
+CLASS__ options {
+    caseInsensitive = false;
+}: 'Class';
+ACCESS__ options {
+    caseInsensitive = false;
+}: 'Access';
+DELTA__ options {
+    caseInsensitive = false;
+}: 'Delta';
+DIGITS__ options {
+    caseInsensitive = false;
+}: 'Digits';
+MOD__ options {
+    caseInsensitive = false;
+}: 'Mod';
 
-CHARACTER_LITERAL_: '\'' ~['\\\r\n] '\'';
-STRING_LITERAL_   : '"' ('""' | ~'"' )* '"';
+WHITESPACE   : [\u0009\u000A\u000B\u000C\u000D\u0020]+ -> channel(HIDDEN);
+LINE_COMMENT : '--' ~[\r\n]* -> channel(HIDDEN);
 
-fragment LETTER   : [A-Z];
-fragment DIGIT    : [0-9];
+IDENTIFIER_      : LETTER+ [A-Z_0-9]*;
+NUMERIC_LITERAL_ : DECIMAL_LITERAL_ | BASED_LITERAL;
+DECIMAL_LITERAL_ : NUMERAL ('.' NUMERAL)? EXPONENT?;
+NUMERAL          : DIGIT+ ('_'? DIGIT)*;
+EXPONENT         : 'E' '+'? NUMERAL | 'E' '-' NUMERAL;
+// Ada 83 (RM Annex J.2) allows ':' in place of '#' as the based literal delimiter.
+BASED_LITERAL    : BASE ('#' BASED_NUMERAL ('.' BASED_NUMERAL)? '#' | ':' BASED_NUMERAL ('.' BASED_NUMERAL)? ':') EXPONENT?;
+BASED_NUMERAL    : EXTENDED_DIGIT ('_'? EXTENDED_DIGIT)*;
+EXTENDED_DIGIT   : DIGIT | [A-F];
+BASE             : NUMERAL;
 
-HASH              : '#';
-AMPERSAND         : '&';
-LP                : '(';
-RP                : ')';
-MULT              : '*';
-PLUS              : '+';
-COMMA             : ',';
-MINUS             : '-';
-DOT               : '.';
-COLON             : ':';
-SEMI              : ';';
-LT                : '<';
-EQ                : '=';
-GT                : '>';
-US                : '_';
-VL                : '|';
-DIV               : '/';
-EP                : '!';
-PS                : '%';
-ARROW             : '=>';
-DOTDOT            : '..';
-EXPON             : '**';
-ASSIGN            : ':=';
-NE                : '/=';
-GE                : '>=';
-LE                : '<=';
-LLB               : '<<';
-RLB               : '>>';
-BOX               : '<>';
-SQ                : '\'';
+// Ada RM 2.6: character_literal ::= 'graphic_character' (includes apostrophe and backslash)
+CHARACTER_LITERAL_ : {this.IsCharLiteralAllowed()}? '\'' ~[\r\n] '\'';
+// Ada 83 (RM Annex J.2) allows '%' as an alternative string delimiter.
+STRING_LITERAL_    : '"' ('""' | ~'"')* '"' | '%' ('%%' | ~[%\r\n])* '%';
+
+fragment LETTER : [A-Z];
+fragment DIGIT  : [0-9];
+
+HASH      : '#';
+AMPERSAND : '&';
+LP        : '(';
+RP        : ')';
+MULT      : '*';
+PLUS      : '+';
+COMMA     : ',';
+MINUS     : '-';
+DOT       : '.';
+COLON     : ':';
+SEMI      : ';';
+LT        : '<';
+EQ        : '=';
+GT        : '>';
+US        : '_';
+VL        : '|' | '!';
+DIV       : '/';
+PS        : '%';
+ARROW     : '=>';
+DOTDOT    : '..';
+EXPON     : '**';
+ASSIGN    : ':=';
+NE        : '/=';
+GE        : '>=';
+LE        : '<=';
+LLB       : '<<';
+RLB       : '>>';
+BOX       : '<>';
+SQ        : '\'';
+
+mode PRAGMA_MODE;
+PRAGMA_WHITESPACE      : [\u0009\u000A\u000B\u000C\u000D\u0020]+ -> channel(HIDDEN);
+PRAGMA_LINE_COMMENT    : '--' ~[\r\n]*                            -> channel(HIDDEN);
+PRAGMA_IDENTIFIER      : [A-Z]+ [A-Z_0-9]*         -> channel(PRAGMA_CHANNEL), type(IDENTIFIER_);
+PRAGMA_STRING_LITERAL  : '"' ('""' | ~'"')* '"'     -> channel(PRAGMA_CHANNEL), type(STRING_LITERAL_);
+PRAGMA_CHAR_LITERAL    : '\'' ~[\r\n] '\''           -> channel(PRAGMA_CHANNEL), type(CHARACTER_LITERAL_);
+PRAGMA_NUMERIC_LITERAL : [0-9]+ ('_'? [0-9])* (('.' [0-9]+ ('_'? [0-9])*)? ([E] [+-]? [0-9]+ ('_'? [0-9])*)? | '#' [0-9A-F]+ ('_'? [0-9A-F])* ('.' [0-9A-F]+ ('_'? [0-9A-F])*)? '#' ([E] [+-]? [0-9]+ ('_'? [0-9])*)?) -> channel(PRAGMA_CHANNEL), type(NUMERIC_LITERAL_);
+PRAGMA_ARROW           : '=>' -> channel(PRAGMA_CHANNEL), type(ARROW);
+PRAGMA_DOTDOT          : '..' -> channel(PRAGMA_CHANNEL), type(DOTDOT);
+PRAGMA_EXPON           : '**' -> channel(PRAGMA_CHANNEL), type(EXPON);
+PRAGMA_NE              : '/=' -> channel(PRAGMA_CHANNEL), type(NE);
+PRAGMA_GE              : '>=' -> channel(PRAGMA_CHANNEL), type(GE);
+PRAGMA_LE              : '<=' -> channel(PRAGMA_CHANNEL), type(LE);
+PRAGMA_LP              : '('  -> channel(PRAGMA_CHANNEL), type(LP);
+PRAGMA_RP              : ')'  -> channel(PRAGMA_CHANNEL), type(RP);
+PRAGMA_COMMA           : ','  -> channel(PRAGMA_CHANNEL), type(COMMA);
+PRAGMA_DOT             : '.'  -> channel(PRAGMA_CHANNEL), type(DOT);
+PRAGMA_SQ              : '\'' -> channel(PRAGMA_CHANNEL), type(SQ);
+PRAGMA_SEMI            : ';'  -> channel(PRAGMA_CHANNEL), type(SEMI), mode(DEFAULT_MODE);
+PRAGMA_PLUS            : '+'  -> channel(PRAGMA_CHANNEL), type(PLUS);
+PRAGMA_MINUS           : '-'  -> channel(PRAGMA_CHANNEL), type(MINUS);
+PRAGMA_MULT            : '*'  -> channel(PRAGMA_CHANNEL), type(MULT);
+PRAGMA_DIV             : '/'  -> channel(PRAGMA_CHANNEL), type(DIV);
+PRAGMA_EQ              : '='  -> channel(PRAGMA_CHANNEL), type(EQ);
+PRAGMA_LT              : '<'  -> channel(PRAGMA_CHANNEL), type(LT);
+PRAGMA_GT              : '>'  -> channel(PRAGMA_CHANNEL), type(GT);
+PRAGMA_AMPERSAND       : '&'  -> channel(PRAGMA_CHANNEL), type(AMPERSAND);
+PRAGMA_VL              : '|'  -> channel(PRAGMA_CHANNEL), type(VL);

@@ -1,0 +1,6 @@
+FUNCTION PrintRange( nFrom, nTo )
+   LOCAL nI
+   FOR nI := nFrom TO nTo
+      ? nI
+   NEXT
+   RETURN NIL

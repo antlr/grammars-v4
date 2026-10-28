@@ -1,0 +1,27 @@
+digraph ATN {
+rankdir=LR;
+s337[fontsize=11, label="337", shape=doublecircle, fixedsize=true, width=.6];
+s336[fontsize=11,label="336", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2152[fontsize=11,label="2152", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2153[fontsize=11,label="2153", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2154[fontsize=11,label="2154", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2155[fontsize=11,label="2155", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2156[fontsize=11,label="2156", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2157[fontsize=11,label="2157", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2158[fontsize=11,label="{&rarr;\n2158\nd=181|{<p0>|<p1>|<p2>|<p3>|<p4>|<p5>}}", shape=record, fixedsize=false, peripheries=1];
+s2159[fontsize=11,label="&larr;\n2159", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s336 -> s2158 [fontname="Times-Italic", label="&epsilon;"];
+s2158:p0 -> s2152 [fontname="Times-Italic", label="&epsilon;"];
+s2158:p1 -> s2153 [fontname="Times-Italic", label="&epsilon;"];
+s2158:p2 -> s2154 [fontname="Times-Italic", label="&epsilon;"];
+s2158:p3 -> s2155 [fontname="Times-Italic", label="&epsilon;"];
+s2158:p4 -> s2156 [fontname="Times-Italic", label="&epsilon;"];
+s2158:p5 -> s2157 [fontname="Times-Italic", label="&epsilon;"];
+s2152 -> s2159 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<from_clause>", arrowhead = normal];
+s2153 -> s2159 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<let_clause>", arrowhead = normal];
+s2154 -> s2159 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<where_clause>", arrowhead = normal];
+s2155 -> s2159 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<join_clause>", arrowhead = normal];
+s2156 -> s2159 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<join_into_clause>", arrowhead = normal];
+s2157 -> s2159 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<orderby_clause>", arrowhead = normal];
+s2159 -> s337 [fontname="Times-Italic", label="&epsilon;"];
+}

@@ -21,5 +21,6 @@
     <module>nasm</module>
     <module>pdp7</module>
     <module>ptx</module>
+    <module>asmRISCV</module>
   </modules>
 </project>

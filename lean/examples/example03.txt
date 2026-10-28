@@ -1,0 +1,4 @@
+def add (x : Nat) (y : Nat) : Nat :=
+  x + y
+
+def addOne : Nat → Nat := fun n => n + 1

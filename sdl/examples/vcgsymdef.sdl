@@ -1,0 +1,282 @@
+module vcgsymdef ident "Added for parsing only" ;
+/*
+/* Modifications:
+/*
+/*  Copyright © 1996, Digital Equipment Corporation.
+/*
+/*	015D	Keith Knowles	16-Oct-1987	(406 SVCG D)
+/*
+/*		Withdrew edit 13..14 under suspicion of causing
+/*		problems, exact cause unknown.
+/*
+/*	014D	Keith Knowles	 2-Oct-1987	(405 SVCG D)
+/*
+/*		Edit 013 did not adjust the other aggregates to reflect
+/*		the new fields.  Sigh.
+/*
+/*	013D	Keith Knowles	24-Aug-1987	(403 SVCG D)
+/*
+/*		Add new fields sym_l_scope_begin and sym_l_scope_end.
+/*
+/*	012D	Ayub Khan	28-Feb-1987	(367 SVCG D)
+/*
+/*		Added sym_v_comm for Ultrix support.
+/*
+/*	011D	Keith Knowles	10-Feb-1987	(342 SVCG D)
+/*
+/*		Add the sym_v_propagated_integer flag to the alternate symbol
+/*		node.  This flag replaces sym_v_propagated_constant by
+/*		indicating that the variable has been propagated away by the
+/*		value represented by an INTEGER_OP.  sym_v_propagated_constant
+/*		is now used to indicate a variable that has been propagated
+/*		away by the value of a CONS_OP.
+/*
+/*	010D	Kent Glossop	14-Aug-1986	(264 SVCG D)
+/*
+/*		Added SYM_V_CONDITION_AT.
+/*
+/*	009D	Tom Benson	14-Mar-1986	(189 SVCG D)
+/*
+/*		Moved the new SYM_L_LIFE_START, _LIFE_END, _DEFINITE_START,
+/*		and _DEFINITE_END fields to overlay FIELD3, SET, VALUE, and
+/*		DEFINITION_POINT, respectively. FIELD2 is used for the scale
+/*		factor of arithmetic types.
+/*
+/*	008D	Tom Benson	02-Mar-1986	(180 SVCG D)
+/*
+/*		Added several flags to GFLAGS2 for split-lifetime DST support:
+/*		SYM_V_ALTERNATE_LIFETIME, SYM_V_PROPAGATED_CONSTANT, SYM_V_-
+/*		PROPAGATED_VARIABLE, and SYM_V_PROPAGATED_VALUE. Also added
+/*		SYM_L_LIFE_START, _LIFE_END, _DEFINITE_START, and 
+/*		_DEFINITE_END for alternate lifetime nodes, which overlay
+/*		FIELD2, FIELD3, SET, and VALUE, respectively.
+/*
+/*	007	Keith Knowles	21-Jan-1986	(167 SVCG D)
+/*
+/*		Added SYM_V_PROPAGATE and SYM_V_PROPAGATION_ABORTED
+/*		for use in the optimizer for value propagation for non-
+/*		register candidates.
+/*
+/*	006	Tom Benson	17-Oct-1985	(087 SVCG D)
+/*
+/*		Added SYM_V_NO_RETURN, which allows the front end to specify
+/*		that a called routine does not return, and
+/*		SYM_V_NO_SIDE_EFFECTS, which indicates calls to a routine may
+/*		be commoned or hoisted. Also renamed the existing field
+/*		SYM_V_NO_CALL_SIDE_EFFECTS to SYM_V_NO_ALIASED_DEFS, to better
+/*		reflect its use in the optimizer.
+/*
+/*	005	Tom Benson	23-Jan-1985	(150 VCG)
+/*
+/*		Removed SYM_V_HAS_EXCEPTION_HANDLER. The function it was
+/*		intended for is now accomplished using the VOLATILE bit,
+/*		to be set on assignment operators which cannot be folded.
+/*
+/*	004	Tom Benson	29-Aug-1984	(086 VCG)
+/*
+/*		Added SYM_V_NEED_PARENT_PTR, currently used by Ada.
+/*
+/*	003	Tom Benson	16-Apr-1984	(031 VCG)
+/*
+/*		added SYM_V_IN_RANGE and SYM_V_OUT_RANGE, to be used in 
+/*		default label nodes so that "IN RANGE" and "OUT RANGE" 
+/*		can be distinguished from "OTHERWISE".
+/*
+/*	002	Caroline Davidson 14-Mar-1984	(012 VCG)
+/*
+/*		Added constants to denote the number of bits in the
+/*		respective flag fields.
+/*
+/*	001	Tom Benson	13-Feb-1984	(003 VCG)
+/*
+/*		Added modification history.
+/*
+/*
+/*
+/* definition of symbol node
+AGGREGATE vcg_sym STRUCTURE PREFIX "sym_";
+/*
+/* general and backend fields
+	filler			WORD;	{ Node type and size codes
+/*
+/* general and backend bits
+	gflags			STRUCTURE;
+	    constant_length	BITFIELD;{ Set if length known at compile-time
+	    constant_size	BITFIELD;{ Set if size known at compile-time
+	    constant_offset	BITFIELD;{ Set for structure members only if offset in structure known at compile-time
+	    "alias"		BITFIELD;{ Set if this symbol can be modified indirectly
+	    options_main	BITFIELD;{ Set if this symbol is to be a transfer address
+	    referenced		BITFIELD;{ Set if used by a REF or ARG_REF operator
+	    options_unfl	BITFIELD;{ Set for entry constants if overflow checking is desired
+	    requires_storage	BITFIELD;{ Set if symbol is unsuitable for assignment to a register
+	    flag2		BITFIELD;{ Set if label is aliased
+	    c_label		BITFIELD;{ Set if no subscripts are to be output in the machine code listing for a label
+	    regtemp_at		BITFIELD;{ Set by the optimizer if symbol is assigned to a register
+	    up_level		BITFIELD;{ Set if this symbol is up-level referenced
+	    def_label		BITFIELD;{ Set for label array members after output
+	    force_g_float	BITFIELD;{ Set if double precision floating point is to be treated as g_float
+	    force_d_float	BITFIELD;{ Set if double precision floating point is to be treated as d_float
+	    bound_label		BITFIELD;{ Set for label constants when the code offset is loaded into the location field
+	    END;
+#gflags_size = 16;
+/*
+/* general data type bits
+	dtflags			STRUCTURE;
+	    structure_at	BITFIELD;
+	    builtin_at		BITFIELD;
+	    file_at		BITFIELD;
+	    entry_at		BITFIELD;
+	    label_at		BITFIELD;
+	    format_at		BITFIELD;
+	    pointer_at		BITFIELD;
+	    character_at	BITFIELD;
+	    bit_at		BITFIELD;
+	    picture_at		BITFIELD;
+	    fixed_at		BITFIELD;
+	    float_at		BITFIELD;
+	    dope_at		BITFIELD;
+	    union_at		BITFIELD;
+	    offset_at		BITFIELD;
+	    area_at		BITFIELD;
+	    condition_at	BITFIELD;
+	    vcg_sym_spare2	BITFIELD LENGTH 2;
+/*
+/* general auxiliary attribute bits
+	    binary_at		BITFIELD;
+	    decimal_at		BITFIELD;
+	    varying_at		BITFIELD;
+	    pass_any_at		BITFIELD;
+	    aligned_at		BITFIELD;
+	    dimension_at	BITFIELD;
+	    value_at		BITFIELD;
+	    readonly_at		BITFIELD;
+	    globalref_at	BITFIELD;
+	    globaldef_at	BITFIELD;
+	    unaligned_at	BITFIELD;
+	    module_local_ref_at	BITFIELD;
+	    module_local_def_at	BITFIELD;
+	    END;
+#dflags_size = 32;
+
+/*
+/* general fields
+#sym_address_fields = .;
+	name			ADDRESS;{ Address of character varying spelling
+	block			ADDRESS;{ Address of block node which immediately contains this declaration
+	brother			ADDRESS(vcg_sym);{ Address of next non-member symbol node belonging to this block
+	father			ADDRESS(vcg_sym);{ Address of the immediately containing structure declaration, otherwise 0
+	field1			LONGWORD;{ Dirty field
+	field2			LONGWORD;{ Dirty field
+#sym_field3_offset = .;						{ M009D A008D
+	field3			LONGWORD;{ Dirty field
+	dcl_line_number		ADDRESS;{ source record this symbol declared in
+#sym_set_offset = .;
+	set			LONGWORD;{ Psect number filled in by the allocator if this is an external declaration
+/*
+#sym_lower_and_upper = .;
+	"value"			LONGWORD;{ Dirty field
+	definition_point	LONGWORD;{ definition point set by the optimizer
+	location		LONGWORD;{ Location of storage allocated for static and automatic variables that are not t-regs
+	size			LONGWORD;{ Constant size or tuple id whose result is the size
+/*
+/* more general flag bits
+#sym_gflags2_offset = .;
+#gflags2_size = 16;
+	gflags2			STRUCTURE;
+	    no_aliased_defs	BITFIELD;{ M006 If set and entry then the call_op will not be an implicit alias definition point
+	    no_side_effects	BITFIELD;{ M006 If set for routine, calls may be commoned or hoisted
+	    is_allocated	BITFIELD;
+	    in_range		BITFIELD;{ A003 set if default label node is for IN RANGE case
+	    out_range		BITFIELD;{ A003 set if default label node is for OUT RANGE case
+	    need_parent_ptr	BITFIELD;{ A004 For entries, pass parent in R1
+	    no_return		BITFIELD;{ A006 Set for CALL destinations which do not return
+	    propagate		BITFIELD;{ A007D => variable is a candidate for
+					 { A007D non-regtemp value propagation
+	    propagation_aborted	BITFIELD;{ A007D if propagate is clear, =>
+					 { A007D the variable has been rejected
+					 { A007D as a candidate for propagation
+					 { A007D if propagate is set, =>
+					 { A007D not all uses were propagated
+					 { A007D and the variable's definition
+					 { A007D cannot be removed
+	    alternate_lifetime	BITFIELD;{ A008D indicates alt lifetime symnode
+	    propagated_constant BITFIELD;{ M011D A008D alt lifetime has constant value originating from CONS_OP
+	    propagated_variable BITFIELD;{ A008D alt lifetime has same value as
+					 { A008D another variable
+	    propagated_value	BITFIELD;{ A008D alt lifetime has specified value
+	    propagated_integer	BITFIELD;{ A011D alt lifetime originates from INTEGER_OP
+	    comm		BITFIELD MASK;{ A012D emit .comm lk globaldef
+	    vcg_sym_spare6	BITFIELD LENGTH #gflags2_size-^;{ M006 M004
+	    END;
+/*
+	boundary		BYTE;	{ Code for the allignment of this symbol (Used only by PL/I but cost nothing now)
+/*
+/* general storage class bits
+#sym_stflags_offset = .;
+#stflags_size = 8;
+	stflags			STRUCTURE;
+	    member_at		BITFIELD;
+	    automatic_at	BITFIELD;
+	    static_at		BITFIELD;
+	    constant_at		BITFIELD;
+	    external_at		BITFIELD;
+	    register_at		BITFIELD;
+	    vcg_sym_spare5	BITFIELD LENGTH #stflags_size-^; { M007
+	    END;
+/*
+#sym_label_size_byte = .;		{ Must be rounded to a multiple of 4
+#sym_pli_label_size_byte = .;
+#sym_min_size_byte = .;		{ Must be a multiple of 4
+#sym_general_size_byte = .;	{ Must be a multiple of 4
+				END;	{ End of common symbol node definition
+/*
+/* Overlay of the symbol node
+AGGREGATE vcg_symbol_image STRUCTURE PREFIX "sym_";
+	image_filler		WORD;
+	gflags			BITFIELD LENGTH #gflags_size;
+	dtflags			BITFIELD LENGTH #dflags_size;
+	image_filler2		CHARACTER LENGTH(#sym_set_offset - .);
+	psect			WORD UNSIGNED;{ overlays low word of sym_l_set
+	envindx			WORD UNSIGNED;{ overlays high word of sym_l_set
+	image_filler3		CHARACTER LENGTH(#sym_gflags2_offset - .);
+	gflags2			BITFIELD LENGTH #gflags2_size + 8;
+	stflags			BITFIELD LENGTH #stflags_size;
+	image_filler4		CHARACTER LENGTH(#sym_min_size_byte - .);
+	END;
+/*
+/* Overlay of the symbol node for alternate lifetime fields
+AGGREGATE vcg_alt_symbol_image	STRUCTURE PREFIX "sym_"; { Begin A008D
+	alt_image_filler	CHARACTER LENGTH #sym_field3_offset; { M009D
+	life_start		LONGWORD; { possible lifetime start (overlays FIELD3)
+	alt_image_filler2	LONGWORD; { skip DCL_LINE_NUMBER (M009D)
+	life_end		LONGWORD; { possible lifetime end (overlays SET)
+	definite_start		LONGWORD; { definite lifetime start (overlays VALUE)
+	definite_end		LONGWORD; { definite lifetime end (overlays DEFINITION_POINT)
+	alt_image_filler3	CHARACTER LENGTH(#sym_min_size_byte - .);
+	END;				  { End A008D
+/*
+/* Label Array Node
+AGGREGATE vcg_label STRUCTURE PREFIX "sym_";
+	label_filler		CHARACTER LENGTH(#sym_lower_and_upper);{ Common fields
+	lower			LONGWORD;{ Lower bound of label array
+	upper			LONGWORD;{ Upper bound of label array
+	location		ADDRESS;{ Location as a pointer to a label node
+	END;
+
+/*
+CONSTANT sym_k_general_size_byte EQUALS (#sym_general_size_byte);
+CONSTANT sym_k_general_size_word EQUALS (#sym_general_size_byte+1)/2;
+CONSTANT sym_k_general_size_long EQUALS (#sym_general_size_byte+3)/4;
+CONSTANT sym_k_min_size_byte EQUALS (#sym_min_size_byte);
+CONSTANT sym_k_min_size_word EQUALS (#sym_min_size_byte+1)/2;
+CONSTANT sym_k_min_size_long EQUALS (#sym_min_size_byte+3)/4;
+CONSTANT sym_k_label_size_byte EQUALS (#sym_label_size_byte);
+CONSTANT sym_k_label_size_word EQUALS (#sym_label_size_byte+1)/2;
+CONSTANT sym_k_label_size_long EQUALS (#sym_label_size_byte+3)/4;
+/*
+CONSTANT sym_k_gflags_size EQUALS #gflags_size;
+CONSTANT sym_k_dflags_size EQUALS #dflags_size;
+CONSTANT sym_k_gflags2_size EQUALS #gflags2_size;
+CONSTANT sym_k_stflags_size EQUALS #stflags_size;
+
+end_module vcgsymdef;

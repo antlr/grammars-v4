@@ -30,135 +30,128 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar arithmetic;
 
-file_ : equation* EOF;
+file_
+    : equation* EOF
+    ;
 
 equation
-   : expression relop expression
-   ;
+    : expression relop expression
+    ;
 
 expression
-   :  expression  POW expression
-   |  expression  (TIMES | DIV)  expression
-   |  expression  (PLUS | MINUS) expression
-   |  LPAREN expression RPAREN
-   |  (PLUS | MINUS)* atom
-   ;
+    : expression POW expression
+    | expression (TIMES | DIV) expression
+    | expression (PLUS | MINUS) expression
+    | LPAREN expression RPAREN
+    | (PLUS | MINUS)* atom
+    ;
 
 atom
-   : scientific
-   | variable
-   ;
+    : scientific
+    | variable
+    ;
 
 scientific
-   : SCIENTIFIC_NUMBER
-   ;
+    : SCIENTIFIC_NUMBER
+    ;
 
 variable
-   : VARIABLE
-   ;
+    : VARIABLE
+    ;
 
 relop
-   : EQ
-   | GT
-   | LT
-   ;
-
+    : EQ
+    | GT
+    | LT
+    ;
 
 VARIABLE
-   : VALID_ID_START VALID_ID_CHAR*
-   ;
-
+    : VALID_ID_START VALID_ID_CHAR*
+    ;
 
 fragment VALID_ID_START
-   : 'a' .. 'z' | 'A' .. 'Z' | '_'
-   ;
-
+    : 'a' .. 'z'
+    | 'A' .. 'Z'
+    | '_'
+    ;
 
 fragment VALID_ID_CHAR
-   : VALID_ID_START | '0' .. '9'
-   ;
+    : VALID_ID_START
+    | '0' .. '9'
+    ;
 
 //The NUMBER part gets its potential sign from "(PLUS | MINUS)* atom" in the expression rule
 SCIENTIFIC_NUMBER
-   : NUMBER (E SIGN? UNSIGNED_INTEGER)?
-   ;
+    : NUMBER (E SIGN? UNSIGNED_INTEGER)?
+    ;
 
 fragment NUMBER
-   : ('0' .. '9') + ('.' ('0' .. '9') +)?
-   ;
+    : ('0' .. '9')+ ('.' ('0' .. '9')+)?
+    ;
 
 fragment UNSIGNED_INTEGER
-   : ('0' .. '9')+
-   ;
-
+    : ('0' .. '9')+
+    ;
 
 fragment E
-   : 'E' | 'e'
-   ;
-
+    : 'E'
+    | 'e'
+    ;
 
 fragment SIGN
-   : '+' | '-'
-   ;
-
+    : '+'
+    | '-'
+    ;
 
 LPAREN
-   : '('
-   ;
-
+    : '('
+    ;
 
 RPAREN
-   : ')'
-   ;
-
+    : ')'
+    ;
 
 PLUS
-   : '+'
-   ;
-
+    : '+'
+    ;
 
 MINUS
-   : '-'
-   ;
-
+    : '-'
+    ;
 
 TIMES
-   : '*'
-   ;
-
+    : '*'
+    ;
 
 DIV
-   : '/'
-   ;
-
+    : '/'
+    ;
 
 GT
-   : '>'
-   ;
-
+    : '>'
+    ;
 
 LT
-   : '<'
-   ;
-
+    : '<'
+    ;
 
 EQ
-   : '='
-   ;
-
+    : '='
+    ;
 
 POINT
-   : '.'
-   ;
-
+    : '.'
+    ;
 
 POW
-   : '^'
-   ;
-
+    : '^'
+    ;
 
 WS
-   : [ \r\n\t] + -> skip
-   ;
+    : [ \r\n\t]+ -> skip
+    ;

@@ -1,0 +1,15 @@
+SafeDrive : {
+   nodeList : {
+      OneMeter : {
+         command : drive ( ) ;
+      }
+      TakePic : {
+         startCondition : OneMeter.state == FINISHED ;
+         command : takePicture ( ) ;
+      }
+      Counter : {
+         preCondition : pictures < 10 ;
+         assignment : pictures = pictures + 1 ;
+      }
+   }
+}

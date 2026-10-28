@@ -13,7 +13,6 @@ class JavaScriptLexerBase(Lexer):
         defined externally (useStrictDefault)"""
         self.scopeStrictModes = []
         self.lastToken: Token = None
-        self.templateDepth = 0
 
         """Default value of strict mode
         Can be defined externally by setUseStrictDefault"""
@@ -22,6 +21,10 @@ class JavaScriptLexerBase(Lexer):
         """Current value of strict mode
         Can be defined during parsing, see StringFunctions.js and StringGlobal.js samples"""
         self.useStrictCurrent = False
+
+        """Preserve nesting depth of template literals"""
+        self.currentDepth = 0
+        self.templateDepthStack = []
 
     def IsStartOfFile(self) -> bool:
         return self.lastToken == null
@@ -37,7 +40,7 @@ class JavaScriptLexerBase(Lexer):
         return self.useStrictCurrent
 
     def IsInTemplateString(self) -> bool:
-        return self.templateDepth > 0;
+        return len(self.templateDepthStack) > 0 and self.templateDepthStack[-1] == self.currentDepth
 
     def IsStartOfFile(self):
         return self.lastToken is None
@@ -58,11 +61,13 @@ class JavaScriptLexerBase(Lexer):
         return next_token
 
     def ProcessOpenBrace(self):
+        self.currentDepth += 1
         self.useStrictCurrent = bool(self.scopeStrictModes) and (True if self.scopeStrictModes[-1] else self.useStrictDefault)
         self.scopeStrictModes.append(self.useStrictCurrent)
 
     def ProcessCloseBrace(self):
         self.useStrictCurrent = bool(self.scopeStrictModes) and (True if self.scopeStrictModes.pop(-1) else self.useStrictDefault)
+        self.currentDepth -= 1
 
     def ProcessStringLiteral(self):
         if relativeImport:
@@ -77,11 +82,13 @@ class JavaScriptLexerBase(Lexer):
                 self.useStrictCurrent = True
                 self.scopeStrictModes.append(self.useStrictCurrent)
 
-    def IncreaseTemplateDepth(self):
-        self.templateDepth = self.templateDepth + 1
+    def ProcessTemplateOpenBrace(self):
+        self.currentDepth += 1
+        self.templateDepthStack.append(self.currentDepth)
 
-    def DecreaseTemplateDepth(self):
-        self.templateDepth = self.templateDepth - 1
+    def ProcessTemplateCloseBrace(self):
+        self.templateDepthStack.pop(-1)
+        self.currentDepth -= 1
 
     def IsRegexPossible(self) -> bool:
         """Returns {@code true} if the lexer can match a regex literal. """
@@ -115,7 +122,8 @@ class JavaScriptLexerBase(Lexer):
     def reset(self):
         self.scopeStrictModes = []
         self.lastToken: Token = None
-        self.templateDepth = 0
         self.useStrictDefault = False
         self.useStrictCurrent = False
+        self.currentDepth = 0
+        self.templateDepthStack = []
         super(JavaScriptLexerBase, self).reset()

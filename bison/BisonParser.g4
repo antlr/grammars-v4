@@ -17,15 +17,19 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
-
 /*==========\
 | Grammar.  |
 \==========*/
 
 
+// $antlr-format alignColons hanging, alignSemicolons hanging, alignTrailingComments true, allowShortBlocksOnASingleLine true
+// $antlr-format allowShortRulesOnASingleLine false, columnLimit 150, maxEmptyLinesToKeep 1, minEmptyLines 1, reflowComments false, useTab false
+
 parser grammar BisonParser;
 
-options { tokenVocab=BisonLexer; }
+options {
+    tokenVocab = BisonLexer;
+}
 
 input_
     : prologue_declarations '%%' bison_grammar epilogue_opt EOF
@@ -71,10 +75,8 @@ prologue_declaration
     ;
 
 params
-    : params actionBlock
-    | actionBlock
+    : actionBlock+
     ;
-
 
 /*----------------------.
 | grammar_declaration.  |
@@ -116,6 +118,7 @@ precedence_declarator
     : PERCENT_LEFT
     | PERCENT_RIGHT
     | PERCENT_NONASSOC
+    | PERCENT_BINARY
     | PRECEDENCE
     ;
 
@@ -159,13 +162,15 @@ nterm_decls
 
 // A non empty list of possibly tagged symbols for %token or %nterm.
 
-token_decls : ( | TAG ) token_decl+ ( TAG token_decl+ )* ;
+token_decls
+    : ( | TAG) token_decl+ (TAG token_decl+)*
+    ;
 
 // One symbol declaration for %token or %nterm.
 
 token_decl
     : id int_opt alias
-    | id id LPAREN id RPAREN alias    // Not in Bison, but used in https://github.com/ruby/ruby/parse.y
+    | id id LPAREN id RPAREN alias // Not in Bison, but used in Ruby parse.y
     ;
 
 int_opt
@@ -176,9 +181,8 @@ int_opt
 alias
     :
     | string_as_id
-//| TSTRING
+    //| TSTRING
     ;
-
 
 /*-------------------------------------.
 | token_decls_for_prec (%left, etc.).  |
@@ -190,9 +194,7 @@ alias
 // FOO and 'foo' as two different symbols instead of aliasing them.
 
 token_decls_for_prec
-    : token_decl_for_prec+
-    | TAG token_decl_for_prec+
-    | token_decls_for_prec TAG token_decl_for_prec+
+    : (token_decl_for_prec+ | TAG token_decl_for_prec+) (TAG token_decl_for_prec+)*
     ;
 
 // One token declaration for precedence declaration.
@@ -202,7 +204,6 @@ token_decl_for_prec
     | string_as_id
     ;
 
-
 /*-----------------------------------.
 | symbol_decls (argument of %type).  |
 `-----------------------------------*/
@@ -210,9 +211,7 @@ token_decl_for_prec
 // A non empty list of typed symbols (for %type).
 
 symbol_decls
-    : symbol+
-    | TAG symbol+
-    | symbol_decls TAG symbol+
+    : (symbol+ | TAG symbol+) (TAG symbol+)*
     ;
 
 /*------------------------------------------.
@@ -220,8 +219,7 @@ symbol_decls
 `------------------------------------------*/
 
 bison_grammar
-    : rules_or_grammar_declaration
-    | bison_grammar rules_or_grammar_declaration
+    : rules_or_grammar_declaration+
     ;
 
 /* As a Bison extension, one can use the grammar declarations in the
@@ -241,7 +239,8 @@ rhses_1
     ;
 
 rhs
-    : ( symbol named_ref_opt
+    : (
+        symbol named_ref_opt
         | tag_opt actionBlock named_ref_opt
         | BRACED_PREDICATE
         | EMPTY_RULE
@@ -249,14 +248,14 @@ rhs
         | DPREC INT
         | MERGE TAG
         | EXPECT INT
-        | EXPECT_RR INT)*
+        | EXPECT_RR INT
+    )*
     ;
 
 named_ref_opt
     :
     | BRACKETED_ID
     ;
-
 
 /*---------------------.
 | variable and value.  |
@@ -272,7 +271,6 @@ value
     | STRING
     | actionBlock
     ;
-
 
 /*--------------.
 | Identifiers.  |

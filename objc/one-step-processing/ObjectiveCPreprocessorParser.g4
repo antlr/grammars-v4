@@ -23,23 +23,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar ObjectiveCPreprocessorParser;
 
-options { tokenVocab=ObjectiveCLexer; }
+options {
+    tokenVocab = ObjectiveCLexer;
+}
 
 directive
-    : SHARP (DIRECTIVE_IMPORT | DIRECTIVE_INCLUDE) directiveText          #preprocessorImport
-    | SHARP DIRECTIVE_IF preprocessorExpression                           #preprocessorConditional
-    | SHARP DIRECTIVE_ELIF preprocessorExpression                         #preprocessorConditional
-    | SHARP DIRECTIVE_ELSE                                                #preprocessorConditional
-    | SHARP DIRECTIVE_ENDIF                                               #preprocessorConditional
-    | SHARP DIRECTIVE_IFDEF DIRECTIVE_ID                                  #preprocessorDef
-    | SHARP DIRECTIVE_IFNDEF DIRECTIVE_ID                                 #preprocessorDef
-    | SHARP DIRECTIVE_UNDEF DIRECTIVE_ID                                  #preprocessorDef
-    | SHARP DIRECTIVE_PRAGMA directiveText                                #preprocessorPragma
-    | SHARP DIRECTIVE_ERROR directiveText                                 #preprocessorError
-    | SHARP DIRECTIVE_WARNING directiveText                               #preprocessorWarning
-    | SHARP DIRECTIVE_DEFINE DIRECTIVE_ID directiveText?                  #preprocessorDefine
+    : SHARP (DIRECTIVE_IMPORT | DIRECTIVE_INCLUDE) directiveText # preprocessorImport
+    | SHARP DIRECTIVE_IF preprocessorExpression                  # preprocessorConditional
+    | SHARP DIRECTIVE_ELIF preprocessorExpression                # preprocessorConditional
+    | SHARP DIRECTIVE_ELSE                                       # preprocessorConditional
+    | SHARP DIRECTIVE_ENDIF                                      # preprocessorConditional
+    | SHARP DIRECTIVE_IFDEF DIRECTIVE_ID                         # preprocessorDef
+    | SHARP DIRECTIVE_IFNDEF DIRECTIVE_ID                        # preprocessorDef
+    | SHARP DIRECTIVE_UNDEF DIRECTIVE_ID                         # preprocessorDef
+    | SHARP DIRECTIVE_PRAGMA directiveText                       # preprocessorPragma
+    | SHARP DIRECTIVE_ERROR directiveText                        # preprocessorError
+    | SHARP DIRECTIVE_WARNING directiveText                      # preprocessorWarning
+    | SHARP DIRECTIVE_DEFINE DIRECTIVE_ID directiveText?         # preprocessorDefine
     ;
 
 directiveText
@@ -47,21 +52,16 @@ directiveText
     ;
 
 preprocessorExpression
-    : DIRECTIVE_TRUE                                                      #preprocessorConstant
-    | DIRECTIVE_FALSE                                                     #preprocessorConstant
-    | DIRECTIVE_DECIMAL_LITERAL                                           #preprocessorConstant
-    | DIRECTIVE_STRING                                                    #preprocessorConstant
-    | DIRECTIVE_ID                                                
-      (DIRECTIVE_LP preprocessorExpression DIRECTIVE_RP)?                 #preprocessorConditionalSymbol
-    | DIRECTIVE_LP preprocessorExpression DIRECTIVE_RP                    #preprocessorParenthesis
-    | DIRECTIVE_BANG preprocessorExpression                               #preprocessorNot
-    | preprocessorExpression                                              
-      op=(DIRECTIVE_EQUAL | DIRECTIVE_NOTEQUAL) preprocessorExpression    #preprocessorBinary
-    | preprocessorExpression op=DIRECTIVE_AND preprocessorExpression      #preprocessorBinary
-    | preprocessorExpression op=DIRECTIVE_OR preprocessorExpression       #preprocessorBinary
-    | preprocessorExpression 
-      op=(DIRECTIVE_LT | DIRECTIVE_GT | DIRECTIVE_LE | DIRECTIVE_GE)
-      preprocessorExpression                                              #preprocessorBinary
-    | DIRECTIVE_DEFINED
-      (DIRECTIVE_ID | DIRECTIVE_LP DIRECTIVE_ID DIRECTIVE_RP)             #preprocessorDefined
+    : DIRECTIVE_TRUE                                                                                                 # preprocessorConstant
+    | DIRECTIVE_FALSE                                                                                                # preprocessorConstant
+    | DIRECTIVE_DECIMAL_LITERAL                                                                                      # preprocessorConstant
+    | DIRECTIVE_STRING                                                                                               # preprocessorConstant
+    | DIRECTIVE_ID (DIRECTIVE_LP preprocessorExpression DIRECTIVE_RP)?                                               # preprocessorConditionalSymbol
+    | DIRECTIVE_LP preprocessorExpression DIRECTIVE_RP                                                               # preprocessorParenthesis
+    | DIRECTIVE_BANG preprocessorExpression                                                                          # preprocessorNot
+    | preprocessorExpression op = (DIRECTIVE_EQUAL | DIRECTIVE_NOTEQUAL) preprocessorExpression                      # preprocessorBinary
+    | preprocessorExpression op = DIRECTIVE_AND preprocessorExpression                                               # preprocessorBinary
+    | preprocessorExpression op = DIRECTIVE_OR preprocessorExpression                                                # preprocessorBinary
+    | preprocessorExpression op = (DIRECTIVE_LT | DIRECTIVE_GT | DIRECTIVE_LE | DIRECTIVE_GE) preprocessorExpression # preprocessorBinary
+    | DIRECTIVE_DEFINED (DIRECTIVE_ID | DIRECTIVE_LP DIRECTIVE_ID DIRECTIVE_RP)                                      # preprocessorDefined
     ;

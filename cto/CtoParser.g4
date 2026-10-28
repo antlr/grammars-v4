@@ -31,9 +31,14 @@
  https://hyperledger.github.io/composer/v0.19/reference/cto_language.html
  */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar CtoParser;
 
-options { tokenVocab=CtoLexer; }
+options {
+    tokenVocab = CtoLexer;
+}
 
 modelUnit
     : namespaceDeclaration importDeclaration* typeDeclaration* EOF
@@ -49,7 +54,7 @@ importDeclaration
 
 typeDeclaration
     : assetDeclaration
-    | conceptDeclaration  
+    | conceptDeclaration
     | enumDeclaration
     | participantDeclaration
     | transactionDeclaration
@@ -62,49 +67,45 @@ classModifier
     ;
 
 assetDeclaration
-    : classModifier*
-      ASSET IDENTIFIER
-      extendsOrIdentified
-      classBody
+    : classModifier* ASSET IDENTIFIER extendsOrIdentified classBody
     ;
 
 conceptDeclaration
-    : classModifier*
-      CONCEPT IDENTIFIER
-      (EXTENDS IDENTIFIER)?
-      classBody
+    : classModifier* CONCEPT IDENTIFIER (EXTENDS IDENTIFIER)? classBody
     ;
 
 enumDeclaration
-    : ENUM IDENTIFIER '{' enumConstant* '}';
+    : ENUM IDENTIFIER '{' enumConstant* '}'
+    ;
 
 enumConstant
-    : VAR IDENTIFIER;
+    : VAR IDENTIFIER
+    ;
 
 eventDeclaration
-    : EVENT IDENTIFIER
-      classBody
+    : EVENT IDENTIFIER classBody
     ;
 
 participantDeclaration
-    : classModifier*
-      PARTICIPANT IDENTIFIER
-      extendsOrIdentified
-      classBody
+    : classModifier* PARTICIPANT IDENTIFIER extendsOrIdentified classBody
     ;
 
 transactionDeclaration
-    : classModifier*
-      TRANSACTION IDENTIFIER
-      classBody
+    : classModifier* TRANSACTION IDENTIFIER classBody
     ;
 
-extendsOrIdentified: EXTENDS IDENTIFIER | identified;
+extendsOrIdentified
+    : EXTENDS IDENTIFIER
+    | identified
+    ;
 
-identified: IDENTIFIED IDENTIFIER;
+identified
+    : IDENTIFIED IDENTIFIER
+    ;
 
 classBody
-    : '{' classBodyDeclaration* '}';
+    : '{' classBodyDeclaration* '}'
+    ;
 
 classBodyDeclaration
     : ';'
@@ -117,13 +118,16 @@ fieldDeclaration
     | numericField identifier defaultNumber? rangeValidation? OPTIONAL?
     | dateField identifier defaultDate? OPTIONAL?
     | identifierField identifier
-    | reference identifier;
+    | reference identifier
+    ;
 
 identifierField
-    : VAR IDENTIFIER square*;
+    : VAR IDENTIFIER square*
+    ;
 
 numericField
-    : VAR numericPrimitive square*;
+    : VAR numericPrimitive square*
+    ;
 
 numericPrimitive
     : DOUBLE
@@ -132,44 +136,60 @@ numericPrimitive
     ;
 
 booleanField
-    : VAR BOOLEAN square*;
+    : VAR BOOLEAN square*
+    ;
 
 dateField
-    : VAR DATE_TIME square*;
+    : VAR DATE_TIME square*
+    ;
 
 defaultDate
-    : DEFAULT ASSIGN DATE_TIME_LITERAL;
+    : DEFAULT ASSIGN DATE_TIME_LITERAL
+    ;
 
 regexDeclaration
-    : REGEX ASSIGN REGEX_EXPR;
+    : REGEX ASSIGN REGEX_EXPR
+    ;
 
 stringField
-    : VAR STRING square*;
+    : VAR STRING square*
+    ;
 
 reference
-    : REF IDENTIFIER square*;
+    : REF IDENTIFIER square*
+    ;
 
 qualifiedName
-    : IDENTIFIER ('.' IDENTIFIER)*;
+    : IDENTIFIER ('.' IDENTIFIER)*
+    ;
 
 rangeValidation
-    : RANGE ASSIGN rangeDeclaration;
+    : RANGE ASSIGN rangeDeclaration
+    ;
 
 rangeDeclaration
     : '[' numberLiteral ',' ']'
     | '[' ',' numberLiteral ']'
-    | '[' numberLiteral ',' numberLiteral ']';
+    | '[' numberLiteral ',' numberLiteral ']'
+    ;
 
 defaultBoolean
-    : DEFAULT ASSIGN BOOL_LITERAL;
+    : DEFAULT ASSIGN BOOL_LITERAL
+    ;
 
 defaultString
-    : DEFAULT ASSIGN stringLiteral;
+    : DEFAULT ASSIGN stringLiteral
+    ;
 
 defaultNumber
-    : DEFAULT ASSIGN numberLiteral;
+    : DEFAULT ASSIGN numberLiteral
+    ;
 
-identifier: IDENTIFIER | ASSET | PARTICIPANT;
+identifier
+    : IDENTIFIER
+    | ASSET
+    | PARTICIPANT
+    ;
 
 literal
     : numberLiteral
@@ -179,7 +199,8 @@ literal
 
 numberLiteral
     : integerLiteral
-    | floatLiteral;
+    | floatLiteral
+    ;
 
 stringLiteral
     : CHAR_LITERAL
@@ -192,12 +213,17 @@ integerLiteral
     ;
 
 floatLiteral
-    : FLOAT_LITERAL;
+    : FLOAT_LITERAL
+    ;
 
 decorator
-    : AT qualifiedName ('(' elementValuePair ')')?;
+    : AT qualifiedName ('(' elementValuePair ')')?
+    ;
 
 elementValuePair
-    : literal (',' literal)*;
+    : literal (',' literal)*
+    ;
 
-square: '[' ']';
+square
+    : '[' ']'
+    ;

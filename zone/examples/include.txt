@@ -1,0 +1,4 @@
+$ORIGIN example.test.
+$INCLUDE hosts.zone
+$INCLUDE "mail hosts.zone" mail.example.test.
+@ NS ns.example.test.

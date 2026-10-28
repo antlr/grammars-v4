@@ -1,0 +1,9 @@
+FUNCTION Max3( nA, nB, nC )
+   LOCAL nMax := nA
+   IF nB > nMax
+      nMax := nB
+   ENDIF
+   IF nC > nMax
+      nMax := nC
+   ENDIF
+   RETURN nMax

@@ -1,0 +1,10 @@
+FUNCTION Classify( nAge )
+   LOCAL cResult
+   IF nAge < 13
+      cResult := "child"
+   ELSEIF nAge < 20
+      cResult := "teen"
+   ELSE
+      cResult := "adult"
+   ENDIF
+   RETURN cResult

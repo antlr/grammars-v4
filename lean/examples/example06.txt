@@ -1,0 +1,2 @@
+theorem exists_zero : ∃ (n : Nat), n = 0 := by
+  exact ⟨0, rfl⟩

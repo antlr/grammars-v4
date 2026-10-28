@@ -1,0 +1,7 @@
+section Helpers
+
+variable (n : Nat)
+
+def double : Nat := n * 2
+
+end Helpers

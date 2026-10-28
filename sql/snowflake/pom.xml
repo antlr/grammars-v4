@@ -9,6 +9,9 @@
         <artifactId>sqlparent</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
+    <properties>
+        <packageName>org.antlr.grammars.snowflake</packageName>
+    </properties>
     <build>
         <plugins>
             <plugin>
@@ -16,11 +19,16 @@
                 <artifactId>antlr4-maven-plugin</artifactId>
                 <version>${antlr.version}</version>
                 <configuration>
-                    <sourceDirectory>${basedir}</sourceDirectory>
+                    <sourceDirectory>${basedir}</sourceDirectory>   
+                    <outputDirectory>${project.build.directory}/generated-sources/antlr4/org/antlr/grammars/snowflake</outputDirectory>
                     <includes>
                         <include>SnowflakeLexer.g4</include>
                         <include>SnowflakeParser.g4</include>
                     </includes>
+                    <arguments>
+                        <argument>-package</argument>
+                        <argument>${packageName}</argument>
+                    </arguments>
                 </configuration>
                 <executions>
                     <execution>
@@ -39,7 +47,7 @@
                     <showTree>false</showTree>
                     <entryPoint>snowflake_file</entryPoint>
                     <grammarName>Snowflake</grammarName>
-                    <packageName></packageName>
+                    <packageName>${packageName}</packageName>
                     <exampleFiles>examples/</exampleFiles>
                 </configuration>
                 <executions>

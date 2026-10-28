@@ -32,7 +32,7 @@ func (p *JavaScriptParserBase) next(str string) bool {
 }
 
 func (p *JavaScriptParserBase) notLineTerminator() bool {
-	return !p.here(JavaScriptParserLineTerminator)
+	return !p.lineTerminatorAhead()
 }
 
 func (p *JavaScriptParserBase) notOpenBraceAndNotFunction() bool {
@@ -42,29 +42,6 @@ func (p *JavaScriptParserBase) notOpenBraceAndNotFunction() bool {
 
 func (p *JavaScriptParserBase) closeBrace() bool {
 	return p.GetTokenStream().LT(1).GetTokenType() == JavaScriptParserCloseBrace
-}
-
-// Returns true if on the current index of the parser's
-// token stream a token of the given type exists on the
-// Hidden channel.
-func (p *JavaScriptParserBase) here(_type int) bool {
-	// Get the most recently emitted token.
-	currentToken := p.GetTokenStream().LT(-1)
-
-	// Get the next token index.
-	nextTokenIndex := 0
-
-	if currentToken != nil {
-		nextTokenIndex = currentToken.GetTokenIndex() + 1
-	}
-
-	// Get the token after the `currentToken`. By using `_input.get(index)`,
-	// we also grab a token that is (possibly) on the HIDDEN channel.
-	nextToken := p.GetTokenStream().Get(nextTokenIndex);
-
-	// Check if the token resides on the HIDDEN channel and if it's of the
-	// provided type.
-	return nextToken.GetChannel() == antlr.LexerHidden && nextToken.GetTokenType() == _type
 }
 
 // Returns true if on the current index of the parser's
@@ -81,7 +58,7 @@ func (p *JavaScriptParserBase) lineTerminatorAhead() bool {
 
 	if ahead.GetChannel() != antlr.LexerHidden {
 		// We're only interested in tokens on the HIDDEN channel.
-		return true
+		return false
 	}
 
 	if ahead.GetTokenType() == JavaScriptParserLineTerminator {

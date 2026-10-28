@@ -1,0 +1,2000 @@
+$ TITLE('CPM 3.0 --- GENCOM 1.0')
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+
+                       * * *  GENCOM  * * *
+
+
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+
+gencomer:
+do;
+
+
+declare
+    mpmproduct literally '01h', /* requires mp/m */
+    cpmversion literally '30h'; /* requires 3.0 cp/m */
+
+
+declare plm label public;
+
+declare copyright (*) byte data (
+  ' Copyright (c) 1982, Digital Research ');
+
+declare version (*)     byte data('11/02/82');
+
+/*
+            Digital Research
+            Box 579
+            Pacific Grove, Ca
+            93950
+*/
+$ eject
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+
+                   * * *  CP/M INTERFACE * * *
+
+
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+
+declare
+        maxb      address external,     /* addr field of jmp BDOS */
+        fcb (33)  byte external,        /* default file control block */
+        fcb16(33) byte external,        /* default fcb 2 */
+        buff(128) byte external,        /* default buffer */
+        buffa     literally '.buff',    /* default buffer */
+        fcba      literally '.fcb',     /* default file control block */
+
+        cr              literally '13',
+        lf              literally '10';
+        
+                                        /* reset drive mask */
+    declare reset$mask (16) address data (
+      0000000000000001b,
+      0000000000000010b,
+      0000000000000100b,
+      0000000000001000b,
+      0000000000010000b,
+      0000000000100000b,
+      0000000001000000b,
+      0000000010000000b,
+      0000000100000000b,
+      0000001000000000b,
+      0000010000000000b,
+      0000100000000000b,
+      0001000000000000b,
+      0010000000000000b,
+      0100000000000000b,
+      1000000000000000b );
+
+mon1: procedure(f,a) external;
+    declare f byte, a address;
+    end mon1;
+
+mon2: procedure(f,a) byte external;
+    declare f byte, a address;
+    end mon2;
+
+declare mon3 literally 'mon2a';
+
+mon3: procedure(f,a) address external;
+    declare f byte, a address;
+    end mon3;
+
+    /********** SYSTEM FUNCTION CALLS *********************/
+
+printchar: procedure(char);
+    declare char byte;
+    call mon1(2,char);
+end printchar;
+
+printb: procedure;
+                                /* print blank character */
+    call printchar(' ');
+end printb;
+
+printx: procedure(a);
+    declare a address;
+    declare s based a byte;
+        do while s <> 0;
+                call printchar(s);
+                a = a + 1;
+        end;
+end printx;
+
+check$con$stat: procedure byte;
+    return mon2(11,0);          /* console ready */
+end check$con$stat;
+
+crlf: procedure;
+    call printchar(cr);
+    call printchar(lf);
+    if check$con$stat then do; 
+        call mon1 (1,0);        /* read character */
+        call mon1 (0,0);        /* system reset */
+    end;
+end crlf;
+
+print: procedure(a);
+    declare a address;
+                        /* print the string starting at address a until the
+                           next 0 is encountered */
+    call crlf;
+    call printx(a);
+end print;
+
+get$version: procedure address;
+                        /* returns current cp/m version # */
+    return mon3(12,0);
+end get$version;
+
+
+conin: procedure byte;
+    return mon2(6,0fdh);
+end conin;
+
+
+open: procedure(fcb) byte;
+    declare fcb address;
+    return mon2(15,fcb);
+end open;
+
+close: procedure(fcb) byte;
+        declare fcb     address;
+        return mon2(16,fcb);
+end close;
+
+make: procedure(fcb) byte;
+        declare fcb     address;
+        return mon2(22,fcb);
+end make;
+
+        declare ioflag  address,
+                 nrecs  byte;
+
+mread: procedure(fcb);           /* multi sector read - returns # recs*/
+        declare fcb     address;
+
+        ioflag = mon3(20,fcb);
+        readflag = low(ioflag);         /* if = 255 then error */
+        nrecs = high(ioflag);           /* if 0 -> multi sector count */
+
+end mread;
+
+
+setmulti: procedure(nsects);            /* set multi sector count */
+        declare nsects  byte;
+
+        flag = mon2(44,nsects);
+
+end setmulti;
+
+
+readsq: procedure(fcb) byte;
+        declare fcb     address;
+        return mon2(20,fcb);
+end readsq;
+
+writesq: procedure(fcb) byte;
+        declare fcb     address;
+        return mon2(21,fcb);
+end writesq;
+
+rename: procedure(fcb) byte;
+        declare fcb     address;
+        return mon2(23,fcb);
+end rename;
+
+delete: procedure(fcb) byte;
+        declare fcb     address;
+        return mon2(19,fcb);
+end delete;
+
+setdma: procedure(dma);
+    declare dma address;
+    call mon1(26,dma);
+end setdma;
+
+return$errors:                  /* 0ff => return BDOS errors */
+    procedure(mode);
+    declare mode byte;
+      call mon1 (45,mode);      
+end return$errors;
+
+/******************************************************/
+
+terminate: procedure;
+    call crlf;
+    call mon1 (0,0);
+end terminate;
+
+parse: procedure(pfcb) address external;
+        declare pfcb address;
+
+end parse;
+
+$eject
+
+        declare
+
+                options(*) byte data
+                             ('NULL0LOADER0SCB',0FFH),
+                off$opt(*) byte data(0,5,12,15),
+                end$list        byte data (0ffh),
+                end$of$string   byte data (0),
+
+                delimiters(*) byte data (0,'[]=, :;<>%\|"()/#!@&+-*?',0,0ffh),
+                SPACE           byte data(5),   /* delim        space */
+                COMMA           byte data(4),   /*    "         comma */
+                LPAREN          byte data(14),  /*    "         left paren */
+
+                opt$map(23)     byte,
+
+                j               byte initial(0),
+                buf$ptr         address,
+                opt$index       byte,
+                endbuf          byte,
+                delimiter       byte;
+$ eject
+
+
+        declare
+                true            literally '1',
+                false           literally '0',
+                punchSCB        byte initial (false),
+                COMonly         byte initial (false),
+                revert          byte initial (false),
+                build           byte initial (false),
+                replace         byte initial (false),
+                empty           byte initial (false),
+                hex             byte initial (false),
+
+                oldSCB          byte initial (false),
+
+                incount         byte initial (0),
+                ret$inst        byte data (0c9h),
+                BLANK           byte data (020h),
+                (readflag,writeflag)    byte,
+                flag            byte,
+                (rsx,old,fill)  byte,
+                maxrcd          byte data(32),
+
+                deletes         byte,
+                which(15)       byte,
+
+                comoff          address,
+                comsize         address,
+                totbyte         address,
+                rsxrec          address,
+                oldrsx          address,
+                offsets(15)     address,
+                length$rsx(15)  address,
+                testvers        address,
+
+                comtype(3)      byte data ('COM'),
+                hextype(3)      byte data ('HEX'),
+                rsxtype(3)      byte data ('RSX'),
+
+                tempfcb(33)     byte initial(0,'TEMP    $$$',0,0,0,0,0),
+                errfcb(14)      byte,
+
+              files(16)       structure ( pass(8) byte),
+                len$pass(16)    byte,
+
+                parse$struc     structure(
+                   name$addr    address,
+                   fcb$addr     address),
+
+                optmark         based buf$ptr byte,
+                NULL            byte initial(0),
+                LOAD            byte initial(0),
+                SCB             byte initial(0),
+
+                fcbs(16)        structure(
+                   file(33)       byte),
+
+                test$ptr        address,
+                allfcbs(16)     address,
+                fcbp            address,
+                comptr          address,
+                comfcb          based comptr (1) byte,
+                testfcb         based test$ptr (1) byte,
+                gen$fcb         based fcbp (1) byte;
+
+/*              RSX COM FILE HEADER FORMAT              */
+
+        declare
+                head$ptr        address,
+                head            based head$ptr structure(
+                 retinst        byte,   /* return instruction 0C9h */
+                 progsize       address,/* program size:orig com prog */
+                 SCBjmp         byte,
+                 SCBaddr        address,
+                 RESERVED2(7)   byte,
+                 LOADER         byte,
+                 nscb           byte,
+                 nrsx           byte);  /* number of RSX modules in file */
+
+        declare
+                subptr          address,
+                rsx$sub$head    based subptr structure(
+                 off            address,
+                 len            address,
+                 NONBANK        byte,
+                 RESERVED3      byte,
+                 name(8)        byte,
+                 RESERVED4      address),
+
+                scbvect         based subptr structure(
+                  pad1          byte,
+                  smark         byte,
+                  pad2          address,
+                  svect(12)     byte),
+
+                head$byte       based head$ptr byte,
+
+                head$buffer(384)        byte,
+                iobuff(4096)            byte,
+
+                nextptr         address,
+                next            based nextptr structure(
+                 off            address,
+                 len            address,
+                 NONBANK        byte,
+                 RESERVED3      byte,
+                 name(8)        byte,
+                 RESERVED4      address),
+
+                nbank(16)       byte initial(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0),
+                newoff(16)      address,
+                newlen(16)      address,
+                actlen(15)      address,
+                new(15)         structure(
+                  name(8)       byte),
+
+                soff(20)        byte,
+                sval(20)        byte,
+                nscbs           byte initial(0);
+
+        declare
+                SCBbuff(256)    byte,
+                SCBcode(23)     byte data(011h,018h,00,0d5h,0eh,031h,0cdh,5,0,
+                                          0e1h,23h,23h,23h,7eh,0feh,
+                                          0ffh,0e5h,0ebh,0c2h,4,0,0e1h,0c9h),
+                SCBpos          address;
+$eject
+
+        declare
+                ERRORM(*)               byte data ('ERROR: ',0),
+                FILEM(*)                byte data ('FILE: ',0),
+                err$notfnd(*)           byte data ('File not found.',0),
+                err$msg$make(*)         byte data ('No directory space.',0),
+                err$msg$parse(*)        byte data ('Invalid file name.',0),
+                err$msg$first(*)        byte data ('First submitted file must be
+
+ a COM file.',0),
+                err$msg$dup1(*)         byte data ('Duplicate input RSX...',0),
+                err$msg$dup2(*)         byte data ('Duplicate RSX in header.',
+                                                    ' Replacing old by new.',0),
+
+                err$msg$rsxval(*)       byte data ('Invalid RSX type.',0),
+                err$msg$no$rsx(*)       byte data ('No more RSX files to be used
+
+.',0),
+                err$msg$copy(*)         byte data ('Error on copy.',0),
+                err$msg$rsx$slot(*)     byte data ('There are not enough availab
+
+le RSX slots.',0),
+                err$msg$read(*)         byte data ('Disk read.',0),
+                err$msg$write(*)        byte data ('Disk write.',0),
+                err$msg$toobig(*)       byte data ('Total file size exceeds 64K.
+
+',0),
+                err$NULL(*)     byte data ('COM file found and NULL option.',0),
+
+                errSTRIP(*)     byte data ('No header or RSXs to strip.',0),
+
+                errIFCB(*)      byte data ('Invalid FCB.',0),
+                errMEDIA(*)     byte data ('Media change occurred.',0),
+                errDIO(*)       byte data ('Disk I/O error.',0),
+                errDRIVE(*)     byte data ('Invalid drive error.',0),
+
+                errscboff(*)    byte data ('Invalid SCB offset',0),
+                errscbclose(*)  byte data('Missing right parenthesis.',0),
+                errscbnoval(*)  byte data ('Missing SCB value.',0),
+                errscbpar(*)    byte data ('Missing left parenthesis.',0),
+                err$unrecopt(*) byte data ('Unrecognized option.',0),
+                err$notscb(*)   byte data ('No modifier for this option.',0);
+
+
+
+closeall: procedure;
+        declare i       byte;
+
+        do i = 0 to incount;
+                readflag = close(allfcbs(i));   /* close input files */
+        end;
+        readflag = close(.tempfcb);
+        readflag = delete(.tempfcb);
+
+end closeall;
+
+get$errfcb: procedure;
+        declare (i,j)   byte;
+
+        do i = 1 to 14;
+                errfcb(i) = 0;
+        end;
+        errfcb(0) = 9;                  /* tab */
+
+        i = 1;
+        j = 1;
+        do while i < 9 and gen$fcb(j) <> 32;            /* 32 = space */
+                errfcb(i) = gen$fcb(j);
+                i = i + 1;
+                j = j + 1;
+        end;
+
+ge1:    errfcb(i) = 46;                 /* dot */
+        j = 9;
+        do while i < 12 and gen$fcb(j) <> 32;
+                i = i + 1;
+                errfcb(i) = gen$fcb(j);
+                j = j + 1;
+        end;
+end get$errfcb;
+
+
+e$print1: procedure(message);
+        declare message address;
+
+        call get$errfcb;
+        call print(.ERRORM);
+        call printx(message);
+
+end e$print1;
+
+e$print2: procedure;
+
+        call print(.FILEM);
+        call printx(.errfcb);
+        call crlf;
+
+end e$print2;
+
+
+err$print: procedure(message);
+        declare message address;
+
+        call e$print1(message);
+        call e$print2;
+
+        call closeall;
+        call terminate;
+
+end err$print;
+
+
+
+bdoserr: procedure;
+        declare (lflag,hflag)   byte;
+
+        lflag = low(ioflag);
+        hflag = high(ioflag);
+
+        if lflag = 9 then call err$print(.errIFCB);
+        if lflag = 10 then call err$print(.errMEDIA);
+        if lflag = 255 then do;
+                if hflag = 1 then call err$print(.errDIO);
+                if hflag = 4 then call err$print(.errDRIVE);
+        end;
+
+end bdoserr;
+$ eject
+
+
+$eject
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+
+                    * * *  Option scanner  * * *
+
+
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+
+separator: procedure(character) byte;
+
+                                        /* determines if character is a 
+                                           delimiter and which one */
+        declare k       byte,
+                character       byte;
+
+        k = 1;
+loop:   if delimiters(k) = end$list then return(0);
+        if delimiters(k) = character then return(k);    /* null = 25 */
+                k = k + 1;
+                go to loop;
+
+end separator;
+
+opt$scanner:    procedure(list$ptr,off$ptr,idx$ptr);
+                                        /* scans the list pointed at by idxptr
+                                           for any strings that are in the 
+                                           list pointed at by list$ptr.
+                                           Offptr points at an array that 
+                                           contains the indices for the known
+                                           list. Idxptr points at the index 
+                                           into the list. If the input string
+                                           is unrecognizable then the index is
+                                           0, otherwise > 0.
+
+                                        First, find the string in the known
+                                        list that starts with the same first 
+                                        character.  Compare up until the next
+                                        delimiter on the input. if every input
+                                        character matches then check for 
+                                        uniqueness.  Otherwise try to find 
+                                        another known string that has its first
+                                        character match, and repeat.  If none
+                                        can be found then return invalid.
+
+                                        To test for uniqueness, start at the 
+                                        next string in the knwon list and try
+                                        to get another match with the input.
+                                        If there is a match then return invalid.
+
+                                        else move pointer past delimiter and 
+                                        return.
+
+                                P.Balma         */
+
+        declare
+                buff            based buf$ptr (1) byte,
+                idx$ptr         address,
+                off$ptr         address,
+                list$ptr        address;
+
+        declare
+                i               byte,
+                j               byte,
+                list            based list$ptr (1) byte,
+                offsets         based off$ptr (1) byte,
+                wrd$pos         byte,
+                character       byte,
+                letter$in$word  byte,
+                found$first     byte,
+                start           byte,
+                index           based idx$ptr byte,
+                save$index      byte,
+                (len$new,len$found)     byte,
+                valid           byte;
+
+/*****************************************************************************/
+/*                      internal subroutines                                 */
+/*****************************************************************************/
+
+check$in$list: procedure;
+                                /* find known string that has a match with 
+                                   input on the first character.  Set index
+                                   = invalid if none found.   */
+                        
+        declare i       byte;
+
+        i = start;
+        wrd$pos = offsets(i);
+        do while list(wrd$pos) <> end$list;
+                i = i + 1;
+                index = i;
+                if list(wrd$pos) = character then return;
+                wrd$pos = offsets(i);
+        end;
+                        /* could not find character */
+        index = 0;
+        return;
+end check$in$list;
+
+setup:  procedure;
+        character = buff(0);
+        call check$in$list;
+        letter$in$word = wrd$pos;
+                        /* even though no match may have occurred, position
+                           to next input character.  */
+        i = 1;
+        character = buff(1);
+end setup;
+
+test$letter:    procedure;
+                        /* test each letter in input and known string */
+
+        letter$in$word = letter$in$word + 1;
+
+                                        /* too many chars input? 0 means
+                                           past end of known string */
+        if list(letter$in$word) = end$of$string then valid = false;
+        else
+        if list(letter$in$word) <> character then valid = false;
+
+        i = i + 1;
+        character = buff(i);
+
+end test$letter;
+
+skip:   procedure;
+                                        /* scan past the offending string;
+                                           position buf$ptr to next string...
+                                           skip entire offending string;
+                                           ie., falseopt=mod, [note: comma or
+                                           space is considered to be group 
+                                           delimiter] */
+        character = buff(i);
+        delimiter = separator(character);
+        do while ((delimiter <> 2) and (delimiter <> 4) and (delimiter <> 5)
+                   and (delimiter <> 25));
+                i = i + 1;
+                character = buff(i);
+                delimiter = separator(character);
+        end;
+        endbuf = i;
+        buf$ptr = buf$ptr + endbuf + 1;
+        return;
+end skip;
+
+eat$blanks: procedure;
+
+        declare charac  based buf$ptr byte;
+
+
+        do while(delimiter := separator(charac)) = SPACE;
+                bufptr = buf$ptr + 1;
+        end;
+
+end eat$blanks;
+
+/*****************************************************************************/
+/*                      end of internals                                     */
+/*****************************************************************************/
+
+
+                                        /* start of procedure */
+        call eat$blanks;
+        start = 0;
+        call setup;
+
+                                        /* match each character with the option
+                                           for as many chars as input 
+                                           Please note that due to the array
+                                           indices being relative to 0 and the
+                                           use of index both as a validity flag
+                                           and as a index into the option/mods
+                                           list, index is forced to be +1 as an
+                                           index into array and 0 as a flag*/
+
+        do while index <> 0;
+                start = index;
+                delimiter = separator(character);
+
+                                        /* check up to input delimiter */
+
+                valid = true;           /* test$letter resets this */
+                do while delimiter = 0;
+                        call test$letter;
+                        if not valid then go to exit1;
+                        delimiter = separator(character);
+                end;
+
+                go to good;
+
+                                        /* input ~= this known string;
+                                           get next known string that 
+                                           matches */
+exit1:          call setup;
+        end;
+                                        /* fell through from above, did
+                                           not find a good match*/
+        endbuf = i;                     /* skip over string & return*/
+        call skip;
+        return;
+
+                                        /* is it a unique match in options
+                                           list? */
+good:   endbuf = i;
+        len$found = endbuf;
+        save$index = index;
+        valid = false;
+next$opt:
+                start = index;
+                call setup;
+                if index = 0 then go to finished;
+
+                                        /* look at other options and check
+                                           uniqueness */
+
+                len$new = offsets(index + 1) - offsets(index) - 1;
+                if len$new = len$found then do;
+                        valid = true;
+                        do j = 1 to len$found;
+                                call test$letter;
+                                if not valid then go to next$opt;
+                        end;
+                end;
+                else go to nextopt;
+                                        /* fell through...found another valid
+                                           match --> ambiguous reference */
+        index = 0;
+        call skip;              /* skip input field to next delimiter*/
+        return;
+
+finished:                       /* unambiguous reference */
+        index = save$index;
+        buf$ptr = buf$ptr + endbuf;
+        call eat$blanks;
+        if delimiter <> 0 then  buf$ptr = buf$ptr + 1;
+        else delimiter = SPACE;
+
+end opt$scanner;
+
+error$prt:      procedure;
+        declare i       byte,
+                t       address,
+                char    based t byte;
+
+        t = buf$ptr - endbuf - 1;
+        do i = 1 to endbuf;
+                call printchar(char);
+                t = t + 1;
+        end;
+
+end error$prt;
+
+$eject
+
+e$print3: procedure(message);
+
+        declare message address;
+
+        call print(.ERRORM);
+        call printx(message);
+        call terminate;
+
+end e$print3;
+
+
+aschex: procedure(ahbyte,albyte) byte;
+
+        declare (ahbyte,albyte) address,
+                hbyte           based ahbyte byte,
+                lbyte           based albyte byte;
+
+ conv: procedure(abyte);
+        declare abyte   address,
+                b       based abyte byte;
+
+        if b > 39h then b = b - 37h;
+        else b = b - 30h;
+
+ end conv;
+
+        call conv(ahbyte);
+        call conv(albyte);
+        hbyte = shl(hbyte,4);
+
+        return(hbyte or lbyte);
+
+end aschex;
+
+/**************************************************************************/
+
+valoff: procedure(high,low,achar);
+        declare (high,low)      byte,
+                achar           address,
+                char            based achar byte;
+
+        if (char > high) or (char < low) then
+                call e$print3(.errscboff);
+
+end valoff;
+
+/**************************************************************************/
+
+/**************************************************************************/
+
+getoption: procedure;
+
+        declare char            based buf$ptr byte,
+                bufptr1         address,
+                nextchar        based bufptr1 byte,
+                index           byte,
+                zero            byte;
+
+        /************************************************/
+
+getscbval: procedure;
+
+        bufptr1 = buf$ptr + 1;
+
+        if (delimiter := separator(nextchar)) = 0 then do;
+                sval(nscbs) = aschex(buf$ptr,buf$ptr1);         /* 2 chars */
+                buf$ptr = buf$ptr + 2;
+        end;
+        else do;
+                sval(nscbs) = aschex(.zero,buf$ptr);            /* 1 char */
+                buf$ptr = bufptr1;
+        end;
+
+        nscbs = nscbs + 1;
+
+        if (delimiter := separator(char)) <> 15 then            /* ) */
+                call e$print3(.errscbclose);
+
+        buf$ptr = buf$ptr + 1;
+
+        delimiter = separator(char);                    /* set delimiter */
+        if delimiter <> 0 then buf$ptr = buf$ptr + 1;
+
+end getscbval;
+
+        /******************************************************/
+
+checkval: procedure;
+
+        delimiter = separator(char);
+        if delimiter = SPACE then go to cv0;
+        if delimiter <> COMMA then
+                call e$print3(.err$scbnoval);
+
+cv0:    buf$ptr = buf$ptr + 1;
+
+end checkval;
+
+        /******************************************************/
+
+
+getscboff: procedure;
+
+        if (delimiter := separator(char)) = LPAREN then do;
+
+                buf$ptr = buf$ptr + 1;
+                call valoff(39h,30h,buf$ptr);           /* valid char ? */
+
+                bufptr1 = buf$ptr + 1;
+
+                delimiter = separator(nextchar);
+
+                if delimiter = SPACE then go to gs1;
+                if delimiter = COMMA then go to gs1;
+                                                        /* 2 char input */
+                        call valoff(36h,30h,buf$ptr);
+                        call valoff(46h,30h,bufptr1);   /* valid ? */
+                        soff(nscbs) = aschex(buf$ptr,bufptr1);
+                        buf$ptr = buf$ptr + 2;
+                        call checkval;
+                        return;
+
+                                                        /* single char in */
+gs1:                    soff(nscbs) = aschex(.zero,buf$ptr);
+                        buf$ptr = bufptr1 + 1;
+        end;
+        else call e$print3(.errscbpar);
+
+end getscboff;
+
+        /******************************************************/
+
+        zero = 30h;
+        delimiter = 1;
+        index = 0;
+        buf$ptr = buf$ptr + 1;          /* move off [ delimiter */
+
+                                        /* while not eos */
+
+gto0:           call opt$scanner(.options,.off$opt,.index);
+                if index = 0 then do;
+                        call print(.ERRORM);
+                        call printx(.err$unrecopt);
+                        call print(.('OPTION: ',0));
+                        call error$prt;
+                end;
+
+                if index = 1 then NULL = true;
+                else if index = 2 then LOAD = true;
+
+                if delimiter = 2 then return;
+                if delimiter = 25 then return;
+
+                        if delimiter = 3 then do;               /* = */
+                                if index <> 3 then do;
+                                        call print(.ERRORM);
+                                        call printx(.err$notscb);
+                                        call opt$scanner(.options,.offopt,
+                                                         .index);
+                                        go to gto1;
+                                end;
+
+                                call getscboff;         /* buf$ptr -> value */
+                                call getscbval;
+                                SCB = true;
+                        end;
+
+gto1:   if delimiter = 0 then return;
+        if delimiter = 2 then return;
+        if delimiter = 25 then return;
+
+        go to gto0;
+
+end getoption;
+
+$ eject
+
+
+opener: procedure(fcb);
+        declare fcb     address;
+
+        if open(fcb) > 3 then do;
+                fcbp = fcb;
+                call err$print(.err$notfnd);
+        end;
+
+end opener;
+
+
+closer: procedure(fcb);
+        declare fcb     address;
+
+        if close(fcb) > 3 then do;
+                fcbp = fcb;
+                call err$print(.err$notfnd);
+        end;
+end closer;
+
+maker: procedure(fcb);
+        declare fcb     address;
+
+        flag = make(fcb);
+        if flag > 3 then do;
+                fcbp = fcb;
+                call err$print(.err$msg$make);
+        end;
+
+end maker;
+
+deleter: procedure;
+
+        if (comfcb(8) and 80h) = 80h then return;       /* user 0 file ? */
+
+        if delete(comptr) > 0 then do;
+                fcbp = comptr;
+        end;
+
+end deleter;
+
+
+parser: procedure(fcb$ptr);
+
+        declare fcb$ptr address;
+
+        parse$struc.name$addr = buf$ptr;
+        parse$struc.fcb$addr = fcb$ptr;
+        test$ptr = buf$ptr;
+
+pa1:    buf$ptr = parse(.parse$struc);  /* parse command tail */
+
+pa2:    if buf$ptr = 0ffffh then do;
+                fcbp = test$ptr;
+                call err$print(.err$msg$parse);
+        end;
+
+end parser;
+
+
+copypass$dma: procedure(index);
+        declare index   byte,
+                i       byte;
+
+        do i = 0 to 7;
+                buff(i) = files(index).pass(i);
+        end;
+
+end copypass$dma;
+
+renamer: procedure;
+
+        declare
+                (i,j)           byte,
+                renbuf(32)      byte;
+
+        do i = 12 to 15;
+                j = i + 16;
+                renbuf(i) = 0;
+                renbuf(j) = 0;
+        end;
+
+        do i = 0 to 11;         /* set up buffer */
+                j = i + 16;
+                renbuf(i) = tempfcb(i);
+                renbuf(j) = comfcb(i);
+        end;
+
+re1:    flag = rename(.renbuf);
+
+        if flag > 0 then do;    
+                fcbp = allfcbs(0);              /*GLITCH?????????*/
+        end;
+end renamer;
+
+clearfcb: procedure(fcb);
+
+        declare fcb     address,
+                f       based fcb (1) byte,
+                i       byte;
+
+        do i = 12 to 33;
+                f(i) = 0;
+        end;
+
+end clearfcb;
+
+
+/****************************************************************************/
+
+
+copy: procedure(recsize);
+        declare recsize                 address;
+        declare recs                    based recsize address;
+        declare 
+                i                       byte,
+                flag                    address;
+
+        call setmulti(maxrcd);
+        call mread(fcbp);
+
+co2:            if readflag <> 0 then do;
+                        if readflag = 1 then do;
+                           if nrecs = 0 then  return;    /* EOF */
+                        end;
+                        else call bdoserr;
+                end;
+
+                i = maxrcd;
+                if nrecs <> 0 then do;          /* read less than maxrcd */
+                        call setmulti(nrecs);
+                        i = nrecs;
+                end;
+
+                writeflag = writesq(.tempfcb);
+
+                do while i <> 0;
+                        recs = recs + 128;      /* this is in bytes */
+                        i = i - 1;
+                end;
+                                                /* record count <= 64K */
+                if recs > 0ffffh then call err$print(.err$msg$toobig);
+
+                if nrecs <> 0 then return;
+
+                call mread(fcbp);
+
+                go to co2;
+
+end copy;
+
+
+/*************************************************************************/
+
+
+copy2: procedure(nrcds,skip);
+                                        /* read/write in min(maxrcd,nrcds)
+                                           units. */
+
+        declare nrcds   address,
+                skip    byte,
+                set     byte,
+                savin   address;
+
+        savin = nrcds;
+
+cp20:   if savin > maxrcd then set = maxrcd;
+        else set = savin;
+
+        call setmulti(set);
+        flag = readsq(comptr);                          /* get nrcds units */
+
+cp21:   if skip = 0 then flag = writesq(.tempfcb);     /* while savin > 0 */
+        savin = savin - set;
+
+        if savin = 0 then return;
+
+        if savin > maxrcd then set = maxrcd;
+        else set = savin;
+
+        call setmulti(set);
+        flag = readsq(comptr);
+
+        go to cp21;
+
+end copy2;
+
+
+/****************************************************************************/
+
+
+reopen$temp: procedure;
+        declare i       byte;
+
+        call closer(.tempfcb);
+        call clearfcb(.tempfcb);
+        call opener(.tempfcb);
+
+        call setmulti(2);
+
+        readflag = readsq(.tempfcb);
+
+end reopen$temp;
+
+
+/***************************************************************************/
+
+
+get$off: procedure(xrecs,index);
+        declare index   byte,
+                xrecs   address,
+                i       based xrecs address;
+        declare (temp,sum)      address;
+
+gt0:    temp = offsets(index - 1);
+        sum = temp + i;
+gt1:    if sum < temp then call err$print(.err$msg$toobig);
+
+        offsets(index) = sum;
+
+end get$off;
+
+zapRSX: procedure;
+
+        declare dRSX    based subptr (16) byte,
+                i       byte;
+
+        do i = 0 to 15;
+                dRSX(i) = 0;
+        end;
+
+        subptr = subptr + 16;
+
+end zapRSX;
+
+
+/************************************************************************/
+
+
+addrsx: procedure;
+        declare i               byte,
+                prlptr          address,
+                rsxlen          based prlptr address;
+
+                i = 1;
+next$rsx:       fcbp = allfcbs(i);              /* while i <= incount */
+
+                call setmulti(2);               /* get header */
+                readflag = readsq(fcbp);
+                prlptr = .iobuff(1);            /* get program length */
+ad1:            length$rsx(i) = rsxlen;
+
+                call setmulti(1);
+                readflag = readsq(fcbp);
+
+                if iobuff(15) <> 0 then iobuff(14) = 0ffh;
+                nbank(i) = iobuff(15);          /* only non-banked ? */
+                iobuff(10) = 6;
+                iobuff(12) = 7;
+                iobuff(24) = 0;
+
+                writeflag = writesq(.tempfcb);
+
+                rsxrec = 128;
+                call copy(.rsxrec);
+
+ad2:            totbyte = totbyte + rsxrec;
+
+                i = i + 1;
+
+                if i > incount then go to fini;
+
+                call get$off(.rsxrec,i);
+                go to next$rsx;
+
+fini:   end addrsx;
+
+
+/*****************************************************************************/
+
+
+putSCBcode: procedure(ptrfcb);
+        declare (i,j)   byte,
+                ptrfcb  address,
+                fixup   address,
+                fa      based fixup address;
+
+        if not SCB  and not oldSCB then return;
+
+        totbyte = totbyte + 256;        /* rel to 100h */
+
+        call setdma(.SCBbuff);
+        call setmulti(2);
+
+        if oldscb then i = SCBbuff(23); /* next open slot */
+        else if SCB then do;            /* must initialze buffer with code */
+
+                do i = 0 to 255;
+                        SCBbuff(i) = 0ffh;
+                end;
+
+ps0:            fixup = .SCBcode(1);
+                fa = fa + totbyte;
+                fixup = .SCBcode(19);
+                fa = fa + totbyte;
+
+ps1:            call move(23,.SCBcode,.SCBbuff(0));
+                i = 24;
+        end;
+
+ps2:    if nscbs > 0 then do;
+           do j = 0 to nscbs-1;
+                SCBbuff(i) = soff(j);
+                SCBbuff(i+2) = sval(j);
+                i = i + 3;
+           end;
+        end;
+
+        SCBbuff(23) = i;                /* next available scb init */
+
+ps3:    if oldSCB then 
+                if ptrfcb = comptr then comfcb(32) = comfcb(32) - 2;
+
+        writeflag = writesq(ptrfcb);
+        call setdma(.iobuff);
+
+end putSCBcode;
+
+/***************************************************************************/
+
+
+update$head: procedure;
+        declare (i,j,k)         byte,
+                (olds,temp)     byte;
+
+
+ possub: procedure;
+
+        subptr = .iobuff(16);           /* start of RSX info in header */
+
+        i = 1;                          /* skip old rsx heads */
+        do while i <= old;
+                subptr = subptr + 16;
+                i = i + 1;
+        end;
+end possub;
+
+        /************************************************************/
+
+
+        call possub;                    /* set subptr to end of RSX */
+        head$ptr = .iobuff;
+
+        if not COMonly then do;
+                if build then head.progsize = comsize;
+up1:            k = old;
+
+                do i = 1 to incount;
+                        k = k + 1;
+                        rsx$sub$head.off = offsets(i);
+                        rsx$sub$head.len = length$rsx(i);
+                        rsx$sub$head.NONBANK = nbank(i);
+                        fcbp = allfcbs(i);
+                        do j = 0 to 7;
+                                rsx$sub$head.name(j) = gen$fcb(j + 1);
+                        end;
+
+                        subptr = subptr + 16;
+                end;
+        end;                            /* COMonly... */
+        else head.progsize = comsize;
+
+up2:    if LOAD then head.LOADER = 1;
+        if SCB or oldSCB then call move(2,.totbyte,.iobuff(4));
+
+        tempfcb(32) = 0;                        /* backup CR to re-write rcd */
+
+        writeflag = writesq(.tempfcb);
+        call closer(.tempfcb);
+
+        if not NULL then call deleter;          /* erase old file */
+        call renamer;
+
+end update$head;
+
+
+/***********************************************************************/
+
+
+tear$down: procedure;
+
+                                        /* remove header from file */
+        head$ptr = .iobuff(0);
+        comsize = head.progsize/128;
+
+tr1:    call copy2(comsize,0);          /* copies com to temp */
+
+        call closer(comptr);
+        call closer(.tempfcb);
+                                        /* set up pass if any */
+        if len$pass(0) > 0 then call copypass$dma(0);
+        call deleter;                   /* delete com file*/
+        call renamer;
+
+end tear$down;
+
+
+/***************************************************************************/
+
+create2: procedure;
+
+
+        if not COMonly then do;
+
+                offsets(0) = 256;               /* starting pos in bytes */
+cr4:            call get$off(.comsize,1);
+                call addrsx;                    /* copy RSX to temp */
+        end;
+
+        call putSCBcode(.tempfcb);
+
+        call reopen$temp;
+
+cr5:    old = 0;
+        call update$head;
+
+end create2;
+
+
+/***************************************************************************/
+
+
+create: procedure;
+        declare i       byte;
+
+        do i = 0 to 384;                        /* clear the header buffer */
+                head$buffer(i) = 0;
+        end;
+        do i = 0 to incount;                    /* clear offsets */
+                offsets(i) = 0;
+        end;
+
+        head$ptr = .head$buffer;
+        head.retinst = ret$inst;
+        if not SCB then head.SCBjmp = ret$inst;
+        else head.SCBjmp = 0c3h;
+
+        head.nrsx = incount;
+
+        totbyte = 256;
+        if NULL then do;
+                head$buffer(256) = ret$inst;
+                call setmulti(3);
+        end;
+
+cr1:    call setdma(head$ptr);                  /* move dma to header */
+        writeflag = writesq(.tempfcb);
+        if writeflag > 0 then do;
+                fcbp = .tempfcb;
+                call err$print(.err$msg$write);
+        end;
+
+        call setdma(.iobuff);
+
+        if not NULL then do;
+
+                if readflag <> 1 then do;               /* if size of COM = 1
+                                                           then read in setup
+                                                           found EOF, no need
+                                                           to copy; if flag > 1
+                                                           then setup catches */
+
+                        writeflag = writesq(.tempfcb);  /* first 2 COM rcds */
+
+                        fcbp = comptr;
+                        comsize = 256;
+cr2:                    call copy(.comsize);            /* COM->temp */
+                end;
+                else do;
+                        call setmulti(1);
+                        writeflag = writesq(.tempfcb);
+                        comsize = 128;
+                end;
+        end;
+        else comsize = 128;
+
+        totbyte = totbyte + comsize;
+
+        call create2;
+
+end create;
+
+/*****************************************************************************/
+
+
+SCBget: procedure(skip);
+        declare  skip   byte;
+                                        /* where in record units is beginning
+                                           of SCB initialization code?
+                                           Record numbering is rel to 0 */
+
+                comsize = shr(SCBpos,7) - 4;
+                call copy2(comsize,skip);  /* do not copy SCB code */
+                totbyte = shl(comsize,7);
+
+                readflag = readsq(comptr);
+                call move(256,.iobuff,.SCBbuff);
+
+end SCBget;
+
+/*****************************************************************************/
+
+
+remover: procedure;
+                                        /* remove old RSX in gencommed file */
+
+getname: procedure(j);
+
+        declare (j,k)   byte;
+
+        do k = 0 to 7;
+                new(j).name(k) = rsx$sub$head.name(k);
+        end;
+end getname;
+
+
+        declare (i,j,k,l)       byte,
+                zeroes          based subptr (1) byte,
+                tot             address;
+
+
+        fcbp = comptr;
+rp1:    subptr = .iobuff(16);                   /* prepare to collapse header..
+                                                   compute actual lengths,
+                                                   & save start bit map */
+        nextptr = .iobuff(32);
+        do j = 1 to old;
+                newlen(j) = rsx$sub$head.len;   /* save len & name */
+                call getname(j);
+                actlen(j) = next.off - rsx$sub$head.off;
+                nbank(j) = rsx$sub$head.NONBANK;
+
+                subptr = nextptr;
+                nextptr = nextptr + 16;
+        end;
+        actlen(old) = 0;
+
+rp2:    subptr = .iobuff(16);                   /* start copying current COM
+                                                   file, skipping dup entries*/
+        writeflag = writesq(.tempfcb);          /* header */
+        tot = shr(head.progsize,7);             /* # 80h units to copy */
+        call copy2(tot,0);                      /* copies COM to temp */
+        tot = tot + 2;
+
+rp3:    j = 1;                                  /* now copy each valid RSX */
+        do i = 1 to old;
+                comsize = shr(actlen(i),7);     /* convert to 80h units */
+                if which(i) = i then do;        /* duplicate */
+                        if i <> old then        /* don't skip last */
+                          call copy2(comsize,1);
+                end;
+                else do;                        /* copy RSX & setup new offsets
+                                                   lengths */
+rpx:                    newoff(j) = shl(tot,7);
+                        nbank(j) = nbank(i);
+                                                /* if last RSX then we have no
+                                                   way of knowing the actual 
+                                                   length...so write until EOF,
+                                                   else write comsize # rcds */
+                        if i = old then call copy(.tot);
+                        else do;
+                                tot = tot + comsize;
+                                call copy2(comsize,0);
+                        end;
+
+                        newlen(j) = newlen(i);          /* i > j always */
+                        do k = 0 to 7;
+                                new(j).name(k) = new(i).name(k);
+                        end;
+                        j = j + 1;
+                end;
+        end;
+
+                                                /* now rebuild header */
+        call reopen$temp;
+
+        j = j - 1;
+        subptr = .iobuff(16);
+        do i = 1 to j;                     /* j = # good RSX */
+                rsx$sub$head.off = newoff(i);
+                rsx$sub$head.len = newlen(i);
+                rsx$sub$head.NONBANK = nbank(i);
+                nbank(i) = 0;
+                do k = 0 to 7;
+                        rsx$sub$head.name(k) = new(i).name(k);
+                end;
+                subptr = subptr + 16;
+        end;
+
+        do i = j + 1 to old;                    /* clear out header */
+                call zapRSX;
+        end;
+
+rp4:    head.nrsx = j;
+        old = j;
+
+        tempfcb(32) = 0;                        /* CR = 0 */
+        flag = writesq(.tempfcb);
+
+        call closer(.tempfcb);                  /* close and rename */
+        call deleter;                           /* delete com file */
+        call renamer;
+
+        call clearfcb(comptr);
+        call clearfcb(.tempfcb);
+        call maker(.tempfcb);
+rp9:    call opener(comptr);                    /* prepare return to concat */
+rp7:    readflag = readsq(comptr);
+
+end remover;
+
+
+/***************************************************************************/
+
+
+dup$RSX: procedure byte;
+                                        /* check for duplications in header and
+                                           input.  Remove old entry if found,
+                                           or if all are duplicated then strip
+                                           everything off. */
+
+        declare (i,j,k,l)       byte,
+                temp            address;
+
+        subptr = .iobuff(16);
+        deletes = 0;
+
+        do i = 1 to old;
+                which(i) = 0;
+
+                do j = 1 to incount;            /* compare names */
+                        fcbp = allfcbs(j);
+                        do k = 0 to 7;
+                                if rsx$sub$head.name(k) <> gen$fcb(k+1)
+                                        then go to dp1;
+                        end;
+                                                /* duplicate RSX's */
+                        which(i) = i;
+                        deletes = deletes + 1;
+
+                        call e$print1(.err$msg$dup2);
+                        call e$print2;
+
+                        go to dp2;              /* no need to scan rest of
+                                                   input names- checked input
+                                                   for dups already */
+dp1:            end;
+dp2:            subptr = subptr + 16;
+        end;
+
+        if deletes = 0 then return(false);
+dp4:    if deletes >= old then do;              /* replace all ? */
+                subptr = .iobuff(16);
+                do i = 1 to old;
+                        call zapRSX;
+                end;
+
+                temp = head.progsize;           /* get size of COM in rcds */
+
+                if oldSCB then do;
+                        call SCBget(1);
+                        comfcb(32) = 0;
+                        call setmulti(2);
+                        readflag = readsq(comptr);
+                end;
+
+                comsize = shr(temp,7);
+                writeflag = writesq(.tempfcb);  /* copy header to temp */
+                call copy2(comsize,0);          /* copy COM file */
+
+                comsize = temp;                 /* back to byte count */
+                call create2;
+
+                return(true);
+        end;
+
+        call remover;                           /* selective replace */
+
+        return(false);                          /* return and add new RSX */
+
+end dup$RSX;
+
+
+/***************************************************************************/
+
+
+concat: procedure;
+                                        /* add new, replace old */
+
+        declare i       byte;
+
+        head$ptr = .iobuff;
+        if (old := head.nrsx) <> 0 then do;
+yy:             if dup$RSX then return;         /* true  : did a create
+                                                   false : add new RSX,
+                                                           might have collapsed
+                                                           old header...*/
+
+        end;
+
+        head.nrsx = head.nrsx + incount;
+        fcbp = comptr;
+
+cc1:    if head.nrsx > 15 then
+                call err$print(.err$msg$rsx$slot);
+
+        flag = writesq(.tempfcb);       /* write header */
+
+        if oldSCB then call SCBget(0);
+        else do;                        /* no SCB...copy to EOF */
+                comsize = 256;
+                call copy(.comsize);
+        end;
+
+                                        /* comsize = size of file in bytes
+                                           +1 = offset of first new RSX */
+        offsets(0) = 0;
+        call getoff(.comsize,1);
+
+        totbyte = comsize;
+
+        call closer(fcbp);              /*close old file */
+
+        call addrsx;
+
+        call putSCBcode(.tempfcb);
+
+        call reopen$temp;
+        call update$head;
+
+end concat;
+
+
+/***********************************************************************/
+
+setSCB: procedure;
+
+                                /* read in gencommed file and set scb values
+                                   from command line */
+
+        head$ptr = .iobuff;
+
+        fcbp = comptr;
+        totbyte = 2;
+
+        if LOAD then do;                /* write out loader flag */
+                if oldSCB or not SCB then do;
+                        iobuff(13) = 1;
+                        comfcb(32) = 0;
+                        writeflag = writesq(.comfcb);
+                        if writeflag <> 0 then call err$print(.err$msg$write);
+                        totbyte = 0;
+                end;
+        end;
+
+        if SCB then do;
+                if oldSCB then call SCBget(1);
+                else do;
+                     if readflag <> 1 then do;          /* 1 rcd com file ? */
+                        call setmulti(32);
+                        call mread(comptr);
+                        do while readflag <> 1;
+                                totbyte = totbyte + nrecs;
+                                call mread(comptr);
+                        end;
+                     end;
+
+                        totbyte = totbyte + nrecs;
+                        totbyte= shl(totbyte,7);        /* change to bytes */
+                end;
+
+                call putSCBcode(comptr);
+
+                if not oldSCB then do;                  /* must update header
+                                                           for new SCB's */
+                        call closer(comptr);
+                        call setmulti(1);
+                        call clearfcb(comptr);
+                        call opener(comptr);
+                        readflag = readsq(comptr);
+                        call move(2,.totbyte,.iobuff(4));
+                        if LOAD then iobuff(13) = 1;
+                        iobuff(3) = ret$inst;
+                        comfcb(32) = 0;
+                        writeflag = writesq(.comfcb);
+                        if writeflag <> 0 then call err$print(.err$msg$write);
+                end;
+        end;
+
+        call closer(comptr);
+
+end setSCB;
+
+
+/***********************************************************************/
+
+
+setuper: procedure;
+
+                                /*      1. get each file (process passwords)
+                                        2. check for proper type
+                                        3. check for duplicate RSX on input
+                                        4. open files and make temp
+                                */
+
+        declare (i,j,k,l)       byte;
+
+init:   procedure;
+
+        fcbp,allfcbs(i) = .fcbs(i).file(0);
+        do j = 0 to 32;
+                fcbs(i).file(j) = 0;
+        end;
+end init;
+
+RSX$errprint: procedure;
+
+
+        call e$print1(.('This file was not used.',0));
+        call e$print2;
+        call crlf;
+
+        which(deletes) = i;
+        deletes = deletes + 1;
+
+end RSX$errprint;
+
+fill$type: procedure(typea);
+        declare typea   address,
+                type    based typea (1) byte;
+
+        k = 0;
+        do l = 9 to 11;
+                gen$fcb(l) = type(k);
+                k = k + 1;
+        end;
+
+end fill$type;
+
+
+checktype: procedure(typea) byte;
+        declare typea   address,
+                type    based typea (1) byte;
+
+        if gen$fcb(9) = BLANK then              /* any type ? */
+                call fill$type(typea);
+
+        else do;                                /* check input type */
+                k = 0;
+                do l = 9 to 11;
+                        if gen$fcb(l) <> type(k) then return(false);
+                        k = k + 1;
+                end;
+        end;
+
+        return(true);
+
+end checktype;
+
+
+
+        buf$ptr = .buff(1);                     /* get files */
+        i = 0;
+        do while buf$ptr <> 0;
+                call init;
+                call parser(fcbp);
+
+                if optmark = '[' then go to sb1;/* no more names, options */
+
+                                                /* any PASSWORDS !!!! */
+                k = gen$fcb(26);                /* length of password */
+                if k > 0 then do;
+                        l = 16;                 /* start of password */
+                        do j = 0 to k - 1;
+                                files(i).pass(j) = gen$fcb(l);
+                                l = l + 1;
+                        end;
+                        len$pass(i) = k;
+                end;
+                i = i + 1;
+        end;
+
+sb1:    incount = i - 1;
+
+        if optmark = '[' then do;
+                incount = i;
+                call getoption;
+        end;
+
+        comptr = allfcbs(0);
+                                                        /* check COM */
+sb2:            fcbp = comptr;
+                if not checktype(.comtype) then do;     /* bad input */
+                  if not NULL then do;    
+                        call print(.err$msg$first);
+                        call terminate;
+                  end;
+                end;
+
+                if len$pass(0) > 0 then call copypass$dma(0);
+                if open(fcbp) > 3 then do;             /* something awry */
+                  if not NULL then do;
+                        call err$print(.err$notfnd);
+                        call e$print1(.err$msg$first);
+                        call terminate;
+                  end;
+                end;
+                else
+                if NULL then 
+                if (comfcb(8) and 80h) <> 80h then
+                        call err$print(.err$NULL); /* NULL and COM file*/
+
+                if NULL then do;
+sb3:            i = (incount := incount + 1);   /* move fcbs up */
+                allfcbs(i) = .fcbs(i);
+                do j = 0 to incount - 1;
+                        do k = 0 to 32;
+                                fcbs(i).file(k) = fcbs(i-1).file(k);
+                        end;
+                        i = i - 1;
+                end;
+                                                /* dummy COM name = 1st RSX */
+                call fill$type(.comtype);
+                fcbp = allfcbs(1);              /* restore type to RSX */
+                call fill$type(.rsxtype);
+        end;
+
+sb4:   if incount > 0 then do;
+                deletes = 0;                    /* now check RSX's */
+                do i = 1 to incount;
+                        fcbp = allfcbs(i);      /* point to RSX fcb */
+
+                        if not checktype(.rsxtype) then do;
+                                call e$print1(.err$msg$rsxval);
+                                call RSX$errprint;
+                        end;
+
+                        else do;                /* try to open file */
+                                if len$pass(i) > 0 then
+                                   call copypass$dma(i);
+
+                                flag = open(fcbp);
+                                if flag > 3 then do;
+                                        call e$print1(.err$notfnd);
+                                        call RSX$errprint;
+                                end;
+                                else            /* Duplicate input RSX ? */
+                                     do j = i+1 to incount;
+                                        test$ptr = allfcbs(j);
+                                        do l = 1 to 8;
+                                           if genfcb(l) <> testfcb(l)
+                                                then go to sb5;
+                                        end;
+                                        call e$print1(.err$msg$dup1);
+                                        call RSX$errprint;
+sb5:                                 end;
+                        end;
+                end;                            /* ends i = incount...*/
+
+                                                /* have any RSX's left? */
+                if deletes >= incount then do;
+                   call print(.err$msg$no$rsx);
+                   call terminate;
+                end;
+
+                i = 0;
+sb6:            do while i < deletes;   /* collapse allfcbs */
+                        j = which(i);
+                        incount = incount - 1;
+        
+                        do l = j to incount;
+                                allfcbs(l) = allfcbs(l + 1);
+                        end;
+
+                        i = i + 1;
+                end;
+
+                rsx = true;
+        end;                            /* if incount> 0...*/
+
+sb7:
+        call setdma(.iobuff);
+        call setmulti(2);                       /* read header if any */
+
+        if not NULL then do;
+                fcbp = comptr;
+                call mread(comptr);
+                if readflag > 1 then call err$print(.err$msg$read);
+
+                                                /* is this already gencommed*/
+sb8:            if iobuff(0) = ret$inst then do;
+                                                /* first byte = return */
+                        if rsx then replace = true;
+                        else do;
+                                if SCB or LOAD then punchSCB = true;
+                                else revert = true;
+                        end;
+
+                                                /* do we need to move old SCB
+                                                   initialization code ? */
+                        if iobuff(3) <> 0c9h then do;
+                                oldSCB = true;
+                                call move(2,.iobuff(4),.SCBpos);
+                        end;
+                end;
+                else do;
+                        if rsx then build = true;
+                        else if SCB or LOAD then COMonly = true;
+                        else call err$print(.errSTRIP);
+                end;
+        end;
+        else build = true;
+
+sb9:    if not punchSCB then do;
+                call clearfcb(.tempfcb);
+                flag = delete(.tempfcb);
+                tempfcb(0) = comfcb(0);         /* init temp drive */
+sb0:            call maker(.tempfcb);
+        end;
+
+end setuper;
+
+
+
+/*                      MAIN PROGRAM                    */
+
+
+plm:
+
+        testvers = get$version;
+        if high(testvers) = 1 then go to err$vers;
+        if low(testvers) < 30h then go to err$vers;
+
+        call return$errors(254);
+
+        call setuper;
+
+        if revert then call tear$down;
+        else
+        if build then call create;
+        else
+        if punchSCB then call setscb;
+        else if COMonly then call create;
+        else call concat;
+
+        call closeall;
+
+        call print(.('GENCOM completed.',0));
+        call terminate;
+
+err$vers:
+        call print(.ERRORM);
+        call printx(.('Requires CP/M 3 or higher.',0));
+        call terminate;
+
+
+end gencomer;
+

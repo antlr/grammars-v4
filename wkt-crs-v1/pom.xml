@@ -38,7 +38,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>file_</entryPoint>
+					<entryPoint>propsFile</entryPoint>
 					<grammarName>wktcrsv1</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
