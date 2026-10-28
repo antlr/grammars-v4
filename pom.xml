@@ -293,6 +293,7 @@
 				<module>lark</module>
                 <module>lazyk</module>
 				<module>lcc</module>
+				<module>lean</module>
 				<module>less</module>
                 <module>lil</module>
 				<module>limbo</module>

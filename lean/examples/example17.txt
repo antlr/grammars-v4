@@ -1,0 +1,3 @@
+def greet : IO Unit := do
+  let name := "Lean"
+  IO.println name
