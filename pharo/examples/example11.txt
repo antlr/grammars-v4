@@ -1,0 +1,5 @@
+| a b total |
+a := 3.
+b := 4.
+total := a + b.
+Transcript show: total printString; cr.

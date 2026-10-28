@@ -1,0 +1,4 @@
+Point subclass: #Point3D
+    instanceVariableNames: 'z'
+    classVariableNames: ''
+    category: 'Geometry-3D'

@@ -1,0 +1,3 @@
+| pairs |
+pairs := { 1 -> 'one'. 2 -> 'two'. 3 -> 'three' }.
+pairs do: [:each | Transcript showCr: each key printString, ' -> ', each value].
