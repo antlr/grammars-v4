@@ -6829,14 +6829,20 @@ case_statement
     ;
 
 simple_case_statement
-    : label_declaration? ck1 = CASE expression case_when_part_statement+ case_else_part_statement? END CASE? label_name?
+    : label_declaration? ck1 = CASE expression simple_case_when_part_statement+ case_else_part_statement? END CASE? label_name?
     ;
 
 searched_case_statement
-    : label_declaration? ck1 = CASE case_when_part_statement+ case_else_part_statement? END CASE? label_name?
+    : label_declaration? ck1 = CASE searched_case_when_part_statement+ case_else_part_statement? END CASE? label_name?
     ;
 
-case_when_part_statement
+simple_case_when_part_statement
+    : WHEN (expression | dangling_predicate) (
+        ',' (expression | dangling_predicate)
+    )* THEN seq_of_statements
+    ;
+
+searched_case_when_part_statement
     : WHEN expression THEN seq_of_statements
     ;
 
@@ -6844,6 +6850,16 @@ case_else_part_statement
     : ELSE seq_of_statements
     ;
 
+dangling_predicate
+    : relational_operator expression
+    | NOT? (
+        IN in_elements
+        | BETWEEN between_elements
+        | (LIKE | LIKEC | LIKE2 | LIKE4) concatenation (ESCAPE concatenation)?
+        | (MEMBER | SUBMULTISET) OF? concatenation
+    )
+    | IS NOT? logical_operation
+    ;
 
 // CASE expression
 case_expression
@@ -6852,14 +6868,20 @@ case_expression
     ;
 
 simple_case_expression
-    : ck1 = CASE expression case_when_part_expression+ case_else_part_expression? END CASE?
+    : ck1 = CASE expression simple_case_when_part_expression+ case_else_part_expression? END CASE?
     ;
 
 searched_case_expression
-    : ck1 = CASE case_when_part_expression+ case_else_part_expression? END CASE?
+    : ck1 = CASE searched_case_when_part_expression+ case_else_part_expression? END CASE?
     ;
 
-case_when_part_expression
+simple_case_when_part_expression
+    : WHEN (expression | dangling_predicate) (
+        ',' (expression | dangling_predicate)
+    )* THEN expression
+    ;
+
+searched_case_when_part_expression
     : WHEN expression THEN expression
     ;
 
