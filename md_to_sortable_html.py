@@ -2,6 +2,7 @@
 """Convert a Markdown file with tables into an HTML page.
 The last (largest) table is made sortable; earlier tables are static."""
 import re, sys, html as html_mod
+from urllib.parse import quote
 
 def md_inline(s):
     """Convert basic Markdown inline formatting to HTML."""
@@ -73,6 +74,13 @@ def is_numeric_col(rows, i):
     numeric = [v for v in vals if v is not None]
     return len(numeric) > len(vals) / 2
 
+def render_cell(tbl, column, value):
+    if (column == 0 and tbl['heading'] == 'Results' and
+            tbl['headers'][0] == 'Grammar'):
+        url = 'https://github.com/antlr/grammars-v4/tree/master/' + quote(value, safe='/')
+        return f'<a href="{html_mod.escape(url, quote=True)}">{md_inline(value)}</a>'
+    return md_inline(value)
+
 def render_static_table(tbl):
     out = ''
     if tbl['heading']:
@@ -81,7 +89,8 @@ def render_static_table(tbl):
     out += ''.join(f'<th>{md_inline(c)}</th>' for c in tbl['headers'])
     out += '</tr></thead>\n<tbody>\n'
     for row in tbl['rows']:
-        out += '<tr>' + ''.join(f'<td style="text-align:left">{md_inline(c)}</td>' for c in row) + '</tr>\n'
+        out += '<tr>' + ''.join(f'<td style="text-align:left">{render_cell(tbl, i, c)}</td>'
+                                  for i, c in enumerate(row)) + '</tr>\n'
     out += '</tbody>\n</table>\n'
     return out
 
@@ -99,7 +108,8 @@ def render_sortable_table(tbl, table_id):
                    for i, hdr in enumerate(headers))
     out += '</tr></thead>\n<tbody>\n'
     for row in rows:
-        out += '<tr>' + ''.join(f'<td>{md_inline(c)}</td>' for c in row) + '</tr>\n'
+        out += '<tr>' + ''.join(f'<td>{render_cell(tbl, i, c)}</td>'
+                                  for i, c in enumerate(row)) + '</tr>\n'
     out += '</tbody>\n</table>\n'
 
     out += f"""<script>
