@@ -5830,7 +5830,7 @@ record_type_def
     ;
 
 field_spec
-    : column_name type_spec? (NOT NULL_)? default_value_part?
+    : column_name type_spec? (NOT? NULL_)? default_value_part?
     ;
 
 ref_cursor_type_def
