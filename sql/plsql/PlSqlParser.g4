@@ -6546,7 +6546,7 @@ insert_into_clause
 
 values_clause
     : VALUES (
-        REGULAR_ID
+        record_name
         | '(' expressions_ ')' (COMMA '(' expressions_ ')')*
         | collection_expression
     )
