@@ -6695,7 +6695,7 @@ logical_operation
         | A_LETTER SET
         | EMPTY_
         | OF TYPE? '(' ONLY? type_spec (',' type_spec)* ')'
-        | JSON (FORMAT JSON)? (STRICT | LAX)? ((WITH | WITHOUT) UNIQUE KEYS)?
+        | JSON (FORMAT JSON)? (STRICT | LAX | '(' (STRICT | LAX) ')')? ((WITH | WITHOUT) UNIQUE KEYS)?
     )
     ;
 
