@@ -6937,7 +6937,7 @@ json_function
     )? STRICT? (WITH UNIQUE KEYS)? ')'
     | JSON_QUERY '(' expression (FORMAT JSON)? ',' CHAR_STRING json_query_returning_clause json_query_wrapper_clause? json_query_on_error_clause?
         json_query_on_empty_clause? ')'
-    | JSON_SERIALIZE '(' CHAR_STRING (RETURNING json_query_return_type)? PRETTY? ASCII? TRUNCATE? (
+    | JSON_SERIALIZE '(' concatenation (RETURNING json_query_return_type)? PRETTY? ASCII? TRUNCATE? (
         (NULL_ | ERROR | EMPTY_ (ARRAY | OBJECT)) ON ERROR
     )? ')'
     | JSON_TRANSFORM '(' expression ',' json_transform_op (',' json_transform_op)* ')'
