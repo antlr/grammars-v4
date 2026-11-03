@@ -102,7 +102,8 @@ export abstract class PlSqlParserBase extends Parser {
 
   isNotStartOfJoin(): boolean {
     const lt1 = (this.tokenStream as CommonTokenStream).LT(1);
-    if (lt1!.type == PlSqlLexer.INNER ||
+    if (lt1!.type == PlSqlLexer.JOIN ||
+        lt1!.type == PlSqlLexer.INNER ||
         lt1!.type == PlSqlLexer.CROSS ||
         lt1!.type == PlSqlLexer.NATURAL ||
         lt1!.type == PlSqlLexer.PARTITION ||

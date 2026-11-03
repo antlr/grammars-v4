@@ -96,7 +96,8 @@ public abstract class PlSqlParserBase : Parser
 
     public bool isNotStartOfJoin() {
         var lt1 = (this.InputStream as CommonTokenStream).LT(1);
-        if (lt1.Type == PlSqlParser.INNER ||
+        if (lt1.Type == PlSqlParser.JOIN ||
+            lt1.Type == PlSqlParser.INNER ||
             lt1.Type == PlSqlParser.CROSS ||
             lt1.Type == PlSqlParser.NATURAL ||
             lt1.Type == PlSqlParser.PARTITION ||

@@ -116,7 +116,8 @@ func (p *PlSqlParserBase) IsNotNumericFunction() bool {
 func (p *PlSqlParserBase) isNotStartOfJoin() bool {
     stream := p.GetTokenStream().(*antlr.CommonTokenStream)
     lt1 := stream.LT(1)
-    if lt1.GetTokenType() == PlSqlParserINNER ||
+    if lt1.GetTokenType() == PlSqlParserJOIN ||
+       lt1.GetTokenType() == PlSqlParserINNER ||
        lt1.GetTokenType() == PlSqlParserCROSS ||
        lt1.GetTokenType() == PlSqlParserNATURAL ||
        lt1.GetTokenType() == PlSqlParserPARTITION ||

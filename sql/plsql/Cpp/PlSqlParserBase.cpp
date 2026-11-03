@@ -53,7 +53,8 @@ bool PlSqlParserBase::IsNotNumericFunction() {
 bool PlSqlParserBase::isNotStartOfJoin() {
     auto* stream = dynamic_cast<antlr4::CommonTokenStream*>(getTokenStream());
     auto* lt1 = stream->LT(1);
-    if (lt1->getType() == PlSqlParser::INNER ||
+    if (lt1->getType() == PlSqlParser::JOIN ||
+        lt1->getType() == PlSqlParser::INNER ||
         lt1->getType() == PlSqlParser::CROSS ||
         lt1->getType() == PlSqlParser::NATURAL ||
         lt1->getType() == PlSqlParser::PARTITION ||
