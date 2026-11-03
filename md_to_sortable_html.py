@@ -75,8 +75,8 @@ def is_numeric_col(rows, i):
     return len(numeric) > len(vals) / 2
 
 def render_cell(tbl, column, value):
-    if (column == 0 and tbl['heading'] == 'Results' and
-            tbl['headers'][0] == 'Grammar'):
+    if (tbl['heading'] == 'Results' and
+            column < len(tbl['headers']) and tbl['headers'][column] == 'Grammar'):
         url = 'https://github.com/antlr/grammars-v4/tree/master/' + quote(value, safe='/')
         return f'<a href="{html_mod.escape(url, quote=True)}">{md_inline(value)}</a>'
     return md_inline(value)
@@ -97,6 +97,7 @@ def render_static_table(tbl):
 def render_sortable_table(tbl, table_id):
     headers = tbl['headers']
     rows = tbl['rows']
+    numbered = bool(headers and headers[0] == 'Number')
     numeric_cols_py = [is_numeric_col(rows, i) for i in range(len(headers))]
     numeric_cols_js = '[' + ','.join('true' if v else 'false' for v in numeric_cols_py) + ']'
 
@@ -104,8 +105,11 @@ def render_sortable_table(tbl, table_id):
     if tbl['heading']:
         out += f'<h3>{h(tbl["heading"])}</h3>\n'
     out += f'<table id="{table_id}">\n<thead><tr>\n'
-    out += ''.join(f'  <th onclick="sortTable(\'{table_id}\',{i})">{h(hdr)}</th>\n'
-                   for i, hdr in enumerate(headers))
+    for i, hdr in enumerate(headers):
+        if numbered and i == 0:
+            out += f'  <th class="row-number">{h(hdr)}</th>\n'
+        else:
+            out += f'  <th onclick="sortTable(\'{table_id}\',{i})">{h(hdr)}</th>\n'
     out += '</tr></thead>\n<tbody>\n'
     for row in rows:
         out += '<tr>' + ''.join(f'<td>{render_cell(tbl, i, c)}</td>'
@@ -115,6 +119,7 @@ def render_sortable_table(tbl, table_id):
     out += f"""<script>
 (function() {{
   const NUM = {numeric_cols_js};
+  const NUMBERED = {str(numbered).lower()};
   let col = -1, dir = 1;
   function parseVal(s, num) {{
     s = s.trim();
@@ -124,6 +129,7 @@ def render_sortable_table(tbl, table_id):
     return m ? parseFloat(m[1]) : -Infinity;
   }}
   window.sortTable = function(id, c) {{
+    if (NUMBERED && c === 0) return;
     const tbl = document.getElementById(id);
     const ths = tbl.querySelectorAll('th');
     dir = (col === c) ? -dir : 1;
@@ -136,7 +142,10 @@ def render_sortable_table(tbl, table_id):
       const bv = parseVal(b.cells[c].textContent, NUM[c]);
       return av < bv ? -dir : av > bv ? dir : 0;
     }});
-    rs.forEach(r => tb.appendChild(r));
+    rs.forEach((r, i) => {{
+      tb.appendChild(r);
+      if (NUMBERED) r.cells[0].textContent = String(i + 1);
+    }});
   }};
 }})();
 </script>
@@ -161,8 +170,8 @@ out = f"""<!DOCTYPE html>
   table {{ border-collapse: collapse; font-size: 0.85em; margin-bottom: 1.5em; }}
   th, td {{ border: 1px solid #ccc; padding: 4px 10px; white-space: nowrap; }}
   th {{ background: #eef; }}
-  #perf-table th {{ cursor: pointer; user-select: none; }}
-  #perf-table th:hover {{ background: #ccf; }}
+  #perf-table th:not(.row-number) {{ cursor: pointer; user-select: none; }}
+  #perf-table th:not(.row-number):hover {{ background: #ccf; }}
   th.asc::after {{ content: " \\25B2"; }}
   th.desc::after {{ content: " \\25BC"; }}
   tr:nth-child(even) td {{ background: #f7f7f7; }}

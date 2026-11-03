@@ -295,7 +295,8 @@ do
         action_count=$(printf '%s\n' "$action_counts" |
             awk -F: 'NF > 1 && $NF ~ /^[0-9]+$/ { sum += $NF } END { print sum+0 }')
 
-        table_rows+=("| ${testname} | ${pt_stat} | ${ot_stat} | ${tt_stat} | ${tps_stat} | ${warm_tps_stat} | ${speedup_stat} | ${ambiguity_count} | ${action_count} |")
+        row_number=$((${#table_rows[@]} + 1))
+        table_rows+=("| ${row_number} | ${testname} | ${pt_stat} | ${ot_stat} | ${tt_stat} | ${tps_stat} | ${warm_tps_stat} | ${speedup_stat} | ${ambiguity_count} | ${action_count} |")
         popd > /dev/null
     done
     popd > /dev/null
@@ -310,6 +311,7 @@ if [ ${#table_rows[@]} -gt 0 ]; then
 
 | Label | Description |
 |---|---|
+| `Number` | Current row position in the Results table |
 | `PT` | **Parse time** — sum of the parse-only time across all input files |
 | `OT` | **Overhead time** — `TT − PT`; time spent on file I/O, lexer/parser construction, and post-parse work |
 | `TT` | **Total time** — overall wall-clock time for the entire run |
@@ -320,8 +322,8 @@ if [ ${#table_rows[@]} -gt 0 ]; then
 ### Results
 
 EOF
-        echo "| Grammar | PT (s) | OT (s) | TT (s) | PR (t/s) | Post-warmup PR (t/s) | Post-warmup Speed Up | Ambiguities | Actions |"
-        echo "|---------|--------|--------|--------|-----|-----------------|----------------------|-------------|---------|"
+        echo "| Number | Grammar | PT (s) | OT (s) | TT (s) | PR (t/s) | Post-warmup PR (t/s) | Post-warmup Speed Up | Ambiguities | Actions |"
+        echo "|--------|---------|--------|--------|--------|-----|-----------------|----------------------|-------------|---------|"
         for row in "${table_rows[@]}"; do
             echo "$row"
         done
