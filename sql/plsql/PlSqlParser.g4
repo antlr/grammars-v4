@@ -7912,6 +7912,7 @@ regular_id
     | CONSTRUCTOR
     | CUSTOMDATUM
     | CASESENSITIVE
+    | COMPRESSION
     | COUNTED
     | DATE
     | DECIMAL
