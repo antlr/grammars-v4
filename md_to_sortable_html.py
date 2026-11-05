@@ -2,6 +2,7 @@
 """Convert a Markdown file with tables into an HTML page.
 The last (largest) table is made sortable; earlier tables are static."""
 import re, sys, html as html_mod
+from urllib.parse import quote
 
 def md_inline(s):
     """Convert basic Markdown inline formatting to HTML."""
@@ -30,6 +31,7 @@ h = html_mod.escape
 
 # Collect title and all tables {headers, rows, heading}
 title = ""
+metadata = []
 tables = []       # list of dicts: {heading, headers, rows}
 cur_heading = ""
 cur_headers = None
@@ -40,6 +42,9 @@ def flush():
         tables.append({'heading': cur_heading, 'headers': cur_headers, 'rows': list(cur_rows)})
 
 for line in lines:
+    if line.startswith(('Git commit: ', 'Git tag: ')):
+        metadata.append(line)
+        continue
     if re.match(r'^#{1,6}\s', line):
         flush()
         cur_headers = None
@@ -73,6 +78,13 @@ def is_numeric_col(rows, i):
     numeric = [v for v in vals if v is not None]
     return len(numeric) > len(vals) / 2
 
+def render_cell(tbl, column, value):
+    if (tbl['heading'] == 'Results' and
+            column < len(tbl['headers']) and tbl['headers'][column] == 'Grammar'):
+        url = 'https://github.com/antlr/grammars-v4/tree/master/' + quote(value, safe='/')
+        return f'<a href="{html_mod.escape(url, quote=True)}">{md_inline(value)}</a>'
+    return md_inline(value)
+
 def render_static_table(tbl):
     out = ''
     if tbl['heading']:
@@ -81,13 +93,15 @@ def render_static_table(tbl):
     out += ''.join(f'<th>{md_inline(c)}</th>' for c in tbl['headers'])
     out += '</tr></thead>\n<tbody>\n'
     for row in tbl['rows']:
-        out += '<tr>' + ''.join(f'<td style="text-align:left">{md_inline(c)}</td>' for c in row) + '</tr>\n'
+        out += '<tr>' + ''.join(f'<td style="text-align:left">{render_cell(tbl, i, c)}</td>'
+                                  for i, c in enumerate(row)) + '</tr>\n'
     out += '</tbody>\n</table>\n'
     return out
 
 def render_sortable_table(tbl, table_id):
     headers = tbl['headers']
     rows = tbl['rows']
+    numbered = bool(headers and headers[0] == 'Number')
     numeric_cols_py = [is_numeric_col(rows, i) for i in range(len(headers))]
     numeric_cols_js = '[' + ','.join('true' if v else 'false' for v in numeric_cols_py) + ']'
 
@@ -95,16 +109,21 @@ def render_sortable_table(tbl, table_id):
     if tbl['heading']:
         out += f'<h3>{h(tbl["heading"])}</h3>\n'
     out += f'<table id="{table_id}">\n<thead><tr>\n'
-    out += ''.join(f'  <th onclick="sortTable(\'{table_id}\',{i})">{h(hdr)}</th>\n'
-                   for i, hdr in enumerate(headers))
+    for i, hdr in enumerate(headers):
+        if numbered and i == 0:
+            out += f'  <th class="row-number">{h(hdr)}</th>\n'
+        else:
+            out += f'  <th onclick="sortTable(\'{table_id}\',{i})">{h(hdr)}</th>\n'
     out += '</tr></thead>\n<tbody>\n'
     for row in rows:
-        out += '<tr>' + ''.join(f'<td>{md_inline(c)}</td>' for c in row) + '</tr>\n'
+        out += '<tr>' + ''.join(f'<td>{render_cell(tbl, i, c)}</td>'
+                                  for i, c in enumerate(row)) + '</tr>\n'
     out += '</tbody>\n</table>\n'
 
     out += f"""<script>
 (function() {{
   const NUM = {numeric_cols_js};
+  const NUMBERED = {str(numbered).lower()};
   let col = -1, dir = 1;
   function parseVal(s, num) {{
     s = s.trim();
@@ -114,6 +133,7 @@ def render_sortable_table(tbl, table_id):
     return m ? parseFloat(m[1]) : -Infinity;
   }}
   window.sortTable = function(id, c) {{
+    if (NUMBERED && c === 0) return;
     const tbl = document.getElementById(id);
     const ths = tbl.querySelectorAll('th');
     dir = (col === c) ? -dir : 1;
@@ -126,7 +146,10 @@ def render_sortable_table(tbl, table_id):
       const bv = parseVal(b.cells[c].textContent, NUM[c]);
       return av < bv ? -dir : av > bv ? dir : 0;
     }});
-    rs.forEach(r => tb.appendChild(r));
+    rs.forEach((r, i) => {{
+      tb.appendChild(r);
+      if (NUMBERED) r.cells[0].textContent = String(i + 1);
+    }});
   }};
 }})();
 </script>
@@ -134,6 +157,8 @@ def render_sortable_table(tbl, table_id):
     return out
 
 body = ''
+if metadata:
+    body += ''.join(f'<p>{md_inline(line)}</p>\n' for line in metadata)
 for i, tbl in enumerate(tables):
     if i == sortable_idx:
         body += render_sortable_table(tbl, 'perf-table')
@@ -151,8 +176,8 @@ out = f"""<!DOCTYPE html>
   table {{ border-collapse: collapse; font-size: 0.85em; margin-bottom: 1.5em; }}
   th, td {{ border: 1px solid #ccc; padding: 4px 10px; white-space: nowrap; }}
   th {{ background: #eef; }}
-  #perf-table th {{ cursor: pointer; user-select: none; }}
-  #perf-table th:hover {{ background: #ccf; }}
+  #perf-table th:not(.row-number) {{ cursor: pointer; user-select: none; }}
+  #perf-table th:not(.row-number):hover {{ background: #ccf; }}
   th.asc::after {{ content: " \\25B2"; }}
   th.desc::after {{ content: " \\25BC"; }}
   tr:nth-child(even) td {{ background: #f7f7f7; }}
