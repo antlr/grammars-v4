@@ -107,7 +107,8 @@ public abstract class PlSqlParserBase extends Parser
 
     public boolean isNotStartOfJoin() {
         Token lt1 = _input.LT(1);
-        if (lt1.getType() == PlSqlParser.INNER ||
+        if (lt1.getType() == PlSqlParser.JOIN ||
+            lt1.getType() == PlSqlParser.INNER ||
             lt1.getType() == PlSqlParser.CROSS ||
             lt1.getType() == PlSqlParser.NATURAL ||
             lt1.getType() == PlSqlParser.PARTITION ||
