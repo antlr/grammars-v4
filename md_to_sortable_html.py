@@ -31,6 +31,7 @@ h = html_mod.escape
 
 # Collect title and all tables {headers, rows, heading}
 title = ""
+metadata = []
 tables = []       # list of dicts: {heading, headers, rows}
 cur_heading = ""
 cur_headers = None
@@ -41,6 +42,9 @@ def flush():
         tables.append({'heading': cur_heading, 'headers': cur_headers, 'rows': list(cur_rows)})
 
 for line in lines:
+    if line.startswith(('Git commit: ', 'Git tag: ')):
+        metadata.append(line)
+        continue
     if re.match(r'^#{1,6}\s', line):
         flush()
         cur_headers = None
@@ -153,6 +157,8 @@ def render_sortable_table(tbl, table_id):
     return out
 
 body = ''
+if metadata:
+    body += ''.join(f'<p>{md_inline(line)}</p>\n' for line in metadata)
 for i, tbl in enumerate(tables):
     if i == sortable_idx:
         body += render_sortable_table(tbl, 'perf-table')

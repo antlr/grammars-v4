@@ -304,8 +304,16 @@ done
 
 # Write the markdown report in the repository root.
 if [ ${#table_rows[@]} -gt 0 ]; then
+    git_commit=$(git -C "$prefix" rev-parse HEAD 2>/dev/null) || git_commit="unknown"
+    git_tags="none"
+    if [[ "$git_commit" != "unknown" ]]; then
+        tags_at_commit=$(git -C "$prefix" tag --points-at "$git_commit" 2>/dev/null |
+            awk 'NF { printf "%s%s", separator, $0; separator=", " }')
+        [[ -n "$tags_at_commit" ]] && git_tags="$tags_at_commit"
+    fi
     {
         printf '## Performance Summary (N=%s runs, mean ± SEM)\n\n' "$N"
+        printf 'Git commit: `%s`\n\nGit tag: `%s`\n\n' "$git_commit" "$git_tags"
         cat <<'EOF'
 ### Column key
 

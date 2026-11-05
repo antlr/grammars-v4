@@ -1,5 +1,9 @@
 ## Performance Summary (N=3 runs, mean ± SEM)
 
+Git commit: `5636e79dfa8b9b3408b4113902e9e1540a6c49fc`
+
+Git tag: `none`
+
 ### Column key
 
 | Label | Description |
