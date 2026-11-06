@@ -20,6 +20,7 @@ options {
     tokenVocab = KotlinLexer;
 }
 
+
 kotlinFile
     : ShebangLine? NL* preamble anysemi* (topLevelObject (anysemi+ topLevelObject?)*)? EOF
     ;
@@ -66,7 +67,9 @@ topLevelObject
     ;
 
 classDeclaration
-    : modifierList? (FUN NL* INTERFACE | CLASS | INTERFACE) NL* simpleIdentifier (NL* typeParameters)? (
+    : (classDeclarationModifierList? CLASS | modifierList? (FUN NL* INTERFACE | INTERFACE)) NL* simpleIdentifier (
+        NL* typeParameters
+    )? (
         NL* primaryConstructor
     )? (NL* COLON NL* delegationSpecifiers)? (NL* typeConstraints)? (
         NL* classBody
@@ -710,6 +713,15 @@ modifierList
     : (annotations | modifier)+
     ;
 
+classDeclarationModifierList
+    : (annotations | classDeclarationModifier)+
+    ;
+
+classDeclarationModifier
+    : classModifier NL*
+    | modifier
+    ;
+
 functionModifierList
     : (annotations | modifier | contextModifier)+
     ;
@@ -733,7 +745,7 @@ contextModifier
 
 modifier
     : (
-        classModifier
+        nonValueClassModifier
         | memberModifier
         | visibilityModifier
         | varianceAnnotation
@@ -752,6 +764,11 @@ platformModifier
     ;
 
 classModifier
+    : nonValueClassModifier
+    | VALUE
+    ;
+
+nonValueClassModifier
     : ENUM
     | SEALED
     | ANNOTATION
@@ -900,6 +917,7 @@ simpleIdentifier
     | WHERE
     | EXPECT
     | ACTUAL
+    | VALUE
     //strong keywords
     | CONST
     | SUSPEND
