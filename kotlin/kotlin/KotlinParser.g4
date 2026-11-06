@@ -636,8 +636,7 @@ jumpExpression
     ;
 
 callableReference
-    : (userType (QUEST NL*)*)? NL* (COLONCOLON | Q_COLONCOLON) NL* (identifier | CLASS)
-    | THIS NL* COLONCOLON NL* CLASS
+    : (userType (QUEST NL*)*)? NL* (COLONCOLON | Q_COLONCOLON) NL* (simpleIdentifier | CLASS)
     ;
 
 assignmentOperator
@@ -706,6 +705,7 @@ postfixUnaryOperation
     | EXCL EXCL
     | callSuffix
     | arrayAccess
+    | NL* COLONCOLON NL* (simpleIdentifier | CLASS)
     | NL* memberAccessOperator NL* postfixUnaryExpression
     ;
 
