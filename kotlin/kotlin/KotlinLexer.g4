@@ -500,6 +500,9 @@ StrExpr_TRIPLE_QUOTE_OPEN:
     TRIPLE_QUOTE_OPEN -> pushMode(MultiLineString), type(TRIPLE_QUOTE_OPEN)
 ;
 
+StrExpr_VAL               : VAL -> type(VAL);
+StrExpr_VAR               : VAR -> type(VAR);
+
 StrExpr_BooleanLiteral   : BooleanLiteral   -> type(BooleanLiteral);
 StrExpr_IntegerLiteral   : IntegerLiteral   -> type(IntegerLiteral);
 StrExpr_HexLiteral       : HexLiteral       -> type(HexLiteral);
