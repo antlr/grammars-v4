@@ -31,8 +31,10 @@ final class DeclarationTypeCheck {
         String fixture = Files.readString(Path.of("examples/kotlinFile/declaration_types.kt"));
         ParseResult result = parse(fixture);
         assertNoErrors("declaration type fixture", result.errors);
-        assertDirectChildCount(result, "delegationSpecifier", "functionType", 2);
-        assertDirectChildCount(result, "explicitDelegation", "functionType", 2);
+        assertDirectChildCount(result, "delegationSpecifier", "functionType", 7);
+        assertDirectChildCount(result, "delegationSpecifier", "typeModifierList", 5);
+        assertDirectChildCount(result, "explicitDelegation", "functionType", 5);
+        assertDirectChildCount(result, "explicitDelegation", "typeModifierList", 3);
         assertDirectChildCount(result, "catchBlock", "type", 4);
         assertDirectChildCount(result, "setter", "type", 2);
         assertDirectChildCount(result, "infixExpression", "type", 3);
@@ -40,16 +42,23 @@ final class DeclarationTypeCheck {
 
         ParseResult crlf = parse(fixture.replace("\n", "\r\n"));
         assertNoErrors("CRLF declaration type fixture", crlf.errors);
-        assertDirectChildCount(crlf, "delegationSpecifier", "functionType", 2);
-        assertDirectChildCount(crlf, "explicitDelegation", "functionType", 2);
+        assertDirectChildCount(crlf, "delegationSpecifier", "functionType", 7);
+        assertDirectChildCount(crlf, "delegationSpecifier", "typeModifierList", 5);
+        assertDirectChildCount(crlf, "explicitDelegation", "functionType", 5);
+        assertDirectChildCount(crlf, "explicitDelegation", "typeModifierList", 3);
         assertDirectChildCount(crlf, "catchBlock", "type", 4);
         assertDirectChildCount(crlf, "setter", "type", 2);
 
         for (String source : List.of(
             "class FunctionSupertype : () -> Unit",
             "class FunctionDelegation : (String) -> Unit by handler",
+            "class SuspendFunctionSupertype : suspend\n(String) -> Unit",
+            "class SuspendFunctionDelegation : suspend (String) -> Unit by handler",
             "object FunctionObject : () -> Unit",
+            "object SuspendFunctionObject : suspend () -> Unit",
             "object FunctionDelegationObject : (Int) -> String by handler",
+            "object SuspendFunctionDelegationObject : suspend () -> Unit by handler",
+            "class NullableSuspendFunctionSupertype : suspend (String?) -> Unit",
             "class ExistingSupertype : BaseType(), Named",
             "class ExistingDelegation : Named by delegate",
             "fun catches() { try {} catch (error: (@TypeMarker String) -> Unit) {} }",
@@ -64,6 +73,9 @@ final class DeclarationTypeCheck {
         for (String source : List.of(
             "class MissingFunctionResult : () ->",
             "class MissingDelegationResult : () -> by handler",
+            "class MissingSuspendFunctionResult : suspend () ->",
+            "class MissingSuspendDelegationResult : suspend () -> by handler",
+            "class NullableSuspendFunctionTypeSupertype : suspend (() -> Unit)?",
             "fun catches() { try {} catch (error: -> Unit) {} }",
             "var value: Int = 0\n    set(value): { field = value }",
             "fun casts(value: Any) { val result = value as () -> }")) {
