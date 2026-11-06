@@ -67,7 +67,9 @@ This intentionally changes the generated parse-tree API: expression consumers sh
 `expression` and `infixExpression` contexts instead of the removed wrappers. `ifExpression`, `whenExpression`,
 and `callableReference` are now alternatives directly under `atomicExpression`.
 Ordinary expressions use `infixExpression` directly; `comparison` is present only when a comparison operator is
-used. Cast targets remain `type` nodes, and type tests still consume a `type` rather than an expression.
+used. Where generic-call type arguments overlap with comparison syntax, `infixExpression` is preferred so call
+arguments are not split into comparison nodes. Cast targets remain `type` nodes, and type tests still consume a
+`type` rather than an expression.
 
 ## Issues
 
