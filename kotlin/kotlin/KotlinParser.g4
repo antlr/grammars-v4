@@ -142,11 +142,11 @@ enumClassBody
     ;
 
 enumEntries
-    : (enumEntry NL*)+ SEMICOLON?
+    : enumEntry (NL* COMMA NL* enumEntry)* (NL* COMMA)?
     ;
 
 enumEntry
-    : annotations* simpleIdentifier (NL* valueArguments)? (NL* classBody)? (NL* COMMA)?
+    : annotations* simpleIdentifier (NL* valueArguments)? (NL* classBody)?
     ;
 
 functionDeclaration
@@ -416,7 +416,8 @@ prefixUnaryExpression
     ;
 
 postfixUnaryExpression
-    : (atomicExpression | callableReference) postfixUnaryOperation*
+    : (atomicExpression | callableReference) postfixUnaryOperation* (postfixCallChain postfixUnaryOperation+)* postfixCallChain?
+        postfixUnaryOperation*
     ;
 
 atomicExpression
@@ -438,9 +439,22 @@ parenthesizedExpression
     ;
 
 callSuffix
-    : typeArguments valueArguments? annotatedLambda*
-    | valueArguments annotatedLambda*
-    | annotatedLambda+
+    : callSuffixWithoutLambda annotatedLambda?
+    | annotatedLambda
+    ;
+
+postfixCallChain
+    : callSuffixWithoutLambda* callSuffixWithLambda callSuffixWithoutLambda*
+    | callSuffixWithoutLambda+
+    ;
+
+callSuffixWithoutLambda
+    : typeArguments valueArguments?
+    | valueArguments
+    ;
+
+callSuffixWithLambda
+    : callSuffixWithoutLambda? annotatedLambda
     ;
 
 annotatedLambda
@@ -604,7 +618,7 @@ typeTest
     ;
 
 tryExpression
-    : TRY NL* block (NL* catchBlock)* (NL* finallyBlock)?
+    : TRY NL* block ((NL* catchBlock)+ (NL* finallyBlock)? | NL* finallyBlock)
     ;
 
 catchBlock
@@ -708,7 +722,6 @@ postfixUnaryOperation
     : INCR
     | DECR
     | EXCL EXCL
-    | callSuffix
     | arrayAccess
     | NL* COLONCOLON NL* (simpleIdentifier | CLASS)
     | NL* memberAccessOperator NL* postfixUnaryExpression
