@@ -533,7 +533,7 @@ objectLiteral
     ;
 
 collectionLiteral
-    : LSQUARE expression? (COMMA expression)* RSQUARE
+    : LSQUARE (expression (COMMA expression)* COMMA?)? RSQUARE
     ;
 
 thisExpression
