@@ -742,7 +742,13 @@ modifier
         | inheritanceModifier
         | parameterModifier
         | typeParameterModifier
+        | platformModifier
     ) NL*
+    ;
+
+platformModifier
+    : EXPECT
+    | ACTUAL
     ;
 
 classModifier
@@ -892,6 +898,8 @@ simpleIdentifier
     | SETTER
     | VARARG
     | WHERE
+    | EXPECT
+    | ACTUAL
     //strong keywords
     | CONST
     | SUSPEND

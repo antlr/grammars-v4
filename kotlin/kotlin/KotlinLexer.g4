@@ -180,6 +180,8 @@ VARARG      : 'vararg';
 NOINLINE    : 'noinline';
 CROSSINLINE : 'crossinline';
 REIFIED     : 'reified';
+EXPECT      : 'expect';
+ACTUAL      : 'actual';
 
 //
 
@@ -392,6 +394,8 @@ Inside_VARARG      : VARARG      -> type(VARARG);
 Inside_NOINLINE    : NOINLINE    -> type(NOINLINE);
 Inside_CROSSINLINE : CROSSINLINE -> type(CROSSINLINE);
 Inside_REIFIED     : REIFIED     -> type(REIFIED);
+Inside_EXPECT      : EXPECT      -> type(EXPECT);
+Inside_ACTUAL      : ACTUAL      -> type(ACTUAL);
 
 Inside_BooleanLiteral   : BooleanLiteral   -> type(BooleanLiteral);
 Inside_IntegerLiteral   : IntegerLiteral   -> type(IntegerLiteral);
@@ -575,6 +579,8 @@ StrExpr_VARARG        : VARARG        -> type(VARARG);
 StrExpr_NOINLINE      : NOINLINE      -> type(NOINLINE);
 StrExpr_CROSSINLINE   : CROSSINLINE   -> type(CROSSINLINE);
 StrExpr_REIFIED       : REIFIED       -> type(REIFIED);
+StrExpr_EXPECT        : EXPECT        -> type(EXPECT);
+StrExpr_ACTUAL        : ACTUAL        -> type(ACTUAL);
 
 StrExpr_BooleanLiteral   : BooleanLiteral   -> type(BooleanLiteral);
 StrExpr_IntegerLiteral   : IntegerLiteral   -> type(IntegerLiteral);
