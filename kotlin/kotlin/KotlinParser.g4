@@ -105,7 +105,7 @@ explicitDelegation
     ;
 
 classBody
-    : LCURL NL* classMemberDeclaration* NL* RCURL
+    : LCURL NL* (classMemberDeclaration (anysemi+ classMemberDeclaration)* anysemi*)? NL* RCURL
     ;
 
 classMemberDeclaration
@@ -118,7 +118,7 @@ classMemberDeclaration
         | anonymousInitializer
         | secondaryConstructor
         | typeAlias
-    ) anysemi+
+    )
     ;
 
 anonymousInitializer
@@ -137,7 +137,7 @@ constructorDelegationCall
     ;
 
 enumClassBody
-    : LCURL NL* enumEntries? (NL* SEMICOLON NL* classMemberDeclaration*)? NL* RCURL
+    : LCURL NL* enumEntries? (NL* SEMICOLON NL* (classMemberDeclaration (anysemi+ classMemberDeclaration)* anysemi*)?)? NL* RCURL
     ;
 
 enumEntries
