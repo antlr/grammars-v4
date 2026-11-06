@@ -75,9 +75,21 @@ final class MultiplatformModifierCheck {
                 throw new AssertionError("platformModifier is not owned by modifier: " + platformModifier.getText());
             }
             ParseTree grandparent = modifier.getParent();
-            if (!(grandparent instanceof ParserRuleContext modifierList)
-                || !List.of("modifierList", "functionModifierList", "propertyModifierList")
-                    .contains(ruleName(modifierList, result.parser))) {
+            ParserRuleContext modifierList;
+            if (grandparent instanceof ParserRuleContext classDeclarationModifier
+                && ruleName(classDeclarationModifier, result.parser).equals("classDeclarationModifier")) {
+                ParseTree classModifierList = classDeclarationModifier.getParent();
+                if (!(classModifierList instanceof ParserRuleContext list)
+                    || !ruleName(list, result.parser).equals("classDeclarationModifierList")) {
+                    throw new AssertionError("platformModifier is not contained in classDeclarationModifierList: "
+                        + platformModifier.getText());
+                }
+                modifierList = list;
+            } else if (grandparent instanceof ParserRuleContext list
+                && List.of("modifierList", "functionModifierList", "propertyModifierList")
+                    .contains(ruleName(list, result.parser))) {
+                modifierList = list;
+            } else {
                 throw new AssertionError("platformModifier is not contained in a declaration modifierList: "
                     + platformModifier.getText());
             }

@@ -84,6 +84,7 @@ callSuffix
 callSuffixWithoutLambda
 classBody
 classDeclaration
+classDeclarationModifier
 controlStructureBody
 delegationSpecifier
 enumClassBody
