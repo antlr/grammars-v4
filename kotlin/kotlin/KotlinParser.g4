@@ -25,7 +25,7 @@ kotlinFile
     ;
 
 script
-    : NL* preamble anysemi* (statement (anysemi+ statement?)*)? EOF
+    : NL* preamble statements EOF
     ;
 
 preamble
@@ -575,8 +575,12 @@ whenExpression
     ;
 
 whenSubject
-    : annotations* VAL NL* variableDeclaration NL* ASSIGNMENT NL* expression
+    : whenSubjectVariable
     | expression
+    ;
+
+whenSubjectVariable
+    : annotations* VAL NL* variableDeclaration NL* ASSIGNMENT NL* expression
     ;
 
 whenEntry
