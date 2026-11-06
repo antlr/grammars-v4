@@ -14,6 +14,8 @@ fun @ReceiverMarker String.annotated() {}
 fun (String).parenthesized() {}
 fun `name.with.dot`() {}
 
+fun interface Action
+
 open fun semanticModifier() {}
 
 object Singleton : Base()
