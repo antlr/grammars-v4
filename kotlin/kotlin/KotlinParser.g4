@@ -360,55 +360,30 @@ declaration
     ;
 
 expression
-    : disjunction
+    : expression equalityOperation NL* expression
+    | expression NL* CONJ NL* expression
+    | expression NL* DISJ NL* expression
+    | comparison
+    | infixExpression
     ;
 
 assignment
     : prefixUnaryExpression assignmentOperator NL* expression
     ;
 
-disjunction
-    : conjunction (NL* DISJ NL* conjunction)*
-    ;
-
-conjunction
-    : equalityComparison (NL* CONJ NL* equalityComparison)*
-    ;
-
-equalityComparison
-    : comparison (equalityOperation NL* comparison)*
-    ;
-
 comparison
-    : namedInfix (comparisonOperator NL* namedInfix)?
+    : infixExpression comparisonOperator NL* infixExpression
     ;
 
-namedInfix
-    : elvisExpression ((inOperator NL* elvisExpression) | (isOperator NL* type))*
-    ;
-
-elvisExpression
-    : infixFunctionCall (NL* ELVIS NL* infixFunctionCall)*
-    ;
-
-infixFunctionCall
-    : rangeExpression (simpleIdentifier NL* rangeExpression)*
-    ;
-
-rangeExpression
-    : additiveExpression (RANGE NL* additiveExpression)*
-    ;
-
-additiveExpression
-    : multiplicativeExpression (additiveOperator NL* multiplicativeExpression)*
-    ;
-
-multiplicativeExpression
-    : typeRHS (multiplicativeOperation NL* typeRHS)*
-    ;
-
-typeRHS
-    : prefixUnaryExpression (NL* typeOperation NL* type)*
+infixExpression
+    : infixExpression multiplicativeOperation NL* infixExpression
+    | infixExpression additiveOperator NL* infixExpression
+    | infixExpression RANGE NL* infixExpression
+    | infixExpression simpleIdentifier NL* infixExpression
+    | infixExpression NL* ELVIS NL* infixExpression
+    | infixExpression inOperator NL* infixExpression
+    | infixExpression isOperator NL* type
+    | prefixUnaryExpression (NL* typeOperation NL* type)*
     ;
 
 prefixUnaryExpression
@@ -416,7 +391,7 @@ prefixUnaryExpression
     ;
 
 postfixUnaryExpression
-    : (atomicExpression | callableReference) postfixUnaryOperation* (postfixCallChain postfixUnaryOperation+)* postfixCallChain?
+    : atomicExpression postfixUnaryOperation* (postfixCallChain postfixUnaryOperation+)* postfixCallChain?
         postfixUnaryOperation*
     ;
 
@@ -426,11 +401,13 @@ atomicExpression
     | functionLiteral
     | thisExpression        // THIS labelReference?
     | superExpression       // SUPER (LANGLE type RANGLE)? labelReference?
-    | conditionalExpression // ifExpression, whenExpression
+    | ifExpression
+    | whenExpression
     | tryExpression
     | objectLiteral
     | jumpExpression
     | collectionLiteral
+    | callableReference
     | simpleIdentifier
     ;
 
@@ -567,11 +544,6 @@ thisExpression
 
 superExpression
     : SUPER (LANGLE NL* type NL* RANGLE)? LabelReference?
-    ;
-
-conditionalExpression
-    : ifExpression
-    | whenExpression
     ;
 
 ifExpression
