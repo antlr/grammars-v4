@@ -439,7 +439,7 @@ StrExpr_LSQUARE : LSQUARE -> pushMode(Inside), type(LSQUARE);
 
 StrExpr_RPAREN           : ')'              -> type(RPAREN);
 StrExpr_RSQUARE          : ']'              -> type(RSQUARE);
-StrExpr_LCURL            : LCURL            -> pushMode(StringExpression), type(LCURL);
+StrExpr_LCURL            : LCURL            -> pushMode(DEFAULT_MODE), type(LCURL);
 StrExpr_DOT              : DOT              -> type(DOT);
 StrExpr_COMMA            : COMMA            -> type(COMMA);
 StrExpr_MULT             : MULT             -> type(MULT);
