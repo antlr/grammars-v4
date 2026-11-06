@@ -169,7 +169,15 @@ def run_audit(antlr_jar, grammar_dir=GRAMMAR_DIR):
             [
                 "java", "-jar", str(antlr_jar), "-Dlanguage=Java", "-package", JAVA_PACKAGE,
                 "-no-listener", "-no-visitor", "-lib", str(grammar_dir), "-o", str(generated_dir),
-                "KotlinLexer.g4", "KotlinParser.g4",
+                "KotlinLexer.g4",
+            ],
+            cwd=grammar_dir,
+        )
+        run_command(
+            [
+                "java", "-jar", str(antlr_jar), "-Dlanguage=Java", "-package", JAVA_PACKAGE,
+                "-no-listener", "-no-visitor", "-lib", str(generated_dir), "-o", str(generated_dir),
+                "KotlinParser.g4",
             ],
             cwd=grammar_dir,
         )
