@@ -1,0 +1,1 @@
+val message = "${run { [val name, val age] = Pair("Ada", 36); name }}"
