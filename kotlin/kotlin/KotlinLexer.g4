@@ -21,13 +21,25 @@ import UnicodeClasses;
 
 ShebangLine: '#!' ~[\u000A\u000D]* -> channel(HIDDEN);
 
-DelimitedComment: '/*' ( DelimitedComment | .)*? '*/' -> channel(HIDDEN);
+DelimitedComment: DelimitedCommentText -> channel(HIDDEN);
 
 LineComment: '//' ~[\u000A\u000D]* -> channel(HIDDEN);
 
 WS: [\u0020\u0009\u000C] -> skip;
 
 NL: '\u000A' | '\u000D' '\u000A';
+
+fragment DelimitedCommentText: '/*' (DelimitedCommentText | .)*? '*/';
+
+fragment OperatorTrivia:
+    [\u0020\u0009\u000C]
+    | '\u000A'
+    | '\u000D' '\u000A'
+    | '//' ~[\u000A\u000D]*
+    | DelimitedCommentText
+;
+
+fragment SeparatedExclamation: '!' OperatorTrivia+;
 
 //SEPARATORS & OPERATIONS
 
@@ -49,6 +61,7 @@ INCR             : '++';
 DECR             : '--';
 CONJ             : '&&';
 DISJ             : '||';
+EXCL_WS          : {_input.LA(-1) != '!'}? SeparatedExclamation;
 EXCL             : '!';
 COLON            : ':';
 SEMICOLON        : ';';
@@ -66,6 +79,7 @@ Q_COLONCOLON     : '?::';
 DOUBLE_SEMICOLON : ';;';
 HASH             : '#';
 AT               : '@';
+SAFE_NAV_WS      : '?' OperatorTrivia+ '.';
 QUEST            : '?';
 ELVIS            : '?:';
 LANGLE           : '<';
@@ -251,6 +265,7 @@ Inside_ADD              : ADD              -> type(ADD);
 Inside_SUB              : SUB              -> type(SUB);
 Inside_INCR             : INCR             -> type(INCR);
 Inside_DECR             : DECR             -> type(DECR);
+Inside_EXCL_WS          : {_input.LA(-1) != '!'}? SeparatedExclamation -> type(EXCL_WS);
 Inside_CONJ             : CONJ             -> type(CONJ);
 Inside_DISJ             : DISJ             -> type(DISJ);
 Inside_EXCL             : EXCL             -> type(EXCL);
@@ -271,6 +286,7 @@ Inside_Q_COLONCOLON     : Q_COLONCOLON     -> type(Q_COLONCOLON);
 Inside_DOUBLE_SEMICOLON : DOUBLE_SEMICOLON -> type(DOUBLE_SEMICOLON);
 Inside_HASH             : HASH             -> type(HASH);
 Inside_AT               : AT               -> type(AT);
+Inside_SAFE_NAV_WS      : SAFE_NAV_WS      -> type(SAFE_NAV_WS);
 Inside_QUEST            : QUEST            -> type(QUEST);
 Inside_ELVIS            : ELVIS            -> type(ELVIS);
 Inside_LANGLE           : LANGLE           -> type(LANGLE);
@@ -430,6 +446,7 @@ StrExpr_ADD              : ADD              -> type(ADD);
 StrExpr_SUB              : SUB              -> type(SUB);
 StrExpr_INCR             : INCR             -> type(INCR);
 StrExpr_DECR             : DECR             -> type(DECR);
+StrExpr_EXCL_WS          : {_input.LA(-1) != '!'}? SeparatedExclamation -> type(EXCL_WS);
 StrExpr_CONJ             : CONJ             -> type(CONJ);
 StrExpr_DISJ             : DISJ             -> type(DISJ);
 StrExpr_EXCL             : EXCL             -> type(EXCL);
@@ -449,6 +466,7 @@ StrExpr_Q_COLONCOLON     : Q_COLONCOLON     -> type(Q_COLONCOLON);
 StrExpr_DOUBLE_SEMICOLON : DOUBLE_SEMICOLON -> type(DOUBLE_SEMICOLON);
 StrExpr_HASH             : HASH             -> type(HASH);
 StrExpr_AT               : AT               -> type(AT);
+StrExpr_SAFE_NAV_WS      : SAFE_NAV_WS      -> type(SAFE_NAV_WS);
 StrExpr_QUEST            : QUEST            -> type(QUEST);
 StrExpr_ELVIS            : ELVIS            -> type(ELVIS);
 StrExpr_LANGLE           : LANGLE           -> type(LANGLE);
