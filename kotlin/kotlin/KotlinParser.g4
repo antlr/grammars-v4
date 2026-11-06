@@ -260,7 +260,7 @@ setter
     | modifierList? SETTER NL* LPAREN (annotations | parameterModifier)* (
         simpleIdentifier
         | parameter
-    ) RPAREN NL* functionBody
+    ) (NL* COMMA)? RPAREN NL* functionBody
     ;
 
 typeAlias
@@ -317,7 +317,7 @@ simpleUserType
 
 //parameters for functionType
 functionTypeParameters
-    : LPAREN NL* (parameter | type)? (NL* COMMA NL* (parameter | type))* (NL* COMMA)? NL* RPAREN
+    : LPAREN NL* ((parameter | type) (NL* COMMA NL* (parameter | type))* (NL* COMMA)?)? NL* RPAREN
     ;
 
 typeConstraints
@@ -447,7 +447,7 @@ annotatedLambda
     ;
 
 arrayAccess
-    : LSQUARE (expression (COMMA expression)*)? RSQUARE
+    : LSQUARE expression (COMMA expression)* COMMA? RSQUARE
     ;
 
 valueArguments
@@ -528,7 +528,7 @@ functionLiteral
     ;
 
 lambdaParameters
-    : lambdaParameter? (NL* COMMA NL* lambdaParameter)*
+    : (lambdaParameter (NL* COMMA NL* lambdaParameter)* (NL* COMMA)?)?
     ;
 
 lambdaParameter
@@ -584,7 +584,7 @@ whenSubjectVariable
     ;
 
 whenEntry
-    : whenCondition (NL* COMMA NL* whenCondition)* NL* ARROW NL* controlStructureBody semi?
+    : whenCondition (NL* COMMA NL* whenCondition)* (NL* COMMA)? NL* ARROW NL* controlStructureBody semi?
     | ELSE NL* ARROW NL* controlStructureBody
     ;
 
@@ -607,7 +607,7 @@ tryExpression
     ;
 
 catchBlock
-    : CATCH NL* LPAREN annotations* simpleIdentifier COLON userType RPAREN NL* block
+    : CATCH NL* LPAREN annotations* simpleIdentifier COLON userType (NL* COMMA)? RPAREN NL* block
     ;
 
 finallyBlock
