@@ -66,7 +66,7 @@ topLevelObject
     ;
 
 classDeclaration
-    : modifierList? (CLASS | INTERFACE) NL* simpleIdentifier (NL* typeParameters)? (
+    : modifierList? (FUN NL* INTERFACE | CLASS | INTERFACE) NL* simpleIdentifier (NL* typeParameters)? (
         NL* primaryConstructor
     )? (NL* COLON NL* delegationSpecifiers)? (NL* typeConstraints)? (
         NL* classBody
