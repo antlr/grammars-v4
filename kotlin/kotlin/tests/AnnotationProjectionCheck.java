@@ -17,13 +17,13 @@ import org.antlr.v4.runtime.tree.ParseTree;
 
 final class AnnotationProjectionCheck {
     private static final String[] TARGETS = {
-        "field", "file", "property", "get", "set", "receiver", "param", "setparam", "delegate"
+        "field", "file", "property", "get", "set", "receiver", "param", "setparam", "delegate", "all"
     };
 
     private static final int[] TARGET_TYPES = {
         KotlinLexer.FIELD_SITE, KotlinLexer.FILE_SITE, KotlinLexer.PROPERTY_SITE, KotlinLexer.GET_SITE,
         KotlinLexer.SET_SITE, KotlinLexer.RECEIVER_SITE, KotlinLexer.PARAM_SITE, KotlinLexer.SETPARAM_SITE,
-        KotlinLexer.DELEGATE_SITE
+        KotlinLexer.DELEGATE_SITE, KotlinLexer.ALL_SITE
     };
 
     private static final class ParseResult {
@@ -73,6 +73,21 @@ final class AnnotationProjectionCheck {
         assertCount(ordinaryFile, "annotationName", 1);
 
         for (String source : List.of(
+            "@alligator class AlligatorAnnotation",
+            "@`all` class EscapedAllAnnotation"
+        )) {
+            ParseResult ordinary = parse(source, false);
+            assertNoErrors("ordinary annotation " + source, ordinary.errors);
+            assertCount(ordinary, "annotationName", 1);
+            assertCount(ordinary, "annotationUseSiteTarget", 0);
+        }
+
+        ParseResult allPropertyAndParameter = parse(
+            "@all: Marker val property = 1\nclass AllConstructor(@all: Marker val value: Int)", false);
+        assertNoErrors("all target on property and constructor parameter", allPropertyAndParameter.errors);
+        assertCount(allPropertyAndParameter, "annotationUseSiteTarget", 2);
+
+        for (String source : List.of(
             "@file\n:\nJvmName(\"LfName\")\npackage sample\nclass FileAnnotated",
             "@file\r\n:\r\n[\r\nJvmName(\"CrLfName\")\r\nSuppress\r\n]\r\npackage sample\r\nclass FileAnnotated"
         )) {
@@ -85,13 +100,15 @@ final class AnnotationProjectionCheck {
         assertNoErrors("script ordinary annotation", script.errors);
         assertCount(script, "annotationName", 1);
 
-        assertTargetTokens("@field @file @property @get @set @receiver @param @setparam @delegate");
-        assertTargetTokens("(@field @file @property @get @set @receiver @param @setparam @delegate)");
-        assertTargetTokens("\"${@field @file @property @get @set @receiver @param @setparam @delegate}\"");
+        assertTargetTokens("@field @file @property @get @set @receiver @param @setparam @delegate @all");
+        assertTargetTokens("(@field @file @property @get @set @receiver @param @setparam @delegate @all)");
+        assertTargetTokens("\"${@field @file @property @get @set @receiver @param @setparam @delegate @all}\"");
 
         for (String source : List.of(
             "fun malformed(value: Box<@First in>) {}",
             "@get: class MissingAnnotation",
+            "@all: class MissingAllAnnotation",
+            "@all:: Marker class RepeatedAllTargetSeparator",
             "@file\n: package sample"
         )) {
             assertHasErrors("malformed annotation or projection " + source, parse(source, false).errors);
