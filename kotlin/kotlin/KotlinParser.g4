@@ -37,7 +37,7 @@ fileAnnotations
     ;
 
 fileAnnotation
-    : (FILE_SITE COLON (LSQUARE unescapedAnnotation+ RSQUARE | unescapedAnnotation) semi?)+
+    : (FILE_SITE NL* COLON NL* (LSQUARE NL* (unescapedAnnotation NL*)+ RSQUARE | unescapedAnnotation) semi?)+
     ;
 
 packageHeader
@@ -464,7 +464,7 @@ typeProjection
     ;
 
 typeProjectionModifierList
-    : varianceAnnotation+
+    : (varianceAnnotation NL* | annotations)+
     ;
 
 valueArgument
@@ -821,11 +821,24 @@ annotations
 
 annotation
     : annotationUseSiteTarget NL* COLON NL* unescapedAnnotation
-    | LabelReference (NL* DOT NL* simpleIdentifier)* (NL* typeArguments)? (NL* valueArguments)?
+    | annotationName (NL* DOT NL* simpleIdentifier)* (NL* typeArguments)? (NL* valueArguments)?
+    ;
+
+annotationName
+    : LabelReference
+    | FIELD_SITE
+    | FILE_SITE
+    | PROPERTY_SITE
+    | GET_SITE
+    | SET_SITE
+    | RECEIVER_SITE
+    | PARAM_SITE
+    | SETPARAM_SITE
+    | DELEGATE_SITE
     ;
 
 annotationList
-    : annotationUseSiteTarget COLON LSQUARE unescapedAnnotation+ RSQUARE
+    : annotationUseSiteTarget NL* COLON NL* LSQUARE unescapedAnnotation+ RSQUARE
     | AT LSQUARE unescapedAnnotation+ RSQUARE
     ;
 
