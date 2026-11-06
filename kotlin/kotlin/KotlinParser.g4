@@ -363,8 +363,8 @@ expression
     : expression equalityOperation NL* expression
     | expression NL* CONJ NL* expression
     | expression NL* DISJ NL* expression
-    | comparison
     | infixExpression
+    | comparison
     ;
 
 assignment
