@@ -93,6 +93,7 @@ delegationSpecifiers
 delegationSpecifier
     : constructorInvocation
     | userType
+    | functionType
     | explicitDelegation
     ;
 
@@ -101,7 +102,7 @@ constructorInvocation
     ;
 
 explicitDelegation
-    : userType NL* BY NL* expression
+    : (userType | functionType) NL* BY NL* expression
     ;
 
 classBody
@@ -260,7 +261,7 @@ setter
     | modifierList? SETTER NL* LPAREN (annotations | parameterModifier)* (
         simpleIdentifier
         | parameter
-    ) (NL* COMMA)? RPAREN NL* functionBody
+    ) (NL* COMMA)? RPAREN (NL* COLON NL* type)? NL* functionBody
     ;
 
 typeAlias
@@ -607,7 +608,7 @@ tryExpression
     ;
 
 catchBlock
-    : CATCH NL* LPAREN annotations* simpleIdentifier COLON userType (NL* COMMA)? RPAREN NL* block
+    : CATCH NL* LPAREN annotations* simpleIdentifier COLON type (NL* COMMA)? RPAREN NL* block
     ;
 
 finallyBlock
