@@ -502,7 +502,6 @@ lineStringExpression
 
 multiLineStringContent
     : MultiLineStrText
-    | MultiLineStrEscapedChar
     | MultiLineStrRef
     ;
 
