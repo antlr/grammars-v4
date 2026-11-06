@@ -25,7 +25,7 @@ kotlinFile
     ;
 
 script
-    : NL* preamble anysemi* (expression (anysemi+ expression?)*)? EOF
+    : NL* preamble anysemi* (statement (anysemi+ statement?)*)? EOF
     ;
 
 preamble
@@ -338,6 +338,8 @@ statements
 
 statement
     : declaration
+    | assignment
+    | loopStatement
     | blockLevelExpression
     ;
 
@@ -346,11 +348,22 @@ blockLevelExpression
     ;
 
 declaration
-    : labelDefinition* (classDeclaration | functionDeclaration | propertyDeclaration | fullMultiPropertyDeclaration | typeAlias)
+    : labelDefinition* (
+        classDeclaration
+        | objectDeclaration
+        | functionDeclaration
+        | propertyDeclaration
+        | fullMultiPropertyDeclaration
+        | typeAlias
+    )
     ;
 
 expression
-    : disjunction (assignmentOperator disjunction)*
+    : disjunction
+    ;
+
+assignment
+    : prefixUnaryExpression assignmentOperator NL* expression
     ;
 
 disjunction
@@ -415,10 +428,8 @@ atomicExpression
     | tryExpression
     | objectLiteral
     | jumpExpression
-    | loopExpression
     | collectionLiteral
     | simpleIdentifier
-    | VAL identifier
     ;
 
 parenthesizedExpression
@@ -556,11 +567,16 @@ ifExpression
 
 controlStructureBody
     : block
-    | expression
+    | statement
     ;
 
 whenExpression
-    : WHEN NL* (LPAREN expression RPAREN)? NL* LCURL NL* (whenEntry NL*)* NL* RCURL
+    : WHEN NL* (LPAREN whenSubject RPAREN)? NL* LCURL NL* (whenEntry NL*)* NL* RCURL
+    ;
+
+whenSubject
+    : annotations* VAL NL* variableDeclaration NL* ASSIGNMENT NL* expression
+    | expression
     ;
 
 whenEntry
@@ -594,10 +610,8 @@ finallyBlock
     : FINALLY NL* block
     ;
 
-loopExpression
-    : forExpression
-    | whileExpression
-    | doWhileExpression
+loopStatement
+    : labelDefinition* (forExpression | whileExpression | doWhileExpression)
     ;
 
 forExpression
