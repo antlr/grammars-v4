@@ -378,7 +378,7 @@ comparison
 infixExpression
     : infixExpression multiplicativeOperation NL* infixExpression
     | infixExpression additiveOperator NL* infixExpression
-    | infixExpression RANGE NL* infixExpression
+    | infixExpression (RANGE_UNTIL | RANGE) NL* infixExpression
     | infixExpression simpleIdentifier NL* infixExpression
     | infixExpression NL* ELVIS NL* infixExpression
     | infixExpression inOperator NL* infixExpression
