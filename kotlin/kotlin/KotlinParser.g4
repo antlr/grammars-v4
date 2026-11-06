@@ -93,7 +93,7 @@ delegationSpecifiers
 delegationSpecifier
     : constructorInvocation
     | userType
-    | functionType
+    | typeModifierList? functionType
     | explicitDelegation
     ;
 
@@ -102,7 +102,7 @@ constructorInvocation
     ;
 
 explicitDelegation
-    : (userType | functionType) NL* BY NL* expression
+    : (userType | typeModifierList? functionType) NL* BY NL* expression
     ;
 
 classBody
