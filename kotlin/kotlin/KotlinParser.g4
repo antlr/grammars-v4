@@ -41,7 +41,7 @@ fileAnnotation
     ;
 
 packageHeader
-    : (modifierList? PACKAGE identifier semi?)?
+    : (PACKAGE identifier semi?)?
     ;
 
 importList
@@ -150,9 +150,9 @@ enumEntry
     ;
 
 functionDeclaration
-    : functionModifierList? FUN (NL* type NL* DOT)? (NL* typeParameters)? (NL* receiverType NL* DOT)? (
-        NL* identifier
-    )? NL* functionValueParameters (NL* COLON NL* type)? (NL* typeConstraints)? (NL* functionBody)?
+    : functionModifierList? FUN (NL* typeParameters)? (NL* receiverType NL* DOT)? NL* simpleIdentifier NL* functionValueParameters (
+        NL* COLON NL* type
+    )? (NL* typeConstraints)? (NL* functionBody)?
     ;
 
 functionValueParameters
@@ -177,7 +177,7 @@ functionBody
     ;
 
 objectDeclaration
-    : modifierList? OBJECT NL* simpleIdentifier (NL* primaryConstructor)? (
+    : modifierList? OBJECT NL* simpleIdentifier (
         NL* COLON NL* delegationSpecifiers
     )? (NL* classBody)?
     ;
