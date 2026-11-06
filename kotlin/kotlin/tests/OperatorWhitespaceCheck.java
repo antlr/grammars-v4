@@ -49,7 +49,10 @@ final class OperatorWhitespaceCheck {
 
         for (String source : List.of(
                  "fun valid(value: Any) { val result = value!! }",
+                 "fun valid(value: Any) { val result = (value!!) }",
                  "fun valid(value: Boolean) { val result = !!value }",
+                 "fun valid(value: Boolean) { val result = \"${!!value}\" }",
+                 "fun valid(value: Any) { val result = \"\"\"${value!!}\"\"\" }",
                  "fun valid(value: Boolean) { val result = ! !value }",
                  "fun valid(value: String?) { val result: String? = value }",
                  "fun valid() { val result = [+\n1] }",
@@ -58,6 +61,11 @@ final class OperatorWhitespaceCheck {
                  "fun valid(value: Boolean) { val result = \"\"\"${!\nvalue}\"\"\"}")) {
             assertNoErrors("valid operator expression", parse(source).errors);
         }
+        assertHasToken("value!!", "EXCL_EXCL");
+        assertHasToken("!!value", "EXCL_EXCL");
+        assertHasToken("(value!!)", "EXCL_EXCL");
+        assertHasToken("\"${!!value}\"", "EXCL_EXCL");
+        assertHasToken("\"\"\"${value!!}\"\"\"", "EXCL_EXCL");
 
         for (String source : List.of(
                  "fun invalid(value: Any) { val result = value! ! }",

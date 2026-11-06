@@ -19,7 +19,8 @@ lexer grammar KotlinLexer;
 
 import UnicodeClasses;
 
-ShebangLine: {_input.index() == 0}? '#!' ~[\u000A\u000D]* -> channel(HIDDEN);
+ShebangLine: '#!' ~[\u000A\u000D]*;
+InvalidShebangLine: OperatorTrivia+ '#!' ~[\u000A\u000D]*;
 
 DelimitedComment: DelimitedCommentText -> channel(HIDDEN);
 
@@ -60,7 +61,8 @@ INCR             : '++';
 DECR             : '--';
 CONJ             : '&&';
 DISJ             : '||';
-EXCL_WS          : {_input.LA(-1) != '!'}? SeparatedExclamation;
+EXCL_EXCL        : '!!';
+EXCL_WS          : SeparatedExclamation;
 EXCL             : '!';
 COLON            : ':';
 SEMICOLON        : ';';
@@ -264,7 +266,8 @@ Inside_ADD              : ADD              -> type(ADD);
 Inside_SUB              : SUB              -> type(SUB);
 Inside_INCR             : INCR             -> type(INCR);
 Inside_DECR             : DECR             -> type(DECR);
-Inside_EXCL_WS          : {_input.LA(-1) != '!'}? SeparatedExclamation -> type(EXCL_WS);
+Inside_EXCL_EXCL        : EXCL_EXCL -> type(EXCL_EXCL);
+Inside_EXCL_WS          : SeparatedExclamation -> type(EXCL_WS);
 Inside_CONJ             : CONJ             -> type(CONJ);
 Inside_DISJ             : DISJ             -> type(DISJ);
 Inside_EXCL             : EXCL             -> type(EXCL);
@@ -445,7 +448,8 @@ StrExpr_ADD              : ADD              -> type(ADD);
 StrExpr_SUB              : SUB              -> type(SUB);
 StrExpr_INCR             : INCR             -> type(INCR);
 StrExpr_DECR             : DECR             -> type(DECR);
-StrExpr_EXCL_WS          : {_input.LA(-1) != '!'}? SeparatedExclamation -> type(EXCL_WS);
+StrExpr_EXCL_EXCL        : EXCL_EXCL -> type(EXCL_EXCL);
+StrExpr_EXCL_WS          : SeparatedExclamation -> type(EXCL_WS);
 StrExpr_CONJ             : CONJ             -> type(CONJ);
 StrExpr_DISJ             : DISJ             -> type(DISJ);
 StrExpr_EXCL             : EXCL             -> type(EXCL);
