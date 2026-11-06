@@ -43,8 +43,62 @@ final class StatementExpressionCheck {
 
         ParseResult script = parse(Files.readString(Path.of("examples/script/statements.kts")), true);
         assertNoErrors("script statement fixture", script.errors);
-        assertRules("script statement fixture", script.rules(), "declaration", "assignment", "loopStatement");
+        assertRules("script statement fixture", script.rules(), "statements", "declaration", "assignment", "loopStatement");
+        ParserRuleContext scriptStatements = directRuleChild(script.tree, script.parser, "statements");
+        if (scriptStatements == null) {
+            throw new AssertionError("script statement fixture expected a direct statements child");
+        }
+        assertDirectRuleChildrenCount("script statement fixture", scriptStatements, script.parser, "statement", 12);
         assertNoRules("script statement fixture", script.rules(), "loopExpression");
+
+        for (String source : List.of(
+            "",
+            "val finalDeclaration = 1",
+            "package sample\nimport kotlin.math.*\nval first = 1; val second = first + 1\nsecond",
+            "fun scriptFunction() {}\nclass ScriptClass\nobject ScriptObject\nvar mutable = 1\n" +
+                "mutable = 2\nfor (item in items) println(item)\nwhile (ready) mutable += 1\n" +
+                "do mutable += 1 while (ready)\nprintln(mutable)"
+        )) {
+            ParseResult result = parse(source, true);
+            assertNoErrors("script source " + source, result.errors);
+            ParserRuleContext statements = directRuleChild(result.tree, result.parser, "statements");
+            if (statements == null) {
+                throw new AssertionError("script source " + source + " expected a direct statements child");
+            }
+            if (source.isEmpty()) {
+                assertDirectRuleChildrenCount("empty script", statements, result.parser, "statement", 0);
+            } else {
+                assertDirectRuleChild("script source " + source, statements, result.parser, "statement");
+            }
+        }
+
+        ParseResult whenSubjects = parse(
+            "fun subjects(value: Int) { " +
+                "val plain = when (val subject = value) { else -> subject }; " +
+                "val typed = when (@Subject val subject: Int = value) { else -> subject }; " +
+                "val ordinary = when (value) { else -> 0 }; " +
+                "val subjectless = when { else -> 0 } " +
+            "}", false);
+        assertNoErrors("when subject variables", whenSubjects.errors);
+        List<ParserRuleContext> subjectVariables = findRules(whenSubjects.tree, whenSubjects.parser, "whenSubjectVariable");
+        if (subjectVariables.size() != 2) {
+            throw new AssertionError("Expected two when subject variables but found " + subjectVariables.size());
+        }
+        for (ParserRuleContext subjectVariable : subjectVariables) {
+            if (!(subjectVariable.getParent() instanceof ParserRuleContext parent)
+                || !ruleName(parent, whenSubjects.parser).equals("whenSubject")) {
+                throw new AssertionError("whenSubjectVariable must be a direct child of whenSubject: " + subjectVariable.getText());
+            }
+        }
+        if (!subjectVariables.get(0).getText().equals("valsubject=value")
+            || !subjectVariables.get(1).getText().equals("@Subjectvalsubject:Int=value")) {
+            throw new AssertionError("Unexpected when subject variable forms: " + subjectVariables);
+        }
+
+        for (String subject : List.of("var subject = value", "val subject", "val (first, second) = value")) {
+            ParseResult result = parse("fun invalid() { val result = when (" + subject + ") { else -> 0 } }", false);
+            assertHasErrors("invalid when subject " + subject, result.errors);
+        }
 
         for (String expression : List.of(
             "value = 1",
@@ -96,6 +150,53 @@ final class StatementExpressionCheck {
         }
         for (int i = 0; i < tree.getChildCount(); i++) {
             collectRules(tree.getChild(i), parser, rules);
+        }
+    }
+
+    private static List<ParserRuleContext> findRules(ParseTree tree, Parser parser, String rule) {
+        List<ParserRuleContext> result = new ArrayList<>();
+        collectRules(tree, parser, rule, result);
+        return result;
+    }
+
+    private static void collectRules(ParseTree tree, Parser parser, String rule, List<ParserRuleContext> result) {
+        if (tree instanceof ParserRuleContext context && ruleName(context, parser).equals(rule)) {
+            result.add(context);
+        }
+        for (int i = 0; i < tree.getChildCount(); i++) {
+            collectRules(tree.getChild(i), parser, rule, result);
+        }
+    }
+
+    private static String ruleName(ParserRuleContext context, Parser parser) {
+        return parser.getRuleNames()[context.getRuleIndex()];
+    }
+
+    private static void assertDirectRuleChild(String label, ParserRuleContext parent, Parser parser, String childRule) {
+        if (directRuleChild(parent, parser, childRule) == null) {
+            throw new AssertionError(label + " expected direct child rule " + childRule + " but found " + parent.getText());
+        }
+    }
+
+    private static ParserRuleContext directRuleChild(ParserRuleContext parent, Parser parser, String childRule) {
+        for (int i = 0; i < parent.getChildCount(); i++) {
+            if (parent.getChild(i) instanceof ParserRuleContext child && ruleName(child, parser).equals(childRule)) {
+                return child;
+            }
+        }
+        return null;
+    }
+
+    private static void assertDirectRuleChildrenCount(String label, ParserRuleContext parent, Parser parser, String childRule,
+        int expected) {
+        int actual = 0;
+        for (int i = 0; i < parent.getChildCount(); i++) {
+            if (parent.getChild(i) instanceof ParserRuleContext child && ruleName(child, parser).equals(childRule)) {
+                actual++;
+            }
+        }
+        if (actual != expected) {
+            throw new AssertionError(label + " expected " + expected + " direct " + childRule + " children but found " + actual);
         }
     }
 
