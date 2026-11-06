@@ -4,6 +4,16 @@ class FunctionSupertype : (String) -> Unit
 class DelegatedFunctionSupertype : (String) -> Unit by handler
 object FunctionObject : () -> Unit
 object DelegatedFunctionObject : () -> Unit by callback
+class SuspendFunctionSupertype : suspend (String) -> Unit
+class SuspendFunctionDelegation : suspend (String) -> Unit by handler
+object SuspendFunctionObject : suspend () -> Unit
+object SuspendFunctionDelegationObject : suspend () -> Unit by callback
+class AnnotatedSuspendFunctionSupertype : suspend @TypeMarker String.() -> Unit
+class AnnotatedSuspendFunctionDelegation : suspend @TypeMarker String.() -> Unit by handler
+class CompanionFunctionHolder {
+    companion object : suspend () -> Unit
+}
+val suspendObjectLiteral = object : suspend () -> Unit {}
 
 open class BaseType
 interface Named
