@@ -188,7 +188,7 @@ companionObject
     ;
 
 propertyDeclaration
-    : modifierList? (VAL | VAR) (NL* typeParameters)? (NL* type NL* DOT)? (
+    : propertyModifierList? (VAL | VAR) (NL* typeParameters)? (NL* type NL* DOT)? (
         NL* (multiVariableDeclaration | variableDeclaration)
     ) (NL* typeConstraints)? (NL* (BY | ASSIGNMENT) NL* expression)? (
         (NL* getter (semi setter)?
@@ -726,13 +726,21 @@ functionModifierList
     : (annotations | modifier | contextModifier)+
     ;
 
+propertyModifierList
+    : (annotations | modifier | contextModifier)+
+    ;
+
 contextParameters
-    : LPAREN (parameter (COMMA parameter)* COMMA?)? RPAREN
+    : LPAREN (contextParameter (COMMA contextParameter)* COMMA?)? RPAREN
+    ;
+
+contextParameter
+    : annotations* parameter
     ;
 
 contextModifier
     : CONTEXT
-    contextParameters
+    contextParameters NL*
     ;
 
 modifier
