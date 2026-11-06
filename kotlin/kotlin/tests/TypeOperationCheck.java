@@ -33,7 +33,7 @@ final class TypeOperationCheck {
         assertNoErrors("type operation fixture", fixture.errors);
         assertCastTargetsAreTypes(fixture, 10);
         assertOperationSequence(fixture, List.of("in", "is", "!in", "!is"),
-            List.of("elvisExpression", "type", "elvisExpression", "type"));
+            List.of("infixExpression", "type", "infixExpression", "type"));
         assertCount("cast operations", fixture, "typeOperation", 10);
 
         for (String target : List.of("1", "String()", "-String")) {
@@ -61,7 +61,7 @@ final class TypeOperationCheck {
 
     private static void assertCastTargetsAreTypes(ParseResult result, int expectedCasts) {
         int casts = 0;
-        for (ParserRuleContext context : findRules(result.tree, result.parser, "typeRHS")) {
+        for (ParserRuleContext context : findRules(result.tree, result.parser, "infixExpression")) {
             List<ParserRuleContext> operations = directRuleChildren(context, result.parser, "typeOperation");
             if (operations.isEmpty()) {
                 continue;
@@ -78,28 +78,10 @@ final class TypeOperationCheck {
     }
 
     private static void assertOperationSequence(ParseResult result, List<String> operators, List<String> operands) {
-        for (ParserRuleContext context : findRules(result.tree, result.parser, "namedInfix")) {
+        for (ParserRuleContext context : findRules(result.tree, result.parser, "infixExpression")) {
             List<String> actualOperators = new ArrayList<>();
             List<String> actualOperands = new ArrayList<>();
-            for (int i = 0; i < context.getChildCount(); i++) {
-                ParseTree child = context.getChild(i);
-                if (!(child instanceof ParserRuleContext operation)) {
-                    continue;
-                }
-                String rule = ruleName(operation, result.parser);
-                if (!rule.equals("inOperator") && !rule.equals("isOperator")) {
-                    continue;
-                }
-                actualOperators.add(operation.getText().strip());
-                int operandIndex = i + 1;
-                while (operandIndex < context.getChildCount() && context.getChild(operandIndex) instanceof TerminalNode) {
-                    operandIndex++;
-                }
-                if (operandIndex == context.getChildCount() || !(context.getChild(operandIndex) instanceof ParserRuleContext operand)) {
-                    throw new AssertionError("Missing operand after " + rule + " in " + context.getText());
-                }
-                actualOperands.add(ruleName(operand, result.parser));
-            }
+            collectOperations(context, result.parser, actualOperators, actualOperands);
             if (actualOperators.equals(operators)) {
                 if (!actualOperands.equals(operands)) {
                     throw new AssertionError("Expected operands " + operands + " but found " + actualOperands);
@@ -107,25 +89,49 @@ final class TypeOperationCheck {
                 return;
             }
         }
-        throw new AssertionError("Did not find namedInfix chain with operators " + operators);
+        throw new AssertionError("Did not find infixExpression chain with operators " + operators);
     }
 
     private static void assertCastPrecedence(ParseResult result) {
-        for (ParserRuleContext expression : findRules(result.tree, result.parser, "additiveExpression")) {
-            List<ParserRuleContext> multiplicativeExpressions = directRuleChildren(expression, result.parser, "multiplicativeExpression");
-            boolean hasCastBeforeMultiplication = false;
-            for (ParserRuleContext multiplicative : multiplicativeExpressions) {
-                List<ParserRuleContext> typeRhs = directRuleChildren(multiplicative, result.parser, "typeRHS");
-                boolean hasCast = typeRhs.stream().anyMatch(rhs -> !directRuleChildren(rhs, result.parser, "typeOperation").isEmpty());
-                if (hasCast && directRuleChildren(multiplicative, result.parser, "multiplicativeOperation").size() == 1) {
-                    hasCastBeforeMultiplication = true;
-                }
+        for (ParserRuleContext addition : findRules(result.tree, result.parser, "infixExpression")) {
+            if (directRuleChildren(addition, result.parser, "additiveOperator").isEmpty()) {
+                continue;
             }
-            if (hasCastBeforeMultiplication && !directRuleChildren(expression, result.parser, "additiveOperator").isEmpty()) {
-                return;
+            for (ParserRuleContext multiplication : directRuleChildren(addition, result.parser, "infixExpression")) {
+                if (directRuleChildren(multiplication, result.parser, "multiplicativeOperation").isEmpty()) {
+                    continue;
+                }
+                for (ParserRuleContext cast : directRuleChildren(multiplication, result.parser, "infixExpression")) {
+                    if (!directRuleChildren(cast, result.parser, "typeOperation").isEmpty()) {
+                        return;
+                    }
+                }
             }
         }
         throw new AssertionError("Expected cast to bind before multiplication, and multiplication before addition");
+    }
+
+    private static void collectOperations(ParseTree tree, Parser parser, List<String> operators, List<String> operands) {
+        for (int i = 0; i < tree.getChildCount(); i++) {
+            ParseTree child = tree.getChild(i);
+            if (!(child instanceof ParserRuleContext operation)) {
+                continue;
+            }
+            String rule = ruleName(operation, parser);
+            if (rule.equals("inOperator") || rule.equals("isOperator")) {
+                operators.add(operation.getText().strip());
+                int operandIndex = i + 1;
+                while (operandIndex < tree.getChildCount() && tree.getChild(operandIndex) instanceof TerminalNode) {
+                    operandIndex++;
+                }
+                if (operandIndex == tree.getChildCount()
+                        || !(tree.getChild(operandIndex) instanceof ParserRuleContext operand)) {
+                    throw new AssertionError("Missing operand after " + rule + " in " + tree.getText());
+                }
+                operands.add(ruleName(operand, parser));
+            }
+            collectOperations(child, parser, operators, operands);
+        }
     }
 
     private static void assertCount(String label, ParseResult result, String rule, int expected) {
