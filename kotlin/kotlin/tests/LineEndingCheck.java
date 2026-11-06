@@ -26,6 +26,7 @@ final class LineEndingCheck {
         assertNewlineTokens();
         assertParsesWithLineEndings();
         assertSuppressedLineEndings();
+        assertTemplateBlockNewlines();
         assertOperatorTrivia();
         assertShebangPosition();
         System.out.println("Line ending checks passed.");
@@ -74,6 +75,52 @@ final class LineEndingCheck {
         for (Token token : tokens.tokens) {
             if ("NL".equals(symbolicName(tokens, token))) {
                 throw new AssertionError("Expected CR newlines to be suppressed in nested modes but found " + describe(tokens));
+            }
+        }
+    }
+
+    private static void assertTemplateBlockNewlines() {
+        for (String lineEnding : List.of("\r", "\n", "\r\n")) {
+            String lineTemplate = "val ordinary = \"${{" + lineEnding
+                + "val first = 1" + lineEnding
+                + "val nested = {" + lineEnding
+                + "val second = 2" + lineEnding
+                + "second" + lineEnding
+                + "}" + lineEnding
+                + "first + nested()" + lineEnding
+                + "}}suffix\"";
+            String rawTemplate = "val raw = \"\"\"${{" + lineEnding
+                + "val first = 1" + lineEnding
+                + "val nested = {" + lineEnding
+                + "val second = 2" + lineEnding
+                + "second" + lineEnding
+                + "}" + lineEnding
+                + "first + nested()" + lineEnding
+                + "}}suffix\"\"\"";
+
+            for (String source : List.of(lineTemplate, rawTemplate)) {
+                ParseResult parsed = parse(source, false);
+                assertNoErrors("template block with " + printable(lineEnding), parsed.errors);
+
+                LexResult tokens = lex(source);
+                assertNoErrors("template block tokenization with " + printable(lineEnding), tokens.errors);
+                long newlineCount = tokens.tokens.stream()
+                    .filter(token -> "NL".equals(symbolicName(tokens, token)))
+                    .count();
+                if (newlineCount != 7) {
+                    throw new AssertionError("Expected seven visible block newlines for " + printable(lineEnding)
+                        + " but found " + newlineCount + " in " + describe(tokens));
+                }
+            }
+
+            String expressionOnly = "val template = \"${1" + lineEnding + "+ 2}\"";
+            assertNoErrors("newline suppressed in ordinary interpolation with " + printable(lineEnding), parse(expressionOnly, false));
+            LexResult expressionTokens = lex(expressionOnly);
+            assertNoErrors("ordinary interpolation tokenization with " + printable(lineEnding), expressionTokens.errors);
+            for (Token token : expressionTokens.tokens) {
+                if ("NL".equals(symbolicName(expressionTokens, token))) {
+                    throw new AssertionError("Expected interpolation newline suppression but found " + describe(expressionTokens));
+                }
             }
         }
     }

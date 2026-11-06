@@ -24,4 +24,20 @@ fun blockNewlines() {
         val sixth = 6
         sixth + 1
     })}"""
+    val lineTemplateBlock = "${{
+        val seventh = 7
+        val nested = {
+            val eighth = 8
+            eighth
+        }
+        seventh + nested()
+    }}suffix"
+    val rawTemplateBlock = """${{
+        val ninth = 9
+        val nested = {
+            val tenth = 10
+            tenth
+        }
+        ninth + nested()
+    }}suffix"""
 }
