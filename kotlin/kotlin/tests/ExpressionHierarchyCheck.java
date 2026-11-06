@@ -52,6 +52,10 @@ final class ExpressionHierarchyCheck {
         assertShape(parseExpression("a || b || c"), "(|| (|| a b) c)");
         assertShape(parseExpression("a ?: b ?: c"), "(?: (?: a b) c)");
         assertShape(parseExpression("a + b .. c * d"), "(.. (+ a b) (* c d))");
+        assertShape(parseExpression("a ..< b"), "(..< a b)");
+        assertShape(parseExpression("a ..< b .. c"), "(.. (..< a b) c)");
+        assertShape(parseExpression("a .. b ..< c"), "(..< (.. a b) c)");
+        assertShape(parseExpression("a ..< b + c"), "(..< a (+ b c))");
         assertShape(parseExpression("a foo b + c"), "(foo a (+ b c))");
         assertShape(parseExpression("a foo b foo c"), "(foo (foo a b) c)");
         assertShape(parseExpression("a foo b ?: c"), "(?: (foo a b) c)");
@@ -69,12 +73,20 @@ final class ExpressionHierarchyCheck {
 
         assertNoErrors("parenthesized precedence", parseExpression("(a + b) * c"));
         assertNoErrors("postfix call chain", parseExpression("factory() { first(); second() }"));
+        for (String source : List.of("(1..<2)", "[1..<2]", "\"${1..<2}\"", "\"\"\"${1..<2}\"\"\"")) {
+            assertNoErrors("open-ended range in nested lexer mode", parseExpression(source));
+        }
         assertNoErrors("newline after binary operator", parseExpression("a +\n b"));
+        assertNoErrors("newline after open-ended range operator", parseExpression("a ..<\n b"));
         assertNoErrors("newline after prefix operator", parseExpression("-\na"));
         assertNoErrors("newline after navigation operator", parseExpression("a.\nb"));
         assertHasErrors("newline before binary operator", parseExpression("a\n + b"));
+        assertHasErrors("newline before open-ended range operator", parseExpression("a\n ..< b"));
 
         assertHasErrors("comparison chain", parseExpression("a < b < c"));
+        assertHasErrors("open-ended range missing right endpoint", parseExpression("a ..<"));
+        assertHasErrors("open-ended range missing left endpoint", parseExpression("..< b"));
+        assertHasErrors("split open-ended range operator", parseExpression("a .. < b"));
         assertHasErrors("assignment as expression", parseExpression("a = b"));
         assertHasErrors("loop as expression", parseExpression("while (ready) run()"));
         assertHasErrors("multiple trailing lambdas", parseExpression("factory {} {}"));
@@ -177,7 +189,7 @@ final class ExpressionHierarchyCheck {
             ParseTree child = context.getChild(i);
             if (child instanceof TerminalNode terminal) {
                 String text = terminal.getText().strip();
-                if (List.of("||", "&&", "?:", "..", "<", ">", "<=", ">=", "==", "!=", "===", "!==")
+                if (List.of("||", "&&", "?:", "..<", "..", "<", ">", "<=", ">=", "==", "!=", "===", "!==")
                         .contains(text)) {
                     return text;
                 }
