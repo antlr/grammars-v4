@@ -21,11 +21,11 @@ options {
 }
 
 kotlinFile
-    : NL* preamble anysemi* (topLevelObject (anysemi+ topLevelObject?)*)? EOF
+    : ShebangLine? NL* preamble anysemi* (topLevelObject (anysemi+ topLevelObject?)*)? EOF
     ;
 
 script
-    : NL* preamble statements EOF
+    : ShebangLine? NL* preamble statements EOF
     ;
 
 preamble
@@ -713,6 +713,7 @@ prefixUnaryOperation
     | ADD
     | SUB
     | EXCL
+    | EXCL_EXCL
     | EXCL_WS
     | annotations
     | labelDefinition
@@ -721,7 +722,7 @@ prefixUnaryOperation
 postfixUnaryOperation
     : INCR
     | DECR
-    | EXCL EXCL
+    | EXCL_EXCL
     | arrayAccess
     | NL* COLONCOLON NL* (simpleIdentifier | CLASS)
     | NL* memberAccessOperator NL* postfixUnaryExpression
