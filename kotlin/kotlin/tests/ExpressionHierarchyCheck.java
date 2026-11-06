@@ -44,6 +44,22 @@ final class ExpressionHierarchyCheck {
         assertCount(comparison, "comparison", 1);
         assertDirectParent(comparison, "comparison", "expression");
 
+        ParseResult genericCallArgument = parseExpression("consume(factory<First, Second>(value))");
+        assertNoErrors("nested generic call argument", genericCallArgument);
+        assertCount(genericCallArgument, "comparison", 0);
+        assertCount(genericCallArgument, "valueArgument", 2);
+        assertCount(genericCallArgument, "typeArguments", 1);
+        assertCount(genericCallArgument, "typeProjection", 2);
+
+        ParseResult mixedArguments = parseExpression(
+            "consume(value < limit, factory<First, Second>(item), left == right)");
+        assertNoErrors("generic call and comparisons in arguments", mixedArguments);
+        assertCount(mixedArguments, "comparison", 1);
+        assertCount(mixedArguments, "equalityOperation", 1);
+        assertCount(mixedArguments, "valueArgument", 4);
+        assertCount(mixedArguments, "typeArguments", 1);
+        assertCount(mixedArguments, "typeProjection", 2);
+
         ParseResult associativity = parseExpression("a - b - c");
         assertNoErrors("left-associative subtraction", associativity);
         assertShape(associativity, "(- (- a b) c)");
