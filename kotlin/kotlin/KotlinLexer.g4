@@ -182,6 +182,7 @@ CROSSINLINE : 'crossinline';
 REIFIED     : 'reified';
 EXPECT      : 'expect';
 ACTUAL      : 'actual';
+VALUE       : 'value';
 
 //
 
@@ -396,6 +397,7 @@ Inside_CROSSINLINE : CROSSINLINE -> type(CROSSINLINE);
 Inside_REIFIED     : REIFIED     -> type(REIFIED);
 Inside_EXPECT      : EXPECT      -> type(EXPECT);
 Inside_ACTUAL      : ACTUAL      -> type(ACTUAL);
+Inside_VALUE       : VALUE       -> type(VALUE);
 
 Inside_BooleanLiteral   : BooleanLiteral   -> type(BooleanLiteral);
 Inside_IntegerLiteral   : IntegerLiteral   -> type(IntegerLiteral);
@@ -581,6 +583,7 @@ StrExpr_CROSSINLINE   : CROSSINLINE   -> type(CROSSINLINE);
 StrExpr_REIFIED       : REIFIED       -> type(REIFIED);
 StrExpr_EXPECT        : EXPECT        -> type(EXPECT);
 StrExpr_ACTUAL        : ACTUAL        -> type(ACTUAL);
+StrExpr_VALUE         : VALUE         -> type(VALUE);
 
 StrExpr_BooleanLiteral   : BooleanLiteral   -> type(BooleanLiteral);
 StrExpr_IntegerLiteral   : IntegerLiteral   -> type(IntegerLiteral);
