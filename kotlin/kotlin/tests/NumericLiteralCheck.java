@@ -42,9 +42,14 @@ final class NumericLiteralCheck {
         for (String literal : List.of("0b0", "0B10_01")) {
             assertSingleToken(literal, "BinLiteral");
         }
+        for (String literal : List.of("0u", "1u", "42U", "1_000u", "0xFFu", "0XCA_FEU", "0b10u", "0B10_01U",
+                 "0UL", "42uL", "1_000UL", "0xFFUL", "0XCA_FEuL", "0b10uL", "0B10_01UL")) {
+            assertSingleToken(literal, "UnsignedLiteral");
+        }
 
         String unicodeDigit = new String(Character.toChars(0x0661));
-        for (String literal : List.of("0x1_", "0b1_", "12_", "01", "01L", "1e3L", unicodeDigit, "1" + unicodeDigit)) {
+        for (String literal : List.of("0x1_", "0b1_", "12_", "01", "01L", "01u", "1e3L", "1.0u", "1e3U",
+                 "1ul", "1Ul", "1Lu", "1uu", "0x1_u", "0b1_U", unicodeDigit, "1" + unicodeDigit)) {
             assertNotCompleteNumericLiteral(literal);
             assertHasErrors("invalid numeric initializer " + literal, parse("val numeric = " + literal));
         }
@@ -55,6 +60,15 @@ final class NumericLiteralCheck {
         assertContextToken("brackets", "val value = [1e3]", "1e3", "RealLiteral");
         assertContextToken("line template", "val value = \"${1e3}\"", "1e3", "RealLiteral");
         assertContextToken("multiline template", "val value = \"\"\"${1e3}\"\"\"", "1e3", "RealLiteral");
+        assertContextToken("default unsigned literal", "val value = 1uL", "1uL", "UnsignedLiteral");
+        assertContextToken("parenthesized unsigned literal", "val value = (1uL)", "1uL", "UnsignedLiteral");
+        assertContextToken("bracketed unsigned literal", "val value = [1uL]", "1uL", "UnsignedLiteral");
+        assertContextToken("line-template unsigned literal", "val value = \"${1uL}\"", "1uL", "UnsignedLiteral");
+        assertContextToken("multiline-template unsigned literal", "val value = \"\"\"${1uL}\"\"\"", "1uL", "UnsignedLiteral");
+        for (String source : List.of("val value = 1uL", "val value = (1uL)", "val value = [1uL]",
+                 "val value = \"${1uL}\"", "val value = \"\"\"${1uL}\"\"\"")) {
+            assertNoErrors("unsigned literal parse context " + source, parse(source));
+        }
         assertContextToken("default open-ended range", "val value = 1..<2", "..<", "RANGE_UNTIL");
         assertContextToken("parenthesized open-ended range", "val value = (1..<2)", "..<", "RANGE_UNTIL");
         assertContextToken("bracketed open-ended range", "val value = [1..<2]", "..<", "RANGE_UNTIL");
@@ -105,7 +119,7 @@ final class NumericLiteralCheck {
         LexResult result = lex(source);
         if (result.errors.isEmpty() && result.tokens.size() == 1 && source.equals(result.tokens.get(0).getText())) {
             String type = result.lexer.getVocabulary().getSymbolicName(result.tokens.get(0).getType());
-            if (List.of("IntegerLiteral", "LongLiteral", "RealLiteral", "HexLiteral", "BinLiteral").contains(type)) {
+            if (List.of("IntegerLiteral", "LongLiteral", "UnsignedLiteral", "RealLiteral", "HexLiteral", "BinLiteral").contains(type)) {
                 throw new AssertionError("Invalid numeral was recognized as a complete " + type + ": " + source);
             }
         }
