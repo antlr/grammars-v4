@@ -55,8 +55,15 @@ final class NumericLiteralCheck {
         assertContextToken("brackets", "val value = [1e3]", "1e3", "RealLiteral");
         assertContextToken("line template", "val value = \"${1e3}\"", "1e3", "RealLiteral");
         assertContextToken("multiline template", "val value = \"\"\"${1e3}\"\"\"", "1e3", "RealLiteral");
+        assertContextToken("default open-ended range", "val value = 1..<2", "..<", "RANGE_UNTIL");
+        assertContextToken("parenthesized open-ended range", "val value = (1..<2)", "..<", "RANGE_UNTIL");
+        assertContextToken("bracketed open-ended range", "val value = [1..<2]", "..<", "RANGE_UNTIL");
+        assertContextToken("line-template open-ended range", "val value = \"${1..<2}\"", "..<", "RANGE_UNTIL");
+        assertContextToken("multiline-template open-ended range", "val value = \"\"\"${1..<2}\"\"\"", "..<", "RANGE_UNTIL");
 
         assertTokenSequence("1..2", List.of("IntegerLiteral", "RANGE", "IntegerLiteral"));
+        assertTokenSequence("1..<2", List.of("IntegerLiteral", "RANGE_UNTIL", "IntegerLiteral"));
+        assertTokenSequence("1.. <2", List.of("IntegerLiteral", "RANGE", "LANGLE", "IntegerLiteral"));
         assertNoErrors("numeric literal fixture", parse(Files.readString(Path.of("examples/kotlinFile/numeric_literals.kt"))));
         System.out.println("Numeric literal checks passed.");
     }
