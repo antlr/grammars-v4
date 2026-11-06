@@ -61,6 +61,7 @@ topLevelObject
     | objectDeclaration
     | functionDeclaration
     | propertyDeclaration
+    | fullMultiPropertyDeclaration
     | typeAlias
     ;
 
@@ -196,12 +197,50 @@ propertyDeclaration
     )?
     ;
 
+fullMultiPropertyDeclaration
+    : fullMultiVariableDeclaration NL* ASSIGNMENT NL* expression
+    ;
+
 explicitBackingField
     : FIELD COLON type ASSIGNMENT NL* expression
     ;
 
 multiVariableDeclaration
-    : LPAREN variableDeclaration (COMMA variableDeclaration)* RPAREN
+    : multiParenVariableDeclaration
+    | multiPositionalVariableDeclaration
+    ;
+
+multiParenVariableDeclaration
+    : LPAREN NL* variableDeclarationWithRenaming (NL* COMMA NL* variableDeclarationWithRenaming)* (NL* COMMA)? NL* RPAREN
+    ;
+
+multiPositionalVariableDeclaration
+    : LSQUARE NL* variableDeclaration (NL* COMMA NL* variableDeclaration)* (NL* COMMA)? NL* RSQUARE
+    ;
+
+variableDeclarationWithRenaming
+    : variableDeclaration (NL* ASSIGNMENT NL* simpleIdentifier)?
+    ;
+
+fullMultiVariableDeclaration
+    : fullMultiParenVariableDeclaration
+    | fullMultiPositionalVariableDeclaration
+    ;
+
+fullMultiParenVariableDeclaration
+    : LPAREN NL* fullVariableDeclarationWithRenaming (NL* COMMA NL* fullVariableDeclarationWithRenaming)* (NL* COMMA)? NL* RPAREN
+    ;
+
+fullMultiPositionalVariableDeclaration
+    : LSQUARE NL* fullVariableDeclaration (NL* COMMA NL* fullVariableDeclaration)* (NL* COMMA)? NL* RSQUARE
+    ;
+
+fullVariableDeclaration
+    : (VAL | VAR) NL* simpleIdentifier (NL* COLON NL* type)?
+    ;
+
+fullVariableDeclarationWithRenaming
+    : fullVariableDeclaration (NL* ASSIGNMENT NL* simpleIdentifier)?
     ;
 
 variableDeclaration
@@ -307,7 +346,7 @@ blockLevelExpression
     ;
 
 declaration
-    : labelDefinition* (classDeclaration | functionDeclaration | propertyDeclaration | typeAlias)
+    : labelDefinition* (classDeclaration | functionDeclaration | propertyDeclaration | fullMultiPropertyDeclaration | typeAlias)
     ;
 
 expression
@@ -485,6 +524,7 @@ lambdaParameters
 lambdaParameter
     : variableDeclaration
     | multiVariableDeclaration (NL* COLON NL* type)?
+    | fullMultiVariableDeclaration (NL* COLON NL* type)?
     ;
 
 // https://kotlinlang.org/docs/reference/grammar.html#objectLiteral
@@ -562,7 +602,7 @@ loopExpression
     ;
 
 forExpression
-    : FOR NL* LPAREN annotations* (variableDeclaration | multiVariableDeclaration) IN expression RPAREN NL* controlStructureBody?
+    : FOR NL* LPAREN annotations* (variableDeclaration | multiVariableDeclaration | fullMultiVariableDeclaration) IN expression RPAREN NL* controlStructureBody?
     ;
 
 whileExpression
