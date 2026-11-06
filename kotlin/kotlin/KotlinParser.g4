@@ -202,7 +202,7 @@ fullMultiPropertyDeclaration
     ;
 
 explicitBackingField
-    : FIELD COLON type ASSIGNMENT NL* expression
+    : FIELD (COLON type (ASSIGNMENT NL* expression)? | ASSIGNMENT NL* expression)
     ;
 
 multiVariableDeclaration
