@@ -35,7 +35,7 @@ final class DeclarationTypeCheck {
         assertDirectChildCount(result, "explicitDelegation", "functionType", 2);
         assertDirectChildCount(result, "catchBlock", "type", 4);
         assertDirectChildCount(result, "setter", "type", 2);
-        assertDirectChildCount(result, "typeRHS", "type", 3);
+        assertDirectChildCount(result, "infixExpression", "type", 3);
         assertCount(result, "typeOperation", 3);
 
         ParseResult crlf = parse(fixture.replace("\n", "\r\n"));
