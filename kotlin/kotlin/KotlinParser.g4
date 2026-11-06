@@ -587,8 +587,12 @@ whenSubjectVariable
     ;
 
 whenEntry
-    : whenCondition (NL* COMMA NL* whenCondition)* (NL* COMMA)? NL* ARROW NL* controlStructureBody semi?
-    | ELSE NL* ARROW NL* controlStructureBody
+    : whenCondition (NL* COMMA NL* whenCondition)* (NL* COMMA)? (NL* whenGuard)? NL* ARROW NL* controlStructureBody semi?
+    | ELSE (NL* whenGuard)? NL* ARROW NL* controlStructureBody
+    ;
+
+whenGuard
+    : IF NL* expression
     ;
 
 whenCondition

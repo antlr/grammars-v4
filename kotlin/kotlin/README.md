@@ -88,6 +88,7 @@ classDeclarationModifier
 controlStructureBody
 delegationSpecifier
 enumClassBody
+expression
 fileAnnotation
 functionLiteral
 ifExpression
