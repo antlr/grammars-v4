@@ -816,6 +816,7 @@ annotationName
     : LabelReference
     | FIELD_SITE
     | FILE_SITE
+    | ALL_SITE
     | PROPERTY_SITE
     | GET_SITE
     | SET_SITE
@@ -833,6 +834,7 @@ annotationList
 annotationUseSiteTarget
     : FIELD_SITE
     | FILE_SITE
+    | ALL_SITE
     | PROPERTY_SITE
     | GET_SITE
     | SET_SITE
