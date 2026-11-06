@@ -197,6 +197,8 @@ fragment DoubleExponent: [eE] ('+' | '-')? DecDigits;
 
 DoubleLiteral: DecDigits? '.' DecDigits DoubleExponent? | DecDigits DoubleExponent;
 
+UnsignedLiteral: (IntegerLiteral | HexLiteral | BinLiteral) [uU] 'L'?;
+
 LongLiteral: (IntegerLiteral | HexLiteral | BinLiteral) 'L';
 
 IntegerLiteral: DecDigitNoZero DecDigitOrSeparator* DecDigit | DecDigit;
@@ -397,6 +399,7 @@ Inside_CharacterLiteral : CharacterLiteral -> type(CharacterLiteral);
 Inside_RealLiteral      : RealLiteral      -> type(RealLiteral);
 Inside_NullLiteral      : NullLiteral      -> type(NullLiteral);
 
+Inside_UnsignedLiteral: UnsignedLiteral -> type(UnsignedLiteral);
 Inside_LongLiteral: LongLiteral -> type(LongLiteral);
 
 Inside_Identifier      : Identifier                       -> type(Identifier);
@@ -577,6 +580,7 @@ StrExpr_BinLiteral       : BinLiteral       -> type(BinLiteral);
 StrExpr_CharacterLiteral : CharacterLiteral -> type(CharacterLiteral);
 StrExpr_RealLiteral      : RealLiteral      -> type(RealLiteral);
 StrExpr_NullLiteral      : NullLiteral      -> type(NullLiteral);
+StrExpr_UnsignedLiteral  : UnsignedLiteral  -> type(UnsignedLiteral);
 StrExpr_LongLiteral      : LongLiteral      -> type(LongLiteral);
 
 StrExpr_Identifier      : Identifier                       -> type(Identifier);
