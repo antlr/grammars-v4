@@ -238,6 +238,7 @@ fragment UniCharacterLiteral: '\\' 'u' HexDigit HexDigit HexDigit HexDigit;
 
 fragment EscapedIdentifier: '\\' ('t' | 'b' | 'r' | 'n' | '\'' | '"' | '\\' | '$');
 
+// Frozen Unicode 12.1.0 categories are generated in UnicodeClasses.g4.
 fragment Letter:
     UNICODE_CLASS_LL
     | UNICODE_CLASS_LM
