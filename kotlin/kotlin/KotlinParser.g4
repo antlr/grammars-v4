@@ -411,7 +411,7 @@ typeRHS
     ;
 
 prefixUnaryExpression
-    : prefixUnaryOperation* postfixUnaryExpression
+    : (prefixUnaryOperation NL*)* postfixUnaryExpression
     ;
 
 postfixUnaryExpression
@@ -695,6 +695,7 @@ prefixUnaryOperation
     | ADD
     | SUB
     | EXCL
+    | EXCL_WS
     | annotations
     | labelDefinition
     ;
@@ -705,7 +706,7 @@ postfixUnaryOperation
     | EXCL EXCL
     | callSuffix
     | arrayAccess
-    | NL* memberAccessOperator postfixUnaryExpression
+    | NL* memberAccessOperator NL* postfixUnaryExpression
     ;
 
 memberAccessOperator
