@@ -383,7 +383,7 @@ comparison
     ;
 
 namedInfix
-    : elvisExpression ((inOperator NL* elvisExpression)+ | (isOperator NL* type))?
+    : elvisExpression ((inOperator NL* elvisExpression) | (isOperator NL* type))*
     ;
 
 elvisExpression
@@ -407,7 +407,7 @@ multiplicativeExpression
     ;
 
 typeRHS
-    : prefixUnaryExpression (NL* typeOperation prefixUnaryExpression)*
+    : prefixUnaryExpression (NL* typeOperation NL* type)*
     ;
 
 prefixUnaryExpression
@@ -687,7 +687,6 @@ multiplicativeOperation
 typeOperation
     : AS
     | AS_SAFE
-    | COLON
     ;
 
 prefixUnaryOperation
