@@ -20,7 +20,6 @@ options {
     tokenVocab = KotlinLexer;
 }
 
-
 kotlinFile
     : ShebangLine? NL* preamble anysemi* (topLevelObject (anysemi+ topLevelObject?)*)? EOF
     ;
@@ -280,7 +279,7 @@ typeParameter
     ;
 
 type
-    : typeModifierList? (functionType | parenthesizedType | nullableType | typeReference)
+    : typeModifierList? (functionType | parenthesizedType | nullableType | definitelyNonNullableType | typeReference)
     ;
 
 typeModifierList
@@ -293,6 +292,14 @@ parenthesizedType
 
 nullableType
     : (typeReference | parenthesizedType) NL* QUEST+
+    ;
+
+definitelyNonNullableType
+    : definitelyNonNullableTypeOperand NL* AMP NL* definitelyNonNullableTypeOperand
+    ;
+
+definitelyNonNullableTypeOperand
+    : annotations* (userType | parenthesizedUserType)
     ;
 
 typeReference
@@ -313,6 +320,11 @@ functionTypeReceiver
 
 userType
     : simpleUserType (NL* DOT NL* simpleUserType)*
+    ;
+
+parenthesizedUserType
+    : LPAREN NL* userType NL* RPAREN
+    | LPAREN NL* parenthesizedUserType NL* RPAREN
     ;
 
 simpleUserType
