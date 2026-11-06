@@ -19,7 +19,7 @@ lexer grammar KotlinLexer;
 
 import UnicodeClasses;
 
-ShebangLine: '#!' ~[\u000A\u000D]* -> channel(HIDDEN);
+ShebangLine: {_input.index() == 0}? '#!' ~[\u000A\u000D]* -> channel(HIDDEN);
 
 DelimitedComment: DelimitedCommentText -> channel(HIDDEN);
 
@@ -27,14 +27,13 @@ LineComment: '//' ~[\u000A\u000D]* -> channel(HIDDEN);
 
 WS: [\u0020\u0009\u000C] -> skip;
 
-NL: '\u000A' | '\u000D' '\u000A';
+NL: '\u000D' '\u000A' | '\u000D' | '\u000A';
 
 fragment DelimitedCommentText: '/*' (DelimitedCommentText | .)*? '*/';
 
 fragment OperatorTrivia:
     [\u0020\u0009\u000C]
-    | '\u000A'
-    | '\u000D' '\u000A'
+    | NL
     | '//' ~[\u000A\u000D]*
     | DelimitedCommentText
 ;
