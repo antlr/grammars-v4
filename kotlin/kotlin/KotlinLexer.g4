@@ -254,7 +254,7 @@ BooleanLiteral: 'true' | 'false';
 
 NullLiteral: 'null';
 
-Identifier: (Letter | '_') (Letter | '_' | DecDigit)* | '`' ~('`')+ '`';
+Identifier: (Letter | '_') (Letter | '_' | DecDigit)* | '`' ~('`' | '\u000A' | '\u000D')+ '`';
 
 LabelReference: '@' Identifier;
 
@@ -262,7 +262,7 @@ LabelDefinition: Identifier '@';
 
 FieldIdentifier: '$' Identifier;
 
-CharacterLiteral: '\'' (EscapeSeq | .) '\'';
+CharacterLiteral: '\'' (EscapeSeq | ~('\'' | '\\' | '\u000A' | '\u000D')) '\'';
 
 fragment EscapeSeq: UniCharacterLiteral | EscapedIdentifier;
 
@@ -438,9 +438,9 @@ QUOTE_CLOSE: '"' -> popMode;
 
 LineStrRef: FieldIdentifier;
 
-LineStrText: ~('\\' | '"' | '$')+ | '$';
+LineStrText: ~('\\' | '"' | '$' | '\u000A' | '\u000D')+ | '$';
 
-LineStrEscapedChar: '\\' . | UniCharacterLiteral;
+LineStrEscapedChar: EscapeSeq;
 
 LineStrExprStart: '${' -> pushMode(StringExpression);
 
@@ -452,9 +452,7 @@ MultiLineStringQuote: '"'+;
 
 MultiLineStrRef: FieldIdentifier;
 
-MultiLineStrText: ~('\\' | '"' | '$')+ | '$';
-
-MultiLineStrEscapedChar: '\\' .;
+MultiLineStrText: ~('"' | '$')+ | '$';
 
 MultiLineStrExprStart: '${' -> pushMode(StringExpression);
 
