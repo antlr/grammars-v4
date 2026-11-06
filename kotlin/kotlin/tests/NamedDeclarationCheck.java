@@ -13,6 +13,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.TerminalNode;
 
 final class NamedDeclarationCheck {
     private static final class ParseResult {
@@ -31,6 +32,7 @@ final class NamedDeclarationCheck {
         String fixture = Files.readString(Path.of("examples/kotlinFile/named_declarations.kt"));
         ParseResult result = parse(fixture);
         assertNoErrors("named declaration fixture", result.errors);
+        assertFunctionalInterfaceCount(result, 1);
         assertFunctionNamesAndReceivers(result, List.of(
             new FunctionShape("ordinary", null),
             new FunctionShape("member", "a.b"),
@@ -49,6 +51,7 @@ final class NamedDeclarationCheck {
 
         ParseResult crlf = parse(fixture.replace("\n", "\r\n"));
         assertNoErrors("CRLF named declaration fixture", crlf.errors);
+        assertFunctionalInterfaceCount(crlf, 1);
         assertFunctionNamesAndReceivers(crlf, List.of(
             new FunctionShape("ordinary", null),
             new FunctionShape("member", "a.b"),
@@ -78,8 +81,37 @@ final class NamedDeclarationCheck {
         }
 
         for (String source : List.of(
+            "fun interface Action",
+            "fun interface Action<T> : Base<T> { fun invoke(value: T) }",
+            "class Outer { fun interface Nested }",
+            "@Marker fun interface Annotated",
+            "expect fun interface ExpectedAction\nactual fun interface ActualAction",
+            "fun\ninterface SplitAction",
+            "interface OrdinaryInterface",
+            "fun ordinaryFunction() {}")) {
+            ParseResult functional = parse(source);
+            assertNoErrors("valid functional interface source " + source, functional.errors);
+            assertFunctionalInterfaceCount(functional,
+                source.contains("ExpectedAction") ? 2
+                    : source.contains("fun interface") || source.contains("fun\ninterface") ? 1 : 0);
+        }
+
+        ParseResult crlfSplit = parse("fun\r\ninterface CrLfSplitAction");
+        assertNoErrors("CRLF between functional interface keywords", crlfSplit.errors);
+        assertFunctionalInterfaceCount(crlfSplit, 1);
+
+        ParseResult scriptFunctional = parseScript("fun interface ScriptAction\nfun main() {}");
+        assertNoErrors("functional interface in script", scriptFunctional.errors);
+        assertFunctionalInterfaceCount(scriptFunctional, 1);
+
+        for (String source : List.of(
             "fun () {}",
             "fun receiver.() {}",
+            "fun class NotAnInterface",
+            "fun object NotAnInterface",
+            "fun val notAnInterface = 1",
+            "fun fun interface RepeatedPrefix",
+            "fun interface",
             "object Named()",
             "public package invalid.name",
             "open package invalid.name",
@@ -141,6 +173,35 @@ final class NamedDeclarationCheck {
                     + receivers.stream().map(ParseTree::getText).toList());
             }
         }
+    }
+
+    private static void assertFunctionalInterfaceCount(ParseResult result, int expected) {
+        int actual = 0;
+        for (ParserRuleContext classDeclaration : findRules(result.tree, result.parser, "classDeclaration")) {
+            boolean hasFun = hasDirectToken(classDeclaration, result.parser, "FUN");
+            boolean hasInterface = hasDirectToken(classDeclaration, result.parser, "INTERFACE");
+            if (hasFun && !hasInterface) {
+                throw new AssertionError("Expected FUN and INTERFACE together under classDeclaration: "
+                    + classDeclaration.getText());
+            }
+            if (hasFun) {
+                actual++;
+            }
+        }
+        if (actual != expected) {
+            throw new AssertionError("Expected " + expected + " functional interface classDeclaration nodes but found "
+                + actual);
+        }
+    }
+
+    private static boolean hasDirectToken(ParserRuleContext context, Parser parser, String tokenName) {
+        for (int i = 0; i < context.getChildCount(); i++) {
+            if (context.getChild(i) instanceof TerminalNode terminal
+                && tokenName.equals(parser.getVocabulary().getSymbolicName(terminal.getSymbol().getType()))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static void assertDirectChildCount(ParseResult result, String parent, String child, int expected) {
