@@ -99,29 +99,43 @@ final class LineEndingCheck {
             assertNoErrors("initial shebang with " + printable(lineEnding), result.errors);
             assertInitialShebang(result, "#!/usr/bin/env kotlin");
             assertNoErrors("parse initial shebang with " + printable(lineEnding), parse(source, false));
+            assertNoErrors("parse script initial shebang with " + printable(lineEnding), parse(source, true));
         }
 
         LexResult atEof = lex("#!");
         assertNoErrors("initial shebang at EOF", atEof.errors);
         assertInitialShebang(atEof, "#!");
         assertNoErrors("parse initial shebang at EOF", parse("#!", false));
+        assertNoErrors("parse script initial shebang at EOF", parse("#!", true));
 
         for (String source : List.of(
             " \n#!/usr/bin/env kotlin\n",
-            "// preceding comment\n#!/usr/bin/env kotlin\n",
-            "package sample\n#!/usr/bin/env kotlin\n",
-            "fun test() { #!/usr/bin/env kotlin }")) {
+            " \r#!/usr/bin/env kotlin\r",
+            "\t\r\n#!/usr/bin/env kotlin\r\n",
+            "// preceding comment\r#!/usr/bin/env kotlin\r",
+            "/* preceding comment */ #!/usr/bin/env kotlin\n")) {
             LexResult result = lex(source);
             assertNoErrors("lex noninitial shebang spelling " + printable(source), result.errors);
             assertNoToken(result, "ShebangLine");
+            assertContainsToken(result, "InvalidShebangLine");
             assertHasErrors("parse noninitial shebang spelling " + printable(source), parse(source, false));
+            assertHasErrors("parse script noninitial shebang spelling " + printable(source), parse(source, true));
+        }
+
+        for (String source : List.of("package sample\n#!/usr/bin/env kotlin\n", "fun test() { #!/usr/bin/env kotlin }")) {
+            LexResult result = lex(source);
+            assertNoErrors("lex later shebang spelling " + printable(source), result.errors);
+            assertNoToken(result, "ShebangLine");
+            assertContainsToken(result, "InvalidShebangLine");
+            assertHasErrors("parse later shebang spelling " + printable(source), parse(source, false));
+            assertHasErrors("parse script later shebang spelling " + printable(source), parse(source, true));
         }
     }
 
     private static void assertInitialShebang(LexResult result, String expectedText) {
         for (Token token : result.tokens) {
             if ("ShebangLine".equals(symbolicName(result, token))) {
-                if (token.getStartIndex() != 0 || token.getChannel() != Token.HIDDEN_CHANNEL || !expectedText.equals(token.getText())) {
+                if (token.getStartIndex() != 0 || token.getChannel() != Token.DEFAULT_CHANNEL || !expectedText.equals(token.getText())) {
                     throw new AssertionError("Initial shebang has unexpected position, channel, or text: " + describe(result));
                 }
                 return;
@@ -137,6 +151,15 @@ final class LineEndingCheck {
             }
         }
         throw new AssertionError("Expected " + type + " with text " + printable(expectedText) + " but found " + describe(result));
+    }
+
+    private static void assertContainsToken(LexResult result, String type) {
+        for (Token token : result.tokens) {
+            if (type.equals(symbolicName(result, token))) {
+                return;
+            }
+        }
+        throw new AssertionError("Expected " + type + " but found " + describe(result));
     }
 
     private static void assertNoToken(LexResult result, String type) {
