@@ -19,15 +19,27 @@ lexer grammar KotlinLexer;
 
 import UnicodeClasses;
 
-ShebangLine: '#!' ~[\u000A\u000D]* -> channel(HIDDEN);
+ShebangLine: '#!' ~[\u000A\u000D]*;
+InvalidShebangLine: OperatorTrivia+ '#!' ~[\u000A\u000D]*;
 
-DelimitedComment: '/*' ( DelimitedComment | .)*? '*/' -> channel(HIDDEN);
+DelimitedComment: DelimitedCommentText -> channel(HIDDEN);
 
 LineComment: '//' ~[\u000A\u000D]* -> channel(HIDDEN);
 
 WS: [\u0020\u0009\u000C] -> skip;
 
-NL: '\u000A' | '\u000D' '\u000A';
+NL: '\u000D' '\u000A' | '\u000D' | '\u000A';
+
+fragment DelimitedCommentText: '/*' (DelimitedCommentText | .)*? '*/';
+
+fragment OperatorTrivia:
+    [\u0020\u0009\u000C]
+    | NL
+    | '//' ~[\u000A\u000D]*
+    | DelimitedCommentText
+;
+
+fragment SeparatedExclamation: '!' OperatorTrivia+;
 
 //SEPARATORS & OPERATIONS
 
@@ -38,8 +50,8 @@ LPAREN           : '(' -> pushMode(Inside);
 RPAREN           : ')';
 LSQUARE          : '[' -> pushMode(Inside);
 RSQUARE          : ']';
-LCURL            : '{';
-RCURL            : '}';
+LCURL            : '{' -> pushMode(DEFAULT_MODE);
+RCURL            : '}' -> popMode;
 MULT             : '*';
 MOD              : '%';
 DIV              : '/';
@@ -48,7 +60,10 @@ SUB              : '-';
 INCR             : '++';
 DECR             : '--';
 CONJ             : '&&';
+AMP              : '&';
 DISJ             : '||';
+EXCL_EXCL        : '!!';
+EXCL_WS          : SeparatedExclamation;
 EXCL             : '!';
 COLON            : ':';
 SEMICOLON        : ';';
@@ -60,12 +75,14 @@ DIV_ASSIGNMENT   : '/=';
 MOD_ASSIGNMENT   : '%=';
 ARROW            : '->';
 DOUBLE_ARROW     : '=>';
+RANGE_UNTIL      : '..<';
 RANGE            : '..';
 COLONCOLON       : '::';
 Q_COLONCOLON     : '?::';
 DOUBLE_SEMICOLON : ';;';
 HASH             : '#';
 AT               : '@';
+SAFE_NAV_WS      : '?' OperatorTrivia+ '.';
 QUEST            : '?';
 ELVIS            : '?:';
 LANGLE           : '<';
@@ -86,6 +103,7 @@ CONTINUE_AT     : 'continue@' Identifier;
 BREAK_AT        : 'break@' Identifier;
 
 FILE_SITE       : '@file';
+ALL_SITE        : '@all';
 PACKAGE         : 'package';
 IMPORT          : 'import';
 CLASS           : 'class';
@@ -120,8 +138,8 @@ BREAK           : 'break';
 AS              : 'as';
 IS              : 'is';
 IN              : 'in';
-NOT_IS          : '!is' (WS | NL)+;
-NOT_IN          : '!in' (WS | NL)+;
+NOT_IS          : '!is' OperatorTrivia+;
+NOT_IN          : '!in' OperatorTrivia+;
 OUT             : 'out';
 FIELD_SITE      : '@field';
 FIELD           : 'field';
@@ -163,98 +181,64 @@ VARARG      : 'vararg';
 NOINLINE    : 'noinline';
 CROSSINLINE : 'crossinline';
 REIFIED     : 'reified';
+EXPECT      : 'expect';
+ACTUAL      : 'actual';
+VALUE       : 'value';
 
 //
 
+Dollar1TripleQuoteOpen: '$"""' -> pushMode(MultiLineString), type(TRIPLE_QUOTE_OPEN);
+Dollar1QuoteOpen: '$"' -> pushMode(LineString), type(QUOTE_OPEN);
+Dollar2TripleQuoteOpen: '$$"""' -> pushMode(MultiDollarMultiLineString2), type(TRIPLE_QUOTE_OPEN);
+Dollar2QuoteOpen: '$$"' -> pushMode(MultiDollarLineString2), type(QUOTE_OPEN);
+Dollar3TripleQuoteOpen: '$$$"""' -> pushMode(MultiDollarMultiLineString3), type(TRIPLE_QUOTE_OPEN);
+Dollar3QuoteOpen: '$$$"' -> pushMode(MultiDollarLineString3), type(QUOTE_OPEN);
+Dollar4TripleQuoteOpen: '$$$$"""' -> pushMode(MultiDollarMultiLineString4), type(TRIPLE_QUOTE_OPEN);
+Dollar4QuoteOpen: '$$$$"' -> pushMode(MultiDollarLineString4), type(QUOTE_OPEN);
 QUOTE_OPEN        : '"'   -> pushMode(LineString);
 TRIPLE_QUOTE_OPEN : '"""' -> pushMode(MultiLineString);
 
 RealLiteral: FloatLiteral | DoubleLiteral;
 
-FloatLiteral: (DoubleLiteral | IntegerLiteral) [fF];
+FloatLiteral: DoubleLiteral [fF] | DecDigits [fF];
 
-DoubleLiteral:
-    ((DecDigitNoZero DecDigit* | '0')? '.' | (DecDigitNoZero (DecDigit | '_')* DecDigit)? '.') (
-        DecDigit+
-        | DecDigit (DecDigit | '_')+ DecDigit
-        | DecDigit+ [eE] ('+' | '-')? DecDigit+
-        | DecDigit+ [eE] ('+' | '-')? DecDigit (DecDigit | '_')+ DecDigit
-        | DecDigit (DecDigit | '_')+ DecDigit [eE] ('+' | '-')? DecDigit+
-        | DecDigit (DecDigit | '_')+ DecDigit [eE] ('+' | '-')? DecDigit (DecDigit | '_')+ DecDigit
-    )
-;
+fragment DecDigitOrSeparator: DecDigit | '_';
+
+fragment DecDigits: DecDigit DecDigitOrSeparator* DecDigit | DecDigit;
+
+fragment DoubleExponent: [eE] ('+' | '-')? DecDigits;
+
+DoubleLiteral: DecDigits? '.' DecDigits DoubleExponent? | DecDigits DoubleExponent;
+
+UnsignedLiteral: (IntegerLiteral | HexLiteral | BinLiteral) [uU] 'L'?;
 
 LongLiteral: (IntegerLiteral | HexLiteral | BinLiteral) 'L';
 
-IntegerLiteral:
-    (
-        '0'
-        | DecDigitNoZero DecDigit*
-        | DecDigitNoZero (DecDigit | '_')+ DecDigit
-        | DecDigitNoZero DecDigit* [eE] ('+' | '-')? DecDigit+
-        | DecDigitNoZero DecDigit* [eE] ('+' | '-')? DecDigit (DecDigit | '_')+ DecDigit
-        | DecDigitNoZero (DecDigit | '_')+ DecDigit [eE] ('+' | '-')? DecDigit+
-        | DecDigitNoZero (DecDigit | '_')+ DecDigit [eE] ('+' | '-')? DecDigit (DecDigit | '_')+ DecDigit
-    )
-;
+IntegerLiteral: DecDigitNoZero DecDigitOrSeparator* DecDigit | DecDigit;
 
-fragment DecDigit: UNICODE_CLASS_ND;
+fragment DecDigit: [0-9];
 
-fragment DecDigitNoZero: UNICODE_CLASS_ND_NoZeros;
+fragment DecDigitNoZero: [1-9];
 
-fragment UNICODE_CLASS_ND_NoZeros:
-    '\u0031' ..'\u0039'
-    | '\u0661' ..'\u0669'
-    | '\u06f1' ..'\u06f9'
-    | '\u07c1' ..'\u07c9'
-    | '\u0967' ..'\u096f'
-    | '\u09e7' ..'\u09ef'
-    | '\u0a67' ..'\u0a6f'
-    | '\u0ae7' ..'\u0aef'
-    | '\u0b67' ..'\u0b6f'
-    | '\u0be7' ..'\u0bef'
-    | '\u0c67' ..'\u0c6f'
-    | '\u0ce7' ..'\u0cef'
-    | '\u0d67' ..'\u0d6f'
-    | '\u0de7' ..'\u0def'
-    | '\u0e51' ..'\u0e59'
-    | '\u0ed1' ..'\u0ed9'
-    | '\u0f21' ..'\u0f29'
-    | '\u1041' ..'\u1049'
-    | '\u1091' ..'\u1099'
-    | '\u17e1' ..'\u17e9'
-    | '\u1811' ..'\u1819'
-    | '\u1947' ..'\u194f'
-    | '\u19d1' ..'\u19d9'
-    | '\u1a81' ..'\u1a89'
-    | '\u1a91' ..'\u1a99'
-    | '\u1b51' ..'\u1b59'
-    | '\u1bb1' ..'\u1bb9'
-    | '\u1c41' ..'\u1c49'
-    | '\u1c51' ..'\u1c59'
-    | '\ua621' ..'\ua629'
-    | '\ua8d1' ..'\ua8d9'
-    | '\ua901' ..'\ua909'
-    | '\ua9d1' ..'\ua9d9'
-    | '\ua9f1' ..'\ua9f9'
-    | '\uaa51' ..'\uaa59'
-    | '\uabf1' ..'\uabf9'
-    | '\uff11' ..'\uff19'
-;
+fragment UnicodeDigit: UNICODE_CLASS_ND;
 
-HexLiteral: '0' [xX] HexDigit (HexDigit | '_')*;
+HexLiteral: '0' [xX] HexDigit HexDigitOrSeparator* HexDigit | '0' [xX] HexDigit;
 
 fragment HexDigit: [0-9a-fA-F];
 
-BinLiteral: '0' [bB] BinDigit (BinDigit | '_')*;
+fragment HexDigitOrSeparator: HexDigit | '_';
+
+BinLiteral: '0' [bB] BinDigit BinDigitOrSeparator* BinDigit | '0' [bB] BinDigit;
 
 fragment BinDigit: [01];
+
+fragment BinDigitOrSeparator: BinDigit | '_';
 
 BooleanLiteral: 'true' | 'false';
 
 NullLiteral: 'null';
 
-Identifier: (Letter | '_') (Letter | '_' | DecDigit)* | '`' ~('`')+ '`';
+Identifier: (Letter | '_') (Letter | '_' | UnicodeDigit)* | '`' ~('`' | '\u000A' | '\u000D')+ '`';
 
 LabelReference: '@' Identifier;
 
@@ -262,7 +246,7 @@ LabelDefinition: Identifier '@';
 
 FieldIdentifier: '$' Identifier;
 
-CharacterLiteral: '\'' (EscapeSeq | .) '\'';
+CharacterLiteral: '\'' (EscapeSeq | ~('\'' | '\\' | '\u000A' | '\u000D')) '\'';
 
 fragment EscapeSeq: UniCharacterLiteral | EscapedIdentifier;
 
@@ -270,6 +254,7 @@ fragment UniCharacterLiteral: '\\' 'u' HexDigit HexDigit HexDigit HexDigit;
 
 fragment EscapedIdentifier: '\\' ('t' | 'b' | 'r' | 'n' | '\'' | '"' | '\\' | '$');
 
+// Frozen Unicode 12.1.0 categories are generated in UnicodeClasses.g4.
 fragment Letter:
     UNICODE_CLASS_LL
     | UNICODE_CLASS_LM
@@ -287,8 +272,8 @@ Inside_RSQUARE : ']' -> popMode, type(RSQUARE);
 Inside_LPAREN  : LPAREN  -> pushMode(Inside), type(LPAREN);
 Inside_LSQUARE : LSQUARE -> pushMode(Inside), type(LSQUARE);
 
-Inside_LCURL            : LCURL            -> type(LCURL);
-Inside_RCURL            : RCURL            -> type(RCURL);
+Inside_LCURL            : LCURL            -> pushMode(DEFAULT_MODE), type(LCURL);
+Inside_RCURL            : RCURL            -> popMode, type(RCURL);
 Inside_DOT              : DOT              -> type(DOT);
 Inside_COMMA            : COMMA            -> type(COMMA);
 Inside_MULT             : MULT             -> type(MULT);
@@ -298,7 +283,10 @@ Inside_ADD              : ADD              -> type(ADD);
 Inside_SUB              : SUB              -> type(SUB);
 Inside_INCR             : INCR             -> type(INCR);
 Inside_DECR             : DECR             -> type(DECR);
+Inside_EXCL_EXCL        : EXCL_EXCL -> type(EXCL_EXCL);
+Inside_EXCL_WS          : SeparatedExclamation -> type(EXCL_WS);
 Inside_CONJ             : CONJ             -> type(CONJ);
+Inside_AMP              : AMP              -> type(AMP);
 Inside_DISJ             : DISJ             -> type(DISJ);
 Inside_EXCL             : EXCL             -> type(EXCL);
 Inside_COLON            : COLON            -> type(COLON);
@@ -311,6 +299,7 @@ Inside_DIV_ASSIGNMENT   : DIV_ASSIGNMENT   -> type(DIV_ASSIGNMENT);
 Inside_MOD_ASSIGNMENT   : MOD_ASSIGNMENT   -> type(MOD_ASSIGNMENT);
 Inside_ARROW            : ARROW            -> type(ARROW);
 Inside_DOUBLE_ARROW     : DOUBLE_ARROW     -> type(DOUBLE_ARROW);
+Inside_RANGE_UNTIL      : RANGE_UNTIL      -> type(RANGE_UNTIL);
 Inside_RANGE            : RANGE            -> type(RANGE);
 Inside_RESERVED         : RESERVED         -> type(RESERVED);
 Inside_COLONCOLON       : COLONCOLON       -> type(COLONCOLON);
@@ -318,6 +307,7 @@ Inside_Q_COLONCOLON     : Q_COLONCOLON     -> type(Q_COLONCOLON);
 Inside_DOUBLE_SEMICOLON : DOUBLE_SEMICOLON -> type(DOUBLE_SEMICOLON);
 Inside_HASH             : HASH             -> type(HASH);
 Inside_AT               : AT               -> type(AT);
+Inside_SAFE_NAV_WS      : SAFE_NAV_WS      -> type(SAFE_NAV_WS);
 Inside_QUEST            : QUEST            -> type(QUEST);
 Inside_ELVIS            : ELVIS            -> type(ELVIS);
 Inside_LANGLE           : LANGLE           -> type(LANGLE);
@@ -332,42 +322,79 @@ Inside_AS_SAFE          : AS_SAFE          -> type(AS_SAFE);
 Inside_EQEQ             : EQEQ             -> type(EQEQ);
 Inside_EQEQEQ           : EQEQEQ           -> type(EQEQEQ);
 Inside_SINGLE_QUOTE     : SINGLE_QUOTE     -> type(SINGLE_QUOTE);
+Inside_Dollar1TripleQuoteOpen:
+    '$"""' -> pushMode(MultiLineString), type(TRIPLE_QUOTE_OPEN)
+;
+Inside_Dollar1QuoteOpen: '$"' -> pushMode(LineString), type(QUOTE_OPEN);
+Inside_Dollar2TripleQuoteOpen:
+    '$$"""' -> pushMode(MultiDollarMultiLineString2), type(TRIPLE_QUOTE_OPEN)
+;
+Inside_Dollar2QuoteOpen: '$$"' -> pushMode(MultiDollarLineString2), type(QUOTE_OPEN);
+Inside_Dollar3TripleQuoteOpen:
+    '$$$"""' -> pushMode(MultiDollarMultiLineString3), type(TRIPLE_QUOTE_OPEN)
+;
+Inside_Dollar3QuoteOpen: '$$$"' -> pushMode(MultiDollarLineString3), type(QUOTE_OPEN);
+Inside_Dollar4TripleQuoteOpen:
+    '$$$$"""' -> pushMode(MultiDollarMultiLineString4), type(TRIPLE_QUOTE_OPEN)
+;
+Inside_Dollar4QuoteOpen: '$$$$"' -> pushMode(MultiDollarLineString4), type(QUOTE_OPEN);
 Inside_QUOTE_OPEN       : QUOTE_OPEN       -> pushMode(LineString), type(QUOTE_OPEN);
 Inside_TRIPLE_QUOTE_OPEN:
     TRIPLE_QUOTE_OPEN -> pushMode(MultiLineString), type(TRIPLE_QUOTE_OPEN)
 ;
 
-Inside_VAL         : VAL            -> type(VAL);
-Inside_VAR         : VAR            -> type(VAR);
-Inside_OBJECT      : OBJECT         -> type(OBJECT);
-Inside_SUPER       : SUPER          -> type(SUPER);
-Inside_IN          : IN             -> type(IN);
-Inside_OUT         : OUT            -> type(OUT);
-Inside_FIELD       : FIELD          -> type(FIELD);
-Inside_FILE        : FILE_SITE      -> type(FILE_SITE);
-Inside_PROPERTY    : PROPERTY_SITE  -> type(PROPERTY_SITE);
-Inside_GET         : GET_SITE       -> type(GET_SITE);
-Inside_SET         : SET_SITE       -> type(SET_SITE);
-Inside_RECEIVER    : RECEIVER_SITE  -> type(RECEIVER_SITE);
-Inside_PARAM       : PARAM_SITE     -> type(PARAM_SITE);
-Inside_SETPARAM    : SETPARAM_SITE  -> type(SETPARAM_SITE);
-Inside_DELEGATE    : DELEGATE_SITE  -> type(DELEGATE_SITE);
-Inside_THROW       : THROW          -> type(THROW);
-Inside_RETURN      : RETURN         -> type(RETURN);
-Inside_CONTINUE    : CONTINUE       -> type(CONTINUE);
-Inside_BREAK       : BREAK          -> type(BREAK);
-Inside_RETURN_AT   : RETURN_AT      -> type(RETURN_AT);
-Inside_CONTINUE_AT : CONTINUE_AT    -> type(CONTINUE_AT);
-Inside_BREAK_AT    : BREAK_AT       -> type(BREAK_AT);
-Inside_IF          : IF             -> type(IF);
-Inside_ELSE        : ELSE           -> type(ELSE);
-Inside_WHEN        : WHEN           -> type(WHEN);
-Inside_TRY         : TRY            -> type(TRY);
-Inside_CATCH       : CATCH          -> type(CATCH);
-Inside_FINALLY     : FINALLY        -> type(FINALLY);
-Inside_FOR         : FOR            -> type(FOR);
-Inside_DO          : DO             -> type(DO);
-Inside_WHILE       : WHILE          -> type(WHILE);
+Inside_RETURN_AT     : RETURN_AT     -> type(RETURN_AT);
+Inside_CONTINUE_AT   : CONTINUE_AT   -> type(CONTINUE_AT);
+Inside_BREAK_AT      : BREAK_AT      -> type(BREAK_AT);
+Inside_FILE          : FILE_SITE     -> type(FILE_SITE);
+Inside_ALL_SITE      : ALL_SITE      -> type(ALL_SITE);
+Inside_PACKAGE       : PACKAGE       -> type(PACKAGE);
+Inside_IMPORT        : IMPORT        -> type(IMPORT);
+Inside_CLASS         : CLASS         -> type(CLASS);
+Inside_INTERFACE     : INTERFACE     -> type(INTERFACE);
+Inside_CONTEXT       : CONTEXT       -> type(CONTEXT);
+Inside_FUN           : FUN           -> type(FUN);
+Inside_OBJECT        : OBJECT        -> type(OBJECT);
+Inside_VAL           : VAL           -> type(VAL);
+Inside_VAR           : VAR           -> type(VAR);
+Inside_TYPE_ALIAS    : TYPE_ALIAS    -> type(TYPE_ALIAS);
+Inside_CONSTRUCTOR   : CONSTRUCTOR   -> type(CONSTRUCTOR);
+Inside_BY            : BY            -> type(BY);
+Inside_COMPANION     : COMPANION     -> type(COMPANION);
+Inside_INIT          : INIT          -> type(INIT);
+Inside_THIS          : THIS          -> type(THIS);
+Inside_SUPER         : SUPER         -> type(SUPER);
+Inside_TYPEOF        : TYPEOF        -> type(TYPEOF);
+Inside_WHERE         : WHERE         -> type(WHERE);
+Inside_IF            : IF            -> type(IF);
+Inside_ELSE          : ELSE          -> type(ELSE);
+Inside_WHEN          : WHEN          -> type(WHEN);
+Inside_TRY           : TRY           -> type(TRY);
+Inside_CATCH         : CATCH         -> type(CATCH);
+Inside_FINALLY       : FINALLY       -> type(FINALLY);
+Inside_FOR           : FOR           -> type(FOR);
+Inside_DO            : DO            -> type(DO);
+Inside_WHILE         : WHILE         -> type(WHILE);
+Inside_THROW         : THROW         -> type(THROW);
+Inside_RETURN        : RETURN        -> type(RETURN);
+Inside_CONTINUE      : CONTINUE      -> type(CONTINUE);
+Inside_BREAK         : BREAK         -> type(BREAK);
+Inside_AS            : AS            -> type(AS);
+Inside_IS            : IS            -> type(IS);
+Inside_IN            : IN            -> type(IN);
+Inside_OUT           : OUT           -> type(OUT);
+Inside_FIELD_SITE    : FIELD_SITE    -> type(FIELD_SITE);
+Inside_FIELD         : FIELD         -> type(FIELD);
+Inside_PROPERTY      : PROPERTY_SITE -> type(PROPERTY_SITE);
+Inside_GET           : GET_SITE      -> type(GET_SITE);
+Inside_SET           : SET_SITE      -> type(SET_SITE);
+Inside_GETTER        : GETTER        -> type(GETTER);
+Inside_SETTER        : SETTER        -> type(SETTER);
+Inside_RECEIVER      : RECEIVER_SITE -> type(RECEIVER_SITE);
+Inside_PARAM         : PARAM_SITE    -> type(PARAM_SITE);
+Inside_SETPARAM      : SETPARAM_SITE -> type(SETPARAM_SITE);
+Inside_DELEGATE      : DELEGATE_SITE -> type(DELEGATE_SITE);
+Inside_DYNAMIC       : DYNAMIC       -> type(DYNAMIC);
 
 Inside_PUBLIC      : PUBLIC      -> type(PUBLIC);
 Inside_PRIVATE     : PRIVATE     -> type(PRIVATE);
@@ -394,6 +421,9 @@ Inside_VARARG      : VARARG      -> type(VARARG);
 Inside_NOINLINE    : NOINLINE    -> type(NOINLINE);
 Inside_CROSSINLINE : CROSSINLINE -> type(CROSSINLINE);
 Inside_REIFIED     : REIFIED     -> type(REIFIED);
+Inside_EXPECT      : EXPECT      -> type(EXPECT);
+Inside_ACTUAL      : ACTUAL      -> type(ACTUAL);
+Inside_VALUE       : VALUE       -> type(VALUE);
 
 Inside_BooleanLiteral   : BooleanLiteral   -> type(BooleanLiteral);
 Inside_IntegerLiteral   : IntegerLiteral   -> type(IntegerLiteral);
@@ -403,6 +433,7 @@ Inside_CharacterLiteral : CharacterLiteral -> type(CharacterLiteral);
 Inside_RealLiteral      : RealLiteral      -> type(RealLiteral);
 Inside_NullLiteral      : NullLiteral      -> type(NullLiteral);
 
+Inside_UnsignedLiteral: UnsignedLiteral -> type(UnsignedLiteral);
 Inside_LongLiteral: LongLiteral -> type(LongLiteral);
 
 Inside_Identifier      : Identifier                       -> type(Identifier);
@@ -418,27 +449,84 @@ QUOTE_CLOSE: '"' -> popMode;
 
 LineStrRef: FieldIdentifier;
 
-LineStrText: ~('\\' | '"' | '$')+ | '$';
+LineStrText: ~('\\' | '"' | '$' | '\u000A' | '\u000D')+ | '$';
 
-LineStrEscapedChar: '\\' . | UniCharacterLiteral;
+LineStrEscapedChar: EscapeSeq;
 
 LineStrExprStart: '${' -> pushMode(StringExpression);
 
+mode MultiDollarLineString2;
+
+MD2_QUOTE_CLOSE: '"' -> popMode, type(QUOTE_CLOSE);
+MD2_REF: '$$' Identifier -> type(LineStrRef);
+MD2_EXPR: '$$' '{' -> pushMode(StringExpression), type(LineStrExprStart);
+MD2_EXTRA_DOLLAR: '$' -> type(LineStrText);
+MD2_TEXT: ~('\\' | '"' | '$' | '\u000A' | '\u000D')+ -> type(LineStrText);
+MD2_ESCAPE: EscapeSeq -> type(LineStrEscapedChar);
+
+mode MultiDollarLineString3;
+
+MD3_QUOTE_CLOSE: '"' -> popMode, type(QUOTE_CLOSE);
+MD3_REF: '$$$' Identifier -> type(LineStrRef);
+MD3_EXPR: '$$$' '{' -> pushMode(StringExpression), type(LineStrExprStart);
+MD3_EXTRA_DOLLAR: '$' -> type(LineStrText);
+MD3_TEXT: ~('\\' | '"' | '$' | '\u000A' | '\u000D')+ -> type(LineStrText);
+MD3_ESCAPE: EscapeSeq -> type(LineStrEscapedChar);
+
+mode MultiDollarLineString4;
+
+MD4_QUOTE_CLOSE: '"' -> popMode, type(QUOTE_CLOSE);
+MD4_REF: '$$$$' Identifier -> type(LineStrRef);
+MD4_EXPR: '$$$$' '{' -> pushMode(StringExpression), type(LineStrExprStart);
+MD4_EXTRA_DOLLAR: '$' -> type(LineStrText);
+MD4_TEXT: ~('\\' | '"' | '$' | '\u000A' | '\u000D')+ -> type(LineStrText);
+MD4_ESCAPE: EscapeSeq -> type(LineStrEscapedChar);
+
 mode MultiLineString;
 
-TRIPLE_QUOTE_CLOSE: MultiLineStringQuote? '"""' -> popMode;
+TRIPLE_QUOTE_CLOSE: MultiLineStringQuoteSequence? '"""' -> popMode;
 
-MultiLineStringQuote: '"'+;
+MultiLineStringQuote: MultiLineStringQuoteSequence;
+
+fragment MultiLineStringQuoteSequence: '"'+;
 
 MultiLineStrRef: FieldIdentifier;
 
-MultiLineStrText: ~('\\' | '"' | '$')+ | '$';
-
-MultiLineStrEscapedChar: '\\' .;
+MultiLineStrText: ~('"' | '$')+ | '$';
 
 MultiLineStrExprStart: '${' -> pushMode(StringExpression);
 
 MultiLineNL: NL -> skip;
+
+mode MultiDollarMultiLineString2;
+
+MD2_TRIPLE_QUOTE_CLOSE: MultiLineStringQuoteSequence? '"""' -> popMode, type(TRIPLE_QUOTE_CLOSE);
+MD2_QUOTE_RUN: MultiLineStringQuoteSequence -> type(MultiLineStringQuote);
+MD2M_REF: '$$' Identifier -> type(MultiLineStrRef);
+MD2M_EXPR: '$$' '{' -> pushMode(StringExpression), type(MultiLineStrExprStart);
+MD2M_EXTRA_DOLLAR: '$' -> type(MultiLineStrText);
+MD2M_TEXT: ~('"' | '$')+ -> type(MultiLineStrText);
+MD2M_NL: NL -> skip;
+
+mode MultiDollarMultiLineString3;
+
+MD3_TRIPLE_QUOTE_CLOSE: MultiLineStringQuoteSequence? '"""' -> popMode, type(TRIPLE_QUOTE_CLOSE);
+MD3_QUOTE_RUN: MultiLineStringQuoteSequence -> type(MultiLineStringQuote);
+MD3M_REF: '$$$' Identifier -> type(MultiLineStrRef);
+MD3M_EXPR: '$$$' '{' -> pushMode(StringExpression), type(MultiLineStrExprStart);
+MD3M_EXTRA_DOLLAR: '$' -> type(MultiLineStrText);
+MD3M_TEXT: ~('"' | '$')+ -> type(MultiLineStrText);
+MD3M_NL: NL -> skip;
+
+mode MultiDollarMultiLineString4;
+
+MD4_TRIPLE_QUOTE_CLOSE: MultiLineStringQuoteSequence? '"""' -> popMode, type(TRIPLE_QUOTE_CLOSE);
+MD4_QUOTE_RUN: MultiLineStringQuoteSequence -> type(MultiLineStringQuote);
+MD4M_REF: '$$$$' Identifier -> type(MultiLineStrRef);
+MD4M_EXPR: '$$$$' '{' -> pushMode(StringExpression), type(MultiLineStrExprStart);
+MD4M_EXTRA_DOLLAR: '$' -> type(MultiLineStrText);
+MD4M_TEXT: ~('"' | '$')+ -> type(MultiLineStrText);
+MD4M_NL: NL -> skip;
 
 mode StringExpression;
 
@@ -449,7 +537,7 @@ StrExpr_LSQUARE : LSQUARE -> pushMode(Inside), type(LSQUARE);
 
 StrExpr_RPAREN           : ')'              -> type(RPAREN);
 StrExpr_RSQUARE          : ']'              -> type(RSQUARE);
-StrExpr_LCURL            : LCURL            -> pushMode(StringExpression), type(LCURL);
+StrExpr_LCURL            : LCURL            -> pushMode(DEFAULT_MODE), type(LCURL);
 StrExpr_DOT              : DOT              -> type(DOT);
 StrExpr_COMMA            : COMMA            -> type(COMMA);
 StrExpr_MULT             : MULT             -> type(MULT);
@@ -459,7 +547,10 @@ StrExpr_ADD              : ADD              -> type(ADD);
 StrExpr_SUB              : SUB              -> type(SUB);
 StrExpr_INCR             : INCR             -> type(INCR);
 StrExpr_DECR             : DECR             -> type(DECR);
+StrExpr_EXCL_EXCL        : EXCL_EXCL -> type(EXCL_EXCL);
+StrExpr_EXCL_WS          : SeparatedExclamation -> type(EXCL_WS);
 StrExpr_CONJ             : CONJ             -> type(CONJ);
+StrExpr_AMP              : AMP              -> type(AMP);
 StrExpr_DISJ             : DISJ             -> type(DISJ);
 StrExpr_EXCL             : EXCL             -> type(EXCL);
 StrExpr_COLON            : COLON            -> type(COLON);
@@ -472,12 +563,14 @@ StrExpr_DIV_ASSIGNMENT   : DIV_ASSIGNMENT   -> type(DIV_ASSIGNMENT);
 StrExpr_MOD_ASSIGNMENT   : MOD_ASSIGNMENT   -> type(MOD_ASSIGNMENT);
 StrExpr_ARROW            : ARROW            -> type(ARROW);
 StrExpr_DOUBLE_ARROW     : DOUBLE_ARROW     -> type(DOUBLE_ARROW);
+StrExpr_RANGE_UNTIL      : RANGE_UNTIL      -> type(RANGE_UNTIL);
 StrExpr_RANGE            : RANGE            -> type(RANGE);
 StrExpr_COLONCOLON       : COLONCOLON       -> type(COLONCOLON);
 StrExpr_Q_COLONCOLON     : Q_COLONCOLON     -> type(Q_COLONCOLON);
 StrExpr_DOUBLE_SEMICOLON : DOUBLE_SEMICOLON -> type(DOUBLE_SEMICOLON);
 StrExpr_HASH             : HASH             -> type(HASH);
 StrExpr_AT               : AT               -> type(AT);
+StrExpr_SAFE_NAV_WS      : SAFE_NAV_WS      -> type(SAFE_NAV_WS);
 StrExpr_QUEST            : QUEST            -> type(QUEST);
 StrExpr_ELVIS            : ELVIS            -> type(ELVIS);
 StrExpr_LANGLE           : LANGLE           -> type(LANGLE);
@@ -486,19 +579,113 @@ StrExpr_LE               : LE               -> type(LE);
 StrExpr_GE               : GE               -> type(GE);
 StrExpr_EXCL_EQ          : EXCL_EQ          -> type(EXCL_EQ);
 StrExpr_EXCL_EQEQ        : EXCL_EQEQ        -> type(EXCL_EQEQ);
-StrExpr_AS               : AS               -> type(IS);
-StrExpr_IS               : IS               -> type(IN);
-StrExpr_IN               : IN;
-StrExpr_NOT_IS           : NOT_IS       -> type(NOT_IS);
-StrExpr_NOT_IN           : NOT_IN       -> type(NOT_IN);
-StrExpr_AS_SAFE          : AS_SAFE      -> type(AS_SAFE);
-StrExpr_EQEQ             : EQEQ         -> type(EQEQ);
-StrExpr_EQEQEQ           : EQEQEQ       -> type(EQEQEQ);
-StrExpr_SINGLE_QUOTE     : SINGLE_QUOTE -> type(SINGLE_QUOTE);
+StrExpr_AS               : AS               -> type(AS);
+StrExpr_IS               : IS               -> type(IS);
+StrExpr_IN               : IN               -> type(IN);
+StrExpr_NOT_IS           : NOT_IS           -> type(NOT_IS);
+StrExpr_NOT_IN           : NOT_IN           -> type(NOT_IN);
+StrExpr_AS_SAFE          : AS_SAFE          -> type(AS_SAFE);
+StrExpr_EQEQ             : EQEQ             -> type(EQEQ);
+StrExpr_EQEQEQ           : EQEQEQ           -> type(EQEQEQ);
+StrExpr_SINGLE_QUOTE     : SINGLE_QUOTE     -> type(SINGLE_QUOTE);
+StrExpr_Dollar1TripleQuoteOpen:
+    '$"""' -> pushMode(MultiLineString), type(TRIPLE_QUOTE_OPEN)
+;
+StrExpr_Dollar1QuoteOpen: '$"' -> pushMode(LineString), type(QUOTE_OPEN);
+StrExpr_Dollar2TripleQuoteOpen:
+    '$$"""' -> pushMode(MultiDollarMultiLineString2), type(TRIPLE_QUOTE_OPEN)
+;
+StrExpr_Dollar2QuoteOpen: '$$"' -> pushMode(MultiDollarLineString2), type(QUOTE_OPEN);
+StrExpr_Dollar3TripleQuoteOpen:
+    '$$$"""' -> pushMode(MultiDollarMultiLineString3), type(TRIPLE_QUOTE_OPEN)
+;
+StrExpr_Dollar3QuoteOpen: '$$$"' -> pushMode(MultiDollarLineString3), type(QUOTE_OPEN);
+StrExpr_Dollar4TripleQuoteOpen:
+    '$$$$"""' -> pushMode(MultiDollarMultiLineString4), type(TRIPLE_QUOTE_OPEN)
+;
+StrExpr_Dollar4QuoteOpen: '$$$$"' -> pushMode(MultiDollarLineString4), type(QUOTE_OPEN);
 StrExpr_QUOTE_OPEN       : QUOTE_OPEN   -> pushMode(LineString), type(QUOTE_OPEN);
 StrExpr_TRIPLE_QUOTE_OPEN:
     TRIPLE_QUOTE_OPEN -> pushMode(MultiLineString), type(TRIPLE_QUOTE_OPEN)
 ;
+
+StrExpr_RETURN_AT     : RETURN_AT     -> type(RETURN_AT);
+StrExpr_CONTINUE_AT   : CONTINUE_AT   -> type(CONTINUE_AT);
+StrExpr_BREAK_AT      : BREAK_AT      -> type(BREAK_AT);
+StrExpr_FILE          : FILE_SITE     -> type(FILE_SITE);
+StrExpr_ALL_SITE      : ALL_SITE      -> type(ALL_SITE);
+StrExpr_PACKAGE       : PACKAGE       -> type(PACKAGE);
+StrExpr_IMPORT        : IMPORT        -> type(IMPORT);
+StrExpr_CLASS         : CLASS         -> type(CLASS);
+StrExpr_INTERFACE     : INTERFACE     -> type(INTERFACE);
+StrExpr_CONTEXT       : CONTEXT       -> type(CONTEXT);
+StrExpr_FUN           : FUN           -> type(FUN);
+StrExpr_OBJECT        : OBJECT        -> type(OBJECT);
+StrExpr_VAL           : VAL           -> type(VAL);
+StrExpr_VAR           : VAR           -> type(VAR);
+StrExpr_TYPE_ALIAS    : TYPE_ALIAS    -> type(TYPE_ALIAS);
+StrExpr_CONSTRUCTOR   : CONSTRUCTOR   -> type(CONSTRUCTOR);
+StrExpr_BY            : BY            -> type(BY);
+StrExpr_COMPANION     : COMPANION     -> type(COMPANION);
+StrExpr_INIT          : INIT          -> type(INIT);
+StrExpr_THIS          : THIS          -> type(THIS);
+StrExpr_SUPER         : SUPER         -> type(SUPER);
+StrExpr_TYPEOF        : TYPEOF        -> type(TYPEOF);
+StrExpr_WHERE         : WHERE         -> type(WHERE);
+StrExpr_IF            : IF            -> type(IF);
+StrExpr_ELSE          : ELSE          -> type(ELSE);
+StrExpr_WHEN          : WHEN          -> type(WHEN);
+StrExpr_TRY           : TRY           -> type(TRY);
+StrExpr_CATCH         : CATCH         -> type(CATCH);
+StrExpr_FINALLY       : FINALLY       -> type(FINALLY);
+StrExpr_FOR           : FOR           -> type(FOR);
+StrExpr_DO            : DO            -> type(DO);
+StrExpr_WHILE         : WHILE         -> type(WHILE);
+StrExpr_THROW         : THROW         -> type(THROW);
+StrExpr_RETURN        : RETURN        -> type(RETURN);
+StrExpr_CONTINUE      : CONTINUE      -> type(CONTINUE);
+StrExpr_BREAK         : BREAK         -> type(BREAK);
+StrExpr_OUT           : OUT           -> type(OUT);
+StrExpr_FIELD_SITE    : FIELD_SITE    -> type(FIELD_SITE);
+StrExpr_FIELD         : FIELD         -> type(FIELD);
+StrExpr_PROPERTY      : PROPERTY_SITE -> type(PROPERTY_SITE);
+StrExpr_GET           : GET_SITE      -> type(GET_SITE);
+StrExpr_SET           : SET_SITE      -> type(SET_SITE);
+StrExpr_GETTER        : GETTER        -> type(GETTER);
+StrExpr_SETTER        : SETTER        -> type(SETTER);
+StrExpr_RECEIVER      : RECEIVER_SITE -> type(RECEIVER_SITE);
+StrExpr_PARAM         : PARAM_SITE    -> type(PARAM_SITE);
+StrExpr_SETPARAM      : SETPARAM_SITE -> type(SETPARAM_SITE);
+StrExpr_DELEGATE      : DELEGATE_SITE -> type(DELEGATE_SITE);
+StrExpr_DYNAMIC       : DYNAMIC       -> type(DYNAMIC);
+StrExpr_PUBLIC        : PUBLIC        -> type(PUBLIC);
+StrExpr_PRIVATE       : PRIVATE       -> type(PRIVATE);
+StrExpr_PROTECTED     : PROTECTED     -> type(PROTECTED);
+StrExpr_INTERNAL      : INTERNAL      -> type(INTERNAL);
+StrExpr_ENUM          : ENUM          -> type(ENUM);
+StrExpr_SEALED        : SEALED        -> type(SEALED);
+StrExpr_ANNOTATION    : ANNOTATION    -> type(ANNOTATION);
+StrExpr_DATA          : DATA          -> type(DATA);
+StrExpr_INNER         : INNER         -> type(INNER);
+StrExpr_TAILREC       : TAILREC       -> type(TAILREC);
+StrExpr_OPERATOR      : OPERATOR      -> type(OPERATOR);
+StrExpr_INLINE        : INLINE        -> type(INLINE);
+StrExpr_INFIX         : INFIX         -> type(INFIX);
+StrExpr_EXTERNAL      : EXTERNAL      -> type(EXTERNAL);
+StrExpr_SUSPEND       : SUSPEND       -> type(SUSPEND);
+StrExpr_OVERRIDE      : OVERRIDE      -> type(OVERRIDE);
+StrExpr_ABSTRACT      : ABSTRACT      -> type(ABSTRACT);
+StrExpr_FINAL         : FINAL         -> type(FINAL);
+StrExpr_OPEN          : OPEN          -> type(OPEN);
+StrExpr_CONST         : CONST         -> type(CONST);
+StrExpr_LATEINIT      : LATEINIT      -> type(LATEINIT);
+StrExpr_VARARG        : VARARG        -> type(VARARG);
+StrExpr_NOINLINE      : NOINLINE      -> type(NOINLINE);
+StrExpr_CROSSINLINE   : CROSSINLINE   -> type(CROSSINLINE);
+StrExpr_REIFIED       : REIFIED       -> type(REIFIED);
+StrExpr_EXPECT        : EXPECT        -> type(EXPECT);
+StrExpr_ACTUAL        : ACTUAL        -> type(ACTUAL);
+StrExpr_VALUE         : VALUE         -> type(VALUE);
 
 StrExpr_BooleanLiteral   : BooleanLiteral   -> type(BooleanLiteral);
 StrExpr_IntegerLiteral   : IntegerLiteral   -> type(IntegerLiteral);
@@ -507,6 +694,7 @@ StrExpr_BinLiteral       : BinLiteral       -> type(BinLiteral);
 StrExpr_CharacterLiteral : CharacterLiteral -> type(CharacterLiteral);
 StrExpr_RealLiteral      : RealLiteral      -> type(RealLiteral);
 StrExpr_NullLiteral      : NullLiteral      -> type(NullLiteral);
+StrExpr_UnsignedLiteral  : UnsignedLiteral  -> type(UnsignedLiteral);
 StrExpr_LongLiteral      : LongLiteral      -> type(LongLiteral);
 
 StrExpr_Identifier      : Identifier                       -> type(Identifier);
