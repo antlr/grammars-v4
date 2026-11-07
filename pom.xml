@@ -467,6 +467,7 @@
 				<module>toml</module>
 				<module>trac</module>
 				<module>transactionlogic</module>
+				<module>treecalculus</module>
 				<module>tsv</module>
 				<module>ttm</module>
 				<module>turing</module>
