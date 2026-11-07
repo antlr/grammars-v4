@@ -20,7 +20,6 @@ options {
     tokenVocab = KotlinLexer;
 }
 
-
 kotlinFile
     : ShebangLine? NL* preamble anysemi* (topLevelObject (anysemi+ topLevelObject?)*)? EOF
     ;
@@ -323,8 +322,7 @@ definitelyNonNullableTypeOperand
     ;
 
 typeReference
-    : LPAREN typeReference RPAREN
-    | userType
+    : userType
     | DYNAMIC
     ;
 
@@ -806,8 +804,7 @@ platformModifier
     ;
 
 classModifier
-    : nonValueClassModifier
-    | VALUE
+    : VALUE
     ;
 
 nonValueClassModifier
