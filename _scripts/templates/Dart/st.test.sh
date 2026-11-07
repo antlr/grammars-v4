@@ -36,6 +36,10 @@ do
         files+=( "$source_root/$f" )
 done
 parse_inputs=()
+input_root="$source_examples"
+if command -v cygpath >/dev/null 2>&1; then
+    input_root=$(cygpath -m "$source_examples")
+fi
 for f in "${files[@]}"; do
     if command -v cygpath >/dev/null 2>&1; then
         parse_inputs+=( "$(cygpath -m "$f")" )
@@ -63,7 +67,7 @@ runner=("$generated_dir/Test.exe")
 rm -f parse.txt
 for f in "${parse_inputs[@]}"
 do
-    trash wdog "${runner[@]}" -q -tee -tree -o "$output_dir" "$f" >> parse.txt 2>&1
+    trash wdog "${runner[@]}" -q -tee -tree -o "$output_dir" --input-root "$input_root" "$f" >> parse.txt 2>&1
     xxx="$?"
     if [ "$xxx" -ne 0 ]
     then
@@ -72,7 +76,7 @@ do
 done
 <else>
 # Group parsing.
-echo "${parse_inputs[*]}" | trash wdog "${runner[@]}" -q -x -tee -tree -o "$output_dir" > parse.txt 2>&1
+echo "${parse_inputs[*]}" | trash wdog "${runner[@]}" -q -x -tee -tree -o "$output_dir" --input-root "$input_root" > parse.txt 2>&1
 status=$?
 <endif>
 

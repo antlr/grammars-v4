@@ -1,0 +1,4 @@
+line 5:52 extraneous input '{' expecting {<EOF>, NL, ';'}
+line 6:15 no viable alternative at input ',age'
+line 8:0 extraneous input '}' expecting {NL, '='}
+line 9:0 extraneous input '<EOF>' expecting {NL, '='}
