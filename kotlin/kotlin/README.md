@@ -62,24 +62,6 @@ only the final threshold-sized dollar sequence before an identifier or `{` begin
 dollars remain string content. Both ordinary and raw strings use the same thresholds, including inside nested
 expressions. Prefixes longer than four dollars are intentionally unsupported by this bounded grammar.
 
-## Expression parse-tree changes
-
-The non-formal parser now uses left-recursive `expression` and `infixExpression` rules to encode operator precedence
-and associativity. The former precedence-wrapper rules `disjunction`, `conjunction`, `equalityComparison`,
-`namedInfix`,
-`elvisExpression`, `infixFunctionCall`, `rangeExpression`, `additiveExpression`, `multiplicativeExpression`,
-and `typeRHS` have been removed; `conditionalExpression` has also been removed.
-
-This intentionally changes the generated parse-tree API: expression consumers should inspect the recursive
-`expression` and `infixExpression` contexts instead of the removed wrappers. `ifExpression`, `whenExpression`,
-and `callableReference` are now alternatives directly under `atomicExpression`.
-Ordinary expressions use `infixExpression` directly; `comparison` is present only when a comparison operator is
-used. Where generic-call type arguments overlap with comparison syntax, `infixExpression` is preferred so call
-arguments are not split into comparison nodes. Cast targets remain `type` nodes, and type tests still consume a
-`type` rather than an expression. Navigation operations now consume a simple identifier, parenthesized expression, or
-`class` selector instead of recursively owning another postfix expression; subsequent calls and postfix operations
-belong to the outer `postfixUnaryExpression`.
-
 ## Issues
 
 ### Ambiguities
@@ -94,7 +76,6 @@ callSuffix
 callSuffixWithoutLambda
 classBody
 classDeclaration
-classDeclarationModifier
 controlStructureBody
 delegationSpecifier
 enumClassBody
@@ -104,7 +85,7 @@ fileAnnotation
 functionLiteral
 ifExpression
 infixExpression
-jumpExpression
+jumpExpressionession
 kotlinFile
 objectLiteral
 packageHeader
