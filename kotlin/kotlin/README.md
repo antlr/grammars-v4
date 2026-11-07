@@ -89,6 +89,7 @@ classDeclarationModifier
 controlStructureBody
 delegationSpecifier
 enumClassBody
+explicitDelegation
 expression
 fileAnnotation
 functionLiteral
@@ -109,6 +110,7 @@ statement
 statements
 tryExpression
 type
+typeModifierList
 typeProjectionModifierList
 whenEntry
 whenExpression
