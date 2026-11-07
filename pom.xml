@@ -332,6 +332,7 @@
 				<module>mumps</module>
 				<module>muparser</module>
 				<module>newick</module>
+				<module>nock</module>
 				<module>oberon</module>
 				<module>ocl</module>
                 <module>odin</module>
