@@ -323,7 +323,13 @@ typeReference
     ;
 
 functionType
-    : (functionTypeReceiver NL* DOT NL*)? functionTypeParameters NL* ARROW (NL* type)
+    : (contextFunctionTypeParameters NL*)? typeModifierList? (functionTypeReceiver NL* DOT NL*)? functionTypeParameters NL* ARROW (
+        NL* type
+    )
+    ;
+
+contextFunctionTypeParameters
+    : CONTEXT NL* LPAREN NL* type (NL* COMMA NL* type)* (NL* COMMA)? NL* RPAREN
     ;
 
 functionTypeReceiver

@@ -47,7 +47,7 @@ final class ContextParameterCheck {
             "context(logger: Logger,, other: Other) fun invalid() {}",
             "context(logger: Logger)",
             "context(logger: Logger)\nprintln(1)",
-            "typealias ContextFunction = context(Logger) () -> Unit")) {
+            "typealias NamedContextFunction = context(logger: Logger) () -> Unit")) {
             assertHasErrors("invalid context declaration " + source, parse(source).errors);
         }
 
