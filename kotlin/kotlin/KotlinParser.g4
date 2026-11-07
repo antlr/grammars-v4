@@ -760,11 +760,15 @@ classDeclarationModifier
     ;
 
 functionModifierList
-    : (annotations | modifier | contextModifier)+
+    : (annotations | modifier | contextModifier | companionModifier)+
     ;
 
 propertyModifierList
-    : (annotations | modifier | contextModifier)+
+    : (annotations | modifier | contextModifier | companionModifier)+
+    ;
+
+companionModifier
+    : COMPANION NL*
     ;
 
 contextParameters
