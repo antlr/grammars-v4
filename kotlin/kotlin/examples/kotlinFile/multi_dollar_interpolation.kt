@@ -1,4 +1,6 @@
-package samples.multidollar
+// Tests multi-dollar string-template interpolation.
+
+package sample.multidollar
 
 val oneDollar = $"one $name ${name}"
 val twoDollars = $$"below $name; active $$name, $$$name, $$$$name; braced $${name}, $$$${name}"

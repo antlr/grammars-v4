@@ -1,3 +1,7 @@
+// Tests value class declarations and modifier placement.
+
+package sample.valueclasses
+
 value class UserId(val value: Int)
 
 value class Box<T>(val value: T)

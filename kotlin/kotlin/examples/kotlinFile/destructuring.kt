@@ -1,3 +1,7 @@
+// Tests positional, named, and full destructuring declarations.
+
+package sample.destructuring
+
 [val topLevelName, val topLevelAge] = Pair("Ada", 36)
 
 fun destructuring(values: List<Pair<String, Int>>) {

@@ -1,3 +1,7 @@
+// Tests expect and actual modifiers and identifiers.
+
+package sample.multiplatformmodifiers
+
 expect class CommonApi
 actual class PlatformApi
 
