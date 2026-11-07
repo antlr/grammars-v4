@@ -64,6 +64,7 @@ function Test-Grammar {
     $zzz = Get-Location
 
     $failStage = [FailStage]::Success
+    $failedList = @()
     
     $success = $true
     $start = Get-Date
@@ -79,7 +80,7 @@ function Test-Grammar {
         return @{
             Success     = $false
             Stage       = $failStage
-            FailedCases = @()
+            FailedCases = @("dotnet trash gen exited with code $status")
         }
     }
     $dirs = @(Get-ChildItem -Path "Generated-$Target*")
@@ -90,7 +91,7 @@ function Test-Grammar {
         return @{
             Success     = $false
             Stage       = $failStage
-            FailedCases = @()
+            FailedCases = @("dotnet trash gen produced no Generated-$Target* directory")
         }
     }
     foreach ($m in $dirs) {
@@ -107,7 +108,7 @@ function Test-Grammar {
             return @{
                 Success     = $false
                 Stage       = $failStage
-                FailedCases = @()
+                FailedCases = @("Generated directory $targetgenerated was not found")
             }
         }
         if ($failStage -ne [FailStage]::Success) {
@@ -127,7 +128,8 @@ function Test-Grammar {
 
         if ($buildResult -ne 0) {
             $failStage = [FailStage]::Compile
-            Write-Host "Build failed" -ForegroundColor Red
+            $failedList = @("$targetgenerated/build.ps1 exited with code $buildResult")
+            Write-Host "Build failed: $($failedList[0])" -ForegroundColor Red
         }
 
         Write-Host "Build completed, time: $((Get-Date) - $start)" -ForegroundColor Yellow
@@ -136,7 +138,7 @@ function Test-Grammar {
             return @{
                 Success     = $false
                 Stage       = $failStage
-                FailedCases = @()
+                FailedCases = $failedList
             }
         }
 
@@ -146,12 +148,21 @@ function Test-Grammar {
             Write-Host "--- Testing files ---"
             $workingDirectory = Get-Location
             Write-Host "The pwd is  $workingDirectory"
-            ./test.ps1
-            $passed = $LASTEXITCODE -eq 0
+            $testFailures = [System.Collections.Generic.List[string]]::new()
+            ./test.ps1 *>&1 | ForEach-Object {
+                $line = $_.ToString()
+                Write-Host "[$Directory/$targetgenerated] $line"
+                if ($line -match '^(Output differs:|Missing output:|Unexpected parse errors|Input is outside the example directory:)') {
+                    $testFailures.Add($line)
+                }
+            }
+            $testResult = $LASTEXITCODE
+            $passed = $testResult -eq 0
             if (! $passed) {
                 $success = $false
                 $failStage = [FailStage]::Test
-                Write-Host "Test completed, time: $((Get-Date) - $start2)" -ForegroundColor Yellow
+                $failedList = if ($testFailures.Count -gt 0) { $testFailures.ToArray() } else { @("$targetgenerated/test.ps1 exited with code $testResult") }
+                Write-Host "Test completed for $Directory ($targetgenerated), time: $((Get-Date) - $start2)" -ForegroundColor Yellow
                 Set-Location $cwd
                 return @{
                     Success     = $success
@@ -162,7 +173,7 @@ function Test-Grammar {
         }
     }
 
-    Write-Host "Test completed, time: $((Get-Date) - $start)" -ForegroundColor Yellow
+    Write-Host "Test completed for $Directory ($Target), time: $((Get-Date) - $start)" -ForegroundColor Yellow
     Set-Location $cwd
     return @{
         Success     = $success
@@ -335,9 +346,9 @@ Write-Host "CurrentCommit = $CurrentCommit"
         $state = Test-Grammar -Directory $g -Target $Target
         if (!$state.Success) {
             $success = $false
-            $failedGrammars += $g
+            $failedGrammars += "$g ($($state.Stage))"
             $failedCases += $state.FailedCases
-            Write-Host "$g failed" -ForegroundColor Red
+            Write-Host "$g failed at stage $($state.Stage) for target $Target" -ForegroundColor Red
         }        
     }
     Write-Host "finished in $((Get-Date)-$t)" -ForegroundColor Yellow
@@ -345,8 +356,10 @@ Write-Host "CurrentCommit = $CurrentCommit"
         exit 0
     }
     else {
-        Write-Error "Failed grammars: $([String]::Join(' ', $failedGrammars))"
-        Write-Error "Failed cases: $([String]::Join(' ', $failedCases))"
+        Write-Host "Failed grammars: $([String]::Join('; ', $failedGrammars))" -ForegroundColor Red
+        foreach ($failedCase in $failedCases) {
+            Write-Host "  $failedCase" -ForegroundColor Red
+        }
         exit 1
     }
 }
