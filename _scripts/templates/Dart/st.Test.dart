@@ -50,6 +50,7 @@ class NamedCharStream extends CharStream {
 
 var tee = false;
 var output_dir = "";
+var input_root = "";
 var show_tree = false;
 var show_tokens = false;
 var show_trace = false;
@@ -99,6 +100,10 @@ void main(List\<String> args) async {
         {
             output_dir = args[++i];
             tee = true;
+        }
+        else if (args[i] == "--input-root")
+        {
+            input_root = args[++i];
         }
         else if (args[i] == "-x")
         {
@@ -224,13 +229,21 @@ Future\<void> DoParse(CharStream str, String input_name, int row_number) async
 {
     String out_name = input_name;
     if (output_dir != "") {
-        String absPath = File(input_name).absolute.path;
-        String root = Directory('<source_example_dir_unix>').absolute.path;
-        String rootPrefix = root.endsWith(Platform.pathSeparator)
-            ? root : root + Platform.pathSeparator;
-        String rootless = absPath.startsWith(rootPrefix)
-            ? absPath.substring(rootPrefix.length)
-            : absPath.split(Platform.pathSeparator).last;
+        // Input filenames come from the command line. When the caller supplies
+        // an input root, preserve paths beneath it in the output directory.
+        // Normalize separators because MSYS passes C:/... to native Dart.
+        String absPath = File(input_name).absolute.path
+            .replaceAll(String.fromCharCode(92), '/');
+        String rootless = absPath.split('/').last;
+        if (input_root != "") {
+            String root = Directory(input_root).absolute.path
+                .replaceAll(String.fromCharCode(92), '/');
+            String rootPrefix = root.endsWith('/') ? root : root + '/';
+            bool underRoot = Platform.isWindows
+                ? absPath.toLowerCase().startsWith(rootPrefix.toLowerCase())
+                : absPath.startsWith(rootPrefix);
+            if (underRoot) rootless = absPath.substring(rootPrefix.length);
+        }
         out_name = output_dir + '/' + rootless;
         await Directory(File(out_name).parent.path).create(recursive: true);
     }
