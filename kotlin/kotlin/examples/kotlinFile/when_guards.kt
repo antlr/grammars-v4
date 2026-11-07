@@ -1,4 +1,6 @@
-package samples.whenguards
+// Tests guarded when conditions and subject declarations.
+
+package sample.whenguards
 
 fun guarded(value: Any, enabled: Boolean) = when (value) {
     is String if value.isNotEmpty() -> value

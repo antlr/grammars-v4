@@ -1,3 +1,7 @@
+// Tests keyword operator modes in expressions and string templates.
+
+package sample.keywordmodes
+
 open class KeywordModeBase
 
 class KeywordModes : KeywordModeBase() {

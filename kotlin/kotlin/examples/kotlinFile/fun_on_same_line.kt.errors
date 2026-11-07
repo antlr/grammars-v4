@@ -1,1 +1,1 @@
-line 1:12 mismatched input 'fun' expecting {<EOF>, NL, ';'}
+line 5:12 mismatched input 'fun' expecting {<EOF>, NL, ';'}

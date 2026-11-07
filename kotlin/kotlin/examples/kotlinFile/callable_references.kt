@@ -1,3 +1,7 @@
+// Tests callable references with expression and type receivers.
+
+package sample.callablereferences
+
 fun refs() {
     val callReceiver = factory()::run
     val parenthesizedReceiver = (value)::member

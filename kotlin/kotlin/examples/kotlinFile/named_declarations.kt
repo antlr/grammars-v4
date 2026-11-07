@@ -1,4 +1,6 @@
-package samples.named
+// Tests named declaration forms, receivers, and object expressions.
+
+package sample.nameddeclarations
 
 annotation class ReceiverMarker
 open class Base

@@ -1,3 +1,7 @@
+// Tests collection literals in declarations, calls, loops, and destructuring.
+
+package sample.collectionliterals
+
 @Suppress(["unused",])
 fun collectionLiteralCases(values: List<Int>): List<Int> {
     val empty: List<Int> = []

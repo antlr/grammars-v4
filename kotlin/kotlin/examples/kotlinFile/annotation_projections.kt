@@ -1,3 +1,5 @@
+// Tests file annotations, annotation use-site targets, and type projections.
+
 @file
 :
 JvmName("AnnotationProjections")
@@ -6,7 +8,8 @@ JvmName("AnnotationProjections")
     Suppress("unused")
     Deprecated
 ]
-package annotations
+package sample.annotationprojections
+
 import kotlin.Deprecated
 
 @field class FieldOrdinary

@@ -1,3 +1,7 @@
+// Tests newline handling around operators and expressions.
+
+package sample.operatorwhitespace
+
 fun operatorWhitespace() {
     var value = 0
     value =

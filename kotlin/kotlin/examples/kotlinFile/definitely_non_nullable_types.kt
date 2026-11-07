@@ -1,3 +1,7 @@
+// Tests definitely non-nullable types in declarations and expressions.
+
+package sample.definitelynonnullabletypes
+
 typealias NonNull<T> = T & Any
 
 class Holder<T>(val value: T & Any)

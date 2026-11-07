@@ -1,3 +1,7 @@
+// Tests statement expressions and assignments in control flow.
+
+package sample.statementexpressions
+
 object NamedStatementObject {
 }
 

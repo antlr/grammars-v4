@@ -1,3 +1,7 @@
+// Tests function-type supertypes, delegation, catch types, and setters.
+
+package sample.declarationtypes
+
 annotation class TypeMarker
 
 class FunctionSupertype : (String) -> Unit

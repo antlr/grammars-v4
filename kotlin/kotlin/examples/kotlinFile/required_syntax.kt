@@ -1,4 +1,6 @@
-package samples.requiredsyntax
+// Tests required syntax in enums, try expressions, and trailing lambdas.
+
+package sample.requiredsyntax
 
 enum class Empty {}
 enum class Single { ONE }
