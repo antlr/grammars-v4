@@ -461,17 +461,13 @@ callSuffix
     ;
 
 postfixCallChain
-    : callSuffixWithoutLambda* callSuffixWithLambda callSuffixWithoutLambda*
-    | callSuffixWithoutLambda+
+    : callSuffixWithoutLambda+ (annotatedLambda callSuffixWithoutLambda*)?
+    | annotatedLambda callSuffixWithoutLambda*
     ;
 
 callSuffixWithoutLambda
     : typeArguments valueArguments?
     | valueArguments
-    ;
-
-callSuffixWithLambda
-    : callSuffixWithoutLambda? annotatedLambda
     ;
 
 annotatedLambda
