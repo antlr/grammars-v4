@@ -20,6 +20,7 @@ options {
     tokenVocab = KotlinLexer;
 }
 
+
 kotlinFile
     : ShebangLine? NL* preamble anysemi* (topLevelObject (anysemi+ topLevelObject?)*)? EOF
     ;
@@ -117,6 +118,7 @@ classMemberDeclaration
         | functionDeclaration
         | objectDeclaration
         | companionObject
+        | companionBlock
         | propertyDeclaration
         | anonymousInitializer
         | secondaryConstructor
@@ -202,6 +204,10 @@ companionObject
     : modifierList? COMPANION NL* modifierList? OBJECT (NL* simpleIdentifier)? (
         NL* COLON NL* delegationSpecifiers
     )? (NL* classBody)?
+    ;
+
+companionBlock
+    : modifierList? COMPANION NL* classBody
     ;
 
 propertyDeclaration
