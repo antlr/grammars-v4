@@ -45,10 +45,15 @@ final class PerformanceCheck {
     private static final class ParseResult {
         private final List<String> errors;
         private final long predictionTransitions;
+        private final long postfixCallChainTransitions;
+        private final int postfixCallChainFallbacks;
 
-        private ParseResult(List<String> errors, long predictionTransitions) {
+        private ParseResult(List<String> errors, long predictionTransitions, long postfixCallChainTransitions,
+            int postfixCallChainFallbacks) {
             this.errors = errors;
             this.predictionTransitions = predictionTransitions;
+            this.postfixCallChainTransitions = postfixCallChainTransitions;
+            this.postfixCallChainFallbacks = postfixCallChainFallbacks;
         }
     }
 
@@ -108,9 +113,29 @@ final class PerformanceCheck {
 
         ParseResult callsAndOperations = parseExpression("factory()++()--()++");
         assertNoErrors("postfix call and operation chain", callsAndOperations);
-        System.out.println("Postfix prediction transitions: " + callsAndOperations.predictionTransitions);
+        reportPostfixMetrics("calls and operations", callsAndOperations);
+
+        String repeatedCalls = "factory()" + "()".repeat(10);
+        assertNoErrors("repeated argument calls", reportPostfixMetrics("repeated argument calls",
+            parseExpression(repeatedCalls)));
+        assertNoErrors("generic call chain", reportPostfixMetrics("generic call chain",
+            parseExpression("factory<First>()<Second>()<Third>()")));
+        assertNoErrors("lambda-first call chain", reportPostfixMetrics("lambda-first call chain",
+            parseExpression("factory {}" + "()".repeat(8))));
+        assertNoErrors("lambda-middle call chain", reportPostfixMetrics("lambda-middle call chain",
+            parseExpression("factory()" + "()".repeat(4) + " {} " + "()".repeat(4))));
+        assertNoErrors("lambda-last call chain", reportPostfixMetrics("lambda-last call chain",
+            parseExpression("factory()" + "()".repeat(8) + " {}")));
 
         assertHasErrors("incomplete postfix call chain", parseExpression("factory()++("));
+        assertHasErrors("multiple adjacent trailing lambdas", parseExpression("factory() {} {}"));
+    }
+
+    private static ParseResult reportPostfixMetrics(String label, ParseResult result) {
+        System.out.println(label + " postfixCallChain transitions: " + result.postfixCallChainTransitions
+            + ", LL fallbacks: " + result.postfixCallChainFallbacks
+            + ", total parser transitions: " + result.predictionTransitions);
+        return result;
     }
 
     private static ParseResult parseExpression(String source) {
@@ -131,10 +156,18 @@ final class PerformanceCheck {
             errors.add("Unconsumed input " + parser.getCurrentToken().getText());
         }
         long transitions = 0;
-        for (DecisionInfo info : parser.getParseInfo().getDecisionInfo()) {
+        long postfixCallChainTransitions = 0;
+        int postfixCallChainFallbacks = 0;
+        DecisionInfo[] decisionInfo = parser.getParseInfo().getDecisionInfo();
+        for (int i = 0; i < decisionInfo.length; i++) {
+            DecisionInfo info = decisionInfo[i];
             transitions += info.SLL_ATNTransitions + info.LL_ATNTransitions;
+            if (parser.getRuleNames()[parser.getATN().getDecisionState(i).ruleIndex].equals("postfixCallChain")) {
+                postfixCallChainTransitions += info.SLL_ATNTransitions + info.LL_ATNTransitions;
+                postfixCallChainFallbacks += info.LL_Fallback;
+            }
         }
-        return new ParseResult(errors, transitions);
+        return new ParseResult(errors, transitions, postfixCallChainTransitions, postfixCallChainFallbacks);
     }
 
     private static BaseErrorListener errorCollector(List<String> errors) {

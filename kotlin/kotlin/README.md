@@ -106,7 +106,6 @@ jumpExpression
 kotlinFile
 objectLiteral
 packageHeader
-postfixCallChain
 postfixUnaryExpression
 receiverType
 secondaryConstructor
