@@ -1,0 +1,11 @@
+( Parent and child labels, with a sub-label referenced via scope. )
+
+@counter
+	&value 00
+	&limit 0a
+
+@routine
+	.counter/value LDZ
+	INC
+	.counter/value STZ
+	JMP2r

@@ -1,0 +1,16 @@
+( Absolute and relative padding, anchoring code to fixed addresses. )
+
+|0100
+
+@init
+	BRK
+
+$10
+
+@later
+	BRK
+
+|0200
+
+@fixed
+	BRK

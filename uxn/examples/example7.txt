@@ -1,0 +1,9 @@
+( Brackets are purely for readability; they carry no semantic weight. )
+
+@routine
+	[ LIT2 20 -Console/write ] DEO
+	JMP2r
+
+%abs ( a -- a ) {
+	DUP #7f GTH [ #ff EOR #01 ADD ] POP
+}

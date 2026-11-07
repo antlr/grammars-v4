@@ -1,0 +1,10 @@
+( Stack arithmetic using byte, short, keep, and return modes. )
+
+#01 DUP ADD #03 MUL
+
+#1234 #4567 ADD2
+
+#1234 #4567 ADD2k
+
+LITr 12
+#34 STH ADDr STHr
