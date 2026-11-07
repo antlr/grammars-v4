@@ -1,0 +1,8 @@
+( A raw-data sprite table, grouped with brackets for readability. )
+
+@sprite [ 00 66 ff ff ff 7e 3c 18 ]
+
+@palette
+	&r 0 f 8
+	&g 0 f 2
+	&b 0 f 4

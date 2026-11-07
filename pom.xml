@@ -480,6 +480,7 @@
 				<module>url</module>
 				<module>useragent</module>
 				<module>uuencoding</module>
+				<module>uxn</module>
 				<module>v</module>
 				<module>vaxscan</module>
 				<module>vb6</module>
