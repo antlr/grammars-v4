@@ -1,3 +1,7 @@
+// Tests numeric literal formats and unsigned suffixes.
+
+package sample.numericliterals
+
 val exponent = 1e3
 val signedExponent = 1.25e-3
 val underscoredExponent = 1_2.3_4e+5_6

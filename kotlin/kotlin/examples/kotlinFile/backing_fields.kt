@@ -1,3 +1,7 @@
+// Tests backing-field declarations in properties and setters.
+
+package sample.backingfields
+
 val inferredBackingField
     field = 1
 

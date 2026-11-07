@@ -1,3 +1,7 @@
+// Tests class, interface, enum, and object member declarations.
+
+package sample.classmembers
+
 class CompactProperty { val value = 1 }
 
 class CompactFunction { fun value() = 1 }

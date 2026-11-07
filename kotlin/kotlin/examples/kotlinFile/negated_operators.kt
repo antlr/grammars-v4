@@ -1,4 +1,6 @@
-package samples.negatedoperators
+// Tests negated type and membership operators with trivia.
+
+package sample.negatedoperators
 
 fun negatedOperators(value: Any, values: List<Int>, array: Array<Boolean>) {
     val defaultType = value !is/* block */String

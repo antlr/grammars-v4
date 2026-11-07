@@ -1,4 +1,6 @@
-package samples.contextfunctiontypes
+// Tests context function types in declarations and expressions.
+
+package sample.contextfunctiontypes
 
 typealias Basic = context(Logger) () -> Unit
 typealias Multiple = context(Logger, @TypeMarker Service, List<String?>) suspend () -> String

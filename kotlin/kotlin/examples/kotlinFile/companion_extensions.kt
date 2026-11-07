@@ -1,4 +1,6 @@
-package samples.companionextensions
+// Tests companion extensions and the companion soft keyword.
+
+package sample.companionextensions
 
 companion
 fun String.topLevel(): String = this

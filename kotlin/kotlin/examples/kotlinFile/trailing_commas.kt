@@ -1,3 +1,7 @@
+// Tests trailing commas in functions, lambdas, indices, and clauses.
+
+package sample.trailingcommas
+
 typealias EmptyFunction = () -> Unit
 typealias NamedFunction = (value: String,) -> Unit
 typealias UnnamedFunction = (String, Int,) -> Unit

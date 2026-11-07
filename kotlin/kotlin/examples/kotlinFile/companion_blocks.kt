@@ -1,3 +1,7 @@
+// Tests companion block declarations across class-like declarations.
+
+package sample.companionblocks
+
 class CompanionBlockHost {
     companion {}
 

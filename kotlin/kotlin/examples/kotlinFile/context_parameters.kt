@@ -1,3 +1,7 @@
+// Tests context parameter declarations and modifiers.
+
+package sample.contextparameters
+
 @DeclarationAnnotation
 context(logger: Logger)
 public fun multilineFunction() {}

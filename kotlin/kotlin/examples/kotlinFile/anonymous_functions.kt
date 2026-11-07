@@ -1,4 +1,6 @@
-package samples.anonymousfunctions
+// Tests anonymous function syntax, parameters, receivers, and expressions.
+
+package sample.anonymousfunctions
 
 fun typed(value: Int) = fun(item: Int): Int { return item + value }
 

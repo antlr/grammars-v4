@@ -1,3 +1,7 @@
+// Tests newline handling in expressions, blocks, and string templates.
+
+package sample.blocknewlines
+
 fun blockNewlines() {
     val parenthesizedExpression = (1
         + 2)
