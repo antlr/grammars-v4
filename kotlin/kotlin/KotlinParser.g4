@@ -20,7 +20,6 @@ options {
     tokenVocab = KotlinLexer;
 }
 
-
 kotlinFile
     : ShebangLine? NL* preamble anysemi* (topLevelObject (anysemi+ topLevelObject?)*)? EOF
     ;
@@ -433,7 +432,6 @@ prefixUnaryExpression
 
 postfixUnaryExpression
     : atomicExpression postfixUnaryOperation* (postfixCallChain postfixUnaryOperation+)* postfixCallChain?
-        postfixUnaryOperation*
     ;
 
 atomicExpression
