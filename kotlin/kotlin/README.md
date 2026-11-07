@@ -101,7 +101,6 @@ expression
 fileAnnotation
 functionLiteral
 ifExpression
-importHeader
 infixExpression
 jumpExpression
 kotlinFile
