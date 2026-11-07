@@ -187,6 +187,14 @@ VALUE       : 'value';
 
 //
 
+Dollar1TripleQuoteOpen: '$"""' -> pushMode(MultiLineString), type(TRIPLE_QUOTE_OPEN);
+Dollar1QuoteOpen: '$"' -> pushMode(LineString), type(QUOTE_OPEN);
+Dollar2TripleQuoteOpen: '$$"""' -> pushMode(MultiDollarMultiLineString2), type(TRIPLE_QUOTE_OPEN);
+Dollar2QuoteOpen: '$$"' -> pushMode(MultiDollarLineString2), type(QUOTE_OPEN);
+Dollar3TripleQuoteOpen: '$$$"""' -> pushMode(MultiDollarMultiLineString3), type(TRIPLE_QUOTE_OPEN);
+Dollar3QuoteOpen: '$$$"' -> pushMode(MultiDollarLineString3), type(QUOTE_OPEN);
+Dollar4TripleQuoteOpen: '$$$$"""' -> pushMode(MultiDollarMultiLineString4), type(TRIPLE_QUOTE_OPEN);
+Dollar4QuoteOpen: '$$$$"' -> pushMode(MultiDollarLineString4), type(QUOTE_OPEN);
 QUOTE_OPEN        : '"'   -> pushMode(LineString);
 TRIPLE_QUOTE_OPEN : '"""' -> pushMode(MultiLineString);
 
@@ -314,6 +322,22 @@ Inside_AS_SAFE          : AS_SAFE          -> type(AS_SAFE);
 Inside_EQEQ             : EQEQ             -> type(EQEQ);
 Inside_EQEQEQ           : EQEQEQ           -> type(EQEQEQ);
 Inside_SINGLE_QUOTE     : SINGLE_QUOTE     -> type(SINGLE_QUOTE);
+Inside_Dollar1TripleQuoteOpen:
+    '$"""' -> pushMode(MultiLineString), type(TRIPLE_QUOTE_OPEN)
+;
+Inside_Dollar1QuoteOpen: '$"' -> pushMode(LineString), type(QUOTE_OPEN);
+Inside_Dollar2TripleQuoteOpen:
+    '$$"""' -> pushMode(MultiDollarMultiLineString2), type(TRIPLE_QUOTE_OPEN)
+;
+Inside_Dollar2QuoteOpen: '$$"' -> pushMode(MultiDollarLineString2), type(QUOTE_OPEN);
+Inside_Dollar3TripleQuoteOpen:
+    '$$$"""' -> pushMode(MultiDollarMultiLineString3), type(TRIPLE_QUOTE_OPEN)
+;
+Inside_Dollar3QuoteOpen: '$$$"' -> pushMode(MultiDollarLineString3), type(QUOTE_OPEN);
+Inside_Dollar4TripleQuoteOpen:
+    '$$$$"""' -> pushMode(MultiDollarMultiLineString4), type(TRIPLE_QUOTE_OPEN)
+;
+Inside_Dollar4QuoteOpen: '$$$$"' -> pushMode(MultiDollarLineString4), type(QUOTE_OPEN);
 Inside_QUOTE_OPEN       : QUOTE_OPEN       -> pushMode(LineString), type(QUOTE_OPEN);
 Inside_TRIPLE_QUOTE_OPEN:
     TRIPLE_QUOTE_OPEN -> pushMode(MultiLineString), type(TRIPLE_QUOTE_OPEN)
@@ -431,11 +455,40 @@ LineStrEscapedChar: EscapeSeq;
 
 LineStrExprStart: '${' -> pushMode(StringExpression);
 
+mode MultiDollarLineString2;
+
+MD2_QUOTE_CLOSE: '"' -> popMode, type(QUOTE_CLOSE);
+MD2_REF: '$$' Identifier -> type(LineStrRef);
+MD2_EXPR: '$$' '{' -> pushMode(StringExpression), type(LineStrExprStart);
+MD2_EXTRA_DOLLAR: '$' -> type(LineStrText);
+MD2_TEXT: ~('\\' | '"' | '$' | '\u000A' | '\u000D')+ -> type(LineStrText);
+MD2_ESCAPE: EscapeSeq -> type(LineStrEscapedChar);
+
+mode MultiDollarLineString3;
+
+MD3_QUOTE_CLOSE: '"' -> popMode, type(QUOTE_CLOSE);
+MD3_REF: '$$$' Identifier -> type(LineStrRef);
+MD3_EXPR: '$$$' '{' -> pushMode(StringExpression), type(LineStrExprStart);
+MD3_EXTRA_DOLLAR: '$' -> type(LineStrText);
+MD3_TEXT: ~('\\' | '"' | '$' | '\u000A' | '\u000D')+ -> type(LineStrText);
+MD3_ESCAPE: EscapeSeq -> type(LineStrEscapedChar);
+
+mode MultiDollarLineString4;
+
+MD4_QUOTE_CLOSE: '"' -> popMode, type(QUOTE_CLOSE);
+MD4_REF: '$$$$' Identifier -> type(LineStrRef);
+MD4_EXPR: '$$$$' '{' -> pushMode(StringExpression), type(LineStrExprStart);
+MD4_EXTRA_DOLLAR: '$' -> type(LineStrText);
+MD4_TEXT: ~('\\' | '"' | '$' | '\u000A' | '\u000D')+ -> type(LineStrText);
+MD4_ESCAPE: EscapeSeq -> type(LineStrEscapedChar);
+
 mode MultiLineString;
 
-TRIPLE_QUOTE_CLOSE: MultiLineStringQuote? '"""' -> popMode;
+TRIPLE_QUOTE_CLOSE: MultiLineStringQuoteSequence? '"""' -> popMode;
 
-MultiLineStringQuote: '"'+;
+MultiLineStringQuote: MultiLineStringQuoteSequence;
+
+fragment MultiLineStringQuoteSequence: '"'+;
 
 MultiLineStrRef: FieldIdentifier;
 
@@ -444,6 +497,36 @@ MultiLineStrText: ~('"' | '$')+ | '$';
 MultiLineStrExprStart: '${' -> pushMode(StringExpression);
 
 MultiLineNL: NL -> skip;
+
+mode MultiDollarMultiLineString2;
+
+MD2_TRIPLE_QUOTE_CLOSE: MultiLineStringQuoteSequence? '"""' -> popMode, type(TRIPLE_QUOTE_CLOSE);
+MD2_QUOTE_RUN: MultiLineStringQuoteSequence -> type(MultiLineStringQuote);
+MD2M_REF: '$$' Identifier -> type(MultiLineStrRef);
+MD2M_EXPR: '$$' '{' -> pushMode(StringExpression), type(MultiLineStrExprStart);
+MD2M_EXTRA_DOLLAR: '$' -> type(MultiLineStrText);
+MD2M_TEXT: ~('"' | '$')+ -> type(MultiLineStrText);
+MD2M_NL: NL -> skip;
+
+mode MultiDollarMultiLineString3;
+
+MD3_TRIPLE_QUOTE_CLOSE: MultiLineStringQuoteSequence? '"""' -> popMode, type(TRIPLE_QUOTE_CLOSE);
+MD3_QUOTE_RUN: MultiLineStringQuoteSequence -> type(MultiLineStringQuote);
+MD3M_REF: '$$$' Identifier -> type(MultiLineStrRef);
+MD3M_EXPR: '$$$' '{' -> pushMode(StringExpression), type(MultiLineStrExprStart);
+MD3M_EXTRA_DOLLAR: '$' -> type(MultiLineStrText);
+MD3M_TEXT: ~('"' | '$')+ -> type(MultiLineStrText);
+MD3M_NL: NL -> skip;
+
+mode MultiDollarMultiLineString4;
+
+MD4_TRIPLE_QUOTE_CLOSE: MultiLineStringQuoteSequence? '"""' -> popMode, type(TRIPLE_QUOTE_CLOSE);
+MD4_QUOTE_RUN: MultiLineStringQuoteSequence -> type(MultiLineStringQuote);
+MD4M_REF: '$$$$' Identifier -> type(MultiLineStrRef);
+MD4M_EXPR: '$$$$' '{' -> pushMode(StringExpression), type(MultiLineStrExprStart);
+MD4M_EXTRA_DOLLAR: '$' -> type(MultiLineStrText);
+MD4M_TEXT: ~('"' | '$')+ -> type(MultiLineStrText);
+MD4M_NL: NL -> skip;
 
 mode StringExpression;
 
@@ -505,6 +588,22 @@ StrExpr_AS_SAFE          : AS_SAFE          -> type(AS_SAFE);
 StrExpr_EQEQ             : EQEQ             -> type(EQEQ);
 StrExpr_EQEQEQ           : EQEQEQ           -> type(EQEQEQ);
 StrExpr_SINGLE_QUOTE     : SINGLE_QUOTE     -> type(SINGLE_QUOTE);
+StrExpr_Dollar1TripleQuoteOpen:
+    '$"""' -> pushMode(MultiLineString), type(TRIPLE_QUOTE_OPEN)
+;
+StrExpr_Dollar1QuoteOpen: '$"' -> pushMode(LineString), type(QUOTE_OPEN);
+StrExpr_Dollar2TripleQuoteOpen:
+    '$$"""' -> pushMode(MultiDollarMultiLineString2), type(TRIPLE_QUOTE_OPEN)
+;
+StrExpr_Dollar2QuoteOpen: '$$"' -> pushMode(MultiDollarLineString2), type(QUOTE_OPEN);
+StrExpr_Dollar3TripleQuoteOpen:
+    '$$$"""' -> pushMode(MultiDollarMultiLineString3), type(TRIPLE_QUOTE_OPEN)
+;
+StrExpr_Dollar3QuoteOpen: '$$$"' -> pushMode(MultiDollarLineString3), type(QUOTE_OPEN);
+StrExpr_Dollar4TripleQuoteOpen:
+    '$$$$"""' -> pushMode(MultiDollarMultiLineString4), type(TRIPLE_QUOTE_OPEN)
+;
+StrExpr_Dollar4QuoteOpen: '$$$$"' -> pushMode(MultiDollarLineString4), type(QUOTE_OPEN);
 StrExpr_QUOTE_OPEN       : QUOTE_OPEN   -> pushMode(LineString), type(QUOTE_OPEN);
 StrExpr_TRIPLE_QUOTE_OPEN:
     TRIPLE_QUOTE_OPEN -> pushMode(MultiLineString), type(TRIPLE_QUOTE_OPEN)
