@@ -49,7 +49,7 @@ importList
     ;
 
 importHeader
-    : IMPORT identifier (DOT MULT | importAlias)? semi?
+    : IMPORT identifier (DOT MULT | importAlias)? (semi | EOF)
     ;
 
 importAlias
