@@ -20,6 +20,7 @@ options {
     tokenVocab = KotlinLexer;
 }
 
+
 kotlinFile
     : ShebangLine? NL* preamble anysemi* (topLevelObject (anysemi+ topLevelObject?)*)? EOF
     ;
@@ -738,7 +739,7 @@ postfixUnaryOperation
     | EXCL_EXCL
     | arrayAccess
     | NL* COLONCOLON NL* (simpleIdentifier | CLASS)
-    | NL* memberAccessOperator NL* postfixUnaryExpression
+    | NL* memberAccessOperator NL* (simpleIdentifier | parenthesizedExpression | CLASS)
     ;
 
 memberAccessOperator

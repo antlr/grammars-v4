@@ -76,7 +76,9 @@ and `callableReference` are now alternatives directly under `atomicExpression`.
 Ordinary expressions use `infixExpression` directly; `comparison` is present only when a comparison operator is
 used. Where generic-call type arguments overlap with comparison syntax, `infixExpression` is preferred so call
 arguments are not split into comparison nodes. Cast targets remain `type` nodes, and type tests still consume a
-`type` rather than an expression.
+`type` rather than an expression. Navigation operations now consume a simple identifier, parenthesized expression, or
+`class` selector instead of recursively owning another postfix expression; subsequent calls and postfix operations
+belong to the outer `postfixUnaryExpression`.
 
 ## Issues
 
@@ -106,7 +108,6 @@ jumpExpression
 kotlinFile
 objectLiteral
 packageHeader
-postfixUnaryExpression
 receiverType
 secondaryConstructor
 semi
