@@ -157,6 +157,20 @@ functionDeclaration
     )? (NL* typeConstraints)? (NL* functionBody)?
     ;
 
+anonymousFunction
+    : FUN (NL* type NL* DOT)? NL* anonymousFunctionParameters (NL* COLON NL* type)? (NL* typeConstraints)? (
+        NL* functionBody
+    )?
+    ;
+
+anonymousFunctionParameters
+    : LPAREN (anonymousFunctionParameter (COMMA anonymousFunctionParameter)* COMMA?)? RPAREN
+    ;
+
+anonymousFunctionParameter
+    : modifierList? simpleIdentifier (COLON type)? (ASSIGNMENT expression)?
+    ;
+
 functionValueParameters
     : LPAREN (functionValueParameter (COMMA functionValueParameter)* COMMA?)? RPAREN
     ;
@@ -413,6 +427,7 @@ postfixUnaryExpression
 atomicExpression
     : parenthesizedExpression
     | literalConstant
+    | anonymousFunction
     | functionLiteral
     | thisExpression        // THIS labelReference?
     | superExpression       // SUPER (LANGLE type RANGLE)? labelReference?
