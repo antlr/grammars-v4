@@ -87,12 +87,19 @@ final class CallableReferenceCheck {
             }
         }
         assertReferenceTarget(result.parser, reference, "run");
-        if (navigation == null || directRuleChildren(navigation, result.parser, "postfixUnaryExpression").isEmpty()) {
+        if (navigation == null) {
             throw new AssertionError("Navigation after ::run must remain a separate postfix operation: " + chain.getText());
         }
-        ParserRuleContext nestedNavigation = directRuleChildren(navigation, result.parser, "postfixUnaryExpression").get(0);
-        if (!nestedNavigation.getText().equals("invoke()")) {
-            throw new AssertionError("Expected invoke() to remain after reference navigation but found " + nestedNavigation.getText());
+        if (!directRuleChildren(navigation, result.parser, "postfixUnaryExpression").isEmpty()) {
+            throw new AssertionError("Navigation selector must not recursively own a postfix expression: " + navigation.getText());
+        }
+        List<ParserRuleContext> selectors = directRuleChildren(navigation, result.parser, "simpleIdentifier");
+        if (selectors.size() != 1 || !selectors.get(0).getText().equals("invoke")) {
+            throw new AssertionError("Expected invoke as the direct navigation selector but found " + navigation.getText());
+        }
+        if (directRuleChildren(chain, result.parser, "postfixCallChain").size() != 2) {
+            throw new AssertionError("Calls before and after navigation must belong to the outer postfix expression: "
+                + chain.getText());
         }
     }
 
