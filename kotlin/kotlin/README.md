@@ -17,6 +17,15 @@ Licensed under the Apache 2.0
 Test.kt includes the test data from the JetBrains's repository
 github.com/JetBrains/kotlin/tree/master/compiler/testData/psi
 
+## Contacts
+
+* [Alexander Hinze](mailto:alexh@karmakrafts.dev)
+* [Anastasiya Shadrina](mailto:a.shadrina5@mail.ru)
+
+## Origin source
+
+<https://github.com/shadrina/kotlin-grammar-antlr4>
+
 ## Identifier Unicode baseline
 
 The lexer freezes identifier categories at Unicode 12.1.0, the category baseline checked against the Kotlin 2.5.0-Beta2
@@ -46,14 +55,12 @@ Run the grammar examples with `mvn test`, and run the standalone Unicode regress
 `org.antlr.grammars.UnicodeIdentifierCheck` using the generated parser and ANTLR runtime classpath.
 Supplementary-plane tests use ANTLR's code-point-aware `CharStreams.fromString` input.
 
-## Contacts
+## Multi-dollar string interpolation
 
-* [Alexander Hinze](mailto:alexh@karmakrafts.dev)
-* [Anastasiya Shadrina](mailto:a.shadrina5@mail.ru)
-
-## Origin source
-
-<https://github.com/shadrina/kotlin-grammar-antlr4>
+String openers may be prefixed with one through four dollar signs. The prefix sets the interpolation threshold:
+only the final threshold-sized dollar sequence before an identifier or `{` begins interpolation, while preceding
+dollars remain string content. Both ordinary and raw strings use the same thresholds, including inside nested
+expressions. Prefixes longer than four dollars are intentionally unsupported by this bounded grammar.
 
 ## Expression parse-tree changes
 
