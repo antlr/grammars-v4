@@ -1655,10 +1655,8 @@ index_expr
     ;
 
 index_properties
-    : (
-        (global_partitioned_index | local_partitioned_index | index_attributes)+
-        | INDEXTYPE IS (domain_index_clause | xmlindex_clause)
-    )?
+    : (global_partitioned_index | local_partitioned_index | index_attributes)+
+    | INDEXTYPE IS (domain_index_clause | xmlindex_clause)
     ;
 
 domain_index_clause
@@ -3477,7 +3475,8 @@ xmltype_storage
     ;
 
 xmlschema_spec
-    : ((XMLSCHEMA DELIMITED_ID)? ELEMENT id_expression)? (allow_or_disallow (NONSCHEMA | ANYSCHEMA))*
+    : (XMLSCHEMA DELIMITED_ID)? ELEMENT id_expression (allow_or_disallow (NONSCHEMA | ANYSCHEMA))*
+    | (allow_or_disallow (NONSCHEMA | ANYSCHEMA))+
     ;
 
 object_table
@@ -5276,7 +5275,7 @@ enable_disable_clause
     ;
 
 using_index_clause
-    : USING INDEX (index_name | '(' create_index ')' | index_properties)
+    : USING INDEX (index_name | '(' create_index ')' | index_properties)?
     ;
 
 index_attributes
