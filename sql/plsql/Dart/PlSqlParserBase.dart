@@ -113,4 +113,11 @@ abstract class PlSqlParserBase extends Parser
             return false;
         return true;
     }
+
+    bool isNotBulkCollect() {
+        var stream = tokenStream as CommonTokenStream;
+        var lt1 = stream.LT(1);
+        var lt2 = stream.LT(2);
+        return lt1!.type != PlSqlLexer.TOKEN_BULK || lt2!.type != PlSqlLexer.TOKEN_COLLECT;
+    }
 }

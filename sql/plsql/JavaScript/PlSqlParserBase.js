@@ -112,4 +112,10 @@ export default class PlSqlParserBase extends antlr4.Parser {
         return false;
     return true;
   }
+
+  isNotBulkCollect() {
+    const lt1 = this.getTokenStream().LT(1);
+    const lt2 = this.getTokenStream().LT(2);
+    return lt1.type !== PlSqlLexer.BULK || lt2.type !== PlSqlLexer.COLLECT;
+  }
 }

@@ -65,3 +65,10 @@ bool PlSqlParserBase::isNotStartOfJoin() {
         return false;
     return true;
 }
+
+bool PlSqlParserBase::isNotBulkCollect() {
+    auto* stream = dynamic_cast<antlr4::CommonTokenStream*>(getTokenStream());
+    auto* lt1 = stream->LT(1);
+    auto* lt2 = stream->LT(2);
+    return lt1->getType() != PlSqlParser::BULK || lt2->getType() != PlSqlParser::COLLECT;
+}

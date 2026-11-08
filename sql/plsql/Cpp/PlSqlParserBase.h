@@ -62,6 +62,8 @@ class PlSqlParserBase : public antlr4::Parser
     bool IsNotNumericFunction();
 
     bool isNotStartOfJoin();
+
+    bool isNotBulkCollect();
 };
 
 #endif
