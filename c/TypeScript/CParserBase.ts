@@ -3,16 +3,14 @@ import { SymbolTable } from "./SymbolTable.js";
 import { Symbol } from "./Symbol.js";
 import { TypeClassification } from "./TypeClassification.js";
 import CLexer from "./CLexer.js";
-// Note: CParser import removed to break circular dependency (CParser extends CParserBase).
-// RULE_declaration = 27, RULE_declarationSpecifiers = 28, RULE_functionDefinition = 92 (from CParser.js static fields).
-
-function isDeclarationContext(x: any): boolean {
-  return x?.ruleIndex === 27;
-}
-
-
-function isFunctionDefinitionContext(x: any): boolean {
-  return x?.ruleIndex === 92;
+function hasRuleName(parser: Parser, context: ParserRuleContext, expectedName: string): boolean {
+    if (!("ruleNames" in parser) || !Array.isArray(parser.ruleNames)) {
+        return false;
+    }
+    if (!("ruleIndex" in context) || typeof context.ruleIndex !== "number") {
+        return false;
+    }
+    return parser.ruleNames[context.ruleIndex] === expectedName;
 }
 
 // List of all semantic function names
@@ -377,7 +375,7 @@ export default abstract class CParserBase extends Parser {
         if (this.debug) console.log("EnterDeclaration");
         let context: ParserRuleContext | null | undefined = this._ctx;
         for (; context != null; context = context.parentCtx) {
-            if (isDeclarationContext(context)) {
+            if (hasRuleName(this, context, "declaration")) {
                 const declaration_context = context as any;
                 const declaration_specifiers = declaration_context.declarationSpecifiers();
                 const declaration_specifier = declaration_specifiers?.declarationSpecifier_list() ?? null;
@@ -437,7 +435,7 @@ export default abstract class CParserBase extends Parser {
                     }
                 }
             }
-            if (isFunctionDefinitionContext(context)) {
+            if (hasRuleName(this, context, "functionDefinition")) {
                 const fd = context as any;
                 const de = fd.declarator();
                 if (de === null || de === undefined) continue;
