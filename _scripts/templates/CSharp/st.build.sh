@@ -1,10 +1,13 @@
 # Generated from trgen <version>
 set -e
+if [ "${ANTLR_GENERATION_ONLY:-0}" = "1" ]; then set -x; fi
 if [ -f transformGrammar.py ]; then python3 transformGrammar.py ; fi
 
 <if(antlrng_tool)>
+if [ "${ANTLR_GENERATION_ONLY:-0}" != "1" ]; then
 npm init -y
 npm i antlr-ng
+fi
 <endif>
 
 <if(antlr_is_dev)>
@@ -29,6 +32,8 @@ java -jar "$JAR" -encoding <antlr_encoding> -Dlanguage=CSharp <x.AntlrArgs> <ant
 antlr4 -v $version -encoding <antlr_encoding> -Dlanguage=CSharp <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileNameTarget>
 <endif>
 } >
+
+if [ "${ANTLR_GENERATION_ONLY:-0}" = "1" ]; then exit 0; fi
 
 dotnet restore Test.csproj
 dotnet build Test.csproj

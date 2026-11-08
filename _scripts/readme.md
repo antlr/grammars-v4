@@ -18,6 +18,15 @@ code contains makefiles and Powershell files to present an idealized interface
 to build and run the parse with the examples, so you do not need to memorize how
 to build and run the parser for the given target.
 
+## Generator warning inventory
+
+The `Generator warning inventory` workflow runs `_scripts/test.sh` with
+`--generation-only`. This performs grammar transforms and invokes the configured
+generator without compiling generated sources or parsing examples. The workflow
+publishes normalized diagnostics, generator version metadata, the tested/skipped
+matrix, and per-grammar raw logs. Generator warnings are inventory data and do
+not fail the workflow; missing, unparseable, or failed generator runs do.
+
 To build and run the parser using the makefiles, you must be in an environment
 that provides make and Bash. Ubuntu provides that out of the box. For Windows,
 you must use MinGW64, then "pacman install [make](https://packages.msys2.org/package/mingw-w64-x86_64-make)"

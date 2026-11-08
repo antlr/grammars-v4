@@ -18,6 +18,7 @@ myrealpath ()
 # true or false
 quiet=true
 jobs_limit=4
+generation_only=false
 
 # Get full path of this script.
 full_path_script=$(myrealpath $0)
@@ -110,6 +111,10 @@ while [[ $# -gt 0 ]]; do
             antlr_version="${1#*=}"
             shift
             ;;
+        --generation-only)
+            generation_only=true
+            shift
+            ;;
         *)
             _args+=("$1")
             shift
@@ -196,6 +201,10 @@ OPTIONS
            Specifies the ANTLR4 tool and runtime version to use (e.g. "4.13.1"),
            or "dev" to clone and build from the ANTLR4 dev branch. Passed
            directly to trgen. If omitted, trgen's default version is used.
+
+       --generation-only
+           Runs grammar transformation and parser generation without compiling
+           generated sources or parsing examples.
 
 EOF
             exit 0
@@ -375,10 +384,16 @@ run_pair()
 
     echo ""
     echo "$testname,$target:"
+    if [ "$generation_only" = true ]; then
+        echo "generator-inventory: status=started"
+    fi
 
     if [ ! -f desc.xml ]
     then
         echo No desc.xml for $testname
+        if [ "$generation_only" = true ]; then
+            echo "generator-inventory: status=failed stage=metadata"
+        fi
         failed=1
         popd > /dev/null
         return 1
@@ -387,6 +402,9 @@ run_pair()
     if [ "${PIPESTATUS[0]}" -ne 0 ]
     then
         echo "The desc.xml for $testname is malformed. Skipping."
+        if [ "$generation_only" = true ]; then
+            echo "generator-inventory: status=failed stage=metadata"
+        fi
         failed=1
         popd > /dev/null
         return 1
@@ -405,6 +423,9 @@ run_pair()
     if [ "$yes" == "false" ]
     then
         echo "Intentionally skipping grammar $testname target $target."
+        if [ "$generation_only" = true ]; then
+            echo "generator-inventory: status=skipped"
+        fi
         popd > /dev/null
         return 0
     fi
@@ -435,6 +456,9 @@ run_pair()
         echo "Generation of $testname for $target failed (exit $gen_status)."
         printf '%s\n' "$gen_output"
         echo ========
+        if [ "$generation_only" = true ]; then
+            echo "generator-inventory: status=failed stage=driver-generation"
+        fi
         popd > /dev/null
         return 1
     fi
@@ -446,8 +470,22 @@ run_pair()
     if [ "${#generated_dirs[@]}" -eq 0 ]; then
         echo " Build: $(thetime $(($(date +"%s") - build_start)))"
         echo "Generation of $testname for $target produced no driver directory."
+        if [ "$generation_only" = true ]; then
+            echo "generator-inventory: status=failed stage=driver-generation"
+        fi
         popd > /dev/null
         return 1
+    fi
+
+    # Test scenarios can produce multiple drivers for the same grammar and
+    # target. One generator invocation is sufficient for warning inventory.
+    if [ "$generation_only" = true ]; then
+        primary_generated_dir="Generated-$target"
+        if [ -d "$primary_generated_dir" ]; then
+            generated_dirs=( "$primary_generated_dir" )
+        else
+            generated_dirs=( "${generated_dirs[0]}" )
+        fi
     fi
 
     built_dirs=()
@@ -461,7 +499,11 @@ run_pair()
         # Build driver code.
         if [ $quiet != "true" ]; then echo "Building."; fi
         pushd "$d" > /dev/null
-        bash build.sh
+        if [ "$generation_only" = true ]; then
+            ANTLR_GENERATION_ONLY=1 bash build.sh
+        else
+            bash build.sh
+        fi
         status="$?"
         if [ "$status" != "0" ]
         then
@@ -476,6 +518,17 @@ run_pair()
         popd > /dev/null
     done
     echo " Build: $(thetime $(($(date +"%s") - build_start)))"
+
+    if [ "$generation_only" = true ]; then
+        if [ "$failed" -eq 0 ]; then
+            echo "generator-inventory: status=completed"
+        else
+            echo "generator-inventory: status=failed stage=generator"
+        fi
+        popd > /dev/null
+        [ "$failed" -eq 0 ]
+        return
+    fi
 
     for d in "${built_dirs[@]}"; do
         # Test generated parser on examples.

@@ -1,0 +1,129 @@
+name: Generator warning inventory
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 4 * * 2'
+  pull_request:
+    paths:
+      - '.github/workflows/generator-warning-inventory.yml'
+      - '_scripts/collect-generator-diagnostics.py'
+      - '_scripts/test-collect-generator-diagnostics.py'
+      - '_scripts/test.sh'
+      - '_scripts/templates/**/st.build.sh'
+      - '_scripts/templates/Cpp/cmake/st.FindANTLR.cmake'
+
+permissions:
+  contents: read
+
+env:
+  ANTLR_VERSION: '4.13.2'
+  ANTLR_NG_COMMIT: '4975d4a7b556e34c38c2e53b9815c8c4c802236f'
+  INVENTORY_TARGETS: 'Antlr4ng Cpp CSharp Dart Go Java JavaScript Python3 TypeScript'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v7
+    - name: Validate inventory scripts
+      run: |
+        bash -n _scripts/test.sh
+        python3 _scripts/test-collect-generator-diagnostics.py
+
+  inventory:
+    if: github.event_name != 'pull_request'
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        fetch-depth: 0
+    - name: Set up Java
+      uses: actions/setup-java@v6.1.0
+      with:
+        java-version: '17'
+        distribution: zulu
+    - name: Set up Python
+      uses: actions/setup-python@v7.1.0
+      with:
+        python-version: '3.10'
+    - name: Set up Node.js
+      uses: actions/setup-node@v7.1.0
+      with:
+        node-version: '22.12.0'
+    - name: Install repository tools
+      run: |
+        python -m ensurepip --upgrade
+        pip install _scripts/antlr4-tools
+        dotnet tool restore
+        npm install --global tsx typescript
+    - name: Install pinned antlr-ng
+      run: |
+        git clone https://github.com/mike-lischke/antlr-ng.git "$HOME/antlr-ng"
+        git -C "$HOME/antlr-ng" checkout "$ANTLR_NG_COMMIT"
+        npm --prefix "$HOME/antlr-ng" install
+        npm --prefix "$HOME/antlr-ng" run build
+    - name: Generate warning inventory
+      id: generate
+      shell: bash
+      run: |
+        mkdir -p generator-warning-inventory
+        read -r -a inventory_targets <<< "$INVENTORY_TARGETS"
+        set +e
+        bash _scripts/test.sh \
+          --generation-only \
+          --antlr-version "$ANTLR_VERSION" \
+          -j 4 \
+          -t "${inventory_targets[@]}" \
+          2>&1 | tee generator-warning-inventory/raw.log
+        exit_code=${PIPESTATUS[0]}
+        set -e
+        echo "exit_code=$exit_code" >> "$GITHUB_OUTPUT"
+    - name: Normalize diagnostics
+      id: normalize
+      continue-on-error: true
+      shell: bash
+      run: |
+        read -r -a inventory_targets <<< "$INVENTORY_TARGETS"
+        antlr_jar="$HOME/.m2/repository/org/antlr/antlr4/$ANTLR_VERSION/antlr4-$ANTLR_VERSION-complete.jar"
+        if [ ! -f "$antlr_jar" ]; then
+          echo "ANTLR JAR not found: $antlr_jar" >&2
+          exit 1
+        fi
+        antlr_jar_sha256=$(sha256sum "$antlr_jar" | awk '{print $1}')
+        antlr_ng_version=$(node -p "require('$HOME/antlr-ng/package.json').version")
+        python3 _scripts/collect-generator-diagnostics.py \
+          --log generator-warning-inventory/raw.log \
+          --output generator-warning-inventory \
+          --repository . \
+          --repository-commit "$GITHUB_SHA" \
+          --antlr-version "$ANTLR_VERSION" \
+          --antlr-jar-sha256 "$antlr_jar_sha256" \
+          --antlr-ng-commit "$ANTLR_NG_COMMIT" \
+          --antlr-ng-version "$antlr_ng_version" \
+          --test-exit-code '${{ steps.generate.outputs.exit_code }}' \
+          --targets "${inventory_targets[@]}"
+    - name: Publish job summary
+      if: always()
+      run: cat generator-warning-inventory/summary.md >> "$GITHUB_STEP_SUMMARY"
+    - name: Upload inventory
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: generator-warning-inventory
+        path: generator-warning-inventory/
+        retention-days: 30
+    - name: Validate inventory completeness
+      if: always()
+      shell: bash
+      run: |
+        if [ '${{ steps.generate.outputs.exit_code }}' != '0' ]; then
+          echo 'One or more generator runs failed.' >&2
+          exit 1
+        fi
+        if [ '${{ steps.normalize.outcome }}' != 'success' ]; then
+          echo 'The inventory is incomplete or contains unparsed diagnostics.' >&2
+          exit 1
+        fi
