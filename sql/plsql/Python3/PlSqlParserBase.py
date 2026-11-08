@@ -93,3 +93,9 @@ class PlSqlParserBase(Parser):
                          _Lexer.RIGHT, _Lexer.OUTER)):
             return False
         return True
+
+    def isNotBulkCollect(self):
+        from PlSqlLexer import PlSqlLexer as _Lexer
+        lt1 = self._input.LT(1)
+        lt2 = self._input.LT(2)
+        return lt1.type != _Lexer.BULK or lt2.type != _Lexer.COLLECT

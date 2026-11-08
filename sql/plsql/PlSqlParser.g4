@@ -6267,7 +6267,7 @@ from_clause
 
 select_list_elements
     : tableview_name '.' ASTERISK
-    | expression column_alias?
+    | expression ({this.isNotBulkCollect()}? column_alias)?
     ;
 
 table_ref_list
