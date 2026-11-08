@@ -122,7 +122,6 @@ rm -rf `find . -name 'Generated*' -type d`
 
 # Pre-process long options not handled by getopts.
 antlr_version=""
-set -- "${_args[@]}"
 
 if [ "${#grammars[@]}" -gt 0 ]
 then
