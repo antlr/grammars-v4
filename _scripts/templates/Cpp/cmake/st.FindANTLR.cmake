@@ -99,5 +99,11 @@ find_package(Java QUIET COMPONENTS Runtime)
                 ${ANTLR_TARGET_DEPENDS}
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         COMMENT "Building ${Name} with ANTLR")
-  endmacro(ANTLR_TARGET)
 
+    if(NOT TARGET antlr_warning_inventory)
+      add_custom_target(antlr_warning_inventory)
+    endif()
+    add_custom_target(antlr_warning_inventory_${Name}
+                      DEPENDS ${ANTLR_${Name}_OUTPUTS})
+    add_dependencies(antlr_warning_inventory antlr_warning_inventory_${Name})
+  endmacro(ANTLR_TARGET)

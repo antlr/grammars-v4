@@ -1,5 +1,6 @@
 # Generated from trgen <version>
 set -e
+if [ "${ANTLR_GENERATION_ONLY:-0}" = "1" ]; then set -x; fi
 
 if [ -f transformGrammar.py ]; then python3 transformGrammar.py ; fi
 
@@ -19,7 +20,9 @@ version=`grep antlr4 package.json | awk '{print $2}' | tr -d '"' | tr -d ',' | t
 <endif>
 
 <if(antlrng_tool)>
+if [ "${ANTLR_GENERATION_ONLY:-0}" != "1" ]; then
 npm i antlr-ng
+fi
 <endif>
 
 <tool_grammar_tuples:{x |
@@ -31,6 +34,8 @@ java -jar "$JAR" -encoding <antlr_encoding> -Dlanguage=JavaScript <x.AntlrArgs> 
 antlr4 -v $version -encoding <antlr_encoding> -Dlanguage=JavaScript <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileNameTarget>
 <endif>
 } >
+
+if [ "${ANTLR_GENERATION_ONLY:-0}" = "1" ]; then exit 0; fi
 
 npm install
 exit 0

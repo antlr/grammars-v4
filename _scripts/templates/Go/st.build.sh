@@ -1,5 +1,7 @@
 # Generated from trgen <version>
 
+if [ "${ANTLR_GENERATION_ONLY:-0}" = "1" ]; then set -x; fi
+
 <if(antlr_is_dev)>
 ANTLR4_DEV_DIR=<antlr_dev_dir>/antlr4
 if [ ! -d "$ANTLR4_DEV_DIR/.git" ]; then
@@ -11,12 +13,14 @@ JAR=$(ls "$ANTLR4_DEV_DIR"/tool/target/antlr4-*-complete.jar | tail -1)
 version="<antlr_version>"
 <endif>
 export GO111MODULE=on
+if [ "${ANTLR_GENERATION_ONLY:-0}" != "1" ]; then
 <if(antlr_is_dev)>
 for i in {1..5}; do go get github.com/antlr4-go/antlr/v4@latest; if [ "$?" = "0" ]; then break; fi; done; if [ "$?" != "0" ]; then exit 1; fi
 <else>
 for i in {1..5}; do go get github.com/antlr4-go/antlr/v4@v$version; if [ "$?" = "0" ]; then break; fi; done; if [ "$?" != "0" ]; then exit 1; fi
 <endif>
 for i in {1..5}; do go get golang.org/x/text@v0.26.0; if [ "$?" = "0" ]; then break; fi; done; if [ "$?" != "0" ]; then exit 1; fi
+fi
 
 set -e
 
@@ -29,8 +33,10 @@ if [ -f transformGrammar.py ]; then python3 transformGrammar.py ; fi
 # Go has no version, just the latest version.
 
 <if(antlrng_tool)>
+if [ "${ANTLR_GENERATION_ONLY:-0}" != "1" ]; then
 npm init -y
 npm i antlr-ng
+fi
 <endif>
 
 <tool_grammar_tuples:{x |
@@ -42,5 +48,7 @@ java -jar "$JAR" -encoding <antlr_encoding> -Dlanguage=Go <if(os_win)>-o parser<
 antlr4 -v $version -encoding <antlr_encoding> -Dlanguage=Go <if(os_win)>-o parser<endif> -lib parser -package parser  <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileNameTarget>
 <endif>
 } >
+
+if [ "${ANTLR_GENERATION_ONLY:-0}" = "1" ]; then exit 0; fi
 
 go build
