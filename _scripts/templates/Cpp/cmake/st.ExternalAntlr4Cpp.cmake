@@ -2,8 +2,7 @@ cmake_minimum_required(VERSION 3.7)
 
 include(ExternalProject)
 
-#set(ANTLR4_ROOT ${CMAKE_CURRENT_BINARY_DIR}/antlr4_runtime/src/antlr4_runtime)
-set(ANTLR4_ROOT <temp_dir>/antlr4_runtime/src/antlr4_runtime)
+set(ANTLR4_ROOT ${CMAKE_CURRENT_BINARY_DIR}/antlr4_runtime/src/antlr4_runtime)
 set(ANTLR4_INCLUDE_DIRS ${ANTLR4_ROOT}/runtime/Cpp/runtime/src)
 set(ANTLR4_GIT_REPOSITORY https://github.com/kaby76/antlr4.git)
 if(NOT DEFINED ANTLR4_TAG)
@@ -13,11 +12,11 @@ if(NOT DEFINED ANTLR4_TAG)
 endif()
 
 if(${CMAKE_GENERATOR} MATCHES "Visual Studio.*")
-  set(ANTLR4_OUTPUT_DIR ${ANTLR4_ROOT}/runtime/Cpp/dist)
+  set(ANTLR4_OUTPUT_DIR ${ANTLR4_ROOT}/runtime/Cpp/runtime/$(Configuration))
 elseif(${CMAKE_GENERATOR} MATCHES "Xcode.*")
-  set(ANTLR4_OUTPUT_DIR ${ANTLR4_ROOT}/runtime/Cpp/dist/$(CONFIGURATION))
+  set(ANTLR4_OUTPUT_DIR ${ANTLR4_ROOT}/runtime/Cpp/runtime/$(CONFIGURATION))
 else()
-  set(ANTLR4_OUTPUT_DIR ${ANTLR4_ROOT}/runtime/Cpp/dist)
+  set(ANTLR4_OUTPUT_DIR ${ANTLR4_ROOT}/runtime/Cpp/runtime)
 endif()
 
 if(MSVC)
@@ -79,7 +78,7 @@ endif()
 if(ANTLR4_ZIP_REPOSITORY)
   ExternalProject_Add(
       antlr4_runtime
-      PREFIX <temp_dir>/antlr4_runtime
+      PREFIX ${CMAKE_CURRENT_BINARY_DIR}/antlr4_runtime
       URL ${ANTLR4_ZIP_REPOSITORY}
       DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
       BUILD_COMMAND ""
@@ -89,12 +88,13 @@ if(ANTLR4_ZIP_REPOSITORY)
       CMAKE_CACHE_ARGS
           -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
           -DWITH_STATIC_CRT:BOOL=${ANTLR4_WITH_STATIC_CRT}
+          -DANTLR_BUILD_CPP_TESTS:BOOL=OFF
       INSTALL_COMMAND ""
       EXCLUDE_FROM_ALL 1)
 else()
   ExternalProject_Add(
       antlr4_runtime
-      PREFIX <temp_dir>/antlr4_runtime
+      PREFIX ${CMAKE_CURRENT_BINARY_DIR}/antlr4_runtime
       GIT_REPOSITORY ${ANTLR4_GIT_REPOSITORY}
       GIT_TAG f5bd4bec221ca5d916839eca52759720fa28d24c # df4d68c09cdef73e023b8838a8bc7ca4dff1d1de # ${ANTLR4_TAG}
       DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
@@ -105,6 +105,7 @@ else()
       CMAKE_CACHE_ARGS
           -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
           -DWITH_STATIC_CRT:BOOL=${ANTLR4_WITH_STATIC_CRT}
+          -DANTLR_BUILD_CPP_TESTS:BOOL=OFF
       INSTALL_COMMAND ""
       EXCLUDE_FROM_ALL 1)
 endif()
