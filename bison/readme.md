@@ -6,7 +6,7 @@ Ken Domino, FSF
 
 ## Source
 
-https://git.savannah.gnu.org/cgit/bison.git/tree/src/parse-gram.y
+https://raw.githubusercontent.com/silicon-lang/bison/refs/heads/master/src/parse-gram.y (mirror)
 
 ## Reference
 
