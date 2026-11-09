@@ -203,7 +203,10 @@ EOF
     esac
 done
 
-if [ "$filter" == "diff" ]
+if [ "${#grammars[@]}" -gt 0 ]
+then
+    : # -g explicitly selected grammars; skip discovery.
+elif [ "$filter" == "diff" ]
 then
     if [ "${#additional[@]}" -eq 0 ]
     then
@@ -362,16 +365,9 @@ run_pair()
     source_dir="$prefix/$testname"
     pair_dir="$run_dir/$target/$testname"
     mkdir -p -- "$pair_dir" || return 1
-    # Keep every generated file and test output outside the source checkout.
-    if ! (set -o pipefail; tar -C "$source_dir" --exclude='Generated*' --exclude='.git' -cf - . | tar -C "$pair_dir" -xf -)
-    then
-        echo "Could not copy $testname into the temporary test directory."
-        return 1
-    fi
-    git -C "$pair_dir" init -q || return 1
-    git -C "$pair_dir" config core.excludesfile "$prefix/.gitignore"
-    git -C "$pair_dir" -c core.autocrlf=false add -A || return 1
-    pushd "$pair_dir" > /dev/null || return 1
+    # Read the grammar from the checkout; generate and test only in the
+    # temporary directory. trgen applies .trgen-ignore when copying files.
+    pushd "$source_dir" > /dev/null || return 1
 
     echo ""
     echo "$testname,$target:"
@@ -425,7 +421,7 @@ run_pair()
 
     if [ $quiet != "true" ]; then echo "Generating driver for $testname."; fi
     build_start=$(date +"%s")
-    trgen_opts=(-t "$target" --template-sources-directory "$full_path_templates" --antlr-tool-path "$antlr4jar")
+    trgen_opts=(-t "$target" -o "$pair_dir/" --template-sources-directory "$full_path_templates" --antlr-tool-path "$antlr4jar")
     [[ -n "$antlr_version" ]] && trgen_opts+=(--antlr-version "$antlr_version")
     gen_output=$(dotnet trash gen "${trgen_opts[@]}" 2>&1)
     gen_status=$?
@@ -439,6 +435,8 @@ run_pair()
         return 1
     fi
 
+    popd > /dev/null
+    pushd "$pair_dir" > /dev/null || return 1
     generated_dirs=()
     for d in Generated-$target-* Generated-$target; do
         if [ -d "$d" ]; then generated_dirs+=( "$d" ); fi
