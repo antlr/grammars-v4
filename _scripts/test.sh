@@ -174,7 +174,8 @@ DESCRIPTION
 
 OPTIONS
        -g
-           Specifies a list of directories that are searched for grammars.
+           Specifies directories to search for grammars, relative to the
+           directory where this script was invoked.
            A grammar requires pom.xml and desc.xml files for it to be tested.
            If the option is not specified, then the default is to search from
            the current directory. Searching is subject to filters.
@@ -203,102 +204,75 @@ EOF
     esac
 done
 
-if [ "$filter" == "diff" ]
-then
-    if [ "${#additional[@]}" -eq 0 ]
-    then
-        diffs=`git diff --exit-code --name-only .`
-        if [ "$diffs" != "" ]
-        then
-            grammars=()
-            # Test grammars for the enclosing directories.
-            directories=`git diff --name-only . 2> /dev/null | sed 's#\(.*\)[/][^/]*$#\1#' | sort -u | grep -v _scripts`
-            for g in $directories
-            do
-                pushd $g > /dev/null
-                while true
-                do
-                    if [ -f `pwd`/desc.xml ]
-                    then
-                        break
-                    elif [ `pwd` == "$prefix" ]
-                    then
-                        break
-                    fi
-                    cd ..
-                done
-                g=`pwd`
-                g=${g##*$prefix}
-                g=${g##/}
-                if [ "$g" == "" ]
-                then
-                    g="."
-                fi
-                popd > /dev/null
-                echo Adding diff $g
-                grammars+=( $g )
-            done
-            grammars=( $(for g in "${grammars[@]}"; do echo "${g}"; done | sort -u) )
-        fi
-    elif [ "${#additional[@]}" -eq 2 ]
-    then
-        grammars=()
-        # Test grammars for the enclosing directories.
-        directories=`git diff --name-only ${additional[0]} ${additional[1]} . 2> /dev/null | sed 's#\(.*\)[/][^/]*$#\1#' | sort -u | grep -v _scripts`
-        for g in $directories
-        do
-            pushd $g > /dev/null
-            while true
-            do
-                if [ -f `pwd`/desc.xml ]
-                then
-                    break
-                elif [ `pwd` == "$prefix" ]
-                then
-                    break
-                fi
-                cd ..
-            done
-            g=`pwd`
-            g=${g##*$prefix}
-            g=${g##/}
-            if [ "$g" == "" ]
-            then
-                g="."
-            fi
-            popd > /dev/null
-            echo Adding diff $g
-            grammars+=( $g )
-        done
-    else
-        echo ouch
-        exit 1
-    fi
-elif [ "$filter" == "all" ]
-then
-    grammars=()
-    # Test grammars for the enclosing directories.
-    directories=`find . -type d -name 'Generated*' -prune -o -name desc.xml -print | sed 's#/desc.xml##' | sort -u`
-    for g in $directories
-    do
-        pushd $g > /dev/null 2>&1
-        g=`pwd`
-        g=${g##*$prefix/}
-        popd > /dev/null 2>&1
-        echo Adding $g
-        grammars+=( $g )
-    done
-    grammars=( $(for g in "${grammars[@]}"; do echo "${g}"; done | sort -u) )
-elif [ "$filter" != "all" ]
-then
-    echo Unknown filter $filter
-    exit 1
+# -g paths are search roots relative to the directory where the command was
+# invoked. With no -g, search the invocation directory itself.
+case "$filter" in
+    all|diff|agnostic) ;;
+    *) echo "Unknown filter $filter" >&2; exit 2 ;;
+esac
+if [ "$filter" = diff ] && [ "${#additional[@]}" -ne 0 ] && [ "${#additional[@]}" -ne 2 ]; then
+    echo 'The diff filter takes either zero or two revisions.' >&2
+    exit 2
 fi
+search_roots=( "${grammars[@]}" )
+if [ "${#search_roots[@]}" -eq 0 ]; then search_roots=(.); fi
+prefix=$(cd "$prefix" && pwd -P) || exit 1
+grammars=()
+declare -A discovered=()
+for root in "${search_roots[@]}"; do
+    if [ ! -d "$root" ]; then
+        echo "Grammar search directory does not exist: $root" >&2
+        exit 2
+    fi
+    root_abs=$(cd "$root" && pwd -P) || exit 1
+    case "$root_abs" in
+        "$prefix"|"$prefix"/*) ;;
+        *) echo "Grammar search directory is outside the repository: $root" >&2; exit 2 ;;
+    esac
+    while IFS= read -r -d '' desc; do
+        grammar_dir=${desc%/desc.xml}
+        if [ "$grammar_dir" = "$prefix" ]; then
+            relative=.
+        else
+            relative=${grammar_dir#"$prefix"/}
+        fi
+        if [ -z "${discovered[$relative]+x}" ]; then
+            discovered[$relative]=1
+            grammars+=( "$relative" )
+        fi
+    done < <(find "$root_abs" -type d \( -name 'Generated*' -o -name .git \) -prune -o -name desc.xml -print0)
+done
 
-echo "Number of grammars before sorting and making unique: ${#grammars[@]}"
-grammars=($(echo "${grammars[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' '))
-echo "Number of grammars after sorting and making unique: ${#grammars[@]}"
-
+echo "Number of grammars before filtering: ${#grammars[@]}"
+if [ "$filter" = diff ]; then
+    # Map each changed file to its nearest enclosing grammar. Intersect that
+    # result with the grammars discovered under the requested search roots.
+    mapfile -d '' -t changed_files < <(git -C "$prefix" diff --name-only -z "${additional[@]}" -- .)
+    declare -A selected=()
+    for changed in "${changed_files[@]}"; do
+        grammar_dir=${changed%/*}
+        if [ "$grammar_dir" = "$changed" ]; then grammar_dir=.; fi
+        while :; do
+            if [ -f "$prefix/$grammar_dir/desc.xml" ]; then
+                if [ -n "${discovered[$grammar_dir]+x}" ]; then selected[$grammar_dir]=1; fi
+                break
+            fi
+            if [ "$grammar_dir" = . ]; then break; fi
+            if [[ "$grammar_dir" = */* ]]; then
+                grammar_dir=${grammar_dir%/*}
+            else
+                grammar_dir=.
+            fi
+        done
+    done
+    filtered=()
+    for grammar_dir in "${grammars[@]}"; do
+        if [ -n "${selected[$grammar_dir]+x}" ]; then filtered+=( "$grammar_dir" ); fi
+    done
+    grammars=( "${filtered[@]}" )
+fi
+for grammar_dir in "${grammars[@]}"; do echo "Adding $grammar_dir"; done
+echo "Number of grammars after filtering: ${#grammars[@]}"
 if [ "${#grammars[@]}" -eq 0 ]
 then
     echo There are no grammars in current directory to test.
@@ -362,16 +336,9 @@ run_pair()
     source_dir="$prefix/$testname"
     pair_dir="$run_dir/$target/$testname"
     mkdir -p -- "$pair_dir" || return 1
-    # Keep every generated file and test output outside the source checkout.
-    if ! (set -o pipefail; tar -C "$source_dir" --exclude='Generated*' --exclude='.git' -cf - . | tar -C "$pair_dir" -xf -)
-    then
-        echo "Could not copy $testname into the temporary test directory."
-        return 1
-    fi
-    git -C "$pair_dir" init -q || return 1
-    git -C "$pair_dir" config core.excludesfile "$prefix/.gitignore"
-    git -C "$pair_dir" -c core.autocrlf=false add -A || return 1
-    pushd "$pair_dir" > /dev/null || return 1
+    # Read the grammar from the checkout; generate and test only in the
+    # temporary directory. trgen applies .trgen-ignore when copying files.
+    pushd "$source_dir" > /dev/null || return 1
 
     echo ""
     echo "$testname,$target:"
@@ -425,7 +392,7 @@ run_pair()
 
     if [ $quiet != "true" ]; then echo "Generating driver for $testname."; fi
     build_start=$(date +"%s")
-    trgen_opts=(-t "$target" --template-sources-directory "$full_path_templates" --antlr-tool-path "$antlr4jar")
+    trgen_opts=(-t "$target" -o "$pair_dir/" --template-sources-directory "$full_path_templates" --antlr-tool-path "$antlr4jar")
     [[ -n "$antlr_version" ]] && trgen_opts+=(--antlr-version "$antlr_version")
     gen_output=$(dotnet trash gen "${trgen_opts[@]}" 2>&1)
     gen_status=$?
@@ -439,6 +406,8 @@ run_pair()
         return 1
     fi
 
+    popd > /dev/null
+    pushd "$pair_dir" > /dev/null || return 1
     generated_dirs=()
     for d in Generated-$target-* Generated-$target; do
         if [ -d "$d" ]; then generated_dirs+=( "$d" ); fi
@@ -557,6 +526,36 @@ trap 'exit 143' TERM
 trap cleanup_pool EXIT
 mkdir -p -- "$run_dir/.config" || exit 1
 cp -- "$prefix/.config/dotnet-tools.json" "$run_dir/.config/dotnet-tools.json" || exit 1
+
+# Compile the C++ runtime once for this invocation. Generated grammar projects
+# import this library; standalone generated projects retain their own build.
+if printf '%s\n' "${tests[@]}" | grep -q ',Cpp$'; then
+    echo 'Building the shared ANTLR C++ runtime once for this test run.'
+    cpp_template_dir="$full_path_templates/Cpp"
+    if [ "$machine" = MinGw ]; then
+        cpp_template_dir=$(cygpath -m "$cpp_template_dir") || exit 1
+    fi
+    cpp_build_dir="$run_dir/cpp-runtime/build"
+    cpp_cmake_args=(-S "$prefix/_scripts/cpp-runtime" -B "$cpp_build_dir"
+        "-DTRASH_CPP_TEMPLATE_DIR=$cpp_template_dir")
+    if [ "$machine" = MinGw ]; then
+        cpp_cmake_args+=(-G 'Visual Studio 18 2026' -A x64)
+    fi
+    cmake "${cpp_cmake_args[@]}" || exit 1
+    cmake --build "$cpp_build_dir" --config Release --target build_runtime || exit 1
+    TRASH_ANTLR4_RUNTIME_ROOT="$cpp_build_dir/antlr4_runtime/src/antlr4_runtime"
+    if [ "$machine" = MinGw ]; then
+        TRASH_ANTLR4_RUNTIME_ROOT=$(cygpath -m "$TRASH_ANTLR4_RUNTIME_ROOT") || exit 1
+        cpp_library="$TRASH_ANTLR4_RUNTIME_ROOT/runtime/Cpp/runtime/Release/antlr4-runtime-static.lib"
+    else
+        cpp_library="$TRASH_ANTLR4_RUNTIME_ROOT/runtime/Cpp/runtime/libantlr4-runtime.a"
+    fi
+    if [ ! -f "$cpp_library" ]; then
+        echo "C++ runtime build did not produce $cpp_library" >&2
+        exit 1
+    fi
+    export TRASH_ANTLR4_RUNTIME_ROOT
+fi
 mkfifo "$run_dir/slots" "$run_dir/npm" || exit 1
 exec 3<>"$run_dir/slots"
 exec 4<>"$run_dir/npm"
