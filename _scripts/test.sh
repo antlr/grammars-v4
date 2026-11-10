@@ -555,6 +555,36 @@ trap 'exit 143' TERM
 trap cleanup_pool EXIT
 mkdir -p -- "$run_dir/.config" || exit 1
 cp -- "$prefix/.config/dotnet-tools.json" "$run_dir/.config/dotnet-tools.json" || exit 1
+
+# Compile the C++ runtime once for this invocation. Generated grammar projects
+# import this library; standalone generated projects retain their own build.
+if printf '%s\n' "${tests[@]}" | grep -q ',Cpp$'; then
+    echo 'Building the shared ANTLR C++ runtime once for this test run.'
+    cpp_template_dir="$full_path_templates/Cpp"
+    if [ "$machine" = MinGw ]; then
+        cpp_template_dir=$(cygpath -m "$cpp_template_dir") || exit 1
+    fi
+    cpp_build_dir="$run_dir/cpp-runtime/build"
+    cpp_cmake_args=(-S "$prefix/_scripts/cpp-runtime" -B "$cpp_build_dir"
+        "-DTRASH_CPP_TEMPLATE_DIR=$cpp_template_dir")
+    if [ "$machine" = MinGw ]; then
+        cpp_cmake_args+=(-G 'Visual Studio 18 2026' -A x64)
+    fi
+    cmake "${cpp_cmake_args[@]}" || exit 1
+    cmake --build "$cpp_build_dir" --config Release --target build_runtime || exit 1
+    TRASH_ANTLR4_RUNTIME_ROOT="$cpp_build_dir/antlr4_runtime/src/antlr4_runtime"
+    if [ "$machine" = MinGw ]; then
+        TRASH_ANTLR4_RUNTIME_ROOT=$(cygpath -m "$TRASH_ANTLR4_RUNTIME_ROOT") || exit 1
+        cpp_library="$TRASH_ANTLR4_RUNTIME_ROOT/runtime/Cpp/runtime/Release/antlr4-runtime-static.lib"
+    else
+        cpp_library="$TRASH_ANTLR4_RUNTIME_ROOT/runtime/Cpp/runtime/libantlr4-runtime.a"
+    fi
+    if [ ! -f "$cpp_library" ]; then
+        echo "C++ runtime build did not produce $cpp_library" >&2
+        exit 1
+    fi
+    export TRASH_ANTLR4_RUNTIME_ROOT
+fi
 mkfifo "$run_dir/slots" "$run_dir/npm" || exit 1
 exec 3<>"$run_dir/slots"
 exec 4<>"$run_dir/npm"

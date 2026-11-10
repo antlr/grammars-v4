@@ -18,7 +18,20 @@ SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /MT")
 
 add_definitions(-DANTLR4CPP_STATIC)
 
-include(ExternalAntlr4Cpp)
+if(DEFINED ENV{TRASH_ANTLR4_RUNTIME_ROOT} AND NOT "$ENV{TRASH_ANTLR4_RUNTIME_ROOT}" STREQUAL "")
+  # The test harness builds the runtime once and shares it with all C++ jobs.
+  set(ANTLR4_ROOT "$ENV{TRASH_ANTLR4_RUNTIME_ROOT}")
+  set(ANTLR4_INCLUDE_DIRS ${ANTLR4_ROOT}/runtime/Cpp/runtime/src)
+  if(MSVC)
+    set(ANTLR4_STATIC_LIBRARY ${ANTLR4_ROOT}/runtime/Cpp/runtime/Release/antlr4-runtime-static.lib)
+  else()
+    set(ANTLR4_STATIC_LIBRARY ${ANTLR4_ROOT}/runtime/Cpp/runtime/libantlr4-runtime.a)
+  endif()
+  add_library(antlr4_static STATIC IMPORTED)
+  set_target_properties(antlr4_static PROPERTIES IMPORTED_LOCATION ${ANTLR4_STATIC_LIBRARY})
+else()
+  include(ExternalAntlr4Cpp)
+endif()
 include_directories(${ANTLR4_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/)
 find_package(ANTLR REQUIRED)
 
