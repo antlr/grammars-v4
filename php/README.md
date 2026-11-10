@@ -32,7 +32,7 @@ Also this parser has been tested on plenty number of PHP files from different CM
 It took approximately 1 hour and 15 minutes with 70% on lexer part and 30% on parser part.
 
 ## Reference
-* [pldb](http://pldb.info/concepts/php)
+* [pldb](https://pldb.io/concepts/php)
 
 
 ## License

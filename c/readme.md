@@ -334,7 +334,7 @@ Windows: Version 10.0.26200.7623 (this is a Windows 11 Insider Preview build);
 | c,TypeScript | 3.215 ± 0.02867 | 2.321 ± 0.02983 | 5.536 ± 0.0585 | 2.083e+04 ± 184.3 | 2.153e+04 ± 142 | 40.38 ± 2.737 |
 
 ## Reference
-* [pldb](http://pldb.info/concepts/c)
+* [pldb](https://pldb.io/concepts/c)
 * ISO Specification: https://www.iso.org/standard/82075.html
 * ISO/ IEC C - Project status and milestones: https://www.open-std.org/jtc1/sc22/wg14/www/projects#9899
 * ISO/ IEC JTC1/SC22/WG14 - C, Official home of the working group: https://www.open-std.org/jtc1/sc22/wg14/

@@ -24,7 +24,7 @@ In particular, efforts by Matt Hargett pushed for the refinement of the grammar.
 
 [Wikipedia](https://en.wikipedia.org/wiki/Lua_(programming_language))
 
-* [pldb](http://pldb.info/concepts/lua)
+* [pldb](https://pldb.io/concepts/lua)
 
 ### Notes on mutual recursion removal
 The EBNF grammar specified in the Lua Manual contains

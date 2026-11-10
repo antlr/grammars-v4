@@ -25,5 +25,5 @@ Apparently, the Dart port for this grammar cannot be done. This is because the p
 calls for file reading synchronously, which cannot be done.
 
 ## Reference
-* [pldb](http://pldb.info/concepts/protobuf)
+* [pldb](https://pldb.io/concepts/protobuf)
 

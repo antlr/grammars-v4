@@ -5,5 +5,5 @@ The grammar and examples are copied directory from the comments
 at the top of the TinyC source code.
 
 ## Reference
-* [pldb](http://pldb.info/concepts/tinyc-compiler)
+* [pldb](https://pldb.io/concepts/tinyc-compiler)
 

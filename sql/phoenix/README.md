@@ -3,5 +3,5 @@
 https://phoenix.apache.org/language/index.html
 
 ## Reference
-* [pldb](http://pldb.info/concepts/apache-phoenix)
+* [pldb](https://pldb.io/concepts/apache-phoenix)
 

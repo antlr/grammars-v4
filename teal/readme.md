@@ -1,5 +1,5 @@
 # Teal Grammar
 
 ## Reference
-* [pldb](http://pldb.info/concepts/teal)
+* [pldb](https://pldb.io/concepts/teal)
 

@@ -5,5 +5,5 @@ An ANTLR4 grammar for [PLY](https://en.wikipedia.org/wiki/PLY_(file_format)) fil
 Examples from [here](https://people.sc.fsu.edu/~jburkardt/data/ply/ply.html)
 
 ## Reference
-* [pldb](http://pldb.info/concepts/ply)
+* [pldb](https://pldb.io/concepts/ply)
 

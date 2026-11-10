@@ -1,5 +1,5 @@
 # Informix Grammar
 
 ## Reference
-* [pldb](http://pldb.info/concepts/informix)
+* [pldb](https://pldb.io/concepts/informix)
 

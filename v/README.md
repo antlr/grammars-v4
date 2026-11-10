@@ -11,5 +11,5 @@ Examples are all from [V language's official website](https://vlang.io)
 - some golang features are not completely removed in the `V.g4` file.
 
 ## Reference
-* [pldb](http://pldb.info/concepts/v)
+* [pldb](https://pldb.io/concepts/v)
 

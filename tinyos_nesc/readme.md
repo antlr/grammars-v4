@@ -1,5 +1,5 @@
 # Tinyos Nesc
 
 ## Reference
-* [pldb](http://pldb.info/concepts/nesc)
+* [pldb](https://pldb.io/concepts/nesc)
 

@@ -9,5 +9,5 @@ Currently, the grammar is incomplete and only supports the request line and
 headers.
 
 ## Reference
-* [pldb](http://pldb.info/concepts/http)
+* [pldb](https://pldb.io/concepts/http)
 

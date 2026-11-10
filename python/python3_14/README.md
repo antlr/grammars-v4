@@ -22,5 +22,5 @@
 [ANTLR4-parser-for-Python-3.14](https://github.com/RobEin/ANTLR4-parser-for-Python-3.14)
 
 ## Reference
-* [pldb](http://pldb.info/concepts/python)
+* [pldb](https://pldb.io/concepts/python)
 

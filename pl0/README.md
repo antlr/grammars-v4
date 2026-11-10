@@ -3,5 +3,5 @@
 An ANTLR4 grammar for [PL/0](https://en.wikipedia.org/wiki/PL/0) files.
 
 ## Reference
-* [pldb](http://pldb.info/concepts/pl-0)
+* [pldb](https://pldb.io/concepts/pl-0)
 

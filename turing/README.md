@@ -5,5 +5,5 @@ A simple ANTLR4 grammar for [Turing](https://en.wikipedia.org/wiki/Turing_(progr
 Examples from [Wikibooks](https://en.wikibooks.org/wiki/Turing/Hello_world)
 
 ## Reference
-* [pldb](http://pldb.info/concepts/turing)
+* [pldb](https://pldb.io/concepts/turing)
 

@@ -16,5 +16,5 @@ Gavin Bierman; mailto:jls-jvms-spec-comments@openjdk.java.net.
 ## Reference
 
 [wikipedia](https://en.wikipedia.org/wiki/Java_(programming_language))
-* [pldb](http://pldb.info/concepts/java)
+* [pldb](https://pldb.io/concepts/java)
 

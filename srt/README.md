@@ -6,5 +6,5 @@ Example taken from first few subtitles in: https://www.opensubtitles.org/en/subt
 This grammar supports srt files. Should be useful for applications that allow srt file modification and creation.
 
 ## Reference
-* [pldb](http://pldb.info/concepts/srt)
+* [pldb](https://pldb.io/concepts/srt)
 

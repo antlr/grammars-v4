@@ -1,5 +1,5 @@
 # SCSS Grammar
 
 ## Reference
-* [pldb](http://pldb.info/concepts/scss)
+* [pldb](https://pldb.io/concepts/scss)
 

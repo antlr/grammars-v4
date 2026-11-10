@@ -1,5 +1,5 @@
 # Turtle Grammar
 
 ## Reference
-* [pldb](http://pldb.info/concepts/turtle)
+* [pldb](https://pldb.io/concepts/turtle)
 
