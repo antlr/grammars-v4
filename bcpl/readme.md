@@ -17,5 +17,5 @@ is the source for the compiler,
 March 14, 2021.
 
 ## Reference
-* [pldb](http://pldb.info/concepts/bcpl)
+* [pldb](https://pldb.io/concepts/bcpl)
 

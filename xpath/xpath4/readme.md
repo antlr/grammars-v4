@@ -1,7 +1,7 @@
 # XPath4 Grammar
 
 ## Reference
-* [pldb](http://pldb.info/concepts/xpath)
+* [pldb](https://pldb.io/concepts/xpath)
 * https://qt4cg.org/specifications/xquery-40/xpath-40.html#id-grammar
 * https://qt4cg.org/specifications/grammar-explorer/xpath40/index.html#XPath
 

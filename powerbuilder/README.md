@@ -23,5 +23,5 @@ NOTES:
 ```
 
 ## Reference
-* [pldb](http://pldb.info/concepts/powerbuilder)
+* [pldb](https://pldb.io/concepts/powerbuilder)
 

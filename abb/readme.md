@@ -13,7 +13,7 @@ based on a set of ABB Rapid sys-files and the existing kuka-krl antlr file
 
 ## Reference
 
-* [pldb](http://pldb.info/concepts/rapid)
+* [pldb](https://pldb.io/concepts/rapid)
 
 ## License
 

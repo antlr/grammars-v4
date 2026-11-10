@@ -35,5 +35,5 @@ sources on the Internet.
     a semi-colon after an "end".
 * Report on the Algorithmic Language ALGOL 60. https://dl.acm.org/doi/pdf/10.1145/367236.367262
 * Revised Report on the Algorithmic Language ALGOL 60. https://dl.acm.org/doi/pdf/10.1145/366193.366201
-* [pldb](http://pldb.info/concepts/algol-60)
+* [pldb](https://pldb.io/concepts/algol-60)
 

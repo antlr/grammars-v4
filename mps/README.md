@@ -3,5 +3,5 @@
 An ANTLR4 grammar for [MPS](https://en.wikipedia.org/wiki/MPS_(format) files.
 
 ## Reference
-* [pldb](http://pldb.info/concepts/mps)
+* [pldb](https://pldb.io/concepts/mps)
 

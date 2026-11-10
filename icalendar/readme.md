@@ -1,5 +1,5 @@
 # iCalendar Grammar
 
 ## Reference
-* [pldb](http://pldb.info/concepts/icalendar-format)
+* [pldb](https://pldb.io/concepts/icalendar-format)
 

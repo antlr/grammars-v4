@@ -1,5 +1,5 @@
 # Ada
 
 ## Reference
-* [pldb](http://pldb.info/concepts/ada)
+* [pldb](https://pldb.io/concepts/ada)
 

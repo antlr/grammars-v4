@@ -5,5 +5,5 @@ A simple ANTLR4 grammar for [Action!](https://en.wikipedia.org/wiki/Action!_(pro
 Grammar reference from [x868k.com](https://x868k.com/retro/action/man/)
 
 ## Reference
-* [pldb](http://pldb.info/concepts/action)
+* [pldb](https://pldb.io/concepts/action)
 

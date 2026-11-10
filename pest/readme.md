@@ -4,7 +4,7 @@
 Ken Domino
 
 ## Reference
-* [pldb](http://pldb.info/concepts/pest)
+* [pldb](https://pldb.io/concepts/pest)
 
 
 ## License

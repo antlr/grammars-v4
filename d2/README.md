@@ -3,5 +3,5 @@
 An ANTLR4 grammar for [D2](https://d2lang.com/)
 
 ## Reference
-* [pldb](http://pldb.info/concepts/d2)
+* [pldb](https://pldb.io/concepts/d2)
 

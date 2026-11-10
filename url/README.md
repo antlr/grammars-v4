@@ -3,5 +3,5 @@
 An ANTLR4 grammar for [URLs](https://en.wikipedia.org/wiki/Uniform_Resource_Locator).
 
 ## Reference
-* [pldb](http://pldb.info/concepts/url)
+* [pldb](https://pldb.io/concepts/url)
 

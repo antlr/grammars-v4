@@ -51,5 +51,5 @@ make check
 ```
 
 ## Reference
-* [pldb](http://pldb.info/concepts/erlang)
+* [pldb](https://pldb.io/concepts/erlang)
 

@@ -8,5 +8,5 @@ There are two deviations from the source grammar
 * The 'not' symbol "!" is not referred to in the source grammar
 
 ## Reference
-* [pldb](http://pldb.info/concepts/pike)
+* [pldb](https://pldb.io/concepts/pike)
 

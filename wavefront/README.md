@@ -5,5 +5,5 @@ An ANTLR4 grammar for [Wavefront OBJ](https://en.wikipedia.org/wiki/Wavefront_.o
 Adapted from now widely available Appendix B1 of the Advanced Visualizer documentation.
 
 ## Reference
-* [pldb](http://pldb.info/concepts/wavefront-object)
+* [pldb](https://pldb.io/concepts/wavefront-object)
 

@@ -3,5 +3,5 @@
 https://docs.nvidia.com/cuda/parallel-thread-execution/index.html
 
 ## Reference
-* [pldb](http://pldb.info/concepts/ptx)
+* [pldb](https://pldb.io/concepts/ptx)
 

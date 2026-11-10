@@ -15,7 +15,7 @@ by [Positive Technologies](https://github.com/PositiveTechnologies).
 
 ## Reference
 
-* [pldb](http://pldb.info/concepts/typescript)
+* [pldb](https://pldb.io/concepts/typescript)
 * https://www.typescriptlang.org/
 * https://github.com/Microsoft/TypeScript/blob/730f18955dc17068be33691f0fb0e0285ebbf9f5/doc/spec.md -- the abandoned specification.
 

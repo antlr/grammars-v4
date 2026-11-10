@@ -72,5 +72,5 @@ More than 95% correctly parsed **.m** files from these projects:
 ObjectiveC grammars and helper files are licensed under [MIT](https://opensource.org/licenses/MIT).
 
 ## Reference
-* [pldb](http://pldb.info/concepts/objective-c)
+* [pldb](https://pldb.io/concepts/objective-c)
 

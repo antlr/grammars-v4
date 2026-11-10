@@ -5,5 +5,5 @@ An ANTLR4 grammar for [Logo](http://en.wikipedia.org/wiki/Logo_(programming_lang
 Examples are based on the tutorial [here](http://cs.brown.edu/courses/bridge/1997/Resources/LogoTutorial.html).
 
 ## Reference
-* [pldb](http://pldb.info/concepts/logo)
+* [pldb](https://pldb.io/concepts/logo)
 

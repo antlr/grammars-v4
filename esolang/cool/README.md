@@ -10,7 +10,7 @@ Aiken, Alexander. �Cool: a portable project for teaching compiler construction
 
 ## Reference
 
-* [pldb](http://pldb.info/concepts/cool)
+* [pldb](https://pldb.io/concepts/cool)
 http://theory.stanford.edu/~aiken/software/cool/cool.html
 
 https://www.semanticscholar.org/paper/Cool%3A-a-portable-project-for-teaching-compiler-Aiken/c31ab5485ca8efb466f4e48cdc596f8def3aafee

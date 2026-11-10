@@ -15,4 +15,4 @@ Original sources: [parser](https://github.com/cyrillemidingoyi/PyCropML/blob/d69
 
 Examples from [flang](https://github.com/flang-compiler/flang).
 
-* [pldb](http://pldb.info/concepts/fortran-90)
+* [pldb](https://pldb.io/concepts/fortran-90)

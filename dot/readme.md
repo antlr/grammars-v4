@@ -1,5 +1,5 @@
 # Dot Grammar
 
 ## Reference
-* [pldb](http://pldb.info/concepts/dot)
+* [pldb](https://pldb.io/concepts/dot)
 

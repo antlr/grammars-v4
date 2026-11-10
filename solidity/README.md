@@ -16,7 +16,7 @@ https://docs.soliditylang.org/en/latest/grammar.html
 
 [Docs](https://docs.soliditylang.org/en/v0.8.27/)
 
-* [pldb](http://pldb.info/concepts/solidity)
+* [pldb](https://pldb.io/concepts/solidity)
 
 [Original grammar](https://github.com/ethereum/solidity/tree/develop/docs/grammar)
 

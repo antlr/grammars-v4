@@ -6,5 +6,5 @@ A first attempt at a grammar for the programming language [B](https://en.wikiped
 Examples are from https://www.nokia.com/bell-labs/about/dennis-m-ritchie/btut.html.
 
 ## Reference
-* [pldb](http://pldb.info/concepts/b)
+* [pldb](https://pldb.io/concepts/b)
 

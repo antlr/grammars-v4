@@ -1,5 +1,5 @@
 # JSON5 Grammar
 
 ## Reference
-* [pldb](http://pldb.info/concepts/json5)
+* [pldb](https://pldb.io/concepts/json5)
 

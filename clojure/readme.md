@@ -1,5 +1,5 @@
 # Clojure Grammar
 
 ## Reference
-* [pldb](http://pldb.info/concepts/clojure)
+* [pldb](https://pldb.io/concepts/clojure)
 
