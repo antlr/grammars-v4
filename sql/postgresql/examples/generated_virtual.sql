@@ -1,6 +1,5 @@
--- Virtual generated columns (PostgreSQL 18): GENERATED ALWAYS AS (expr) [VIRTUAL | STORED],
--- where STORED is now optional and defaults to VIRTUAL.
--- Derived from src/test/regress/sql/generated_virtual.sql of PostgreSQL 18.
+-- Virtual generated columns (PostgreSQL 18): GENERATED ALWAYS AS (expr) [VIRTUAL | STORED].
+-- Statements taken from src/test/regress/sql/generated_virtual.sql.
 
 CREATE TABLE gtest0 (a int PRIMARY KEY, b int GENERATED ALWAYS AS (55) VIRTUAL);
 
@@ -37,14 +36,7 @@ CREATE TABLE gtestm (
   f4 int GENERATED ALWAYS AS (f2 * 2) VIRTUAL
 );
 
-CREATE TABLE gtestm (
-  a int PRIMARY KEY,
-  b int GENERATED ALWAYS AS (a * 2) VIRTUAL
-);
-
 CREATE TABLE gtest_normal_child (a int, b int GENERATED ALWAYS AS (a * 2) VIRTUAL) INHERITS (gtest_normal);
-
-CREATE TABLE gtest_normal_child (a int, b int GENERATED ALWAYS AS (a * 2) VIRTUAL);
 
 CREATE TABLE gtestx (x int, b int GENERATED ALWAYS AS (a * 22) VIRTUAL) INHERITS (gtest1);
 
@@ -113,10 +105,6 @@ CREATE TABLE gtestnn_parent (
 
 ALTER TABLE gtestnn_parent ADD COLUMN c int NOT NULL GENERATED ALWAYS AS (nullif(f1, 14) + nullif(f2, 10)) VIRTUAL;
 
-ALTER TABLE gtestnn_parent ADD COLUMN c int NOT NULL GENERATED ALWAYS AS (nullif(f1, 13) + nullif(f2, 5)) VIRTUAL;
-
-ALTER TABLE gtestnn_parent ADD COLUMN c int NOT NULL GENERATED ALWAYS AS (nullif(f1, 4) + nullif(f2, 6)) VIRTUAL;
-
 CREATE TABLE gtest22a (a int PRIMARY KEY, b int GENERATED ALWAYS AS (a / 2) VIRTUAL UNIQUE);
 
 CREATE TABLE gtest22b (a int, b int GENERATED ALWAYS AS (a / 2) VIRTUAL, PRIMARY KEY (a, b));
@@ -163,15 +151,7 @@ CREATE TABLE gtest_part_key (f1 date NOT NULL, f2 bigint, f3 bigint GENERATED AL
 
 CREATE TABLE gtest_part_key (f1 date NOT NULL, f2 bigint, f3 bigint GENERATED ALWAYS AS (f2 * 2) VIRTUAL) PARTITION BY RANGE ((f3));
 
-CREATE TABLE gtest_part_key (f1 date NOT NULL, f2 bigint, f3 bigint GENERATED ALWAYS AS (f2 * 2) VIRTUAL) PARTITION BY RANGE ((f3 * 3));
-
-CREATE TABLE gtest_part_key (f1 date NOT NULL, f2 bigint, f3 bigint GENERATED ALWAYS AS (f2 * 2) VIRTUAL) PARTITION BY RANGE ((gtest_part_key));
-
-CREATE TABLE gtest_part_key (f1 date NOT NULL, f2 bigint, f3 bigint GENERATED ALWAYS AS (f2 * 2) VIRTUAL) PARTITION BY RANGE ((gtest_part_key is not null));
-
 ALTER TABLE gtest25 ADD COLUMN x int GENERATED ALWAYS AS (b * 4) VIRTUAL;
-
-ALTER TABLE gtest25 ADD COLUMN x int GENERATED ALWAYS AS (z * 4) VIRTUAL;
 
 ALTER TABLE gtest25 ADD COLUMN c int DEFAULT 42,
   ADD COLUMN x int GENERATED ALWAYS AS (c * 4) VIRTUAL;
@@ -191,18 +171,7 @@ ALTER TABLE gtest27
   ALTER COLUMN b TYPE bigint,
   ADD COLUMN x bigint GENERATED ALWAYS AS ((a + b) * 2) VIRTUAL NOT NULL;
 
-ALTER TABLE gtest27
-  DROP COLUMN x,
-  ALTER COLUMN a TYPE bigint,
-  ALTER COLUMN b TYPE bigint,
-  ADD COLUMN x bigint GENERATED ALWAYS AS ((a + b) * 2) VIRTUAL;
-
 CREATE TABLE gtest29 (
-    a int,
-    b int GENERATED ALWAYS AS (a * 2) VIRTUAL
-);
-
-CREATE TABLE gtest30 (
     a int,
     b int GENERATED ALWAYS AS (a * 2) VIRTUAL
 );
