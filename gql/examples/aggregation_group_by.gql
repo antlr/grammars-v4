@@ -1,0 +1,3 @@
+MATCH (p:Person)-[:WORKS_FOR]->(c:Company)
+RETURN c AS company, COUNT(p) AS employees
+GROUP BY c
