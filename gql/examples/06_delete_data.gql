@@ -1,1 +1,0 @@
-MATCH (n) DELETE n
