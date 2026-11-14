@@ -729,7 +729,7 @@
  {
   "name": "jvmBasic",
   "lexer": "",
-  "parser": "https://raw.githubusercontent.com/antlr/grammars-v4/master/basic/jvmBasic.g4",
+  "parser": "https://raw.githubusercontent.com/antlr/grammars-v4/master/basic/jvmBasic/jvmBasic.g4",
   "start": "prog",
   "example": [
    "lander.bas",
