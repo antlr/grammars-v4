@@ -3,4 +3,11 @@
    <antlr-version>^4.7</antlr-version>
    <targets>CSharp;Java;JavaScript</targets>
    <entry-point>program</entry-point>
+   <test>
+      <inputs>examples;!examples/3728.js</inputs>
+   </test>
+   <test>
+      <name>Negative</name>
+      <inputs>examples/3728.js</inputs>
+   </test>
 </desc>

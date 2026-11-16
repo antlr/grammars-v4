@@ -6,10 +6,20 @@
    <test>
       <!-- Subdivide fast ports from slow ports. -->
       <targets>Cpp;CSharp;Dart;Java;</targets>
-      <inputs>examples/**/*.g4</inputs>
+      <inputs>examples/**/*.g4;!examples/LexerElementLabel.g4;!examples/three.g4</inputs>
+   </test>
+   <test>
+      <name>Negative</name>
+      <targets>Cpp;CSharp;Dart;Java;</targets>
+      <inputs>examples/LexerElementLabel.g4;examples/three.g4</inputs>
    </test>
    <test>
       <targets>Antlr4ng;JavaScript;Python3;TypeScript</targets>
-      <inputs>examples/*.g4</inputs>
+      <inputs>examples/*.g4;!examples/LexerElementLabel.g4;!examples/three.g4</inputs>
+   </test>
+   <test>
+      <name>Negative</name>
+      <targets>Antlr4ng;JavaScript;Python3;TypeScript</targets>
+      <inputs>examples/LexerElementLabel.g4;examples/three.g4</inputs>
    </test>
 </desc>

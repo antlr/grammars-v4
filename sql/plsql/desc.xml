@@ -10,7 +10,12 @@
    <test>
       <name>more-examples</name>
       <targets>Antlr4ng;Cpp;CSharp;Dart;Go;Java</targets>
-      <inputs>more-examples/**/*.sql</inputs>
+      <inputs>more-examples/**/*.sql;!more-examples/cc_expr_invalid.sql;!more-examples/cte_in_derived_union_branch_not_allowed.sql;!more-examples/nested_cte_not_allowed.sql;!more-examples/sqlplus_slash_separated_invalid.sql;!more-examples/sqlplus_slash_separated_invalid2.sql;!more-examples/sqlplus_slash_separated_invalid3.sql;!more-examples/static_returning_clause_invalid.sql;!more-examples/tuple_method_call_invalid.sql</inputs>
+   </test>
+   <test>
+      <name>Negative-more-examples</name>
+      <targets>Antlr4ng;Cpp;CSharp;Dart;Go;Java</targets>
+      <inputs>more-examples/cc_expr_invalid.sql;more-examples/cte_in_derived_union_branch_not_allowed.sql;more-examples/nested_cte_not_allowed.sql;more-examples/sqlplus_slash_separated_invalid.sql;more-examples/sqlplus_slash_separated_invalid2.sql;more-examples/sqlplus_slash_separated_invalid3.sql;more-examples/static_returning_clause_invalid.sql;more-examples/tuple_method_call_invalid.sql</inputs>
    </test>
 </desc>
 

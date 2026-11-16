@@ -3,4 +3,11 @@
    <antlr-version>^4.13.0</antlr-version>
    <targets>Cpp;CSharp;Go;Java;JavaScript;Python3</targets>
    <entry-point>program</entry-point>
+   <test>
+      <inputs>examples;!examples/3728.js</inputs>
+   </test>
+   <test>
+      <name>Negative</name>
+      <inputs>examples/3728.js</inputs>
+   </test>
 </desc>

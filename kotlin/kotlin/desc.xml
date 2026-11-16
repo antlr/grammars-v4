@@ -5,7 +5,12 @@
    <grammar-name>Kotlin</grammar-name>
    <test>
       <entry-point>kotlinFile</entry-point>
-      <inputs>examples/kotlinFile</inputs>
+      <inputs>examples/kotlinFile;!examples/kotlinFile/bad_property.kt;!examples/kotlinFile/fun_on_same_line.kt</inputs>
+   </test>
+   <test>
+      <name>Negative</name>
+      <entry-point>kotlinFile</entry-point>
+      <inputs>examples/kotlinFile/bad_property.kt;examples/kotlinFile/fun_on_same_line.kt</inputs>
    </test>
    <test>
       <entry-point>script</entry-point>

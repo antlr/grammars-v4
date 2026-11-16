@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/kaby76/Trash/raw/refs/heads/main/desc.xsd">
    <targets>CSharp;Cpp;Dart;Go;Java;JavaScript;PHP;Python3;TypeScript;Antlr4ng</targets>
+   <test>
+      <inputs>examples;!examples/invalid_dice_format.txt;!examples/invalid_dice_missing_side.txt;!examples/invalid_dice_suffix.txt;!examples/invalid_dice_whitespace_end.txt;!examples/invalid_dice_whitespace_start.txt</inputs>
+   </test>
+   <test>
+      <name>Negative</name>
+      <inputs>examples/invalid_dice_format.txt;examples/invalid_dice_missing_side.txt;examples/invalid_dice_suffix.txt;examples/invalid_dice_whitespace_end.txt;examples/invalid_dice_whitespace_start.txt</inputs>
+   </test>
 </desc>
