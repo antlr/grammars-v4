@@ -1,5 +1,6 @@
 # Generated from trgen <version>
 set -e
+if [ "${ANTLR_GENERATION_ONLY:-0}" = "1" ]; then set -x; fi
 
 if [ -f transformGrammar.py ]; then python3 transformGrammar.py ; fi
 
@@ -19,8 +20,10 @@ version=`grep antlr4 pubspec.yaml | awk '{print $2}' | tr -d '\r' | tr -d '\n'`
 <endif>
 
 <if(antlrng_tool)>
+if [ "${ANTLR_GENERATION_ONLY:-0}" != "1" ]; then
 npm init -y
 npm i antlr-ng
+fi
 <endif>
 
 <tool_grammar_tuples:{x |
@@ -32,6 +35,8 @@ java -jar "$JAR" -encoding <antlr_encoding> -Dlanguage=Dart <x.AntlrArgs> <antlr
 antlr4 -v $version -encoding <antlr_encoding> -Dlanguage=Dart <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileNameTarget>
 <endif>
 } >
+
+if [ "${ANTLR_GENERATION_ONLY:-0}" = "1" ]; then exit 0; fi
 
 dart pub get
 

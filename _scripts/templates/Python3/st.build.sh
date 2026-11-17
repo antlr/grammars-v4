@@ -1,5 +1,6 @@
 # Generated from trgen <version>
 set -e
+if [ "${ANTLR_GENERATION_ONLY:-0}" = "1" ]; then set -x; fi
 
 if [ -f transformGrammar.py ]; then python3 transformGrammar.py ; fi
 
@@ -14,6 +15,7 @@ JAR=$(ls "$ANTLR4_DEV_DIR"/tool/target/antlr4-*-complete.jar | tail -1)
 version=`grep antlr4-python3-runtime requirements.txt | awk -F= '{print $3}' | tr -d '\r' | tr -d '\n'`
 <endif>
 
+if [ "${ANTLR_GENERATION_ONLY:-0}" != "1" ]; then
 python3 -m venv --copies .venv
 source .venv/bin/activate
 
@@ -25,6 +27,7 @@ npm i antlr-ng
 <endif>
 
 .venv/bin/pip install -r requirements.txt
+fi
 
 <tool_grammar_tuples:{x |
 <if(antlrng_tool)>
@@ -35,5 +38,7 @@ java -jar "$JAR" -encoding <antlr_encoding> -Dlanguage=Python3 <x.AntlrArgs> <an
 antlr4 -v $version -encoding <antlr_encoding> -Dlanguage=Python3 <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileNameTarget>
 <endif>
 }>
+
+if [ "${ANTLR_GENERATION_ONLY:-0}" = "1" ]; then exit 0; fi
 
 exit 0

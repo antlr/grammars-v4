@@ -2,8 +2,10 @@
 set -e
 set -x
 rm -rf node_modules package-lock.json
+if [ "${ANTLR_GENERATION_ONLY:-0}" != "1" ]; then
 npm install -g typescript ts-node
 npm install
+fi
 
 if [ -f transformGrammar.py ]; then python3 transformGrammar.py ; fi
 
@@ -16,6 +18,8 @@ version=`grep antlr4 package.json | awk '{print $2}' | tr -d '"' | tr -d ',' | t
 <tool_grammar_tuples:{x |
 tsx $HOME/antlr-ng/cli/runner.ts --encoding <antlr_encoding> -Dlanguage=TypeScript <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileNameTarget>
 } >
+
+if [ "${ANTLR_GENERATION_ONLY:-0}" = "1" ]; then exit 0; fi
 
 tsc -p tsconfig.json --pretty
 exit 0
