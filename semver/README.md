@@ -8,5 +8,5 @@ Therefore, it should be easier to implement comparison between semvers.
 ```
 
 ## Reference
-* [pldb](http://pldb.info/concepts/semver)
+* [pldb](https://pldb.io/concepts/semver)
 

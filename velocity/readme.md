@@ -1,5 +1,5 @@
 # Velocity Grammar
 
 ## Reference
-* [pldb](http://pldb.info/concepts/apache-velocity)
+* [pldb](https://pldb.io/concepts/apache-velocity)
 

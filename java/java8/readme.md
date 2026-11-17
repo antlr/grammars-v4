@@ -1,5 +1,5 @@
 # Java8 Grammar
 
 ## Reference
-* [pldb](http://pldb.info/concepts/java)
+* [pldb](https://pldb.io/concepts/java)
 

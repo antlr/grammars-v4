@@ -23,3 +23,7 @@ All ten files in [`examples/`](examples/) are tested with
 `mvn -pl mermaid clean test` from the repository root, or `mvn clean test` from
 this directory. `desc.xml` selects the same parser entry point for Trash Toolkit
 drivers.
+
+## Reference
+* [pldb](https://pldb.io/concepts/mermaid)
+

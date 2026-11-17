@@ -7,5 +7,5 @@ Created for the purpose of parsing the [CP/M Source code](http://www.cpm.z80.de/
 Examples code is from [here](http://www.cpm.z80.de/download/c8611src.zip)
 
 ## Reference
-* [pldb](http://pldb.info/concepts/x86-isa)
+* [pldb](https://pldb.io/concepts/x86-isa)
 

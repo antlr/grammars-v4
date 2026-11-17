@@ -1,5 +1,5 @@
 # Creole Grammar
 
 ## Reference
-* [pldb](http://pldb.info/concepts/creole)
+* [pldb](https://pldb.io/concepts/creole)
 

@@ -3,7 +3,7 @@
 ANTLR v4 grammar for the FlatBuffers schema language: https://google.github.io/flatbuffers/flatbuffers_grammar.html
 
 ## Reference
-* [pldb](http://pldb.info/concepts/flatbuffers)
+* [pldb](https://pldb.io/concepts/flatbuffers)
 
 
 ## License

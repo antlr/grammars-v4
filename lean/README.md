@@ -23,3 +23,7 @@ core of the language that appears in everyday Lean 4 source files:
   tactic combinators like `induction ... with`, and nested tactic blocks
 
 Reference: <https://lean-lang.org/>
+
+## Reference
+* [pldb](https://pldb.io/concepts/lean)
+

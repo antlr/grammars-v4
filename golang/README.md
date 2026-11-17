@@ -22,7 +22,7 @@ An ANTLR4 grammar for Golang based on [The Go Programming Language Specification
     * Fixes and refactoring
 
 ## Reference
-* [pldb](http://pldb.info/concepts/go)
+* [pldb](https://pldb.io/concepts/go)
 
 
 ## License

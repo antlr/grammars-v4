@@ -95,5 +95,5 @@ fails due to unicode width limitations in the java used in ANTLR4.
 * classify21.g4 works with a theoretically complete 21 bit java ANTLR4
 
 ## Reference
-* [pldb](http://pldb.info/concepts/unicode)
+* [pldb](https://pldb.io/concepts/unicode)
 

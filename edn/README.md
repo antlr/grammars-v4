@@ -295,5 +295,5 @@ representations are equal. #inst elements are equal if their representation stri
 same timestamp per [RFC-3339](http://www.ietf.org/rfc/rfc3339.txt).
 
 ## Reference
-* [pldb](http://pldb.info/concepts/edn)
+* [pldb](https://pldb.io/concepts/edn)
 

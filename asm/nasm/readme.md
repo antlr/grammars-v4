@@ -1,5 +1,5 @@
 # Nasm
 
 ## Reference
-* [pldb](http://pldb.info/concepts/nasm)
+* [pldb](https://pldb.io/concepts/nasm)
 

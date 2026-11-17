@@ -9,5 +9,5 @@ and bit by bit make it a more complete grammar.
 The reference for the Adaptive Server Enterprise variant of TSql is [online](http://infocenter.sybase.com/help/topic/com.sybase.dc36272_1251/pdf/commands.pdf).
 
 ## Reference
-* [pldb](http://pldb.info/concepts/transact-sql)
+* [pldb](https://pldb.io/concepts/transact-sql)
 

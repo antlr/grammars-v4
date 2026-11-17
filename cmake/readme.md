@@ -1,5 +1,5 @@
 # CMake Grammar
 
 ## Reference
-* [pldb](http://pldb.info/concepts/cmake)
+* [pldb](https://pldb.io/concepts/cmake)
 

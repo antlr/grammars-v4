@@ -23,3 +23,7 @@ syntax that Pharo source commonly appears as:
   (`{1 + 2. 3. x}`)
 
 Reference: <https://pharo.org/>
+
+## Reference
+* [pldb](https://pldb.io/concepts/pharo)
+

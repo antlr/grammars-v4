@@ -1,5 +1,5 @@
 # IDL Grammar
 
 ## Reference
-* [pldb](http://pldb.info/concepts/idl)
+* [pldb](https://pldb.io/concepts/idl)
 

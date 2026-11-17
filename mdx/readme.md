@@ -8,5 +8,5 @@ updated MDX grammar for V 3.XX from V 2.XXX.please add your custom actions and h
 Ported to Antlr4 by Tom Everett, 2016
 
 ## Reference
-* [pldb](http://pldb.info/concepts/mdx)
+* [pldb](https://pldb.io/concepts/mdx)
 

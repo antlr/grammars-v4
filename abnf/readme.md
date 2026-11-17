@@ -16,7 +16,7 @@ bidirectional communications protocol.
 * [Augmented BNF for Syntax Specifications: ABNF, RFC 2234 (obsolete)](https://datatracker.ietf.org/doc/rfc2234/)
 * [Augmented BNF for Syntax Specifications: ABNF, RFC 5234 also known as STD 68](https://datatracker.ietf.org/doc/rfc5234/)
 * [Case-Sensitive String Support in ABNF, RFC 7405](https://datatracker.ietf.org/doc/rfc7405/)
-* [pldb](http://pldb.info/concepts/abnf)
+* [pldb](https://pldb.io/concepts/abnf)
 * https://en.wikipedia.org/wiki/Augmented_Backus%E2%80%93Naur_form
 
 ## Implementations

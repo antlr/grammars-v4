@@ -7,5 +7,5 @@ https://web.archive.org/web/20231210145024/https://msopenspecs.azureedge.net/fil
 The vba_like grammar can be used to work with the Like expression patterns in VBA.
 
 ## Reference
-* [pldb](http://pldb.info/concepts/vba)
+* [pldb](https://pldb.io/concepts/vba)
 
