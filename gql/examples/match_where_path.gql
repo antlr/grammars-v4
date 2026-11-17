@@ -1,0 +1,3 @@
+MATCH (p:Person)-[:WORKS_FOR]->(c:Company)
+WHERE p.name = 'Mario'
+RETURN p.name AS person, c.name AS company

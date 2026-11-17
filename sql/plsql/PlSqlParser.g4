@@ -1655,10 +1655,8 @@ index_expr
     ;
 
 index_properties
-    : (
-        (global_partitioned_index | local_partitioned_index | index_attributes)+
-        | INDEXTYPE IS (domain_index_clause | xmlindex_clause)
-    )?
+    : (global_partitioned_index | local_partitioned_index | index_attributes)+
+    | INDEXTYPE IS (domain_index_clause | xmlindex_clause)
     ;
 
 domain_index_clause
@@ -3477,7 +3475,8 @@ xmltype_storage
     ;
 
 xmlschema_spec
-    : ((XMLSCHEMA DELIMITED_ID)? ELEMENT id_expression)? (allow_or_disallow (NONSCHEMA | ANYSCHEMA))*
+    : (XMLSCHEMA DELIMITED_ID)? ELEMENT id_expression (allow_or_disallow (NONSCHEMA | ANYSCHEMA))*
+    | (allow_or_disallow (NONSCHEMA | ANYSCHEMA))+
     ;
 
 object_table
@@ -5276,7 +5275,7 @@ enable_disable_clause
     ;
 
 using_index_clause
-    : USING INDEX (index_name | '(' create_index ')' | index_properties)
+    : USING INDEX (index_name | '(' create_index ')' | index_properties)?
     ;
 
 index_attributes
@@ -6267,7 +6266,7 @@ from_clause
 
 select_list_elements
     : tableview_name '.' ASTERISK
-    | expression column_alias?
+    | expression ({this.isNotBulkCollect()}? column_alias)?
     ;
 
 table_ref_list
@@ -8478,7 +8477,6 @@ non_reserved_keywords_pre12c
     | BATCH
     | BECOME
     | BEFORE
-    | BEGIN
     | BEGIN_OUTLINE_DATA
     | BEHALF
     | BFILE

@@ -1,0 +1,1 @@
+(expression (expression (expression (literalExpression 1)) (wsc  ) Or (wsc  ) (expression (literalExpression 2))) (wsc  ) Xor (wsc  ) (expression (literalExpression 3)))

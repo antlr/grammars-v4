@@ -1,0 +1,1 @@
+(expression (expression (literalExpression 24)) (wsc  ) Mod (wsc  ) (expression (expression (literalExpression 7)) \ (expression (literalExpression 2))))

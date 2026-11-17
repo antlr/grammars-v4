@@ -183,3 +183,8 @@ SELECT geo.name, IFF(geo.suspended, 'off', 'on') AS state FROM geo WHERE geo.reg
 SELECT system.id FROM system;
 SELECT * FROM t SAMPLE SYSTEM (10);
 SELECT * FROM t AS system TABLESAMPLE SYSTEM (10) SEED (42);
+SELECT EXTRACT(year FROM order_date) FROM orders;
+SELECT EXTRACT(dayofweek FROM o.order_date) AS dow, DATE_PART(month FROM o.order_date) AS m FROM orders o;
+SELECT SUM(EXTRACT(day FROM order_date)), DATE_PART(quarter FROM CAST(order_ts AS date)) FROM orders GROUP BY 2;
+SELECT EXTRACT(year, order_date), DATE_PART(year, order_date), DATE_PART('year', order_date) FROM orders;
+SELECT extract, t.extract AS extract FROM t;

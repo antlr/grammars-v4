@@ -129,3 +129,10 @@ func (p *PlSqlParserBase) isNotStartOfJoin() bool {
     }
     return true
 }
+
+func (p *PlSqlParserBase) isNotBulkCollect() bool {
+    stream := p.GetTokenStream().(*antlr.CommonTokenStream)
+    lt1 := stream.LT(1)
+    lt2 := stream.LT(2)
+    return lt1.GetTokenType() != PlSqlParserBULK || lt2.GetTokenType() != PlSqlParserCOLLECT
+}
