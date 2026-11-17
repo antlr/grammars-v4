@@ -1,0 +1,1 @@
+(expression (expression (expression (literalExpression 1)) (wsc  ) And (wsc  ) (expression (literalExpression 2))) (wsc  ) Or (wsc  ) (expression (literalExpression 3)))
