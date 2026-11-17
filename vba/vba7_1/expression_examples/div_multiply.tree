@@ -1,0 +1,1 @@
+(expression (expression (expression (literalExpression 24)) / (expression (literalExpression 4))) * (expression (literalExpression 2)))

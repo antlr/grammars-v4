@@ -224,11 +224,20 @@ Future\<void> DoParse(CharStream str, String input_name, int row_number) async
 {
     String out_name = input_name;
     if (output_dir != "") {
-        String absPath = File(input_name).absolute.path;
-        String root = Directory('<source_example_dir_unix>').absolute.path;
+        String absPath = Uri.file(
+            File(input_name).absolute.path,
+            windows: Platform.isWindows
+        ).toFilePath(windows: Platform.isWindows);
+        String root = Uri.file(
+            Directory('<source_example_dir_unix>').absolute.path,
+            windows: Platform.isWindows
+        ).toFilePath(windows: Platform.isWindows);
         String rootPrefix = root.endsWith(Platform.pathSeparator)
             ? root : root + Platform.pathSeparator;
-        String rootless = absPath.startsWith(rootPrefix)
+        bool hasRootPrefix = Platform.isWindows
+            ? absPath.toLowerCase().startsWith(rootPrefix.toLowerCase())
+            : absPath.startsWith(rootPrefix);
+        String rootless = hasRootPrefix
             ? absPath.substring(rootPrefix.length)
             : absPath.split(Platform.pathSeparator).last;
         out_name = output_dir + '/' + rootless;
