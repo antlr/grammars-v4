@@ -108,4 +108,10 @@ public abstract class PlSqlParserBase : Parser
             return false;
         return true;
     }
+
+    public bool isNotBulkCollect() {
+        var lt1 = (this.InputStream as CommonTokenStream).LT(1);
+        var lt2 = (this.InputStream as CommonTokenStream).LT(2);
+        return lt1.Type != PlSqlParser.BULK || lt2.Type != PlSqlParser.COLLECT;
+    }
 }
