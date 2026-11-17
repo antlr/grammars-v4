@@ -725,7 +725,7 @@ colconstraintelem
     | DEFAULT b_expr
     | GENERATED generated_when AS (
         IDENTITY_P optparenthesizedseqoptlist?
-        | OPEN_PAREN a_expr CLOSE_PAREN STORED
+        | OPEN_PAREN a_expr CLOSE_PAREN virtual_or_stored_?
     )
     | REFERENCES qualified_name column_list_? key_match? key_actions?
     ;
@@ -733,6 +733,11 @@ colconstraintelem
 generated_when
     : ALWAYS
     | BY DEFAULT
+    ;
+
+virtual_or_stored_
+    : STORED
+    | VIRTUAL
     ;
 
 constraintattr
@@ -4779,6 +4784,7 @@ unreserved_keyword
     | VERSION_P
     | VIEW
     | VIEWS
+    | VIRTUAL
     | VOLATILE
     | WHITESPACE_P
     | WITHIN
@@ -5433,6 +5439,7 @@ bare_label_keyword
     | VERSION_P
     | VIEW
     | VIEWS
+    | VIRTUAL
     | VOLATILE
     | WHEN
     | WHITESPACE_P
