@@ -1,30 +1,70 @@
 # GQL Grammar
 
-## Description
-GQL is a database query language that allows users to interact with databases in a structured and efficient manner. It is designed to be intuitive and easy to use, while also providing powerful features for complex queries and data manipulation. GQL supports a wide range of database systems and is compatible with various data formats, making it a versatile tool for developers and data analysts alike.
+ANTLR4 grammar for Graph Query Language (GQL), standardized as
+ISO/IEC 39075:2024.
 
-## Features
-- **Structured Querying**: GQL provides a clear and concise syntax for querying databases, allowing users to retrieve and manipulate data with ease.
-- **Cross-Database Compatibility**: GQL is designed to work with multiple database systems, enabling users to write queries that can be executed across different platforms without modification.
-- **Data Manipulation**: GQL includes commands for inserting, updating, and deleting data, making it a comprehensive tool for managing database content.
-- **Advanced Filtering**: GQL supports complex filtering options, allowing users to specify conditions and criteria for data retrieval, including support for logical operators, wildcards, and regular expressions.
-- **Aggregation Functions**: GQL provides built-in aggregation functions for summarizing and analyzing data, such as COUNT, SUM, AVG, MIN, and MAX, enabling users to perform statistical operations directly within their queries.
-- **Join Operations**: GQL allows users to perform join operations between multiple tables, facilitating the retrieval of related data from different sources and enabling more complex data analysis.
-- **Subqueries**: GQL supports subqueries, allowing users to nest queries within other queries to perform more advanced data retrieval and manipulation tasks.
-- **Indexing and Performance Optimization**: GQL includes features for indexing and optimizing query performance, helping users to improve the efficiency of their database interactions and reduce response times for large datasets.
-- **Security Features**: GQL incorporates security features such as user authentication, access control, and data encryption, ensuring that sensitive information is protected and that only authorized users can access and manipulate the database.
+GQL is a declarative language for defining, querying, and modifying
+property graphs.
 
-## Use Cases
-- **Data Analysis**: GQL can be used by data analysts to extract insights from large datasets, perform statistical analysis, and generate reports based on the retrieved data.
-- **Application Development**: Developers can use GQL to build applications that require database interactions, enabling them to create dynamic and data-driven applications with ease.
-- **Data Migration**: GQL can facilitate the migration of data between different database systems, allowing users to transfer and transform data while maintaining its integrity and structure.
-- **Business Intelligence**: GQL can be integrated into business intelligence tools to enable users to create dashboards and visualizations based on real-time data, providing valuable insights for decision-making processes.
+## Scope
 
-## Information
-### Author
-- **Name**: [Miotto Nicola](https://github.com/miottonicola)
-- **Last Updated**: 2026-06-13
+`GQL.g4` contains the lexer and parser rules. The parser entry point is
+`gqlProgram`.
 
-### References
-* [ISO/IEC 39075:2024](https://www.iso.org/standard/76120.html)
-* [Graph Query Language](https:://pldb.info/concepts/graph-query-language)
+The grammar covers language constructs including:
+
+- Session and transaction management.
+- Graph and schema operations.
+- Graph pattern matching.
+- Filtering, projection, aggregation, ordering, and pagination.
+- Data insertion, modification, and deletion.
+- Procedure calls and expressions.
+
+Parsing checks syntactic structure. It does not execute statements or
+perform the semantic validation required by a database implementation,
+such as resolving names, checking types, or enforcing access permissions.
+
+Successful parsing does not by itself establish full conformance to
+ISO/IEC 39075:2024.
+
+## Origin and Attribution
+
+### Original grammar
+
+This grammar originates from the
+[OpenGQL grammar project](https://github.com/opengql/grammar).
+
+Credit for the original grammar belongs to the OpenGQL project and its
+contributors.
+
+The upstream project distributes its work under the
+[Apache License, Version 2.0](https://github.com/opengql/grammar/blob/main/LICENSE).
+
+### Integration into grammars-v4
+
+[Miotto Nicola](https://github.com/miottonicola) contributed the integration
+of the grammar into this repository.
+
+This integration builds on the work of OpenGQL and its contributors.
+
+## Examples
+
+The `examples/` directory contains GQL input files for parser testing.
+
+Each `.gql` file should contain a standalone input accepted by the
+`gqlProgram` entry point.
+
+These examples demonstrate syntax. They do not provide a database fixture
+or verify query execution results.
+
+## Related Projects
+
+- [gql-rs](https://github.com/ntur-lab/gql-rs):
+  A Rust project providing an ANTLR-based GQL parser, a typed abstract
+  syntax tree, and semantic analysis.
+
+## References
+
+- [ISO/IEC 39075:2024 — Graph Query Language](https://www.iso.org/standard/76120.html)
+- [OpenGQL grammar project](https://github.com/opengql/grammar)
+- [ANTLR](https://www.antlr.org/)

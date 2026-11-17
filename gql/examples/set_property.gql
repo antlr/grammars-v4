@@ -1,0 +1,4 @@
+MATCH (p:Person)
+WHERE p.name = 'Alice'
+SET p.age = 31
+RETURN p.name AS name, p.age AS age
