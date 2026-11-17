@@ -24,3 +24,7 @@ All ten files in [`examples/`](examples/) are tested with the `zonefile` entry
 point, which consumes the entire input. Run `mvn -pl zone clean test` from the
 repository root, or `mvn clean test` from this directory. `desc.xml` configures
 the same entry point for Trash Toolkit drivers.
+
+## Reference
+* [pldb](https://pldb.io/concepts/zone)
+

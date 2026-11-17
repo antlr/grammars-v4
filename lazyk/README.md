@@ -1,3 +1,7 @@
 # Lazy K Grammar
 
 An ANTLR4 grammar for [Lazy K](https://tromp.github.io/cl/lazy-k.html) files.
+
+## Reference
+* [pldb](https://pldb.io/concepts/lazy-k)
+

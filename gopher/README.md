@@ -12,3 +12,7 @@ with the whole listing terminated by a line containing only a period.
 * [RFC 1436](https://datatracker.ietf.org/doc/html/rfc1436) — The Internet
   Gopher Protocol, which defines the directory listing format this grammar
   parses.
+
+## Reference
+* [pldb](https://pldb.io/concepts/gopher)
+
