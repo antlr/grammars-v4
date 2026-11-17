@@ -4106,6 +4106,7 @@ non_reserved_words
     | EXPIRY_DATE
     | EXPR
     | EXTENSION
+    | EXTRACT
     | FACTS
     | FILE
     | FILES
@@ -4533,6 +4534,7 @@ function_call
     | to_date = ( TO_DATE | DATE) LR_BRACKET expr RR_BRACKET
     | length = ( LENGTH | LEN) LR_BRACKET expr RR_BRACKET
     | TO_BOOLEAN LR_BRACKET expr RR_BRACKET
+    | (EXTRACT | DATE_PART) LR_BRACKET id_ FROM expr RR_BRACKET
     ;
 
 param_assoc_list
