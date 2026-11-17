@@ -8478,7 +8478,6 @@ non_reserved_keywords_pre12c
     | BATCH
     | BECOME
     | BEFORE
-    | BEGIN
     | BEGIN_OUTLINE_DATA
     | BEHALF
     | BFILE
