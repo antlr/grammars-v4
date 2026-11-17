@@ -119,5 +119,10 @@ public abstract class PlSqlParserBase extends Parser
             return false;
         return true;
     }
-}
 
+    public boolean isNotBulkCollect() {
+        Token lt1 = _input.LT(1);
+        Token lt2 = _input.LT(2);
+        return lt1.getType() != PlSqlParser.BULK || lt2.getType() != PlSqlParser.COLLECT;
+    }
+}

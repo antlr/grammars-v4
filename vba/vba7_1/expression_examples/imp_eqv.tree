@@ -1,0 +1,1 @@
+(expression (expression (literalExpression 1)) (wsc  ) Imp (wsc  ) (expression (expression (literalExpression 2)) (wsc  ) Eqv (wsc  ) (expression (literalExpression 3))))

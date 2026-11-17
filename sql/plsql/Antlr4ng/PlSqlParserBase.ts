@@ -115,4 +115,11 @@ export abstract class PlSqlParserBase extends Parser {
     return true;
   }
 
+  isNotBulkCollect(): boolean {
+    const stream = this.tokenStream as CommonTokenStream;
+    const lt1 = stream.LT(1);
+    const lt2 = stream.LT(2);
+    return lt1!.type !== PlSqlLexer.BULK || lt2!.type !== PlSqlLexer.COLLECT;
+  }
+
 }
