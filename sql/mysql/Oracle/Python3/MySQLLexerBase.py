@@ -76,7 +76,7 @@ class MySQLLexerBase(Lexer):
         if text is None:
             return MySQLParser.INT_NUMBER
 
-        length = len(text) - 1
+        length = len(text)
         if length < MySQLLexerBase.longLength:
             return MySQLParser.INT_NUMBER
 
@@ -84,7 +84,7 @@ class MySQLLexerBase(Lexer):
         index = 1 if text[0] in '+-' else 0
         length -= index
 
-        while text[index] == '0' and length > 0:
+        while length > 0 and text[index] == '0':
             index += 1
             length -= 1
 
@@ -113,7 +113,11 @@ class MySQLLexerBase(Lexer):
             elif length < MySQLLexerBase.longLongLength:
                 return self.LONG_NUMBER
             elif length > MySQLLexerBase.longLongLength:
-                return self.DECIMAL_NUMBER if length > MySQLLexerBase.unsignedLongLongLength else self.ULONGLONG_NUMBER
+                if length > MySQLLexerBase.unsignedLongLongLength:
+                    return self.DECIMAL_NUMBER
+                cmp = MySQLLexerBase.unsignedLongLongString
+                smaller = self.ULONGLONG_NUMBER
+                bigger = self.DECIMAL_NUMBER
             else:
                 cmp = MySQLLexerBase.longLongString
                 smaller = self.LONG_NUMBER
@@ -123,7 +127,7 @@ class MySQLLexerBase(Lexer):
             if text[index + idx] != char:
                 break
 
-        return smaller if text[index + idx - 1] <= cmp[idx - 1] else bigger
+        return smaller if text[index + idx] <= cmp[idx] else bigger
 
     def checkCharset(self, text):
         return self.UNDERSCORE_CHARSET if text in self.charSets else self.IDENTIFIER
@@ -201,7 +205,7 @@ class MySQLLexerBase(Lexer):
         self._type = self.CONCAT_PIPES_SYMBOL if self.isSqlModeActive(SqlMode.PipesAsConcat) else self.LOGICAL_OR_OPERATOR
 
     def doIntNumber(self):
-        self._type = self.determineNumericType(self._text)
+        self._type = self.determineNumericType(self.text)
 
     def doAdddate(self):
         self._type = self.determineFunction(self.ADDDATE_SYMBOL)
