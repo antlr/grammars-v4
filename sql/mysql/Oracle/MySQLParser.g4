@@ -1403,7 +1403,7 @@ onError
 jsonOnResponse
     : ERROR_SYMBOL
     | NULL_SYMBOL
-    | DEFAULT_SYMBOL textStringLiteral
+    | DEFAULT_SYMBOL signedLiteral
     ;
 
 unionOption

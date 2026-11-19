@@ -1,0 +1,7 @@
+-- DEFAULT in an ON EMPTY or ON ERROR clause takes a literal of the returned type,
+-- not only a string (json_on_response: DEFAULT_SYM signed_literal in sql_yacc.yy).
+SELECT JSON_VALUE(j, '$.a' RETURNING UNSIGNED DEFAULT 0 ON EMPTY) FROM t;
+SELECT JSON_VALUE(j, '$.a' RETURNING SIGNED DEFAULT -1 ON EMPTY DEFAULT -2 ON ERROR) FROM t;
+SELECT JSON_VALUE(j, '$.a' RETURNING DECIMAL(10,2) DEFAULT 1.5 ON ERROR) FROM t;
+SELECT JSON_VALUE(j, '$.a' DEFAULT 'none' ON EMPTY ERROR ON ERROR) FROM t;
+SELECT jt.a FROM t, JSON_TABLE(t.j, '$[*]' COLUMNS (a INT PATH '$.a' DEFAULT '0' ON EMPTY NULL ON ERROR)) AS jt;
