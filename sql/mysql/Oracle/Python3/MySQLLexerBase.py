@@ -309,13 +309,13 @@ class MySQLLexerBase(Lexer):
         self._type = self.determineFunction(self.VAR_SAMP_SYMBOL)
 
     def doUnderscoreCharset(self):
-        self._type = self.checkCharset(self._text)
+        self._type = self.checkCharset(self.text)
 
     def doDollarQuotedStringText(self):
         return self.serverVersion >= 80034 and self.supportMle;
 
     def isVersionComment(self):
-        return self.checkMySQLVersion(self._text)
+        return self.checkMySQLVersion(self.text)
 
     def isBackTickQuotedId(self):
         return not self.isSqlModeActive(SqlMode.NoBackslashEscapes)
