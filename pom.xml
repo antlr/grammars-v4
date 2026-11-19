@@ -228,6 +228,7 @@
 				<module>falcon</module>
                 <module>fantom</module>
 				<module>fasta</module>
+				<module>fbx</module>
 				<module>fdo91</module>
 				<module>fen</module>
 				<module>flatbuffers</module>
