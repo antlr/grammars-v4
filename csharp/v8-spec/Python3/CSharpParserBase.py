@@ -242,7 +242,11 @@ class CSharpParserBase(Parser):
         self.SymTable.import_namespace(ns)
 
     def BeginVariableDeclaration(self):
+        # After left-factoring (typed_member_declaration), type_ lives in the
+        # parent context; fall back to parent when current context has no children.
         ctx = self._ctx
+        if ctx.getChildCount() == 0 and ctx.parentCtx is not None:
+            ctx = ctx.parentCtx
         self._pending_var_type = ctx.getChild(ctx.getChildCount() - 1).getText()
 
     def OnVariableDeclarator(self):
@@ -375,6 +379,32 @@ class CSharpParserBase(Parser):
 
     def IsClassBaseClassType(self):
         return self._classBaseTypeCheck(False)
+
+    def IsPrimaryConstraintAhead(self):
+        if "." in __name__:
+            from .CSharpLexer import CSharpLexer
+        else:
+            from CSharpLexer import CSharpLexer
+        tok = self._input.LT(1)
+        if tok is None:
+            return False
+        if tok.type in (CSharpLexer.KW_CLASS, CSharpLexer.KW_STRUCT,
+                        CSharpLexer.KW_NOTNULL, CSharpLexer.KW_UNMANAGED,
+                        CSharpLexer.KW_OBJECT, CSharpLexer.KW_STRING):
+            return True
+        sym = self.SymTable.current_scope.lookup_chain(tok.text)
+        if sym is None:
+            return True
+        if sym.kind == CSharpSymbolKind.TypeParameter:
+            return False
+        if sym.kind != CSharpSymbolKind.Type:
+            return True
+        if not isinstance(sym, CSharpTypeSymbol):
+            return True
+        return sym.type_kind != CSharpTypeKind.Interface
+
+    def IsSecondaryConstraintAhead(self):
+        return not self.IsPrimaryConstraintAhead()
 
     def IsDeclarationPatternAhead(self):
         # Speculative parse: create a new parser on the same stream, try to parse
