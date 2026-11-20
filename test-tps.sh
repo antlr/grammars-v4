@@ -315,7 +315,11 @@ if [ ${#table_rows[@]} -gt 0 ]; then
     {
         printf '## Performance Summary (N=%s runs, mean ± SEM)\n\n' "$N"
         printf 'Git commit: `%s`\n\nGit tag: `%s`\n\n' "$git_commit" "$git_tags"
+	printf '\n'
+	dotnet trash machine
+	printf '\n'
         cat <<'EOF'
+
 ### Column key
 
 | Label | Description |

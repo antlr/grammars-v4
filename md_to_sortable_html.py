@@ -29,43 +29,61 @@ lines = src.splitlines()
 
 h = html_mod.escape
 
-# Collect title and all tables {headers, rows, heading}
+# Preserve Markdown blocks in their original order. The largest table is sortable.
 title = ""
-metadata = []
-tables = []       # list of dicts: {heading, headers, rows}
+blocks = []       # ('heading', level, text), ('paragraph', text), ('table', table)
+tables = []
 cur_heading = ""
-cur_headers = None
-cur_rows = []
+paragraph = []
+current_table = None
 
-def flush():
-    if cur_headers:
-        tables.append({'heading': cur_heading, 'headers': cur_headers, 'rows': list(cur_rows)})
+def flush_paragraph():
+    global paragraph
+    if paragraph:
+        blocks.append(('paragraph', ' '.join(paragraph)))
+        paragraph = []
+
+def flush_table():
+    global current_table
+    if current_table is not None and current_table['headers'] is not None:
+        tables.append(current_table)
+        blocks.append(('table', current_table))
+    current_table = None
 
 for line in lines:
-    if line.startswith(('Git commit: ', 'Git tag: ')):
-        metadata.append(line)
-        continue
-    if re.match(r'^#{1,6}\s', line):
-        flush()
-        cur_headers = None
-        cur_rows = []
-        cur_heading = re.sub(r'^#{1,6}\s+', '', line).strip()
+    heading = re.match(r'^(#{1,6})\s+(.*)$', line)
+    if heading:
+        flush_paragraph()
+        flush_table()
+        level = len(heading.group(1))
+        text = heading.group(2).strip()
+        blocks.append(('heading', level, text))
+        cur_heading = text
         if not title:
-            title = cur_heading
+            title = text
         continue
-    if not line.startswith('|'):
-        continue
-    cells = [c.strip() for c in line.split('|')[1:-1]]
-    if not cells:
-        continue
-    if all(re.match(r'^[-: ]+$', c) for c in cells):
-        continue  # separator row
-    if cur_headers is None:
-        cur_headers = cells
-    else:
-        cur_rows.append(cells)
 
-flush()
+    if line.startswith('|'):
+        flush_paragraph()
+        if current_table is None:
+            current_table = {'heading': cur_heading, 'headers': None, 'rows': []}
+        cells = [c.strip() for c in line.split('|')[1:-1]]
+        if not cells or all(re.fullmatch(r'[-: ]+', c) for c in cells):
+            continue
+        if current_table['headers'] is None:
+            current_table['headers'] = cells
+        else:
+            current_table['rows'].append(cells)
+        continue
+
+    flush_table()
+    if not line.strip():
+        flush_paragraph()
+    else:
+        paragraph.append(line.strip())
+
+flush_paragraph()
+flush_table()
 
 if not tables:
     sys.exit("No tables found in " + sys.argv[1])
@@ -87,8 +105,7 @@ def render_cell(tbl, column, value):
 
 def render_static_table(tbl):
     out = ''
-    if tbl['heading']:
-        out += f'<h3>{h(tbl["heading"])}</h3>\n'
+
     out += '<table class="key-table">\n<thead><tr>'
     out += ''.join(f'<th>{md_inline(c)}</th>' for c in tbl['headers'])
     out += '</tr></thead>\n<tbody>\n'
@@ -106,8 +123,7 @@ def render_sortable_table(tbl, table_id):
     numeric_cols_js = '[' + ','.join('true' if v else 'false' for v in numeric_cols_py) + ']'
 
     out = ''
-    if tbl['heading']:
-        out += f'<h3>{h(tbl["heading"])}</h3>\n'
+
     out += f'<table id="{table_id}">\n<thead><tr>\n'
     for i, hdr in enumerate(headers):
         if numbered and i == 0:
@@ -157,13 +173,16 @@ def render_sortable_table(tbl, table_id):
     return out
 
 body = ''
-if metadata:
-    body += ''.join(f'<p>{md_inline(line)}</p>\n' for line in metadata)
-for i, tbl in enumerate(tables):
-    if i == sortable_idx:
-        body += render_sortable_table(tbl, 'perf-table')
+for block in blocks:
+    if block[0] == 'heading':
+        _, level, text = block
+        body += f'<h{level}>{md_inline(text)}</h{level}>\n'
+    elif block[0] == 'paragraph':
+        body += f'<p>{md_inline(block[1])}</p>\n'
     else:
-        body += render_static_table(tbl)
+        tbl = block[1]
+        body += (render_sortable_table(tbl, 'perf-table')
+                 if tables[sortable_idx] is tbl else render_static_table(tbl))
 
 out = f"""<!DOCTYPE html>
 <html lang="en">
@@ -187,7 +206,6 @@ out = f"""<!DOCTYPE html>
 </style>
 </head>
 <body>
-<h2>{h(title)}</h2>
 {body}</body>
 </html>
 """
