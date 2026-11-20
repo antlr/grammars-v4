@@ -2887,13 +2887,15 @@ bitExpr
     ;
 
 // $antlr-format groupedAlignments off
+// PARAM_MARKER stays the first primary alternative: the left-recursion rewrite puts an empty action
+// before the first one, and prediction ignores predicates behind it (columnRef needs isPureIdentifier).
 simpleExpr
-    : columnRef jsonOperator?                                                                                   # simpleExprColumnRef
+    : PARAM_MARKER                                                                                              # simpleExprParamMarker
+    | columnRef jsonOperator?                                                                                   # simpleExprColumnRef
     | runtimeFunctionCall                                                                                       # simpleExprRuntimeFunction
     | functionCall                                                                                              # simpleExprFunction
     | simpleExpr COLLATE_SYMBOL textOrIdentifier                                                                # simpleExprCollate
     | literalOrNull                                                                                             # simpleExprLiteral
-    | PARAM_MARKER                                                                                              # simpleExprParamMarker
     | rvalueSystemOrUserVariable                                                                                # simpleExpressionRValue
     | inExpressionUserVariableAssignment                                                                        # simpleExprUserVariableAssignment
     | sumExpr                                                                                                   # simpleExprSum
