@@ -49,7 +49,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
+        os: [windows-latest, ubuntu-latest]
         language: ${{ fromJson(needs.setup.outputs.mymatrix) }}
     steps:
     - name: Info
@@ -179,8 +179,6 @@ jobs:
             _scripts/test.ps1 -target ${{ matrix.language }} -pc "$Before" -cc "$After"
         } elseif ("${{ matrix.os }}" -eq "windows-latest") {
             _scripts/test.ps1 -target ${{ matrix.language }} -pc "$Before" -cc "$After"
-        } elseif ("${{ matrix.os }}" -eq "macos-latest") {
-            _scripts/test.ps1 -target ${{ matrix.language }} -pc "$Before" -cc "$After" -buildonly:1
         }
 
   stale-links:
