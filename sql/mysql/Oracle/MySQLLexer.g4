@@ -319,15 +319,15 @@ fragment HEXDIGIT
     : [0-9a-fA-F]
     ;
 
-// Only lower case 'x' and 'b' count for hex + bin numbers. Otherwise it's an identifier.
+// The 0x and 0b prefixes are lower case only; the quoted forms X'..' and B'..' take either case.
 HEX_NUMBER
     : ('0x' HEXDIGIT+)
-    | ('x\'' HEXDIGIT* '\'')
+    | ([xX] '\'' HEXDIGIT* '\'')
     ;
 
 BIN_NUMBER
     : ('0b' [01]+)
-    | ('b\'' [01]+ '\'')
+    | ([bB] '\'' [01]+ '\'')
     ;
 
 INT_NUMBER
