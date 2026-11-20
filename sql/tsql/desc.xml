@@ -8,6 +8,11 @@
    </test>
    <test>
       <targets>CSharp;Go;Java</targets>
-      <inputs>examples</inputs>
+      <inputs>examples;!examples/constants.sql;!examples/keywords_reserved.sql</inputs>
+   </test>
+   <test>
+      <name>Negative</name>
+      <targets>CSharp;Go;Java</targets>
+      <inputs>examples/constants.sql;examples/keywords_reserved.sql</inputs>
    </test>
 </desc>

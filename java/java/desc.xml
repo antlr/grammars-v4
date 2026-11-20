@@ -6,5 +6,11 @@
    priority.
 -->
    <targets>Cpp;CSharp;Dart;Go;Java;OphiRust;Rust;TypeScript</targets>
-   <inputs>examples/**/*.java</inputs>
+   <test>
+      <inputs>examples/**/*.java;!examples/Foo4391.java</inputs>
+   </test>
+   <test>
+      <name>Negative</name>
+      <inputs>examples/Foo4391.java</inputs>
+   </test>
 </desc>
