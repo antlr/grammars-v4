@@ -122,7 +122,6 @@ rm -rf `find . -name 'Generated*' -type d`
 
 # Pre-process long options not handled by getopts.
 antlr_version=""
-set -- "${_args[@]}"
 
 if [ "${#grammars[@]}" -gt 0 ]
 then
@@ -230,6 +229,7 @@ do
         DIFF=$(($date2-$date1))
         if [ "$status" != "0" ]
         then
+            popd > /dev/null
             continue
         fi
 
@@ -242,9 +242,8 @@ do
         cmd=`grep '^files2' test.sh`
 
         eval "$cmd"
-	pushd ..
+	pushd .. > /dev/null
         files=()
-	pwd
         for f in $files2
         do
             if [ -d "$f" ]; then continue; fi
@@ -252,9 +251,11 @@ do
         done
         if [ ${#files[@]} -eq 0 ]
         then
+            popd > /dev/null
+            popd > /dev/null
             continue
         fi
-	popd
+	popd > /dev/null
 
 	# Warmup run (discarded): lets Windows AV pre-scan the executable.
         printf '%s\n' "${files[@]}" | trash parse -p Generated-$target --no-output -x
