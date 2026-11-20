@@ -4642,6 +4642,7 @@ unreserved_keyword
     | NORMALIZED
     | NOTHING
     | NOTIFY
+    | NOTICE
     | NOWAIT
     | NULLS_P
     | OBJECT_P
@@ -5261,6 +5262,7 @@ bare_label_keyword
     | NOT
     | NOTHING
     | NOTIFY
+    | NOTICE
     | NOWAIT
     | NULL_P
     | NULLIF
