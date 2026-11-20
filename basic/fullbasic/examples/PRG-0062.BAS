@@ -1,0 +1,12 @@
+1 REM FBCS PRG-0062
+2 REM CLAIM A-4.4.4-05
+3 REM TYPE OUTPUT
+100 REM DEF SIN overrides the supplied SIN in this unit (4.4.4 l.1511-1518); TAB is an
+110 REM array; DATA, MAX are plain variables (4.4.6 l.1553-1557)
+120 DEF SIN(X) = X * 2
+130 DIM TAB(3)
+140 LET TAB(1) = SIN(4)
+150 LET DATA = TAB(1)
+160 LET MAX = DATA + 1
+170 PRINT MAX
+180 END

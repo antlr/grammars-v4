@@ -136,7 +136,7 @@ gopher/examples/*.txt eol=crlf
 **/example/test_scripts/** linguist-vendored
 agc/notworking/** linguist-vendored
 asm/asmMASM/helloworld2.asm linguist-vendored
-basic/print.bas linguist-vendored
+basic/jvmBasic/print.bas linguist-vendored
 erlang/src/** linguist-vendored
 solidity/test.sol linguist-vendored
 sql/postgresql/examples.errors/** linguist-vendored

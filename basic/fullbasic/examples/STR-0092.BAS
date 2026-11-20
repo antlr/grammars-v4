@@ -1,0 +1,30 @@
+1 REM FBCS STR-0092
+2 REM CLAIM A-6.4.4-CL27
+3 REM TYPE SELF
+100 REM MAXLEN(V$) is the maximum length of the string variable or string array (6.4.4
+110 REM l.2640-2643); MAXNUM only if there is no effective limit. This implementation has an
+120 REM effective limit of 1E9 characters, so a variable without a declared length
+130 REM reports 1000000000 and a declared length is reported as such.
+139 DECLARE SUB P, R
+140 DECLARE STRING S$*5
+150 DECLARE STRING W$
+160 DIM T$(2)
+170 DECLARE STRING *7 U$(3)
+180 LET A$ = "x"
+190 LET FAIL = 0
+200 IF MAXLEN(S$) <> 5 THEN LET FAIL = FAIL + 1
+210 IF MAXLEN(Q$) <> 1000000000 THEN LET FAIL = FAIL + 1
+220 IF MAXLEN(W$) <> 1000000000 THEN LET FAIL = FAIL + 1
+230 IF MAXLEN(T$) <> 1000000000 THEN LET FAIL = FAIL + 1
+240 IF MAXLEN(U$) <> 7 THEN LET FAIL = FAIL + 1
+250 CALL P(A$)
+260 CALL P((A$))
+270 CALL R(S$, 5)
+280 IF FAIL = 0 THEN PRINT "*** TEST PASSED ***" ELSE PRINT "*** TEST FAILED ***"
+300 SUB P(B$)
+310 IF MAXLEN(B$) <> 1000000000 THEN LET FAIL = FAIL + 1
+320 END SUB
+330 SUB R(B$, N)
+340 IF MAXLEN(B$) <> N THEN LET FAIL = FAIL + 1
+350 END SUB
+360 END
