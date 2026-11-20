@@ -1,6 +1,6 @@
 # Generated from trgen <version>
 set -e
-set -x
+#set -x
 rm -rf node_modules package-lock.json
 if [ "${ANTLR_GENERATION_ONLY:-0}" != "1" ]; then
 npm install -g typescript ts-node

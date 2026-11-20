@@ -32,11 +32,11 @@ try {
 <if(individual_parsing)>
     $status = 0
     foreach ($file in $files) {
-        & dotnet trash wdog @runner -q -tee -tree -o $outputDir $file *> $parseFile
+        & dotnet trash wdog @runner -q -tee -tree -o $outputDir --input-root $sourceExamples $file *> $parseFile
         if ($LASTEXITCODE -ne 0) { $status = $LASTEXITCODE }
     }
 <else>
-    $files.ToArray() | & dotnet trash wdog @runner -q -x -tee -tree -o $outputDir *> $parseFile
+    $files.ToArray() | & dotnet trash wdog @runner -q -x -tee -tree -o $outputDir --input-root $sourceExamples *> $parseFile
     $status = $LASTEXITCODE
 <endif>
 } finally {
