@@ -5195,6 +5195,7 @@ identifierKeywordsUnambiguous
         | TIMESTAMP_SYMBOL
         | TIME_SYMBOL
     )
+    | {this.isServerVersionGe80032()}? URL_SYMBOL
     | {this.isServerVersionGe80200()}? (
         BULK_SYMBOL
         | GENERATE_SYMBOL
