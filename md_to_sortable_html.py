@@ -101,6 +101,10 @@ def render_cell(tbl, column, value):
             column < len(tbl['headers']) and tbl['headers'][column] == 'Grammar'):
         url = 'https://github.com/antlr/grammars-v4/tree/master/' + quote(value, safe='/')
         return f'<a href="{html_mod.escape(url, quote=True)}">{md_inline(value)}</a>'
+    if (column < len(tbl['headers']) and tbl['headers'][column] == 'Combined'):
+        normalized = value.strip().lower()
+        if normalized in ('yes', 'no'):
+            return f'<span class="combined-{normalized}">{normalized}</span>'
     return md_inline(value)
 
 def render_static_table(tbl):
@@ -119,7 +123,8 @@ def render_sortable_table(tbl, table_id):
     headers = tbl['headers']
     rows = tbl['rows']
     numbered = bool(headers and headers[0] == 'Number')
-    numeric_cols_py = [is_numeric_col(rows, i) for i in range(len(headers))]
+    numeric_cols_py = [hdr != 'Combined' and is_numeric_col(rows, i)
+                       for i, hdr in enumerate(headers)]
     numeric_cols_js = '[' + ','.join('true' if v else 'false' for v in numeric_cols_py) + ']'
 
     out = ''
@@ -203,6 +208,8 @@ out = f"""<!DOCTYPE html>
   td {{ text-align: right; }}
   td:first-child {{ text-align: left; }}
   .key-table td {{ text-align: left; }}
+  .combined-yes {{ color: #176b38; font-weight: 600; }}
+  .combined-no {{ color: #8d2932; font-weight: 600; }}
 </style>
 </head>
 <body>

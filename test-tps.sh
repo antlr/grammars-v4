@@ -211,7 +211,8 @@ do
     if [ $quiet != "true" ]; then echo "Generating driver for $testname."; fi
     trgen_opts=(-t "$target")
     [[ -n "$antlr_version" ]] && trgen_opts+=(--antlr-version "$antlr_version")
-    bad=$(dotnet trash gen "${trgen_opts[@]}" 2>/dev/null)
+    trgen_log="$tmpdir/$(echo "$testname" | tr '/' '_')_trgen.txt"
+    bad=$(dotnet trash gen "${trgen_opts[@]}" 2>"$trgen_log")
     for i in $bad; do failed+=( "$testname/$target" ); done
 
     for d in `echo Generated-$target`
@@ -296,8 +297,28 @@ do
         action_count=$(printf '%s\n' "$action_counts" |
             awk -F: 'NF > 1 && $NF ~ /^[0-9]+$/ { sum += $NF } END { print sum+0 }')
 
+        # Match the top-level parser selected by trgen to its source .g4.
+        # A combined grammar named Foo produces the top-level FooParser.
+        combined=no
+        top_level_names=$(sed -n 's/^Top-level grammars //p' "$trgen_log" |
+            tr -d '\r' | tr '\n' ' ')
+        combined_xpath='//grammarSpec[not(grammarDecl/grammarType/LEXER or grammarDecl/grammarType/PARSER) and not(prequelConstruct/optionsSpec/option[identifier/text() = "tokenVocab"])]'
+        for grammar_file in ../*.g4; do
+            [[ -f "$grammar_file" ]] || continue
+            grammar_name=${grammar_file##*/}
+            grammar_name=${grammar_name%.g4}
+            [[ " $top_level_names " == *" ${grammar_name}Parser "* ]] || continue
+            combined_count=$(dotnet trash parse -t ANTLRv4 "$grammar_file" 2>/dev/null |
+                MSYS2_ARG_CONV_EXCL='//' dotnet trash xpath "$combined_xpath" |
+                dotnet trash text --text -c 2>/dev/null)
+            if [[ "$combined_count" == 1 ]]; then
+                combined=yes
+                break
+            fi
+        done
+
         row_number=$((${#table_rows[@]} + 1))
-        table_rows+=("| ${row_number} | ${testname} | ${pt_stat} | ${ot_stat} | ${tt_stat} | ${tps_stat} | ${warm_tps_stat} | ${speedup_stat} | ${ambiguity_count} | ${action_count} |")
+        table_rows+=("| ${row_number} | ${testname} | ${pt_stat} | ${ot_stat} | ${tt_stat} | ${tps_stat} | ${warm_tps_stat} | ${speedup_stat} | ${ambiguity_count} | ${action_count} | ${combined} |")
         popd > /dev/null
     done
     popd > /dev/null
@@ -331,12 +352,13 @@ if [ ${#table_rows[@]} -gt 0 ]; then
 | `PR` | **Parse rate** — `total tokens / PT`; pure parse throughput across all files |
 | `Post-warmup PR` | PR computed from files 2…N only, excluding the first (warm-up) run; `n.a.` if only one file was parsed |
 | `Post-warmup Speed Up` | Ratio of Post-warmup PR to first-file PR, showing the JIT/runtime warm-up benefit; `n.a.` if only one file was parsed |
+| `Combined` | `yes` if the top-level grammar is combined and has no `tokenVocab` option; otherwise `no` |
 
 ### Results
 
 EOF
-        echo "| Number | Grammar | PT (s) | OT (s) | TT (s) | PR (t/s) | Post-warmup PR (t/s) | Post-warmup Speed Up | Ambiguities | Actions |"
-        echo "|--------|---------|--------|--------|--------|-----|-----------------|----------------------|-------------|---------|"
+        echo "| Number | Grammar | PT (s) | OT (s) | TT (s) | PR (t/s) | Post-warmup PR (t/s) | Post-warmup Speed Up | Ambiguities | Actions | Combined |"
+        echo "|--------|---------|--------|--------|--------|-----|-----------------|----------------------|-------------|---------|----------|"
         for row in "${table_rows[@]}"; do
             echo "$row"
         done
