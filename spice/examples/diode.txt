@@ -1,0 +1,6 @@
+* Diode model
+V1 in 0 1
+D1 in 0 DDEFAULT
+.model DDEFAULT D(IS=1e-14 N=1)
+.dc V1 -1 1 .01
+.end

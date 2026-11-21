@@ -1,0 +1,4 @@
+IF CNTR > 0 THEN
+RESULT = 1;
+ELSE
+RESULT = 2;

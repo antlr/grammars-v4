@@ -1,0 +1,5 @@
+FUNCTION UsePerson()
+   LOCAL oPerson := Person():New( "Ana", 30 )
+   ? oPerson:Greet()
+   ? oPerson:nAge
+   RETURN NIL

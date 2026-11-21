@@ -1,0 +1,18 @@
+digraph ATN {
+rankdir=LR;
+s65[fontsize=11, label="65", shape=doublecircle, fixedsize=true, width=.6];
+s64[fontsize=11,label="64", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s967[fontsize=11,label="967", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s968[fontsize=11,label="968", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s969[fontsize=11,label="969", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s970[fontsize=11,label="{&rarr;\n970\nd=22|{<p0>|<p1>|<p2>}}", shape=record, fixedsize=false, peripheries=1];
+s971[fontsize=11,label="&larr;\n971", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s64 -> s970 [fontname="Times-Italic", label="&epsilon;"];
+s970:p0 -> s967 [fontname="Times-Italic", label="&epsilon;"];
+s970:p1 -> s968 [fontname="Times-Italic", label="&epsilon;"];
+s970:p2 -> s969 [fontname="Times-Italic", label="&epsilon;"];
+s967 -> s971 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<type_name>", arrowhead = normal];
+s968 -> s971 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<simple_type>", arrowhead = normal];
+s969 -> s971 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<tuple_type>", arrowhead = normal];
+s971 -> s65 [fontname="Times-Italic", label="&epsilon;"];
+}

@@ -1,0 +1,30 @@
+digraph ATN {
+rankdir=LR;
+s7[fontsize=11, label="7", shape=doublecircle, fixedsize=true, width=.6];
+s6[fontsize=11,label="6", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s299[fontsize=11,label="299", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s300[fontsize=11,label="300", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s301[fontsize=11,label="{&rarr;\n301\nd=8|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s302[fontsize=11,label="&larr;\n302", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s303[fontsize=11,label="303", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s304[fontsize=11,label="304", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s305[fontsize=11,label="305", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s306[fontsize=11,label="{&rarr;\n306\nd=9|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s307[fontsize=11,label="&larr;\n307", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s308[fontsize=11,label="308", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s309[fontsize=11,label="309", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s6 -> s299 [fontname="Times-Italic", label="&epsilon;"];
+s299 -> s301 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'import'", arrowhead = normal];
+s301:p0 -> s300 [fontname="Times-Italic", label="&epsilon;"];
+s301:p1 -> s302 [fontname="Times-Italic", label="&epsilon;"];
+s300 -> s302 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'static'", arrowhead = normal];
+s302 -> s303 [fontname="Times-Italic", label="&epsilon;"];
+s303 -> s306 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<qualifiedName>", arrowhead = normal];
+s306:p0 -> s304 [fontname="Times-Italic", label="&epsilon;"];
+s306:p1 -> s307 [fontname="Times-Italic", label="&epsilon;"];
+s304 -> s305 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'.'", arrowhead = normal];
+s307 -> s308 [fontname="Times-Italic", label="&epsilon;"];
+s305 -> s307 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'*'", arrowhead = normal];
+s308 -> s309 [fontsize=11, fontname="Courier", arrowsize=.7, label = "';'", arrowhead = normal];
+s309 -> s7 [fontname="Times-Italic", label="&epsilon;"];
+}

@@ -10,6 +10,8 @@ public abstract class PlSqlParserBase : Parser
     private bool _isVersion11 = true;
     private bool _isVersion12 = true;
 
+    private bool _lastUnitWasPlsql = false;
+
     protected PlSqlParserBase(ITokenStream input)
         : base(input)
     {
@@ -17,6 +19,52 @@ public abstract class PlSqlParserBase : Parser
 
     public PlSqlParserBase(ITokenStream input, TextWriter output, TextWriter errorOutput) : this(input)
     {
+    }
+
+    public override void Reset()
+    {
+        _lastUnitWasPlsql = false;
+        base.Reset();
+    }
+
+    public void setLastUnitPlsql() { _lastUnitWasPlsql = true; }
+    public void setLastUnitSql()   { _lastUnitWasPlsql = false; }
+    public bool isLastUnitSql()    { return !_lastUnitWasPlsql; }
+    public bool isLastUnitPlsql()  { return _lastUnitWasPlsql; }
+
+    public bool isSolidusSeparator()
+    {
+        var stream = (CommonTokenStream)InputStream;
+        var solidus = stream.LT(1);
+        if (solidus == null || solidus.Type != PlSqlParser.SOLIDUS)
+            return false;
+
+        int solidusLine = solidus.Line;
+
+        var prev = stream.LT(-1);
+        if (prev != null && prev.Type != TokenConstants.EOF && prev.Line == solidusLine)
+            return false;
+
+        var next = stream.LT(2);
+        if (next != null && next.Type != TokenConstants.EOF && next.Line == solidusLine)
+            return false;
+
+        return true;
+    }
+
+    /** True when the current token is the first significant token on its line. */
+    public bool isLineStart()
+    {
+        var stream = (CommonTokenStream)InputStream;
+        var token = stream.LT(1);
+        if (token == null)
+            return false;
+
+        var prev = stream.LT(-1);
+        if (prev == null || prev.Type == TokenConstants.EOF)
+            return true;
+
+        return prev.Line < token.Line;
     }
 
     public bool isVersion10() => _isVersion10;
@@ -48,7 +96,8 @@ public abstract class PlSqlParserBase : Parser
 
     public bool isNotStartOfJoin() {
         var lt1 = (this.InputStream as CommonTokenStream).LT(1);
-        if (lt1.Type == PlSqlParser.INNER ||
+        if (lt1.Type == PlSqlParser.JOIN ||
+            lt1.Type == PlSqlParser.INNER ||
             lt1.Type == PlSqlParser.CROSS ||
             lt1.Type == PlSqlParser.NATURAL ||
             lt1.Type == PlSqlParser.PARTITION ||
@@ -58,5 +107,11 @@ public abstract class PlSqlParserBase : Parser
             lt1.Type == PlSqlParser.OUTER)
             return false;
         return true;
+    }
+
+    public bool isNotBulkCollect() {
+        var lt1 = (this.InputStream as CommonTokenStream).LT(1);
+        var lt2 = (this.InputStream as CommonTokenStream).LT(2);
+        return lt1.Type != PlSqlParser.BULK || lt2.Type != PlSqlParser.COLLECT;
     }
 }

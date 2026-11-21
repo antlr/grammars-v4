@@ -1,0 +1,976 @@
+$ TITLE('CP/M 3.0 --- PUT user interface')
+put:
+do;
+
+/*
+  Copyright (C) 1982
+  Digital Research
+  P.O. Box 579
+  Pacific Grove, CA 93950
+*/
+
+/*
+Written:  02 Aug 82  by John Knight 
+9/6/82  - changed RSX deletion & sub-function codes
+        - modified syntax & messages
+        - fixed password handling
+9/11/82 - sign-on message
+11/30/82 - interaction with SAVE
+         - PUT CONSOLE INPUT TO FILE 
+*/
+
+/********************************************
+*                                           *
+*       LITERALS AND GLOBAL VARIABLES       *
+*                                           *
+********************************************/
+
+declare
+    true    		literally '1',
+    false   		literally '0',
+    forever 		literally 'while true',
+    lit     		literally 'literally',
+    proc    		literally 'procedure',
+    dcl     		literally 'declare',
+    addr    		literally 'address',
+    cr      		literally '13',
+    lf      		literally '10',
+    ctrlc   		literally '3',
+    ctrlx   		literally '18h',
+    bksp    		literally '8',
+    con$type		literally '0',
+    aux$type		literally '1',
+    list$type		literally '2',
+    input$type          literally '3',
+    con$width$offset	literally '1ah',
+    ccp$flag$offset	literally '18h',
+    init$rsx		literally '132',
+    kill$con$rsx	literally '133',
+    kill$lst$rsx	literally '137',
+    kill$journal$rsx    literally '141',
+    get$con$fcb		literally '134',
+    get$lst$fcb		literally '138',
+    get$journal$fcb     literally '142',
+    cpmversion		literally '30h';
+    
+  declare ccp$flag byte;
+  declare con$width byte;
+  declare i byte;
+  declare begin$buffer address;
+  declare buf$length byte;
+  declare no$chars byte;
+  declare rsx$kill$pb byte initial(kill$con$rsx);
+  declare rsx$fcb$pb  byte initial(get$con$fcb);
+  declare 
+    warning (*)    byte data ('WARNING:',cr,lf,'$');
+
+  /* scanner variables and data */
+  declare
+    options(*) byte data
+        ('OUTPUT~TO~FILE~CONSOLE~CONOUT:~AUXILIARY~',
+         'AUXOUT:~END~CON:~AUX:~LIST~LST:~PRINTER~INPUT',0FFH),
+		
+    options$offset(*) byte data
+        (0,7,10,15,23,31,41,49,53,58,63,68,73,81,86),
+
+    put$options(*) byte data
+        ('NOT~ECHO~RAW~FILTERED~SYSTEM~PROGRAM',0FFH),
+
+    put$options$offset(*) byte data
+        (0,4,9,13,22,29,36),
+
+    end$list	byte data (0ffh),
+
+    delimiters(*) byte data (0,'[]=, ./;',0,0ffh),
+
+    SPACE	byte data(5),
+
+    j		byte initial(0),
+    buf$ptr	address,
+    index	byte,
+    endbuf	byte,
+    delimiter	byte;
+    
+    declare end$of$string  byte initial ('~');
+
+  declare scbpd structure
+    (offset byte,
+     set    byte,
+     value  address);
+
+  declare putpb structure
+    (output$type   byte,
+     echo$flag     byte,
+     filtered$flag byte,
+     program$flag   byte) 
+     initial(con$type,true,true,true);
+
+  declare parse$fn structure
+    (buff$adr address,
+     fcb$adr  address);
+
+ declare passwd (8) byte;
+
+ declare plm label public;
+ 
+  /**************************************
+   *                                    *
+   *       B D O S   INTERFACE          *
+   *                                    *
+   **************************************/
+
+
+  mon1:
+    procedure (func,info) external;
+      declare func byte;
+      declare info address;
+    end mon1;
+
+  mon2:
+    procedure (func,info) byte external;
+      declare func byte;
+      declare info address;
+    end mon2;
+
+  mon3:
+    procedure (func,info) address external;
+      declare func byte;
+      declare info address;
+    end mon3;
+
+  declare cmdrv     byte    external;	/* command drive      */
+  declare fcb (1)   byte    external;	/* 1st default fcb    */
+  declare fcb16 (1) byte    external;	/* 2nd default fcb    */
+  declare pass0     address external;	/* 1st password ptr   */
+  declare len0      byte    external;	/* 1st passwd length  */
+  declare pass1     address external;	/* 2nd password ptr   */
+  declare len1      byte    external;	/* 2nd passwd length  */
+  declare tbuff (1) byte    external;	/* default dma buffer */
+
+  /**************************************
+   *                                    *
+   *       B D O S   Externals          *
+   *                                    *
+   **************************************/
+
+  read$console:
+    procedure byte;
+      return mon2(1,0);
+    end read$console;
+
+  printchar: 
+    procedure(char);
+    declare char byte;
+    call mon1(2,char);
+    end printchar;
+
+  conin:
+    procedure byte;
+    return mon2(6,0fdh);
+    end conin;
+
+  print$buf:
+    procedure (buffer$address);
+      declare buffer$address address;
+      call mon1 (9,buffer$address);
+    end print$buf;
+
+  read$console$buf:
+    procedure (buffer$address,max) byte;
+    declare buffer$address address;
+    declare new$max based buffer$address address;
+    declare max byte;
+    new$max = max;
+    call mon1(10,buffer$address);
+    buffer$address = buffer$address + 1;
+    return new$max;	/* actually number of characters input */
+  end read$console$buf;
+
+  version: procedure address;
+    /* returns current cp/m version # */
+    return mon3(12,0);
+    end version;
+
+  check$con$stat: procedure byte;
+    return mon2(11,0);
+  end check$con$stat;
+
+  delete$file:
+    procedure (fcb$address) address;
+    declare fcb$address address;
+    return mon3(19,fcb$address);
+  end delete$file;
+
+  make$file: procedure (fcb) address;
+    declare fcb address;
+    return mon3(22,fcb);
+  end make$file;
+
+  set$dma: procedure(dma);
+    declare dma address;
+    call mon1(26,dma);
+  end set$dma;
+
+  /* 0ffh ==> return BDOS errors */
+  return$errors: procedure (mode);
+    declare mode byte;
+    call mon1(45,mode);
+  end return$errors;
+
+  getscbbyte: procedure (offset) byte;
+    declare offset byte;
+    scbpd.offset = offset;
+    scbpd.set = 0;
+    return mon2(49,.scbpd);
+  end getscbbyte;
+
+  setscbbyte:
+    procedure (offset,value);
+    declare offset byte;
+    declare value byte;
+    scbpd.offset = offset;
+    scbpd.set = 0ffh;
+    scbpd.value = double(value);
+    call mon1(49,.scbpd);
+  end setscbbyte;
+
+rsx$call: procedure (rsxpb) address;
+/* call Resident System Extension */
+  declare rsxpb address;
+  return mon3(60,rsxpb);
+end rsx$call;
+
+
+get$console$mode: procedure address;
+/* returns console mode */
+  return mon3(6dh,0ffffh);
+end get$console$mode;
+
+set$console$mode: procedure (new$value);
+  declare new$value address;
+  call mon1(6dh,new$value);
+end set$console$mode;
+
+parse: procedure (pfcb) address external;
+  declare pfcb address;
+end parse;
+
+putf: procedure (param$block) external;
+  declare param$block address;
+end putf;
+
+  /**************************************
+   *                                    *
+   *       S U B R O U T I N E S        *
+   *                                    *
+   **************************************/
+
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+
+                    * * *  Option scanner  * * *
+
+
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+
+separator: procedure(character) byte;
+
+					/* determines if character is a 
+					   delimiter and which one */
+	declare	k	byte,
+		character	byte;
+
+	k = 1;
+loop:	if delimiters(k) = end$list then return(0);
+	if delimiters(k) = character then return(k);	/* null = 25 */
+		k = k + 1;
+		go to loop;
+
+end separator;
+
+opt$scanner:	procedure(list$ptr,off$ptr,idx$ptr);
+					/* scans the list pointed at by idxptr
+					   for any strings that are in the 
+					   list pointed at by list$ptr.
+					   Offptr points at an array that 
+					   contains the indices for the known
+					   list. Idxptr points at the index 
+					   into the list. If the input string
+					   is unrecognizable then the index is
+				   	   0, otherwise > 0.
+
+					First, find the string in the known
+					list that starts with the same first 
+					character.  Compare up until the next
+					delimiter on the input. if every input
+					character matches then check for 
+					uniqueness.  Otherwise try to find 
+					another known string that has its first
+					character match, and repeat.  If none
+					can be found then return invalid.
+
+					To test for uniqueness, start at the 
+					next string in the knwon list and try
+					to get another match with the input.
+					If there is a match then return invalid.
+
+					else move pointer past delimiter and 
+					return.
+
+				P.Balma		*/
+
+	declare
+		buff		based buf$ptr (1) byte,
+		idx$ptr		address,
+		off$ptr		address,
+		list$ptr	address;
+
+	declare
+		i		byte,
+		j		byte,
+		list		based list$ptr (1) byte,
+		offsets		based off$ptr (1) byte,
+		wrd$pos  	byte,
+		character	byte,
+		letter$in$word	byte,
+		found$first	byte,
+		start		byte,
+		index		based idx$ptr byte,
+		save$index	byte,
+		(len$new,len$found)	byte,
+		valid		byte;
+
+/*****************************************************************************/
+/*			internal subroutines				     */
+/*****************************************************************************/
+
+check$in$list: procedure;
+				/* find known string that has a match with 
+				   input on the first character.  Set index
+				   = invalid if none found.   */
+			
+	declare	i	byte;
+
+	i = start;
+	wrd$pos = offsets(i);
+	do while list(wrd$pos) <> end$list;
+		i = i + 1;
+		index = i;
+		if list(wrd$pos) = character then return;
+		wrd$pos = offsets(i);
+	end;
+			/* could not find character */
+	index = 0;
+	return;
+end check$in$list;
+
+setup:	procedure;
+	character = buff(0);
+	call check$in$list;
+	letter$in$word = wrd$pos;
+			/* even though no match may have occurred, position
+			   to next input character.  */
+	i = 1;
+	character = buff(1);
+end setup;
+
+test$letter:	procedure;
+			/* test each letter in input and known string */
+
+	letter$in$word = letter$in$word + 1;
+
+					/* too many chars input? 0 means
+					   past end of known string */
+	if list(letter$in$word) = end$of$string then valid = false;
+	else
+	if list(letter$in$word) <> character then valid = false;
+
+	i = i + 1;
+	character = buff(i);
+
+end test$letter;
+
+skip:	procedure;
+					/* scan past the offending string;
+					   position buf$ptr to next string...
+					   skip entire offending string;
+					   ie., falseopt=mod, [note: comma or
+					   space is considered to be group 
+					   delimiter] */
+	character = buff(i);
+	delimiter = separator(character);
+	/* No skip for PUT */
+        do while ((delimiter < 1) or (delimiter > 9));
+		i = i + 1;
+		character = buff(i);
+		delimiter = separator(character);
+	end;
+	endbuf = i;
+	buf$ptr = buf$ptr + endbuf + 1;
+	return;
+end skip;
+
+eat$blanks: procedure;
+
+	declare	charac	based buf$ptr byte;
+
+
+	do while ((delimiter := separator(charac)) = SPACE);
+		buf$ptr = buf$ptr + 1;
+	end;
+
+end eat$blanks;
+
+/*****************************************************************************/
+/*			end of internals				     */
+/*****************************************************************************/
+
+
+					/* start of procedure */
+	if delimiter = 9 then
+		return;			/* return if at end of buffer */
+	call eat$blanks;
+	start = 0;
+	call setup;
+
+					/* match each character with the option
+					   for as many chars as input 
+					   Please note that due to the array
+					   indices being relative to 0 and the
+					   use of index both as a validity flag
+					   and as a index into the option/mods
+					   list, index is forced to be +1 as an
+					   index into array and 0 as a flag*/
+
+	do while index <> 0;
+		start = index;
+		delimiter = separator(character);
+
+					/* check up to input delimiter */
+
+		valid = true;		/* test$letter resets this */
+		do while delimiter = 0;
+			call test$letter;
+			if not valid then go to exit1;
+			delimiter = separator(character);
+		end;
+
+		go to good;
+
+					/* input ~= this known string;
+					   get next known string that 
+					   matches */
+exit1:		call setup;
+	end;
+					/* fell through from above, did
+					   not find a good match*/
+	endbuf = i;			/* skip over string & return*/
+	call skip;
+	return;
+
+					/* is it a unique match in options
+					   list? */
+good:	endbuf = i;
+	len$found = endbuf;
+	save$index = index;
+	valid = false;
+next$opt:
+		start = index;
+		call setup;
+		if index = 0 then go to finished;
+
+					/* look at other options and check
+					   uniqueness */
+
+		len$new = offsets(index + 1) - offsets(index) - 1;
+		if len$new = len$found then do;
+			valid = true;
+			do j = 1 to len$found;
+				call test$letter;
+				if not valid then go to next$opt;
+			end;
+		end;
+		else go to nextopt;
+					/* fell through...found another valid
+					   match --> ambiguous reference */
+	index = 0;
+	call skip;		/* skip input field to next delimiter*/
+	return;
+
+finished:			/* unambiguous reference */
+	index = save$index;
+	buf$ptr = buf$ptr + endbuf;
+	call eat$blanks;
+	if delimiter <> 0 then
+          buf$ptr = buf$ptr + 1;
+        else
+          delimiter = 5;
+	return;
+
+end opt$scanner;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+crlf:   proc;
+    call printchar(cr);
+    call printchar(lf);
+    end crlf;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+/* fill string @ s for c bytes with f */
+fill: procedure(s,f,c);
+  declare s address;
+  declare (f,c) byte;
+  declare a based s byte;
+  do while (c:=c-1) <> 255;
+    a=f;
+    s=s+1;
+  end;
+end fill;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+/* The error processor.  This routine prints the command line
+  with a carot '^' under the offending delimiter, or sub-string.
+  The code passed to the routine determines the error message
+  to be printed beneath the command string.                  */
+
+error: procedure (code);
+  declare (code,i,j,nlines,rem) byte;
+  declare (string$ptr,tstring$ptr) address;
+  declare chr1 based string$ptr byte;
+  declare chr2 based tstring$ptr byte;
+  declare carot$flag byte;
+
+print$command: procedure (size);
+  declare size byte;
+  do j=1 to size;	/* print command string */
+    call printchar(chr1);
+    string$ptr = string$ptr + 1;
+  end;
+  call crlf;
+  do j=1 to size;	/* print carot if applicable */
+    if .chr2 = buf$ptr then do;
+      carot$flag = true;
+      call printchar('^');
+    end;
+    else
+      call printchar(' ');
+    tstring$ptr = tstring$ptr + 1;
+  end;
+  call crlf;
+end print$command;
+
+  carot$flag = false;
+  string$ptr,tstring$ptr = begin$buffer;
+  con$width = getscbbyte(con$width$offset);
+  if con$width < 40 then con$width = 40;
+  nlines = buf$length / con$width;	/* num lines to print */
+  rem = buf$length mod con$width;	/* num extra chars to print */
+  if code <> 2 then do;
+    if ((code = 1) or (code = 4)) then	/* adjust carot pointer */
+      buf$ptr = buf$ptr - 1;	/* for delimiter errors */
+    else if code <> 5 then
+      buf$ptr = buf$ptr - endbuf - 1;	/* all other errors */
+  end;
+  call crlf;
+  do i=1 to nlines;
+    tstring$ptr = string$ptr;
+    call print$command(con$width);
+  end;
+  call print$command(rem);
+  if carot$flag then
+    call print$buf(.('Error at the ''^'': $'));
+  else
+    call print$buf(.('Error at end of line: $'));
+  if con$width < 65 then
+    call crlf;
+  do case code;
+    call print$buf(.('Invalid option or modifier$'));
+    call print$buf(.('End of line expected$'));
+    call print$buf(.('Invalid file specification$'));
+    call print$buf(.('Invalid command$'));
+    call print$buf(.('Invalid delimiter$'));
+    call print$buf(.('File is Read Only$'));
+  end;
+  call mon1(0,0);
+end error;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+user$abort: procedure (a);
+  declare a address;
+  declare response byte;
+
+  call print$buf(a);
+  call print$buf(.(' (Y/N)? $'));
+  response=read$console;
+  call crlf;
+  if not((response='y') or (response='Y')) then do;
+      call print$buf(.('PUT aborted$'));
+      call mon1(0,0);
+    end;
+  end user$abort;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+ucase: procedure (char) byte;
+  declare char byte;
+  if char >= 'a' then
+    if char < '{' then
+      return (char-20h);
+  return char;
+end ucase;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+getucase: procedure byte;
+  declare c byte;
+  c = ucase(conin);
+  return c;
+end getucase;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+getpasswd: procedure;
+  declare (i,c) byte;
+  call crlf;
+  call crlf;
+  call print$buf(.('Enter Password: $'));
+retry:
+  call fill(.passwd,' ',8);
+  do i=0 to 7;
+nxtchr:
+  if (c:=getucase) >= ' ' then
+    passwd(i)=c;
+  if c = cr then 
+    return;
+  if c = ctrlx then
+    go to retry;
+  if c = bksp then do;
+    if i < 1 then
+      goto retry;
+    else do;
+      passwd(i := i - 1) = ' ';
+      goto nxtchr;
+      end;
+    end;
+  if c = 3 then
+    call mon1(0,0);
+  end;
+end getpasswd;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+put$msg: procedure;
+  call print$buf(.('Putting $'));
+  if putpb.output$type = list$type then
+    call print$buf(.('list$'));
+  else
+    call print$buf(.('console$'));
+  if putpb.output$type = input$type then
+    call print$buf(.(' input to $'));
+  else
+    call print$buf(.(' output to $'));
+end put$msg;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+print$fn: procedure (fcb$ad);
+  declare k byte;
+  declare fcb$ad address;
+  declare driv based fcb$ad byte;
+  declare fn based fcb$ad (12) byte;
+
+  if getscbbyte(26) < 48 then
+    call crlf;				/* console width */
+  call print$buf(.('file: $'));
+  if driv <> 0 then do;
+    call printchar('@'+driv);
+    call printchar(':');
+  end;
+  do k=1 to 11;
+    if k=9 then
+      call printchar('.');
+    if fn(k) <> ' ' then
+      call printchar(fn(k));
+  end;
+end print$fn;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+try$open: procedure;
+  declare (error$code,a) address;
+  declare prog$flag based a byte;
+  declare code byte;
+
+  error$code = rsx$call(.rsx$fcb$pb);
+  if error$code <> 0ffh then do;	/* ff means no active PUT file */
+    a = error$code - 2;			/* program output only? */
+    if prog$flag then
+      a = rsx$call(.rsx$kill$pb);       /* kill it if so */
+    else do;
+      call print$buf(.warning);
+      call put$msg;
+      call print$fn(error$code);	/* print the file name */
+      call user$abort(.(cr,lf,'Do you want another file$'));
+    end;
+  end;
+
+  call return$errors(0ffh);
+  call setdma(.passwd);	/* set dma to password */
+  if passwd(0) <> ' ' then
+    fcb(6) = fcb(6) or 80h;
+  error$code=make$file(.fcb);
+  if low(error$code)=0ffh then do;	/* make failed? */
+    code = high(error$code);
+    if code = 8 then do;	/* file already exists */
+      call print$buf(.warning);
+      call user$abort(.('File already exists; Delete it$'));
+      error$code = delete$file(.fcb);
+      if low(error$code) = 0ffh then do;
+        code = high(error$code);
+        if code = 3 then	/* file is read only */
+          call error(5);
+        if code = 7 then do;	/* Password protected */
+          call getpasswd;
+          call crlf;
+        end;
+        call return$errors(0);
+        error$code=delete$file(.fcb);
+      end;
+    end;
+    call return$errors(0);
+    if passwd(0) <> ' ' then
+      fcb(6) = fcb(6) or 80h;
+    error$code = make$file(.fcb);
+  end;
+  call return$errors(0);
+  call put$msg;
+  call print$fn(.fcb);		/* print the file name */
+  call putf(.putpb);	/* do PUT processing */
+/*call mon1(0,0);	   debug exit */
+end try$open;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+kill$rsx: procedure;
+  declare (fcb$adr,a) address;
+
+  if (delimiter <> 9) and (delimiter <> 2) then	/* check for eoln or ']' */
+    call error(1);
+  /* remove PUT RSX */
+  do while (fcb$adr:=rsx$call(.rsx$fcb$pb)) <> 0ffh;
+    a = rsx$call(.rsx$kill$pb);
+    call print$buf(.('PUT completed for $'));
+    call print$fn(fcb$adr);
+    call crlf;
+  end;
+  call put$msg;
+  if putpb.output$type = list$type then
+    call print$buf(.('printer$'));
+  else
+    call print$buf(.('console$'));
+  call mon1(0,0);
+end kill$rsx;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+output$options: procedure;
+  declare negate byte;
+  do while ((delimiter<>2) and (delimiter<>9));
+    negate = false;
+    call opt$scanner(.put$options(0),.put$options$offset(0),.index);
+    if index = 1 then do;	/* NOT */
+      negate = true;
+      call opt$scanner(.put$options(0),.put$options$offset(0),.index);
+    end;
+    if (index=0) or (index=1) then
+      call error(0);
+    if index = 2 then do;	/* ECHO */
+      if negate then
+        putpb.echo$flag = false;
+      else
+        putpb.echo$flag = true;
+    end;
+    if index = 3 then do;	/* RAW output */
+      if negate then
+        putpb.filtered$flag = true;
+      else
+        putpb.filtered$flag = false;
+    end;
+    if index = 4 then do;	/* FILTERED output */
+      if negate then
+        putpb.filtered$flag = false;
+      else
+        putpb.filtered$flag = true;
+    end;
+    if index = 5 then do;	/* SYSTEM output */
+      if negate then
+        putpb.program$flag = true;
+      else
+        putpb.program$flag = false;
+    end;
+    if index = 6 then do;	/* PROGRAM output */
+      if negate then
+        putpb.program$flag = false;
+      else
+        putpb.program$flag = true;
+    end;
+  end;
+end output$options;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+process$file: procedure(buf$adr);
+  declare status address;
+  declare buf$adr address;
+  declare char based status byte;
+  parse$fn.buff$adr = buf$adr;
+  parse$fn.fcb$adr = .fcb;
+  status = parse(.parse$fn);
+  if status = 0ffffh then do;
+    buf$ptr = parse$fn.buff$adr;
+    call error(2);	/* bad file */
+  end;
+  call move(8,.fcb16,.passwd);
+  if status = 0 then	/* eoln */
+    call try$open;
+  else do;
+    buf$ptr = status + 1;	/* position buf$ptr past '[' */
+    if char <> '[' then
+      call error(4);	/* Invalid delimiter */
+    else do;
+      call output$options;	/* process output options */
+      call try$open;
+    end;
+  end;
+end process$file;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+input$found: procedure (buffer$adr) byte;
+  declare buffer$adr address;
+  declare char based buffer$adr byte;
+  do while (char = ' ') or (char = 9); /* tabs & spaces */
+    buffer$adr = buffer$adr + 1;
+  end;
+  if char = 0 then	/* eoln */
+    return false;	/* input not found */
+  else
+    return true;	/* input found */
+end input$found;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+ /*********************************
+*                                *
+*    M A I N   P R O G R A M     *
+*                                *
+*********************************/
+
+plm:
+  do;
+    if (low(version) < cpmversion) or (high(version)=1) then do;
+      call print$buf(.('Requires CP/M 3.0$'));
+      call mon1(0,0);
+    end;
+    /* default modes for putf call */
+    if not input$found(.tbuff(1)) then do;	/* just PUT, no command tail */
+        call print$buf(.('CP/M 3 PUT Version 3.0',cr,lf,'$'));
+        call print$buf(.('Put console output to a file$'));
+        call print$buf(.(cr,lf,'Enter file: $'));
+        no$chars = read$console$buf(.tbuff(0),128);
+        call crlf;
+        tbuff(1) = ' ';		/* blank out nc field */
+        tbuff(no$chars+2) = 0;	/* mark eoln */
+        if not input$found(.tbuff(1)) then	/* quit, no file name */
+          call mon1(0,0);
+        do i=1 to no$chars;	/* make input capitals */
+          tbuff(i+1) = ucase(tbuff(i+1));
+        end;
+        begin$buffer = .tbuff(2);
+        buf$length = no$chars;
+        buf$ptr = .tbuff(2);
+        call process$file(.tbuff(2));
+    end;
+    else do;	/* Put with input */
+      i = 1;			/* skip over leading spaces */
+      do while (tbuff(i) = ' ');
+        i = i + 1;
+      end;
+      begin$buffer = .tbuff(1);	/* note beginning of input */
+      buf$length = tbuff(0);	/* note length of input */
+      buf$ptr = .tbuff(i);	/* set up for scanner */
+      index = 0;
+      delimiter = 1;
+      call opt$scanner(.options(0),.options$offset(0),.index);
+      if (index=6) or (index=7) or (index=10) then do;	/* AUX: */
+        putpb.output$type = aux$type;
+        call opt$scanner(.options(0),.options$offset(0),.index);
+        if index = 1 then	/* OUTPUT */
+          call opt$scanner(.options(0),.options$offset(0),.index);
+        if index = 2 then	/* TO */
+          call opt$scanner(.options(0),.options$offset(0),.index);
+        if index = 3 then	/* FILE */
+          call process$file(buf$ptr);
+        else do;
+          if (index=6) or (index=7) or (index=10) then	/* AUX: */
+            call kill$rsx;
+          else
+            call error(3);
+        end;
+      end;
+      else do;	/* not AUX, check LST */
+        if (index=11) or (index=12) or (index=13) then do;	/* LIST */
+          putpb.output$type = list$type;
+          putpb.echo$flag = false;	/* don't echo list output */
+          rsx$fcb$pb = get$lst$fcb;
+          rsx$kill$pb = kill$lst$rsx;
+          call opt$scanner(.options(0),.options$offset(0),.index);
+          if index = 1 then	/* OUTPUT */
+            call opt$scanner(.options(0),.options$offset(0),.index);
+          if index = 2 then	/* TO */
+            call opt$scanner(.options(0),.options$offset(0),.index);
+          if index = 3 then	/* FILE */
+            call process$file(buf$ptr);
+          if (index=11) or (index=12) or (index=13) then	/* LIST */
+            call kill$rsx;
+          else
+            call error(3);
+        end;
+        else do;	/* normal CONSOLE output */
+          /* if CONSOLE or CONOUT or CON: */ 
+          if (index=4) or (index=5) or (index=9) then do;    /* CONSOLE */
+            if delimiter = 9 then
+              call kill$rsx;
+            else
+              call opt$scanner(.options(0),.options$offset(0),.index);
+          end;
+          if index = 1 then	      /* OUTPUT */
+            call opt$scanner(.options(0),.options$offset(0),.index);
+          else if index = 14 then do; /* INPUT  */
+            putpb.output$type = input$type;
+            putpb.echo$flag = true;
+            putpb.filtered$flag = false;	
+            rsx$fcb$pb = get$journal$fcb;
+            rsx$kill$pb = kill$journal$rsx;
+            call opt$scanner(.options(0),.options$offset(0),.index);
+          end;
+          if index = 2 then	      /* TO */
+            call opt$scanner(.options(0),.options$offset(0),.index);
+          if index = 3 then	      /* FILE */
+            call process$file(buf$ptr);
+          if (index=4) or (index=5) or (index=9) then /* CONOUT: or CONSOLE */
+            call kill$rsx;
+          else
+            call error(3);
+        end;
+      end;
+    end;
+  end;
+end put;
+

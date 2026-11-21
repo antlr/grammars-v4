@@ -1,0 +1,1016 @@
+###########################################
+#
+#  ChipWar
+#
+#  War. War never changes.
+#  This game takes place on a toroidal field
+#  of 16 territories. Each has some number
+#  of troops stationed there (1-5).
+#  at the beginning of the game, territories
+#  are divided between you (white)
+#  and an AI opponent (black).
+#
+#  You can order your territories to attack
+#  adjacent enemy territories provided you
+#  have more than one troop available.
+#  When you attack, a number of 8-sided dice
+#  will be rolled and summed based on the
+#  number of attackers and defenders.
+#  If the attackers win, they capture the
+#  territory and transfer all but one of
+#  their troops over.
+#  If the defenders win, they destroy all
+#  but one of the attackers and lose one troop,
+#  or none if they have only a single troop.
+#
+#  After white has taken a turn,
+#  each territory has a 50% chance of
+#  producing one new troop.
+#  The game ends when black or white has
+#  conquered the entire map.
+#
+#  When selecting a territory, ASWD move
+#  your cursor, E selects the territory
+#  and Q ends your turn.
+#  With a territory selected, ASWD choose
+#  the direction in which to attack,
+#  E confirms the attack and Q cancels.
+#  When the game is over press any key to
+#  play again.
+#
+#  Based loosely on the Flash game DiceWars:
+#
+#  http://www.gamedesign.jp/flash/dice/dice.html
+#
+###########################################
+
+: whitedice
+	0xFE 0x82 0x82 0x92 0x82 0x82 0xFE 0x00 # 1
+	0xFE 0x82 0x8A 0x82 0xA2 0x82 0xFE 0x00 # 2
+	0xFE 0x82 0xAA 0x82 0x92 0x82 0xFE 0x00 # 3
+	0xFE 0x82 0xAA 0x82 0xAA 0x82 0xFE 0x00 # 4
+	0xFE 0x82 0xAA 0x92 0xAA 0x82 0xFE 0x00 # 5
+
+: blackdice
+	0xFE 0xFE 0xFE 0xEE 0xFE 0xFE 0xFE 0x00 # 1
+	0xFE 0xFE 0xF6 0xFE 0xDE 0xFE 0xFE 0x00 # 2
+	0xFE 0xFE 0xD6 0xFE 0xEE 0xFE 0xFE 0x00 # 3
+	0xFE 0xFE 0xD6 0xFE 0xD6 0xFE 0xFE 0x00 # 4
+	0xFE 0xFE 0xD6 0xEE 0xD6 0xFE 0xFE 0x00 # 5
+
+: arrows
+	0x10 0x38 0x7C 0xFE 0x38 0x38 0x38 0x00 # n
+	0x10 0x18 0xFC 0xFE 0xFC 0x18 0x10 0x00 # e
+	0x38 0x38 0x38 0xFE 0x7C 0x38 0x10 0x00 # s
+	0x10 0x30 0x7E 0xFE 0x7E 0x30 0x10 0x00 # w
+
+: p1
+	0x00 0x78 0x44 0x44 0x78 0x40 0x40 0x00
+	0x10 0x30 0x10 0x10 0x7C 0x00
+: p2
+	0xFE 0x86 0xBA 0xBA 0x86 0xBE 0xBE 0xFE
+	0xC6 0xBA 0xE6 0xDE 0x82 0xFE
+
+: curs1 0xAA 0x00 0x80 0x00 0x80 0x00 0x80 0x00 0xAA
+: curs2 0x80 0x00 0x80 0x00 0x80 0x00 0x80 0x00 0x80
+
+: empty 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+: fill  0xFF 0xFF 0xFF 0xFF 0xFF 0xFF 0xFF 0xFF
+        0xFF 0xFF 0xFF 0xFF 0xFF 0xFF 0xFF 0xFF
+: plus  0x00 0x40 0xE0 0x40
+
+# game over
+: go1 0x7E 0xFE 0xC0 0xDE 0xC6 0xFE 0x7E 0x00 0x7C 0xFE 0xC6 0xC6 0xC6 0xFE 0x7C
+: go2 0x7C 0xFE 0xC6 0xFE 0xC6 0xC6 0xC6 0x00 0xC6 0xC6 0xC6 0xC6 0xEE 0x7C 0x38
+: go3 0xC6 0xEE 0xFE 0xD6 0xC6 0xC6 0xC6 0x00 0x7E 0xFE 0xC0 0xF8 0xC0 0xFE 0x7E
+: go4 0x7E 0xFE 0xC0 0xF8 0xC0 0xFE 0x7E 0x00 0xFC 0xFE 0xC6 0xFE 0xFC 0xCE 0xC6
+
+# you win
+: yw1 0xC6 0xC6 0xEE 0x7C 0x38 0x38 0x38 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+: yw2 0x7C 0xFE 0xC6 0xC6 0xC6 0xFE 0x7C 0x00 0x63 0x63 0x63 0x6B 0x7F 0x77 0x63
+: yw3 0xC6 0xC6 0xC6 0xC6 0xC6 0xFE 0x7C 0x00 0x7E 0x7E 0x18 0x18 0x18 0x7E 0x7E
+: yw4 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0xC6 0xE6 0xF6 0xFE 0xDE 0xCE 0xC6
+
+# title/loading screen
+: ti1 0xFE 0x82 0xAA 0x92 0xAA 0x82 0xFE 0x00 0x06 0x06 0x06 0x06 0x06 0x07 0x03
+: ti2 0x00 0x00 0x75 0x47 0x45 0x75 0x00 0x00 0x19 0x1B 0xDB 0xDB 0xDB 0xFB 0x33
+: ti3 0x00 0x00 0x5C 0x54 0x5C 0x50 0x00 0x00 0xE7 0xF7 0x36 0xF7 0xF7 0x36 0x36
+: ti4 0xFE 0xFE 0xF6 0xFE 0xDE 0xFE 0xFE 0x00 0xC0 0xE0 0x60 0xC0 0xE0 0x60 0x60
+: lo1 0x8E 0x8A 0x8A 0xEE
+: lo2 0x4C 0xAA 0xEA 0xAC
+: lo3 0xB3 0xAA 0xAA 0xAB
+: lo4 0x80 0x00 0x80 0xAA
+
+#           n  e  s  w
+: delta-x   0  1  0 -1
+: delta-y  -1  0  1  0
+
+###########################################
+#
+#  Register Map:
+#
+###########################################
+
+# vf is always temporary
+:alias mode         ve
+:alias cursorx      vd
+:alias cursory      vc
+:alias dir          vb
+:alias wdice        v9
+:alias bdice        v8
+:alias wtotal       v7
+:alias btotal       v6
+:alias wroll        v5
+:alias broll        v4
+:alias rolls        v3
+# v0-v2 are temporary
+
+###########################################
+#
+#  Mutable Data
+#
+###########################################
+
+# game modes (mode)
+:const MOVE    0
+:const ATTACK  1
+:const AIMOVE  2
+:const WIN     3
+:const LOSE    4
+:const RESET   5
+
+# space owners (owns-at)
+:const START 0
+:const WHITE 1
+:const BLACK 2
+:const EMPTY 3
+
+: bcd-buffer 0
+: tens       0
+: ones       0
+
+: owns-at  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+: dice-at  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+
+###########################################
+#
+#  Utility Subroutines
+#
+###########################################
+
+: random-vector
+	# trashes v0-v2
+	# returns in v1
+	v1 := random 0xFF
+	v2 := v1
+	v0 := 0
+	loop
+		while v2 != 0
+		v2 <<= v2
+		v0 += vf
+	again
+	if v0 != 4 then jump random-vector
+;
+
+: vfwait
+	delay := vf
+	loop
+		vf := delay
+		if vf != 0 then
+	again
+;
+
+: longwait
+	vf := 60
+	jump vfwait
+
+: wait
+	vf := 30
+	jump vfwait
+
+: uwait
+	vf := 10
+	jump vfwait
+
+: fillscreen
+	# trashes v0-v1
+	clear
+	i := fill
+	v0 := 0
+	loop
+		v1 := 0
+		sprite v0 v1 15
+		v1 := 15
+		sprite v0 v1 15
+		v1 := 30
+		sprite v0 v1 2
+		v0 += 8
+		if v0 != 64 then
+	again
+;
+
+: draw-end-screen
+	v0 := 16
+	v1 :=  8
+	v2 := 15
+	loop
+		sprite v0 v1 15
+		i += v2
+		v0 += 8
+		if v0 != 48 then
+	again
+	v0 := key
+	mode := RESET
+;
+
+: draw-game-over
+	fillscreen
+	i := go1
+	jump draw-end-screen
+
+: draw-you-win
+	clear
+	i := yw1
+	jump draw-end-screen
+
+###########################################
+#
+#  Battle
+#
+###########################################
+
+: draw-wtotal
+	# trashes v0-v2
+	v2 := 23
+	v1 := 11
+	i := bcd-buffer
+	bcd wtotal
+	i := tens load v0 i := hex v0
+	sprite v1 v2 5
+	v1 += 5
+	i := ones load v0 i := hex v0
+	sprite v1 v2 5
+;
+
+: draw-btotal
+	# trashes v0-v2
+	v2 := 23
+	v1 := 43
+	i := bcd-buffer
+	bcd btotal
+	i := tens load v0 i := hex v0
+	sprite v1 v2 5
+	v1 += 5
+	i := ones load v0 i := hex v0
+	sprite v1 v2 5
+;
+
+: draw-wroll
+	# trashes v0-v2
+	v2 := 16
+	v1 := 14
+	i := hex wroll
+	sprite v1 v2 5
+	v1 += -4
+	i := plus
+	sprite v1 v2 4
+;
+
+: draw-broll
+	# trashes v0-v2
+	v2 := 16
+	v1 := 46
+	i := hex broll
+	sprite v1 v2 5
+	v1 += -4
+	i := plus
+	sprite v1 v2 4
+;
+
+: draw-battle
+	# trashes v0-v2
+	clear
+	i  := fill
+	v0 := 32
+	v1 := 0
+	loop
+		v1 := 0
+		sprite v0 v1 15
+		v1 := 15
+		sprite v0 v1 15
+		v1 := 30
+		sprite v0 v1  2
+		v0 += 8
+		if v0 != 64 then
+	again
+
+
+	# dice counters:
+	v1 :=  4
+	v0 := 12
+
+	i  := whitedice
+	v2 := wdice
+	v2 <<= v2
+	v2 <<= v2
+	v2 <<= v2
+	v2 += -8
+	i  += v2
+	sprite v0 v1 7
+
+	i  := whitedice
+	v2 := bdice
+	v2 <<= v2
+	v2 <<= v2
+	v2 <<= v2
+	v2 += -8
+	i  += v2
+	v0 := 45
+	sprite v0 v1 7
+
+	draw-wtotal
+	draw-btotal
+;
+
+: b-do-roll
+	broll := random 7
+	broll += 1
+	draw-broll
+	draw-btotal
+	btotal += broll
+	draw-btotal
+;
+
+: w-do-roll
+	wroll := random 7
+	wroll += 1
+	draw-wroll
+	draw-wtotal
+	wtotal += wroll
+	draw-wtotal
+;
+
+: defender-wins
+	# set attacker to 1
+	cursor-to-index
+	i := dice-at
+	i += vf
+	v0 := 1
+	save v0
+
+	# set defender to max(1, old-1)
+	direction-to-index
+	i := dice-at
+	i += vf
+	load v0
+	v0 += -1
+	if v0 == 0 then v0 := 1
+	i := dice-at
+	i += vf
+	save v0
+;
+
+: attacker-wins
+	# set dest to attackers - 1
+	cursor-to-index
+	i := dice-at
+	i += vf
+	load v0
+	va := v0
+	va += -1
+	direction-to-index
+	i := dice-at
+	i += vf
+	v0 := va
+	save v0
+
+	# set dest to be attacker owned
+	direction-to-index
+	i := owns-at
+	i += vf
+	if mode == ATTACK then v0 := WHITE
+	if mode != ATTACK then v0 := BLACK
+	save v0
+
+	# set attackers to 1
+	cursor-to-index
+	i := dice-at
+	i += vf
+	v0 := 1
+	save v0
+;
+
+: white-wins-attack
+	attacker-wins
+
+	# if there are no black zones,
+	# game over and white wins.
+	i := owns-at
+	v1 := 0
+	loop
+		load v0
+		if v0 == BLACK then return
+		v1 += 1
+		if v1 != 18 then
+	again
+	mode := WIN
+;
+
+: black-wins-attack
+	attacker-wins
+
+	# if there are no white zones,
+	# game over and black wins.
+	i := owns-at
+	v1 := 0
+	loop
+		load v0
+		if v0 == WHITE then return
+		v1 += 1
+		if v1 != 18 then
+	again
+	mode := LOSE
+;
+
+: white-wins
+	if mode == ATTACK then jump white-wins-attack
+	jump defender-wins
+
+: black-wins
+	if mode != ATTACK then jump black-wins-attack
+	jump defender-wins
+
+: battle
+	wtotal := 0
+	btotal := 0
+	rolls  := 0
+
+	draw-battle
+	wait
+
+	loop
+		if bdice > rolls then b-do-roll
+		if wdice > rolls then w-do-roll
+		wait
+		if bdice > rolls then draw-broll
+		if wdice > rolls then draw-wroll
+		uwait
+
+		rolls += 1
+
+		# get max of dice count
+		v0 := bdice
+		if wdice > bdice then v0 := wdice
+
+		if rolls != v0 then
+	again
+	longwait
+
+	# note that this gives black a fundamental
+	# advantage; it always wins ties:
+	if wtotal > btotal then jump white-wins
+	jump black-wins
+
+###########################################
+#
+#  Map
+#
+###########################################
+
+: map-tile
+	# trashes v0-v2.
+	# takes an index in vf
+	# initializes i to the appropriate
+	# sprite data to draw
+
+	v2 := vf
+
+	i := dice-at
+	i += v2
+	load v0
+	v0 += -1
+	v1 <<= v0
+	v1 <<= v1
+	v1 <<= v1
+
+	i := owns-at
+	i += v2
+	load v0
+
+	i := whitedice
+	if v0 == BLACK then i := blackdice
+	i += v1
+	if v0 == EMPTY then i := empty
+;
+
+: draw-map
+	# trashes v0-v5
+	v4 := 4 # y position
+	v5 := 0 # map array index
+
+	clear
+	loop
+		v3 := 8 # x position
+		loop
+			vf := v5 map-tile
+			sprite v3 v4 7
+
+			v5 += 1
+			v3 += 8
+
+			if v3 != 56 then
+		again
+		v4 += 8
+		if v4 != 28 then
+	again
+;
+
+: draw-p1
+	i  := p1
+	v0 := 0
+	v1 := 9
+	sprite v0 v1 14
+;
+
+: draw-p2
+	i  := p2
+	v0 := 56
+	v1 := 9
+	sprite v0 v1 14
+;
+
+###########################################
+#
+#  Cursor
+#
+###########################################
+
+: draw-cursor
+	# trash v0-v2
+	v0 <<= cursorx
+	v0 <<= v0
+	v0 <<= v0
+	v0 += 7
+
+	v1 <<= cursory
+	v1 <<= v1
+	v1 <<= v1
+	v1 += 3
+
+	v2 := v0
+	v2 += 8
+	i  := curs1
+	sprite v0 v1 9
+	i  := curs2
+	sprite v2 v1 9
+;
+
+: cursor-to-index
+	# leave result in vf
+	vf := cursorx
+	if cursory == 1 then vf +=  6
+	if cursory == 2 then vf += 12
+;
+
+: direction-to-index
+	# trashes v0-v2
+	# leave the result in vf
+	v1 := cursorx
+	i := delta-x
+	i += dir
+	load v0
+	v1 += v0
+	if v1 == -1 then v1 := 5
+	if v1 ==  6 then v1 := 0
+
+	v2 := cursory
+	i := delta-y
+	i += dir
+	load v0
+	v2 += v0
+	if v2 == -1 then v2 := 2
+	if v2 ==  3 then v2 := 0
+
+	if v2 == 1 then v1 += 6
+	if v2 == 2 then v1 += 12
+	vf := v1
+;
+
+: cursor-to-xy
+	# leave result in v0/v1
+	v0 <<= cursorx
+	v0 <<= v0
+	v0 <<= v0
+	v0 += 8
+
+	v1 <<= cursory
+	v1 <<= v1
+	v1 <<= v1
+	v1 += 4
+;
+
+: erase-selected
+	# trash v0-v2
+	cursor-to-index
+	map-tile
+	cursor-to-xy
+	sprite v0 v1 7
+;
+
+: draw-arrow
+	i := arrows
+	v0 <<= dir
+	v0 <<= v0
+	v0 <<= v0
+	i += v0
+	cursor-to-xy
+	sprite v0 v1 7
+;
+
+: start-attack
+	dir := 0
+
+	# ignore spaces we don't control
+	cursor-to-index
+	i := owns-at
+	i += vf
+	load v0
+	if v0 != WHITE then return
+
+	# ignore spaces with 1 die
+	i := dice-at
+	i += vf
+	load v0
+	if v0 == 1 then return
+
+	# switch to attack selection mode
+	mode := ATTACK
+	draw-cursor
+	erase-selected
+	draw-arrow
+;
+
+: cancel-attack
+	draw-arrow
+	mode := MOVE
+	draw-cursor
+	erase-selected
+;
+
+: start-fight
+	direction-to-index
+
+	# if the adjacent tile isn't black, give up
+	i := owns-at
+	i += vf
+	load v0
+	if v0 != BLACK then return
+
+	# set up and fight
+	i := dice-at
+	i += v1
+	load v0
+	bdice := v0
+
+	i := dice-at
+	cursor-to-index
+	i += vf
+	load v0
+	wdice := v0
+
+	battle
+	if mode == WIN then return
+	draw-map
+	draw-p1
+	draw-cursor
+	mode := MOVE
+;
+
+: start-ai-turn
+	restock
+	draw-map
+	longwait
+	draw-p2
+	mode := AIMOVE
+	ai-move
+	if mode == LOSE then return
+	mode := MOVE
+	draw-p2
+	draw-p1
+;
+
+: move-cursor
+	va := key
+	draw-cursor
+	if va == 7 then cursorx += -1
+	if va == 9 then cursorx +=  1
+	if va == 5 then cursory += -1
+	if va == 8 then cursory +=  1
+	if va == 6 then start-attack
+	if va == 4 then start-ai-turn
+
+	if cursorx ==  6 then cursorx := 0
+	if cursorx == -1 then cursorx := 5
+	if cursory ==  3 then cursory := 0
+	if cursory == -1 then cursory := 2
+	draw-cursor
+;
+
+: attack-cursor
+	va := key
+	draw-cursor
+	draw-arrow
+	if va == 7 then dir := 3
+	if va == 9 then dir := 1
+	if va == 5 then dir := 0
+	if va == 8 then dir := 2
+	draw-arrow
+	draw-cursor
+	if va == 4 then cancel-attack
+	if va == 6 then start-fight
+;
+
+###########################################
+#
+#  AI Opponent
+#
+###########################################
+
+: ai-pickdir
+	direction-to-index
+
+	# must be white
+	i := owns-at
+	i += vf
+	load v0
+	if v0 != WHITE then return
+
+	# is this zone weaker?
+	i := dice-at
+	i += vf
+	load v0
+	if v5 < v0 then return
+
+	# our new choice
+	v4 := dir
+	v5 := v0
+;
+
+: ai-single
+	# pick a random territory
+	v2 := random 0b1111
+	v1 := 0
+	cursorx := 0
+	cursory := 0
+	i := owns-at
+	loop
+		while v2 != 0
+		load v0
+		if v0 != EMPTY then v2 += -1
+		v1 += 1
+		cursorx += 1
+		if cursorx == 6 then cursory += 1
+		if cursorx == 6 then cursorx := 0
+	again
+	# v1 now contains the (0-17) index of
+	# our chosen territory.
+
+	# if it's not black, ignore it
+	i := owns-at
+	i += v1
+	load v0
+	if v0 != BLACK then return
+
+	# if it has 1 die, ignore it
+	i := dice-at
+	i += v1
+	load v0
+	if v0 == 1 then return
+	bdice := v0
+
+	# attack the weakest adjacent white zone
+	v4 := -1   # best direction
+	v5 := 0xFF # best die count (lower is better)
+	dir := 0 ai-pickdir
+	dir := 1 ai-pickdir
+	dir := 2 ai-pickdir
+	dir := 3 ai-pickdir
+	if v4 == -1 then return
+	dir   := v4
+	wdice := v5
+
+	# show arrow
+	draw-cursor
+	longwait
+	draw-cursor
+	erase-selected
+	draw-arrow
+	longwait
+
+	# FIRE ZE MISSILES
+	battle
+	draw-map
+	draw-p2
+	wait
+;
+
+# unroll these loops so that I don't
+# need to keep track of a loop index:
+
+: ai-moves
+	ai-single
+	ai-single
+	ai-single
+	ai-single
+	ai-single
+;
+
+: ai-move
+	ai-moves
+	ai-moves
+	ai-moves
+	ai-moves
+;
+
+###########################################
+#
+#  Restocking
+#
+###########################################
+
+: restock-single
+	# take index in va
+	i  := owns-at
+	i  += va
+	load v0
+	if v0 == EMPTY then return
+
+	vb += 1
+	i  := dice-at
+	i  += va
+	load v0
+	v1 <<= v1
+	v0 += vf
+	if v0 == 6 then v0 := 5
+
+	i  := dice-at
+	i  += va
+	save v0
+;
+
+: restock
+	va := 0 # cell index
+	vb := 0 # bit  index
+	random-vector
+	loop
+		restock-single
+		va += 1
+		if vb != 8 then
+	again
+	random-vector
+	loop
+		restock-single
+		va += 1
+		if vb != 16 then
+	again
+;
+
+###########################################
+#
+#  Map Generation
+#
+###########################################
+
+: fill-boards
+	# expects i to be initialized
+	# takes the fill value in v0
+	v1 := 0
+	loop
+		save v0
+		v1 += 1
+		if v1 != 18 then
+	again
+;
+
+: reset-owned
+	i  := owns-at
+	v0 := START
+	jump fill-boards
+
+: reset-dice
+	i  := dice-at
+	v0 := 1
+	jump fill-boards
+
+: place-empty
+	# trashes v0-v2
+	# pick an index 0-17
+	v2 := random 0b11111
+	if v2 > 17 then jump place-empty
+
+	# make sure that spot is uninitialized
+	i := owns-at
+	i += v2
+	load v0
+	if v0 != START then jump place-empty
+
+	# set it to be empty
+	i := owns-at
+	i += v2
+	v0 := EMPTY
+	save v0
+;
+
+: place-owned-single
+	# take index in va
+	i  := owns-at
+	i  += va
+	load v0
+	if v0 == EMPTY then return
+
+	v1 <<= v1
+	vb += 1
+	v0 := WHITE
+	if vf == 1 then v0 := BLACK
+	i  := owns-at
+	i  += va
+	save v0
+;
+
+: place-owned
+	va := 0 # cell index
+	vb := 0 # bit  index
+	random-vector
+	loop
+		place-owned-single
+		va += 1
+		if vb != 8 then
+	again
+	random-vector
+	loop
+		place-owned-single
+		va += 1
+		if vb != 16 then
+	again
+;
+
+: random-map
+	reset-owned
+	reset-dice
+	place-empty
+	place-empty
+	place-owned
+	restock
+;
+
+###########################################
+#
+#  Main
+#
+###########################################
+
+: title-screen
+	v0 := 16
+	v1 :=  4
+	v2 :=  0
+	v3 := 15
+	i  := ti1
+	loop
+		sprite v0 v1 15
+		v0 +=  8
+		v2 +=  1
+		i  += v3
+		if v2 != 4 then
+	again
+
+	v0  := 16
+	v1  := 27
+	v2  :=  0
+	v3  :=  4
+	loop
+		sprite v0 v1 4
+		v0 += 8
+		v2 += 1
+		i  += v3
+		if v2 != 4 then
+	again
+;
+
+: init-game
+	random-map
+	draw-map
+	draw-p1
+	draw-cursor
+	mode := MOVE
+;
+
+: main
+	title-screen
+	init-game
+	loop
+		if mode == MOVE    then move-cursor
+		if mode == ATTACK  then attack-cursor
+		if mode == WIN     then draw-you-win
+		if mode == LOSE    then draw-game-over
+		if mode == RESET   then init-game
+	again

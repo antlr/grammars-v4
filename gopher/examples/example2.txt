@@ -1,0 +1,3 @@
+0About this server	/about.txt	gopher.example.com	70
+1Software Archive	/software	gopher.example.com	70
+.

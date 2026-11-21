@@ -1,0 +1,201 @@
+{ file: XPath.ixml }
+{    
+    An iXML grammar for XPath 3.1
+    
+    Source file: XPath.decorated.ixml
+    John Lumley 2022jun30
+    
+    This is an iXML grammar for XPath3.1 expressions, 
+    the original source of which has additionally been 
+    decorated with pragmas ([jl:opt]) on rule declarations to indicate where a 
+    'reduced tree' form would be preferable - i.e. if a serialized element has a
+    single element child, and no attributes, its tags can be omitted from the result -
+    this ensures that small expressions, such as '1+2', present as the minimal 
+    parse tree necessary to identify it uniquely.
+    
+    Automatically generated versions of this file without the pragmas are available
+    to run on a conformant iXML version 1.0 processor:    
+    *  XPath.ixml - will produce the 'full' parse tree for successfully parsed expressions.
+    *  XPath.reducedTree.ixml - has the ruleset transformed such that it will produce the
+       minimal reduced parse for successfully parsed expressions.    
+ }
+{  
+   The grammar generally follows the EBNF of  https://www.w3.org/TR/xpath-31/#id-grammar 
+   with the following alterations and caveats:
+   * There is no attempt to honour reserved function names (e.g. 'if', 'element')
+     and ambiguity will result in using such node tests
+   * In most cases where an operator or a 'property' is involved
+     and is potentially variable, the value is projected onto an attribute. 
+   * The values of XPath constant terms (numbers, strings etc.) are serialized as a
+     single text node under the respective named element.
+   * Type information (SequenceType, ItemType) is retained as a parsed
+     element/child structure, though OccurrenceIndicators are projected as an attribute.
+   
+   Areas of concern:
+   * Some of the binary operators are assumed to be separated by whitespace
+      from their operands, when the specification does not require this. 
+      This avoids considerable ambiguity complexity when they could be confused with
+      parts of names or other constructs. For example 
+            '2-2' 
+      will not be recognised (will cause a failure) but 
+           '2 - 2'
+      will. 
+      Changing this introduces considerable scope for ambiguity in ANY NCName 
+      containing a hyphen - which can easily lead to memory crashes.
+    * Support for comments is currently dodgy - colon (':') characters are assumed to
+      mark the start of the end of the comment, so unless they are followed by a 
+      closing parenthesis, a failure will then ensue.
+ }
+XPath:s?,Expr,s?.
+ParamList:Param,(s?,-",",s?,Param)*.
+Param:-"$",EQName,TypeDeclaration?.
+FunctionBody:EnclosedExpr.
+EnclosedExpr:-"{",s?,Expr?,s?,-"}".
+Expr:ExprSingle;ExprSingle,(s?,-",",s?,ExprSingle)+.
+-ExprSingle:ForExpr;LetExpr;QuantifiedExpr;IfExpr;OrExpr.
+ForExpr:-SimpleForClause,s,-"return",s,ExprSingle.
+SimpleForClause:-"for",s,SimpleForBinding,(s?,-",",s?,SimpleForBinding)*.
+SimpleForBinding:s?,-"$",VarName,s,-"in",s,ExprSingle.
+LetExpr:-SimpleLetClause,s?,-"return",s,ExprSingle.
+SimpleLetClause:-"let",s,SimpleLetBinding,(s?,-",",s?,SimpleLetBinding)*.
+SimpleLetBinding:-"$",-VarName,s?,-":=",s?,ExprSingle.
+QuantifiedExpr:@QuantOp,s,-"$",-VarName,s,-"in",s,ExprSingle,(s?,",",s?,-"$",VarName,s,-"in",s,ExprSingle)*,s,-"satisfies",s,ExprSingle.
+@QuantOp:"some";"every".
+{  brackets removed - jwL  }
+IfExpr:-"if",s?,-"(",s?,Expr,s?,-")",s,-"then",s,ExprSingle,s,-"else",s,ExprSingle.
+OrExpr:AndExpr;AndExpr,s,-"or",s,OrExpr.
+AndExpr:ComparisonExpr;ComparisonExpr,s,-"and",s,AndExpr.
+ComparisonExpr:StringConcatExpr;StringConcatExpr,(s,@ValueComp,s;s?,@GeneralComp,s?;@NodeComp),StringConcatExpr.
+StringConcatExpr:RangeExpr;RangeExpr,s?,-"||",s?,StringConcatExpr.
+RangeExpr:AdditiveExpr;AdditiveExpr,s,-"to",s,AdditiveExpr.
+AdditiveExpr:MultiplicativeExpr;MultiplicativeExpr,AddOp,AdditiveExpr.
+@AddOp:s?,"+",s?;s,"-",s.
+{  Spaces required around '-' to avoid confusion with a hyphen-separated name  }
+MultiplicativeExpr:UnionExpr;UnionExpr,MultOp,MultiplicativeExpr.
+@MultOp:s?,"*",s?;s,("div";"idiv";"mod"),s.
+UnionExpr:IntersectExceptExpr;IntersectExceptExpr,(s,-"union",s;s?,-"|",s?),UnionExpr.
+IntersectExceptExpr:InstanceofExpr;InstanceofExpr,s,IntersectOp,s,IntersectExceptExpr.
+@IntersectOp:"intersect";"except".
+InstanceofExpr:TreatExpr;TreatExpr,(s,-"instance",s,-"of",s,SequenceType).
+TreatExpr:CastableExpr;CastableExpr,(s,-"treat",s,-"as",s,SequenceType).
+CastableExpr:CastExpr;CastExpr,(s,-"castable",s,-"as",s,SequenceType).
+CastExpr:ArrowExpr;ArrowExpr,(s,-"cast",s,-"as",s,SingleType).
+ArrowExpr:UnaryExpr;UnaryExpr,(s?,-"=>",s?,ArrowFunctionSpecifier,ArgumentList)+.
+UnaryExpr:ValueExpr;UnaryOp,UnaryExpr.
+@UnaryOp:"-";"+".
+-ValueExpr:SimpleMapExpr.
+GeneralComp:"=";"!=";"<";"<=";">";">=".
+ValueComp:"eq";"ne";"lt";"le";"gt";"ge".
+NodeComp:s,"is",s;s?,("<<";">>"),s?.
+SimpleMapExpr:PathExpr;PathExpr,(s?,-"!",s?,SimpleMapExpr).
+-PathExpr:RootExpr;RelativePathExpr.
+RootExpr:root,(s?,RelativePathExpr)?;root-descendant,s?,RelativePathExpr.
+@root:"/".
+@root-descendant:"//".
+RelativePathExpr:StepExpr;StepExpr,(s?,step,s?,RelativePathExpr).
+@step:"/";"//".
+-StepExpr:PostfixExpr;AxisStep.
+AxisStep:DirectedStep;DirectedStep,PredicateList.
+-DirectedStep:ReverseStep;ForwardStep.
+ForwardStep:AbbrevForwardStep;@ForwardAxis,NodeTest.
+ForwardAxis:"child::";"descendant::";"attribute::";"self::";"descendant-or-self::";"following-sibling::";"following::";"namespace::".
+-AbbrevForwardStep:ChildStep;AttributeStep.
+ChildStep:-NodeTest.
+AttributeStep:-"@",-NodeTest.
+ReverseStep:@ReverseAxis,NodeTest;@AbbrevReverseStep.
+ReverseAxis:"parent::";"ancestor::";"preceding-sibling::";"preceding::";"ancestor-or-self::".
+AbbrevReverseStep:"..".
+-NodeTest:KindTest;NameTest.
+-NameTest:EQName;Wildcard.
+PostfixExpr:PrimaryExpr;PrimaryExpr,(Predicate;ArgumentList;Lookup)+.
+ArgumentList:s?,-"(",s?,(-Argument,(s?,-",",s?,-Argument)*)?,s?,-")".
+PredicateList:-Predicate+.
+Predicate:s?,-"[",s?,Expr,s?,-"]".
+Lookup:s?,-"?",s?,KeySpecifier.
+KeySpecifier:NCName;IntegerLiteral;ParenthesizedExpr;"*".
+-ArrowFunctionSpecifier:EQName;VarRef;ParenthesizedExpr.
+-PrimaryExpr:Literal;VarRef;ParenthesizedExpr;ContextItemExpr;FunctionCall;FunctionItemExpr;MapConstructor;ArrayConstructor;UnaryLookup.
+-Literal:NumericLiteral;StringLiteral.
+-NumericLiteral:IntegerLiteral;DecimalLiteral;DoubleLiteral.
+VarRef:-"$",-VarName.
+VarName:EQName.
+-ParenthesizedExpr:-"(",s?,Expr?,s?,-")".
+ContextItemExpr:-".".
+FunctionCall:-FunctionEQName,ArgumentList.
+-Argument:ExprSingle;ArgumentPlaceholder.
+ArgumentPlaceholder:-"?".
+-FunctionItemExpr:NamedFunctionRef;InlineFunctionExpr.
+NamedFunctionRef:-FunctionEQName,-"#",IntegerLiteral.
+InlineFunctionExpr:-"function",s?,-"(",s?,ParamList?,s?,-")",(s,-"as",s,SequenceType)?,s?,FunctionBody.
+MapConstructor:-"map",s?,-"{",s?,(MapConstructorEntry,(s?,-",",s?,MapConstructorEntry)*)?,s?,-"}".
+MapConstructorEntry:MapKeyExpr,s?,-":",s?,MapValueExpr.
+-MapKeyExpr:ExprSingle.
+-MapValueExpr:ExprSingle.
+ArrayConstructor:SquareArrayConstructor;CurlyArrayConstructor.
+-SquareArrayConstructor:-"[",s?,(ExprSingle,(s?,-",",s?,ExprSingle)*)?,s?,-"]".
+-CurlyArrayConstructor:-"array",s?,-"{",s?,Expr?,s?,-"}".
+UnaryLookup:s?,-"?",s?,KeySpecifier.
+SingleType:SimpleTypeName,s?,"?"?.
+TypeDeclaration:s,-"as",s,SequenceType.
+SequenceType:"empty-sequence()";-ItemType,(s?,OccurrenceIndicator)?.
+@OccurrenceIndicator:"?";"*";"+".
+ItemType:KindTest;"item()";FunctionTest;MapTest;ArrayTest;AtomicOrUnionType;ParenthesizedItemType.
+AtomicOrUnionType:EQName.
+-KindTest:DocumentTest;ElementTest;AttributeTest;SchemaElementTest;SchemaAttributeTest;PITest;CommentTest;TextTest;NamespaceNodeTest;AnyKindTest.
+AnyKindTest:-"node()".
+DocumentTest:-"document-node(",(ElementTest;SchemaElementTest)?,-")".
+TextTest:-"text()".
+CommentTest:-"comment()".
+NamespaceNodeTest:-"namespace-node()".
+PITest:-"processing-instruction(",(NCName;StringLiteral)?,-")".
+AttributeTest:-"attribute(",(AttribNameOrWildcard,(",",s?,TypeName)?)?,-")".
+AttribNameOrWildcard:AttributeName;"*".
+SchemaAttributeTest:-"schema-attribute(",AttributeDeclaration,-")".
+AttributeDeclaration:AttributeName.
+ElementTest:-"element(",(ElementNameOrWildcard,(",",s?,TypeName,"?"?)?)?,-")".
+-ElementNameOrWildcard:ElementName;ElementWildcard.
+ElementWildcard:-"*".
+SchemaElementTest:-"schema-element(",ElementDeclaration,-")".
+ElementDeclaration:ElementName.
+AttributeName:EQName.
+ElementName:EQName.
+SimpleTypeName:EQName.
+TypeName:EQName.
+FunctionTest:AnyFunctionTest;TypedFunctionTest.
+AnyFunctionTest:-"function(*)".
+TypedFunctionTest:-"function(",(SequenceType,(s?,-",",s?,SequenceType)*)?,-")",s,-"as",s,SequenceType.
+MapTest:AnyMapTest;TypedMapTest.
+AnyMapTest:-"map(*)".
+TypedMapTest:-"map(",s?,AtomicOrUnionType,s?,-",",s?,SequenceType,s?,-")".
+ArrayTest:AnyArrayTest;TypedArrayTest.
+AnyArrayTest:-"array(*)".
+TypedArrayTest:-"array(",s?,SequenceType,s?,-")".
+-ParenthesizedItemType:-"(",s?,ItemType,s?,-")".
+FunctionEQName:FunctionName;URIQualifiedName.
+-EQName:QName;URIQualifiedName.
+-QName:FunctionName.
+-FunctionName:QNameToken.
+StringLiteral:-'"',(EscapeQuot;~['"'])*,-'"';-"'",(EscapeApos;~["'"])*,-"'".
+IntegerLiteral:-Digits.
+DecimalLiteral:".",-Digits;-Digits,".",['0'-'9']*.
+DoubleLiteral:(".",-Digits;-Digits,(".",['0'-'9']*)?),["e";"E"],["+";"-"]?,-Digits.
+-URIQualifiedName:BracedURILiteral,@LocalPart.
+-BracedURILiteral:-"Q{",URI,-"}".
+@URI:~["{";"}"]*.
+EscapeQuot:'""'.
+EscapeApos:"''".
+-QNameToken:PrefixedName;UnprefixedName.
+PrefixedName:@Prefix,-":",@LocalPart.
+UnprefixedName:@LocalPart.
+Prefix:NCName.
+LocalPart:NCName.
+-NCName:@Name.
+-NameStartChar:['A'-'Z'];"_";['a'-'z'].
+-NameChar:NameStartChar;"-";".";['0'-'9'].
+Name:NameStartChar,NameChar*.
+-s:(whitespace;comment)+.
+-whitespace:-[" ";#9;#a;#d].
+comment:-"(:",(cchar;comment)*,-":)".
+-cchar:~[":"].
+Wildcard:"*";NCName,":","*";"*",":",NCName;BracedURILiteral,"*".
+Digits:['0'-'9']+.

@@ -18,4 +18,4 @@
     }
     ```
 
-* In both `TypeScriptLexer.g4` and `TypeScriptParser.g4`, replace all `this.` ocurrences with `this->`
+* In both `TypeScriptLexer.g4` and `TypeScriptParser.g4`, replace all `this.` occurrences with `this->`

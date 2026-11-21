@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar mumps;
 
 program
-    : line+ eof
+    : line+ eof EOF
     ;
 
 eof

@@ -2701,7 +2701,7 @@ select_into_statement
 
 values_into_statement
     : VALUES
-    (expression | '(' expression_list ')' | row_expression)
+    (expression | '(' expr_list ')' | row_expression)
     INTO assignment_target (',' assignment_target)*
     ;
 
@@ -2735,7 +2735,7 @@ sql_routine_statement
     ;
 
 common_table_expression
-    : table_name column_name_list_paren? AS '(' (WITH common_table_expression)? ')'
+    : table_name column_name_list_paren? AS '(' (WITH common_table_expression_list)? fullselect ')'
     ;
 
 create_alias_statement
@@ -3975,7 +3975,7 @@ col_names
     ;
 
 sequence_key_spec
-    : '(' sequence_key_spec_list ')' (ALLOW | DISALLOW) OVERFLOW (PCTFREE integer_value)?
+    : '(' sequence_key_spec_list ')' (ALLOW | DISALLOW) OVERFLOW_ (PCTFREE integer_value)?
     ;
 
 sequence_key_spec_list
@@ -4657,7 +4657,10 @@ from_clause
     ;
 
 table_reference
-    : singles_table_reference
+    : table_reference (INNER | outer)? JOIN table_reference (ON join_condition | USING '(' column_name_list ')')
+    | table_reference CROSS JOIN table_reference
+    | '(' table_reference ')'
+    | singles_table_reference
     | single_view_reference
     | single_nickname_reference
     | only_table_reference
@@ -4668,7 +4671,6 @@ table_reference
     | table_function_reference
     | collection_derived_table
     | xmltable_expression
-    //| joined_table
     | external_table_reference
     ;
 
@@ -4794,12 +4796,6 @@ xmltable_expression
 
 xmltable_function
     : todo
-    ;
-
-joined_table
-    : table_reference (INNER | outer)? JOIN table_reference (ON join_condition | USING '(' column_name_list ')')
-    | table_reference CROSS JOIN table_reference
-    | '(' joined_table ')'
     ;
 
 join_condition
@@ -5191,7 +5187,7 @@ wrapper_option
 // EXPRESSION
 expression
     : function_invocation
-    | '(' expression_list ')'
+    | '(' expr_list ')'
     | constant_
     | expression '**' expression
     | expression ('*' | '/') expression
@@ -5218,7 +5214,7 @@ expression
     ;
 
 function_invocation
-    : function_name '(' all_distinct? arg_list ')'
+    : function_name '(' all_distinct? arg_list? ')'
     ;
 
 all_distinct
@@ -5262,7 +5258,7 @@ array_element_specification
     ;
 
 array_constructor
-    : ARRAY '[' ((WITH common_table_expression_list)? fullselect | expression_list)? ']'
+    : ARRAY '[' ((WITH common_table_expression_list)? fullselect | expr_list)? ']'
     ;
 
 method_invocation
@@ -5280,7 +5276,7 @@ ordered_olap_specification
     ;
 
 window_partition_clause
-    : PARTITION BY expression_list
+    : PARTITION BY expr_list
     ;
 
 window_order_clause
@@ -5372,12 +5368,12 @@ subtype_treatment
     : TREAT '(' AS data_type ')'
     ;
 
-expression_list
+expr_list
     : expression (',' expression)*
     ;
 
 expression_list_in_parentheses
-    : '(' expression_list ')'
+    : '(' expr_list ')'
     ;
 
 // ID

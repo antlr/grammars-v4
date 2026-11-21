@@ -1,0 +1,3 @@
+gLogo image	/images/logo.gif	gopher.example.com	70
+IPhoto	/images/photo.jpg	gopher.example.com	70
+.

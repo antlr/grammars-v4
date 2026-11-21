@@ -1,0 +1,4 @@
+inductive Color where
+  | red
+  | green
+  | blue

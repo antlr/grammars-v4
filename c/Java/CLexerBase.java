@@ -10,6 +10,9 @@ public abstract class CLexerBase extends Lexer {
         super(runGccAndMakeStream(input));
     }
 
+    public static String yo_java;
+    public static String yo_output;
+
     public static CharStream runGccAndMakeStream(CharStream input) {
         boolean isWindows = System.getProperty("os.name").toLowerCase().contains("win");
 
@@ -75,7 +78,11 @@ public abstract class CLexerBase extends Lexer {
 
                 process.waitFor();
 
-                Files.writeString(Path.of(outputName), output);
+		//System.err.println(output);
+		yo_java = outputName;
+		yo_output = output;
+					   
+		Files.writeString(Path.of(outputName), output);
                 return CharStreams.fromString(output);
             } catch (Exception e) {
                 throw new RuntimeException("Failed to run gcc preprocessor", e);

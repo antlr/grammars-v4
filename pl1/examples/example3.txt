@@ -1,0 +1,3 @@
+DO WHILE (CNTR > 0);
+CNTR = CNTR - 1;
+END;

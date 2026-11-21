@@ -1,0 +1,7 @@
+(* Outer comment (* nested comment *) still in the outer comment. *)
+local
+  val increment = 1
+in
+  fun next x = x + increment
+end
+val answer = let val base = 41 in next base end

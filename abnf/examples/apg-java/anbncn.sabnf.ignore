@@ -1,0 +1,8 @@
+AnBnCn    = &Prefix ConsumeAs BnCn
+Prefix    = AnBn C
+ConsumeAs = *A
+AnBn      = A [AnBn] B
+BnCn      = B [BnCn] C
+A         = %d97
+B         = %d98
+C         = %d99

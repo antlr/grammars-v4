@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../_scripts/desc.xsd">
+<desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/kaby76/Trash/raw/refs/heads/main/desc.xsd">
    <targets>Antlr4ng;Cpp;CSharp;Dart;Java;JavaScript;TypeScript;Python3</targets>
    <grammar-files>KotlinLexer.g4;KotlinParser.g4</grammar-files>
    <grammar-name>Kotlin</grammar-name>
    <test>
       <entry-point>kotlinFile</entry-point>
-      <inputs>examples/kotlinFile</inputs>
+      <inputs>examples/kotlinFile;!examples/kotlinFile/bad_property.kt;!examples/kotlinFile/fun_on_same_line.kt</inputs>
+   </test>
+   <test>
+      <name>Negative</name>
+      <entry-point>kotlinFile</entry-point>
+      <inputs>examples/kotlinFile/bad_property.kt;examples/kotlinFile/fun_on_same_line.kt</inputs>
    </test>
    <test>
       <entry-point>script</entry-point>

@@ -1,0 +1,4 @@
+type point = {x : real, y : real}
+type 'a sequence = 'a list
+val identity : 'a -> 'a = fn x => x
+val origin : point = {x = 0.0, y = 0.0}

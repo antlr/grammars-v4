@@ -1,0 +1,46 @@
+$title ('SDIR 8080 - Get Disk Parameters')
+dpb80:
+do;
+       /* the purpose of this module is to allow independence */
+       /* of processor, i.e., 8080 or 8086                    */
+
+$include (comlit.lit)
+
+/* function call 32 in 2.0 or later BDOS, returns the address of the disk
+parameter block for the currently selected disk, which consists of:
+        spt                   (2 bytes) number of sectors per track
+        blkshf                (1 byte)  block size = shl(double(128),blkshf)
+        blkmsk                (1 byte)  sector# and blkmsk = block number
+        extmsk                (1 byte)  logical/physical extents
+        blkmax                (2 bytes) max alloc number
+        dirmax                (2 bytes) size of directory-1
+        dirblk                (2 bytes) reservation bits for directory
+        chksiz                (2 bytes) size of checksum vector
+        offset                (2 bytes) offset for operating system
+*/
+
+$include(dpb.lit)
+$include(mon.plm)
+declare k$per$block address public;
+declare dpb$base address;
+declare dpb$array based dpb$base (15) byte;
+
+dcl get$dpb lit '31';
+
+dpb$byte: procedure(param) byte public;
+    dcl param byte;
+    return(dpb$array(param));
+end dpb$byte;
+
+dpb$word: procedure(param) address public;
+    dcl param byte;
+    return(dpb$array(param) + shl(double(dpb$array(param+1)),8));
+end dpb$word;
+
+base$dpb: procedure public;
+    dpb$base = mon3(get$dpb,0);
+    k$per$block = shr(dpb$byte(blkmsk$b)+1,3);
+end base$dpb;
+
+end dpb80;
+

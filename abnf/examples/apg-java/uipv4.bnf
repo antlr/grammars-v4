@@ -1,0 +1,5 @@
+;
+; IPv4 address - UDT with dummy "byte" rule for AST node creation
+;
+ipv4 = u_ipv4
+byte = ""

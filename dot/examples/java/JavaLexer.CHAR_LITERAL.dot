@@ -1,0 +1,21 @@
+digraph ATN {
+rankdir=LR;
+s150[fontsize=11, label="150", shape=doublecircle, fixedsize=true, width=.6];
+s149[fontsize=11,label="149", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s853[fontsize=11,label="853", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s854[fontsize=11,label="854", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s855[fontsize=11,label="855", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s856[fontsize=11,label="{&rarr;\n856\nd=29|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s857[fontsize=11,label="&larr;\n857", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s858[fontsize=11,label="858", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s859[fontsize=11,label="859", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s149 -> s853 [fontname="Times-Italic", label="&epsilon;"];
+s853 -> s856 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'''", arrowhead = normal];
+s856:p0 -> s854 [fontname="Times-Italic", label="&epsilon;"];
+s856:p1 -> s855 [fontname="Times-Italic", label="&epsilon;"];
+s854 -> s857 [fontsize=11, fontname="Courier", arrowsize=.7, label = "~{'\\n', '', ''', '\\'}", arrowhead = normal];
+s855 -> s857 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<EscapeSequence>", arrowhead = normal];
+s857 -> s858 [fontname="Times-Italic", label="&epsilon;"];
+s858 -> s859 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'''", arrowhead = normal];
+s859 -> s150 [fontname="Times-Italic", label="&epsilon;"];
+}

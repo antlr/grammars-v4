@@ -1,0 +1,15 @@
+--algorithm NestedIf {
+  variables x = 5, y = 10, label2 = 0;
+  {
+    n1: if (x < y) {
+          if (x = 5) {
+            label2 := 1;
+          } else {
+            label2 := 2;
+          }
+        } else {
+          label2 := 3;
+        };
+    n2: print label2;
+  }
+}

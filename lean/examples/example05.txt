@@ -1,0 +1,5 @@
+theorem add_comm_ex : ∀ (x y : Nat), x + y = y + x := by
+  intro x y
+  induction y with
+  | zero => rfl
+  | succ n ih => simp [ih]

@@ -1,0 +1,3 @@
+Adder (a b)
+    sum = Add a b
+    Print sum

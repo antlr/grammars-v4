@@ -1,0 +1,6 @@
+     A          R ITEMREC                   TEXT('INVENTORY ITEM')
+     A            ITEMNO        10          COLHDG('ITEM' 'NUMBER')
+     A            QTYONHAND      5S 0       COLHDG('QTY' 'ON HAND')
+     A            UNITPRICE      7P 2       COLHDG('UNIT' 'PRICE')
+     A            DISCONT        1          COLHDG('DISC')
+     A          K ITEMNO

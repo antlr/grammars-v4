@@ -1,0 +1,17 @@
+PolicyStatement : [
+{
+  "Id" : "Policy8",
+  "Type": "O-",
+  "Who": "ServiceAccount",
+  "Action": *,
+  "What" : {"Resource": "Pipeline"},
+  "Where": {"Target": ["pipeline-1", "pipeline-2"]}
+},
+{
+  "Id" : "Policy9",
+  "Type": "A+",
+  "Who": "*",
+  "Action": ["READ"],
+  "What" : {"Resource": "PublicAPI"}
+}
+]

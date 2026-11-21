@@ -1,0 +1,1669 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ixml>
+   <comment>* 2022-06-23: whitespace handling added by inject-whitespace.xsl *
+ * start = module
+ * whitespace = s
+ * literal = trailing
+ * tokens = ident+integer+real+CharConstant+string
+ * hide = letter+character+digit+hexDigit
+</comment>
+   <rule name="module">
+      <alt>
+         <nonterminal name="MODULE"/>
+         <nonterminal name="ident"/>
+         <nonterminal name="SEMI"/>
+         <option>
+            <alts>
+               <alt>
+                  <nonterminal name="ImportList"/>
+               </alt>
+            </alts>
+         </option>
+         <nonterminal name="DeclarationSequence"/>
+         <option>
+            <alts>
+               <alt>
+                  <nonterminal name="BEGIN"/>
+                  <nonterminal name="StatementSequence"/>
+               </alt>
+            </alts>
+         </option>
+         <nonterminal name="END"/>
+         <nonterminal name="ident"/>
+         <nonterminal name="DOT"/>
+      </alt>
+   </rule>
+   <rule name="digit" mark="-">
+      <alt>
+         <nonterminal name="D-0"/>
+      </alt>
+      <alt>
+         <nonterminal name="D-1"/>
+      </alt>
+      <alt>
+         <nonterminal name="D-2"/>
+      </alt>
+      <alt>
+         <nonterminal name="D-3"/>
+      </alt>
+      <alt>
+         <nonterminal name="D-4"/>
+      </alt>
+      <alt>
+         <nonterminal name="D-5"/>
+      </alt>
+      <alt>
+         <nonterminal name="D-6"/>
+      </alt>
+      <alt>
+         <nonterminal name="D-7"/>
+      </alt>
+      <alt>
+         <nonterminal name="D-8"/>
+      </alt>
+      <alt>
+         <nonterminal name="D-9"/>
+      </alt>
+   </rule>
+   <rule name="hexDigit" mark="-">
+      <alt>
+         <nonterminal name="digit" mark="-"/>
+      </alt>
+      <alt>
+         <nonterminal name="D-A"/>
+      </alt>
+      <alt>
+         <nonterminal name="D-B"/>
+      </alt>
+      <alt>
+         <nonterminal name="D-C"/>
+      </alt>
+      <alt>
+         <nonterminal name="D-D"/>
+      </alt>
+      <alt>
+         <nonterminal name="D-E"/>
+      </alt>
+      <alt>
+         <nonterminal name="D-F"/>
+      </alt>
+   </rule>
+   <rule name="ident">
+      <alt>
+         <nonterminal name="letter" mark="-"/>
+         <repeat0>
+            <alts>
+               <alt>
+                  <nonterminal name="letter" mark="-"/>
+               </alt>
+               <alt>
+                  <nonterminal name="digit" mark="-"/>
+               </alt>
+            </alts>
+         </repeat0>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="qualident">
+      <alt>
+         <option>
+            <alts>
+               <alt>
+                  <nonterminal name="ident"/>
+                  <nonterminal name="DOT"/>
+               </alt>
+            </alts>
+         </option>
+         <nonterminal name="ident"/>
+      </alt>
+   </rule>
+   <rule name="identdef">
+      <alt>
+         <nonterminal name="ident"/>
+         <option>
+            <alts>
+               <alt>
+                  <nonterminal name="STAR"/>
+               </alt>
+            </alts>
+         </option>
+      </alt>
+   </rule>
+   <rule name="integer">
+      <alt>
+         <nonterminal name="digit" mark="-"/>
+         <repeat0>
+            <alts>
+               <alt>
+                  <nonterminal name="digit" mark="-"/>
+               </alt>
+            </alts>
+         </repeat0>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+      <alt>
+         <nonterminal name="digit" mark="-"/>
+         <repeat0>
+            <alts>
+               <alt>
+                  <nonterminal name="hexDigit" mark="-"/>
+               </alt>
+            </alts>
+         </repeat0>
+         <nonterminal name="HEXINT"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="real">
+      <alt>
+         <nonterminal name="digit" mark="-"/>
+         <repeat0>
+            <alts>
+               <alt>
+                  <nonterminal name="digit" mark="-"/>
+               </alt>
+            </alts>
+         </repeat0>
+         <nonterminal name="DOT"/>
+         <repeat0>
+            <alts>
+               <alt>
+                  <nonterminal name="digit" mark="-"/>
+               </alt>
+            </alts>
+         </repeat0>
+         <option>
+            <alts>
+               <alt>
+                  <nonterminal name="ScaleFactor"/>
+               </alt>
+            </alts>
+         </option>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="ScaleFactor">
+      <alt>
+         <alts>
+            <alt>
+               <nonterminal name="D-E"/>
+            </alt>
+            <alt>
+               <nonterminal name="D-D"/>
+            </alt>
+         </alts>
+         <option>
+            <alts>
+               <alt>
+                  <nonterminal name="PLUS"/>
+               </alt>
+               <alt>
+                  <nonterminal name="MINUS"/>
+               </alt>
+            </alts>
+         </option>
+         <nonterminal name="digit" mark="-"/>
+         <repeat0>
+            <alts>
+               <alt>
+                  <nonterminal name="digit" mark="-"/>
+               </alt>
+            </alts>
+         </repeat0>
+      </alt>
+   </rule>
+   <rule name="number">
+      <alt>
+         <nonterminal name="integer"/>
+      </alt>
+      <alt>
+         <nonterminal name="real"/>
+      </alt>
+   </rule>
+   <rule name="string">
+      <alt>
+         <nonterminal name="__39"/>
+         <repeat0>
+            <alts>
+               <alt>
+                  <nonterminal name="character" mark="-"/>
+               </alt>
+            </alts>
+         </repeat0>
+         <nonterminal name="__39"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+      <alt>
+         <nonterminal name="digit" mark="-"/>
+         <repeat0>
+            <alts>
+               <alt>
+                  <nonterminal name="hexdigit"/>
+               </alt>
+            </alts>
+         </repeat0>
+         <nonterminal name="HEXCHAR"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="ConstDeclaration">
+      <alt>
+         <nonterminal name="identdef"/>
+         <nonterminal name="EQUALS"/>
+         <nonterminal name="ConstExpression"/>
+      </alt>
+   </rule>
+   <rule name="ConstExpression">
+      <alt>
+         <nonterminal name="expression"/>
+      </alt>
+   </rule>
+   <rule name="TypeDeclaration">
+      <alt>
+         <nonterminal name="identdef"/>
+         <nonterminal name="EQUALS"/>
+         <nonterminal name="StrucType"/>
+      </alt>
+   </rule>
+   <rule name="StrucType">
+      <alt>
+         <nonterminal name="ArrayType"/>
+      </alt>
+      <alt>
+         <nonterminal name="RecordType"/>
+      </alt>
+      <alt>
+         <nonterminal name="PointerType"/>
+      </alt>
+      <alt>
+         <nonterminal name="ProcedureType"/>
+      </alt>
+   </rule>
+   <rule name="type">
+      <alt>
+         <nonterminal name="qualident"/>
+      </alt>
+      <alt>
+         <nonterminal name="StrucType"/>
+      </alt>
+   </rule>
+   <rule name="ArrayType">
+      <alt>
+         <nonterminal name="ARRAY"/>
+         <nonterminal name="length"/>
+         <repeat0>
+            <alts>
+               <alt>
+                  <nonterminal name="COMMA"/>
+                  <nonterminal name="length"/>
+               </alt>
+            </alts>
+         </repeat0>
+         <nonterminal name="OF"/>
+         <nonterminal name="type"/>
+      </alt>
+   </rule>
+   <rule name="length">
+      <alt>
+         <nonterminal name="ConstExpression"/>
+      </alt>
+   </rule>
+   <rule name="RecordType">
+      <alt>
+         <nonterminal name="RECORD"/>
+         <option>
+            <alts>
+               <alt>
+                  <nonterminal name="LPAR"/>
+                  <nonterminal name="BaseType"/>
+                  <nonterminal name="RPAR"/>
+               </alt>
+            </alts>
+         </option>
+         <option>
+            <alts>
+               <alt>
+                  <nonterminal name="FieldListSequence"/>
+               </alt>
+            </alts>
+         </option>
+         <nonterminal name="END"/>
+      </alt>
+   </rule>
+   <rule name="BaseType">
+      <alt>
+         <nonterminal name="qualident"/>
+      </alt>
+   </rule>
+   <rule name="FieldListSequence">
+      <alt>
+         <nonterminal name="FieldList"/>
+         <repeat0>
+            <alts>
+               <alt>
+                  <nonterminal name="SEMI"/>
+                  <nonterminal name="FieldList"/>
+               </alt>
+            </alts>
+         </repeat0>
+      </alt>
+   </rule>
+   <rule name="FieldList">
+      <alt>
+         <nonterminal name="IdentList"/>
+         <nonterminal name="COLON"/>
+         <nonterminal name="type"/>
+      </alt>
+   </rule>
+   <rule name="IdentList">
+      <alt>
+         <nonterminal name="identdef"/>
+         <repeat0>
+            <alts>
+               <alt>
+                  <nonterminal name="COMMA"/>
+                  <nonterminal name="identdef"/>
+               </alt>
+            </alts>
+         </repeat0>
+      </alt>
+   </rule>
+   <rule name="PointerType">
+      <alt>
+         <nonterminal name="POINTER"/>
+         <nonterminal name="TO"/>
+         <nonterminal name="type"/>
+      </alt>
+   </rule>
+   <rule name="ProcedureType">
+      <alt>
+         <nonterminal name="PROCEDURE"/>
+         <option>
+            <alts>
+               <alt>
+                  <nonterminal name="FormalParameters"/>
+               </alt>
+            </alts>
+         </option>
+      </alt>
+   </rule>
+   <rule name="VariableDeclaration">
+      <alt>
+         <nonterminal name="IdentList"/>
+         <nonterminal name="COLON"/>
+         <nonterminal name="type"/>
+      </alt>
+   </rule>
+   <rule name="expression">
+      <alt>
+         <nonterminal name="SimpleExpression"/>
+         <option>
+            <alts>
+               <alt>
+                  <nonterminal name="relation"/>
+                  <nonterminal name="SimpleExpression"/>
+               </alt>
+            </alts>
+         </option>
+      </alt>
+   </rule>
+   <rule name="relation">
+      <alt>
+         <nonterminal name="EQUALS"/>
+      </alt>
+      <alt>
+         <nonterminal name="NEQ"/>
+      </alt>
+      <alt>
+         <nonterminal name="LSS"/>
+      </alt>
+      <alt>
+         <nonterminal name="LEQ"/>
+      </alt>
+      <alt>
+         <nonterminal name="GTR"/>
+      </alt>
+      <alt>
+         <nonterminal name="GEQ"/>
+      </alt>
+      <alt>
+         <nonterminal name="IN"/>
+      </alt>
+      <alt>
+         <nonterminal name="IS"/>
+      </alt>
+   </rule>
+   <rule name="SimpleExpression">
+      <alt>
+         <option>
+            <alts>
+               <alt>
+                  <nonterminal name="PLUS"/>
+               </alt>
+               <alt>
+                  <nonterminal name="MINUS"/>
+               </alt>
+            </alts>
+         </option>
+         <nonterminal name="term"/>
+         <repeat0>
+            <alts>
+               <alt>
+                  <nonterminal name="AddOperator"/>
+                  <nonterminal name="term"/>
+               </alt>
+            </alts>
+         </repeat0>
+      </alt>
+   </rule>
+   <rule name="AddOperator">
+      <alt>
+         <nonterminal name="PLUS"/>
+      </alt>
+      <alt>
+         <nonterminal name="MINUS"/>
+      </alt>
+      <alt>
+         <nonterminal name="OR"/>
+      </alt>
+   </rule>
+   <rule name="term">
+      <alt>
+         <nonterminal name="factor"/>
+         <repeat0>
+            <alts>
+               <alt>
+                  <nonterminal name="MulOperator"/>
+                  <nonterminal name="factor"/>
+               </alt>
+            </alts>
+         </repeat0>
+      </alt>
+   </rule>
+   <rule name="MulOperator">
+      <alt>
+         <nonterminal name="STAR"/>
+      </alt>
+      <alt>
+         <nonterminal name="SLASH"/>
+      </alt>
+      <alt>
+         <nonterminal name="DIV"/>
+      </alt>
+      <alt>
+         <nonterminal name="MOD"/>
+      </alt>
+      <alt>
+         <nonterminal name="AND"/>
+      </alt>
+   </rule>
+   <rule name="factor">
+      <alt>
+         <nonterminal name="number"/>
+      </alt>
+      <alt>
+         <nonterminal name="string"/>
+      </alt>
+      <alt>
+         <nonterminal name="NIL"/>
+      </alt>
+      <alt>
+         <nonterminal name="TRUE"/>
+      </alt>
+      <alt>
+         <nonterminal name="FALSE"/>
+      </alt>
+      <alt>
+         <nonterminal name="set"/>
+      </alt>
+      <alt>
+         <nonterminal name="designator"/>
+         <option>
+            <alts>
+               <alt>
+                  <nonterminal name="ActualParameters"/>
+               </alt>
+            </alts>
+         </option>
+      </alt>
+      <alt>
+         <nonterminal name="LPAR"/>
+         <nonterminal name="expression"/>
+         <nonterminal name="RPAR"/>
+      </alt>
+      <alt>
+         <nonterminal name="NEGATION"/>
+         <nonterminal name="factor"/>
+      </alt>
+   </rule>
+   <rule name="designator">
+      <alt>
+         <nonterminal name="qualident"/>
+         <repeat0>
+            <alts>
+               <alt>
+                  <nonterminal name="selector"/>
+               </alt>
+            </alts>
+         </repeat0>
+      </alt>
+   </rule>
+   <rule name="selector">
+      <alt>
+         <nonterminal name="DOT"/>
+         <nonterminal name="ident"/>
+      </alt>
+      <alt>
+         <nonterminal name="LBRKT"/>
+         <nonterminal name="ExpList"/>
+         <nonterminal name="RBRKT"/>
+      </alt>
+      <alt>
+         <nonterminal name="UP"/>
+      </alt>
+      <alt>
+         <nonterminal name="LPAR"/>
+         <nonterminal name="qualident"/>
+         <nonterminal name="RPAR"/>
+      </alt>
+   </rule>
+   <rule name="set">
+      <alt>
+         <nonterminal name="LBRACE"/>
+         <option>
+            <alts>
+               <alt>
+                  <nonterminal name="element"/>
+                  <repeat0>
+                     <alts>
+                        <alt>
+                           <nonterminal name="COMMA"/>
+                           <nonterminal name="element"/>
+                        </alt>
+                     </alts>
+                  </repeat0>
+               </alt>
+            </alts>
+         </option>
+         <nonterminal name="RBRACE"/>
+      </alt>
+   </rule>
+   <rule name="element">
+      <alt>
+         <nonterminal name="expression"/>
+         <option>
+            <alts>
+               <alt>
+                  <nonterminal name="DOTDOT"/>
+                  <nonterminal name="expression"/>
+               </alt>
+            </alts>
+         </option>
+      </alt>
+   </rule>
+   <rule name="ExpList">
+      <alt>
+         <nonterminal name="expression"/>
+         <repeat0>
+            <alts>
+               <alt>
+                  <nonterminal name="COMMA"/>
+                  <nonterminal name="expression"/>
+               </alt>
+            </alts>
+         </repeat0>
+      </alt>
+   </rule>
+   <rule name="ActualParameters">
+      <alt>
+         <nonterminal name="LPAR"/>
+         <option>
+            <alts>
+               <alt>
+                  <nonterminal name="ExpList"/>
+               </alt>
+            </alts>
+         </option>
+         <nonterminal name="RPAR"/>
+      </alt>
+   </rule>
+   <rule name="statement">
+      <alt>
+         <option>
+            <alts>
+               <alt>
+                  <nonterminal name="assignment"/>
+               </alt>
+               <alt>
+                  <nonterminal name="ProcedureCall"/>
+               </alt>
+               <alt>
+                  <nonterminal name="IfStatement"/>
+               </alt>
+               <alt>
+                  <nonterminal name="CaseStatement"/>
+               </alt>
+               <alt>
+                  <nonterminal name="WhileStatement"/>
+               </alt>
+               <alt>
+                  <nonterminal name="RepeatStatement"/>
+               </alt>
+               <alt>
+                  <nonterminal name="ForStatement"/>
+               </alt>
+            </alts>
+         </option>
+      </alt>
+   </rule>
+   <rule name="assignment">
+      <alt>
+         <nonterminal name="designator"/>
+         <nonterminal name="GETS"/>
+         <nonterminal name="expression"/>
+      </alt>
+   </rule>
+   <rule name="ProcedureCall">
+      <alt>
+         <nonterminal name="designator"/>
+         <option>
+            <alts>
+               <alt>
+                  <nonterminal name="ActualParameters"/>
+               </alt>
+            </alts>
+         </option>
+      </alt>
+   </rule>
+   <rule name="StatementSequence">
+      <alt>
+         <nonterminal name="statement"/>
+         <repeat0>
+            <alts>
+               <alt>
+                  <nonterminal name="SEMI"/>
+                  <nonterminal name="statement"/>
+               </alt>
+            </alts>
+         </repeat0>
+      </alt>
+   </rule>
+   <rule name="IfStatement">
+      <alt>
+         <nonterminal name="IF"/>
+         <nonterminal name="expression"/>
+         <nonterminal name="THEN"/>
+         <nonterminal name="StatementSequence"/>
+         <repeat0>
+            <alts>
+               <alt>
+                  <nonterminal name="ELSIF"/>
+                  <nonterminal name="expression"/>
+                  <nonterminal name="THEN"/>
+                  <nonterminal name="StatementSequence"/>
+               </alt>
+            </alts>
+         </repeat0>
+         <option>
+            <alts>
+               <alt>
+                  <nonterminal name="ELSE"/>
+                  <nonterminal name="StatementSequence"/>
+               </alt>
+            </alts>
+         </option>
+         <nonterminal name="END"/>
+      </alt>
+   </rule>
+   <rule name="CaseStatement">
+      <alt>
+         <nonterminal name="CASE"/>
+         <nonterminal name="expression"/>
+         <nonterminal name="OF"/>
+         <nonterminal name="case"/>
+         <repeat0>
+            <alts>
+               <alt>
+                  <nonterminal name="VBAR"/>
+                  <nonterminal name="case"/>
+               </alt>
+            </alts>
+         </repeat0>
+         <nonterminal name="END"/>
+      </alt>
+   </rule>
+   <rule name="Case">
+      <alt>
+         <nonterminal name="CaseLabelList"/>
+         <nonterminal name="COLON"/>
+         <nonterminal name="StatementSequence"/>
+      </alt>
+   </rule>
+   <rule name="CaseLabelList">
+      <alt>
+         <nonterminal name="LabelRange"/>
+         <repeat0>
+            <alts>
+               <alt>
+                  <nonterminal name="COMMA"/>
+                  <nonterminal name="LabelRange"/>
+               </alt>
+            </alts>
+         </repeat0>
+      </alt>
+   </rule>
+   <rule name="LabelRange">
+      <alt>
+         <nonterminal name="label"/>
+         <option>
+            <alts>
+               <alt>
+                  <nonterminal name="DOTDOT"/>
+                  <nonterminal name="label"/>
+               </alt>
+            </alts>
+         </option>
+      </alt>
+   </rule>
+   <rule name="label">
+      <alt>
+         <nonterminal name="integer"/>
+      </alt>
+      <alt>
+         <nonterminal name="string"/>
+      </alt>
+      <alt>
+         <nonterminal name="ident"/>
+      </alt>
+   </rule>
+   <rule name="WhileStatement">
+      <alt>
+         <nonterminal name="WHILE"/>
+         <nonterminal name="expression"/>
+         <nonterminal name="DO"/>
+         <nonterminal name="StatementSequence"/>
+         <repeat0>
+            <alts>
+               <alt>
+                  <nonterminal name="ELSIF"/>
+                  <nonterminal name="expression"/>
+                  <nonterminal name="DO"/>
+                  <nonterminal name="StatementSequence"/>
+               </alt>
+            </alts>
+         </repeat0>
+         <nonterminal name="END"/>
+      </alt>
+   </rule>
+   <rule name="RepeatStatement">
+      <alt>
+         <nonterminal name="REPEAT"/>
+         <nonterminal name="StatementSequence"/>
+         <nonterminal name="UNTIL"/>
+         <nonterminal name="expression"/>
+      </alt>
+   </rule>
+   <rule name="ForStatement">
+      <alt>
+         <nonterminal name="FOR"/>
+         <nonterminal name="ident"/>
+         <nonterminal name="GETS"/>
+         <nonterminal name="expression"/>
+         <nonterminal name="TO"/>
+         <nonterminal name="expression"/>
+         <option>
+            <alts>
+               <alt>
+                  <nonterminal name="BY"/>
+                  <nonterminal name="ConstExpression"/>
+               </alt>
+            </alts>
+         </option>
+         <nonterminal name="DO"/>
+         <nonterminal name="StatementSequence"/>
+         <nonterminal name="END"/>
+      </alt>
+   </rule>
+   <rule name="ProcedureDeclaration">
+      <alt>
+         <nonterminal name="ProcedureHeading"/>
+         <nonterminal name="SEMI"/>
+         <nonterminal name="ProcedureBody"/>
+         <nonterminal name="ident"/>
+      </alt>
+   </rule>
+   <rule name="ProcedureHeading">
+      <alt>
+         <nonterminal name="PROCEDURE"/>
+         <nonterminal name="identdef"/>
+         <option>
+            <alts>
+               <alt>
+                  <nonterminal name="FormalParameters"/>
+               </alt>
+            </alts>
+         </option>
+      </alt>
+   </rule>
+   <rule name="ProcedureBody">
+      <alt>
+         <nonterminal name="DeclarationSequence"/>
+         <option>
+            <alts>
+               <alt>
+                  <nonterminal name="BEGIN"/>
+                  <nonterminal name="StatementSequence"/>
+               </alt>
+            </alts>
+         </option>
+         <option>
+            <alts>
+               <alt>
+                  <nonterminal name="RETURN"/>
+                  <nonterminal name="expression"/>
+               </alt>
+            </alts>
+         </option>
+         <nonterminal name="END"/>
+      </alt>
+   </rule>
+   <rule name="DeclarationSequence">
+      <alt>
+         <option>
+            <alts>
+               <alt>
+                  <nonterminal name="CONST"/>
+                  <repeat0>
+                     <alts>
+                        <alt>
+                           <nonterminal name="ConstDeclaration"/>
+                           <nonterminal name="SEMI"/>
+                        </alt>
+                     </alts>
+                  </repeat0>
+               </alt>
+            </alts>
+         </option>
+         <option>
+            <alts>
+               <alt>
+                  <nonterminal name="TYPE"/>
+                  <repeat0>
+                     <alts>
+                        <alt>
+                           <nonterminal name="TypeDeclaration"/>
+                           <nonterminal name="SEMI"/>
+                        </alt>
+                     </alts>
+                  </repeat0>
+               </alt>
+            </alts>
+         </option>
+         <option>
+            <alts>
+               <alt>
+                  <nonterminal name="VAR"/>
+                  <repeat0>
+                     <alts>
+                        <alt>
+                           <nonterminal name="VariableDeclaration"/>
+                           <nonterminal name="SEMI"/>
+                        </alt>
+                     </alts>
+                  </repeat0>
+               </alt>
+            </alts>
+         </option>
+         <repeat0>
+            <alts>
+               <alt>
+                  <nonterminal name="ProcedureDeclaration"/>
+                  <nonterminal name="SEMI"/>
+               </alt>
+            </alts>
+         </repeat0>
+      </alt>
+   </rule>
+   <rule name="FormalParameters">
+      <alt>
+         <nonterminal name="LPAR"/>
+         <option>
+            <alts>
+               <alt>
+                  <nonterminal name="FPSection"/>
+                  <repeat0>
+                     <alts>
+                        <alt>
+                           <nonterminal name="SEMI"/>
+                           <nonterminal name="FPSection"/>
+                        </alt>
+                     </alts>
+                  </repeat0>
+               </alt>
+            </alts>
+         </option>
+         <nonterminal name="RPAR"/>
+         <option>
+            <alts>
+               <alt>
+                  <nonterminal name="COLON"/>
+                  <nonterminal name="qualident"/>
+               </alt>
+            </alts>
+         </option>
+      </alt>
+   </rule>
+   <rule name="FPSection">
+      <alt>
+         <option>
+            <alts>
+               <alt>
+                  <nonterminal name="CONST"/>
+               </alt>
+               <alt>
+                  <nonterminal name="VAR"/>
+               </alt>
+            </alts>
+         </option>
+         <nonterminal name="ident"/>
+         <repeat0>
+            <alts>
+               <alt>
+                  <nonterminal name="COMMA"/>
+                  <nonterminal name="ident"/>
+               </alt>
+            </alts>
+         </repeat0>
+         <nonterminal name="COLON"/>
+         <nonterminal name="FormalType"/>
+      </alt>
+   </rule>
+   <rule name="FormalType">
+      <alt>
+         <option>
+            <alts>
+               <alt>
+                  <nonterminal name="ARRAY"/>
+                  <nonterminal name="OF"/>
+               </alt>
+            </alts>
+         </option>
+         <nonterminal name="qualident"/>
+      </alt>
+   </rule>
+   <rule name="ImportList">
+      <alt>
+         <nonterminal name="IMPORT"/>
+         <nonterminal name="import"/>
+         <repeat0>
+            <alts>
+               <alt>
+                  <nonterminal name="COMMA"/>
+                  <nonterminal name="import"/>
+               </alt>
+            </alts>
+         </repeat0>
+         <nonterminal name="SEMI"/>
+      </alt>
+   </rule>
+   <rule name="import">
+      <alt>
+         <nonterminal name="ident"/>
+         <option>
+            <alts>
+               <alt>
+                  <nonterminal name="GETS"/>
+                  <nonterminal name="ident"/>
+               </alt>
+            </alts>
+         </option>
+      </alt>
+   </rule>
+   <comment>*  Rules added by inject-whitespace.xsl *</comment>
+   <rule name="s" mark="-">
+      <alt>
+         <inclusion tmark="-">
+            <member code="Zs"/>
+            <member hex="9"/>
+            <member hex="A"/>
+            <member hex="D"/>
+         </inclusion>
+      </alt>
+   </rule>
+   <rule name="NEQ" mark="-">
+      <alt>
+         <literal tmark="-" string="#"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="AND" mark="-">
+      <alt>
+         <literal tmark="-" string="&amp;"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="__39" mark="-">
+      <alt>
+         <literal tmark="-" string="'"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="LPAR" mark="-">
+      <alt>
+         <literal tmark="-" string="("/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="RPAR" mark="-">
+      <alt>
+         <literal tmark="-" string=")"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="STAR" mark="-">
+      <alt>
+         <literal tmark="-" string="*"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="PLUS" mark="-">
+      <alt>
+         <literal tmark="-" string="+"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="COMMA" mark="-">
+      <alt>
+         <literal tmark="-" string=","/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="MINUS" mark="-">
+      <alt>
+         <literal tmark="-" string="-"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="DOT" mark="-">
+      <alt>
+         <literal tmark="-" string="."/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="DOTDOT" mark="-">
+      <alt>
+         <literal tmark="-" string=".."/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="SLASH" mark="-">
+      <alt>
+         <literal tmark="-" string="/"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="D-0" mark="-">
+      <alt>
+         <literal tmark="-" string="0"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="D-1" mark="-">
+      <alt>
+         <literal tmark="-" string="1"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="D-2" mark="-">
+      <alt>
+         <literal tmark="-" string="2"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="D-3" mark="-">
+      <alt>
+         <literal tmark="-" string="3"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="D-4" mark="-">
+      <alt>
+         <literal tmark="-" string="4"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="D-5" mark="-">
+      <alt>
+         <literal tmark="-" string="5"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="D-6" mark="-">
+      <alt>
+         <literal tmark="-" string="6"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="D-7" mark="-">
+      <alt>
+         <literal tmark="-" string="7"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="D-8" mark="-">
+      <alt>
+         <literal tmark="-" string="8"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="D-9" mark="-">
+      <alt>
+         <literal tmark="-" string="9"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="COLON" mark="-">
+      <alt>
+         <literal tmark="-" string=":"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="GETS" mark="-">
+      <alt>
+         <literal tmark="-" string=":="/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="SEMI" mark="-">
+      <alt>
+         <literal tmark="-" string=";"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="LSS" mark="-">
+      <alt>
+         <literal tmark="-" string="&lt;"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="LEQ" mark="-">
+      <alt>
+         <literal tmark="-" string="&lt;="/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="EQUALS" mark="-">
+      <alt>
+         <literal tmark="-" string="="/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="GTR" mark="-">
+      <alt>
+         <literal tmark="-" string="&gt;"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="GEQ" mark="-">
+      <alt>
+         <literal tmark="-" string="&gt;="/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="D-A" mark="-">
+      <alt>
+         <literal tmark="-" string="A"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="ARRAY" mark="-">
+      <alt>
+         <literal tmark="-" string="ARRAY"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="D-B" mark="-">
+      <alt>
+         <literal tmark="-" string="B"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="BEGIN" mark="-">
+      <alt>
+         <literal tmark="-" string="BEGIN"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="BY" mark="-">
+      <alt>
+         <literal tmark="-" string="BY"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="D-C" mark="-">
+      <alt>
+         <literal tmark="-" string="C"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="CASE" mark="-">
+      <alt>
+         <literal tmark="-" string="CASE"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="CONST" mark="-">
+      <alt>
+         <literal tmark="-" string="CONST"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="D-D" mark="-">
+      <alt>
+         <literal tmark="-" string="D"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="DIV" mark="-">
+      <alt>
+         <literal tmark="-" string="DIV"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="DO" mark="-">
+      <alt>
+         <literal tmark="-" string="DO"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="D-E" mark="-">
+      <alt>
+         <literal tmark="-" string="E"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="ELSE" mark="-">
+      <alt>
+         <literal tmark="-" string="ELSE"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="ELSIF" mark="-">
+      <alt>
+         <literal tmark="-" string="ELSIF"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="END" mark="-">
+      <alt>
+         <literal tmark="-" string="END"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="D-F" mark="-">
+      <alt>
+         <literal tmark="-" string="F"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="FALSE" mark="-">
+      <alt>
+         <literal tmark="-" string="FALSE"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="FOR" mark="-">
+      <alt>
+         <literal tmark="-" string="FOR"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="HEXINT" mark="-">
+      <alt>
+         <literal tmark="-" string="H"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="IF" mark="-">
+      <alt>
+         <literal tmark="-" string="IF"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="IMPORT" mark="-">
+      <alt>
+         <literal tmark="-" string="IMPORT"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="IN" mark="-">
+      <alt>
+         <literal tmark="-" string="IN"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="IS" mark="-">
+      <alt>
+         <literal tmark="-" string="IS"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="MOD" mark="-">
+      <alt>
+         <literal tmark="-" string="MOD"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="MODULE" mark="-">
+      <alt>
+         <literal tmark="-" string="MODULE"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="NIL" mark="-">
+      <alt>
+         <literal tmark="-" string="NIL"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="OF" mark="-">
+      <alt>
+         <literal tmark="-" string="OF"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="OR" mark="-">
+      <alt>
+         <literal tmark="-" string="OR"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="POINTER" mark="-">
+      <alt>
+         <literal tmark="-" string="POINTER"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="PROCEDURE" mark="-">
+      <alt>
+         <literal tmark="-" string="PROCEDURE"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="RECORD" mark="-">
+      <alt>
+         <literal tmark="-" string="RECORD"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="REPEAT" mark="-">
+      <alt>
+         <literal tmark="-" string="REPEAT"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="RETURN" mark="-">
+      <alt>
+         <literal tmark="-" string="RETURN"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="THEN" mark="-">
+      <alt>
+         <literal tmark="-" string="THEN"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="TO" mark="-">
+      <alt>
+         <literal tmark="-" string="TO"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="TRUE" mark="-">
+      <alt>
+         <literal tmark="-" string="TRUE"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="TYPE" mark="-">
+      <alt>
+         <literal tmark="-" string="TYPE"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="UNTIL" mark="-">
+      <alt>
+         <literal tmark="-" string="UNTIL"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="VAR" mark="-">
+      <alt>
+         <literal tmark="-" string="VAR"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="WHILE" mark="-">
+      <alt>
+         <literal tmark="-" string="WHILE"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="HEXCHAR" mark="-">
+      <alt>
+         <literal tmark="-" string="X"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="LBRKT" mark="-">
+      <alt>
+         <literal tmark="-" string="["/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="RBRKT" mark="-">
+      <alt>
+         <literal tmark="-" string="]"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="UP" mark="-">
+      <alt>
+         <literal tmark="-" string="^"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="LBRACE" mark="-">
+      <alt>
+         <literal tmark="-" string="{"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="VBAR" mark="-">
+      <alt>
+         <literal tmark="-" string="|"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="RBRACE" mark="-">
+      <alt>
+         <literal tmark="-" string="}"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+   <rule name="NEGATION" mark="-">
+      <alt>
+         <literal tmark="-" string="~"/>
+         <option>
+            <nonterminal name="s"/>
+         </option>
+      </alt>
+   </rule>
+</ixml>

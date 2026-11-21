@@ -1,0 +1,3 @@
+iWelcome to the Gopher server		gopher.example.com	0
+1Root menu	/	gopher.example.com	70
+.

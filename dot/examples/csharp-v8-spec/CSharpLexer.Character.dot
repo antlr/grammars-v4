@@ -1,0 +1,21 @@
+digraph ATN {
+rankdir=LR;
+s402[fontsize=11, label="402", shape=doublecircle, fixedsize=true, width=.6];
+s1712[fontsize=11,label="1712", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s401[fontsize=11,label="401", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1713[fontsize=11,label="{&rarr;\n1713\nd=50|{<p0>|<p1>|<p2>|<p3>}}", shape=record, fixedsize=false, peripheries=1];
+s1714[fontsize=11,label="&larr;\n1714", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1709[fontsize=11,label="1709", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1710[fontsize=11,label="1710", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1711[fontsize=11,label="1711", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s401 -> s1713 [fontname="Times-Italic", label="&epsilon;"];
+s1713:p0 -> s1709 [fontname="Times-Italic", label="&epsilon;"];
+s1713:p1 -> s1710 [fontname="Times-Italic", label="&epsilon;"];
+s1713:p2 -> s1711 [fontname="Times-Italic", label="&epsilon;"];
+s1713:p3 -> s1712 [fontname="Times-Italic", label="&epsilon;"];
+s1709 -> s1714 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<Single_Character>", arrowhead = normal];
+s1710 -> s1714 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<Simple_Escape_Sequence>", arrowhead = normal];
+s1711 -> s1714 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<Hexadecimal_Escape_Sequence>", arrowhead = normal];
+s1712 -> s1714 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<Unicode_Escape_Sequence>", arrowhead = normal];
+s1714 -> s402 [fontname="Times-Italic", label="&epsilon;"];
+}

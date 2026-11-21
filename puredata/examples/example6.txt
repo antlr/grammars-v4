@@ -1,0 +1,4 @@
+#N canvas 0 0 450 300 10;
+#X floatatom 50 50 5 0 0 0 - - - 0;
+#X obj 50 100 metro 500;
+#X connect 0 0 1 0;

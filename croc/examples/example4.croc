@@ -1,0 +1,23 @@
+module example4;
+
+local arr = [1, 2, 3, 4, 5];
+
+local t = {
+	x = 1,
+	y = 2,
+	[3] = "three"
+};
+
+try
+{
+	if (t.x == 1)
+		throw "bad value";
+}
+catch (e)
+{
+	arr[0] = 0;
+}
+finally
+{
+	t.y = 0;
+}

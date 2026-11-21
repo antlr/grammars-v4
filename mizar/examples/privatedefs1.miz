@@ -1,0 +1,6 @@
+environ
+begin
+set c = 1;
+deffunc f() = 1
+defpred p[] means thesis
+.

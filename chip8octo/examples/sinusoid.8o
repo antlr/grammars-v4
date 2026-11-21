@@ -1,0 +1,39 @@
+###########################################
+#
+#  Sinusoid
+#
+#  Demonstrate :calc and :macro by computing
+#  a sinusoidal lookup table at compile time.
+#
+#  John Earnest
+#
+###########################################
+
+: main
+	hires
+	loop
+		scroll-down 2
+		i := table
+		i += v2
+		load v1
+		i := thin
+		sprite v0 v3 2
+		i := thick
+		sprite v1 v3 2
+		v2 += 2
+	again
+
+: thin  0x0F 0x0F
+: thick 0xFF 0xFF
+
+: table
+	:macro S2 {
+		:calc rads { ( HERE - table ) * ( 2 * PI ) / 256 }
+		:byte { 56 + 38 * sin rads }
+		:byte { 56 + 16 * cos rads }
+	}
+
+	# expand S2 2*8*8 times for a 256-byte table:
+	:macro S1 { S2 S2 S2 S2 S2 S2 S2 S2 }
+	:macro S0 { S1 S1 S1 S1 S1 S1 S1 S1 }
+	S0 S0

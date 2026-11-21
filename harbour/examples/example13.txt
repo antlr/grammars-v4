@@ -1,0 +1,2 @@
+FUNCTION CanVote( nAge, lCitizen )
+   RETURN ( nAge >= 18 ) .AND. lCitizen .OR. .F.

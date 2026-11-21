@@ -1,0 +1,33 @@
+digraph ATN {
+rankdir=LR;
+s93[fontsize=11, label="93", shape=doublecircle, fixedsize=true, width=.6];
+s1031[fontsize=11,label="1031", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1032[fontsize=11,label="1032", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1033[fontsize=11,label="1033", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1034[fontsize=11,label="1034", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1035[fontsize=11,label="1035", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1036[fontsize=11,label="1036", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1037[fontsize=11,label="1037", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1038[fontsize=11,label="1038", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1039[fontsize=11,label="1039", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1040[fontsize=11,label="{&rarr;\n1040\nd=31|{<p0>|<p1>|<p2>|<p3>|<p4>|<p5>}}", shape=record, fixedsize=false, peripheries=1];
+s1041[fontsize=11,label="&larr;\n1041", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s92[fontsize=11,label="92", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s92 -> s1040 [fontname="Times-Italic", label="&epsilon;"];
+s1040:p0 -> s1031 [fontname="Times-Italic", label="&epsilon;"];
+s1040:p1 -> s1033 [fontname="Times-Italic", label="&epsilon;"];
+s1040:p2 -> s1035 [fontname="Times-Italic", label="&epsilon;"];
+s1040:p3 -> s1036 [fontname="Times-Italic", label="&epsilon;"];
+s1040:p4 -> s1038 [fontname="Times-Italic", label="&epsilon;"];
+s1040:p5 -> s1039 [fontname="Times-Italic", label="&epsilon;"];
+s1031 -> s1032 [fontsize=11, fontname="Courier", arrowsize=.7, label = "pred_46:6", arrowhead = normal];
+s1033 -> s1034 [fontsize=11, fontname="Courier", arrowsize=.7, label = "pred_46:7", arrowhead = normal];
+s1035 -> s1041 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<var_pattern>", arrowhead = normal];
+s1036 -> s1037 [fontsize=11, fontname="Courier", arrowsize=.7, label = "pred_46:8", arrowhead = normal];
+s1038 -> s1041 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<property_pattern>", arrowhead = normal];
+s1039 -> s1041 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<discard_pattern>", arrowhead = normal];
+s1032 -> s1041 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<declaration_pattern>", arrowhead = normal];
+s1034 -> s1041 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<constant_pattern>", arrowhead = normal];
+s1041 -> s93 [fontname="Times-Italic", label="&epsilon;"];
+s1037 -> s1041 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<positional_pattern>", arrowhead = normal];
+}

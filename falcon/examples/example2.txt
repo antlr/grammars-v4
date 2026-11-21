@@ -1,0 +1,7 @@
+if x > 10
+    y : 1
+elif x > 5
+    y : 2
+else
+    y : 3
+end

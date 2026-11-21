@@ -1,0 +1,149 @@
+$title('SDIR - Utility Routines')
+utility:
+do;
+
+/* Utility Module for SDIR */
+ 
+$include(comlit.lit)
+
+
+/* -------- arithmetic functions -------- */
+
+add3byte: procedure(byte3adr,num) public;
+      dcl (byte3adr,num) address,
+          b3 based byte3adr structure (
+          lword address,
+          hbyte byte),
+          temp address;
+
+      temp = b3.lword;
+      if (b3.lword := b3.lword + num) < temp then             /* overflow */
+          b3.hbyte = b3.hbyte + 1;
+end add3byte;
+
+            /* add three byte number to 3 byte value structure */
+add3byte3: procedure(totalb,numb) public;
+      dcl (totalb,numb) address,
+          num based numb structure (
+          lword address,
+          hbyte byte),
+          total based totalb structure (
+          lword address,
+          hbyte byte);
+
+      call add3byte(totalb,num.lword);
+      total.hbyte = num.hbyte + total.hbyte;
+end add3byte3;
+
+                                                /* divide 3 byte value by 8 */
+shr3byte: procedure(byte3adr) public;
+    dcl byte3adr address,
+        b3 based byte3adr structure (
+        lword address,
+        hbyte byte),
+        temp1 based byte3adr (2) byte,
+        temp2 byte;
+
+        temp2  = ror(b3.hbyte,3) and 11100000b;  /* get 3 bits              */
+        b3.hbyte = shr(b3.hbyte,3);
+        b3.lword = shr(b3.lword,3);
+        temp1(1) = temp1(1) or temp2;            /* or in 3 bits from hbyte */
+end shr3byte;
+
+
+/* ------- print routines -------- */
+
+mon1: procedure(f,a) external;
+    declare f byte, a address;
+end mon1;
+
+break: procedure external;
+end break;
+
+$include(fcb.lit)
+
+/* BDOS calls */
+
+print$char: procedure(char) public;
+    declare char byte;
+    call mon1(2,char);
+end print$char;
+
+print: procedure(string$adr) public;
+    dcl string$adr address;
+    call mon1(9,string$adr);
+end print;
+
+printb: procedure public;
+    call print$char(' ');
+end printb;
+ 
+crlf: procedure public;
+    call print$char(cr);
+    call print$char(lf);
+end crlf;
+
+printfn: procedure(fname$adr) public;
+    dcl fname$adr address,
+        file$name based fname$adr (1) byte,
+        i byte;                                /* <filename> ' ' <filetype> */
+
+    do i = 0 to f$namelen - 1;
+        call printchar(file$name(i) and 7fh);
+    end;
+    call printchar(' ');
+    do i = f$namelen to f$namelen + f$typelen - 1;
+        call printchar(file$name(i) and 7fh);
+    end;
+end printfn;
+
+pdecimal: procedure(v,prec,zerosup) public;
+                         /* print value v, field size = (log10 prec) + 1  */
+                         /* with leading zero suppression if zerosup = true */
+    declare v address,                          /* value to print           */
+            prec address,                       /* precision                */
+            zerosup boolean,                    /* zero suppression flag    */
+            d byte;                             /* current decimal digit    */
+
+    do while prec <> 0;
+        d = v / prec;                           /* get next digit           */
+        v = v mod prec;                         /* get remainder back to v  */
+        prec = prec / 10;                       /* ready for next digit     */
+        if prec <> 0 and zerosup and d = 0 then
+            call printb;
+        else
+        do;
+            zerosup = false;
+            call printchar('0'+d);
+        end;
+    end;
+end pdecimal;
+
+p3byte: procedure(byte3adr,prec) public;
+                                   /* print 3 byte value with 0 suppression */
+      dcl byte3adr address,        /* assume high order bit is < 10         */
+          prec address,
+          b3 based byte3adr structure (
+          lword address,
+          hbyte byte),
+          i byte;
+
+                                       /* prec = 1 for 6 chars, 2 for 7 */
+      if b3.hbyte <> 0 then
+      do;
+          call pdecimal(b3.hbyte,prec,true);  /* 3 for 8 chars printed      */
+          call pdecimal(b3.lword,10000,false);
+      end;
+      else
+      do;
+          i = 1;
+          do while i <= prec;
+              call printb;
+              i = i * 10;
+          end;
+          call pdecimal(b3.lword,10000,true);
+      end;
+end p3byte;
+
+end utility;
+

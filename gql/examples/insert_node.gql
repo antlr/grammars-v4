@@ -1,0 +1,1 @@
+INSERT (n:Person {name: 'Alice', age: 30})

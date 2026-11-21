@@ -1,0 +1,114 @@
+;
+; ED Generation
+;
+stat con:=tty:
+vax $$as\sd mason.cpm30.sources\ar
+vax ed.plm $$stran
+vax copyrt.lit $$stran
+stat con:=uc1:
+seteof ed.plm
+seteof copyrt.lit
+is14
+plm80 ed.plm optimize debug
+link mcd80a.obj,ed.obj,plm80.lib to ed.mod
+locate ed.mod code(0100h) stacksize(100) map print(ed.tra)
+cpm
+zero
+objcpm ed
+era ed
+era ed.obj
+stat con:=tty:
+vax $$as\sd mason.cpm30.listing\ar
+vax ed.lst $$stran
+vax ed.sym $$stran
+vax ed.lin $$stran
+stat con:=uc1:
+era *.lst
+era *.sym
+era *.lin
+;
+; GENCOM, SET, SHOW Generation
+;
+stat con:=tty:
+vax $$as\sd mason.cpm30.sources\ar
+vax gencom.plm $$stran
+vax show.plm $$stran
+vax set.plm $$stran
+vax sopt.inc $$stran
+vax sopt.dcl $$stran
+stat con:=uc1:
+seteof gencom.plm
+seteof show.plm
+seteof set.plm
+seteof sopt.inc
+seteof sopt.dcl
+era gencom
+era show
+era set
+era gencom.obj
+era set.obj
+era show.obj
+;
+; Compile GENCOM
+;
+is14
+PLM80 GENCOM.PLM debug optimize PAGEWIDTH(132)
+link mcd80a.obj,parse.obj,GENCOM.obj,plm80.lib to gencom.mod 
+locate gencom.mod code(0100H) stacksize(100) map print(gencom.tra)
+cpm
+zero
+objcpm gencom
+era gencom
+era gencom.obj
+;
+; Compile SHOW
+;
+is14
+PLM80 show.PLM debug optimize PAGEWIDTH(132)
+link mcd80a.obj,show.obj,plm80.lib to show.mod 
+locate show.mod code(0100H) stacksize(100) map print(show.tra)
+cpm
+zero
+objcpm show
+era show
+era show.obj
+;
+; Compile SET
+;
+is14
+PLM80 set.PLM debug optimize PAGEWIDTH(132)
+link mcd80a.obj,parse.obj,set.obj,plm80.lib to set.mod 
+locate set.mod code(0100H) stacksize(100) map print(set.tra)
+cpm
+zero
+objcpm set
+era set
+era set.obj
+;
+; Print out GENCOM,SET,SHOW Modules
+;
+stat con:=tty:
+vax $$as\sd mason.cpm30.listing
+vax gencom.lst $$stran
+vax gencom.sym $$stran
+vax gencom.lin $$stran
+vax set.lst $$stran
+vax set.sym $$stran
+vax set.lin $$stran
+vax show.lst $$stran
+vax show.sym $$stran
+vax show.lin $$stran
+stat con:=uc1:
+era set.mod
+era set.lin
+era set.tra
+era show.mod
+era show.lin
+era show.tra
+era gencom.mod
+era gencom.lin
+era gencom.tra
+;
+; chain next one
+sub cpm3plm5
+

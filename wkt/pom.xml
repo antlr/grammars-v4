@@ -18,7 +18,8 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
-					   <include>wkt.g4</include>
+					   <include>wktLexer.g4</include>
+					   <include>wktParser.g4</include>
 					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>

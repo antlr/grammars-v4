@@ -1,4 +1,4 @@
-# ANTLR4 grammar for Apache Drill
+# Apache Drill Grammar
 
 https://drill.apache.org/docs/sql-reference/
 

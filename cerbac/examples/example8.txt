@@ -1,0 +1,10 @@
+PolicyStatement : [
+{
+  "Id" : "Policy6",
+  "Type": "A-",
+  "Who": "Intern",
+  "Action": ["WRITE"],
+  "What" : {"Resource": "Reports"},
+  "When": "timeBefore": {"time": "5PM"}
+}
+]

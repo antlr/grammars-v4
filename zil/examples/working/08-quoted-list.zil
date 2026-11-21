@@ -1,0 +1,2 @@
+'<LIST
+    (NORTH SOUTH EAST WEST)>

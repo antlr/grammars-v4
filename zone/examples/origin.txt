@@ -1,0 +1,5 @@
+$ORIGIN example.test.
+$TTL 3600
+@ IN NS ns.example.test.
+ns IN A 192.0.2.1
+www IN A 192.0.2.2

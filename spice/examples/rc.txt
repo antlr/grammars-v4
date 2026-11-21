@@ -1,0 +1,6 @@
+* RC circuit with named nodes and inline comments
+Vin input 0 DC 5
+R1 input output 1k ; resistance
+C1 output 0 100n
+.op
+.end

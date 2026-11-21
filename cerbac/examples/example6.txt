@@ -1,0 +1,10 @@
+PolicyStatement : [
+{
+  "Id" : "Policy4",
+  "Type": "A-",
+  "Who": "Contractor",
+  "Action": *,
+  "What" : {"Resource": "Network"},
+  "When": "timeEquals": {"time": "9AM"}
+}
+]

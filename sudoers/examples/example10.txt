@@ -1,0 +1,6 @@
+# comments and blank lines interspersed with multi-host entries
+
+Runas_Alias	OP = root, operator
+
+# bob may run anything on master as root/operator, and on mail as root/operator
+bob	master = (OP) ALL : mail = (OP) ALL

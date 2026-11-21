@@ -1,0 +1,24 @@
+digraph ATN {
+rankdir=LR;
+s474[fontsize=11, label="474", shape=doublecircle, fixedsize=true, width=.6];
+s2070[fontsize=11,label="2070", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2071[fontsize=11,label="2071", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2072[fontsize=11,label="2072", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s473[fontsize=11,label="473", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2073[fontsize=11,label="2073", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2074[fontsize=11,label="2074", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2075[fontsize=11,label="2075", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2076[fontsize=11,label="2076", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2077[fontsize=11,label="2077", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2078[fontsize=11,label="2078", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s473 -> s2070 [fontname="Times-Italic", label="&epsilon;"];
+s2070 -> s2071 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'d'", arrowhead = normal];
+s2071 -> s2072 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'e'", arrowhead = normal];
+s2072 -> s2073 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'f'", arrowhead = normal];
+s2073 -> s2074 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'i'", arrowhead = normal];
+s2074 -> s2075 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'n'", arrowhead = normal];
+s2075 -> s2076 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'e'", arrowhead = normal];
+s2076 -> s2077 [fontname="Times-Italic", label="&epsilon;"];
+s2077 -> s2078 [fontsize=11, fontname="Courier", arrowsize=.7, label = "action_234:16", arrowhead = normal];
+s2078 -> s474 [fontname="Times-Italic", label="&epsilon;"];
+}

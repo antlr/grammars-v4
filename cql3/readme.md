@@ -1,4 +1,4 @@
-# Cql3
+# CQL3 Grammar
 
 ## Reference
 

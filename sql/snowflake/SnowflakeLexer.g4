@@ -327,6 +327,7 @@ ESCAPE_UNENCLOSED_FIELD          : 'ESCAPE_UNENCLOSED_FIELD';
 EVENT                            : 'EVENT';
 EXCEPT                           : 'EXCEPT';
 EXCLUDE                          : 'EXCLUDE';
+EXCLUDING                        : 'EXCLUDING';
 EXCHANGE                         : 'EXCHANGE';
 EXECUTE                          : 'EXEC' 'UTE'?;
 EXECUTION                        : 'EXECUTION';
@@ -360,6 +361,7 @@ EXTERNAL_OAUTH_SNOWFLAKE_USER_MAPPING_ATTRIBUTE:
 EXTERNAL_OAUTH_TOKEN_USER_MAPPING_CLAIM : 'EXTERNAL_OAUTH_TOKEN_USER_MAPPING_CLAIM';
 EXTERNAL_OAUTH_TYPE                     : 'EXTERNAL_OAUTH_TYPE';
 EXTERNAL_STAGE                          : 'EXTERNAL_STAGE';
+EXTRACT                                 : 'EXTRACT';
 FACTS                                   : 'FACTS';
 FAILOVER                                : 'FAILOVER';
 // FAILOVER_MODE:                                         'FAILOVER_MODE';

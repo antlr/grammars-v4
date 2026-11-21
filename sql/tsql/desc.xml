@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../_scripts/desc.xsd">
+<desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/kaby76/Trash/raw/refs/heads/main/desc.xsd">
    <antlr-version>^4.10</antlr-version>
    <targets>CSharp;Go;Java;TypeScript;Antlr4ng</targets>
    <test>
@@ -8,6 +8,11 @@
    </test>
    <test>
       <targets>CSharp;Go;Java</targets>
-      <inputs>examples</inputs>
+      <inputs>examples;!examples/constants.sql;!examples/keywords_reserved.sql</inputs>
+   </test>
+   <test>
+      <name>Negative</name>
+      <targets>CSharp;Go;Java</targets>
+      <inputs>examples/constants.sql;examples/keywords_reserved.sql</inputs>
    </test>
 </desc>

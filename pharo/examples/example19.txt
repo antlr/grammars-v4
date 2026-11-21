@@ -1,0 +1,10 @@
+Object subclass: #Shape
+    instanceVariableNames: ''
+    classVariableNames: ''
+    package: 'Geometry'
+
+Shape >> area
+    ^ self subclassResponsibility
+
+Shape >> describe
+    ^ 'A shape with area: ' , self area printString

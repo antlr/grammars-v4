@@ -1,0 +1,2 @@
+Point class >> new
+    ^ super new setX: 0 y: 0

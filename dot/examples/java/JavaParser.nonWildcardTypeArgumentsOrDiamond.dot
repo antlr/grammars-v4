@@ -1,0 +1,17 @@
+digraph ATN {
+rankdir=LR;
+s241[fontsize=11, label="241", shape=doublecircle, fixedsize=true, width=.6];
+s240[fontsize=11,label="240", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1766[fontsize=11,label="1766", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1767[fontsize=11,label="1767", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1768[fontsize=11,label="1768", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1769[fontsize=11,label="{&rarr;\n1769\nd=219|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1770[fontsize=11,label="&larr;\n1770", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s240 -> s1769 [fontname="Times-Italic", label="&epsilon;"];
+s1769:p0 -> s1766 [fontname="Times-Italic", label="&epsilon;"];
+s1769:p1 -> s1768 [fontname="Times-Italic", label="&epsilon;"];
+s1766 -> s1767 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'<'", arrowhead = normal];
+s1768 -> s1770 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<nonWildcardTypeArguments>", arrowhead = normal];
+s1767 -> s1770 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'>'", arrowhead = normal];
+s1770 -> s241 [fontname="Times-Italic", label="&epsilon;"];
+}

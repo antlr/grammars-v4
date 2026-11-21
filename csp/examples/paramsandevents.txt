@@ -1,0 +1,6 @@
+-- A parameterized process definition and call, compound (dotted)
+-- channel events, and hiding by a named event set.
+Buffer(n) = in.n -> out.n -> STOP
+Running = Buffer(1)
+LeakSet = leak
+Pipe = (in.1 -> leak -> out.1 -> STOP) \ LeakSet

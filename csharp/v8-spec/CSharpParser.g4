@@ -30,7 +30,7 @@ input_element
 
 // Source: §6.4.1 General
 // ║ Previous:
-// ║ 
+// ║
 // ║ token
 // ║     : identifier
 // ║     | keyword
@@ -40,7 +40,7 @@ input_element
 // ║     | String_Literal
 // ║     | operator_or_punctuator
 // ║     ;
-// ║ 
+// ║
 token
     : identifier
     | keyword
@@ -404,7 +404,7 @@ argument_value
 
 // Source: §12.8.1 General
 // ║ Previous:
-// ║ 
+// ║
 // ║ primary_expression
 // ║     : literal
 // ║     | interpolated_string_expression
@@ -430,13 +430,13 @@ argument_value
 // ║     | checked_expression
 // ║     | unchecked_expression
 // ║     | default_value_expression
-// ║     | nameof_expression    
+// ║     | nameof_expression
 // ║     | anonymous_method_expression
 // ║     | pointer_member_access     // unsafe code support
 // ║     | pointer_element_access    // unsafe code support
 // ║     | stackalloc_expression
 // ║     ;
-// ║ 
+// ║
 // [CHANGE] This removes a mutual left-recursion group which has been left in the Standard
 // [CHANGE] (other uses of MLR have been removed). Without this change the grammar will fail
 // [CHANGE] to verify and no sample testing can be done.
@@ -825,7 +825,7 @@ named_entity_target
     : simple_name
     | 'this'
     | 'base'
-    | predefined_type 
+    | predefined_type
     | qualified_alias_member
     ;
 
@@ -1643,7 +1643,7 @@ extern_alias_directive
 using_directive
     : using_alias_directive
     | using_namespace_directive
-    | using_static_directive    
+    | using_static_directive
     ;
 
 // Source: §14.5.2 Using alias directives
@@ -1931,7 +1931,7 @@ parameter_array
 property_declaration
     : attributes? property_modifier* type_ member_name property_body
     | attributes? property_modifier* ref_kind type_ member_name ref_property_body
-    ;    
+    ;
 
 property_modifier
     : 'new'
@@ -1991,7 +1991,7 @@ accessor_modifier
 accessor_body
     : block
     | '=>' expression ';'
-    | ';' 
+    | ';'
     ;
 
 ref_get_accessor_declaration
@@ -2067,9 +2067,9 @@ indexer_declarator
     ;
 
 indexer_body
-    : '{' accessor_declarations '}' 
+    : '{' accessor_declarations '}'
     | '=>' expression ';'
-    ;  
+    ;
 
 ref_indexer_body
     : '{' ref_get_accessor_declaration '}'
@@ -2112,7 +2112,7 @@ binary_operator_declarator
     ;
 
 overloadable_binary_operator
-    : '+'  | '-'  | '*'  | '/'  | '%'  | '&' | '|' | '^'  | '<<' 
+    : '+'  | '-'  | '*'  | '/'  | '%'  | '&' | '|' | '^'  | '<<'
     | right_shift | '==' | '!=' | '>' | '<' | '>=' | '<='
     ;
 

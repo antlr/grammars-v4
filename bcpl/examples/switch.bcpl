@@ -1,0 +1,15 @@
+GET "libhdr"
+
+LET classify(n) = VALOF
+{ SWITCHON n INTO
+  { CASE 0: RESULTIS 0
+    CASE 1:
+    CASE 2: RESULTIS 1
+    DEFAULT: RESULTIS 2
+  }
+}
+
+LET start() = VALOF
+{ FOR i = 0 TO 3 DO writef("%n -> %n*n", i, classify(i))
+  RESULTIS 0
+}

@@ -1,4 +1,4 @@
-# gvpr grammar
+# GVPR Grammar
 
 Graphviz "gvpr" is a graph scanning and processing language.
 

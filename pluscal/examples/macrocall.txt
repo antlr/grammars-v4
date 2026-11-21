@@ -1,0 +1,11 @@
+--algorithm MacroCall {
+  variables total = 0;
+  macro addOne(x) {
+    total := total + x;
+  }
+  {
+    m1: addOne(1);
+    m2: addOne(2);
+    print total;
+  }
+}

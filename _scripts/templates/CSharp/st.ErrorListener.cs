@@ -1,4 +1,4 @@
-// Generated from trgen <version>
+﻿// Generated from trgen <version>
 
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
@@ -77,6 +77,7 @@ public class MyDiagnosticErrorListener : DiagnosticErrorListener
         }
     }
 
+<if(antlr_has_diagnostic_overrides)>
     public override void ReportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int stopIndex, BitSet conflictingAlts,
         ATNConfigSet configs)
     {
@@ -96,6 +97,7 @@ public class MyDiagnosticErrorListener : DiagnosticErrorListener
         System.Console.WriteLine(msg);
         NewMethod(recognizer, dfa, startIndex, stopIndex, configs);
     }
+<endif>
 
     string OutIt(Parser recognizer, ATNConfig c, PredictionContext p)
     {
@@ -119,6 +121,17 @@ public class MyDiagnosticErrorListener : DiagnosticErrorListener
             return str;
         }
         return "";
+    }
+}
+
+public class AmbigCountListener : Antlr4.Runtime.BaseErrorListener
+{
+    public int ambiguity_count = 0;
+
+    public override void ReportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex,
+        bool exact, BitSet ambigAlts, ATNConfigSet configs)
+    {
+        ambiguity_count++;
     }
 }
 

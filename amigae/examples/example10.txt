@@ -1,0 +1,7 @@
+PROC add(a, b) IS a + b
+
+PROC main()
+  DEF r
+  r := add(1, 2)
+  WriteF('%ld\n', r)
+ENDPROC

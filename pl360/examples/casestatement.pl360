@@ -1,0 +1,8 @@
+BEGIN INTEGER N;
+   N := 1;
+   CASE R1 OF BEGIN
+      R0 := 1;
+      R0 := 2;
+      R0 := 3;
+   END;
+END.

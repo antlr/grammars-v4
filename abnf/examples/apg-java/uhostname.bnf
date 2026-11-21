@@ -1,0 +1,14 @@
+;
+; hostname: Taken from the SIP message standard RFC 3261.
+;           SABNF Modifications:
+;           1) prioritized-choice disambiguation
+;           2) UDT is used to select between domanlabel and toplabel
+;           3) the interior hyphen requirement corrected for "greedy" repetitions
+;
+context     = SP hostname SP
+hostname    = 1*u_UDT-as-ALT                 ; UDT to select between domainlabel & toplabel
+label       = 1*alphanum *(1*"-" 1*alphanum) ; generic label
+domainlabel = ""                             ; dummy rule for AST node creation
+toplabel    = ""                             ; dummy rule for AST node creation
+alphanum    = %d65-90 / %d97-122 / %d48-57
+SP          = " "

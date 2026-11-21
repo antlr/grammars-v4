@@ -1,0 +1,10 @@
+load MyModule
+import foo, bar from "mymodule.fal"
+
+v : [1, 2, 3]
+d : [ "a" => 1, "b" => 2 ]
+try
+    v[0] : 42
+catch err
+    err_handler(err)
+end

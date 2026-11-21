@@ -1,0 +1,8 @@
+(* labels and goto, with a conditional and nested comments (* like this *) *)
+begin label L; new i; new j;
+i <- 0;
+i <- if i < 5 then i+1 else i;
+j <- (1, L);
+goto j[2];
+L: out i
+end

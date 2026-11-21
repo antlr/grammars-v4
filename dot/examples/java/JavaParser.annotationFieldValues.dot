@@ -1,0 +1,34 @@
+digraph ATN {
+rankdir=LR;
+s117[fontsize=11, label="117", shape=doublecircle, fixedsize=true, width=.6];
+s864[fontsize=11,label="&larr;\n864", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s865[fontsize=11,label="{865*\nd=92|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s866[fontsize=11,label="866", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s867[fontsize=11,label="867*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s868[fontsize=11,label="{&rarr;\n868\nd=93|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s869[fontsize=11,label="&larr;\n869", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s870[fontsize=11,label="870", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s871[fontsize=11,label="871", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s116[fontsize=11,label="116", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s859[fontsize=11,label="859", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s860[fontsize=11,label="860", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s861[fontsize=11,label="861", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s862[fontsize=11,label="862", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s863[fontsize=11,label="&rarr;\n863*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s116 -> s859 [fontname="Times-Italic", label="&epsilon;"];
+s859 -> s868 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'('", arrowhead = normal];
+s868:p0 -> s860 [fontname="Times-Italic", label="&epsilon;"];
+s868:p1 -> s869 [fontname="Times-Italic", label="&epsilon;"];
+s860 -> s865 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<annotationFieldValue>", arrowhead = normal];
+s869 -> s870 [fontname="Times-Italic", label="&epsilon;"];
+s865:p0 -> s863 [fontname="Times-Italic", label="&epsilon;"];
+s865:p1 -> s866 [fontname="Times-Italic", label="&epsilon;"];
+s870 -> s871 [fontsize=11, fontname="Courier", arrowsize=.7, label = "')'", arrowhead = normal];
+s863 -> s861 [fontname="Times-Italic", label="&epsilon;"];
+s866 -> s869 [fontname="Times-Italic", label="&epsilon;"];
+s871 -> s117 [fontname="Times-Italic", label="&epsilon;"];
+s861 -> s862 [fontsize=11, fontname="Courier", arrowsize=.7, label = "','", arrowhead = normal];
+s862 -> s864 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<annotationFieldValue>", arrowhead = normal];
+s864 -> s867 [fontname="Times-Italic", label="&epsilon;"];
+s867 -> s865 [fontname="Times-Italic", label="&epsilon;", style="dashed"];
+}

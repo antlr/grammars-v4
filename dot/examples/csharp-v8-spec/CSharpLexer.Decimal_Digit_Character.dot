@@ -1,0 +1,15 @@
+digraph ATN {
+rankdir=LR;
+s364[fontsize=11, label="364", shape=doublecircle, fixedsize=true, width=.6];
+s1529[fontsize=11,label="1529", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1530[fontsize=11,label="1530", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s363[fontsize=11,label="363", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1531[fontsize=11,label="{&rarr;\n1531\nd=21|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1532[fontsize=11,label="&larr;\n1532", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s363 -> s1531 [fontname="Times-Italic", label="&epsilon;"];
+s1531:p0 -> s1529 [fontname="Times-Italic", label="&epsilon;"];
+s1531:p1 -> s1530 [fontname="Times-Italic", label="&epsilon;"];
+s1529 -> s1532 [fontsize=11, fontname="Courier", arrowsize=.7, label = "{'0'..'9', '٠'..'٩', '۰'..'۹', '߀'..'߉', '०'..'९', '০'..'৯', '੦'..'੯', '૦'..'૯', '୦'..'୯', '௦'..'௯', '౦'..'౯', '೦'..'೯', '൦'..'൯', '෦'..'෯', '๐'..'๙', '໐'..'໙', '༠'..'༩', '၀'..'၉', '႐'..'႙', '០'..'៩', '᠐'..'᠙', '᥆'..'᥏', '᧐'..'᧙', '᪀'..'᪉', '᪐'..'᪙', '᭐'..'᭙', '᮰'..'᮹', '᱀'..'᱉', '᱐'..'᱙', '꘠'..'꘩', '꣐'..'꣙', '꤀'..'꤉', '꧐'..'꧙', '꧰'..'꧹', '꩐'..'꩙', '꯰'..'꯹', '０'..'９', '𐒠'..'𐒩', '𐴰'..'𐴹', '𑁦'..'𑁯', '𑃰'..'𑃹', '𑄶'..'𑄿', '𑇐'..'𑇙', '𑋰'..'𑋹', '𑑐'..'𑑙', '𑓐'..'𑓙', '𑙐'..'𑙙', '𑛀'..'𑛉', '𑜰'..'𑜹', '𑣠'..'𑣩', '𑥐'..'𑥙', '𑱐'..'𑱙', '𑵐'..'𑵙', '𑶠'..'𑶩', '𑽐'..'𑽙', '𖩠'..'𖩩', '𖫀'..'𖫉', '𖭐'..'𖭙', '𝟎'..'𝟿', '𞅀'..'𞅉', '𞋰'..'𞋹', '𞓰'..'𞓹', '𞥐'..'𞥙', '🯰'..'🯹'}", arrowhead = normal];
+s1530 -> s1532 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<Unicode_Escape_Sequence>", arrowhead = normal];
+s1532 -> s364 [fontname="Times-Italic", label="&epsilon;"];
+}

@@ -1,4 +1,4 @@
-import { Parser, TokenStream } from "antlr4";
+import { Parser, TokenStream, Token } from "antlr4";
 import PlSqlLexer from './PlSqlLexer.js';
 
 export default abstract class PlSqlParserBase extends Parser {
@@ -6,6 +6,7 @@ export default abstract class PlSqlParserBase extends Parser {
   _isVersion10: boolean;
   _isVersion11: boolean;
   _isVersion12: boolean;
+  _lastUnitWasPlsql: boolean;
   self: PlSqlParserBase;
 
   constructor(input: TokenStream) {
@@ -13,7 +14,53 @@ export default abstract class PlSqlParserBase extends Parser {
     this._isVersion10 = false;
     this._isVersion11 = true;
     this._isVersion12 = true;
+    this._lastUnitWasPlsql = false;
     this.self = this;
+  }
+
+  reset(): void {
+    this._lastUnitWasPlsql = false;
+    super.reset();
+  }
+
+  setLastUnitPlsql(): void { this._lastUnitWasPlsql = true; }
+  setLastUnitSql(): void   { this._lastUnitWasPlsql = false; }
+  isLastUnitSql(): boolean { return !this._lastUnitWasPlsql; }
+  isLastUnitPlsql(): boolean { return this._lastUnitWasPlsql; }
+
+  isSolidusSeparator(): boolean {
+    const stream = this.getTokenStream();
+    const solidus = stream.LT(1);
+    if (solidus == null || solidus!.type !== PlSqlLexer.SOLIDUS)
+      return false;
+
+    const solidusLine = solidus!.line;
+
+    const prev = stream.LT(-1);
+    if (prev != null && prev!.type !== Token.EOF && prev!.line === solidusLine)
+      return false;
+
+    const next = stream.LT(2);
+    if (next != null && next!.type !== Token.EOF && next!.line === solidusLine)
+      return false;
+
+    return true;
+  }
+
+  /** True when the current token is the first significant token on its line. */
+  isLineStart(): boolean {
+    const stream = this.getTokenStream();
+    const token = stream.LT(1);
+    if (token == null) {
+      return false;
+    }
+
+    const prev = stream.LT(-1);
+    if (prev == null || prev.type === Token.EOF) {
+      return true;
+    }
+
+    return prev.line < token.line;
   }
 
   isVersion10(): boolean {
@@ -57,7 +104,8 @@ export default abstract class PlSqlParserBase extends Parser {
 
   isNotStartOfJoin(): boolean {
     const lt1 = this.getTokenStream().LT(1);
-    if (lt1!.type == PlSqlLexer.INNER ||
+    if (lt1!.type == PlSqlLexer.JOIN ||
+        lt1!.type == PlSqlLexer.INNER ||
         lt1!.type == PlSqlLexer.CROSS ||
         lt1!.type == PlSqlLexer.NATURAL ||
         lt1!.type == PlSqlLexer.PARTITION ||
@@ -67,6 +115,12 @@ export default abstract class PlSqlParserBase extends Parser {
         lt1!.type == PlSqlLexer.OUTER)
       return false;
     return true
+  }
+
+  isNotBulkCollect(): boolean {
+    const lt1 = this.getTokenStream().LT(1);
+    const lt2 = this.getTokenStream().LT(2);
+    return lt1!.type !== PlSqlLexer.BULK || lt2!.type !== PlSqlLexer.COLLECT;
   }
 
 }

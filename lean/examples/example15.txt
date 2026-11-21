@@ -1,0 +1,5 @@
+namespace Foo
+
+def bar : Nat := 1
+
+end Foo

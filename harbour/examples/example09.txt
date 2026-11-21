@@ -1,0 +1,11 @@
+FUNCTION DayName( nDay )
+   LOCAL cName
+   DO CASE
+      CASE nDay == 1
+         cName := "Monday"
+      CASE nDay == 2
+         cName := "Tuesday"
+      OTHERWISE
+         cName := "Unknown"
+   ENDCASE
+   RETURN cName

@@ -1,0 +1,17 @@
+digraph ATN {
+rankdir=LR;
+s525[fontsize=11, label="525", shape=doublecircle, fixedsize=true, width=.6];
+s2903[fontsize=11,label="2903", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2904[fontsize=11,label="{&rarr;\n2904\nd=272|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s2905[fontsize=11,label="&larr;\n2905", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2906[fontsize=11,label="2906", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2907[fontsize=11,label="2907", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s524[fontsize=11,label="524", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s524 -> s2904 [fontname="Times-Italic", label="&epsilon;"];
+s2904:p0 -> s2903 [fontname="Times-Italic", label="&epsilon;"];
+s2904:p1 -> s2905 [fontname="Times-Italic", label="&epsilon;"];
+s2903 -> s2905 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<attributes>", arrowhead = normal];
+s2905 -> s2906 [fontname="Times-Italic", label="&epsilon;"];
+s2906 -> s2907 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<type_parameter>", arrowhead = normal];
+s2907 -> s525 [fontname="Times-Italic", label="&epsilon;"];
+}

@@ -1,0 +1,3 @@
+BEGIN
+   IF R1 < R2 THEN R0 := R3 ELSE R0 := R4;
+END.

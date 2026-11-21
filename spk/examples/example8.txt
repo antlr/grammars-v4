@@ -1,0 +1,12 @@
+MAIN: PROCEDURE OPTIONS(MAIN);
+    DECLARE X FIXED;
+
+    PRINTIT: PROCEDURE(N);
+        DECLARE N FIXED;
+        PUT LIST('N = ', N);
+        RETURN;
+    END;
+
+    X = 3;
+    CALL PRINTIT(X);
+END;

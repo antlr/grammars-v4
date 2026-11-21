@@ -1,0 +1,14 @@
+type integer = int 8;
+
+box simple
+in (i::integer)
+out (o::string,p::integer)
+match
+ x -> (x as string++"\n",if x<128 then 127-x else x);
+
+stream output to "std_err";
+stream min from "midi_myin";
+stream mout to "midi_myout";
+
+wire simple (min)
+            (output,mout);

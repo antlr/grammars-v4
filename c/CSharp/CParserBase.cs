@@ -152,6 +152,29 @@ public abstract class CParserBase : Parser
         var lt1 = (this.InputStream as CommonTokenStream).LT(1);
         var text = lt1.Text;
         if (debug) System.Console.WriteLine("IsDeclarationSpecifier " + lt1);
+        // If the current token is a user-declared typedef name, check whether a type
+        // specifier already exists among the siblings already parsed in this
+        // declarationSpecifiers. C does not allow a typedef name alongside any other
+        // type specifier (6.7.2). Predefined built-in identifiers (e.g. __int128) are
+        // exempt because they behave like keywords and may combine with others.
+        // Only apply this when we are already inside the declarationSpecifiers loop
+        // (this.Context is DeclarationSpecifiersContext), not when gating entry from
+        // an outer rule such as parameterDeclaration.
+        if (lt1.Type == CLexer.Identifier
+            && this.Context is CParser.DeclarationSpecifiersContext dsCtx)
+        {
+            var resolvedId = ResolveWithOutput(lt1);
+            if (resolvedId != null && !resolvedId.Predefined
+                && !resolvedId.Classification.Contains(TypeClassification.Variable_)
+                && !resolvedId.Classification.Contains(TypeClassification.Function_))
+            {
+                foreach (var spec in dsCtx.declarationSpecifier())
+                {
+                    if (spec.typeSpecifier() != null)
+                        return false;
+                }
+            }
+        }
         var result =
             IsStorageClassSpecifier()
             || IsTypeSpecifier()
@@ -392,7 +415,8 @@ public abstract class CParserBase : Parser
 
     public void EnterDeclaration()
     {
-        if (debug) System.Console.WriteLine("EnterDeclaration");
+	    if (debug) System.Console.WriteLine("EnterDeclaration");
+	    bool nothing_defined = true;
         ParserRuleContext context = this.Context;
         for (; context != null; context = (ParserRuleContext)((ParserRuleContext)context).Parent)
         {
@@ -420,11 +444,13 @@ public abstract class CParserBase : Parser
                         var loc = GetSourceLocation(idToken);
                         if (is_typedef) {
                             var symbol = new Symbol() { Name = text, Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ }, DefinedFile = loc.File, DefinedLine = loc.Line, DefinedColumn = loc.Column };
-                            _st.Define(symbol);
+			    _st.Define(symbol);
+			    nothing_defined = false;
                             if (debug) System.Console.WriteLine("New symbol Declaration2 Declarator " + symbol);
                         } else {
                             var symbol = new Symbol() { Name = text, Classification = new HashSet<TypeClassification>() { TypeClassification.Variable_ }, DefinedFile = loc.File, DefinedLine = loc.Line, DefinedColumn = loc.Column };
                             _st.Define(symbol);
+			    nothing_defined = false;
                             if (debug) System.Console.WriteLine("New symbol Declaration3 Declarator " + symbol);
                         }
                     }
@@ -442,11 +468,25 @@ public abstract class CParserBase : Parser
                     var loc = GetSourceLocation(idToken);
                     var symbol = new Symbol() { Name = text, Classification = new HashSet<TypeClassification>() { TypeClassification.Function_ }, DefinedFile = loc.File, DefinedLine = loc.Line, DefinedColumn = loc.Column };
                     _st.Define(symbol);
+		    nothing_defined = false;
                     if (debug) System.Console.WriteLine("New symbol Declarationf Declarator " + symbol);
                     return;
                 }
             }
         }
+	if (debug && nothing_defined) {
+		var _cs = (ICharStream)this.Context.Start.InputStream;
+		var token_start = this.Context.Start;
+            var token_start_index = token_start.TokenIndex;
+            var cs_start = token_start.StartIndex;
+            var token_stop_index = token_start_index + 2;
+            var token_stop = ((CommonTokenStream)this.InputStream).Get(token_stop_index);
+            var cs_stop = token_stop.StopIndex;
+            var _inputFromContext = _cs.GetText(Antlr4.Runtime.Misc.Interval.Of(cs_start, cs_stop));
+	    System.Console.WriteLine("Nothing defined for context "
+		+ this.Context.ToStringTree(this)
+		+ " input=" + _inputFromContext + " ...");
+	}
     }
 
     private string GetDeclarationId(CParser.DeclaratorContext y)
@@ -618,7 +658,33 @@ public abstract class CParserBase : Parser
         else if (resolved.Classification.Contains(TypeClassification.TypeQualifier_)
             || resolved.Classification.Contains(TypeClassification.TypeSpecifier_)
             || text == "__attribute__")
-            result = false;
+        {
+            // A typedef name that resolves as a type specifier would normally be rejected
+            // as a declarator. But if the declarationSpecifiers in the enclosing declaration
+            // already contain a type specifier, C rules require this identifier to be the
+            // declarator, not another type specifier.
+            if (lt1.Type == CLexer.Identifier
+                && resolved.Classification.Contains(TypeClassification.TypeSpecifier_))
+            {
+                var declCtx = this.Context as CParser.DeclarationContext;
+                if (declCtx != null)
+                {
+                    var dsCtx = declCtx.declarationSpecifiers();
+                    if (dsCtx != null)
+                    {
+                        foreach (var spec in dsCtx.declarationSpecifier())
+                        {
+                            if (spec.typeSpecifier() != null)
+                            {
+                                result = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            if (!result) result = false;
+        }
         else
             result = true;
         if (this.debug) System.Console.WriteLine(" " + result);

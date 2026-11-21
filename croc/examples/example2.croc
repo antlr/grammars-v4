@@ -1,0 +1,22 @@
+module example2;
+
+local function fib(n: int): int
+{
+	if (n < 2)
+		return n;
+	else
+		return fib(n - 1) + fib(n - 2);
+}
+
+local i = 0;
+
+while (i < 10)
+{
+	fib(i);
+	i += 1;
+}
+
+for (local j = 0; j < 10; j++)
+{
+	fib(j);
+}

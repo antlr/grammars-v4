@@ -1,0 +1,5 @@
+MAIN: PROCEDURE OPTIONS(MAIN);
+    DECLARE X FIXED;
+    X = 5;
+    PUT LIST('X = ', X);
+END;

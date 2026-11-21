@@ -1,0 +1,3 @@
+dec flatten : numtree -> list(num);
+--- flatten(tip(n)) <= [n];
+--- flatten(node(t1,t2)) <= flatten(t1)::flatten(t2);

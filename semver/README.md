@@ -1,4 +1,4 @@
-### A parser for Semantic Version 2.0 spec
+# Semantic Versioning Grammar
 
 This is a parser for [semver 2.0 spec](https://semver.org/).
 In addition to the semver spec, the grammar supports version "tags" such as "beta3" or "rc.2" - this would allow implementers to implement version comparison not only with major/minor/patch versions but with the numbers of beta/rc versions.

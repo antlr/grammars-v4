@@ -36,6 +36,7 @@ class SymbolTable {
     define(_createSymbol("float", TypeClassification.typeSpecifier));
     define(_createSymbol("double", TypeClassification.typeSpecifier));
     define(_createSymbol("signed", TypeClassification.typeSpecifier));
+    define(_createSymbol("__signed__", TypeClassification.typeSpecifier));
     define(_createSymbol("unsigned", TypeClassification.typeSpecifier));
     define(_createSymbol("_BitInt", TypeClassification.typeSpecifier));
     define(_createSymbol("bool", TypeClassification.typeSpecifier));
@@ -100,6 +101,10 @@ class SymbolTable {
     define(_createSymbol("_Float32", TypeClassification.typeSpecifier)); // gcc
     define(_createSymbol("_Float64", TypeClassification.typeSpecifier)); // gcc
     define(_createSymbol("_Float128", TypeClassification.typeSpecifier)); // gcc
+    define(_createSymbol("_Float16x", TypeClassification.typeSpecifier)); // gcc
+    define(_createSymbol("_Float32x", TypeClassification.typeSpecifier)); // gcc
+    define(_createSymbol("_Float64x", TypeClassification.typeSpecifier)); // gcc
+    define(_createSymbol("_Float128x", TypeClassification.typeSpecifier)); // gcc
     define(_createSymbol("__v8hf", TypeClassification.typeSpecifier)); // gcc
     define(_createSymbol("__bf16", TypeClassification.typeSpecifier)); // gcc
     define(_createSymbol("__v16bf", TypeClassification.typeSpecifier)); // gcc

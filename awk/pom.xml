@@ -17,7 +17,8 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
-						<include>awk.g4</include>
+						<include>awkLexer.g4</include>
+						<include>awkParser.g4</include>
 					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
@@ -41,6 +42,7 @@
 					<grammarName>awk</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
+					<testFileExtension>.awk</testFileExtension>
 				</configuration>
 				<executions>
 					<execution>

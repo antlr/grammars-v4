@@ -1,0 +1,4 @@
+; RFC 3597 generic resource record
+$ORIGIN example.test.
+data TYPE65280 \# 4 DEADBEEF
+@ IN TXT ("parenthesized" "text")

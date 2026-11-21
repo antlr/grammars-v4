@@ -1,4 +1,4 @@
-# An ANTLR4 grammar for Databricks Database
+# Databricks Grammar
 
 https://docs.databricks.com/aws/en/sql/language-manual/
 

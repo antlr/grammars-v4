@@ -1,0 +1,26 @@
+digraph ATN {
+rankdir=LR;
+s561[fontsize=11, label="561", shape=doublecircle, fixedsize=true, width=.6];
+s560[fontsize=11,label="560", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s3088[fontsize=11,label="3088", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s3089[fontsize=11,label="3089*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s3090[fontsize=11,label="3090", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s3091[fontsize=11,label="{&rarr;\n3091\nd=299|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s3092[fontsize=11,label="&larr;\n3092", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s3084[fontsize=11,label="3084", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s3085[fontsize=11,label="&rarr;\n3085*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s3086[fontsize=11,label="&larr;\n3086", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s3087[fontsize=11,label="{3087*\nd=298|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s560 -> s3087 [fontname="Times-Italic", label="&epsilon;"];
+s3087:p0 -> s3085 [fontname="Times-Italic", label="&epsilon;"];
+s3087:p1 -> s3088 [fontname="Times-Italic", label="&epsilon;"];
+s3085 -> s3084 [fontname="Times-Italic", label="&epsilon;"];
+s3088 -> s3091 [fontname="Times-Italic", label="&epsilon;"];
+s3084 -> s3086 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<method_modifier>", arrowhead = normal];
+s3091:p0 -> s3090 [fontname="Times-Italic", label="&epsilon;"];
+s3091:p1 -> s3092 [fontname="Times-Italic", label="&epsilon;"];
+s3086 -> s3089 [fontname="Times-Italic", label="&epsilon;"];
+s3090 -> s3092 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'partial'", arrowhead = normal];
+s3092 -> s561 [fontname="Times-Italic", label="&epsilon;"];
+s3089 -> s3087 [fontname="Times-Italic", label="&epsilon;", style="dashed"];
+}

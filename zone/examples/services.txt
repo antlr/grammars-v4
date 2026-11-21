@@ -1,0 +1,3 @@
+$ORIGIN example.test.
+_sip._tcp IN SRV 10 20 5060 sip.example.test.
+@ CAA 0 issue "ca.example.test"

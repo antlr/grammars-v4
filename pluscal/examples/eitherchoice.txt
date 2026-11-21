@@ -1,0 +1,13 @@
+--algorithm EitherChoice {
+  variables x = 0;
+  {
+    either {
+      x := 1;
+    } or {
+      x := 2;
+    } or {
+      x := 3;
+    };
+    print x;
+  }
+}

@@ -1,0 +1,22 @@
+#!! NoStoWarnings
+# One way of firing several bullets in rapid succession.
+0
+30
+60
+90
+
+Aim'
+Aim'
+Aim'
+Aim'
+
+STORE
+STORE
+STORE
+STORE
+
+10
+10
+10
+10
+#!! StoWarnings

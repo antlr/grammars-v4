@@ -1,0 +1,23 @@
+digraph ATN {
+rankdir=LR;
+s693[fontsize=11, label="693", shape=doublecircle, fixedsize=true, width=.6];
+s3840[fontsize=11,label="{3840*\nd=405|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s3841[fontsize=11,label="3841", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s3842[fontsize=11,label="3842*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s692[fontsize=11,label="692", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s3835[fontsize=11,label="3835", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s3836[fontsize=11,label="3836", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s3837[fontsize=11,label="3837", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s3838[fontsize=11,label="&rarr;\n3838*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s3839[fontsize=11,label="&larr;\n3839", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s692 -> s3835 [fontname="Times-Italic", label="&epsilon;"];
+s3835 -> s3840 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<variable_initializer>", arrowhead = normal];
+s3840:p0 -> s3838 [fontname="Times-Italic", label="&epsilon;"];
+s3840:p1 -> s3841 [fontname="Times-Italic", label="&epsilon;"];
+s3838 -> s3836 [fontname="Times-Italic", label="&epsilon;"];
+s3841 -> s693 [fontname="Times-Italic", label="&epsilon;"];
+s3836 -> s3837 [fontsize=11, fontname="Courier", arrowsize=.7, label = "','", arrowhead = normal];
+s3837 -> s3839 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<variable_initializer>", arrowhead = normal];
+s3839 -> s3842 [fontname="Times-Italic", label="&epsilon;"];
+s3842 -> s3840 [fontname="Times-Italic", label="&epsilon;", style="dashed"];
+}

@@ -1,0 +1,18 @@
+digraph ATN {
+rankdir=LR;
+s123[fontsize=11, label="123", shape=doublecircle, fixedsize=true, width=.6];
+s899[fontsize=11,label="899", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s900[fontsize=11,label="900", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s901[fontsize=11,label="901", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s902[fontsize=11,label="{&rarr;\n902\nd=99|{<p0>|<p1>|<p2>}}", shape=record, fixedsize=false, peripheries=1];
+s903[fontsize=11,label="&larr;\n903", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s122[fontsize=11,label="122", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s122 -> s902 [fontname="Times-Italic", label="&epsilon;"];
+s902:p0 -> s899 [fontname="Times-Italic", label="&epsilon;"];
+s902:p1 -> s900 [fontname="Times-Italic", label="&epsilon;"];
+s902:p2 -> s901 [fontname="Times-Italic", label="&epsilon;"];
+s899 -> s903 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<expression[0]>", arrowhead = normal];
+s900 -> s903 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<annotation>", arrowhead = normal];
+s901 -> s903 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<elementValueArrayInitializer>", arrowhead = normal];
+s903 -> s123 [fontname="Times-Italic", label="&epsilon;"];
+}

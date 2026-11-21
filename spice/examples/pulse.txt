@@ -1,0 +1,5 @@
+* Pulsed voltage source
+V1 in 0 PULSE(0, 5, 0, 1n, 1n, 10u, 20u)
+R1 in 0 1k
+.tran 1n 100u
+.end

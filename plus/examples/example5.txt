@@ -1,0 +1,5 @@
+if X > 0 then
+  Y := 1;
+else
+  Y := 0;
+end if;

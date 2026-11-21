@@ -1,0 +1,19 @@
+-- exceptions, data/type declarations and a handled box
+
+exception Overflow :: string;
+
+type integer = int 32;
+
+stream input from "in.txt";
+stream output to "out.txt";
+
+box B
+in (x::integer)
+out (res::string)
+handles Overflow
+match
+ x -> if x>100 then raise Overflow "overflow" else x as string
+handle
+ Overflow s -> s;
+
+wire B (input) (output);

@@ -1,0 +1,4 @@
+definition Foo
+  variable X is (0 to 10);
+  X := 1;
+end Foo;

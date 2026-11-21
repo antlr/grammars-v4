@@ -1,0 +1,14 @@
+;
+; ABNF version of grammar (4.2)
+; Aho, Lam, Sethi and Ullman, "Compilers: Principles, Techniques, & Tools",
+; 2nd ed., pp. 193, Addison Wesley, (2007)
+;
+E      = T Eprime               ; expression = sum of terms
+Eprime = "+" T Eprime / ""
+T      = F Tprime               ; term = product of factors
+Tprime = "*" F Tprime / ""
+F      = "(" E ")" / id         ; factor = parenthesized expression or identifier
+id     = alpha *(alpha / digit) ; id = alphanumeric name
+alpha  = %d65-90 / %d97-122     ; upper or lower case letters
+digit  = %d48-57                ; digits 0-9
+

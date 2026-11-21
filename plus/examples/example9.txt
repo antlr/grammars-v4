@@ -1,0 +1,3 @@
+macro Max parameter is A, B
+  if A > B then A; else B; end if
+end Max;

@@ -1,0 +1,6 @@
+PROC main()
+  DEF a=0, b
+  a := 1
+  b := a + 2
+  WriteF('Result: %ld\n', b)
+ENDPROC

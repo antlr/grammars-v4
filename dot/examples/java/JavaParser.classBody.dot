@@ -1,0 +1,25 @@
+digraph ATN {
+rankdir=LR;
+s35[fontsize=11, label="35", shape=doublecircle, fixedsize=true, width=.6];
+s464[fontsize=11,label="&rarr;\n464*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s465[fontsize=11,label="&larr;\n465", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s34[fontsize=11,label="34", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s466[fontsize=11,label="{466*\nd=36|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s467[fontsize=11,label="467", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s468[fontsize=11,label="468*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s469[fontsize=11,label="469", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s470[fontsize=11,label="470", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s462[fontsize=11,label="462", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s463[fontsize=11,label="463", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s34 -> s462 [fontname="Times-Italic", label="&epsilon;"];
+s462 -> s466 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'{'", arrowhead = normal];
+s466:p0 -> s464 [fontname="Times-Italic", label="&epsilon;"];
+s466:p1 -> s467 [fontname="Times-Italic", label="&epsilon;"];
+s464 -> s463 [fontname="Times-Italic", label="&epsilon;"];
+s467 -> s469 [fontname="Times-Italic", label="&epsilon;"];
+s463 -> s465 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<classBodyDeclaration>", arrowhead = normal];
+s469 -> s470 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'}'", arrowhead = normal];
+s465 -> s468 [fontname="Times-Italic", label="&epsilon;"];
+s470 -> s35 [fontname="Times-Italic", label="&epsilon;"];
+s468 -> s466 [fontname="Times-Italic", label="&epsilon;", style="dashed"];
+}

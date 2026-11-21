@@ -1,0 +1,31 @@
+digraph ATN {
+rankdir=LR;
+s264[fontsize=11, label="264", shape=doublecircle, fixedsize=true, width=.6];
+s263[fontsize=11,label="263", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1100[fontsize=11,label="1100", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1101[fontsize=11,label="1101", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1102[fontsize=11,label="1102", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1103[fontsize=11,label="{&rarr;\n1103*\nd=46|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1104[fontsize=11,label="&larr;\n1104", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1105[fontsize=11,label="{1105*\nd=47|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1106[fontsize=11,label="1106", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1107[fontsize=11,label="1107*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1108[fontsize=11,label="1108", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1109[fontsize=11,label="{&rarr;\n1109\nd=48|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1110[fontsize=11,label="&larr;\n1110", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s263 -> s1100 [fontname="Times-Italic", label="&epsilon;"];
+s1100 -> s1109 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<HexDigit>", arrowhead = normal];
+s1109:p0 -> s1105 [fontname="Times-Italic", label="&epsilon;"];
+s1109:p1 -> s1110 [fontname="Times-Italic", label="&epsilon;"];
+s1105:p0 -> s1103 [fontname="Times-Italic", label="&epsilon;"];
+s1105:p1 -> s1106 [fontname="Times-Italic", label="&epsilon;"];
+s1110 -> s264 [fontname="Times-Italic", label="&epsilon;"];
+s1103:p0 -> s1101 [fontname="Times-Italic", label="&epsilon;"];
+s1103:p1 -> s1102 [fontname="Times-Italic", label="&epsilon;"];
+s1106 -> s1108 [fontname="Times-Italic", label="&epsilon;"];
+s1101 -> s1104 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<HexDigit>", arrowhead = normal];
+s1102 -> s1104 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'_'", arrowhead = normal];
+s1108 -> s1110 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<HexDigit>", arrowhead = normal];
+s1104 -> s1107 [fontname="Times-Italic", label="&epsilon;"];
+s1107 -> s1105 [fontname="Times-Italic", label="&epsilon;", style="dashed"];
+}

@@ -1,0 +1,581 @@
+$title ('CP/M V3.0 Date and Time')
+tod:
+   do;
+
+/*
+  Revised:
+    14 Sept 81  by Thomas Rolander
+
+  Modifications:
+   Date: September 2,1982
+
+   Programmer: Thomas J. Mason
+
+   Changes:
+    The 'P' option was changed to the 'C'ontinuous option.
+    Also added is the 'S'et option to let the user set either
+    the time or the date.
+
+   Date: October 31,1982
+
+   Programmer: Bruce K. Skidmore
+
+   Changes:
+    Added Function 50 call to signal Time Set and Time Get.
+*/
+
+   declare PLM label public;
+
+   mon1:
+    procedure (func,info) external;
+       declare func byte;
+       declare info address;
+    end mon1;
+
+   mon2:
+    procedure (func,info) byte external;
+       declare func byte;
+       declare info address;
+    end mon2;
+
+   mon2a:
+    procedure (func,info) address external;
+       declare func byte;
+       declare info address;
+    end mon2a;
+
+   declare xdos literally 'mon2a';
+
+   declare fcb (1) byte external;
+   declare fcb16 (1) byte external;
+   declare tbuff (1) byte external;
+
+   RETURN$VERSION$FUNC:
+    procedure address;
+       return MON2A(12,0);
+    end RETURN$VERSION$FUNC;
+
+   read$console:
+    procedure byte;
+       return mon2 (1,0);
+    end read$console;
+
+   write$console:
+    procedure (char);
+       declare char byte;
+       call mon1 (2,char);
+    end write$console;
+
+   print$buffer:
+    procedure (buffer$address);
+       declare buffer$address address;
+       call mon1 (9,buffer$address);
+    end print$buffer;
+
+   READ$CONSOLE$BUFFER:
+    procedure (BUFF$ADR);
+    declare BUFF$ADR address;
+       call MON1(10,BUFF$ADR);
+    end READ$CONSOLE$BUFFER;
+
+   check$console$status:
+    procedure byte;
+       return mon2 (11,0);
+    end check$console$status;
+
+
+   terminate:
+    procedure;
+       call mon1 (0,0);
+    end terminate;
+
+   crlf:
+    procedure;
+       call write$console (0dh);
+       call write$console (0ah);
+    end crlf;
+
+
+/*****************************************************
+
+          Time & Date ASCII Conversion Code
+
+ *****************************************************/
+declare BUFFER$ADR structure (
+        MAX$CHARS byte,
+        NUMB$OF$CHARS byte,
+        CONSOLE$BUFFER(21) byte)
+        initial(21,0,0,0,0,0,0,0,0,0,0,0,
+                 0,0,0,0,0,0,0,0,0,0,0);
+
+declare tod$adr address;
+declare tod based tod$adr structure (
+  opcode byte,
+  date address,
+  hrs byte,
+  min byte,
+  sec byte,
+  ASCII (21) byte );
+
+declare string$adr address;
+declare string based string$adr (1) byte;
+declare index byte;
+
+declare lit literally 'literally',
+  forever lit 'while 1',
+  word lit 'address';
+
+/* - - - - - - - - - - - - - - - - - - - - - - */
+   emitchar:
+    procedure(c);
+    declare c byte;
+       string(index := index + 1) = c;
+    end emitchar;
+
+/*- - - - - - - - - - - - - - - - - - - - - - -*/
+   emitn:
+    procedure(a);
+    declare a address;
+    declare c based a byte;
+       do while c <> '$';
+          string(index := index + 1) = c;
+          a = a + 1;
+       end;
+    end emitn;
+
+/*- - - - - - - - - - - - - - - - - - - - - - -*/
+
+   emit$bcd:
+    procedure(b);
+    declare b byte;
+       call emitchar('0'+b);
+    end emit$bcd;
+
+/*- - - - - - - - - - - - - - - - - - - - - - -*/
+
+   emit$bcd$pair:  
+    procedure(b);
+    declare b byte;
+       call emit$bcd(shr(b,4));
+       call emit$bcd(b and 0fh);
+    end emit$bcd$pair;
+
+/*- - - - - - - - - - - - - - - - - - - - - - -*/
+ 
+   emit$colon:
+    procedure(b);
+    declare b byte;
+       call emit$bcd$pair(b);
+       call emitchar(':');
+    end emit$colon;
+
+/*- - - - - - - - - - - - - - - - - - - - - - -*/
+
+   emit$bin$pair:
+    procedure(b);
+    declare b byte;
+       call emit$bcd(b/10);
+       call emit$bcd(b mod 10);
+    end emit$bin$pair;
+
+/*- - - - - - - - - - - - - - - - - - - - - - -*/
+
+   emit$slant:
+    procedure(b);
+    declare b byte;
+       call emit$bin$pair(b);
+       call emitchar('/');
+    end emit$slant;
+
+/*- - - - - - - - - - - - - - - - - - - - - - -*/
+
+   declare chr byte;
+
+/*- - - - - - - - - - - - - - - - - - - - - - -*/
+
+   gnc:
+    procedure;
+    /* get next command byte */
+       if chr = 0 then return;
+       if index = 20 then
+       do;
+          chr = 0;
+          return;
+       end;
+       chr = string(index := index + 1);
+    end gnc;
+
+/*- - - - - - - - - - - - - - - - - - - - - - -*/
+   deblank:
+    procedure;
+       do while chr = ' ';
+          call gnc;
+       end;
+    end deblank;
+
+   numeric:
+    procedure byte;
+    /* test for numeric */
+       return (chr - '0') < 10;
+    end numeric;
+
+   scan$numeric:
+    procedure(lb,ub) byte;
+    declare (lb,ub) byte;
+    declare b byte;
+       b = 0;
+       call deblank;
+       if not numeric then go to error;
+       do while numeric;
+          if (b and 1110$0000b) <> 0 then go to error;
+          b = shl(b,3) + shl(b,1); /* b = b * 10 */
+          if carry then go to error;
+          b = b + (chr - '0');
+          if carry then go to error;
+          call gnc;
+       end;
+       if (b < lb) or (b > ub) then go to error;
+       return b;
+     end scan$numeric;
+
+   scan$delimiter:
+    procedure(d,lb,ub) byte;
+    declare (d,lb,ub) byte;
+       call deblank;
+       if chr <> d then go to error;
+       call gnc;
+       return scan$numeric(lb,ub);
+    end scan$delimiter;
+
+declare base$year lit '78',   /* base year for computations */
+        base$day  lit '0',    /* starting day for base$year 0..6 */
+        month$size (*) byte data
+        /* jan feb mar apr may jun jul aug sep oct nov dec */
+        (   31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31),
+        month$days (*) word data
+        /* jan feb mar apr may jun jul aug sep oct nov dec */
+        (  000,031,059,090,120,151,181,212,243,273,304,334);
+
+   leap$days:
+    procedure(y,m) byte;
+    declare (y,m) byte;
+    /* compute days accumulated by leap years */
+    declare yp byte;
+       yp = shr(y,2); /* yp = y/4 */
+       if (y and 11b) = 0 and month$days(m) < 59 then
+        /* y not 00, y mod 4 = 0, before march, so not leap yr */
+          return yp - 1;
+    /* otherwise, yp is the number of accumulated leap days */
+       return yp;
+    end leap$days;
+
+   declare word$value word;
+
+   get$next$digit:
+    procedure byte;
+    /* get next lsd from word$value */
+    declare lsd byte;
+       lsd = word$value mod 10;
+       word$value = word$value / 10;
+       return lsd;
+    end get$next$digit;
+
+   bcd:
+    procedure (val) byte;
+    declare val byte;
+       return shl((val/10),4) + val mod 10;
+    end bcd;
+
+   declare (month, day, year, hrs, min, sec) byte;
+
+   set$date:
+    procedure;
+    declare (i, leap$flag) byte; /* temporaries */
+       month = scan$numeric(1,12) - 1;
+    /* may be feb 29 */
+       if (leap$flag := month = 1) then i = 29;
+        else i = month$size(month);
+       day   = scan$delimiter('/',1,i);
+       year  = scan$delimiter('/',base$year,99);
+    /* ensure that feb 29 is in a leap year */
+       if leap$flag and day = 29 and (year and 11b) <> 0 then
+    /* feb 29 of non-leap year */ go to error;
+    /* compute total days */
+       tod.date = month$days(month)
+                + 365 * (year - base$year)
+                + day
+                - leap$days(base$year,0)
+                + leap$days(year,month);
+
+     end SET$DATE;
+
+   SET$TIME:
+    procedure;
+       tod.hrs   = bcd (scan$numeric(0,23));
+       tod.min   = bcd (scan$delimiter(':',0,59));
+       if tod.opcode = 2
+        then
+    /* date, hours and minutes only */
+        do;
+           if chr = ':'
+            then i = scan$delimiter (':',0,59);
+           tod.sec = 0;
+        end;
+    /* include seconds */
+        else tod.sec   = bcd (scan$delimiter(':',0,59));
+    end set$time;
+
+   bcd$pair:
+    procedure(a,b) byte;
+    declare (a,b) byte;
+       return shl(a,4) or b;
+    end bcd$pair;
+
+
+   compute$year:
+    procedure;
+    /* compute year from number of days in word$value */
+    declare year$length word;
+       year = base$year;
+          do forever;
+             year$length = 365;
+             if (year and 11b) = 0 then /* leap year */
+                year$length = 366;
+             if word$value <= year$length then
+                return;
+             word$value = word$value - year$length;
+             year = year + 1;
+          end;
+    end compute$year;
+
+declare week$day  byte, /* day of week 0 ... 6 */
+        day$list (*) byte data ('Sun$Mon$Tue$Wed$Thu$Fri$Sat$'),
+        leap$bias byte; /* bias for feb 29 */
+
+   compute$month:
+    procedure;
+       month = 12;
+       do while month > 0;
+          if (month := month - 1) < 2 then /* jan or feb */
+             leapbias = 0;
+          if month$days(month) + leap$bias < word$value then return;
+       end;
+    end compute$month;
+
+declare date$test byte,    /* true if testing date */
+        test$value word;   /* sequential date value under test */
+
+   get$date$time:
+    procedure;
+    /* get date and time */
+       hrs = tod.hrs;
+       min = tod.min;
+       sec = tod.sec;
+       word$value = tod.date;
+    /* word$value contains total number of days */
+       week$day = (word$value + base$day - 1) mod 7;
+       call compute$year;
+    /* year has been set, word$value is remainder */
+       leap$bias = 0;
+       if (year and 11b) = 0 and word$value > 59 then
+        /* after feb 29 on leap year */ leap$bias = 1;
+       call compute$month;
+       day = word$value - (month$days(month) + leap$bias);
+       month = month + 1;
+    end get$date$time;
+
+   emit$date$time:
+    procedure;
+       call emitn(.day$list(shl(week$day,2)));
+       call emitchar(' ');
+       call emit$slant(month);
+       call emit$slant(day);
+       call emit$bin$pair(year);
+       call emitchar(' ');
+       call emit$colon(hrs);
+       call emit$colon(min);
+       call emit$bcd$pair(sec);
+    end emit$date$time;
+
+   tod$ASCII:
+    procedure (parameter);
+    declare parameter address;
+    declare ret address;
+       ret = 0;
+       tod$adr = parameter;
+       string$adr = .tod.ASCII;
+       if tod.opcode = 0 then
+       do;
+          call get$date$time;
+          index = -1;
+          call emit$date$time;
+       end;
+        else
+       do;
+          if (tod.opcode = 1) or
+           (tod.opcode = 2) then
+          do;
+             chr = string(index:=0);
+             call set$date;
+             call set$time;
+             ret = .string(index);
+          end;
+           else
+          do;
+             go to error;
+          end;
+       end;
+    end tod$ASCII;
+
+/********************************************************
+ ********************************************************/
+
+
+   declare lcltod structure (
+     opcode byte,
+     date address,
+     hrs byte,
+     min byte,
+     sec byte,
+     ASCII (21) byte );
+
+   declare datapgadr address;
+   declare datapg based datapgadr address;
+
+   declare extrnl$todadr address;
+   declare extrnl$tod based extrnl$todadr structure (
+     date address,
+     hrs byte,
+     min byte,
+     sec byte );
+
+   declare i byte;
+   declare ret address;
+
+   display$tod:
+    procedure;
+       lcltod.opcode = 0; /* read tod */
+       call mon1(50,.(26,0,0,0,0,0,0,0)); /* BIOS TIME GET SIGNAL */
+       call move (5,.extrnl$tod.date,.lcltod.date);
+       call tod$ASCII (.lcltod);
+       call write$console (0dh);
+       do i = 0 to 20;
+          call write$console (lcltod.ASCII(i));
+       end;
+    end display$tod;
+
+   comp:
+    procedure (cnt,parmadr1,parmadr2) byte;
+    declare (i,cnt) byte;
+    declare (parmadr1,parmadr2) address;
+    declare parm1 based parmadr1 (5) byte;
+    declare parm2 based parmadr2 (5) byte;
+       do i = 0 to cnt-1;
+          if parm1(i) <> parm2(i)
+           then return 0;
+       end;
+       return 0ffh;
+    end comp;
+
+
+  /**************************************
+
+
+    Main Program
+
+
+  **************************************/
+
+   declare last$dseg$byte byte initial (0);
+   declare CURRENT$VERSION address initial (0);
+   declare CPM30 byte initial (030h);
+   declare MPM byte initial (01h);
+
+PLM:
+do;
+   CURRENT$VERSION = RETURN$VERSION$FUNC;
+   if (low(CURRENT$VERSION) >= CPM30) and (high(CURRENT$VERSION) <> MPM) then
+   do;
+      datapgadr = xdos (49,.(03ah,0));
+      extrnl$todadr = xdos(49,.(03ah,0)) + 58H;
+      if (FCB(1) = 'C') then
+      do while FCB(1) = 'C';
+         if comp(5,.extrnl$tod.date,.lcltod.date) = 0 then
+            call display$tod;
+         if check$console$status then
+         do;
+            ret = read$console;
+            fcb(1) = 0;
+         end;
+      end;
+      else
+         if (FCB(1) = ' ') then
+         do;
+            call display$tod;
+         end;
+         else
+            if (FCB(1) = 'S')
+            then do;
+               call crlf;
+               call print$buffer(.('Enter today''s date (MM/DD/YY): ','$'));
+               call move(21,.(000000000000000000000),.buffer$adr.console$buffer);
+               call read$console$buffer(.buffer$adr);
+               if buffer$adr.numb$of$chars > 0
+               then do;
+                  call move(21,.buffer$adr.console$buffer,.lcltod.ASCII);
+                  tod$adr = .lcltod;
+                  string$adr = .tod.ASCII;
+                  chr = string(index := 0);
+                  call set$date;
+                  call move(2,.lcltod.date,.extrnl$tod.date);
+               end;  /* date initialization */
+               call crlf;
+               call print$buffer(.('Enter the time (HH:MM:SS):     ','$'));
+               call move(21,.(000000000000000000000),.buffer$adr.console$buffer);
+               call read$console$buffer(.buffer$adr);
+               if buffer$adr.numb$of$chars > 0
+                then do;
+                  call move(21,.buffer$adr.console$buffer,.lcltod.ASCII);
+                  tod$adr = .lcltod;
+                  string$adr = .tod.ASCII;
+                  chr = string(index := 0);
+                  call set$time;
+                  call crlf;
+                  call print$buffer(.('Press any key to set time ','$'));
+                  ret = read$console;
+                  call move(3,.lcltod.hrs,.extrnl$tod.hrs);
+                  call mon1(50,.(26,0,0ffh,0,0,0,0,0,)); /* BIOS TIME SET SIGNAL */
+                end;
+                call crlf;
+             end;
+            else do;
+               call move (21,.tbuff(1),.lcltod.ASCII);
+               lcltod.opcode = 1;
+               call tod$ASCII (.lcltod);
+               call crlf;
+               call print$buffer (.('Strike key to set time','$'));
+               ret = read$console;
+               call move (5,.lcltod.date,.extrnl$tod.date);
+               call mon1(50,.(26,0,0ffh,0,0,0,0,0,)); /* BIOS TIME SET SIGNAL */
+               call crlf;
+             end;
+      call terminate;
+      end;
+      else
+      do;
+         call CRLF;
+         call PRINT$BUFFER(.('ERROR:  Requires CP/M3.','$'));
+         call CRLF;
+         call TERMINATE;
+      end;
+   end;
+
+   error:
+   do;
+      call crlf;
+      call print$buffer (.('ERROR: Illegal time/date specification.','$'));
+      call terminate;
+   end;
+
+end tod;
+

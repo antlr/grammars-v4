@@ -203,7 +203,7 @@ Long
     : 'long'
     ;
 
-Nulptr
+Nullptr_
     : 'nullptr'
     ;
 
@@ -264,8 +264,8 @@ Typeof
     ;
 
 Typeof_unqual
-    : 'typeof_unequal'
-    | '__typeof_unequal__' //GNU
+    : 'typeof_unqual'
+    | '__typeof_unqual__' //GNU
     ;
 
 Union

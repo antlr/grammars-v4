@@ -1,0 +1,3 @@
+datatype 'a tree = Empty | Node of 'a * 'a tree * 'a tree
+fun size Empty = 0
+  | size (Node (_, left, right)) = 1 + size left + size right

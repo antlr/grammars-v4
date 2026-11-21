@@ -1,0 +1,15 @@
+*---------------------- HEADER FIELD
+#PLAYER 1
+#GENRE Sample
+#TITLE Sample
+#ARTIST Sample
+#BPM 120
+#PLAYLEVEL 5
+#TOTAL 100
+#RANK 2
+#bmp00 miss.bmp
+#bmp01 1.bmp
+#wav01 1.wav
+*---------------------- MAIN DATA FIELD
+#00111:01010101
+#00211:0101010001010100

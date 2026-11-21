@@ -1,0 +1,7 @@
+MODULE MainModule
+    PROC OpenAndWrite()
+        Open "HOME:" \File:="log.txt", logfile \Write;
+        Write logfile, "started" \NoNewLine;
+        Close logfile;
+    ENDPROC
+ENDMODULE

@@ -1,0 +1,17 @@
+--algorithm ProducerConsumer {
+  variables buffer = 0, ready = FALSE;
+  fair process (producer = 0) {
+    p1: while (TRUE) {
+      await ~ready;
+      buffer := buffer + 1;
+      ready := TRUE;
+    }
+  }
+  fair+ process (consumer = 1) {
+    c1: while (TRUE) {
+      await ready;
+      print buffer;
+      ready := FALSE;
+    }
+  }
+}

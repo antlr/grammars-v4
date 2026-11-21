@@ -1,0 +1,7 @@
+environ
+begin
+theorem
+ for x being @ holds x is @;
+consider y being @;
+reconsider y as @;
+.

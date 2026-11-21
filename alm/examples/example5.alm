@@ -1,0 +1,14 @@
+"   example5 -- macros and segment linkage
+    name    example5
+    segdef  shared_table
+    segref  other_segment
+
+    macro   read_clock
+    rccl    sys_info$clock_,*
+&end
+
+start:
+    read_clock
+    ldq     shared_table|0
+    sxl1    other_segment$count,*
+    tra     start

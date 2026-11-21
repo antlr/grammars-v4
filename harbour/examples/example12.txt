@@ -1,0 +1,2 @@
+FUNCTION IsAdult( nAge )
+   RETURN nAge >= 18 .AND. nAge < 120

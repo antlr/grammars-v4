@@ -1,0 +1,1 @@
+line 19:0 extraneous input 'bzp' expecting {<EOF>, 'v', 'vp', 'vn', 'vt', 'cstype', 'deg', 'bmat', 'step', 'p', 'l', 'f', 'curv', 'curv2', 'surf', 'con', 'g', 's', 'mg', 'o', 'bevel', 'c_interp', 'd_interp', 'lod', 'maplib', 'usemap', 'mtllib', 'usemtl', 'shadow_obj', 'trace_obj', 'ctech', 'stech', FILENAME, NL}

@@ -1,0 +1,17 @@
+digraph ATN {
+rankdir=LR;
+s77[fontsize=11, label="77", shape=doublecircle, fixedsize=true, width=.6];
+s656[fontsize=11,label="656", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s657[fontsize=11,label="{&rarr;\n657\nd=60|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s658[fontsize=11,label="&larr;\n658", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s76[fontsize=11,label="76", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s654[fontsize=11,label="654", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s655[fontsize=11,label="655", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s76 -> s654 [fontname="Times-Italic", label="&epsilon;"];
+s654 -> s657 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<variableDeclaratorId>", arrowhead = normal];
+s657:p0 -> s655 [fontname="Times-Italic", label="&epsilon;"];
+s657:p1 -> s658 [fontname="Times-Italic", label="&epsilon;"];
+s655 -> s656 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'='", arrowhead = normal];
+s658 -> s77 [fontname="Times-Italic", label="&epsilon;"];
+s656 -> s658 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<variableInitializer>", arrowhead = normal];
+}

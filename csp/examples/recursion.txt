@@ -1,0 +1,6 @@
+-- Recursive processes, written with the mu binder (first using the
+-- ASCII "mu" spelling, then the traditional Greek letter), and the
+-- equivalent recursion via a self-referencing process definition.
+Clock = mu X . (tick -> X)
+Clock2 = μ X . (tick -> X)
+Clock3 = tick -> Clock3

@@ -1,0 +1,6 @@
+PROC main()
+  DEF i
+  FOR i := 1 TO 10
+    WriteF('%ld\n', i)
+  ENDFOR
+ENDPROC

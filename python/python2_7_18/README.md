@@ -1,4 +1,4 @@
-# Python 2.7.18 parser
+# Python 2.7.18 Grammar
 
 ### About files:
 - PythonParser.g4

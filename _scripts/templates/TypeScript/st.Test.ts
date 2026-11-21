@@ -3,17 +3,20 @@
 import { CharStream } from 'antlr4';
 import { CharStreams } from 'antlr4';
 import { CommonTokenStream } from 'antlr4';
+import { PredictionMode } from 'antlr4';
 import { InputStream } from 'antlr4';
 import { Recognizer } from 'antlr4';
 import { RecognitionException } from 'antlr4';
 import { Token } from 'antlr4';
 import { readFileSync } from 'fs';
 import { writeFileSync } from 'fs';
+import { mkdirSync } from 'fs';
 import { openSync } from 'fs';
 import { readSync } from 'fs';
 import { writeSync } from 'fs';
 import { closeSync } from 'fs';
 import { readFile } from 'fs/promises'
+import { join as pathJoin, dirname as pathDirname, resolve as pathResolve, relative as pathRelative, sep as pathSep, isAbsolute as pathIsAbsolute, basename as pathBasename } from 'path';
 import { BinaryCharStream } from './BinaryCharStream.js';
 import { ErrorListener } from './ErrorListener.js';
 
@@ -37,16 +40,24 @@ function getChar() {
 }
 
 var tee = false;
+var output_dir = '';
 var show_profile = false;
 var show_tree = false;
 var show_tokens = false;
 var show_trace = false;
 var error_code = 0;
 var quiet = false;
+var perf = false;
+var per_file = false;
+var sll = false;
 var enc = '<file_encoding>';
 var binary = <binary>;
 var string_instance = 0;
 var prefix = '';
+var total_tokens = 0;
+var total_parse_seconds = 0;
+var first_file_tokens = 0;
+var first_file_parse_seconds = 0;
 var inputs: string[] = [];
 var is_fns: boolean[] = [];
 
@@ -72,6 +83,10 @@ function main() {
             case '-tee':
                 tee = true;
                 break;
+            case '-o':
+                output_dir = process.argv[++i];
+                tee = true;
+                break;
             case '-encoding':
                 enc = process.argv[++i];
                 break;
@@ -91,6 +106,15 @@ function main() {
                 break;
             case '-q':
                 quiet = true;
+                break;
+            case '--perf':
+                perf = true;
+                break;
+            case '--per-file':
+                per_file = true;
+                break;
+            case '--sll':
+                sll = true;
                 break;
             case '-trace':
                 show_trace = true;
@@ -118,7 +142,27 @@ function main() {
         }
         timer.stop();
         var t = timer.time().m * 60 + timer.time().s + timer.time().ms / 1000;
-        if (!quiet) console.error(prefix + 'Total Time: ' + t);
+        if (!quiet) {
+            if (!perf) {
+                console.error(prefix + 'TT: ' + t);
+            } else {
+            var warm_tokens = total_tokens - first_file_tokens;
+            var warm_seconds = total_parse_seconds - first_file_parse_seconds;
+            var warm_tps = (inputs.length > 1 && warm_seconds > 0)
+                ? Math.round(warm_tokens / warm_seconds).toString()
+                : 'n.a.';
+            var first_tps = first_file_parse_seconds > 0 ? (first_file_tokens / first_file_parse_seconds) : 0;
+            var speedup = (inputs.length > 1 && warm_seconds > 0 && first_tps > 0)
+                ? ((warm_tokens / warm_seconds) / first_tps).toFixed(2)
+                : 'n.a.';
+            console.error(prefix + 'PT: ' + total_parse_seconds);
+            console.error(prefix + 'OT: ' + (t - total_parse_seconds));
+            console.error(prefix + 'TT: ' + t);
+            console.error(prefix + 'PR: ' + Math.round(total_tokens / total_parse_seconds));
+            console.error(prefix + 'Post-warmup PR: ' + warm_tps);
+            console.error(prefix + 'Post-warmup speed up: ' + speedup);
+            }
+        }
     }
     process.exitCode = error_code;
 }
@@ -148,13 +192,24 @@ function ParseFilename(input: string, row_number: number) {
 }
 
 function DoParse(str: CharStream, input_name: string, row_number: number) {
+    let out_name = input_name;
+    if (output_dir) {
+        const absPath = pathResolve(input_name);
+        const root = pathResolve('<source_example_dir_unix>');
+        let rootless = pathRelative(root, absPath);
+        if (rootless === '..' || rootless.startsWith('..' + pathSep) || pathIsAbsolute(rootless))
+            rootless = pathBasename(absPath);
+        out_name = pathJoin(output_dir, rootless);
+        mkdirSync(pathDirname(out_name), { recursive: true });
+    }
     if (binary) str = new BinaryCharStream(str);
     const lexer = new <lexer_name>(str);
     const tokens = new CommonTokenStream(lexer);
     const parser = new <parser_name>(tokens);
+    if (sll) parser._interp.predictionMode = PredictionMode.SLL;
     lexer.removeErrorListeners();
     parser.removeErrorListeners();
-    var output = tee ? openSync(input_name + ".errors", 'w') : 1;
+    var output = tee ? openSync(out_name + ".errors", 'w') : 1;
     var listener_parser = new ErrorListener(quiet, tee, output);
     var listener_lexer = new ErrorListener(quiet, tee, output);
     parser.addErrorListener(listener_parser);
@@ -177,6 +232,8 @@ function DoParse(str: CharStream, input_name: string, row_number: number) {
     timer.start();
     const tree = parser.<start_symbol>();
     timer.stop();
+    var token_count = tokens.size;
+    total_tokens += token_count;
     var result = "";
     if (listener_parser.had_error || listener_lexer.had_error) {
         result = 'fail';
@@ -186,15 +243,20 @@ function DoParse(str: CharStream, input_name: string, row_number: number) {
         result = 'success';
     }
     var t = timer.time().m * 60 + timer.time().s + timer.time().ms / 1000;
+    total_parse_seconds += t;
+    if (row_number == 0) {
+        first_file_tokens = token_count;
+        first_file_parse_seconds = t;
+    }
     if (show_tree) {
         if (tee) {
-            writeFileSync(input_name + ".tree", tree.toStringTree(parser.ruleNames, parser));
+            writeFileSync(out_name + ".tree", tree.toStringTree(parser.ruleNames, parser));
         } else {
             console.error(tree.toStringTree(parser.ruleNames, parser));
         }
     }
-    if (!quiet) {
-        console.error(prefix + 'TypeScript ' + row_number + ' ' + input_name + ' ' + result + ' ' + t);
+    if (!quiet && per_file) {
+        console.error(prefix + 'TypeScript ' + row_number + ' ' + input_name + ' ' + result + ' ' + t + ' s ' + token_count + ' tokens ' + Math.round(token_count / t) + ' pr');
     }
     if (tee) {
         closeSync(output);

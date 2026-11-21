@@ -1,0 +1,642 @@
+Input    ::= CompilationUnit Sub? EOF
+QualifiedIdentifier
+         ::= Identifier ( '.' Identifier )*
+QualifiedIdentifierList
+         ::= QualifiedIdentifier ( ',' QualifiedIdentifier )*
+CompilationUnit
+         ::= ( Annotations? 'package' QualifiedIdentifier ';' )? ImportDeclaration* TypeDeclaration*
+ImportDeclaration
+         ::= 'import' 'static'? Identifier ( '.' Identifier )* ( '.' '*' )? ';'
+TypeDeclaration
+         ::= ClassOrInterfaceDeclaration
+           | ';'
+ClassOrInterfaceDeclaration
+         ::= Modifier* ( ClassDeclaration | InterfaceDeclaration )
+ClassDeclaration
+         ::= NormalClassDeclaration
+           | EnumDeclaration
+InterfaceDeclaration
+         ::= NormalInterfaceDeclaration
+           | AnnotationTypeDeclaration
+NormalClassDeclaration
+         ::= 'class' Identifier TypeParameters? ( 'extends' Type )? ( 'implements' TypeList )? ClassBody
+EnumDeclaration
+         ::= 'enum' Identifier ( 'implements' TypeList )? EnumBody
+NormalInterfaceDeclaration
+         ::= 'interface' Identifier TypeParameters? ( 'extends' TypeList )? InterfaceBody
+AnnotationTypeDeclaration
+         ::= '@' 'interface' Identifier AnnotationTypeBody
+Type     ::= BasicType ( '[' ']' )*
+           | ReferenceType ( '[' ']' )*
+BasicType
+         ::= 'byte'
+           | 'short'
+           | 'char'
+           | 'int'
+           | 'long'
+           | 'float'
+           | 'double'
+           | 'boolean'
+ReferenceType
+         ::= Identifier TypeArguments? ( '.' Identifier TypeArguments? )*
+TypeArguments
+         ::= '<' TypeArgument ( ',' TypeArgument )* '>'
+TypeArgument
+         ::= Type
+           | '?' ( ( 'extends' | 'super' ) Type )?
+NonWildcardTypeArguments
+         ::= '<' TypeList '>'
+TypeList ::= Type ( ',' Type )*
+TypeArgumentsOrDiamond
+         ::= '<' '>'
+           | TypeArguments
+NonWildcardTypeArgumentsOrDiamond
+         ::= '<' '>'
+           | NonWildcardTypeArguments
+TypeParameters
+         ::= '<' TypeParameter ( ',' TypeParameter )* '>'
+TypeParameter
+         ::= Identifier ( 'extends' Bound )?
+Bound    ::= ReferenceType ( '&' ReferenceType )*
+Modifier ::= Annotation
+           | 'public'
+           | 'protected'
+           | 'private'
+           | 'static'
+           | 'abstract'
+           | 'final'
+           | 'native'
+           | 'synchronized'
+           | 'transient'
+           | 'volatile'
+           | 'strictfp'
+Annotations
+         ::= Annotation+
+Annotation
+         ::= '@' QualifiedIdentifier ( '(' AnnotationElement? ')' )?
+AnnotationElement
+         ::= ElementValuePairs
+           | ElementValue
+ElementValuePairs
+         ::= ElementValuePair ( ',' ElementValuePair )*
+ElementValuePair
+         ::= Identifier '=' ElementValue
+ElementValue
+         ::= Annotation
+           | Expression1
+           | ElementValueArrayInitializer
+ElementValueArrayInitializer
+         ::= '{' ElementValues? ','? '}'
+ElementValues
+         ::= ElementValue ( ',' ElementValue )*
+ClassBody
+         ::= '{' ClassBodyDeclaration* '}'
+ClassBodyDeclaration
+         ::= ';'
+           | Modifier* MemberDecl
+           | 'static'? Block
+MemberDecl
+         ::= MethodOrFieldDecl
+           | 'void' Identifier VoidMethodDeclaratorRest
+           | Identifier ConstructorDeclaratorRest
+           | GenericMethodOrConstructorDecl
+           | ClassDeclaration
+           | InterfaceDeclaration
+MethodOrFieldDecl
+         ::= Type Identifier MethodOrFieldRest
+MethodOrFieldRest
+         ::= FieldDeclaratorsRest ';'
+           | MethodDeclaratorRest
+FieldDeclaratorsRest
+         ::= VariableDeclaratorRest ( ',' VariableDeclarator )*
+MethodDeclaratorRest
+         ::= FormalParameters ( '[' ']' )* ( 'throws' QualifiedIdentifierList )? ( Block | ';' )
+VoidMethodDeclaratorRest
+         ::= FormalParameters ( 'throws' QualifiedIdentifierList )? ( Block | ';' )
+ConstructorDeclaratorRest
+         ::= FormalParameters ( 'throws' QualifiedIdentifierList )? Block
+GenericMethodOrConstructorDecl
+         ::= TypeParameters GenericMethodOrConstructorRest
+GenericMethodOrConstructorRest
+         ::= ( Type | 'void' ) Identifier MethodDeclaratorRest
+           | Identifier ConstructorDeclaratorRest
+InterfaceBody
+         ::= '{' InterfaceBodyDeclaration* '}'
+InterfaceBodyDeclaration
+         ::= ';'
+           | Modifier* InterfaceMemberDecl
+InterfaceMemberDecl
+         ::= InterfaceMethodOrFieldDecl
+           | 'void' Identifier VoidInterfaceMethodDeclaratorRest
+           | InterfaceGenericMethodDecl
+           | ClassDeclaration
+           | InterfaceDeclaration
+InterfaceMethodOrFieldDecl
+         ::= Type Identifier InterfaceMethodOrFieldRest
+InterfaceMethodOrFieldRest
+         ::= ConstantDeclaratorsRest ';'
+           | InterfaceMethodDeclaratorRest
+ConstantDeclaratorsRest
+         ::= ConstantDeclaratorRest ( ',' ConstantDeclarator )*
+ConstantDeclaratorRest
+         ::= ( '[' ']' )* '=' VariableInitializer
+ConstantDeclarator
+         ::= Identifier ConstantDeclaratorRest
+InterfaceMethodDeclaratorRest
+         ::= FormalParameters ( '[' ']' )* ( 'throws' QualifiedIdentifierList )? ';'
+VoidInterfaceMethodDeclaratorRest
+         ::= FormalParameters ( 'throws' QualifiedIdentifierList )? ';'
+InterfaceGenericMethodDecl
+         ::= TypeParameters ( Type | 'void' ) Identifier InterfaceMethodDeclaratorRest
+FormalParameters
+         ::= '(' FormalParameterDecls? ')'
+FormalParameterDecls
+         ::= VariableModifier* Type FormalParameterDeclsRest
+VariableModifier
+         ::= 'final'
+           | Annotation
+FormalParameterDeclsRest
+         ::= VariableDeclaratorId ( ',' FormalParameterDecls )?
+           | '...' VariableDeclaratorId
+VariableDeclaratorId
+         ::= Identifier ( '[' ']' )*
+VariableDeclarators
+         ::= VariableDeclarator ( ',' VariableDeclarator )*
+VariableDeclarator
+         ::= Identifier VariableDeclaratorRest
+VariableDeclaratorRest
+         ::= ( '[' ']' )* ( '=' VariableInitializer )?
+VariableInitializer
+         ::= ArrayInitializer
+           | Expression
+ArrayInitializer
+         ::= '{' ( VariableInitializer ( ',' VariableInitializer )* ','? )? '}'
+Block    ::= '{' BlockStatements '}'
+BlockStatements
+         ::= BlockStatement*
+BlockStatement
+         ::= LocalVariableDeclarationStatement
+           | ClassOrInterfaceDeclaration
+           | ( Identifier ':' )? Statement
+LocalVariableDeclarationStatement
+         ::= VariableModifier* Type VariableDeclarators ';'
+Statement
+         ::= Block
+           | ';'
+           | Identifier ':' Statement
+           | StatementExpression ';'
+           | 'if' ParExpression Statement ( 'else' Statement )?
+           | 'assert' Expression ( ':' Expression )? ';'
+           | 'switch' ParExpression '{' SwitchBlockStatementGroups '}'
+           | 'while' ParExpression Statement
+           | 'do' Statement 'while' ParExpression ';'
+           | 'for' '(' ForControl ')' Statement
+           | 'break' Identifier? ';'
+           | 'continue' Identifier? ';'
+           | 'return' Expression? ';'
+           | 'throw' Expression ';'
+           | 'synchronized' ParExpression Block
+           | 'try' Block ( Catches? Finally | Catches )
+           | 'try' ResourceSpecification Block Catches? Finally?
+StatementExpression
+         ::= Expression
+Catches  ::= CatchClause+
+CatchClause
+         ::= 'catch' '(' VariableModifier* CatchType Identifier ')' Block
+CatchType
+         ::= QualifiedIdentifier ( '|' QualifiedIdentifier )*
+Finally  ::= 'finally' Block
+ResourceSpecification
+         ::= '(' Resources ';'? ')'
+Resources
+         ::= Resource ( ';' Resource )*
+Resource ::= VariableModifier* ReferenceType VariableDeclaratorId '=' Expression
+SwitchBlockStatementGroups
+         ::= SwitchBlockStatementGroup*
+SwitchBlockStatementGroup
+         ::= SwitchLabels BlockStatements
+SwitchLabels
+         ::= SwitchLabel+
+SwitchLabel
+         ::= 'case' Expression ':'
+           | 'case' EnumConstantName ':'
+           | 'default' ':'
+EnumConstantName
+         ::= Identifier
+ForControl
+         ::= ForVarControl
+           | ForInit? ';' Expression? ';' ForUpdate?
+ForVarControl
+         ::= VariableModifier* Type VariableDeclaratorId ForVarControlRest
+ForVarControlRest
+         ::= ForVariableDeclaratorsRest ';' Expression? ';' ForUpdate?
+           | ':' Expression
+ForVariableDeclaratorsRest
+         ::= ( '=' VariableInitializer )? ( ',' VariableDeclarator )*
+ForInit  ::= StatementExpression ( ',' StatementExpression )*
+ForUpdate
+         ::= StatementExpression ( ',' StatementExpression )*
+Expression
+         ::= Expression1 ( AssignmentOperator Expression )?
+AssignmentOperator
+         ::= '='
+           | '+='
+           | '-='
+           | '*='
+           | '/='
+           | '&='
+           | '|='
+           | '^='
+           | '%='
+           | '<<='
+           | '>>='
+           | '>>>='
+Expression1
+         ::= Expression2 Expression1Rest?
+Expression1Rest
+         ::= '?' Expression ':' Expression1
+Expression2
+         ::= Expression4 ( InfixOp2 Expression4 | 'instanceof' Type )*
+Expression4
+         ::= Expression3 ( InfixOp Expression3 )*
+InfixOp2 ::= '||'
+           | '&&'
+           | '=='
+           | '!='
+InfixOp  ::= '|'
+           | '^'
+           | '&'
+           | '<'
+           | '>'
+           | '<='
+           | '>='
+           | '<<'
+           | '>>'
+           | '>>>'
+           | '+'
+           | '-'
+           | '*'
+           | '/'
+           | '%'
+Expression3
+         ::= PrefixOp Expression3
+           | CastExpression
+           | Primary Selector* PostfixOp*
+CastExpression
+         ::= '(' ReferenceType ( '[' ']' )* ')' ( CastExpression | Primary Selector* )
+           | '(' BasicType ( '[' ']' )* ')' Expression3
+PrefixOp ::= '++'
+           | '--'
+           | '!'
+           | '~'
+           | '+'
+           | '-'
+PostfixOp
+         ::= '++'
+           | '--'
+Primary  ::= Literal
+           | ParExpression
+           | 'this' Arguments?
+           | 'super' SuperSuffix
+           | 'new' Creator
+           | NonWildcardTypeArguments ( ExplicitGenericInvocationSuffix | 'this' Arguments )
+           | Identifier ( '.' Identifier )* IdentifierSuffix?
+           | BasicType ( '[' ']' )* '.' 'class'
+           | 'void' '.' 'class'
+Literal  ::= IntegerLiteral
+           | FloatingPointLiteral
+           | CharacterLiteral
+           | StringLiteral
+           | BooleanLiteral
+           | NullLiteral
+ParExpression
+         ::= '(' Expression ')'
+Arguments
+         ::= '(' ( Expression ( ',' Expression )* )? ')'
+SuperSuffix
+         ::= Arguments
+           | '.' TypeArguments? Identifier Arguments?
+ExplicitGenericInvocationSuffix
+         ::= 'super' SuperSuffix
+           | Identifier Arguments
+Creator  ::= NonWildcardTypeArguments CreatedName ClassCreatorRest
+           | CreatedName ( ClassCreatorRest | ArrayCreatorRest )
+           | BasicType ArrayCreatorRest
+CreatedName
+         ::= Identifier TypeArgumentsOrDiamond? ( '.' Identifier TypeArgumentsOrDiamond? )*
+ClassCreatorRest
+         ::= Arguments ClassBody?
+ArrayCreatorRest
+         ::= '[' ( ']' ( '[' ']' )* ArrayInitializer | Expression ']' ( '[' Expression ']' )* ( '[' ']' )* )
+IdentifierSuffix
+         ::= '[' ( ( '[' ']' )* '.' 'class' | Expression ) ']'
+           | Arguments
+           | ( '[' ']' )* '.' 'class'
+           | '.' ( ExplicitGenericInvocation | 'this' | 'super' Arguments | 'new' NonWildcardTypeArguments? InnerCreator )
+ExplicitGenericInvocation
+         ::= NonWildcardTypeArguments ExplicitGenericInvocationSuffix
+InnerCreator
+         ::= Identifier NonWildcardTypeArgumentsOrDiamond? ClassCreatorRest
+Selector ::= '.' Identifier Arguments?
+           | '.' ExplicitGenericInvocation
+           | '.' 'this'
+           | '.' 'super' SuperSuffix
+           | '.' 'new' NonWildcardTypeArguments? InnerCreator
+           | '[' Expression ']'
+EnumBody ::= '{' ( EnumConstant ( ',' EnumConstant )* )? ','? EnumBodyDeclarations? '}'
+EnumConstant
+         ::= Annotations? Identifier Arguments? ClassBody?
+EnumBodyDeclarations
+         ::= ';' ClassBodyDeclaration*
+AnnotationTypeBody
+         ::= '{' AnnotationTypeElementDeclaration* '}'
+AnnotationTypeElementDeclaration
+         ::= Modifier* AnnotationTypeElementRest
+AnnotationTypeElementRest
+         ::= Type Identifier AnnotationMethodOrConstantRest ';'
+           | ClassDeclaration
+           | InterfaceDeclaration
+           | EnumDeclaration
+           | AnnotationTypeDeclaration
+AnnotationMethodOrConstantRest
+         ::= AnnotationMethodRest
+           | ConstantDeclaratorsRest
+AnnotationMethodRest
+         ::= '(' ')' ( '[' ']' )? ( 'default' ElementValue )?
+Ignorable
+         ::= WhiteSpace
+           | Comment
+          /* ws: definition */
+
+<?TOKENS?>
+
+UnicodeInputCharacter
+         ::= UnicodeEscape
+           | RawInputCharacter
+UnicodeEscape
+         ::= '\' UnicodeMarker HexDigit HexDigit HexDigit HexDigit
+UnicodeMarker
+         ::= 'u'+
+RawInputCharacter
+         ::= [#x0001-#xD7FF]
+           | [#xE000-#xFFFD]
+           | [#x10000-#x10FFFF]
+HexDigit ::= '0'
+           | '1'
+           | '2'
+           | '3'
+           | '4'
+           | '5'
+           | '6'
+           | '7'
+           | '8'
+           | '9'
+           | 'a'
+           | 'b'
+           | 'c'
+           | 'd'
+           | 'e'
+           | 'f'
+           | 'A'
+           | 'B'
+           | 'C'
+           | 'D'
+           | 'E'
+           | 'F'
+LF       ::= #x000A
+CR       ::= #x000D
+LineTerminator
+         ::= LF
+           | CR
+           | CR LF
+InputCharacter
+         ::= UnicodeInputCharacter - ( CR | LF )
+Sub      ::= #x001A
+WhiteSpace
+         ::= ' '
+           | #x0009
+           | #x000C
+           | LineTerminator
+Comment  ::= TraditionalComment
+           | EndOfLineComment
+TraditionalComment
+         ::= '/*' ( UnicodeInputCharacter* - ( UnicodeInputCharacter* '*/' UnicodeInputCharacter* ) ) '*/'
+EndOfLineComment
+         ::= '//' InputCharacter*
+Identifier
+         ::= ( IdentifierChars - ( Keyword | BooleanLiteral | NullLiteral ) ) &( EOF | RawInputCharacter - JavaLetterOrDigit )
+IdentifierChars
+         ::= JavaLetter JavaLetterOrDigit*
+JavaLetter
+         ::= [#x0024#x0041-#x005A#x005F#x0061-#x007A#x00A2-#x00A5#x00AA#x00B5#x00BA#x00C0-#x00D6#x00D8-#x00F6#x00F8-#x02C1#x02C6-#x02D1#x02E0-#x02E4#x02EC#x02EE#x0370-#x0374#x0376#x0377#x037A-#x037D#x0386#x0388-#x038A#x038C#x038E-#x03A1#x03A3-#x03F5#x03F7-#x0481#x048A-#x0527#x0531-#x0556#x0559#x0561-#x0587#x05D0-#x05EA#x05F0-#x05F2#x060B#x0620-#x064A#x066E#x066F#x0671-#x06D3#x06D5#x06E5#x06E6#x06EE#x06EF#x06FA-#x06FC#x06FF#x0710#x0712-#x072F#x074D-#x07A5#x07B1#x07CA-#x07EA#x07F4#x07F5#x07FA#x0800-#x0815#x081A#x0824#x0828#x0840-#x0858#x0904-#x0939#x093D#x0950#x0958-#x0961#x0971-#x0977#x0979-#x097F#x0985-#x098C#x098F#x0990#x0993-#x09A8#x09AA-#x09B0#x09B2#x09B6-#x09B9#x09BD#x09CE#x09DC#x09DD#x09DF-#x09E1#x09F0-#x09F3#x09FB#x0A05-#x0A0A#x0A0F#x0A10#x0A13-#x0A28#x0A2A-#x0A30#x0A32#x0A33#x0A35#x0A36#x0A38#x0A39#x0A59-#x0A5C#x0A5E#x0A72-#x0A74#x0A85-#x0A8D#x0A8F-#x0A91#x0A93-#x0AA8#x0AAA-#x0AB0#x0AB2#x0AB3#x0AB5-#x0AB9#x0ABD#x0AD0#x0AE0#x0AE1#x0AF1#x0B05-#x0B0C#x0B0F#x0B10#x0B13-#x0B28#x0B2A-#x0B30#x0B32#x0B33#x0B35-#x0B39#x0B3D#x0B5C#x0B5D#x0B5F-#x0B61#x0B71#x0B83#x0B85-#x0B8A#x0B8E-#x0B90#x0B92-#x0B95#x0B99#x0B9A#x0B9C#x0B9E#x0B9F#x0BA3#x0BA4#x0BA8-#x0BAA#x0BAE-#x0BB9#x0BD0#x0BF9#x0C05-#x0C0C#x0C0E-#x0C10#x0C12-#x0C28#x0C2A-#x0C33#x0C35-#x0C39#x0C3D#x0C58#x0C59#x0C60#x0C61#x0C85-#x0C8C#x0C8E-#x0C90#x0C92-#x0CA8#x0CAA-#x0CB3#x0CB5-#x0CB9#x0CBD#x0CDE#x0CE0#x0CE1#x0CF1#x0CF2#x0D05-#x0D0C#x0D0E-#x0D10#x0D12-#x0D3A#x0D3D#x0D4E#x0D60#x0D61#x0D7A-#x0D7F#x0D85-#x0D96#x0D9A-#x0DB1#x0DB3-#x0DBB#x0DBD#x0DC0-#x0DC6#x0E01-#x0E30#x0E32#x0E33#x0E3F-#x0E46#x0E81#x0E82#x0E84#x0E87#x0E88#x0E8A#x0E8D#x0E94-#x0E97#x0E99-#x0E9F#x0EA1-#x0EA3#x0EA5#x0EA7#x0EAA#x0EAB#x0EAD-#x0EB0#x0EB2#x0EB3#x0EBD#x0EC0-#x0EC4#x0EC6#x0EDC#x0EDD#x0F00#x0F40-#x0F47#x0F49-#x0F6C#x0F88-#x0F8C#x1000-#x102A#x103F#x1050-#x1055#x105A-#x105D#x1061#x1065#x1066#x106E-#x1070#x1075-#x1081#x108E#x10A0-#x10C5#x10D0-#x10FA#x10FC#x1100-#x1248#x124A-#x124D#x1250-#x1256#x1258#x125A-#x125D#x1260-#x1288#x128A-#x128D#x1290-#x12B0#x12B2-#x12B5#x12B8-#x12BE#x12C0#x12C2-#x12C5#x12C8-#x12D6#x12D8-#x1310#x1312-#x1315#x1318-#x135A#x1380-#x138F#x13A0-#x13F4#x1401-#x166C#x166F-#x167F#x1681-#x169A#x16A0-#x16EA#x16EE-#x16F0#x1700-#x170C#x170E-#x1711#x1720-#x1731#x1740-#x1751#x1760-#x176C#x176E-#x1770#x1780-#x17B3#x17D7#x17DB#x17DC#x1820-#x1877#x1880-#x18A8#x18AA#x18B0-#x18F5#x1900-#x191C#x1950-#x196D#x1970-#x1974#x1980-#x19AB#x19C1-#x19C7#x1A00-#x1A16#x1A20-#x1A54#x1AA7#x1B05-#x1B33#x1B45-#x1B4B#x1B83-#x1BA0#x1BAE#x1BAF#x1BC0-#x1BE5#x1C00-#x1C23#x1C4D-#x1C4F#x1C5A-#x1C7D#x1CE9-#x1CEC#x1CEE-#x1CF1#x1D00-#x1DBF#x1E00-#x1F15#x1F18-#x1F1D#x1F20-#x1F45#x1F48-#x1F4D#x1F50-#x1F57#x1F59#x1F5B#x1F5D#x1F5F-#x1F7D#x1F80-#x1FB4#x1FB6-#x1FBC#x1FBE#x1FC2-#x1FC4#x1FC6-#x1FCC#x1FD0-#x1FD3#x1FD6-#x1FDB#x1FE0-#x1FEC#x1FF2-#x1FF4#x1FF6-#x1FFC#x203F#x2040#x2054#x2071#x207F#x2090-#x209C#x20A0-#x20B9#x2102#x2107#x210A-#x2113#x2115#x2119-#x211D#x2124#x2126#x2128#x212A-#x212D#x212F-#x2139#x213C-#x213F#x2145-#x2149#x214E#x2160-#x2188#x2C00-#x2C2E#x2C30-#x2C5E#x2C60-#x2CE4#x2CEB-#x2CEE#x2D00-#x2D25#x2D30-#x2D65#x2D6F#x2D80-#x2D96#x2DA0-#x2DA6#x2DA8-#x2DAE#x2DB0-#x2DB6#x2DB8-#x2DBE#x2DC0-#x2DC6#x2DC8-#x2DCE#x2DD0-#x2DD6#x2DD8-#x2DDE#x2E2F#x3005-#x3007#x3021-#x3029#x3031-#x3035#x3038-#x303C#x3041-#x3096#x309D-#x309F#x30A1-#x30FA#x30FC-#x30FF#x3105-#x312D#x3131-#x318E#x31A0-#x31BA#x31F0-#x31FF#x3400-#x4DB5#x4E00-#x9FCB#xA000-#xA48C#xA4D0-#xA4FD#xA500-#xA60C#xA610-#xA61F#xA62A#xA62B#xA640-#xA66E#xA67F-#xA697#xA6A0-#xA6EF#xA717-#xA71F#xA722-#xA788#xA78B-#xA78E#xA790#xA791#xA7A0-#xA7A9#xA7FA-#xA801#xA803-#xA805#xA807-#xA80A#xA80C-#xA822#xA838#xA840-#xA873#xA882-#xA8B3#xA8F2-#xA8F7#xA8FB#xA90A-#xA925#xA930-#xA946#xA960-#xA97C#xA984-#xA9B2#xA9CF#xAA00-#xAA28#xAA40-#xAA42#xAA44-#xAA4B#xAA60-#xAA76#xAA7A#xAA80-#xAAAF#xAAB1#xAAB5#xAAB6#xAAB9-#xAABD#xAAC0#xAAC2#xAADB-#xAADD#xAB01-#xAB06#xAB09-#xAB0E#xAB11-#xAB16#xAB20-#xAB26#xAB28-#xAB2E#xABC0-#xABE2#xAC00-#xD7A3#xD7B0-#xD7C6#xD7CB-#xD7FB#xF900-#xFA2D#xFA30-#xFA6D#xFA70-#xFAD9#xFB00-#xFB06#xFB13-#xFB17#xFB1D#xFB1F-#xFB28#xFB2A-#xFB36#xFB38-#xFB3C#xFB3E#xFB40#xFB41#xFB43#xFB44#xFB46-#xFBB1#xFBD3-#xFD3D#xFD50-#xFD8F#xFD92-#xFDC7#xFDF0-#xFDFC#xFE33#xFE34#xFE4D-#xFE4F#xFE69#xFE70-#xFE74#xFE76-#xFEFC#xFF04#xFF21-#xFF3A#xFF3F#xFF41-#xFF5A#xFF66-#xFFBE#xFFC2-#xFFC7#xFFCA-#xFFCF#xFFD2-#xFFD7#xFFDA-#xFFDC#xFFE0#xFFE1#xFFE5#xFFE6]
+JavaLetterOrDigit
+         ::= [#x0024#x0030-#x0039#x0041-#x005A#x005F#x0061-#x007A#x007F-#x009F#x00A2-#x00A5#x00AA#x00AD#x00B5#x00BA#x00C0-#x00D6#x00D8-#x00F6#x00F8-#x02C1#x02C6-#x02D1#x02E0-#x02E4#x02EC#x02EE#x0300-#x0374#x0376#x0377#x037A-#x037D#x0386#x0388-#x038A#x038C#x038E-#x03A1#x03A3-#x03F5#x03F7-#x0481#x0483-#x0487#x048A-#x0527#x0531-#x0556#x0559#x0561-#x0587#x0591-#x05BD#x05BF#x05C1#x05C2#x05C4#x05C5#x05C7#x05D0-#x05EA#x05F0-#x05F2#x0600-#x0603#x060B#x0610-#x061A#x0620-#x0669#x066E-#x06D3#x06D5-#x06DD#x06DF-#x06E8#x06EA-#x06FC#x06FF#x070F-#x074A#x074D-#x07B1#x07C0-#x07F5#x07FA#x0800-#x082D#x0840-#x085B#x0900-#x0963#x0966-#x096F#x0971-#x0977#x0979-#x097F#x0981-#x0983#x0985-#x098C#x098F#x0990#x0993-#x09A8#x09AA-#x09B0#x09B2#x09B6-#x09B9#x09BC-#x09C4#x09C7#x09C8#x09CB-#x09CE#x09D7#x09DC#x09DD#x09DF-#x09E3#x09E6-#x09F3#x09FB#x0A01-#x0A03#x0A05-#x0A0A#x0A0F#x0A10#x0A13-#x0A28#x0A2A-#x0A30#x0A32#x0A33#x0A35#x0A36#x0A38#x0A39#x0A3C#x0A3E-#x0A42#x0A47#x0A48#x0A4B-#x0A4D#x0A51#x0A59-#x0A5C#x0A5E#x0A66-#x0A75#x0A81-#x0A83#x0A85-#x0A8D#x0A8F-#x0A91#x0A93-#x0AA8#x0AAA-#x0AB0#x0AB2#x0AB3#x0AB5-#x0AB9#x0ABC-#x0AC5#x0AC7-#x0AC9#x0ACB-#x0ACD#x0AD0#x0AE0-#x0AE3#x0AE6-#x0AEF#x0AF1#x0B01-#x0B03#x0B05-#x0B0C#x0B0F#x0B10#x0B13-#x0B28#x0B2A-#x0B30#x0B32#x0B33#x0B35-#x0B39#x0B3C-#x0B44#x0B47#x0B48#x0B4B-#x0B4D#x0B56#x0B57#x0B5C#x0B5D#x0B5F-#x0B63#x0B66-#x0B6F#x0B71#x0B82#x0B83#x0B85-#x0B8A#x0B8E-#x0B90#x0B92-#x0B95#x0B99#x0B9A#x0B9C#x0B9E#x0B9F#x0BA3#x0BA4#x0BA8-#x0BAA#x0BAE-#x0BB9#x0BBE-#x0BC2#x0BC6-#x0BC8#x0BCA-#x0BCD#x0BD0#x0BD7#x0BE6-#x0BEF#x0BF9#x0C01-#x0C03#x0C05-#x0C0C#x0C0E-#x0C10#x0C12-#x0C28#x0C2A-#x0C33#x0C35-#x0C39#x0C3D-#x0C44#x0C46-#x0C48#x0C4A-#x0C4D#x0C55#x0C56#x0C58#x0C59#x0C60-#x0C63#x0C66-#x0C6F#x0C82#x0C83#x0C85-#x0C8C#x0C8E-#x0C90#x0C92-#x0CA8#x0CAA-#x0CB3#x0CB5-#x0CB9#x0CBC-#x0CC4#x0CC6-#x0CC8#x0CCA-#x0CCD#x0CD5#x0CD6#x0CDE#x0CE0-#x0CE3#x0CE6-#x0CEF#x0CF1#x0CF2#x0D02#x0D03#x0D05-#x0D0C#x0D0E-#x0D10#x0D12-#x0D3A#x0D3D-#x0D44#x0D46-#x0D48#x0D4A-#x0D4E#x0D57#x0D60-#x0D63#x0D66-#x0D6F#x0D7A-#x0D7F#x0D82#x0D83#x0D85-#x0D96#x0D9A-#x0DB1#x0DB3-#x0DBB#x0DBD#x0DC0-#x0DC6#x0DCA#x0DCF-#x0DD4#x0DD6#x0DD8-#x0DDF#x0DF2#x0DF3#x0E01-#x0E3A#x0E3F-#x0E4E#x0E50-#x0E59#x0E81#x0E82#x0E84#x0E87#x0E88#x0E8A#x0E8D#x0E94-#x0E97#x0E99-#x0E9F#x0EA1-#x0EA3#x0EA5#x0EA7#x0EAA#x0EAB#x0EAD-#x0EB9#x0EBB-#x0EBD#x0EC0-#x0EC4#x0EC6#x0EC8-#x0ECD#x0ED0-#x0ED9#x0EDC#x0EDD#x0F00#x0F18#x0F19#x0F20-#x0F29#x0F35#x0F37#x0F39#x0F3E-#x0F47#x0F49-#x0F6C#x0F71-#x0F84#x0F86-#x0F97#x0F99-#x0FBC#x0FC6#x1000-#x1049#x1050-#x109D#x10A0-#x10C5#x10D0-#x10FA#x10FC#x1100-#x1248#x124A-#x124D#x1250-#x1256#x1258#x125A-#x125D#x1260-#x1288#x128A-#x128D#x1290-#x12B0#x12B2-#x12B5#x12B8-#x12BE#x12C0#x12C2-#x12C5#x12C8-#x12D6#x12D8-#x1310#x1312-#x1315#x1318-#x135A#x135D-#x135F#x1380-#x138F#x13A0-#x13F4#x1401-#x166C#x166F-#x167F#x1681-#x169A#x16A0-#x16EA#x16EE-#x16F0#x1700-#x170C#x170E-#x1714#x1720-#x1734#x1740-#x1753#x1760-#x176C#x176E-#x1770#x1772#x1773#x1780-#x17D3#x17D7#x17DB-#x17DD#x17E0-#x17E9#x180B-#x180D#x1810-#x1819#x1820-#x1877#x1880-#x18AA#x18B0-#x18F5#x1900-#x191C#x1920-#x192B#x1930-#x193B#x1946-#x196D#x1970-#x1974#x1980-#x19AB#x19B0-#x19C9#x19D0-#x19D9#x1A00-#x1A1B#x1A20-#x1A5E#x1A60-#x1A7C#x1A7F-#x1A89#x1A90-#x1A99#x1AA7#x1B00-#x1B4B#x1B50-#x1B59#x1B6B-#x1B73#x1B80-#x1BAA#x1BAE-#x1BB9#x1BC0-#x1BF3#x1C00-#x1C37#x1C40-#x1C49#x1C4D-#x1C7D#x1CD0-#x1CD2#x1CD4-#x1CF2#x1D00-#x1DE6#x1DFC-#x1F15#x1F18-#x1F1D#x1F20-#x1F45#x1F48-#x1F4D#x1F50-#x1F57#x1F59#x1F5B#x1F5D#x1F5F-#x1F7D#x1F80-#x1FB4#x1FB6-#x1FBC#x1FBE#x1FC2-#x1FC4#x1FC6-#x1FCC#x1FD0-#x1FD3#x1FD6-#x1FDB#x1FE0-#x1FEC#x1FF2-#x1FF4#x1FF6-#x1FFC#x200B-#x200F#x202A-#x202E#x203F#x2040#x2054#x2060-#x2064#x206A-#x206F#x2071#x207F#x2090-#x209C#x20A0-#x20B9#x20D0-#x20DC#x20E1#x20E5-#x20F0#x2102#x2107#x210A-#x2113#x2115#x2119-#x211D#x2124#x2126#x2128#x212A-#x212D#x212F-#x2139#x213C-#x213F#x2145-#x2149#x214E#x2160-#x2188#x2C00-#x2C2E#x2C30-#x2C5E#x2C60-#x2CE4#x2CEB-#x2CF1#x2D00-#x2D25#x2D30-#x2D65#x2D6F#x2D7F-#x2D96#x2DA0-#x2DA6#x2DA8-#x2DAE#x2DB0-#x2DB6#x2DB8-#x2DBE#x2DC0-#x2DC6#x2DC8-#x2DCE#x2DD0-#x2DD6#x2DD8-#x2DDE#x2DE0-#x2DFF#x2E2F#x3005-#x3007#x3021-#x302F#x3031-#x3035#x3038-#x303C#x3041-#x3096#x3099#x309A#x309D-#x309F#x30A1-#x30FA#x30FC-#x30FF#x3105-#x312D#x3131-#x318E#x31A0-#x31BA#x31F0-#x31FF#x3400-#x4DB5#x4E00-#x9FCB#xA000-#xA48C#xA4D0-#xA4FD#xA500-#xA60C#xA610-#xA62B#xA640-#xA66F#xA67C#xA67D#xA67F-#xA697#xA6A0-#xA6F1#xA717-#xA71F#xA722-#xA788#xA78B-#xA78E#xA790#xA791#xA7A0-#xA7A9#xA7FA-#xA827#xA838#xA840-#xA873#xA880-#xA8C4#xA8D0-#xA8D9#xA8E0-#xA8F7#xA8FB#xA900-#xA92D#xA930-#xA953#xA960-#xA97C#xA980-#xA9C0#xA9CF-#xA9D9#xAA00-#xAA36#xAA40-#xAA4D#xAA50-#xAA59#xAA60-#xAA76#xAA7A#xAA7B#xAA80-#xAAC2#xAADB-#xAADD#xAB01-#xAB06#xAB09-#xAB0E#xAB11-#xAB16#xAB20-#xAB26#xAB28-#xAB2E#xABC0-#xABEA#xABEC#xABED#xABF0-#xABF9#xAC00-#xD7A3#xD7B0-#xD7C6#xD7CB-#xD7FB#xF900-#xFA2D#xFA30-#xFA6D#xFA70-#xFAD9#xFB00-#xFB06#xFB13-#xFB17#xFB1D-#xFB28#xFB2A-#xFB36#xFB38-#xFB3C#xFB3E#xFB40#xFB41#xFB43#xFB44#xFB46-#xFBB1#xFBD3-#xFD3D#xFD50-#xFD8F#xFD92-#xFDC7#xFDF0-#xFDFC#xFE00-#xFE0F#xFE20-#xFE26#xFE33#xFE34#xFE4D-#xFE4F#xFE69#xFE70-#xFE74#xFE76-#xFEFC#xFEFF#xFF04#xFF10-#xFF19#xFF21-#xFF3A#xFF3F#xFF41-#xFF5A#xFF66-#xFFBE#xFFC2-#xFFC7#xFFCA-#xFFCF#xFFD2-#xFFD7#xFFDA-#xFFDC#xFFE0#xFFE1#xFFE5#xFFE6#xFFF9-#xFFFB]
+Keyword  ::= 'abstract'
+           | 'continue'
+           | 'for'
+           | 'new'
+           | 'switch'
+           | 'assert'
+           | 'default'
+           | 'if'
+           | 'package'
+           | 'synchronized'
+           | 'boolean'
+           | 'do'
+           | 'goto'
+           | 'private'
+           | 'this'
+           | 'break'
+           | 'double'
+           | 'implements'
+           | 'protected'
+           | 'throw'
+           | 'byte'
+           | 'else'
+           | 'import'
+           | 'public'
+           | 'throws'
+           | 'case'
+           | 'enum'
+           | 'instanceof'
+           | 'return'
+           | 'transient'
+           | 'catch'
+           | 'extends'
+           | 'int'
+           | 'short'
+           | 'try'
+           | 'char'
+           | 'final'
+           | 'interface'
+           | 'static'
+           | 'void'
+           | 'class'
+           | 'finally'
+           | 'long'
+           | 'strictfp'
+           | 'volatile'
+           | 'const'
+           | 'float'
+           | 'native'
+           | 'super'
+           | 'while'
+IntegerLiteral
+         ::= DecimalIntegerLiteral
+           | HexIntegerLiteral
+           | OctalIntegerLiteral
+           | BinaryIntegerLiteral
+DecimalIntegerLiteral
+         ::= DecimalNumeral IntegerTypeSuffix?
+HexIntegerLiteral
+         ::= HexNumeral IntegerTypeSuffix?
+OctalIntegerLiteral
+         ::= OctalNumeral IntegerTypeSuffix?
+BinaryIntegerLiteral
+         ::= BinaryNumeral IntegerTypeSuffix?
+IntegerTypeSuffix
+         ::= 'l'
+           | 'L'
+DecimalNumeral
+         ::= '0'
+           | NonZeroDigit Digits?
+           | NonZeroDigit Underscores Digits
+Digits   ::= Digit
+           | Digit DigitsAndUnderscores? Digit
+Digit    ::= '0'
+           | NonZeroDigit
+NonZeroDigit
+         ::= '1'
+           | '2'
+           | '3'
+           | '4'
+           | '5'
+           | '6'
+           | '7'
+           | '8'
+           | '9'
+DigitsAndUnderscores
+         ::= DigitOrUnderscore+
+DigitOrUnderscore
+         ::= Digit
+           | '_'
+Underscores
+         ::= '_'+
+HexNumeral
+         ::= '0' 'x' HexDigits
+           | '0' 'X' HexDigits
+HexDigits
+         ::= HexDigit
+           | HexDigit HexDigitsAndUnderscores? HexDigit
+HexDigitsAndUnderscores
+         ::= HexDigitOrUnderscore+
+HexDigitOrUnderscore
+         ::= HexDigit
+           | '_'
+OctalNumeral
+         ::= '0' OctalDigits
+           | '0' Underscores OctalDigits
+OctalDigits
+         ::= OctalDigit
+           | OctalDigit OctalDigitsAndUnderscores? OctalDigit
+OctalDigit
+         ::= '0'
+           | '1'
+           | '2'
+           | '3'
+           | '4'
+           | '5'
+           | '6'
+           | '7'
+OctalDigitsAndUnderscores
+         ::= OctalDigitOrUnderscore+
+OctalDigitOrUnderscore
+         ::= OctalDigit
+           | '_'
+BinaryNumeral
+         ::= '0' 'b' BinaryDigits
+           | '0' 'B' BinaryDigits
+BinaryDigits
+         ::= BinaryDigit
+           | BinaryDigit BinaryDigitsAndUnderscores? BinaryDigit
+BinaryDigit
+         ::= '0'
+           | '1'
+BinaryDigitsAndUnderscores
+         ::= BinaryDigitOrUnderscore+
+BinaryDigitOrUnderscore
+         ::= BinaryDigit
+           | '_'
+FloatingPointLiteral
+         ::= DecimalFloatingPointLiteral
+           | HexadecimalFloatingPointLiteral
+DecimalFloatingPointLiteral
+         ::= Digits '.' Digits? ExponentPart? FloatTypeSuffix?
+           | '.' Digits ExponentPart? FloatTypeSuffix?
+           | Digits ExponentPart FloatTypeSuffix?
+           | Digits ExponentPart? FloatTypeSuffix
+ExponentPart
+         ::= ExponentIndicator SignedInteger
+ExponentIndicator
+         ::= 'e'
+           | 'E'
+SignedInteger
+         ::= Sign? Digits
+Sign     ::= '+'
+           | '-'
+FloatTypeSuffix
+         ::= 'f'
+           | 'F'
+           | 'd'
+           | 'D'
+HexadecimalFloatingPointLiteral
+         ::= HexSignificand BinaryExponent FloatTypeSuffix?
+HexSignificand
+         ::= HexNumeral
+           | HexNumeral '.'
+           | '0' 'x' HexDigits? '.' HexDigits
+           | '0' 'X' HexDigits? '.' HexDigits
+BinaryExponent
+         ::= BinaryExponentIndicator SignedInteger
+BinaryExponentIndicator
+         ::= 'p'
+           | 'P'
+BooleanLiteral
+         ::= 'true'
+           | 'false'
+CharacterLiteral
+         ::= "'" SingleCharacter "'"
+           | "'" EscapeSequence "'"
+SingleCharacter
+         ::= InputCharacter - ( "'" | '\' )
+StringLiteral
+         ::= '"' StringCharacters? '"'
+StringCharacters
+         ::= StringCharacter+
+StringCharacter
+         ::= InputCharacter - ( '"' | '\' )
+           | EscapeSequence
+EscapeSequence
+         ::= BackSlash 'b'
+           | BackSlash 't'
+           | BackSlash 'n'
+           | BackSlash 'f'
+           | BackSlash 'r'
+           | BackSlash '"'
+           | BackSlash "'"
+           | BackSlash BackSlash
+           | OctalEscape
+BackSlash
+         ::= '\' ( UnicodeMarker '005' [cC] )?
+OctalEscape
+         ::= '\' OctalDigit
+           | '\' OctalDigit OctalDigit
+           | '\' ZeroToThree OctalDigit OctalDigit
+ZeroToThree
+         ::= '0'
+           | '1'
+           | '2'
+           | '3'
+NullLiteral
+         ::= 'null'
+EOF      ::= $

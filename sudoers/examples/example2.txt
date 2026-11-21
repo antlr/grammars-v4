@@ -1,0 +1,76 @@
+#
+# Sample /etc/sudoers file.
+#
+# This file MUST be edited with the 'visudo' command as root.
+#
+# See the sudoers man page for the details on how to write a sudoers file.
+#
+
+##
+# User alias specification
+##
+User_Alias	FULLTIMERS = millert, mikef, dowdy
+User_Alias	PARTTIMERS = bostley, jwfox, crawl
+User_Alias	WEBMASTERS = will, wendy, wim
+
+##
+# Runas alias specification
+##
+Runas_Alias	OP = root, operator
+Runas_Alias	DB = oracle, sybase
+
+##
+# Host alias specification
+##
+Host_Alias	SERVERS = master, mail, www, ns
+Host_Alias	CDROM = orion, perseus, hercules
+
+##
+# Cmnd alias specification
+##
+Cmnd_Alias	DUMPS = /usr/sbin/dump, /usr/sbin/rdump, /usr/sbin/restore, /usr/sbin/rrestore
+Cmnd_Alias	KILL = /usr/bin/kill
+Cmnd_Alias	PRINTING = /usr/sbin/lpc, /usr/bin/lprm
+Cmnd_Alias	SHUTDOWN = /usr/sbin/shutdown
+Cmnd_Alias	SU = /usr/bin/su
+
+##
+# Override built-in defaults
+##
+Defaults               syslog=auth
+Defaults>root          !set_logname
+Defaults:FULLTIMERS    !lecture
+Defaults:millert       !authenticate
+Defaults@SERVERS       log_year, logfile=/var/log/sudo.log
+
+##
+# User specification
+##
+
+# root and users in group wheel can run anything on any machine as any user
+root		ALL = (ALL) ALL
+%wheel		ALL = (ALL) ALL
+
+# full time sysadmins can run anything on any machine without a password
+FULLTIMERS	ALL = NOPASSWD: ALL
+
+# part time sysadmins may run anything but need a password
+PARTTIMERS	ALL = ALL
+
+# operator may run maintenance commands
+operator	ALL = DUMPS, KILL, SHUTDOWN, PRINTING
+
+# joe may su only to operator
+joe		ALL = /usr/bin/su
+
+# bob may run anything on master and mail as any user listed in OP
+bob		SERVERS = (OP) ALL
+
+# fred can run commands as oracle or sybase without a password
+fred		ALL = (DB) NOPASSWD: ALL
+
+# users in the WEBMASTERS alias may run any command as user www
+WEBMASTERS	www = (www) ALL, (root) /usr/bin/su
+
+# anyone can mount/unmount a cd-rom on the machines in the CDROM alias
+ALL		CDROM = NOPASSWD: /sbin/umount, /sbin/mount

@@ -1,0 +1,104 @@
+selectors_group
+         ::= selector ( COMMA S* selector )*
+selector ::= simple_selector_sequence ( combinator simple_selector_sequence )*
+combinator
+         ::= PLUS S*
+           | GREATER S*
+           | TILDE S*
+           | S+
+simple_selector_sequence
+         ::= ( type_selector | universal ) ( HASH | class | attrib | pseudo | negation )*
+           | ( HASH | class | attrib | pseudo | negation )+
+type_selector
+         ::= namespace_prefix? element_name
+namespace_prefix
+         ::= ( IDENT | '*' )? '|'
+element_name
+         ::= IDENT
+universal
+         ::= namespace_prefix? '*'
+class    ::= '.' IDENT
+attrib   ::= '[' S* namespace_prefix? IDENT S* ( ( PREFIXMATCH | SUFFIXMATCH | SUBSTRINGMATCH | '=' | INCLUDES | DASHMATCH ) S* ( IDENT | STRING ) S* )? ']'
+pseudo   ::= ':' ':'? ( IDENT | functional_pseudo )
+functional_pseudo
+         ::= FUNCTION S* expression ')'
+expression
+         ::= ( ( PLUS | '-' | DIMENSION | NUMBER | STRING | IDENT ) S* )+
+negation ::= NOT S* negation_arg S* ')'
+negation_arg
+         ::= type_selector
+           | universal
+           | HASH
+           | class
+           | attrib
+           | pseudo
+
+<?TOKENS?>
+
+ident    ::= [-]? nmstart nmchar*
+name     ::= nmchar+
+nmstart  ::= [_a-z]
+           | nonascii
+           | escape
+nonascii ::= [^#x0000-#x007F]
+unicode  ::= '\' one-to-six-hex-digits ( #x000D #x000A | [ #x000A#x000D#x0009#x000C] )?
+escape   ::= unicode
+           | '\' [^0-9a-f#x000A#x000D#x000C]
+nmchar   ::= [_a-z0-9#x2D]
+           | nonascii
+           | escape
+num      ::= [0-9]+
+           | [0-9]* '.' [0-9]+
+string   ::= string1
+           | string2
+string1  ::= '"' ( [^#x000A#x000D#x000C\"] | '\' nl | nonascii | escape )* '"'
+string2  ::= "'" ( [^#x000A#x000D#x000C\'] | '\' nl | nonascii | escape )* "'"
+nl       ::= #x000A
+           | #x000D #x000A
+           | #x000D
+           | #x000C
+w        ::= [ #x0009#x000D#x000A#x000C]*
+N        ::= 'n'
+           | '\' zero-to-four-zeroes ( '4e' | '6e' ) ( #x000D #x000A | [ #x0009#x000D#x000A#x000C] )?
+           | '\n'
+O        ::= 'o'
+           | '\' zero-to-four-zeroes ( '4f' | '6f' ) ( #x000D #x000A | [ #x0009#x000D#x000A#x000C] )?
+           | '\o'
+T        ::= 't'
+           | '\' zero-to-four-zeroes ( '54' | '74' ) ( #x000D #x000A | [ #x0009#x000D#x000A#x000C] )?
+           | '\t'
+S        ::= [ #x0009#x000D#x000A#x000C]+
+INCLUDES ::= '~='
+DASHMATCH
+         ::= '|='
+PREFIXMATCH
+         ::= '^='
+SUFFIXMATCH
+         ::= '$='
+SUBSTRINGMATCH
+         ::= '*='
+IDENT    ::= ident
+STRING   ::= string
+FUNCTION ::= ident '('
+NUMBER   ::= num
+HASH     ::= '#' name
+PLUS     ::= w '+'
+GREATER  ::= w '>'
+COMMA    ::= w ','
+TILDE    ::= w '~'
+NOT      ::= ':' N O T '('
+DIMENSION
+         ::= num ident
+one-to-six-hex-digits
+         ::= [0-9a-f]
+           | [0-9a-f] [0-9a-f]
+           | [0-9a-f] [0-9a-f] [0-9a-f]
+           | [0-9a-f] [0-9a-f] [0-9a-f] [0-9a-f]
+           | [0-9a-f] [0-9a-f] [0-9a-f] [0-9a-f] [0-9a-f]
+           | [0-9a-f] [0-9a-f] [0-9a-f] [0-9a-f] [0-9a-f] [0-9a-f]
+zero-to-four-zeroes
+         ::=
+           | '0'
+           | '00'
+           | '000'
+           | '0000'

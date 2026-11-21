@@ -1,0 +1,5 @@
+     A          R CUSTREC                   TEXT('CUSTOMER RECORD')
+     A            CUSTNO         6S 0       COLHDG('CUST' 'NUMBER')
+     A            CUSTNAME      30          COLHDG('NAME')
+     A            BALANCE        9P 2       COLHDG('BALANCE')
+     A          K CUSTNO

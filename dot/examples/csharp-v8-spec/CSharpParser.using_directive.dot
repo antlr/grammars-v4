@@ -1,0 +1,18 @@
+digraph ATN {
+rankdir=LR;
+s505[fontsize=11, label="505", shape=doublecircle, fixedsize=true, width=.6];
+s2816[fontsize=11,label="&larr;\n2816", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s504[fontsize=11,label="504", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2812[fontsize=11,label="2812", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2813[fontsize=11,label="2813", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2814[fontsize=11,label="2814", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2815[fontsize=11,label="{&rarr;\n2815\nd=259|{<p0>|<p1>|<p2>}}", shape=record, fixedsize=false, peripheries=1];
+s504 -> s2815 [fontname="Times-Italic", label="&epsilon;"];
+s2815:p0 -> s2812 [fontname="Times-Italic", label="&epsilon;"];
+s2815:p1 -> s2813 [fontname="Times-Italic", label="&epsilon;"];
+s2815:p2 -> s2814 [fontname="Times-Italic", label="&epsilon;"];
+s2812 -> s2816 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<using_alias_directive>", arrowhead = normal];
+s2813 -> s2816 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<using_namespace_directive>", arrowhead = normal];
+s2814 -> s2816 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<using_static_directive>", arrowhead = normal];
+s2816 -> s505 [fontname="Times-Italic", label="&epsilon;"];
+}

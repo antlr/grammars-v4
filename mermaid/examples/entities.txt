@@ -1,0 +1,5 @@
+erDiagram
+    Standalone
+    Empty {
+    }
+    "Customer Account" ||--o{ ORDER : "places an order"

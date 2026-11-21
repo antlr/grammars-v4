@@ -1,4 +1,4 @@
-# Ada 2012 ANTLR Grammar
+# Ada 2012 Grammar
 
 This is an ANTLR4 grammar for the Ada 2012 programming language,
 based on the [Ada Reference Manual](http://www.ada-auth.org/standards/12rm/html/RM-TOC.html).
@@ -51,7 +51,7 @@ The parser base class implements the following command-line options:
 | `--output-symbol-table` | Output the symbol table to stderr after parsing completes. Shows all non-predefined symbols with their classification and source location. |
 | `--output-applied-occurrences` | Output applied occurrences (identifier references) to stderr as they are resolved. |
 
-## Peformance
+## Performance
 
 <img src="./times.svg">
 

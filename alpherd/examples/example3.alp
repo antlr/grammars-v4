@@ -1,0 +1,7 @@
+begin
+    var total:int = 0;
+    for i from range(1, 5) do
+        assert {i >= 1 and i <= 5};
+        @:=(total, @+(total, i))
+    od
+end

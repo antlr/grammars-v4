@@ -1,0 +1,11 @@
+"   example1 -- simple module header
+    name    example1
+    entry   start
+    include apte
+
+start:
+    eppbp   pds$apt_ptr,*   "get own apt pointer
+    tra     done            "branch to done
+
+done:
+    ret

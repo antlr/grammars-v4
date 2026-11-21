@@ -1,0 +1,5 @@
+HETATM    1  C1  LIG A   1       0.000   0.000   0.000  1.00 10.00           C
+HETATM    2  O1  LIG A   1       1.200   0.000   0.000  1.00 10.00           O
+CONECT    1    2
+CONECT    2    1
+END

@@ -130,6 +130,20 @@ export default class CParserBase extends antlr4.Parser {
         const lt1 = this._input.LT(1);
         const text = lt1.text;
         if (this._debug) console.log("IsDeclarationSpecifier " + lt1);
+        if (lt1.type === CLexer.Identifier && this._ctx instanceof CParser.DeclarationSpecifiersContext) {
+            const dsCtx = this._ctx;
+            const resolvedId = this._resolveWithOutput(lt1);
+            if (resolvedId !== null && !resolvedId.predefined
+                    && !resolvedId.classification.has(TypeClassification.Variable_)
+                    && !resolvedId.classification.has(TypeClassification.Function_)) {
+                const specList = dsCtx.declarationSpecifier() ?? null;
+                if (specList) {
+                    for (const spec of specList) {
+                        if (spec.typeSpecifier() != null) return false;
+                    }
+                }
+            }
+        }
         const result = this.IsStorageClassSpecifier()
             || this.IsTypeSpecifier()
             || this.IsTypeQualifier()
@@ -531,7 +545,19 @@ export default class CParserBase extends antlr4.Parser {
         if (resolved === null) {
             result = true;
         } else if (resolved.classification.has(TypeClassification.TypeQualifier_) || resolved.classification.has(TypeClassification.TypeSpecifier_)) {
-            result = false;
+            if (lt1.type === CLexer.Identifier && resolved.classification.has(TypeClassification.TypeSpecifier_)) {
+                if (this._ctx instanceof CParser.DeclarationContext) {
+                    const declCtx = this._ctx;
+                    const dsCtx = declCtx.declarationSpecifiers();
+                    const specList = dsCtx?.declarationSpecifier() ?? null;
+                    if (specList) {
+                        for (const spec of specList) {
+                            if (spec.typeSpecifier() != null) { result = true; break; }
+                        }
+                    }
+                }
+            }
+            if (!result) result = false;
         } else {
             result = true;
         }

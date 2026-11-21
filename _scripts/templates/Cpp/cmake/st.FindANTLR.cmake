@@ -82,12 +82,12 @@ find_package(Java QUIET COMPONENTS Runtime)
         OUTPUT ${ANTLR_${Name}_OUTPUTS}
 <if(antlrng_tool)>
 <if(os_win)>
-        COMMAND pwsh -c tsx ${HOME}/antlr-ng/cli/runner.ts
+        COMMAND pwsh -c tsx ${HOME}/antlr-ng/cli/runner.ts --encoding utf-8
 <else>
-        COMMAND pwsh -c tsx $ENV{HOME}/antlr-ng/cli/runner.ts
+        COMMAND pwsh -c tsx $ENV{HOME}/antlr-ng/cli/runner.ts --encoding utf-8
 <endif>
 <else>
-        COMMAND antlr4<if(os_win)>.exe<else><endif> -v ${ANTLR4_TAG}
+        COMMAND antlr4<if(os_win)>.exe<else><endif> -v ${ANTLR4_TAG} -encoding utf-8
 <endif>
                 -o ${ANTLR_${Name}_OUTPUT_DIR}
                 -Dlanguage=Cpp
@@ -99,5 +99,11 @@ find_package(Java QUIET COMPONENTS Runtime)
                 ${ANTLR_TARGET_DEPENDS}
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         COMMENT "Building ${Name} with ANTLR")
-  endmacro(ANTLR_TARGET)
 
+    if(NOT TARGET antlr_warning_inventory)
+      add_custom_target(antlr_warning_inventory)
+    endif()
+    add_custom_target(antlr_warning_inventory_${Name}
+                      DEPENDS ${ANTLR_${Name}_OUTPUTS})
+    add_dependencies(antlr_warning_inventory antlr_warning_inventory_${Name})
+  endmacro(ANTLR_TARGET)

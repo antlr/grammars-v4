@@ -1,0 +1,2 @@
+sSong	/audio/song.wav	gopher.example.com	70
+.

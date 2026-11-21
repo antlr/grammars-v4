@@ -41,6 +41,7 @@ SymbolTable::SymbolTable() {
     define(createSymbol("float", {TypeClassification::TypeSpecifier_}));
     define(createSymbol("double", {TypeClassification::TypeSpecifier_}));
     define(createSymbol("signed", {TypeClassification::TypeSpecifier_}));
+    define(createSymbol("__signed__", {TypeClassification::TypeSpecifier_}));
     define(createSymbol("unsigned", {TypeClassification::TypeSpecifier_}));
     define(createSymbol("_BitInt", {TypeClassification::TypeSpecifier_}));
     define(createSymbol("bool", {TypeClassification::TypeSpecifier_}));
@@ -105,6 +106,10 @@ SymbolTable::SymbolTable() {
     define(createSymbol("_Float32", {TypeClassification::TypeSpecifier_}));  // gcc
     define(createSymbol("_Float64", {TypeClassification::TypeSpecifier_}));  // gcc
     define(createSymbol("_Float128", {TypeClassification::TypeSpecifier_})); // gcc
+    define(createSymbol("_Float16x", {TypeClassification::TypeSpecifier_}));  // gcc
+    define(createSymbol("_Float32x", {TypeClassification::TypeSpecifier_}));  // gcc
+    define(createSymbol("_Float64x", {TypeClassification::TypeSpecifier_}));  // gcc
+    define(createSymbol("_Float128x", {TypeClassification::TypeSpecifier_})); // gcc
     define(createSymbol("__v8hf", {TypeClassification::TypeSpecifier_}));    // gcc
     define(createSymbol("__bf16", {TypeClassification::TypeSpecifier_}));    // gcc
     define(createSymbol("__v16bf", {TypeClassification::TypeSpecifier_}));   // gcc

@@ -1,0 +1,9 @@
+OBJECT point
+  x : LONG
+  y : LONG
+ENDOBJECT
+
+PROC main()
+  DEF p : point
+  p.x := 1
+ENDPROC

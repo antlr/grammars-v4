@@ -1,0 +1,2 @@
+Point >> + aPoint
+    ^ Point new x: x + aPoint x y: y + aPoint y

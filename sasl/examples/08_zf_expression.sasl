@@ -1,0 +1,5 @@
+squares
+where
+   squares = { a*a ; a <- x };
+   x = 1, 2, 3, 4, 5
+?

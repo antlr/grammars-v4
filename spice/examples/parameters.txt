@@ -1,0 +1,7 @@
+* Arithmetic inside parameter expressions
+.param base=1000 scale=2
+V1 in 0 5
+R1 in out {base * scale + 10}
+R2 out 0 {base / (scale + 1)}
+.op
+.end

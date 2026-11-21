@@ -168,3 +168,23 @@ SELECT * FROM t PIVOT(SUM(amount) FOR quarter IN (
         ORDER BY quarter))
   ORDER BY empid;
   SELECT * FROM t PIVOT(SUM(amount) FOR quarter IN (ANY) DEFAULT ON NULL (IFF(c3 % 2 = 0 ,1,-1)));
+
+WITH LOCATION as ( SELECT 1 as LOCATION)
+SELECT LOCATION.LOCATION as LOCATION
+FROM LOCATION;
+
+SELECT COUNT(accounts.account_id) FROM accounts;
+SELECT accounts.name FROM db1.public.accounts AS accounts WHERE accounts.id > 0;
+
+SELECT geo, origin, returns, suspended, system, transactions FROM t;
+SELECT COUNT(transactions.id), SUM(transactions.amount) FROM db1.public.transactions AS transactions;
+SELECT returns.order_id, origin.name AS origin FROM returns JOIN origin ON returns.origin_id = origin.id;
+SELECT geo.name, IFF(geo.suspended, 'off', 'on') AS state FROM geo WHERE geo.region = 'EU';
+SELECT system.id FROM system;
+SELECT * FROM t SAMPLE SYSTEM (10);
+SELECT * FROM t AS system TABLESAMPLE SYSTEM (10) SEED (42);
+SELECT EXTRACT(year FROM order_date) FROM orders;
+SELECT EXTRACT(dayofweek FROM o.order_date) AS dow, DATE_PART(month FROM o.order_date) AS m FROM orders o;
+SELECT SUM(EXTRACT(day FROM order_date)), DATE_PART(quarter FROM CAST(order_ts AS date)) FROM orders GROUP BY 2;
+SELECT EXTRACT(year, order_date), DATE_PART(year, order_date), DATE_PART('year', order_date) FROM orders;
+SELECT extract, t.extract AS extract FROM t;

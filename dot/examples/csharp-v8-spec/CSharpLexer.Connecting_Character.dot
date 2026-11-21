@@ -1,0 +1,15 @@
+digraph ATN {
+rankdir=LR;
+s366[fontsize=11, label="366", shape=doublecircle, fixedsize=true, width=.6];
+s1536[fontsize=11,label="&larr;\n1536", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s365[fontsize=11,label="365", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1533[fontsize=11,label="1533", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1534[fontsize=11,label="1534", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1535[fontsize=11,label="{&rarr;\n1535\nd=22|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s365 -> s1535 [fontname="Times-Italic", label="&epsilon;"];
+s1535:p0 -> s1533 [fontname="Times-Italic", label="&epsilon;"];
+s1535:p1 -> s1534 [fontname="Times-Italic", label="&epsilon;"];
+s1533 -> s1536 [fontsize=11, fontname="Courier", arrowsize=.7, label = "{'_', '‿'..'⁀', '⁔', '︳'..'︴', '﹍'..'﹏', '＿'}", arrowhead = normal];
+s1534 -> s1536 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<Unicode_Escape_Sequence>", arrowhead = normal];
+s1536 -> s366 [fontname="Times-Italic", label="&epsilon;"];
+}

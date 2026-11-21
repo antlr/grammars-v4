@@ -1,0 +1,6 @@
+( Writing a byte to the console/write device port, and reading the
+  system/state device port back. )
+
+#18 DEO
+
+.System/state DEI

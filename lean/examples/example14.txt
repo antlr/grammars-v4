@@ -1,0 +1,6 @@
+variable (n m : Nat)
+variable {α : Type} [Monoid α]
+
+abbrev Nat' := Nat
+
+axiom choice_ax : ∀ (α : Type), α → α

@@ -1,0 +1,8 @@
+(* lists, subscripting and references *)
+begin new a; new b;
+a <- (1, 2, 3);
+a[1] <- a[2];
+b <- @a[2];
+b. <- "garf";
+out length a
+end

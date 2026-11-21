@@ -4,7 +4,7 @@
 # grammar built in ../Generated-CSharp.
 #
 # Pre-requisites (run once from csharp/v8-spec/ before calling this script):
-#   dotnet trgen -t CSharp
+#   dotnet trash gen -t CSharp
 #   cd Generated-CSharp && bash build.sh
 #
 # Usage:  bash test.sh
@@ -56,7 +56,7 @@ if [ -z "$TEST_EXE" ]; then
   error: Test.exe not found under $GENERATED_DIR/bin
   Build it first:
     cd "$SCRIPT_DIR/.."
-    dotnet trgen -t CSharp
+    dotnet trash gen -t CSharp
     cd Generated-CSharp && bash build.sh
 MSG
     exit 1

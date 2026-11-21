@@ -1,0 +1,10 @@
+#PLAYER 1
+#MIDIFILE background.mid
+#TITLE MIDI Background Test
+#ARTIST Example
+#BPM 130
+#PLAYLEVEL 3
+#VOLWAV 100
+
+#00101:0A
+#00111:0A000A00

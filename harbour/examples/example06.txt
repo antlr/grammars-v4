@@ -1,0 +1,8 @@
+FUNCTION SumTo( nLimit )
+   LOCAL nI := 1
+   LOCAL nSum := 0
+   DO WHILE nI <= nLimit
+      nSum := nSum + nI
+      nI := nI + 1
+   ENDDO
+   RETURN nSum

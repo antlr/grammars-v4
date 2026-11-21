@@ -1,0 +1,7 @@
+label {
+    text: "Hello, \"CCS\"";
+    font: 'serif';
+    color: #f00;
+    background-color: #00FF00;
+    border: none;
+};

@@ -1,0 +1,2 @@
+FUNCTION Add( nA, nB )
+   RETURN nA + nB

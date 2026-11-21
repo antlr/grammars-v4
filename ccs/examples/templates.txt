@@ -1,0 +1,6 @@
+/* Save a selector rule and use parameterized style names. */
+highlight = .selected {
+    transition(1s, 2s): 0, 1;
+    padding: 1, 2, 3, 4;
+};
+highlight;

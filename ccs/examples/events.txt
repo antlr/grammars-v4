@@ -1,0 +1,4 @@
+button {
+    on_click: { color: #f00; };
+    on_hover: ^ { opacity: .5; };
+};

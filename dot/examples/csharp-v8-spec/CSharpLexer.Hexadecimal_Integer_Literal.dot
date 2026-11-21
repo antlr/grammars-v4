@@ -1,0 +1,37 @@
+digraph ATN {
+rankdir=LR;
+s380[fontsize=11, label="380", shape=doublecircle, fixedsize=true, width=.6];
+s1585[fontsize=11,label="1585", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1586[fontsize=11,label="1586", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1587[fontsize=11,label="1587", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1588[fontsize=11,label="1588", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1589[fontsize=11,label="{&rarr;\n1589\nd=29|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1590[fontsize=11,label="&larr;\n1590", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1591[fontsize=11,label="1591", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1592[fontsize=11,label="&rarr;\n1592+", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1593[fontsize=11,label="&larr;\n1593", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1594[fontsize=11,label="{1594+\nd=30|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s379[fontsize=11,label="379", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1595[fontsize=11,label="1595", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1596[fontsize=11,label="1596", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1597[fontsize=11,label="{&rarr;\n1597\nd=31|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1598[fontsize=11,label="&larr;\n1598", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s379 -> s1589 [fontname="Times-Italic", label="&epsilon;"];
+s1589:p0 -> s1585 [fontname="Times-Italic", label="&epsilon;"];
+s1589:p1 -> s1587 [fontname="Times-Italic", label="&epsilon;"];
+s1585 -> s1586 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'0'", arrowhead = normal];
+s1587 -> s1588 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'0'", arrowhead = normal];
+s1586 -> s1590 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'x'", arrowhead = normal];
+s1588 -> s1590 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'X'", arrowhead = normal];
+s1590 -> s1592 [fontname="Times-Italic", label="&epsilon;"];
+s1592 -> s1591 [fontname="Times-Italic", label="&epsilon;"];
+s1591 -> s1593 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<Decorated_Hex_Digit>", arrowhead = normal];
+s1593 -> s1594 [fontname="Times-Italic", label="&epsilon;"];
+s1594:p0 -> s1592 [fontname="Times-Italic", label="&epsilon;", style="dashed"];
+s1594:p1 -> s1595 [fontname="Times-Italic", label="&epsilon;"];
+s1595 -> s1597 [fontname="Times-Italic", label="&epsilon;"];
+s1597:p0 -> s1596 [fontname="Times-Italic", label="&epsilon;"];
+s1597:p1 -> s1598 [fontname="Times-Italic", label="&epsilon;"];
+s1596 -> s1598 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<Integer_Type_Suffix>", arrowhead = normal];
+s1598 -> s380 [fontname="Times-Italic", label="&epsilon;"];
+}

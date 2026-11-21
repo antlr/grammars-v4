@@ -1,4 +1,4 @@
-# OCL Antlr Grammar
+# OCL Grammar
 
 This repository provides grammars for the Object Constraint Language (OCL) 2.4, along with its integration with UML-RSDS, a tool supporting UML 2.5 class diagram notation and OCL 2.4. These grammars aim to enhance the precision and usability of OCL while making it easier to integrate with UML modeling tools.
 
@@ -56,4 +56,3 @@ Feel free to contribute to this repository or suggest additional grammars and to
 
 ## Reference
 * [pldb](http://pldb.info/concepts/ocl)
-

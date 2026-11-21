@@ -1,0 +1,77 @@
+;
+;
+;
+;
+;		Title		Binary to hex ASCII
+;		Name:		BN2HEX
+;
+;
+;		Purpose:	Convert one byte of binary data
+;				to two ASCII characters
+;
+;		Entry:		Register A = Binary data
+;
+;		Exit:		Register H = ASCII more significant digit
+;				Register L = ASCII less significant digit
+;
+;		Registers used:	AF,B,HL
+;
+;		Time:		Approximately 162 cycles
+;
+;		Size:		Program 28 bytes
+;
+;
+
+BN2HEX:
+	;CONVERT HIGH NIBBLE
+	LD	B,A		;SAVE ORGINAL BINARY VALUE
+	AND	0F0H		;GET HIGH NIBBLE
+	RRCA			;MOVE HIGH NIBBLE TO LOW NIBBLE
+	RRCA
+	RRCA
+	RRCA
+	CALL	NASCII		;CONVERT HIGH NIBBLE TO ASCII
+	LD	H,A		;RETURN HIGH NIBBLE IN H
+	
+	;CONVERT LOW NIBBLE
+	LD	A,B
+	AND	0FH		;GET LOW NIBBLE
+	CALL	NASCII		;CONVERT LOW NIBBLE TO ASCII
+	LD	L,A		;RETURN LOW NIBBLE IN L
+	
+	;----------------------------------
+	;SUBROUTINE ASCII
+	;PURPOSE: CONVERT A HEXADECIMAL DIGIT TO ASCII
+	;ENTRY: A = ASCII CHARACTER
+	;REGISTERS USED: A,F
+	;----------------------------------
+NASCII:
+	CP	10
+	JR	C,NAS1		;JUMP IF HIGH NIBBLE < 10
+	ADD	A,7		;ELSE ADD 7 SO AFTER ADDING '0' THE
+				; CHARACTER WILL BE IN 'A'..'F'
+NAS1:
+	ADD	A,'0'		;ADD ASCII 0 TO MAKE A CHARACTER
+	RET
+;
+;
+;	SAMPLE EXECUTION:
+;
+;
+
+SC4C:
+	;CONVERT 0 TO '00'
+	LD	A,0
+	CALL	BN2HEX		;H='0'=30H, L='0'=30H
+	
+	;CONVERT FF HEX TO 'FF'
+	LD	A,0FFH
+	CALL	BN2HEX		;H='F'=46H, L ='F'=46H
+	
+	;CONVERT 23 HEX TO '23'
+	LD	A,23H
+	CALL	BN2HEX		;H='2'=32H, L='3'=33H
+	
+	JR	SC4C
+	
+	END

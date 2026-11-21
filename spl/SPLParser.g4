@@ -25,86 +25,87 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
 parser grammar SPLParser;
 
-options { tokenVocab = SPLLexer; }
 
-query 
-    : initCommand (PIPE nextCommand)* EOF
-    ;
+options { tokenVocab = SPLLexer; }
+query
+   : initCommand (PIPE nextCommand)* EOF
+   ;
 
 initCommand
-    : PIPE? INIT_COMMAND? operation+ subquery?
-    ;
+   : PIPE? INIT_COMMAND? operation+ subquery?
+   ;
 
 nextCommand
-    : command operation+ subquery?
-    ;
+   : command operation+ subquery?
+   ;
 
 subquery
-    : LBRACK initCommand (PIPE nextCommand)* RBRACK
-    ;
+   : LBRACK initCommand (PIPE nextCommand)* RBRACK
+   ;
 
 operation
-    : operation AND operation
-    | operation OR operation
-    | expression LIKE value
-    | expression IN LPAREN (expression (COMMA expression)*)? RPAREN
-    | NOT operation
-    | expression (OUTPUT | OUTPUTNEW) id
-    | expression expression OUTPUT id COMMA id
-    | expression expression expression (OUTPUT | OUTPUTNEW) id COMMA id COMMA id
-    | BY (id)+
-    | expression AS id
-    | id (EQ | NE | GT | LT | GE | LE) expression
-    | expression
-    | LPAREN operation RPAREN
-    ;
+   : operation AND operation
+   | operation OR operation
+   | expression LIKE value
+   | expression IN LPAREN (expression (COMMA expression)*)? RPAREN
+   | NOT operation
+   | expression (OUTPUT | OUTPUTNEW) id
+   | expression expression OUTPUT id COMMA id
+   | expression expression expression (OUTPUT | OUTPUTNEW) id COMMA id COMMA id
+   | BY (id)+
+   | expression AS id
+   | id (EQ | NE | GT | LT | GE | LE) expression
+   | expression
+   | LPAREN operation RPAREN
+   ;
 
 expression
-    : function LPAREN (expression (COMMA expression)*)? RPAREN  // function call
-    | LPAREN expression RPAREN                                  // paren
-    | <assoc = right> expression POW expression                 // power
-    | expression (MULT | MOD) expression                        // mult, div, mod
-    | expression DIV expression                                 // div, path
-    | MULT expression MULT                                      // wildcard
-    | MULT expression                                           // wildcard
-    | expression MULT                                           // wildcard
-    | MULT                                                      // wildcard
-    | (DIV id)+                                                 // path
-    | expression (ADD | SUB) expression                         // add, sub
-    | value                                                     // value
-    ;
+   : function LPAREN (expression (COMMA expression)*)? RPAREN // function call
+   | LPAREN expression RPAREN // paren
+   | < assoc = right > expression POW expression // power
+   | expression (MULT | MOD) expression // mult, div, mod
+   | expression DIV expression // div, path
+   | MULT expression MULT // wildcard
+   | MULT expression // wildcard
+   | expression MULT // wildcard
+   | MULT // wildcard
+   | (DIV id)+ // path
+   | expression (ADD | SUB) expression // add, sub
+   | value // value
+   
+   ;
 
 value
-    : date
-    | STRING
-    | id
-    | (ADD | SUB)? NUMBER
-    ;
+   : date
+   | STRING
+   | id
+   | (ADD | SUB)? NUMBER
+   ;
 
 date
-    : QUOTE? TIME_AND_FUNCTION QUOTE?
-    | TIME
-    ;
+   : QUOTE? TIME_AND_FUNCTION QUOTE?
+   | TIME
+   ;
 
 id
-    : IDENTIFIER
-    | command
-    | function
-    ;
+   : IDENTIFIER
+   | command
+   | function
+   ;
 
 function
-    : FUNCTION
-    | STD_COMMAND_AND_FUNCTION
-    | MODIFIER_AND_FUNCTION
-    | TIME_AND_FUNCTION
-    | LIKE
-    ;
+   : FUNCTION
+   | STD_COMMAND_AND_FUNCTION
+   | MODIFIER_AND_FUNCTION
+   | TIME_AND_FUNCTION
+   | LIKE
+   ;
 
 command
-    : INIT_COMMAND
-    | STD_COMMAND
-    | STD_COMMAND_AND_FUNCTION
-    ;
+   : INIT_COMMAND
+   | STD_COMMAND
+   | STD_COMMAND_AND_FUNCTION
+   ;
+

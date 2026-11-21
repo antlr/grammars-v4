@@ -1,0 +1,35 @@
+{ Grammar for EBNF as Wirth uses it.  
+
+  From Niklaus Wirth, Grundlagen und Techniken des Compilerbaus (Bonn:
+  Addison-Wesley, 1996, p. 8..
+
+  Rules for ws added for convenience; Wirth assumes the lexer eats
+  whitespace.
+
+  Marks added to suppress literals which are redundant in the XML.
+  (But note that the distinction among the three kinds of braces is
+  not redundant.)
+
+}
+
+syntax:  S?, production**S, S?.
+production: identifier, S?, -"=", S?, expression, S?, -".".
+expression: term++(S?, -"|", S?).
+term: factor++S.
+factor: identifier; string;
+"(", S?, expression, S?, ")";
+"[", S?, expression, S?, "]";
+"{", S?, expression, S?, "}".
+
+identifier: letter, (letter; digit)*.
+string: -'"', character*, -'"'.
+-letter: ["A"-"Z"; "a"-"z"].
+-digit: ["0"-"9"].
+
+{ Wirth does not define character. }
+-character: ~['"'].
+
+{ Wirth does not define empty-set symbol. }
+nil: .
+
+-S: -[" "; #09; #0A; #0D]+.

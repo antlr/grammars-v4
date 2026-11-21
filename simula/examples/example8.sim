@@ -1,0 +1,9 @@
+begin
+    class Point(x, y); integer x, y;
+    begin
+        integer sum;
+        sum := x + y
+    end;
+    ref(Point) p;
+    p :- new Point(3, 4)
+end

@@ -1,0 +1,10 @@
+PolicyStatement : [
+{
+  "Id" : "Policy3",
+  "Type": "O+",
+  "Who": "Admin",
+  "Action": ["CREATE", "DELETE", "UPDATE"],
+  "What" : {"Resource": "Database"},
+  "Where": {"Origin": ["10.0.0.1"]}
+}
+]

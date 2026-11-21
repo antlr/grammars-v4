@@ -1,0 +1,6 @@
+WITH 1 AS a
+UNWIND [1, 2, 3] AS x
+WITH a, x
+MATCH (n)
+WITH n
+RETURN n

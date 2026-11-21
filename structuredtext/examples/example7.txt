@@ -1,0 +1,3 @@
+WHILE x < 100 DO
+    x := x * 2;
+END_WHILE;

@@ -1,0 +1,10 @@
+Guarded : {
+   startCondition : AND ready armed ;
+   repeatUntilCondition : OR done failed ;
+   preCondition : NOT blocked ;
+   postCondition : count > 0 ;
+   invariantCondition : count >= 0 ;
+   endCondition : count <= 10 ;
+   priority : 5 ;
+   assignment : done = true ;
+}

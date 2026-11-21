@@ -1,0 +1,27 @@
+digraph ATN {
+rankdir=LR;
+s157[fontsize=11, label="157", shape=doublecircle, fixedsize=true, width=.6];
+s1360[fontsize=11,label="1360", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1361[fontsize=11,label="1361", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1362[fontsize=11,label="&rarr;\n1362+", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1363[fontsize=11,label="&larr;\n1363", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1364[fontsize=11,label="{1364+\nd=77|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1365[fontsize=11,label="1365", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1366[fontsize=11,label="1366", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1367[fontsize=11,label="1367", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s156[fontsize=11,label="156", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1358[fontsize=11,label="1358", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1359[fontsize=11,label="1359", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s156 -> s1358 [fontname="Times-Italic", label="&epsilon;"];
+s1358 -> s1359 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'('", arrowhead = normal];
+s1359 -> s1362 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<deconstruction_element>", arrowhead = normal];
+s1362 -> s1360 [fontname="Times-Italic", label="&epsilon;"];
+s1360 -> s1361 [fontsize=11, fontname="Courier", arrowsize=.7, label = "','", arrowhead = normal];
+s1361 -> s1363 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<deconstruction_element>", arrowhead = normal];
+s1363 -> s1364 [fontname="Times-Italic", label="&epsilon;"];
+s1364:p0 -> s1362 [fontname="Times-Italic", label="&epsilon;", style="dashed"];
+s1364:p1 -> s1365 [fontname="Times-Italic", label="&epsilon;"];
+s1365 -> s1366 [fontname="Times-Italic", label="&epsilon;"];
+s1366 -> s1367 [fontsize=11, fontname="Courier", arrowsize=.7, label = "')'", arrowhead = normal];
+s1367 -> s157 [fontname="Times-Italic", label="&epsilon;"];
+}

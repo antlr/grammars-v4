@@ -1,0 +1,10 @@
+class Point(x, y)
+    init
+        self.x : x
+        self.y : y
+    end
+
+    function length()
+        return self.x
+    end
+end

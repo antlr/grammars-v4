@@ -6,6 +6,7 @@ import { CLexer } from "./CLexer.js";
 import {
     CParser,
     DeclarationContext,
+    DeclarationSpecifiersContext,
     FunctionDefinitionContext,
     DeclaratorContext
 } from "./CParser.js";
@@ -147,6 +148,17 @@ export abstract class CParserBase extends Parser {
         const lt1 = (this.inputStream as CommonTokenStream).LT(1);
         const text = lt1!.text!;
         if (this.debug) console.log("IsDeclarationSpecifier " + lt1);
+        if (lt1!.type === CLexer.Identifier && this.context instanceof DeclarationSpecifiersContext) {
+            const dsCtx = this.context as DeclarationSpecifiersContext;
+            const resolvedId = this.resolveWithOutput(lt1);
+            if (resolvedId !== null && !resolvedId.predefined
+                    && !resolvedId.classification.has(TypeClassification.Variable_)
+                    && !resolvedId.classification.has(TypeClassification.Function_)) {
+                for (const spec of dsCtx.declarationSpecifier()) {
+                    if (spec.typeSpecifier() != null) return false;
+                }
+            }
+        }
         const result = this.IsStorageClassSpecifier()
             || this.IsTypeSpecifier()
             || this.IsTypeQualifier()
@@ -557,7 +569,19 @@ export abstract class CParserBase extends Parser {
         if (resolved === null) {
             result = true;
         } else if (resolved.classification.has(TypeClassification.TypeQualifier_) || resolved.classification.has(TypeClassification.TypeSpecifier_)) {
-            result = false;
+            if (lt1!.type === CLexer.Identifier && resolved.classification.has(TypeClassification.TypeSpecifier_)) {
+                if (this.context instanceof DeclarationContext) {
+                    const declCtx = this.context as DeclarationContext;
+                    const dsCtx = declCtx.declarationSpecifiers();
+                    const specList = dsCtx?.declarationSpecifier() ?? null;
+                    if (specList) {
+                        for (const spec of specList) {
+                            if (spec.typeSpecifier() != null) { result = true; break; }
+                        }
+                    }
+                }
+            }
+            if (!result) result = false;
         } else {
             result = true;
         }

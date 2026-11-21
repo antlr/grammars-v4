@@ -1,0 +1,3 @@
+Host_Alias      LAN = mario.host.com, lucy.host.com
+Host_Alias      SRV = black.host.com, smokie.host.com, frankie.host.com
+Host_Alias      MAIL = tanya.host.com

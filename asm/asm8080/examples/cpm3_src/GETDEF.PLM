@@ -1,0 +1,339 @@
+$title('GENCPM Token File parser')
+get$sys$defaults:
+do;
+
+/*
+  Copyright (C) 1982
+  Digital Research
+  P.O. Box 579
+  Pacific Grove, CA 93950
+*/
+
+/*
+    Revised:
+      20 Sept 82  by Bruce Skidmore
+*/
+
+  declare true literally '0FFH';
+  declare false literally '0';
+  declare forever literally 'while true';
+  declare boolean literally 'byte';
+  declare cr literally '0dh';
+  declare lf literally '0ah';
+  declare tab literally '09h';
+
+/*
+    D a t a    S t r u c t u r e s
+*/
+
+  declare data$fcb (36) byte external;
+
+  declare quest (156) boolean external;
+
+  declare display boolean external;
+
+  declare symbol (8) byte;
+  
+  declare lnbfr (14) byte external;
+
+  declare buffer (128) byte at (.memory);
+ 
+  declare symtbl (20) structure(
+    token(8) byte,
+    len      byte,
+    flags    byte,
+    qptr     byte,
+    ptr      address) external;
+
+  mon1:
+    procedure (func,info) external;
+      declare func byte;
+      declare info address;
+    end mon1;
+
+  mon2:
+    procedure (func,info) byte external;
+      declare func byte;
+      declare info address;
+    end mon2;
+
+/*
+     B D O S    P r o c e d u r e   &   F u n c t i o n    C a l l s
+*/
+
+  system$reset:
+    procedure external;
+    end system$reset;
+
+  write$console:
+    procedure (char) external;
+      declare char byte;
+    end write$console;
+
+  print$console$buffer:
+    procedure (buffer$address) external;
+      declare buffer$address address;
+    end print$console$buffer;
+
+  open$file:
+    procedure (fcb$address) byte external;
+      declare fcb$address address;
+      declare fcb based fcb$address (1) byte;
+    end open$file;
+
+  close$file:
+    procedure (fcb$address) external;
+      declare fcb$address address;
+    end close$file;
+
+  set$DMA$address:
+    procedure (DMA$address) external;
+      declare DMA$address address;
+    end set$DMA$address;
+
+  crlf:
+    procedure external;
+    end crlf;
+
+  dsply$dec$adr:
+    procedure (val) external;
+      declare val address;
+    end dsply$dec$adr;
+    
+/*
+     M a i n   G E T D E F   P r o c e d u r e
+*/
+ getdef: 
+  procedure public;
+
+  declare buffer$index byte;
+  declare index byte;
+  declare end$of$file byte;
+  declare line$count address;
+
+  err:
+    procedure(term$code,msg$adr);
+      declare (term$code,save$display) byte;
+      declare msg$adr address;
+
+      save$display = display;
+      display = true;
+      call print$console$buffer(.('ERROR:  $'));
+      call print$console$buffer(msg$adr);
+      call print$console$buffer(.(' at line $'));
+      call dsply$dec$adr(line$count);
+      if term$code then
+        call system$reset;
+      call crlf;
+      display = save$display;
+    end err;
+
+  inc$ptr:
+    procedure;
+
+      if buffer$index = 127 then
+        do;
+          buffer$index = 0;
+          if mon2(20,.data$fcb) <> 0 then
+            end$of$file = true;
+        end;
+      else
+        buffer$index = buffer$index + 1;
+    end inc$ptr;
+
+  get$char:
+    procedure byte;
+     declare char byte;
+
+     call inc$ptr;
+     char = buffer(buffer$index);
+     do while (char = ' ') or (char = tab) or (char = lf);
+       if char = lf then
+         line$count = line$count + 1;
+       call inc$ptr;
+       char = buffer(buffer$index);
+     end;
+     if (char >= 'a') and (char <= 'z') then
+       char = char and 0101$1111b;  /* force upper case */
+     if char = 1ah then
+       end$of$file = true;
+     return char;
+   end get$char;
+
+ get$sym:
+   procedure;
+     declare (i,sym$char) byte;
+     declare got$sym boolean;
+
+     got$sym = false;
+     do while (not got$sym) and (not end$of$file);
+       do i = 0 to 7;
+         symbol(i) = ' ';
+       end;
+       sym$char = get$char;
+       i = 0;
+       do while (i < 8) and (sym$char <> '=') and 
+                (sym$char <> cr) and (not end$of$file);
+         symbol(i) = sym$char;
+         sym$char = get$char;
+         i = i + 1;
+       end;
+       do while (sym$char <> '=') and (sym$char <> cr) and (not end$of$file);
+         sym$char = get$char;
+       end;
+       if not end$of$file then
+         do;
+           if (sym$char = '=') and (i > 0) then
+             got$sym = true;
+           else
+             do;
+               if (sym$char = '=') then
+                 call err(false,.('Missing parameter variable$'));
+               else
+                 if i <> 0 then
+                   call err(false,.('Equals (=) delimiter missing$'));
+               do while (sym$char <> cr) and (not end$of$file);
+                 sym$char = get$char;
+               end;
+             end;
+         end;
+     end;
+   end get$sym;
+
+ get$val:
+   procedure;
+     declare (flags,i,val$char) byte;
+     declare val$adr address;
+     declare val based val$adr byte;
+     declare (base,inc,lnbfr$index) byte;
+
+     val$char = get$char;
+     i = 0;
+     do while (i < lnbfr(0)) and (val$char <> cr) and (not end$of$file);
+       lnbfr(i+2) = val$char;
+       i = i + 1;
+       lnbfr(1) = i;
+       val$char = get$char;
+     end;
+     do while (val$char <> cr) and (not end$of$file);
+       val$char = get$char;
+     end;
+     inc = 0;
+     lnbfr$index = 2;
+     if i > 0 then
+       do;
+         val$adr = symtbl(index).ptr;
+         flags = symtbl(index).flags;
+         if (flags and 8) <> 0 then
+           do;
+             if (flags and 10h) <> 0 then
+               inc = symbol(7) - 'A';
+             else
+               if (symbol(7) >= '0') and (symbol(7) <= '9') then
+                 inc = symbol(7) - '0';
+               else
+                 inc = 10 + (symbol(7) - 'A');
+             val$adr = val$adr + (inc * symtbl(index).len);
+           end;
+         if lnbfr(lnbfr$index) = '?' then
+           do;
+             quest(inc+symtbl(index).qptr) = true;
+             display = true;
+             lnbfr$index = lnbfr$index + 1;
+             lnbfr(1) = lnbfr(1) - 1;
+           end;
+         if lnbfr(1) > 0 then
+           do;
+             if (flags and 1) <> 0 then
+               do;
+                  if (lnbfr(lnbfr$index) >= 'A') and 
+                     (lnbfr(lnbfr$index) <= 'P') then
+                    val = lnbfr(lnbfr$index) - 'A';
+                  else
+                    call err(false,.('Invalid drive ignored$'));
+               end;
+             else
+               if (flags and 2) <> 0 then
+                 do;
+                   val = (lnbfr(lnbfr$index) = 'Y');
+                 end;
+               else
+                 do;
+                   base = 16;
+                   val = 0;
+                   do i = 0 to lnbfr(1) - 1;
+                     val$char = lnbfr(i+lnbfr$index);
+                     if val$char = ',' then
+                       do;
+                         val$adr = val$adr + 1;
+                         val = 0;
+                         base = 16;
+                       end;
+                     else
+                       do;
+                         if val$char = '#' then
+                           base = 10;
+                         else
+                           do;
+                             val$char = val$char - '0';
+                             if (base = 16) and (val$char > 9) then
+                               do;
+                                 if val$char > 16 then
+                                   val$char = val$char - 7;
+                                 else
+                                   val$char = 0ffh;
+                               end;
+                             if val$char < base then
+                               val = val * base + val$char;
+                             else
+                               call err(false,.('Invalid character$'));
+                           end;
+                       end;
+                   end;
+                 end;
+           end;
+      end;
+    end get$val;
+
+ compare$sym:
+  procedure byte;
+    declare (i,j) byte;
+    declare found boolean;
+
+    found = false;
+    i = 0;
+    do while ((i < 22) and (not found));
+      j = 0;
+      do while ((j < 7) and (symtbl(i).token(j) = symbol(j)));
+        j = j + 1;
+      end;
+      if j = 7 then
+        found = true;
+      else
+        i = i + 1;
+    end;
+    if not found then
+      return 0ffh;
+    else
+      return i;
+  end compare$sym;
+    
+    line$count = 1;
+    call set$dma$address(.buffer);
+    buffer$index = 127;
+    end$of$file = false;
+    do while (not end$of$file);
+      call get$sym;
+      if not end$of$file then
+        do;
+          index = compare$sym;
+          if index <> 0ffh then
+            call get$val;
+          else
+            call err(false,.('Invalid parameter variable$'));
+        end;
+    end;
+
+  end getdef;
+end get$sys$defaults;
+

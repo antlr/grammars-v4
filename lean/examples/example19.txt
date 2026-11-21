@@ -1,0 +1,2 @@
+def clamp (n : Nat) : Nat :=
+  if n > 100 then 100 else n

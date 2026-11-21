@@ -1,0 +1,4 @@
+| fib |
+fib := nil.
+fib := [:n | n < 2 ifTrue: [n] ifFalse: [(fib value: n - 1) + (fib value: n - 2)]].
+Transcript showCr: (fib value: 10) printString.

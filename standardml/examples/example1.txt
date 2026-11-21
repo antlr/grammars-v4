@@ -1,0 +1,3 @@
+(* A Standard ML program consists of declarations, e.g. value declarations: *)
+
+val rent = 1200

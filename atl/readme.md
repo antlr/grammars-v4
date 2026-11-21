@@ -1,4 +1,4 @@
-# Atl
+# ATL Grammar
 
 ## Reference
 

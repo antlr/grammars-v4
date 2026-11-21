@@ -1,0 +1,4 @@
+REPEAT
+    counter := counter + 1;
+UNTIL counter >= 10
+END_REPEAT;

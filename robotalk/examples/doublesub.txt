@@ -1,0 +1,22 @@
+# Demonstration Robot
+Main:
+5
+# the number to double
+DoubleSub CALL # double it
+DROP
+# discard it
+Main JUMP
+# repeat forever...
+DoubleSub:
+r' STORE
+2 *
+r
+RETURN
+
+# An alternative (better) method of writing DoubleSub would use stack
+# manipulation commands, saving an instruction:
+AltDoubleSub:
+SWAP
+2 *
+SWAP
+RETURN

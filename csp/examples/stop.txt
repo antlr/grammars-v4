@@ -1,0 +1,2 @@
+-- The simplest possible process: one that deadlocks immediately.
+P = STOP

@@ -1,0 +1,10 @@
+PolicyStatement : [
+{
+  "Id" : "Policy5",
+  "Type": "A+",
+  "Who": "Auditor",
+  "Action": ["VIEW"],
+  "What" : {"Resource": "Logs"},
+  "When": "timeAfter": {"time": "6PM"}
+}
+]

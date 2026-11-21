@@ -1,0 +1,26 @@
+digraph ATN {
+rankdir=LR;
+s311[fontsize=11, label="311", shape=doublecircle, fixedsize=true, width=.6];
+s310[fontsize=11,label="310", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2071[fontsize=11,label="2071", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2072[fontsize=11,label="{&rarr;\n2072\nd=168|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s2073[fontsize=11,label="&larr;\n2073", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2074[fontsize=11,label="2074", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2075[fontsize=11,label="2075", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2076[fontsize=11,label="{&rarr;\n2076\nd=169|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s2077[fontsize=11,label="&larr;\n2077", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2078[fontsize=11,label="2078", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2079[fontsize=11,label="2079", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s310 -> s2072 [fontname="Times-Italic", label="&epsilon;"];
+s2072:p0 -> s2071 [fontname="Times-Italic", label="&epsilon;"];
+s2072:p1 -> s2073 [fontname="Times-Italic", label="&epsilon;"];
+s2071 -> s2073 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'async'", arrowhead = normal];
+s2073 -> s2074 [fontname="Times-Italic", label="&epsilon;"];
+s2074 -> s2076 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'delegate'", arrowhead = normal];
+s2076:p0 -> s2075 [fontname="Times-Italic", label="&epsilon;"];
+s2076:p1 -> s2077 [fontname="Times-Italic", label="&epsilon;"];
+s2075 -> s2077 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<explicit_anonymous_function_signature>", arrowhead = normal];
+s2077 -> s2078 [fontname="Times-Italic", label="&epsilon;"];
+s2078 -> s2079 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<block>", arrowhead = normal];
+s2079 -> s311 [fontname="Times-Italic", label="&epsilon;"];
+}

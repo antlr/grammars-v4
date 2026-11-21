@@ -82,7 +82,7 @@ public abstract class CLexerBase : Lexer
                 string error = process.StandardError.ReadToEnd();
 
                 process.WaitForExit();
-
+		
                 File.WriteAllText(output_name, output);
                 return CharStreams.fromString(output);
             }

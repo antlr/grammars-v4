@@ -1,0 +1,15 @@
+digraph ATN {
+rankdir=LR;
+s313[fontsize=11, label="313", shape=doublecircle, fixedsize=true, width=.6];
+s2080[fontsize=11,label="2080", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2081[fontsize=11,label="2081", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2082[fontsize=11,label="{&rarr;\n2082\nd=170|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s2083[fontsize=11,label="&larr;\n2083", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s312[fontsize=11,label="312", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s312 -> s2082 [fontname="Times-Italic", label="&epsilon;"];
+s2082:p0 -> s2080 [fontname="Times-Italic", label="&epsilon;"];
+s2082:p1 -> s2081 [fontname="Times-Italic", label="&epsilon;"];
+s2080 -> s2083 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<explicit_anonymous_function_signature>", arrowhead = normal];
+s2081 -> s2083 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<implicit_anonymous_function_signature>", arrowhead = normal];
+s2083 -> s313 [fontname="Times-Italic", label="&epsilon;"];
+}

@@ -1,0 +1,7 @@
+Cat
+    ReadLine a
+    Print a
+    c = Cat := NOP
+    IfEOF c
+    c := NOP
+Cat

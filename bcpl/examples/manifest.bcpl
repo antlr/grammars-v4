@@ -1,0 +1,10 @@
+GET "libhdr"
+
+MANIFEST { true = 1; false = 0; maxint = 32767 }
+
+LET start() = VALOF
+{ LET x = true
+  LET y = maxint
+  writef("%n %n*n", x, y)
+  RESULTIS 0
+}

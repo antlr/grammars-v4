@@ -140,6 +140,17 @@ public abstract class CParserBase extends Parser {
         Token lt1 = ((CommonTokenStream) this.getInputStream()).LT(1);
         String text = lt1.getText();
         if (debug) System.out.println("IsDeclarationSpecifier " + lt1);
+        if (lt1.getType() == CLexer.Identifier && this.getContext() instanceof CParser.DeclarationSpecifiersContext) {
+            CParser.DeclarationSpecifiersContext dsCtx = (CParser.DeclarationSpecifiersContext) this.getContext();
+            Symbol resolvedId = resolveWithOutput(lt1);
+            if (resolvedId != null && !resolvedId.isPredefined()
+                    && !resolvedId.getClassification().contains(TypeClassification.Variable_)
+                    && !resolvedId.getClassification().contains(TypeClassification.Function_)) {
+                for (CParser.DeclarationSpecifierContext spec : dsCtx.declarationSpecifier()) {
+                    if (spec.typeSpecifier() != null) return false;
+                }
+            }
+        }
         boolean result = IsStorageClassSpecifier()
                 || IsTypeSpecifier()
                 || IsTypeQualifier()
@@ -565,7 +576,18 @@ public abstract class CParserBase extends Parser {
         if (resolved == null) {
             result = true;
         } else if (resolved.getClassification().contains(TypeClassification.TypeQualifier_) || resolved.getClassification().contains(TypeClassification.TypeSpecifier_)) {
-            result = false;
+            if (lt1.getType() == CLexer.Identifier && resolved.getClassification().contains(TypeClassification.TypeSpecifier_)) {
+                if (this.getContext() instanceof CParser.DeclarationContext) {
+                    CParser.DeclarationContext declCtx = (CParser.DeclarationContext) this.getContext();
+                    CParser.DeclarationSpecifiersContext dsCtx = declCtx.declarationSpecifiers();
+                    if (dsCtx != null) {
+                        for (CParser.DeclarationSpecifierContext spec : dsCtx.declarationSpecifier()) {
+                            if (spec.typeSpecifier() != null) { result = true; break; }
+                        }
+                    }
+                }
+            }
+            if (!result) result = false;
         } else {
             result = true;
         }

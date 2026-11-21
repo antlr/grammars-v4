@@ -8,8 +8,8 @@ options {
 }
 
 document
-    : section_document
-    | expression_document
+    : (section_document
+    | expression_document) EOF
     ;
 
 section_document

@@ -1,0 +1,82 @@
+;********************************************************************
+;  APG - an ABNF Parser Generator
+;  Copyright (C) 2011 Lowell D. Thomas, all rights reserved
+;
+;    author: Lowell D. Thomas
+;            lowell@coasttocoastresearch.com
+;            http://www.coasttocoastresearch.com
+;
+;   purpose: ABNF for SABNF
+;
+;*********************************************************************
+; symbol alphabet is ASCII
+; code points: 9, 10, 13, 32-126
+;
+File          = *(BlankLine/Rule/RuleError)
+BlankLine     = *sp LineEnd
+Rule          = NameDef owsp (IncAlt/DefinedAs) owsp Alternation owsp LineEnd
+RuleError     = *fsp LineEnd
+Alternation   = Concatenation *(AltOp Concatenation)
+Concatenation = owsp Repetition *(CatOp Repetition)
+Repetition    = Repeat / Predicate / Element
+Repeat        = Rep Element
+Predicate     = (AndOp / NotOp) Element
+Rep           = (rep-min StarOp rep-max) /
+                (rep-min StarOp)         /
+                (StarOp rep-max)         /
+                 StarOp                  /
+                 rep-min-max
+Element       = TrgOp   /
+                TbsOp   /
+                TlsOp   /
+                TcsOp   /
+                UdtOp   /
+                RnmOp   /
+                Group   /
+                Option  /
+                ProsVal
+Group         = %d40 owsp  Alternation owsp %d41
+Option        = %d91 owsp Alternation owsp %d93
+ProsVal       = %d60 *(%d32-61/%d63-127/%d9) %d62
+
+NameDef       = alphanum
+DefinedAs     = %d61
+IncAlt        = %d61.47
+RnmOp         = alphanum
+UdtOp         = (%d117.95/%d101.95) alphanum
+AltOp         = owsp %d47
+CatOp         = wsp
+StarOp        = %d42
+AndOp         = %d38
+NotOp         = %d33
+TrgOp         = %d37 TrgRange
+TbsOp         = %d37 TbsString
+TlsOp         = [ "%i" ] %d34 *(%d32-33/%d35-127/%d9) %d34
+TcsOp         = %d39 *(%d32-38/%d40-127/%d9) %d39 / "%s" %d34 *(%d32-33/%d35-127/%d9) %d34
+
+rep-min       = 1*(%d48-57)
+rep-min-max   = 1*(%d48-57)
+rep-max       = 1*(%d48-57)
+TrgRange      = (Dec dnum %d45 dnum) / (Hex xnum %d45 xnum) / (Bin bnum %d45 bnum)
+TbsString     = (Dec dnum *(%d46 dnum)) / (Hex xnum *(%d46 xnum)) / (Bin bnum *(%d46 bnum))
+Dec           = (%d68/%d100)
+Hex           = (%d88/%d120)
+Bin           = (%d66/%d98)
+dnum          = 1*(%d48-57)
+bnum          = 1*%d48-49
+xnum          = 1*(%d48-57 / %d65-70 / %d97-102)
+
+; Basics
+alphanum      = (%d97-122/%d65-90) *(%d97-122/%d65-90/%d48-57/%d45)
+sp            = %d32    /
+                %d9     /
+                comment
+fsp           = %d32    /
+                %d9     /
+                comment /
+                LineContinue
+owsp          = *fsp
+wsp           = 1*fsp
+comment       = %d59 *(%d32-127 / %d9)
+LineEnd       = %d13.10 / %d10 /%d13
+LineContinue  = LineEnd (%d32/%d9)

@@ -1,0 +1,5 @@
+%wheel		ALL = (ALL) ALL
+%#100		ALL = (ALL) ALL
+#1001		ALL = (ALL) ALL
++biglab		ALL = ALL
+!root		ALL = (ALL) ALL

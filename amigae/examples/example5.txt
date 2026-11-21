@@ -1,0 +1,7 @@
+PROC main()
+  DEF i
+  i := 0
+  REPEAT
+    i := i + 1
+  UNTIL i = 10
+ENDPROC

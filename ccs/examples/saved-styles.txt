@@ -1,0 +1,9 @@
+red = {
+    background-color: #FF0000;
+    on_click: $white;
+};
+white = {
+    background-color: #FFFFFF;
+    on_click: $red;
+};
+white;

@@ -1,0 +1,17 @@
+digraph ATN {
+rankdir=LR;
+s733[fontsize=11, label="733", shape=doublecircle, fixedsize=true, width=.6];
+s4049[fontsize=11,label="4049", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s4050[fontsize=11,label="&rarr;\n4050+", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s4051[fontsize=11,label="&larr;\n4051", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s4052[fontsize=11,label="{4052+\nd=440|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s4053[fontsize=11,label="4053", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s732[fontsize=11,label="732", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s732 -> s4050 [fontname="Times-Italic", label="&epsilon;"];
+s4050 -> s4049 [fontname="Times-Italic", label="&epsilon;"];
+s4049 -> s4051 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<global_attribute_section>", arrowhead = normal];
+s4051 -> s4052 [fontname="Times-Italic", label="&epsilon;"];
+s4052:p0 -> s4050 [fontname="Times-Italic", label="&epsilon;", style="dashed"];
+s4052:p1 -> s4053 [fontname="Times-Italic", label="&epsilon;"];
+s4053 -> s733 [fontname="Times-Italic", label="&epsilon;"];
+}

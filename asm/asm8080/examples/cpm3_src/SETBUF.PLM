@@ -1,0 +1,1078 @@
+$title ('GENCPM - Buffer allocation module')
+setup$buffers:
+do;
+
+/*
+  Copyright (C) 1982
+  Digital Research
+  P.O. Box 579
+  Pacific Grove, CA 93950
+*/
+
+/*
+    Revised:
+      09 Dec 82  by Bruce Skidmore
+*/
+
+  declare true literally '0FFH';
+  declare false literally '0';
+  declare forever literally 'while true';
+  declare boolean literally 'byte';
+  declare cr literally '0dh';
+  declare lf literally '0ah';
+
+/*
+    D a t a    S t r u c t u r e s
+*/
+
+  declare query boolean external;
+  declare quest(155) boolean external;
+
+  declare offset byte external;
+  declare prgsiz address external;
+  declare bufsiz address external;
+  declare codsiz address external;
+  declare bios$pg byte external;
+  declare scb$pg byte external;
+  declare res$pg byte external;
+  declare bnk$pg byte external;
+  declare bnk$off byte external;
+  declare res$len byte external;
+  declare non$bnk byte external;
+
+  declare dma address external;
+  declare lnbfr (14) byte external;
+
+  declare bios$atts(3) address external;
+  declare res$atts(3) address external;
+  declare bnk$atts(3) address external;
+
+  declare res$bios$len byte external;
+  declare res$base byte external;
+  declare pg$dif byte external;
+  declare xmove$implemented boolean external;
+
+  declare mem$top byte external;
+  declare common$len byte external;
+  declare bnk$top byte external;
+  declare banked$len byte external;
+  declare sys$entry address external;
+  declare bnk$swt boolean external;
+
+  declare drvtbl$adr address external;
+  declare drvtbl based drvtbl$adr (16) address;
+
+  declare dph$adr address external;
+  declare dph based dph$adr structure (
+    xlt         address,
+    scratch1(4) address,
+    scratch2    byte,
+    mf          byte,
+    dpb         address,
+    csv         address,
+    alv         address,
+    dirbcb      address,
+    dtabcb      address,
+    hash        address,
+    hbank       byte);
+
+  declare dpb$adr address external;
+  declare dpb based dpb$adr structure (
+    spt         address,
+    bsh         byte,
+    blm         byte,
+    exm         byte,
+    dsm         address,
+    drm         address,
+    al0         byte,
+    al1         byte,
+    cks         address,
+    off         address,
+    psh         byte,
+    phm         byte);
+
+  declare mem$tbl (17) structure(
+    base        byte,
+    len         byte,
+    bank        byte,
+    attr        address) external;
+
+  declare num$seg byte external;
+ 
+  declare record(16) structure(
+    size        address,
+    attr        byte,
+    altbnks     byte,
+    no$dirrecs  byte,
+    no$dtarecs  byte,
+    ovlydir$dr  byte,
+    ovlydta$dr  byte,
+    dir$resp    byte,
+    dta$resp    byte) external;
+
+  declare hash$data(16) address external;
+  declare hash$space address external;
+  declare hash(16) boolean external;
+  declare alloc(16) address external;
+  declare alloc$space address external;
+  declare chk(16) address external;
+  declare chk$space address external;
+
+/*
+      B D O S  P r o c e d u r e   &   F u n c t i o n    C a l l s
+*/
+
+  system$reset:
+    procedure external;
+    end system$reset;
+
+  write$console:
+    procedure (char) external;
+      declare char byte;
+    end write$console;
+
+  print$console$buffer:
+    procedure (buffer$address) external;
+      declare buffer$address address;
+    end print$console$buffer;
+
+  read$console$buffer:
+    procedure (buffer$address) external;
+      declare buffer$address address;
+      declare buf based buffer$address (1) byte;
+    end read$console$buffer;
+
+/*
+      L o c a l    P r o c e d u r e s
+*/
+
+  shift$left:
+    procedure (pattern, count) address external;
+      declare count byte;
+      declare pattern address;
+   end shift$left;
+
+  crlf:
+    procedure external;
+    end crlf;
+
+error:
+  procedure (term$code,err$type,err$msg$adr) external;
+    declare (term$code,err$type) byte;
+    declare err$msg$adr address;
+  end error;
+
+upper:
+  procedure (b) byte external;
+    declare b byte;
+  end upper;
+
+valid$drive:
+  procedure(drv) boolean external;
+    declare drv byte;
+  end valid$drive;
+
+get$response:
+  procedure (val$adr) external;
+    declare val$adr address;
+  end get$response;
+
+dsply$hex$adr:
+  procedure (val) external;
+    declare val address;
+  end dsply$hex$adr;
+
+get$param:
+  procedure (string$adr,val$adr,pbase) external;
+    declare (string$adr,val$adr) address;
+    declare pbase byte;
+  end get$param;
+
+get$seg:
+  procedure(type,record$size) byte external;
+    declare type byte;
+    declare record$size address;
+  end get$seg;
+
+setbuf:
+  procedure public;
+    declare (i,j,k,ii,save,data$cnt,temp) byte;
+    declare (first$dir,first$dta,first$drive,other$banks) boolean;
+    declare (ok,perm$media,printed) boolean;
+    declare (link$cnt,seg$no,dir$data$field) byte;
+    declare mem$sav$tbl(17) address;
+    declare sav$mem$len (17) byte;
+    declare (rec$siz,drives,save$dph$adr,save$bcb$adr) address;
+    declare (bcb$cnt,bcb$buf$siz,buff$space) address;
+    declare (data$adr,l$buf$adr,act$buf$adr,l$head$adr) address;
+    declare (max$dir$buf,max$attr,tpa,defined$drives) address;
+    declare l$head based l$head$adr address;
+    
+    declare bcb$len byte;
+    declare bcb$buf$cnt address;
+    declare bcb$buf$ptr byte;
+
+    declare bcb$adr address;
+    declare bcb based bcb$adr structure(
+      drv         byte,
+      rec$no(3)   byte,
+      wflag       byte,
+      seq$no      byte,
+      track       address,
+      sector      address,
+      buff$adr    address,
+      bank        byte,
+      link        address);
+
+    declare psect (16) structure(
+      size    address,
+      drives  address);
+
+    disp$space:
+      procedure;
+        declare (seg0,obanks) address;
+        declare ii byte;
+
+        seg0, obanks = 0;
+        do ii = 1 to num$seg;
+          if mem$tbl(ii).bank = 0 then
+            seg0 = seg0 + shr(mem$tbl(ii).attr,8);
+          else
+            obanks = obanks + shr(mem$tbl(ii).attr,8);
+        end;
+        call print$console$buffer(.(lf,cr,'     ',
+                                  'Available space in 256 byte pages:',
+                                    lf,cr,'     ','$'));
+       
+        call print$console$buffer(.('TPA =$'));
+        call dsply$hex$adr(shr(tpa,8));
+        if bnk$swt then
+          do;
+            call print$console$buffer(.(', Bank 0 =$'));
+            call dsply$hex$adr(seg0);
+            if xmove$implemented then
+              do;
+                 call print$console$buffer(.(', Other banks =$'));
+                 call dsply$hex$adr(obanks);
+              end;
+            if (obanks <> 0) or (seg0 <> 0) then
+              other$banks = true;
+            else
+              other$banks = false;
+          end;
+        call crlf;
+        call crlf;
+      end disp$space;
+
+    get$space:
+      procedure(index,parm) byte;
+        declare (index,parm,count,ii) byte;
+        declare (i,j,k,save) byte;
+        declare seg$no byte;
+        declare rsize address;
+
+        rsize = record(index).size;
+        if not bnk$swt then
+          do;
+             tpa = tpa - (rsize + bcb$len);
+          end;
+        else
+          do;
+            bcb$buf$ptr = bcb$buf$ptr - 2;
+            if parm = 1 then /* directory records */
+              do;
+                count = record(index).no$dirrecs;
+                do ii = 1 to count;
+                  if bcb$buf$ptr < bcb$len then
+                    do;
+                      bcb$buf$ptr = 0ffh;
+                      bcb$buf$cnt = bcb$buf$cnt + 1;
+                      j = 0ffh;
+                      save = 0;
+                      do i = 1 to num$seg;
+                        k = mem$tbl(i).len + mem$tbl(i).base;
+                        if (mem$tbl(i).bank = 0) and k > save then
+                          do;
+                             j = i;
+                             save = k;  /* pre allocate space for BCBs */
+                          end;
+                      end;
+                      mem$tbl(j).attr = mem$tbl(j).attr - 100h;
+                    end;
+                  else
+                    bcb$buf$ptr = bcb$buf$ptr - bcb$len;
+      
+                  if (seg$no := get$seg(1,rsize)) = 0ffh then
+                    do;
+                       call error(false,0,
+                            .('Unable to allocate Dir deblocking ',
+                              'buffer space.$'));
+                       return false;
+                    end;
+                  else
+                    mem$tbl(seg$no).attr = mem$tbl(seg$no).attr - rsize;
+                end;
+              end;
+            else   /* data records */
+              do;
+                count = record(index).no$dtarecs;
+                do ii = 1 to count;
+                  if bcb$buf$ptr < bcb$len then
+                    do;
+                      bcb$buf$ptr = 0ffh;
+                      bcb$buf$cnt = bcb$buf$cnt + 1;
+                      j = 0ffh;
+                      save = 0;
+                      do i = 1 to num$seg;
+                        k = mem$tbl(i).len + mem$tbl(i).base;
+                        if (mem$tbl(i).bank = 0) and k > save then
+                          do;
+                             j = i;
+                             save = k;  /* pre allocate space for BCBs */
+                          end;
+                      end;
+                      mem$tbl(j).attr = mem$tbl(j).attr - 100h;
+                    end;
+                  else
+                    bcb$buf$ptr = bcb$buf$ptr - bcb$len;
+                  if not record(index).altbnks then
+                    do;
+                      tpa = tpa - rsize;
+                      if shr(tpa,8) < bnk$top then
+                        do;
+                          call error(false,0,
+                                 .('Unable to allocate Data ',
+                                   'deblocking buffer space.$'));
+                          return false;
+                        end;
+                    end;
+                  else
+                    do;
+                      if (seg$no := get$seg(2,rsize)) = 0ffh then
+                        do;
+                          call error(false,0,
+                                 .('Unable to allocate Data deblocking ',
+                                   'buffer space.$'));
+                          return false;
+                        end;
+                      else
+                        mem$tbl(seg$no).attr = mem$tbl(seg$no).attr - rsize;
+                    end;
+                end;
+              end;
+          end;
+          return true;
+      end get$space;
+
+   drive$not$defined:
+     procedure(val) boolean;
+       declare val byte;
+       if (defined$drives and shift$left(double(1),val)) <> 0 then
+         return false;
+       call error(false,0,.('Drive specified has not ',
+                            'been defined. $'));
+       return true;
+     end drive$not$defined;
+
+   do i = 0 to 15;
+     if drvtbl(i) <> 0 then
+       do;
+         dph$adr = drvtbl(i) + .memory;
+         if (dph.dirbcb = 0fffeh) or (dph.dtabcb = 0fffeh) then
+           do;
+             dpb$adr = dph.dpb + .memory;
+             record(i).size = shift$left(double(128),dpb.psh);
+             record(i).attr = 0;
+           end;
+         if dph.dirbcb = 0ffffh then
+           do;
+             call error(true,0,.('0FFFFH is an invalid value in the',
+                        cr,lf,
+                       'DPH directory BCB address field.$'));
+
+           end;
+       end;
+   end;
+
+   do j = 0 to 15;
+     rec$siz = 0;
+     do i = 0 to 15;
+       if (record(i).size > rec$siz) and (record(i).attr = 0) then
+         rec$siz = record(i).size;
+     end;
+     psect(j).size = rec$siz;
+     psect(j).drives = 0;
+     do i = 0 to 15;
+       if (record(i).size = rec$siz) and (rec$siz <> 0) then
+         do;
+           psect(j).drives = psect(j).drives or shift$left(double(1),i);
+           record(i).attr = 0ffh;
+         end;
+     end;
+   end;
+
+
+   do i = 0 to 16;
+     mem$sav$tbl(i) = mem$tbl(i).attr;
+     sav$mem$len(i) = mem$tbl(i).len;
+   end;
+
+
+   if bnk$swt then
+     bcb$len = 15;
+   else
+     bcb$len = 12;
+
+   ok = false;
+   do while not ok;
+
+     bcb$buf$ptr = bcb$len - 1;
+     bcb$buf$cnt = 0;
+     defined$drives = 0;
+     data$cnt = 0;
+     first$drive = true;
+     tpa = shl(double(res$pg),8) - hash$space;
+     if not bnk$swt then
+       tpa = tpa - alloc$space - chk$space;
+
+     do i = 0 to 15;
+       mem$tbl(i+1).attr = mem$sav$tbl(i+1);
+       record(i).attr = 0;
+     end;
+
+     printed = false;
+     first$dir, first$dta = true;
+
+     ii = 0;
+     drives = psect(ii).drives;
+     do while (psect(ii).size <> 0) and (ii < 16);
+
+       if not printed then
+         do;
+           call print$console$buffer(.(lf,cr,'Setting up ',
+                                       'Blocking/Deblocking buffers:',
+                                       lf,cr,'$'));
+           printed = true;
+         end;
+
+       call print$console$buffer(
+                  .(cr,lf,'The physical record size is$'));
+       call dsply$hex$adr(psect(ii).size);
+       call print$console$buffer(.(':',lf,cr,'$'));
+   
+       i = 0;
+       do while((drives and 1) <> 1) and (i < 16);
+         drives = shr(drives,1);
+         i = i + 1;
+       end;
+       drives = shr(drives,1);
+       do while (i <> 16);
+         dph$adr = drvtbl(i) + .memory;
+         dpb$adr = dph.dpb + .memory;
+         max$dir$buf = shr(dpb.drm + 4,2);
+         if (dpb.cks = 08000h) then
+           perm$media = true;
+         else
+           perm$media = false;
+         if dph.dirbcb = 0fffeh then
+           do;
+             call disp$space;
+             record(i).attr = record(i).attr or 1;
+             if not bnk$swt then
+               do;
+                 if first$dir then
+                   do;
+                     first$dir = false;
+                     record(i).no$dirrecs = 1;
+                     call print$console$buffer(
+                          .('     ',
+                            '*** Directory buffer required  ***',
+                            cr,lf,'     ',
+                            '*** and allocated for drive $'));
+                     call write$console('A'+i);
+                     call print$console$buffer(.(': ***',cr,lf,'$'));
+                   end;
+                 else
+                   do;
+                     query = quest(123 + i);
+                     call print$console$buffer(
+                          .('               ',
+                          'Overlay Directory buffer for drive $'));
+                     call write$console('A'+i);
+                     call print$console$buffer(.(': $'));
+                     call get$response(.record(i).dir$resp);
+                     call crlf;
+                     if not record(i).dir$resp then
+                       do;
+                         record(i).no$dirrecs = 1;
+                       end;
+                     else
+                       record(i).no$dirrecs = 0;
+                   end;
+               end;
+             else
+               do;                       
+                 query = quest(59 + i);
+                 call print$console$buffer(
+                            .('               ',
+                              'Number of directory buffers for drive $'));
+                 call write$console('A'+i);
+                 call get$param(.(': $'),.record(i).no$dirrecs,10);
+                 if first$dir then
+                   do;
+                     first$dir = false;
+                     do while (record(i).no$dirrecs = 0);
+                       call error(false,0,
+                             .('Minumum number of buffers is 1. $'));
+                       call print$console$buffer(
+                             .('               ',
+                               'Number of directory buffers for drive $'));
+                       call write$console('A'+i);
+                       call get$param(.(': $'),.record(i).no$dirrecs,10);
+                     end;
+                   end;
+               end;
+
+             if record(i).no$dirrecs > max$dir$buf then
+               do;
+                 call print$console$buffer(
+                           .(cr,lf,'*** Maximum number of directory buffers ***',
+                             cr,lf,'*** for the current drive is$'));
+                 call dsply$hex$adr(max$dir$buf);
+                 call print$console$buffer(.('.     ***',
+                             cr,lf,'*** Number of directory buffers reduced ***',
+                             cr,lf,'*** accordingly.                        ***',
+                             cr,lf,'$'));
+                 record(i).no$dirrecs = max$dir$buf;
+               end;
+
+             if record(i).no$dirrecs = 0 then
+               do;
+                 query = quest(91 + i);
+         err4:
+                 call print$console$buffer(
+                          .('               ',
+                            'Share buffer(s) with which drive ($'));
+                 call write$console('A'+record(i).ovlydir$dr);
+                 call print$console$buffer(.(':) ? $'));
+                 call read$console$buffer(.lnbfr);
+                 if lnbfr(1) <> 0 then
+                   do;
+                     temp = upper(lnbfr(2))-'A';
+                     if not valid$drive(temp) then
+                       goto err4;
+                     if drive$not$defined(temp) then
+                       goto err4;
+                     record(i).ovlydir$dr = temp;
+                   end;
+                 call crlf;
+              end;
+             else
+               if (get$space(i,1) = 0) then
+                 goto notok;
+           end;
+  
+         if (dph.dtabcb = 0fffeh) then
+           do;
+             dir$data$field = 0;
+             if record(i).size = 80h then
+               do;
+                 dph.dtabcb = 0ffffh;
+                 record(i).no$dtarecs = 0;
+               end;
+             else
+               do;
+                 call disp$space;
+                 record(i).attr = record(i).attr or 2;
+                 if not bnk$swt then
+                   do;
+                     if data$cnt <> 2 then
+                       do;
+                         if not perm$media then
+                           do;
+                             data$cnt = 2;
+                             dir$data$field = 0ffh;
+                             record(i).no$dtarecs = 1;
+                             call print$console$buffer(
+                                  .('     ',
+                                    '*** Data buffer required and ***',
+                                    cr,lf,'     ',
+                                    '*** allocated for drive $'));
+                             call write$console('A'+i);
+                             call print$console$buffer(.(':   ***',cr,lf,'$'));
+                           end;
+                         else
+                           do;
+                             if first$dta then
+                                dir$data$field = 10h;
+                           end;
+                       end;
+
+                     first$dta = false;
+                     if dir$data$field <> 0ffh then
+                       do;
+                          query = quest(139 + i);
+                          call print$console$buffer(
+                                   .('               ',
+                                     'Overlay Data buffer for drive $'));
+                          call write$console('A'+i);
+                          call print$console$buffer(.(': $'));
+                          call get$response(.record(i).dta$resp);
+                          call crlf;
+                          if record(i).dta$resp then /* Y */
+                            record(i).no$dtarecs = 0;
+                          else
+                            do;
+                              record(i).no$dtarecs = 1;
+                              data$cnt = 2;
+                            end;
+                        end;
+                   end;
+                 else
+                   do;
+                     query = quest(75 + i);
+                     call print$console$buffer(
+                              .('               ',
+                                'Number of data buffers for drive $'));
+                     call write$console('A'+i);
+                     call get$param(.(': $'),.record(i).no$dtarecs,10);
+                     record(i).attr = record(i).attr or 2;
+                     if first$dta then
+                       do;
+                         first$dta = false;
+                         do while (record(i).no$dtarecs = 0);
+                           call error(false,0,
+                               .('Minumum number of buffers is 1. $'));
+                           call print$console$buffer(
+                                .('               ',
+                                  'Number of data buffers for drive $'));
+                           call write$console('A'+i);
+                           call get$param(.(': $'),.record(i).no$dtarecs,10);
+                         end;
+                       end;
+                   end;
+
+                 if record(i).no$dtarecs = 0 then
+                   do;
+                     if first$drive then
+                       do;
+                         first$drive = false;
+                         record(i).ovlydta$dr = i;
+                       end;
+                     else
+                       do;
+                         query = quest(107 + i);
+                  err5:
+                         call print$console$buffer(
+                                 .('               ',
+                                   'Share buffer(s) with which drive ($'));
+                         call write$console('A'+record(i).ovlydta$dr);
+                         call print$console$buffer(.(':) ? $'));
+                         call read$console$buffer(.lnbfr);
+                         if lnbfr(1) <> 0 then
+                           do;
+                             temp = upper(lnbfr(2))-'A';
+                             if not valid$drive(temp) then
+                               goto err5;
+                             if drive$not$defined(temp) then
+                               goto err5;
+                             record(i).ovlydta$dr = temp;
+                           end;
+                         call crlf;
+                       end;
+                     record(i).ovlydta$dr = record(i).ovlydta$dr
+                                            or dir$data$field;
+                   end;
+                 else
+                   do;
+                     if (other$banks and xmove$implemented) then
+                       do;
+                         query = quest(43 + i);
+                         call print$console$buffer(
+                                .('               ',
+                                  'Allocate buffers outside of Common $'));
+                         call get$response(.record(i).altbnks);
+                         call crlf;
+                       end;
+                     if (get$space(i,2) = 0) then
+                       goto notok;
+                   end;
+               end;
+           end;
+         first$drive = false;
+         defined$drives = defined$drives or shift$left(double(1),i);
+         i = i + 1;
+         do while((drives and 1) <> 1) and (i < 16);
+           drives = shr(drives,1);
+           i = i + 1;
+         end;
+         drives = shr(drives,1);
+       end;
+       ii = ii + 1;
+       drives = psect(ii).drives;
+     end;
+
+     query = false;
+     ok = true;
+     if printed then
+       do;
+         call disp$space;
+         call print$console$buffer(.
+                   (cr,lf,'Accept new buffer definitions $'));
+         call get$response(.ok);
+         call crlf;
+       end;
+
+     notok:  /*** start over here upon error ***/
+   end;  /*** do while not ok ***/
+
+          /* calculate BCB requirements */
+
+   bcb$cnt,link$cnt,buff$space = 0;
+   do i = 0 to 15;
+     if record(i).attr <> 0 then
+       do;
+         if (record(i).no$dirrecs <> 0) and
+            ((record(i).attr and 1) = 1) then
+           do;
+             if bnk$swt then
+               link$cnt = link$cnt + 1;
+             else
+               buff$space = buff$space +
+                            (record(i).size * record(i).no$dirrecs);
+             bcb$cnt = bcb$cnt + record(i).no$dirrecs;
+           end;
+         if (record(i).no$dtarecs <> 0) and
+            ((record(i).attr and 2) = 2) then
+           do;
+             if bnk$swt then
+               do;
+                 link$cnt = link$cnt + 1;
+                 if not record(i).altbnks then
+                   buff$space = buff$space + record(i).size
+                                           * record(i).no$dtarecs;
+               end;
+             else
+               buff$space = buff$space +
+                            (record(i).size * record(i).no$dtarecs);
+             bcb$cnt = bcb$cnt + record(i).no$dtarecs;
+           end;
+       end;
+   end;
+   bcb$buf$siz = bcb$cnt * bcb$len + link$cnt * 2;
+
+       /*** allocate deblocking buffers ***/
+
+   if not bnk$swt then       /* for non-banked system */
+     do;
+       bcb$adr = bios$atts(0) + .memory;
+       pg$dif = bios$pg - (mem$top - high(bios$atts(0) + bcb$buf$siz +
+                               buff$space + hash$space +
+                               chk$space + alloc$space + 255));
+       bios$pg = bios$pg - pg$dif;
+       res$pg = res$pg - pg$dif;
+       scb$pg = scb$pg - pg$dif;
+       res$bios$len = high(bios$atts(0) + bcb$buf$siz + 255);
+       mem$top = bios$pg + res$bios$len;
+       dma = bios$atts(0) + bcb$buf$siz + .memory;
+       act$buf$adr = shl(double(bios$pg),8) + bios$atts(0);
+       data$adr = act$buf$adr + bcb$buf$siz;
+
+       /*** zero memory for the BCB buffers ***/
+
+       max$attr = prgsiz;
+       do while(.memory(max$attr) < dma);
+         memory(max$attr) = 0;
+         max$attr = max$attr + 1;
+       end;
+
+       ii = 0;
+       drives = psect(ii).drives;
+       do while (psect(ii).size <> 0) and (ii < 16);
+         i = 0;
+         do while((drives and 1) <> 1) and (i < 16);
+           drives = shr(drives,1);
+           i = i + 1;
+         end;
+         drives = shr(drives,1);
+           do while(i <> 16);
+             dph$adr = drvtbl(i) + .memory;
+             if (record(i).attr and 1) = 1 then
+               do;
+                 if record(i).no$dirrecs <> 0 then
+                   do;
+                     bcb.drv = 0ffh;
+                     bcb.buff$adr = data$adr;
+                     data$adr = data$adr + record(i).size;
+                     dph.dirbcb = act$buf$adr;
+                     act$buf$adr = act$buf$adr + bcb$len;
+                     bcb$adr = bcb$adr + bcb$len;
+                   end;
+                 else
+                   do;
+                     save$dph$adr = dph$adr;
+                     dph$adr = drvtbl(record(i).ovlydir$dr) + .memory;
+                     save$bcb$adr = dph.dirbcb;
+                     dph$adr = save$dph$adr;
+                     dph.dirbcb = save$bcb$adr;
+                   end;
+               end;
+
+             if (record(i).attr and 2) = 2 then
+               do;
+                 if record(i).no$dtarecs <> 0 then
+                   do;
+                     bcb.drv = 0ffh;
+                     bcb.buff$adr = data$adr;
+                     data$adr = data$adr + record(i).size;
+                     dph.dtabcb = act$buf$adr;
+                     act$buf$adr = act$buf$adr + bcb$len;
+                     bcb$adr = bcb$adr + bcb$len;
+                   end;
+                 else
+                   do;
+                     save$dph$adr = dph$adr;
+                     dph$adr = drvtbl((record(i).ovlydta$dr) and 0fh) + .memory;
+                     if (record(i).ovlydta$dr and 10h) <> 0 then
+                       save$bcb$adr = dph.dirbcb;
+                     else
+                       save$bcb$adr = dph.dtabcb;
+                     dph$adr = save$dph$adr;
+                     dph.dtabcb = save$bcb$adr;
+                   end;
+               end;
+             i = i + 1;
+             do while((drives and 1) <> 1) and (i < 16);
+               drives = shr(drives,1);
+               i = i + 1;
+             end;
+             drives = shr(drives,1);
+           end;
+           ii = ii + 1;
+           drives = psect(ii).drives;
+       end;
+
+       do i = 0 to 15;             /* allocate hash for non-bank system */
+         if hash$data(i) <> 0 then
+           do;
+             dph$adr = drvtbl(i) + .memory;
+             dph.hash = data$adr;
+             data$adr = data$adr + hash$data(i);
+           end;
+       end;
+
+       do i = 0 to 15;             /* allocate allocation vectors and */
+                                   /* checksub vectors for non-bank system */
+         dph$adr = drvtbl(i) + .memory;
+         if alloc(i) <> 0 then
+           do;
+             dph.alv = data$adr;
+             data$adr = data$adr + alloc(i);
+           end;
+         if chk(i) <> 0 then
+           do;
+             dph.csv = data$adr;
+             data$adr = data$adr + chk(i);
+           end;
+       end;
+
+     end;
+   else        /* allocate deblocking buffers for banked system */
+     do;
+           /* restore memory table */
+       do i = 0 to 16;
+         mem$tbl(i).attr = mem$sav$tbl(i);
+       end;
+ 
+       bcb$buf$siz = bcb$buf$siz + chk$space + alloc$space;
+       if (bios$atts(2) = 0) or (bios$atts(0) = bios$atts(2)) then
+         pg$dif = bios$pg - (mem$top - high(bios$atts(0) + buff$space + 255));
+       else
+         pg$dif = bios$pg - (mem$top - high(bios$atts(2) + buff$space + 255));
+       bios$pg = bios$pg - pg$dif;
+       res$pg = res$pg - pg$dif;
+       scb$pg = scb$pg - pg$dif;
+       mem$top = mem$top - pg$dif;
+       max$attr = bios$atts(0) - (bios$atts(2) + low(256-low(bios$atts(2))));
+       if (bios$atts(2) = 0) or (bios$atts(0) = bios$atts(2)) then
+         do;
+           bnk$off = bnk$top - high(bcb$buf$siz + 255);
+           l$head$adr = bios$atts(0) + low(256-low(bios$atts(0))) + .memory;
+           l$buf$adr = shl(double(bnk$off),8);
+           data$adr = shl(double(bios$pg),8) + bios$atts(0);
+         end;
+       else
+         do;
+           bnk$off = bnk$top - high(max$attr + bcb$buf$siz + 255);
+           l$head$adr = bios$atts(0) + .memory;
+           l$buf$adr = shl(double(bnk$off),8) + max$attr;
+           data$adr = shl(double(bios$pg),8) + bios$atts(2);
+         end;
+       dma = l$head$adr + bcb$buf$siz;
+       bnk$pg = bnk$off - high(bnk$atts(0) + 255);
+       bcb$adr = l$head$adr + link$cnt * 2;
+       act$buf$adr = l$buf$adr + link$cnt * 2;
+       bios$atts(0) = dma - .memory;
+
+       /*** zero memory for the BCB buffers ***/
+
+       max$attr = prgsiz;
+       do while(.memory(max$attr) < dma);
+         memory(max$attr) = 0;
+         max$attr = max$attr + 1;
+       end;
+
+          /*** allocate memory table space for BCB's ***/
+       j = 0ffh;
+       save = 0;
+       do i = 1 to num$seg;
+         k = mem$tbl(i).len + mem$tbl(i).base;
+         if (mem$tbl(i).bank = 0) and (k > save) then
+           do;
+             j = i;
+             save = k;
+           end;
+       end;
+       mem$tbl(0).base = bnk$pg;
+       mem$tbl(0).len = bnk$top - bnk$pg;
+       if j <> 0ffh then
+         do;
+            if  (mem$tbl(j).len + mem$tbl(j).base) > bnk$pg then
+              do;
+                max$attr = shl(double(mem$tbl(j).len),8) - mem$tbl(j).attr;
+                mem$tbl(j).len = bnk$pg - mem$tbl(j).base;
+                mem$tbl(j).attr = shl(double(mem$tbl(j).len),8) - max$attr;
+              end;
+         end;
+
+         /*** allocate directory buffers for banked system ***/
+
+       ii = 0;
+       drives = psect(ii).drives;
+       do while (psect(ii).size <> 0) and (ii < 16);
+         i = 0;
+         do while((drives and 1) <> 1) and (i < 16);
+           drives = shr(drives,1);
+           i = i + 1;
+         end;
+         drives = shr(drives,1);
+           do while (i <> 16);
+             dph$adr = drvtbl(i) + .memory;
+             if (record(i).attr and 1) = 1 then
+              do;
+                if record(i).no$dirrecs = 0 then
+                  do;
+                    save$dph$adr = dph$adr;
+                    dph$adr = drvtbl(record(i).ovlydir$dr) + .memory;
+                    save$bcb$adr = dph.dirbcb;
+                    dph$adr = save$dph$adr;
+                    dph.dirbcb = save$bcb$adr;
+                  end;
+                else
+                  do;
+                    l$head = act$buf$adr;  /*** set up list head ***/
+                    dph.dirbcb = l$buf$adr;
+                    l$buf$adr = l$buf$adr + 2;
+                    l$head$adr = l$head$adr + 2;
+                       /*** create bcbs ***/
+                    do j = 1 to record(i).no$dirrecs;
+                      seg$no = get$seg(1,record(i).size);
+                      bcb.drv = 0ffh;
+                      bcb.buff$adr = shl(double(mem$tbl(seg$no).base),8) +
+                                        (shl(double(mem$tbl(seg$no).len),8) -
+                                         mem$tbl(seg$no).attr);
+                      bcb.bank = 0;
+                      mem$tbl(seg$no).attr = mem$tbl(seg$no).attr -
+                                             record(i).size;
+                      act$buf$adr = act$buf$adr + bcb$len;
+                      bcb.link = act$buf$adr;
+                      bcb$adr = bcb$adr + bcb$len;
+                    end;
+                    bcb$adr = bcb$adr - bcb$len;
+                    bcb.link = 0;
+                    bcb$adr = bcb$adr + bcb$len;
+                  end;
+              end;
+
+         /*** allocate data deblocking buffers for banked system ***/
+
+            if (record(i).attr and 2) = 2 then
+              do;
+                if record(i).no$dtarecs = 0 then
+                  do;
+                    save$dph$adr = dph$adr;
+                    dph$adr = drvtbl(record(i).ovlydta$dr) + .memory;
+                    save$bcb$adr = dph.dtabcb;
+                    dph$adr = save$dph$adr;
+                    dph.dtabcb = save$bcb$adr;
+                  end;
+                else
+                  do;
+                    l$head = act$buf$adr;  /*** set up list head ***/
+                    dph.dtabcb = l$buf$adr;
+                    l$buf$adr = l$buf$adr + 2;
+                    l$head$adr = l$head$adr + 2;
+                       /*** create bcbs ***/
+                    do j = 1 to record(i).no$dtarecs;
+                      if record(i).altbnks then
+                        do;
+                          seg$no = get$seg(2,record(i).size);
+                          bcb.drv = 0ffh;
+                          bcb.buff$adr = shl(double(mem$tbl(seg$no).base),8)
+                                       + (shl(double(mem$tbl(seg$no).len),8)
+                                       - mem$tbl(seg$no).attr);
+                          bcb.bank = mem$tbl(seg$no).bank;
+                          mem$tbl(seg$no).attr = mem$tbl(seg$no).attr -
+                                                 record(i).size;
+                        end;
+                      else
+                        do;
+                          bcb.drv = 0ffh;
+                          bcb.buff$adr = data$adr;
+                          data$adr = data$adr + record(i).size;
+                          bcb.bank = 0;
+                        end;
+                      act$buf$adr = act$buf$adr + bcb$len;
+                      bcb.link = act$buf$adr;
+                      bcb$adr = bcb$adr + bcb$len;
+                    end;
+                    bcb$adr = bcb$adr - bcb$len;
+                    bcb.link = 0;
+                    bcb$adr = bcb$adr + bcb$len;
+                  end;
+              end;
+             i = i + 1;
+             do while((drives and 1) <> 1) and (i < 16);
+               drives = shr(drives,1);
+               i = i + 1;
+             end;
+             drives = shr(drives,1);
+           end;
+           ii = ii + 1;
+           drives = psect(ii).drives;
+       end;
+
+       do i = 0 to 16;
+          mem$tbl(i).len = sav$mem$len(i);
+       end;
+
+       do i = 0 to 15;             /* allocate allocation vectors and */
+                                  /* checksum vectors for banked system */
+         dph$adr = drvtbl(i) + .memory;
+         if alloc(i) <> 0 then
+           do;
+             dph.alv = act$buf$adr;
+             act$buf$adr = act$buf$adr + alloc(i);
+           end;
+         if chk(i) <> 0 then
+           do;
+             dph.csv = act$buf$adr;
+             act$buf$adr = act$buf$adr + chk(i);
+           end;
+       end;
+
+     end;
+
+  end setbuf;
+end setup$buffers;
+

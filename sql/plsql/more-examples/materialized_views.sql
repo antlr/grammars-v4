@@ -1,8 +1,9 @@
-CREATE MATERIALIZED VIEW foreign_customers FOR UPDATE
+CREATE MATERIALIZED VIEW foreign_customers
    AS SELECT * FROM sh.customers@remote cu
    WHERE EXISTS
      (SELECT * FROM sh.countries@remote co
       WHERE co.country_id = cu.country_id);
+
 CREATE MATERIALIZED VIEW sales_mv
    BUILD IMMEDIATE
    REFRESH FAST ON COMMIT
@@ -34,8 +35,31 @@ CREATE MATERIALIZED VIEW sales_sum_table
       WHERE s.time_id = t.time_id AND s.cust_id = c.cust_id
       GROUP BY t.calendar_month_desc, c.cust_state_province;
 
+CREATE MATERIALIZED VIEW catalog
+   REFRESH FAST START WITH SYSDATE NEXT SYSDATE + 1/4096
+   WITH PRIMARY KEY
+   AS SELECT * FROM product_information;
+
 CREATE MATERIALIZED VIEW order_data REFRESH WITH ROWID
    AS SELECT * FROM orders;
+
+CREATE MATERIALIZED VIEW emp_data
+   PCTFREE 5 PCTUSED 60
+   TABLESPACE example
+   STORAGE (INITIAL 50K)
+   REFRESH FAST NEXT sysdate + 7
+   AS SELECT * FROM employees;
+
+CREATE MATERIALIZED VIEW all_customers
+   PCTFREE 5 PCTUSED 60
+   TABLESPACE example
+   STORAGE (INITIAL 50K)
+   USING INDEX STORAGE (INITIAL 25K)
+   REFRESH START WITH ROUND(SYSDATE + 1) + 11/24
+   NEXT NEXT_DAY(TRUNC(SYSDATE), 'MONDAY') + 15/24
+   AS SELECT * FROM sh.customers@remote
+         UNION
+      SELECT * FROM sh.customers@local;
 
 CREATE MATERIALIZED VIEW warranty_orders REFRESH FAST AS
   SELECT order_id, line_item_id, product_id FROM order_items o
@@ -51,6 +75,11 @@ CREATE MATERIALIZED VIEW my_warranty_orders
    FROM warranty_orders w, orders o
    WHERE o.order_id = o.order_id
    AND o.sales_rep_id = 165;
+
+CREATE MATERIALIZED VIEW MView1 ANNOTATIONS (Title 'Tab1 MV1', ADD Snapshot) AS SELECT * from Table1;
+
+CREATE MATERIALIZED VIEW MView1(T ANNOTATIONS (Hidden)) ANNOTATIONS (Title 'Tab1 MV1', ADD Snapshot)
+   AS SELECT * from Table1;
 
 CREATE MATERIALIZED VIEW LOG ON customers
    PCTFREE 5

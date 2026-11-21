@@ -1,0 +1,12 @@
+( A macro definition with a stack-effect comment, and two calls to it. )
+
+%min ( a b -- r ) {
+	GTHk [ JMP SWP ] POP
+}
+
+%max ( a b -- r ) {
+	LTHk [ JMP SWP ] POP
+}
+
+#12 #34 min
+#56 #78 max

@@ -1,0 +1,4 @@
+x = 42
+y := "hello"
+Print x
+Print y

@@ -1,4 +1,4 @@
-# Solidity
+# Solidity Grammar
 
 ## Authors
 

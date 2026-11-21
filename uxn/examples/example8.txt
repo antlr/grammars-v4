@@ -1,0 +1,10 @@
+( All six addressing runes applied to the same label. )
+
+@target 00
+
+.target
+-target
+,target
+_target
+;target
+=target

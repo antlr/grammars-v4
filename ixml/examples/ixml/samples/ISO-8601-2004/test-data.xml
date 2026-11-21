@@ -1,0 +1,327 @@
+<list-of-iso8601>
+   <date>
+      <year>2022</year>
+      <month>04</month>
+      <day>17</day>
+   </date>
+
+   <local-datetime>
+      <year>2022</year>
+      <month>04</month>
+      <day>17</day>
+      <hour>13</hour>
+      <minute>55</minute>
+      <second>24</second>
+      <utc-offset>
+         <offset-hour direction="+">00</offset-hour>
+         <offset-minute>00</offset-minute>
+      </utc-offset>
+   </local-datetime>
+
+   <utc-datetime>
+      <year>2022</year>
+      <month>04</month>
+      <day>17</day>
+      <hour>13</hour>
+      <minute>55</minute>
+      <second>24</second>
+   </utc-datetime>
+
+   <utc-datetime>
+      <year>2022</year>
+      <month>04</month>
+      <day>17</day>
+      <hour>13</hour>
+      <minute>55</minute>
+      <second>24</second>
+   </utc-datetime>
+
+   <local-datetime>
+      <year>2022</year>
+      <month>04</month>
+      <day>17</day>
+      <hour>13</hour>
+      <minute>55</minute>
+      <second>24</second>
+      <utc-offset>
+         <offset-hour direction="+">01</offset-hour>
+         <offset-minute>00</offset-minute>
+      </utc-offset>
+   </local-datetime>
+
+   <local-datetime>
+      <year>2022</year>
+      <month>04</month>
+      <day>17</day>
+      <hour>13</hour>
+      <minute>55</minute>
+      <second>24</second>
+      <utc-offset>
+         <offset-hour direction="+">02</offset-hour>
+         <offset-minute>00</offset-minute>
+      </utc-offset>
+   </local-datetime>
+
+   <local-datetime>
+      <year>2022</year>
+      <month>04</month>
+      <day>17</day>
+      <hour>13</hour>
+      <minute>55</minute>
+      <second>24</second>
+      <utc-offset>
+         <offset-hour direction="-">03</offset-hour>
+         <offset-minute>00</offset-minute>
+      </utc-offset>
+   </local-datetime>
+
+   <local-datetime>
+      <year>2022</year>
+      <month>04</month>
+      <day>17</day>
+      <hour>13</hour>
+      <minute>55</minute>
+      <second>24</second>
+      <utc-offset>
+         <offset-hour direction="-">04</offset-hour>
+         <offset-minute>00</offset-minute>
+      </utc-offset>
+   </local-datetime>
+
+   <local-datetime>
+      <year>2022</year>
+      <month>04</month>
+      <day>17</day>
+      <hour>13</hour>
+      <minute>55</minute>
+      <second>24</second>
+      <utc-offset>
+         <offset-hour direction="-">05</offset-hour>
+      </utc-offset>
+   </local-datetime>
+
+   <date>
+      <year>2022</year>
+      <week>15</week>
+   </date>
+
+   <date>
+      <year>2022</year>
+      <week>15</week>
+      <day-of-week>7</day-of-week>
+   </date>
+
+   <date>
+      <year>2022</year>
+      <week>15</week>
+      <day-of-week>7</day-of-week>
+   </date>
+
+   <date>
+      <year>2022</year>
+      <day-of-year>107</day-of-year>
+   </date>
+
+   <date>
+      <year>2022</year>
+      <day-of-year>107</day-of-year>
+   </date>
+
+   <local-time>
+      <hour>12</hour>
+      <minute>13</minute>
+      <second>14</second>
+   </local-time>
+
+   <local-time>
+      <hour>12</hour>
+      <minute>13</minute>
+      <second>14</second>
+   </local-time>
+
+
+   <local-time>
+      <hour>12</hour>
+      <minute>13</minute>
+      <second>14</second>
+      <fractional-second>5</fractional-second>
+   </local-time>
+
+   <local-time>
+      <hour>12</hour>
+      <minute>13</minute>
+      <fractional-minute>5</fractional-minute>
+   </local-time>
+
+   <local-time>
+      <hour>12</hour>
+      <fractional-hour>5</fractional-hour>
+   </local-time>
+
+   <local-time>
+      <hour>12</hour>
+      <fractional-hour>5</fractional-hour>
+   </local-time>
+
+   <duration>
+      <duration-years>1</duration-years>
+      <duration-months>1</duration-months>
+      <duration-days>1</duration-days>
+      <duration-hours>0</duration-hours>
+      <duration-minutes>0</duration-minutes>
+      <duration-seconds>1</duration-seconds>
+   </duration>
+
+   <duration>
+      <duration-weeks>3</duration-weeks>
+   </duration>
+
+   <duration>
+      <year>2022</year>
+      <month>03</month>
+      <day>14</day>
+      <hour>00</hour>
+      <minute>00</minute>
+      <second>00</second>
+   </duration>
+
+   <interval>
+      <local-datetime>
+         <year>2022</year>
+         <month>03</month>
+         <day>14</day>
+         <hour>00</hour>
+         <minute>00</minute>
+         <second>00</second>
+      </local-datetime>
+      <local-datetime>
+         <year>2022</year>
+         <month>03</month>
+         <day>14</day>
+         <hour>12</hour>
+         <minute>00</minute>
+         <second>00</second>
+      </local-datetime>
+   </interval>
+
+   <interval>
+      <local-datetime>
+         <year>2022</year>
+         <month>03</month>
+         <day>14</day>
+         <hour>00</hour>
+         <minute>00</minute>
+         <second>00</second>
+      </local-datetime>
+      <duration>
+         <duration-hours>12</duration-hours>
+      </duration>
+   </interval>
+
+   <interval>
+      <duration>
+         <duration-hours>12</duration-hours>
+      </duration>
+      <local-datetime>
+         <year>2022</year>
+         <month>03</month>
+         <day>15</day>
+         <hour>00</hour>
+         <minute>00</minute>
+         <second>00</second>
+      </local-datetime>
+   </interval>
+
+   <interval>
+      <local-datetime>
+         <year>2022</year>
+         <month>03</month>
+         <day>14</day>
+         <hour>00</hour>
+         <minute>00</minute>
+         <second>00</second>
+      </local-datetime>
+      <duration>
+         <duration-days>3</duration-days>
+      </duration>
+   </interval>
+
+   <interval>
+      <duration>
+         <duration-days>3</duration-days>
+         <duration-minutes>5</duration-minutes>
+      </duration>
+      <local-datetime>
+         <year>2022</year>
+         <month>03</month>
+         <day>15</day>
+         <hour>00</hour>
+         <minute>00</minute>
+         <second>00</second>
+      </local-datetime>
+   </interval>
+
+   <recurrence>
+      <interval>
+         <local-datetime>
+            <year>2022</year>
+            <month>03</month>
+            <day>15</day>
+            <hour>00</hour>
+            <minute>00</minute>
+            <second>00</second>
+         </local-datetime>
+         <local-datetime>
+            <year>2022</year>
+            <month>03</month>
+            <day>16</day>
+            <hour>00</hour>
+            <minute>00</minute>
+            <second>00</second>
+         </local-datetime>
+      </interval>
+   </recurrence>
+
+   <recurrence>
+      <interval>
+         <local-datetime>
+            <year>2022</year>
+            <month>03</month>
+            <day>15</day>
+            <hour>00</hour>
+            <minute>00</minute>
+            <second>00</second>
+         </local-datetime>
+         <local-datetime>
+            <year>2022</year>
+            <month>03</month>
+            <day>16</day>
+            <hour>00</hour>
+            <minute>00</minute>
+            <second>00</second>
+         </local-datetime>
+      </interval>
+   </recurrence>
+
+   <recurrence>
+      <repetitions>3</repetitions>
+      <interval>
+         <local-datetime>
+            <year>2022</year>
+            <month>03</month>
+            <day>15</day>
+            <hour>00</hour>
+            <minute>00</minute>
+            <second>00</second>
+         </local-datetime>
+         <local-datetime>
+            <year>2022</year>
+            <month>03</month>
+            <day>16</day>
+            <hour>00</hour>
+            <minute>00</minute>
+            <second>00</second>
+         </local-datetime>
+      </interval>
+   </recurrence>
+</list-of-iso8601>

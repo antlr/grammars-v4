@@ -1,0 +1,4 @@
+Counter >> incrementBy: n
+    <primitive: 60>
+    count := count + n.
+    ^ count

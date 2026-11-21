@@ -1,4 +1,4 @@
-# SPASS
+# SPASS Grammar
 
 Scraped manually from https://webspass.spass-prover.org/help/spass-input-syntax15.pdf
 Version 1.5

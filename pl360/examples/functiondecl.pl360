@@ -1,0 +1,5 @@
+BEGIN
+   FUNCTION REDUCE(6,#0600);
+   R3 := 3;
+   REDUCE(R3);
+END.

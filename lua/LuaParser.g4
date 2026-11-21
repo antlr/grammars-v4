@@ -103,7 +103,7 @@ exp
     | exp ('&' | '|' | '~' | '<<' | '>>') exp
     ;
 
-// var ::=  Name | prefixexp '[' exp ']' | prefixexp '.' Name 
+// var ::=  Name | prefixexp '[' exp ']' | prefixexp '.' Name
 var
     : NAME
     | prefixexp ('[' exp ']' | '.' NAME)

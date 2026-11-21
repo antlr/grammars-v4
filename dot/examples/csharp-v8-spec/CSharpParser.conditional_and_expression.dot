@@ -1,0 +1,29 @@
+digraph ATN {
+rankdir=LR;
+s297[fontsize=11, label="297", shape=doublecircle, fixedsize=true, width=.6];
+s2016[fontsize=11,label="2016", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2017[fontsize=11,label="2017", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2018[fontsize=11,label="&rarr;\n2018*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2019[fontsize=11,label="&larr;\n2019", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2020[fontsize=11,label="{2020*\nd=161|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s2021[fontsize=11,label="2021", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2022[fontsize=11,label="2022*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s296[fontsize=11,label="296", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2012[fontsize=11,label="2012", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2013[fontsize=11,label="2013", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2014[fontsize=11,label="2014", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2015[fontsize=11,label="2015", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s296 -> s2012 [fontname="Times-Italic", label="&epsilon;"];
+s2012 -> s2013 [fontsize=11, fontname="Courier", arrowsize=.7, label = "action_148:-1", arrowhead = normal];
+s2013 -> s2014 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<inclusive_or_expression[0]>", arrowhead = normal];
+s2014 -> s2020 [fontname="Times-Italic", label="&epsilon;"];
+s2020:p0 -> s2018 [fontname="Times-Italic", label="&epsilon;"];
+s2020:p1 -> s2021 [fontname="Times-Italic", label="&epsilon;"];
+s2018 -> s2015 [fontname="Times-Italic", label="&epsilon;"];
+s2021 -> s297 [fontname="Times-Italic", label="&epsilon;"];
+s2015 -> s2016 [fontsize=11, fontname="Courier", arrowsize=.7, label = "1 >= _p", arrowhead = normal];
+s2016 -> s2017 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'&&'", arrowhead = normal];
+s2017 -> s2019 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<inclusive_or_expression[0]>", arrowhead = normal];
+s2019 -> s2022 [fontname="Times-Italic", label="&epsilon;"];
+s2022 -> s2020 [fontname="Times-Italic", label="&epsilon;", style="dashed"];
+}

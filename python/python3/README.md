@@ -1,4 +1,4 @@
-# Python 3 parser
+# Python 3 Grammar
 
 An ANTLR4 grammar for Python 3 based on version 3.6 of 
 [The Python Language Reference](https://docs.python.org/3/reference/grammar.html).

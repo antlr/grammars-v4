@@ -1,0 +1,1 @@
+square x = x * x

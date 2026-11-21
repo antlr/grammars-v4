@@ -1,0 +1,16 @@
+digraph ATN {
+rankdir=LR;
+s531[fontsize=11, label="531", shape=doublecircle, fixedsize=true, width=.6];
+s2929[fontsize=11,label="2929", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s530[fontsize=11,label="530", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2930[fontsize=11,label="2930", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2931[fontsize=11,label="2931", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2932[fontsize=11,label="2932", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2933[fontsize=11,label="2933", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s530 -> s2929 [fontname="Times-Italic", label="&epsilon;"];
+s2929 -> s2930 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'where'", arrowhead = normal];
+s2930 -> s2931 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<type_parameter>", arrowhead = normal];
+s2931 -> s2932 [fontsize=11, fontname="Courier", arrowsize=.7, label = "':'", arrowhead = normal];
+s2932 -> s2933 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<type_parameter_constraints>", arrowhead = normal];
+s2933 -> s531 [fontname="Times-Italic", label="&epsilon;"];
+}

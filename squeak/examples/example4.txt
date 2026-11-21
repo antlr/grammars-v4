@@ -1,0 +1,4 @@
+proc Click =
+    DN? . wait [clickTime] (UP? . click! . Click) || (down! . UP? . up! . Click)
+
+click = Click

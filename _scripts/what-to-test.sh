@@ -2,7 +2,7 @@
 #set -x
 declare -A targets
 # remove temporarily TODO add back: "PHP"
-for t in  "Antlr4ng" "Cpp" "CSharp" "Dart" "Go" "Java" "JavaScript" "Python3" "Rust" "TypeScript"
+for t in  "Antlr4ng" "Cpp" "CSharp" "Dart" "Go" "Java" "JavaScript" "OphiRust" "Python3" "Rust" "TypeScript"
 do
     targets[$t]=0
 done
@@ -35,7 +35,7 @@ do
     fi
     if [ -f desc.xml ]
     then
-        gtargets=`dotnet trxml2 desc.xml | fgrep -e '/desc/targets' | awk -F = '{print $2}' | sed 's/;/ /g'`
+        gtargets=`dotnet trash xml2 desc.xml | fgrep -e '/desc/targets' | awk -F = '{print $2}' | sed 's/;/ /g'`
         for t in $gtargets
         do
             targets[$t]=`expr ${targets[$t]} + 1`
@@ -46,7 +46,7 @@ done
 
 ttargets=""
 # remove temporarily TODO add back: "PHP"
-for t in  "Antlr4ng" "Cpp" "CSharp" "Dart" "Go" "Java" "JavaScript" "Python3" "Rust" "TypeScript"
+for t in  "Antlr4ng" "Cpp" "CSharp" "Dart" "Go" "Java" "JavaScript" "OphiRust" "Python3" "Rust" "TypeScript"
 do
     if [ ${targets[$t]} -ne 0 ]
     then

@@ -1,0 +1,3 @@
+BEGIN
+   FOR R1 := 0 STEP 1 UNTIL 10 DO R2 := R2 + R1;
+END.

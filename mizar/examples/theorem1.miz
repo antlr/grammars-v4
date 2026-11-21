@@ -1,0 +1,8 @@
+environ
+ vocabularies TARSKI;
+begin
+theorem
+ thesis
+ proof
+ end;
+.

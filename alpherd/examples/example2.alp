@@ -1,0 +1,10 @@
+begin
+    const LIMIT = 100;
+    var i:int = 0;
+    while @<(i, LIMIT) do
+        @:=(i, @+(i, 1));
+        if @=(i, LIMIT) then
+            exitloop
+        fi
+    od
+end

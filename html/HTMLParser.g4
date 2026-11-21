@@ -36,7 +36,7 @@ options {
 }
 
 htmlDocument
-    : scriptletOrSeaWs* XML? scriptletOrSeaWs* DTD? scriptletOrSeaWs* htmlElements*
+    : scriptletOrSeaWs* XML? scriptletOrSeaWs* DTD? scriptletOrSeaWs* htmlElements* EOF
     ;
 
 scriptletOrSeaWs

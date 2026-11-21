@@ -1,4 +1,4 @@
-names=`dotnet trparse PostgreSQLParser.g4 | dotnet trnullable | \
+names=`dotnet trash parse PostgreSQLParser.g4 | dotnet trash nullable | \
 	grep ' False' | grep '^opt_' | awk '{print $1}'`
 for i in $names
 do
@@ -10,4 +10,4 @@ do
 	sep=";"
 done
 echo $rename
-dotnet trparse PostgreSQLParser.g4 | dotnet trrename "$rename" | dotnet trsponge -o . -c
+dotnet trash parse PostgreSQLParser.g4 | dotnet trash rename "$rename" | dotnet trash sponge -o . -c

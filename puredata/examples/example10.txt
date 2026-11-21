@@ -1,0 +1,4 @@
+#N canvas 0 0 450 300 10;
+#X obj 50 50 tgl 15 0 empty empty empty 0 -8 0 10 -262144 -1 -1 0 1;
+#X obj 50 100 sel 1 0;
+#X connect 0 0 1 0;

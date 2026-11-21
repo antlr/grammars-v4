@@ -4075,6 +4075,7 @@ non_reserved_words
     //List here lexer token referenced by rules which is not a keyword (SnowSQL Meaning) and allowed has object name
     // please add in alphabetic order for easy reading
     : ACCOUNTADMIN
+    | ACCOUNTS
     | AES
     | ALLOW_OVERLAPPING_EXECUTION
     | ARRAY_AGG
@@ -4100,16 +4101,19 @@ non_reserved_words
     | EVENT
     | EXCHANGE
     | EXCLUDE
+    | EXCLUDING
     | EXECUTION
     | EXPIRY_DATE
     | EXPR
     | EXTENSION
+    | EXTRACT
     | FACTS
     | FILE
     | FILES
     | FIRST_NAME
     | FIRST_VALUE
     | FREQUENCY
+    | GEO
     | GLOBAL
     | HIGH
     | HOURS
@@ -4131,6 +4135,7 @@ non_reserved_words
     | LAST_QUERY_ID
     | LEAD
     | LOCAL
+    | LOCATION
     | LOW
     | MAX_CONCURRENCY_LEVEL
     | MEDIUM
@@ -4149,6 +4154,7 @@ non_reserved_words
     | ON_SCHEDULE
     | OPTION
     | ORGADMIN
+    | ORIGIN
     | OUTBOUND
     | OUTER
     | OWNER
@@ -4186,6 +4192,7 @@ non_reserved_words
     | RESPECT
     | RESTRICT
     | RESULT
+    | RETURNS
     | ROLE
     | ROUNDING_MODE
     | ROW_NUMBER
@@ -4198,11 +4205,14 @@ non_reserved_words
     | STATE
     | STATS
     | STATUS
+    | SUSPENDED
     | SYSADMIN
+    | SYSTEM
     | TAG
     | TAGS
     | TARGET_LAG
     | TIMEZONE
+    | TRANSACTIONS
     | URL
     | USERADMIN
     | USERNAME
@@ -4498,9 +4508,15 @@ asc_desc
     ;
 
 over_clause
-    : OVER '(' partition_by order_by_expr? ')'
+    : OVER '(' window_partition_by order_by_expr? ')'
     | OVER '(' order_by_expr ')'
     | OVER '(' ')'
+    ;
+
+// Kept separate from partition_by, the unrelated file-layout clause of COPY INTO <location>,
+// CREATE EXTERNAL TABLE and MATCH_RECOGNIZE, none of which accept EXCLUDING.
+window_partition_by
+    : PARTITION BY EXCLUDING? expr_list
     ;
 
 function_call
@@ -4518,6 +4534,7 @@ function_call
     | to_date = ( TO_DATE | DATE) LR_BRACKET expr RR_BRACKET
     | length = ( LENGTH | LEN) LR_BRACKET expr RR_BRACKET
     | TO_BOOLEAN LR_BRACKET expr RR_BRACKET
+    | (EXTRACT | DATE_PART) LR_BRACKET id_ FROM expr RR_BRACKET
     ;
 
 param_assoc_list
@@ -4954,16 +4971,12 @@ subquery
     : query_statement
     ;
 
+// expr already covers IS, IN, LIKE/ILIKE, RLIKE and LIKE ANY; listing them here too made predicate ambiguous with its bare expr alternative.
+// For the same reason the quantified-subquery comparison is an optional suffix of that alternative rather than an alternative of its own.
 predicate
     : EXISTS LR_BRACKET subquery RR_BRACKET
-    | expr comparison_operator (ALL | SOME | ANY) '(' subquery ')'
     | expr NOT? BETWEEN expr AND expr
-    | expr NOT? IN '(' (subquery | expr_list) ')'
-    | expr NOT? (LIKE | ILIKE) expr (ESCAPE expr)?
-    | expr NOT? RLIKE expr
-    | expr NOT? (LIKE | ILIKE) ANY LR_BRACKET expr (COMMA expr)* RR_BRACKET (ESCAPE expr)?
-    | expr IS null_not_null
-    | expr
+    | expr (comparison_operator (ALL | SOME | ANY) LR_BRACKET subquery RR_BRACKET)?
     ;
 
 where_clause

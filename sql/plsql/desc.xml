@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../_scripts/desc.xsd">
+<desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/kaby76/Trash/raw/refs/heads/main/desc.xsd">
    <antlr-version>^4.12.0</antlr-version>
    <targets>Antlr4ng;Cpp;CSharp;Dart;Go;Java;JavaScript;Python3;TypeScript</targets>
+   <entry-point>sql_script</entry-point>
    <test>
       <targets>Antlr4ng;Cpp;CSharp;Dart;Go;Java;JavaScript;Python3;TypeScript</targets>
       <inputs>examples/**/*.sql</inputs>
@@ -9,7 +10,12 @@
    <test>
       <name>more-examples</name>
       <targets>Antlr4ng;Cpp;CSharp;Dart;Go;Java</targets>
-      <inputs>more/**/*.sql</inputs>
+      <inputs>more-examples/**/*.sql;!more-examples/cc_expr_invalid.sql;!more-examples/cte_in_derived_union_branch_not_allowed.sql;!more-examples/nested_cte_not_allowed.sql;!more-examples/sqlplus_slash_separated_invalid.sql;!more-examples/sqlplus_slash_separated_invalid2.sql;!more-examples/sqlplus_slash_separated_invalid3.sql;!more-examples/static_returning_clause_invalid.sql;!more-examples/tuple_method_call_invalid.sql</inputs>
+   </test>
+   <test>
+      <name>Negative-more-examples</name>
+      <targets>Antlr4ng;Cpp;CSharp;Dart;Go;Java</targets>
+      <inputs>more-examples/cc_expr_invalid.sql;more-examples/cte_in_derived_union_branch_not_allowed.sql;more-examples/nested_cte_not_allowed.sql;more-examples/sqlplus_slash_separated_invalid.sql;more-examples/sqlplus_slash_separated_invalid2.sql;more-examples/sqlplus_slash_separated_invalid3.sql;more-examples/static_returning_clause_invalid.sql;more-examples/tuple_method_call_invalid.sql</inputs>
    </test>
 </desc>
 

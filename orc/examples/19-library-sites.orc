@@ -1,0 +1,6 @@
+-- Some Useful Library Sites (reference, p.28)
+Ref(3) > r > r.write(5) >> r.read()
+| Cell() > r > (r.write(5) | r.read())
+| Array(3) > a > a(0).write(true) >> a(1).read()
+| Semaphore(1) > s > s.acquire() >> Println(0) >> s.release()
+| Channel() > ch > (ch.get() | ch.put(3) >> stop)

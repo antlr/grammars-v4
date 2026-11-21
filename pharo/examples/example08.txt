@@ -1,0 +1,7 @@
+Object subclass: #Counter
+    instanceVariableNames: 'count'
+    classVariableNames: ''
+    package: 'Collections'
+
+Counter >> initialize
+    count := 0

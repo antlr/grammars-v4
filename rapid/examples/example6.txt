@@ -1,0 +1,8 @@
+MODULE MainModule
+    PROC MoveAround()
+        MoveJ p10, v1000, z50, tool0;
+        MoveL p20, v500, fine, tool0 \WObj:=wobj0;
+        MoveAbsJ jpos10 \NoEOffs, v1000, z50, tool0;
+        MoveC p30, p40, v500, z10, tool0;
+    ENDPROC
+ENDMODULE

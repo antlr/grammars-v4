@@ -1,0 +1,4 @@
+Object subclass: #Point
+    instanceVariableNames: 'x y'
+    classVariableNames: ''
+    package: 'Geometry'

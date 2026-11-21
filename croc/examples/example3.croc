@@ -1,0 +1,27 @@
+module example3;
+
+class Animal
+{
+	name;
+
+	this(name: string)
+	{
+		this.name = name;
+	}
+
+	function speak(): string
+	{
+		return this.name ~ " makes a sound";
+	}
+}
+
+class Dog : Animal
+{
+	override function speak(): string
+	{
+		return this.name ~ " barks";
+	}
+}
+
+local d = Dog("Rex");
+local msg = d.speak();

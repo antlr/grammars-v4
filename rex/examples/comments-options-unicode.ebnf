@@ -1,0 +1,13 @@
+// A comment at the very start, with no preceding whitespace.
+/* Ordinary block comment, not an option. */
+Start ::= Word /* ws: explicit */
+Next ::= Word/*ws:explicit*/
+/* ws-like text without a colon is still an ordinary comment. */
+<?TOKENS?>
+Word ::= [#x0041-#x005A#x0061-#x007A]+
+Single ::= [#x0041]
+Space ::= [#x0020#x0009#x000A]+ /* ws: definition */
+[#x0041] == [#x0061]
+[#x0041-#x005A] == [#x0061-#x007A]
+Word \\ Space
+// A final comment.

@@ -1,0 +1,2 @@
+12:00:04.000000 ARP, Request who-has 192.0.2.2 tell 192.0.2.1, length 28
+12:00:04.000100 ARP, Reply 192.0.2.2 is-at 02:00:00:00:00:02, length 28

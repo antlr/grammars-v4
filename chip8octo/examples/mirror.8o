@@ -1,0 +1,35 @@
+###########################################
+#
+#  MacroMirror
+#
+#  Statically compute vertically or
+#  horizontally mirrored copies of 8x8 sprites
+#  using macros and the '@' operator.
+#  These techniques generalize readily to
+#  arbitrary-sized memory blocks.
+#
+#  John Earnest
+#
+###########################################
+
+: main
+	v1 := 10
+	i := sprite-1 sprite v0 v0 8
+	i := sprite-2 sprite v0 v1 8
+	i := sprite-3 sprite v1 v0 8
+	i := sprite-4 sprite v1 v1 8
+	loop again
+
+# see http://graphics.stanford.edu/~seander/bithacks.html#ReverseByteWith32Bits
+:macro rev8 X { :byte { 0xFF & ( 0x10101 * ( 0x22110 & 0x0802 * X ) | 0x88440 & 0x8020 * X ) >> 16 } }
+
+:macro mirror-v_        { :byte   { @ from + 7 - HERE - to }        }
+:macro mirror-h_        { :calc t { @ from +     HERE - to } rev8 t }
+:macro mirror-8 BASE OP { :calc to { HERE }  :calc from { BASE }  OP OP OP OP OP OP OP OP }
+:macro mirror-v BASE    { mirror-8 BASE mirror-v_ }
+:macro mirror-h BASE    { mirror-8 BASE mirror-h_ }
+
+: sprite-1 0x18 0x2C 0x46 0x83 0xEF 0x2C 0x2C 0x3C
+: sprite-3 0x18 0x14 0xF2 0x81 0xF3 0xF6 0x1C 0x18
+: sprite-2 mirror-v sprite-1
+: sprite-4 mirror-h sprite-3

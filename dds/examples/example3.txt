@@ -1,0 +1,16 @@
+                                            UNIQUE
+     A          R STUDENTSR                 TEXT('STUDENTS REGISTER')
+     A            STUDENTNO      9S 0       COLHDG('STUDENT' 'NUMBER')
+     A            FIRSTNAME     15          COLHDG('FIRST NAME')
+     A            LASTNAME      20          COLHDG('LAST NAME')
+     A            BIRTHDATE       L
+     A            PHONE         10S 0       COLHDG('PHONE' 'NUMBER')
+     A            ADDRESS       30          COLHDG('STREET' 'ADDRESS')
+     A            CITY          15
+     A            PROVINCE       2          COLHDG('PROV' 'CODE')
+
+     A            POSTALCODE     6          COLHDG('POSTAL' 'CODE')
+     A            FEESOWED       7P 2       COLHDG('FEES' 'OWED')
+     A            FINESOWED      7P 2       COLHDG('FINES' 'OWED')
+     A          K STUDENTNO 
+     

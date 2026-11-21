@@ -1,0 +1,3 @@
+-- A vending machine offering a choice between tea and coffee,
+-- written with the ASCII "[]" external choice operator.
+VM = coin -> (tea -> SKIP [] coffee -> SKIP)

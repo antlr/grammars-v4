@@ -1,0 +1,19 @@
+digraph ATN {
+rankdir=LR;
+s115[fontsize=11, label="115", shape=doublecircle, fixedsize=true, width=.6];
+s114[fontsize=11,label="114", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s853[fontsize=11,label="853", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s854[fontsize=11,label="854", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s855[fontsize=11,label="855", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s856[fontsize=11,label="856", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s857[fontsize=11,label="{&rarr;\n857\nd=91|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s858[fontsize=11,label="&larr;\n858", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s114 -> s853 [fontname="Times-Italic", label="&epsilon;"];
+s853 -> s854 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'@'", arrowhead = normal];
+s854 -> s855 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<qualifiedName>", arrowhead = normal];
+s855 -> s857 [fontname="Times-Italic", label="&epsilon;"];
+s857:p0 -> s856 [fontname="Times-Italic", label="&epsilon;"];
+s857:p1 -> s858 [fontname="Times-Italic", label="&epsilon;"];
+s856 -> s858 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<annotationFieldValues>", arrowhead = normal];
+s858 -> s115 [fontname="Times-Italic", label="&epsilon;"];
+}

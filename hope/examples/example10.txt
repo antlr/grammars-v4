@@ -1,0 +1,4 @@
+data pair(alpha,beta) == mkpair(alpha#beta);
+
+dec swap : pair(alpha,beta) -> pair(beta,alpha);
+--- swap(mkpair(a,b)) <= mkpair(b,a);

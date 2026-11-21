@@ -1,0 +1,4 @@
+$ORIGIN example.test.
+@ IN 1h MX 10 mail.example.test.
+mail IN A 192.0.2.25
+smtp IN CNAME mail.example.test.

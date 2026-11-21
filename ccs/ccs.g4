@@ -1,0 +1,270 @@
+/*
+BSD License
+
+Copyright (c) 2026, Tom Everett
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+1. Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the distribution.
+3. Neither the name of Tom Everett nor the names of its contributors
+   may be used to endorse or promote products derived from this software
+   without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+grammar ccs;
+
+value
+   : exp
+   | exp PERCENT
+   | exp VW
+   | exp VH
+   | exp SEC
+   ;
+
+var
+   : DOLL NAME
+   ;
+
+lit
+   : NUM
+   | STR
+   | COLOR
+   | NONE
+   | NAME
+   ;
+
+exp
+   : additive
+   ;
+
+additive
+   : multiplicative ((PLUS | SUB) multiplicative)*
+   ;
+
+multiplicative
+   : unary ((STAR | DIV) unary)*
+   ;
+
+unary
+   : (PLUS | SUB) unary
+   | lit
+   | var
+   | OPAREN exp CPAREN
+   ;
+
+alist
+   : value
+   | alist COMMA value
+   ;
+
+comma_sep_altexp
+   : value
+   | comma_sep_altexp COMMA value
+   ;
+
+selector
+   : STAR
+   | CARET
+   | NAME
+   | DOT NAME
+   | HASH NAME
+   | COLOR
+   | selector COLON NAME (OPAREN alist CPAREN)?
+   | selector COLON COLON NAME (OPAREN alist CPAREN)?
+   | selector IMM_CHI selector
+   | selector PLUS selector
+   | selector GEN_SIB selector
+   | selector ALT selector
+   | OPAREN selector CPAREN
+   ;
+
+style_type
+   : NAME
+   | NAME OPAREN alist CPAREN
+   ;
+
+stylize
+   : style_type COLON comma_sep_altexp
+   ;
+
+trigger
+   : style_type COLON rule_
+   | style_type COLON body
+   ;
+
+line
+   : stylize SEMI
+   | trigger SEMI
+   ;
+
+body
+   : OBRACE line* CBRACE
+   ;
+
+rule_
+   : selector body
+   ;
+
+stmt
+   : rule_
+   | NAME ASSGN rule_
+   | NAME ASSGN body
+   | NAME ASSGN exp
+   | NAME
+   ;
+
+stmts
+   : (stmt SEMI)* EOF
+   ;
+
+DOLL
+   : '$'
+   ;
+
+VW
+   : 'vw'
+   ;
+
+VH
+   : 'vh'
+   ;
+
+SEC
+   : 's'
+   ;
+
+NONE
+   : 'none'
+   ;
+
+IMM_CHI
+   : '>'
+   ;
+
+GEN_SIB
+   : '~'
+   ;
+
+ALT
+   : '|'
+   ;
+
+STR
+   : '"' ('\\' . | ~["\\\r\n])* '"'
+   | '\'' ('\\' . | ~['\\\r\n])* '\''
+   ;
+
+COLOR
+   : '#' HEX HEX HEX (HEX HEX HEX)?
+   ;
+
+fragment HEX
+   : [0-9a-fA-F]
+   ;
+
+SEMI
+   : ';'
+   ;
+
+PLUS
+   : '+'
+   ;
+
+SUB
+   : '-'
+   ;
+
+CARET
+   : '^'
+   ;
+
+OPAREN
+   : '('
+   ;
+
+CPAREN
+   : ')'
+   ;
+
+OBRACE
+   : '{'
+   ;
+
+CBRACE
+   : '}'
+   ;
+
+DOT
+   : '.'
+   ;
+
+HASH
+   : '#'
+   ;
+
+PERCENT
+   : '%'
+   ;
+
+COMMA
+   : ','
+   ;
+
+STAR
+   : '*'
+   ;
+
+DIV
+   : '/'
+   ;
+
+COLON
+   : ':'
+   ;
+
+ASSGN
+   : '='
+   ;
+
+NUM
+   : DIGIT+ ('.' DIGIT+)?
+   | '.' DIGIT+
+   ;
+
+NAME
+   : LETTER (LETTER | DIGIT | '-' | '_')*
+   ;
+
+fragment DIGIT
+   : [0-9]
+   ;
+
+fragment LETTER
+   : [A-Za-z_]
+   ;
+
+COMMENT
+   : '/*' .*? '*/' -> skip
+   ;
+
+WS
+   : [ \t\r\n]+ -> skip
+   ;

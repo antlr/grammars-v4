@@ -1,0 +1,2 @@
+-- Hiding an internal synchronization event from the environment.
+P = (a -> sync -> b -> STOP) \ {sync}

@@ -1,0 +1,7 @@
+| p1 p2 bytes assoc symbol |
+p1 := 3 / 4.
+p2 := 2.5e1.
+bytes := #[1 2 3 255].
+assoc := #key -> 'value'.
+symbol := #at:put:.
+Transcript showCr: p1 printString.

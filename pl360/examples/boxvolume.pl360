@@ -1,0 +1,24 @@
+COMMENT -- adapted from the sample program in manual section 3.8:
+   reads in the dimensions of a box, computes the volume, and
+   writes the result --;
+
+BEGIN
+   COMMENT -- declare functions and variables --;
+   FUNCTION REDUCE(6,#0600);
+
+   ARRAY 133 BYTE INPUT = (" INPUT DIMENSIONS ARE:",111(" "));
+   BYTE CARD SYN INPUT(23);
+   ARRAY 133 BYTE OUTPUT = (" VOLUME =",124(" "));
+   BYTE ANSWER SYN OUTPUT(10);
+
+   COMMENT -- main program code --;
+   WHILE R0 := @CARD; READ; = DO
+   BEGIN R0 := @INPUT; WRITE;
+      R1 := @CARD; R2 := 1 =: R5; R3 := 3;
+      WHILE R3 > 0 DO
+      BEGIN BCDTOVAL; R5 := R5 * R0; REDUCE(R3);
+      END;
+      R1 := @ANSWER; R3 := 7; R0 := R5; VALTOBCD;
+      R0 := @OUTPUT; WRITE;
+   END;
+END.

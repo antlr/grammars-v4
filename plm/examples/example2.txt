@@ -1,0 +1,17 @@
+COPY$MODULE:
+DO; /* Beginning of module with COpy procedure*/
+COpy: PROCEDURE (SRC$PTR, DST$PTR, COUNT) PUBLIC;
+/* Moves source record to destination record by treating
+both records as BYTE arrays. COU NT is the number of bytes
+to move (limited to 128), SRC$PTR points to SOURCE, DST$PTR
+points to DEST.*/
+DECLARE (SRC$PTR, DST$PTR) ADDRESS;
+DECLARE (SOURCE BASED SRC$PTR, DEST BASED DST$PTR) (128) BYTE;
+DECLARE (COUNT, 1, LAST) BYTE;
+LAST = COUNT -1;
+LOOP: DO J = 0 TO LAST;
+DEST(j) = SOURCE(j);
+END LOOP;
+RETURN;
+END COPY;
+END COPY$MODULE; /*End of COpy module*/ 

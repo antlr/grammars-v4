@@ -1,0 +1,5 @@
+Watchdog : {
+   startCondition : Main.WAITING.START < INF ;
+   endCondition : Main.outcome == SUCCESS ;
+   assignment : budget = -INF ;
+}

@@ -1,0 +1,8 @@
+Main:
+    range 0 > shoot if
+    aim 5 + aim' store
+    Main jump
+
+Shoot:
+    20 fire' store
+    return

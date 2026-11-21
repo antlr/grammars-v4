@@ -1,0 +1,29 @@
+digraph ATN {
+rankdir=LR;
+s295[fontsize=11, label="295", shape=doublecircle, fixedsize=true, width=.6];
+s294[fontsize=11,label="294", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2001[fontsize=11,label="2001", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2002[fontsize=11,label="2002", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2003[fontsize=11,label="2003", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2004[fontsize=11,label="2004", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2005[fontsize=11,label="2005", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2006[fontsize=11,label="2006", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2007[fontsize=11,label="&rarr;\n2007*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2008[fontsize=11,label="&larr;\n2008", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2009[fontsize=11,label="{2009*\nd=160|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s2010[fontsize=11,label="2010", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2011[fontsize=11,label="2011*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s294 -> s2001 [fontname="Times-Italic", label="&epsilon;"];
+s2001 -> s2002 [fontsize=11, fontname="Courier", arrowsize=.7, label = "action_147:-1", arrowhead = normal];
+s2002 -> s2003 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<exclusive_or_expression[0]>", arrowhead = normal];
+s2003 -> s2009 [fontname="Times-Italic", label="&epsilon;"];
+s2009:p0 -> s2007 [fontname="Times-Italic", label="&epsilon;"];
+s2009:p1 -> s2010 [fontname="Times-Italic", label="&epsilon;"];
+s2007 -> s2004 [fontname="Times-Italic", label="&epsilon;"];
+s2010 -> s295 [fontname="Times-Italic", label="&epsilon;"];
+s2004 -> s2005 [fontsize=11, fontname="Courier", arrowsize=.7, label = "1 >= _p", arrowhead = normal];
+s2005 -> s2006 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'|'", arrowhead = normal];
+s2006 -> s2008 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<exclusive_or_expression[0]>", arrowhead = normal];
+s2008 -> s2011 [fontname="Times-Italic", label="&epsilon;"];
+s2011 -> s2009 [fontname="Times-Italic", label="&epsilon;", style="dashed"];
+}

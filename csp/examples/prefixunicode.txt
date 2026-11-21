@@ -1,0 +1,3 @@
+-- The same vending machine, using the traditional mathematical
+-- arrow symbol instead of the ASCII "->" spelling.
+VendingMachine = coin → chocolate → SKIP

@@ -1,4 +1,4 @@
-# An ANTLR4 grammar for Apache Derby
+# Apache Derby Grammar
 
 https://db.apache.org/derby/docs/10.16/ref/index.html
 

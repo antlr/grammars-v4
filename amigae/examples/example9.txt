@@ -1,0 +1,9 @@
+MODULE 'dos/dos'
+
+PROC main()
+  DEF s = 0
+  LOOP
+    s := s + 1
+    IF s = 5 THEN RETURN 0
+  ENDLOOP
+ENDPROC

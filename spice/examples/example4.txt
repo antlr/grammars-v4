@@ -1,0 +1,9 @@
+* Transient source and load
+v1 1 0 sin(0 15 60 0 0)
+rload 1 0 10k
+* Increase iteration limit for Fourier analysis.
+.options itl5=30000
+.tran 1m 30m .01m
+.plot tran v(1)
+.four 60 v(1)
+.end

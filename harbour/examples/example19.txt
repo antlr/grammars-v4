@@ -1,0 +1,5 @@
+FUNCTION Factorial( nN )
+   IF nN <= 1
+      RETURN 1
+   ENDIF
+   RETURN nN * Factorial( nN - 1 )

@@ -8,8 +8,61 @@ public abstract class PlSqlParserBase extends Parser
     private boolean _isVersion11 = true;
     private boolean _isVersion10 = true;
 
+    /** True if the last script_unit was PL/SQL (bare '/' requires preceding ';'). */
+    private boolean _lastUnitWasPlsql = false;
+
     public PlSqlParserBase(TokenStream input) {
         super(input);
+    }
+
+    @Override
+    public void reset() {
+        _lastUnitWasPlsql = false;
+        super.reset();
+    }
+
+    public void setLastUnitPlsql() { _lastUnitWasPlsql = true; }
+    public void setLastUnitSql()   { _lastUnitWasPlsql = false; }
+    public boolean isLastUnitSql()   { return !_lastUnitWasPlsql; }
+    public boolean isLastUnitPlsql() { return _lastUnitWasPlsql; }
+
+    /**
+     * Parser-level predicate: distinguishes SOLIDUS as a SQL*Plus separator
+     * (on its own line) from SOLIDUS as a division operator (inside an expression).
+     */
+    public boolean isSolidusSeparator()
+    {
+        Token solidus = _input.LT(1);
+        if (solidus == null || solidus.getType() != PlSqlParser.SOLIDUS)
+            return false;
+
+        int solidusLine = solidus.getLine();
+
+        // Look-behind: previous significant token must be on a different line.
+        Token prev = _input.LT(-1);
+        if (prev != null && prev.getType() != Token.EOF && prev.getLine() == solidusLine)
+            return false;
+
+        // Look-ahead: next significant token must be on a different line or EOF.
+        Token next = _input.LT(2);
+        if (next != null && next.getType() != Token.EOF && next.getLine() == solidusLine)
+            return false;
+
+        return true;
+    }
+
+    /** True when the current token is the first significant token on its line. */
+    public boolean isLineStart()
+    {
+        Token token = _input.LT(1);
+        if (token == null)
+            return false;
+
+        Token prev = _input.LT(-1);
+        if (prev == null || prev.getType() == Token.EOF)
+            return true;
+
+        return prev.getLine() < token.getLine();
     }
 
     public boolean isVersion12() {
@@ -54,7 +107,8 @@ public abstract class PlSqlParserBase extends Parser
 
     public boolean isNotStartOfJoin() {
         Token lt1 = _input.LT(1);
-        if (lt1.getType() == PlSqlParser.INNER ||
+        if (lt1.getType() == PlSqlParser.JOIN ||
+            lt1.getType() == PlSqlParser.INNER ||
             lt1.getType() == PlSqlParser.CROSS ||
             lt1.getType() == PlSqlParser.NATURAL ||
             lt1.getType() == PlSqlParser.PARTITION ||
@@ -64,5 +118,11 @@ public abstract class PlSqlParserBase extends Parser
             lt1.getType() == PlSqlParser.OUTER)
             return false;
         return true;
+    }
+
+    public boolean isNotBulkCollect() {
+        Token lt1 = _input.LT(1);
+        Token lt2 = _input.LT(2);
+        return lt1.getType() != PlSqlParser.BULK || lt2.getType() != PlSqlParser.COLLECT;
     }
 }

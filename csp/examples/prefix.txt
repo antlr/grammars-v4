@@ -1,0 +1,2 @@
+-- Event prefixing, using the ASCII arrow spelling.
+Coin = coin -> SKIP

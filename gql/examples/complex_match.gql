@@ -1,0 +1,4 @@
+MATCH (n)
+WHERE n.name = "Mario Rossi"
+RETURN n as Person
+LIMIT 1

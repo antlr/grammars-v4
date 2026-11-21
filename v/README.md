@@ -1,4 +1,4 @@
-# V Language grammar for ANTLR4
+# V Language Grammar
 Because of the grammar similarity between Golang and V,
 
 It's modified from `golang.g4`

@@ -12,4 +12,16 @@ public:
     int la = _input->LA(pos);
     return la == -1 || la == '\n';
   };
+
+  bool IsQQuoteDelimiter()
+  {
+    ssize_t offset = static_cast<ssize_t>(tokenStartCharIndex) + 2 - static_cast<ssize_t>(getCharIndex());
+    int opening = _input->LA(offset);
+    int closing = _input->LA(-2);
+    if (opening == '[') return closing == ']';
+    if (opening == '{') return closing == '}';
+    if (opening == '<') return closing == '>';
+    if (opening == '(') return closing == ')';
+    return closing == opening;
+  };
 };

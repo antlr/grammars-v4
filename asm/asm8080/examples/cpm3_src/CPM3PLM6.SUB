@@ -1,0 +1,102 @@
+; PUT Generation
+stat con:=tty:
+vax $$as\sd mason.cpm30.sources
+vax put.plm $$stran
+vax putf.asm $$stran
+vax putrsx.asm $$stran
+stat con:=uc1:
+seteof put.plm
+is14
+asm80 putf.asm debug
+plm80 put.plm xref pagewidth(100) debug optimize
+link mcd80a.obj,put.obj,parse.obj,putf.obj,plm80.lib to put.mod
+locate put.mod code(0100H) stacksize(100)
+era put.mod
+cpm
+zero
+objcpm put
+era put
+era put.obj
+rmac putrsx
+xref putrsx
+stat con:=tty:
+vax $$as\sd mason.cpm30.listing\ar
+vax putf.sym $$stran
+vax put.lst $$stran
+vax put.sym $$stran
+vax put.lin $$stran
+vax putrsx.prn $$Stran
+vax putrsx.sym $$stran
+stat con:=uc1:
+link putrsx[op]
+era put.rsx
+ren put.rsx=putrsx.prl
+era put
+era put.obj
+era *.lst
+era *.sym
+era *.lin
+era *.prn
+;
+stat con:=tty:
+vax $$as\sd mason.cpm30.sources\ar
+vax submit.plm $$stran
+vax getf.asm $$stran
+vax getrsx.asm $$stran
+stat con:=uc1:
+seteof submit.plm
+seteof copyrt.lit
+is14
+asm80 getf.asm debug
+plm80 submit.plm xref pagewidth(100) debug optimize
+link mcd80a.obj,submit.obj,parse.obj,getf.obj,plm80.lib to submit.mod
+locate submit.mod code(0100H) stacksize(100)
+era submit.mod
+cpm
+zero
+objcpm submit
+rmac subrsx
+xref subrsx
+stat con:=tty:
+vax $$as\sd mason.cpm30.listing\ar
+vax submit.lst $$stran
+vax submit.sym $$stran
+vax submit.lin $$stran
+vax getf.sym $$stran
+vax getf.lst $$stran
+stat con:=uc1:
+link subrsx[op]
+era sub.rsx
+ren sub.rsx=subrsx.prl
+era submit
+era submit.obj
+era *.lst
+era *.sym
+era *.lin
+; DEVICE GENERATION
+stat con:=tty:
+vax $$as\sd mason.cpm30.sources\ar
+vax device.plm $$stran
+stat con:=uc1:
+seteof device.plm
+is14
+plm80 device.plm pagewidth(100) debug optimize
+link mcd80a.obj,device.obj,plm80.lib to device.mod
+locate device.mod code(0100H) stacksize(100)
+era device.mod
+cpm
+zero
+objcpm device
+stat con:=tty:
+vax $$as\sd mason.cpm30.listing\ar
+vax device.lst $$stran
+vax device.lin $$stran
+vax device.sym $$stran
+stat con:=uc1:
+era device.obj
+era device
+era *.lst
+era *.sym
+era *.lin
+sub cpm3plm7
+

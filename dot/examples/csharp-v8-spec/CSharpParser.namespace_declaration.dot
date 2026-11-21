@@ -1,0 +1,19 @@
+digraph ATN {
+rankdir=LR;
+s497[fontsize=11, label="497", shape=doublecircle, fixedsize=true, width=.6];
+s496[fontsize=11,label="496", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2770[fontsize=11,label="2770", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2771[fontsize=11,label="2771", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2772[fontsize=11,label="2772", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2773[fontsize=11,label="2773", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2774[fontsize=11,label="{&rarr;\n2774\nd=254|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s2775[fontsize=11,label="&larr;\n2775", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s496 -> s2770 [fontname="Times-Italic", label="&epsilon;"];
+s2770 -> s2771 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'namespace'", arrowhead = normal];
+s2771 -> s2772 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<qualified_identifier>", arrowhead = normal];
+s2772 -> s2774 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<namespace_body>", arrowhead = normal];
+s2774:p0 -> s2773 [fontname="Times-Italic", label="&epsilon;"];
+s2774:p1 -> s2775 [fontname="Times-Italic", label="&epsilon;"];
+s2773 -> s2775 [fontsize=11, fontname="Courier", arrowsize=.7, label = "';'", arrowhead = normal];
+s2775 -> s497 [fontname="Times-Italic", label="&epsilon;"];
+}

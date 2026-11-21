@@ -1,0 +1,114 @@
+;
+; BDOS3 Generation
+;
+device conout=crt
+vax $$as\sd mason.cpm30.sources\ar
+vax cpmbdos1.asm $$stran
+vax conbdos.asm $$stran
+vax bdos30.asm $$stran
+device conout=crt,lpt
+pip cpmbdosx.asm=cpmbdos1.asm,conbdos.asm,bdos30.asm
+rmac cpmbdosx
+link bdos3=cpmbdosx[os,$$sz]
+xref cpmbdosx
+device conout=crt
+vax $$as\sd mason.cpm30.listing\ar
+vax cpmbdosx.xrf $$stran
+device conout=crt,lpt
+era *.prn
+<y
+era cpmbdosx.rel
+<y
+era *.sym
+<y
+era *.xrf
+<y
+;
+; BNKBDOS3 Generation
+;
+device conout=crt
+vax $$as\sd mason.cpm30.sources\ar
+vax bdos30.asm $$stran
+device conout=crt,lpt
+pip cpmbdos.asm=cpmbdos2.asm,conbdos.asm,bdos30.asm
+rmac cpmbdos
+link bnkbdos3=cpmbdos[os,$$sz]
+xref cpmbdos
+device conout=crt
+vax $$as\sd mason.cpm30.listing\ar
+vax cpmbdos.xrf $$stran
+device conout=crt,lpt
+era *.prn
+<y
+era cpmbdos.rel
+era *.sym
+<y
+era *.xrf
+<y
+;
+; CCP Generation
+;
+device conout=crt
+vax $$as\sd mason.cpm30.sources\ar
+vax ccp3.asm $$sanr
+vax loader3.asm $$sanr
+device conout=crt,lpt
+;phase errors intended for checking CCP3.ASM and DATE.ASM equates
+RMAC LOADER3
+xref loader3
+LINK LOADER3[OP]
+;phase errors intended for checking LOADER.ASM equates
+mac ccp3
+;the fill instruction below is not essential
+;the addresses depend on the loader and ccp origins
+;and size, they
+;should be changed if the loader RSX module grows
+;the d display of 380-400h should reveal 1Ahs at the
+;end of the bit map and in front of the 42eH CCP origin
+;DATE must be origined in the LOADER patch area
+mac date
+SID LOADER3.PRL
+<M200,500,100
+<d380,400
+<f400,1000,0
+<eccp3.hex
+<edate.hex
+<wccp.com,100,d80
+<g0
+rmac ccp3
+xref ccp3
+device conout=crt
+vax $$as\sd mason.cpm30.listing\ar
+vax loader3.xrf $$sanr
+vax ccp3.xrf $$sanr
+device conout=crt,lpt
+era *.hex
+<y
+era *.prn
+<y
+era ccp3.rel
+era *.sym
+<y
+era *.xrf
+<y
+;
+; CPMLDR Generation
+;
+device conout=crt
+vax $$as\sd mason.cpm30.sources\ar
+vax cpmldr.asm $$stran
+device conout=crt,lpt
+rmac cpmldr
+xref cpmldr
+device conout=crt
+vax $$as\sd mason.cpm30.listing\ar
+vax cpmldr.xrf $$stran
+device conout=crt,lpt
+era *.prn
+<y
+era *.sym
+<y
+era *.xrf
+<y
+cpm3asm3
+

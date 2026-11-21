@@ -48,7 +48,7 @@ option
    ;
 
 pf_rule
-   : action direction? (logging | 'quick')* onspec? af? protospec? hosts filteropts?
+   : action_ direction? (logging | 'quick')* onspec? af? protospec? hosts filteropts?
    ;
 
 onspec
@@ -195,14 +195,14 @@ bandwidth_spec
    : NUMBER ('K' | 'M' | 'G')?
    ;
 
-action
+action_
    : 'pass'
    | 'match'
-   | 'block' return?
+   | 'block' return_?
    | 'scrub'
    ;
 
-return
+return_
    : 'drop'
    | 'return'
    | 'return-rst' ('(' 'ttl' NUMBER ')')?

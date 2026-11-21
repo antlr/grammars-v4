@@ -1,0 +1,6 @@
+V←1 2 3 4 5
+EVEN←0=2|V
+ANY←∨/EVEN
+ALL←∧/EVEN
+ANY
+ALL

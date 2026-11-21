@@ -1,0 +1,4 @@
+take 10 fib
+where
+   fib = 1 : 1 : map sum (zip (fib, tl fib))
+?

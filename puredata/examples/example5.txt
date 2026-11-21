@@ -1,0 +1,4 @@
+#N canvas 0 0 450 300 10;
+#X msg 100 50 bang;
+#X obj 100 100 print hello;
+#X connect 0 0 1 0;

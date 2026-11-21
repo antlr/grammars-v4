@@ -1,0 +1,8 @@
+environ
+ vocabularies TARSKI;
+ theorems TARSKI;
+begin
+canceled 3;
+theorem
+ thesis & thesis or not thesis implies thesis iff contradiction;
+.

@@ -1,0 +1,4 @@
+| sum |
+sum := 0.
+1 to: 10 do: [:each | sum := sum + each].
+Transcript showCr: sum printString.

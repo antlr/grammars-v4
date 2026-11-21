@@ -1,0 +1,677 @@
+$ TITLE('CP/M 3.0 --- TYPE ')
+type:
+do;
+
+/*
+  Copyright (C) 1982
+  Digital Research
+  P.O. Box 579
+  Pacific Grove, CA 93950
+*/
+
+/*
+  Revised:
+    19 Jan  80  by Thomas Rolander
+    14 Sept 81  by Doug Huskey
+    07 July 82  by John Knight
+    06 Oct  82  by Doug Huskey
+    02 Dec  82  by Bruce Skidmore
+*/
+
+declare
+    mpmproduct literally '01h', /* requires mp/m */
+    cpmversion literally '30h'; /* requires 3.0 cp/m */
+
+
+  /**************************************
+   *                                    *
+   *        EQUATES (LITERALS)          *
+   *                                    *
+   **************************************/
+
+
+declare
+    true           literally '0FFh',
+    false          literally '0',
+    forever        literally 'while true',
+    lit            literally 'literally',
+    proc           literally 'procedure',
+    dcl            literally 'declare',
+    addr           literally 'address',
+    cr             literally '13',
+    lf             literally '10',
+    ctrli          literally '9',
+    ctrlc          literally '3',
+    ctrlo          literally '0fh',
+    ctrlx          literally '18h',
+    bksp           literally '8',
+    dcnt$offset    literally '45h',
+    searcha$offset literally '47h',
+    searchl$offset literally '49h',
+    hash1$offset   literally '00h',
+    hash2$offset   literally '02h',
+    hash3$offset   literally '04h',
+    con$page$mode  literally '2ch',
+    con$page$size  literally '1ch';
+
+  /**************************************
+   *                                    *
+   *         GLOBAL VARIABLES           *
+   *                                    *
+   **************************************/
+
+declare plm label public;
+declare (eod,i,char) byte;
+declare control$z literally '1AH';
+declare (cnt,tcnt,code) byte;
+declare (ver, error$code)  address;
+declare paging byte initial (true);
+declare negate byte initial (false);
+declare status address;
+declare m based status byte;
+declare no$chars byte;
+declare last$dseg$byte byte initial (0);
+declare wflag byte initial (false);
+declare cur$fcb (33) byte;      /* current fcb (to type) */
+
+declare 
+  more    (*)  byte data (cr,lf,cr,lf,'Press RETURN to Continue $'),
+  failed  (*)  byte data(cr,lf,'ERROR: Not typed: $');
+
+
+
+  /**************************************
+   *                                    *
+   *       B D O S   INTERFACE          *
+   *                                    *
+   **************************************/
+
+
+  mon1:
+    procedure (func,info) external;
+      declare func byte;
+      declare info address;
+    end mon1;
+
+  mon2:
+    procedure (func,info) byte external;
+      declare func byte;
+      declare info address;
+    end mon2;
+
+  mon3:
+    procedure (func,info) address external;
+      declare func byte;
+      declare info address;
+    end mon3;
+
+  declare cmdrv     byte    external;	/* command drive      */
+  declare fcb (1)   byte    external;	/* 1st default fcb    */
+  declare fcb16 (1) byte    external;	/* 2nd default fcb    */
+  declare pass0     address external;	/* 1st password ptr   */
+  declare len0      byte    external;	/* 1st passwd length  */
+  declare pass1     address external;	/* 2nd password ptr   */
+  declare len1      byte    external;	/* 2nd passwd length  */
+  declare tbuff (1) byte    external;	/* default dma buffer */
+
+
+  /**************************************
+   *                                    *
+   *       B D O S   Externals          *
+   *                                    *
+   **************************************/
+
+  read$console:
+    procedure byte;
+      return mon2 (1,0);
+    end read$console;
+
+  printchar:
+    procedure (char);
+      declare char byte;
+      call mon1 (2,char);
+    end printchar;
+
+  conin: 
+    procedure byte;
+    return mon2(6,0fdh);
+    end conin;
+
+  print$buf:
+    procedure (buff$adr);
+      declare buff$adr address;
+      call mon1 (9,buff$adr);
+    end print$buf;
+
+  read$console$buf:
+    procedure (buffer$address,max) byte;
+      declare buffer$address address;
+      declare new$max based buffer$address address;
+      declare max byte;
+      new$max = max;
+      call mon1(10,buffer$address);
+      buffer$address = buffer$address + 1;
+      return new$max;	/* actually number of chars input */
+  end read$console$buf;
+
+  version: procedure address;
+    /* returns current cp/m version # */
+    return mon3(12,0);
+    end version;
+
+  check$con$stat:
+    procedure byte;
+      return mon2 (11,0);
+    end check$con$stat;
+
+  open$file:
+    procedure (fcb$address) address;
+      declare fcb$address address;
+    return mon3(15,fcb$address);
+    end open$file;
+
+  close$file:
+    procedure (fcb$address) byte;
+      declare fcb$address address;
+      return mon2 (16,fcb$address);
+    end close$file;
+
+  read$record:
+    procedure (fcb$address) byte;
+      declare fcb$address address;
+      return mon2 (20,fcb$address);
+    end read$record;
+
+  setdma: procedure(dma);
+    declare dma address;
+    call mon1(26,dma);
+    end setdma;
+
+  /* 0ff & 0fe = return BDOS errors */
+  return$errors:
+    procedure(mode);
+    declare mode byte;
+      call mon1 (45,mode);	
+    end return$errors;
+
+  terminate:
+    procedure;
+      call mon1 (0,0);
+    end terminate;
+
+
+  search$first:
+    procedure (fcb$address) byte;
+      declare fcb$address address;
+      return mon2 (17,fcb$address);
+    end search$first;
+
+  search$next:
+    procedure byte;
+      return mon2 (18,0);
+    end search$next;
+
+  declare scbpd structure
+     (offset byte,
+      set    byte,
+      value  address);
+
+  getscbbyte:
+    procedure (offset) byte;
+       declare offset byte;
+       scbpd.offset = offset;
+       scbpd.set = 0;
+       return mon2(49,.scbpd);
+    end getscbbyte;
+
+  getscbword:
+    procedure (offset) address;
+    declare offset byte;
+    scbpd.offset = offset;
+    scbpd.set = 0;
+    return mon3(49,.scbpd);
+  end getscbword;
+
+  setscbword:
+    procedure (offset,value);
+      declare offset byte;
+      declare value address;
+      scbpd.offset = offset;
+      scbpd.set = 0FEh;
+      scbpd.value = value;
+      call mon1(49,.scbpd);
+  end setscbword;
+
+  set$console$mode: procedure;
+    /* set console mode to control-c only */
+    call mon1(109,1);
+  end set$console$mode;
+
+  declare
+    parse$fn structure (
+      buff$adr  address,
+      fcb$adr   address);
+
+  parse: procedure(pfcb) address external;
+    declare pfcb address;
+    end parse;
+
+
+  /**************************************
+   *                                    *
+   *       S U B R O U T I N E S        *
+   *                                    *
+   **************************************/
+
+                  /* upper case character from console */
+crlf:   proc;
+    call printchar(cr);
+    call printchar(lf);
+    end crlf;
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+
+                  /* fill string @ s for c bytes with f */
+fill:   proc(s,f,c);
+    dcl s addr,
+        (f,c) byte,
+        a based s byte;
+
+        do while (c:=c-1)<>255;
+        a = f;
+        s = s+1;
+        end;
+    end fill;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+                  /* upper case character from console */
+ucase:   proc byte;
+    dcl c byte;
+
+    if (c:=conin) >= 'a' then
+       if c < '{' then
+          return(c-20h);
+    return c;
+    end ucase;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+                  /* get password and place at fcb + 16 */
+getpasswd:   proc;
+    dcl (i,c) byte;
+
+    call crlf;
+    call crlf;
+    call print$buf(.('Password: ','$'));
+retry:
+    call fill(.fcb16,' ',8);
+        do i = 0 to 7;
+nxtchr:
+        if (c:=ucase) >= ' ' then 
+            fcb16(i)=c;
+        if c = cr then
+            go to exit;
+        if c = ctrlx then
+            goto retry;
+        if c = bksp then do;
+            if i<1 then
+                goto retry;
+            else do;
+                fcb16(i:=i-1)=' ';
+                goto nxtchr;
+                end;
+            end;
+        if c = 3 then
+            call terminate;
+        end;
+exit:
+    c = check$con$stat;             /* clear raw I/O mode */
+    end getpasswd;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+                  /* error message routine */
+error:   proc(code);
+   declare
+      code byte;
+
+    if code=0 then do;
+        call print$buf (.('No File','$'));
+        call terminate;
+        end;
+    if code=1 then do;
+        call print$buf(.(cr,lf,'BDOS Bad Sector$'));
+        call terminate;
+        end;
+    if code=4 then do;
+        call print$buf(.(cr,lf,'Invalid Drive$'));
+        call terminate;
+        end;
+    if code = 5 then      
+        call print$buf(.('Currently Opened$'));
+    if code = 7 then
+        call print$buf(.('Password Error$'));
+    end error;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+                 /* print file name */
+print$file: procedure(fcbp);
+    declare (k,c) byte;
+    declare typ lit '9';        /* file type */
+    declare fnam lit '11';        /* file type */
+    declare
+        fcbp   addr,
+        fcbv   based fcbp (32) byte;
+
+    if fcbv(0) <> 0 then do;
+        call printchar(fcbv(0)+'@');
+        call printchar(':');
+    end;
+
+        do k = 1 to fnam;
+        if k = typ then 
+          call printchar('.');
+        if (c := (fcbv(k) and 7fh)) <> ' ' then
+          call printchar(c);
+        end;
+
+end print$file;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+error$opt: procedure (code);
+   declare code byte;
+   call print$buf(.('ERROR: $'));
+   if code = 0 then 
+      call print$buf(.('Invalid or missing delimiter(s) $'));
+   if code = 1 then
+      call print$buf(.('Try ''PAGE'' or ''NO PAGE'' $'));
+   call terminate;
+end error$opt;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+input$found: procedure (buffer$adr) byte;
+  declare buffer$adr address;
+  declare char based buffer$adr byte;
+  do while (char = ' ') or (char = 9); /* tabs & spaces */
+    buffer$adr = buffer$adr + 1;
+  end;
+  if char = 0 then	/* eoln */
+    return false;	/* input not found */
+  else
+    return true;	/* input found */
+end input$found;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+scanques: procedure(str$addr) byte;
+   declare str$addr address;
+   declare char based str$addr byte;
+   declare i byte;
+   declare wildcard byte;
+
+   i = 0;
+   wildcard = false;
+   do while (i < 11);
+      if char = '?' then
+         wildcard = true;
+      i = i + 1;
+      str$addr = str$addr + 1;
+      end; /* do while */
+   return wildcard;
+end scanques;
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
+
+                  /* skip over blanks or tabs in command */
+page$test: procedure;
+
+    if cnt <> 0 then
+      if (tcnt:=tcnt+1) >= cnt then do;
+        call print$buf(.more);
+        tcnt = conin;
+        call print$char(cr);
+        if tcnt = ctrlc then
+          call terminate;
+        if tcnt = ctrlo then
+          eod = true;
+        tcnt = -1;
+      end;
+end page$test;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+                  /* type a file specified by FCB */
+type$file: procedure;
+
+    call return$errors(0FFh);           /* return after error message */
+    call setdma(.fcb16);                /* set dma to password */
+    curfcb(6) = curfcb(6) or 80h;             /* open in RO mode     */
+    curfcb(12) = 0;			      /* open zero extent    */
+    error$code = open$file (.curfcb);
+    if low(error$code) = 0FFh then 
+      if (code := high(error$code)) = 7 then do;
+         call getpasswd;
+         call crlf;
+         call setdma(.fcb16);                /* set dma to password */
+         curfcb(6) = curfcb(6) or 80h;             /* open in RO mode     */
+         call return$errors(0);
+         error$code = open$file(.curfcb);
+      end;
+      else do;
+        call print$buf(.failed);
+        call print$file(.curfcb);
+        call printchar(' ');
+        call error(code);
+      end;
+    if low(error$code) <> 0FFH then
+    do;
+      call return$errors(0);        /* reset error mode */
+      call setdma(.tbuff);
+      curfcb(32) = 0;
+      eod = 0;
+      do while (not eod) and (read$record (.curfcb) = 0);
+        do i = 0 to 127;
+          if (char := tbuff(i)) = control$z
+            then eod = true;
+          if not eod then
+          do;
+            if check$con$stat then do;
+              tcnt = conin;
+              call terminate;	/* terminate only on ctrl-c */
+            end;
+            if cnt <> 0 then
+            do;
+              if char = 0ah then
+                call page$test;
+            end;
+            call printchar (char);
+          end;
+        end;
+      end;
+    /*  necessary to close under MP/M & Concurrent 
+      call close (.curfcb);
+    */
+    end;
+    else call error(0);
+
+end type$file;
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
+
+                  /* try typing files one at a time */
+multi$file:
+    procedure;
+    declare (code,dcnt) byte;
+    declare (nextfcb$adr,savdcnt,savsearcha,savsearchl) addr;
+    declare nextfcb based nextfcb$adr (32) byte;
+    declare (hash1,hash2,hash3) address;
+
+    call setdma(.tbuff);
+    if (dcnt:=search$first(.fcb)) = 0ffh then
+        call error(0);
+
+        do while dcnt <> 0ffh;
+        nextfcb$adr = shl(dcnt,5) + .tbuff;
+        savdcnt = getscbword(dcnt$offset);
+        savsearcha = getscbword(searcha$offset);
+        savsearchl = getscbword(searchl$offset);
+        /* save searched fcb's hash code (5 bytes) */
+        hash1 = getscbword(hash1$offset);
+        hash2 = getscbword(hash2$offset);
+        hash3 = getscbword(hash3$offset);	/* saved one extra byte */
+        call move(16,nextfcb$adr,.curfcb);	/* copy matched filename */
+        curfcb(0) = fcb(0);			/* set drive */
+        call page$test;
+	call crlf;
+        call print$file(.curfcb);
+        call printchar(':');
+        call page$test;
+        call crlf;
+        call type$file;
+        call setdma(.tbuff);
+        call setscbword(dcnt$offset,savdcnt);
+        call setscbword(searcha$offset,savsearcha);
+        call setscbword(searchl$offset,savsearchl);
+        /* restore hash code */
+        call setscbword(hash1$offset,hash1);
+        call setscbword(hash2$offset,hash2);
+        call setscbword(hash3$offset,hash3);
+        if .fcb <> savsearcha then  /*restore orig fcb if destroyed*/
+          call move(16,.fcb,savsearcha);
+        dcnt = search$next;
+        end;
+end multi$file;
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
+
+                  /* skip over blanks or tabs in command */
+eat$blanks: procedure;
+      do while (m = ' ') or (m = ctrli);
+         status = status + 1;
+      end;
+end eat$blanks;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+ 
+  /**************************************
+ *                                    *
+ *       M A I N  P R O G R A M       *
+ *                                    *
+ **************************************/
+
+plm:
+  do;
+    ver = version;
+    if (low(ver) < cpmversion) or (high(ver) = mpmproduct) then do;
+      call print$buf (.('Requires CP/M 3.0','$'));
+      call terminate;
+      end;
+    
+    call set$console$mode;	/* set program interrupt to control-c only */ 
+    
+    /* get command */
+    if not input$found(.tbuff(1)) then do;
+       /* prompt for file */
+       call print$buf(.('Enter file: $'));
+       no$chars = read$console$buf(.tbuff(0),40);
+       call print$buf(.(cr,lf,'$'));
+       tbuff(1) = ' ';	/* blank out nc field */
+       tbuff(no$chars+2)=0;	/* mark eoln */
+       /* convert input to upper case */
+       do i = 2 to no$chars+1;
+          if tbuff(i) >= 'a' then
+             if tbuff(i) < '}' then
+                tbuff(i) = tbuff(i) - 20h;
+       end;
+    end;
+
+    /* parse command for file and options */
+    tcnt,cnt = 0;
+    parse$fn.buff$adr = .tbuff(1);
+    parse$fn.fcb$adr = .fcb;
+    status = parse(.parse$fn);
+    if status = 0FFFFh then do;
+       call print$buf(.('ERROR: Invalid file name. $'));
+       call terminate;
+    end;
+
+    /* get default paging mode */
+    if getscbbyte(con$page$mode) <> 0 then
+       paging = false;
+
+    /* check for options */
+    if (status <> 0) then do; 	/* options follow? */
+      call eat$blanks;
+      if m = 0 then goto continue;	/* no options found */
+      /* check for page option */
+      if m <> '[' then
+         call error$opt(0);
+      status = status + 1;
+      call eat$blanks;
+      if m = 'N' then do;
+         status = status + 1;
+         if (m = 'O') or (m = ' ') then do;
+           status = status + 1;
+           negate = true;
+         end;
+         else
+           call error$opt(1);
+         call eat$blanks;
+      end;
+
+      if m = 'P' then
+         paging = true;
+      else
+         call error$opt(1);
+      status = status + 1;
+      if ( m = ']' ) or ( m = 0 ) then
+         goto continue;
+      else if m <> 'A' then
+         goto end$opt;
+      status = status + 1;
+      if ( m = ']' ) or ( m = 0 ) then
+         goto continue;
+      else if m <> 'G' then
+         goto end$opt;
+      status = status + 1;
+      if ( m = ']' ) or ( m = 0 ) then
+         goto continue;
+      else if m <> 'E' then
+         goto end$opt;
+      status = status + 1;
+    end$opt:
+      call eat$blanks;
+      if ( m <> ']' ) and ( m <> 0 ) then
+         call error$opt(1);
+   end;
+   continue:
+
+   /* check for negation of paging */
+   if negate then 
+     paging = not paging;
+
+   /* get page size */
+   if paging then do;
+     cnt = getscbbyte(con$page$size)-2;
+     if cnt = 0 then cnt = 22;		/* by default, 22 lines on screen */
+   end;
+   else
+     cnt = 0;	/* no paging */
+
+   /* check for wild card or single file */
+    wflag = scanques(.fcb);
+    if wflag = true then 
+       call multi$file;
+    else do;
+       call move(16,.fcb,.curfcb);
+       call type$file;
+    end;
+    call terminate;
+  end;
+end type;
+

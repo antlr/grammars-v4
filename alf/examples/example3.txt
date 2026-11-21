@@ -1,0 +1,29 @@
+module bool.
+    export true, false, not, and, or.
+    datatype bool = { true ; false }.
+    func not : bool -> bool prefix 900.
+    func and : bool, bool -> bool infixleft 800.
+    func or : bool, bool -> bool infixleft 700.
+rules.
+    not(true) = false.
+    not(false) = true.
+    true and X = X.
+    false and X = false.
+    true or X = true.
+    false or X = X.
+end bool.
+
+module stack(elem).
+    use bool with eq for equal.
+    export empty, push, isempty.
+    datatype stack = { empty ; push(elem, stack) }.
+    func isempty : stack -> bool.
+    pred member : elem, stack infix.
+rules.
+    isempty(empty) = true.
+    isempty(push(X, S)) = false.
+    X member push(X, S).
+    X member push(Y, S) :- X member S.
+end stack.
+
+?- isempty(empty) = true, not(false) = true.

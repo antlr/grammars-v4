@@ -1,0 +1,6 @@
+begin
+    text t;
+    t :- "Hello, World!";
+    outtext(t);
+    outimage
+end

@@ -1,0 +1,6 @@
+;
+; IPv4 address
+;
+ipv4  = byte 3("." byte)
+byte  = 1*3digit
+digit = %d48-57

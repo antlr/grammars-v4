@@ -1,0 +1,31 @@
+*======================================================
+* Full featured example
+*======================================================
+#PLAYER 1
+#GENRE Hardcore
+#TITLE The Finale
+#ARTIST Example Crew
+#BPM 180
+#MIDIFILE none.mid
+#PLAYLEVEL 12
+#TOTAL 350
+#RANK 3
+#VOLWAV 120
+#WAV01 kick.wav
+#WAV02 snare.wav
+#WAV03 clap.wav
+#WAVFF crash.wav
+#BMP00 miss.bmp
+#BMP01 stage.bmp
+#BMPEE poor.bmp
+
+*------------------- MAIN DATA
+#00101:01000100
+#00103:B4
+#00104:01000000
+#00111:01020301
+#00112:00020003
+#00121:01000100
+#00211:01020301
+#00221:01000100
+#00311:FF000000

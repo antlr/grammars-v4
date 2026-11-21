@@ -1,0 +1,27 @@
+%Title := "Hello world";
+%Include(Pluslist);
+%Subtitle := "Definitions";
+%Lower_Case := True;
+
+/* Definitions that everyone needs */
+%Include(Boolean, Numeric_Types, More_Numeric_Types, String_Types,
+   More_String_Types);
+
+/* A tasteful subset of procedure definitions */
+%Include(Main);
+
+/* Message routine definitions */
+%Include(Message_Initialize, Message, Message_Terminate);
+
+%Subtitle := "Local Procedure Definitions";
+%Eject();
+definition Main
+
+  variable Mcb is pointer to Stream_Type;
+
+  Mcb := Message_Initialize();
+  Message(Mcb, "Hello, world!");
+  Message_Terminate(Mcb);
+  Mcb := Null;
+
+end Main;

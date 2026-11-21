@@ -1,0 +1,5 @@
+BEGIN
+   PROCEDURE DOUBLE(R1); R1 := R1 + R1;
+   R1 := 5;
+   DOUBLE(R1);
+END.

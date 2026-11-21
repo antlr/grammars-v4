@@ -1,0 +1,2 @@
+12:00:03.000000 IP client.example.test.53000 > resolver.example.test.domain: 1234+ A? www.example.test. (34)
+12:00:03.001000 IP resolver.example.test.domain > client.example.test.53000: 1234 1/0/0 A 192.0.2.80 (50)

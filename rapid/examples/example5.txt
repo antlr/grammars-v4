@@ -1,0 +1,14 @@
+MODULE MainModule
+    PROC Classify()
+        VAR num day;
+        day := 3;
+        TEST day
+        CASE 1, 7:
+            TPWrite "weekend";
+        CASE 2, 3, 4, 5, 6:
+            TPWrite "weekday";
+        DEFAULT:
+            TPWrite "unknown";
+        ENDTEST
+    ENDPROC
+ENDMODULE

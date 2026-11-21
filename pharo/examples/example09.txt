@@ -1,0 +1,3 @@
+Counter >> increment
+    count := count + 1.
+    ^ count

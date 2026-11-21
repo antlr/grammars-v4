@@ -1,0 +1,3 @@
+Point >> printOn: aStream
+    <category: 'printing'>
+    aStream nextPutAll: '('; print: x; nextPutAll: ', '; print: y; nextPutAll: ')'

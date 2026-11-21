@@ -1,0 +1,14 @@
+MODULE E2 (MAIN = ABS) =
+BEGIN
+GLOBAL ROUTINE ABS (Z) =
+!+
+! Returns the absolute value of its argument, using a
+! parenthesized conditional expression.
+!-
+    BEGIN
+    LOCAL Q;
+    Q = (IF .Z GTR 0 THEN .Z ELSE -.Z);
+    Q
+    END;
+END
+ELUDOM

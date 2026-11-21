@@ -1,0 +1,18 @@
+set_option pp.all true
+
+attribute [simp] Nat.add_zero
+
+mutual
+  def isEven (n : Nat) : Bool :=
+    match n with
+    | 0 => true
+    | n + 1 => isOdd n
+
+  def isOdd (n : Nat) : Bool :=
+    match n with
+    | 0 => false
+    | n + 1 => isEven n
+end
+
+#eval 1 + 1
+#check Nat.add

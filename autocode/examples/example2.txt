@@ -1,0 +1,59 @@
+
+Jv1
+TEXT
+FEED COMPOSITION
+
+n20 = TAPE
+v213 = TAPE
+v240 = TAPE n20
+v140 = TAPE n2
+v3 = 0
+n0 = 4
+n1 = 0
+v0 = 4
+43) v215 = v0 + 1
+v215 = v213 / v215
+v218 = v213 - v215
+n1 = 0
+42) v(20+n1) = v(240+n1) X v213
+n1 = n1 + 1
+-> 42, n1 # 0
+v50 = 0
+v3 = 0
+n1 = 0
+44) v10 = v(140+n1) X v0
+v10 = 1 + v10
+v2 = 1 - v(140+n1)
+v2 = v2 / v10
+v2 = v2 / v10
+v(10+n1) = v(20+n1) / v10
+v(300+n1) = v(10+n1) / v215
+v50 = v50 + v(300+n1)
+v2 = v2 X v(300+n1)
+v3 = v3 + v2
+n1 = n1 + 1
+-> 44, n1#n20
+-> 45, v50 =* 1
+v2 = 1 - v50
+v2 = v2 / v3
+v0 = v0 + v2
+-> 43
+45) TEXT
+FEED COMPOSITON
+
+n1 = 0
+48) PRINT v(300+n1), 4023
+n1 = n1 + 1
+-> 48, n1 # n20
+TEXT
+LIQUID FEED COMPOSITION
+
+n1 = 0
+13) PRINT v(300+n1), 4024
+n1 = n1 + 1
+-> 13, n1 # n20
+TEXT
+NUMBER OF LIQUID MOLES =
+PRINT v215, 4040
+STOP
+(-> 0)

@@ -1,0 +1,2 @@
+structure Point3D extends Point where
+  z : Nat

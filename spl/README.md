@@ -6,4 +6,3 @@ An ANTLR4 grammar for Splunk (SPL).
 
 ## Reference
 * [pldb](http://pldb.info/concepts/spl)
-

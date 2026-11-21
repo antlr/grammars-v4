@@ -1,0 +1,26 @@
+digraph ATN {
+rankdir=LR;
+s581[fontsize=11, label="581", shape=doublecircle, fixedsize=true, width=.6];
+s3170[fontsize=11,label="3170", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s3171[fontsize=11,label="3171", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s580[fontsize=11,label="580", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s3172[fontsize=11,label="3172", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s3173[fontsize=11,label="3173", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s3174[fontsize=11,label="3174", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s3175[fontsize=11,label="3175", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s3176[fontsize=11,label="3176", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s3177[fontsize=11,label="{&rarr;\n3177\nd=311|{<p0>|<p1>|<p2>}}", shape=record, fixedsize=false, peripheries=1];
+s3178[fontsize=11,label="&larr;\n3178", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s580 -> s3177 [fontname="Times-Italic", label="&epsilon;"];
+s3177:p0 -> s3170 [fontname="Times-Italic", label="&epsilon;"];
+s3177:p1 -> s3171 [fontname="Times-Italic", label="&epsilon;"];
+s3177:p2 -> s3176 [fontname="Times-Italic", label="&epsilon;"];
+s3170 -> s3178 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<block>", arrowhead = normal];
+s3171 -> s3172 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'=>'", arrowhead = normal];
+s3176 -> s3178 [fontsize=11, fontname="Courier", arrowsize=.7, label = "';'", arrowhead = normal];
+s3178 -> s581 [fontname="Times-Italic", label="&epsilon;"];
+s3172 -> s3173 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'ref'", arrowhead = normal];
+s3173 -> s3174 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<variable_reference>", arrowhead = normal];
+s3174 -> s3175 [fontsize=11, fontname="Courier", arrowsize=.7, label = "';'", arrowhead = normal];
+s3175 -> s3178 [fontname="Times-Italic", label="&epsilon;"];
+}

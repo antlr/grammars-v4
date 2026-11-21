@@ -1,0 +1,15 @@
+MODULE E3 (MAIN = SUMTO) =
+BEGIN
+GLOBAL ROUTINE SUMTO (N) =
+!+
+! Sums the integers from 1 to N using an INCR loop,
+! and returns the result.
+!-
+    BEGIN
+    LOCAL SUM, I;
+    SUM = 0;
+    INCR I FROM 1 TO .N BY 1 DO SUM = .SUM + .I;
+    RETURN .SUM
+    END;
+END
+ELUDOM

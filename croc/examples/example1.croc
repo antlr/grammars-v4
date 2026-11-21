@@ -1,0 +1,12 @@
+module example1;
+
+import console: writeln;
+
+local function add(a: int, b: int): int
+{
+	return a + b;
+}
+
+local x = add(1, 2);
+
+console.writeln(x);

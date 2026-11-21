@@ -1,4 +1,4 @@
-# YINI ANTLR 4 grammar
+# YINI Grammar
 
 This grammar is based on official language specification hosted at [YINI-spec on GitHub](https://github.com/YINI-lang/YINI-spec).
 

@@ -1,0 +1,10 @@
+$ORIGIN example.test.
+$TTL 1h
+@ IN SOA ns.example.test. hostmaster.example.test. (
+    2026102501 ; serial
+    1h         ; refresh
+    15m        ; retry
+    1w         ; expiry
+    5m         ; minimum
+)
+  IN NS ns.example.test.

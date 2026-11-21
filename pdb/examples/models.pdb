@@ -1,0 +1,8 @@
+NUMMDL    2
+MODEL        1
+ATOM      1  CA  GLY A   1       1.000   2.000   3.000  1.00 10.00           C
+ENDMDL
+MODEL        2
+ATOM      1  CA  GLY A   1       1.100   2.100   3.100  1.00 10.00           C
+ENDMDL
+END

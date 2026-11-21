@@ -1,4 +1,4 @@
-# Ada 2022 ANTLR Grammar
+# Ada 2022 Grammar
 
 This is an ANTLR4 grammar for the Ada 2022 programming language,
 based on the [Ada 2022 Reference Manual](http://www.ada-auth.org/standards/ada22.html).

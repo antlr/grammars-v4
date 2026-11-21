@@ -1,0 +1,33 @@
+digraph ATN {
+rankdir=LR;
+s61[fontsize=11, label="61", shape=doublecircle, fixedsize=true, width=.6];
+s576[fontsize=11,label="&larr;\n576", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s567[fontsize=11,label="567", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s568[fontsize=11,label="568", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s569[fontsize=11,label="569", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s570[fontsize=11,label="570", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s571[fontsize=11,label="571", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s60[fontsize=11,label="60", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s572[fontsize=11,label="572", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s573[fontsize=11,label="573", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s574[fontsize=11,label="574", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s575[fontsize=11,label="{&rarr;\n575\nd=50|{<p0>|<p1>|<p2>|<p3>|<p4>|<p5>|<p6>|<p7>}}", shape=record, fixedsize=false, peripheries=1];
+s60 -> s575 [fontname="Times-Italic", label="&epsilon;"];
+s575:p0 -> s567 [fontname="Times-Italic", label="&epsilon;"];
+s575:p1 -> s568 [fontname="Times-Italic", label="&epsilon;"];
+s575:p2 -> s569 [fontname="Times-Italic", label="&epsilon;"];
+s575:p3 -> s570 [fontname="Times-Italic", label="&epsilon;"];
+s575:p4 -> s571 [fontname="Times-Italic", label="&epsilon;"];
+s575:p5 -> s572 [fontname="Times-Italic", label="&epsilon;"];
+s575:p6 -> s573 [fontname="Times-Italic", label="&epsilon;"];
+s575:p7 -> s574 [fontname="Times-Italic", label="&epsilon;"];
+s567 -> s576 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<recordDeclaration>", arrowhead = normal];
+s568 -> s576 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<constDeclaration>", arrowhead = normal];
+s569 -> s576 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<interfaceMethodDeclaration>", arrowhead = normal];
+s570 -> s576 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<genericInterfaceMethodDeclaration>", arrowhead = normal];
+s571 -> s576 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<interfaceDeclaration>", arrowhead = normal];
+s572 -> s576 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<annotationTypeDeclaration>", arrowhead = normal];
+s573 -> s576 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<classDeclaration>", arrowhead = normal];
+s574 -> s576 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<enumDeclaration>", arrowhead = normal];
+s576 -> s61 [fontname="Times-Italic", label="&epsilon;"];
+}

@@ -1,0 +1,36 @@
+digraph ATN {
+rankdir=LR;
+s459[fontsize=11, label="459", shape=doublecircle, fixedsize=true, width=.6];
+s458[fontsize=11,label="458", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2602[fontsize=11,label="2602", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2603[fontsize=11,label="2603", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2604[fontsize=11,label="2604", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2605[fontsize=11,label="2605", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2606[fontsize=11,label="2606", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2607[fontsize=11,label="2607", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2608[fontsize=11,label="2608", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2609[fontsize=11,label="2609", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2610[fontsize=11,label="2610", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2611[fontsize=11,label="2611", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2612[fontsize=11,label="2612", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2613[fontsize=11,label="2613", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2614[fontsize=11,label="{&rarr;\n2614\nd=233|{<p0>|<p1>|<p2>}}", shape=record, fixedsize=false, peripheries=1];
+s2615[fontsize=11,label="&larr;\n2615", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s458 -> s2614 [fontname="Times-Italic", label="&epsilon;"];
+s2614:p0 -> s2602 [fontname="Times-Italic", label="&epsilon;"];
+s2614:p1 -> s2606 [fontname="Times-Italic", label="&epsilon;"];
+s2614:p2 -> s2611 [fontname="Times-Italic", label="&epsilon;"];
+s2602 -> s2603 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'goto'", arrowhead = normal];
+s2606 -> s2607 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'goto'", arrowhead = normal];
+s2611 -> s2612 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'goto'", arrowhead = normal];
+s2603 -> s2604 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<identifier>", arrowhead = normal];
+s2607 -> s2608 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'case'", arrowhead = normal];
+s2612 -> s2613 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'default'", arrowhead = normal];
+s2604 -> s2605 [fontsize=11, fontname="Courier", arrowsize=.7, label = "';'", arrowhead = normal];
+s2608 -> s2609 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<constant_expression>", arrowhead = normal];
+s2613 -> s2615 [fontsize=11, fontname="Courier", arrowsize=.7, label = "';'", arrowhead = normal];
+s2605 -> s2615 [fontname="Times-Italic", label="&epsilon;"];
+s2609 -> s2610 [fontsize=11, fontname="Courier", arrowsize=.7, label = "';'", arrowhead = normal];
+s2615 -> s459 [fontname="Times-Italic", label="&epsilon;"];
+s2610 -> s2615 [fontname="Times-Italic", label="&epsilon;"];
+}

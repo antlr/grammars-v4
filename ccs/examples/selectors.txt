@@ -1,0 +1,5 @@
+* { opacity: 1; };
+^ { color: #123; };
+.panel { width: 10; };
+#main { height: 20; };
+#abc { opacity: .5; };

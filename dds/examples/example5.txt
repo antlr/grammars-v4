@@ -1,0 +1,6 @@
+     A*                                     Printer file for invoices
+     A          R HEADER
+     A                                  1  2'Invoice Date:'
+     A                                  1 16DATE
+     A                                  2  2'Customer:'
+     A            CUSTNAME      30    O  2 16

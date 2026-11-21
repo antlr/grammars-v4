@@ -1,0 +1,19 @@
+digraph ATN {
+rankdir=LR;
+s231[fontsize=11, label="231", shape=doublecircle, fixedsize=true, width=.6];
+s1728[fontsize=11,label="1728", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1729[fontsize=11,label="1729", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s230[fontsize=11,label="230", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1724[fontsize=11,label="1724", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1725[fontsize=11,label="1725", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1726[fontsize=11,label="{&rarr;\n1726\nd=212|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1727[fontsize=11,label="&larr;\n1727", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s230 -> s1724 [fontname="Times-Italic", label="&epsilon;"];
+s1724 -> s1726 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<identifier>", arrowhead = normal];
+s1726:p0 -> s1725 [fontname="Times-Italic", label="&epsilon;"];
+s1726:p1 -> s1727 [fontname="Times-Italic", label="&epsilon;"];
+s1725 -> s1727 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<nonWildcardTypeArgumentsOrDiamond>", arrowhead = normal];
+s1727 -> s1728 [fontname="Times-Italic", label="&epsilon;"];
+s1728 -> s1729 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<classCreatorRest>", arrowhead = normal];
+s1729 -> s231 [fontname="Times-Italic", label="&epsilon;"];
+}

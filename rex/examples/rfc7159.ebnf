@@ -1,0 +1,63 @@
+JSON-text
+         ::= ws value ws EOF
+begin-array
+         ::= ws '[' ws
+begin-object
+         ::= ws '{' ws
+end-array
+         ::= ws ']' ws
+end-object
+         ::= ws '}' ws
+name-separator
+         ::= ws ':' ws
+value-separator
+         ::= ws ',' ws
+value    ::= false
+           | null
+           | true
+           | object
+           | array
+           | number
+           | string
+object   ::= begin-object ( member ( value-separator member )* )? end-object
+member   ::= string name-separator value
+array    ::= begin-array ( value ( value-separator value )* )? end-array
+number   ::= minus? int frac? exp?
+
+<?TOKENS?>
+
+ws       ::= ( ' ' | #x0009 | #x000A | #x000D )*
+false    ::= 'false'
+null     ::= 'null'
+true     ::= 'true'
+decimal-point
+         ::= '.'
+digit1-9 ::= [1-9]
+e        ::= 'e'
+           | 'E'
+exp      ::= e ( minus | plus )? DIGIT+
+frac     ::= decimal-point DIGIT+
+int      ::= zero
+           | digit1-9 DIGIT*
+minus    ::= '-'
+plus     ::= '+'
+zero     ::= '0'
+string   ::= quotation-mark char* quotation-mark
+char     ::= unescaped
+           | escape ( '"' | '\' | '/' | 'b' | 'f' | 'n' | 'r' | 't' | 'u' HEXDIG HEXDIG HEXDIG HEXDIG )
+escape   ::= '\'
+quotation-mark
+         ::= '"'
+unescaped
+         ::= [ -!]
+           | [#-[]
+           | [#x005D-#x10FFFF]
+DIGIT    ::= [0-9]
+HEXDIG   ::= DIGIT
+           | 'A'
+           | 'B'
+           | 'C'
+           | 'D'
+           | 'E'
+           | 'F'
+EOF      ::= $

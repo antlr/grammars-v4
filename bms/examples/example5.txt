@@ -1,0 +1,11 @@
+#TITLE Background Animation Demo
+#ARTIST Example
+#BPM 120
+#BMP00 miss.bmp
+#BMP01 bg1.bmp
+#BMP02 bg2.bmp
+#BMPEE poor.bmp
+
+#00104:01000200
+#00106:EE000000
+#00111:01010101

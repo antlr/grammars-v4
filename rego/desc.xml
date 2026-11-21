@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../_scripts/desc.xsd">
+<desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/kaby76/Trash/raw/refs/heads/main/desc.xsd">
    <targets>Dart;Java</targets>
+   <test>
+      <inputs>examples;!examples/e00002.stmt;!examples/e00003.stmt;!examples/e00004.stmt;!examples/e00011.stmt;!examples/e00012.stmt;!examples/e00013.stmt;!examples/e00014.stmt;!examples/e00015.stmt;!examples/e00016.stmt;!examples/e00017.stmt;!examples/e00018.stmt;!examples/e00019.stmt;!examples/e00020.stmt;!examples/e00021.stmt;!examples/e00022.stmt;!examples/e00023.stmt;!examples/e00024.stmt;!examples/e00025.stmt;!examples/e00026.stmt;!examples/e00027.stmt;!examples/e00028.stmt;!examples/e00030.stmt;!examples/e00039.stmt;!examples/e00040.stmt;!examples/e00041.stmt</inputs>
+   </test>
+   <test>
+      <name>Negative</name>
+      <inputs>examples/e00002.stmt;examples/e00003.stmt;examples/e00004.stmt;examples/e00011.stmt;examples/e00012.stmt;examples/e00013.stmt;examples/e00014.stmt;examples/e00015.stmt;examples/e00016.stmt;examples/e00017.stmt;examples/e00018.stmt;examples/e00019.stmt;examples/e00020.stmt;examples/e00021.stmt;examples/e00022.stmt;examples/e00023.stmt;examples/e00024.stmt;examples/e00025.stmt;examples/e00026.stmt;examples/e00027.stmt;examples/e00028.stmt;examples/e00030.stmt;examples/e00039.stmt;examples/e00040.stmt;examples/e00041.stmt</inputs>
+   </test>
 </desc>

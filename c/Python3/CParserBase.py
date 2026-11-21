@@ -134,10 +134,22 @@ class CParserBase(Parser):
     def IsDeclarationSpecifier(self):
         if "IsDeclarationSpecifier" in self.noSemantics:
             return True
+        CLexer = self._getLexerModule()
+        CParser = self._getParserModule()
         lt1 = self._input.LT(1)
         text = lt1.text
         if self._debug:
             print("IsDeclarationSpecifier " + str(lt1))
+        if lt1.type == CLexer.Identifier and isinstance(self._ctx, CParser.DeclarationSpecifiersContext):
+            resolved_id = self._resolveWithOutput(lt1)
+            if (resolved_id is not None and not resolved_id.predefined
+                    and TypeClassification.Variable_ not in resolved_id.classification
+                    and TypeClassification.Function_ not in resolved_id.classification):
+                spec_list = self._ctx.declarationSpecifier()
+                if spec_list:
+                    for spec in spec_list:
+                        if spec.typeSpecifier() is not None:
+                            return False
         result = (self.IsStorageClassSpecifier()
             or self.IsTypeSpecifier()
             or self.IsTypeQualifier()
@@ -562,6 +574,7 @@ class CParserBase(Parser):
         # Types need to go to preceding declarationSpecifiers.
         if "IsInitDeclaratorList" in self.noSemantics:
             return True
+        CLexer = self._getLexerModule()
         lt1 = self._input.LT(1)
         text = lt1.text
         if self._debug:
@@ -571,7 +584,17 @@ class CParserBase(Parser):
         if resolved is None:
             result = True
         elif TypeClassification.TypeQualifier_ in resolved.classification or TypeClassification.TypeSpecifier_ in resolved.classification:
-            result = False
+            if lt1.type == CLexer.Identifier and TypeClassification.TypeSpecifier_ in resolved.classification:
+                CParser = self._getParserModule()
+                if isinstance(self._ctx, CParser.DeclarationContext):
+                    ds_ctx = self._ctx.declarationSpecifiers()
+                    if ds_ctx is not None:
+                        for spec in (ds_ctx.declarationSpecifier() or []):
+                            if spec.typeSpecifier() is not None:
+                                result = True
+                                break
+            if not result:
+                result = False
         else:
             result = True
         if self._debug:

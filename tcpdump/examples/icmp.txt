@@ -1,0 +1,2 @@
+12:00:05 IP 192.0.2.1 > 198.51.100.2: ICMP echo request, id 123, seq 1, length 64
+12:00:05.100000 IP 198.51.100.2 > 192.0.2.1: ICMP echo reply, id 123, seq 1, length 64

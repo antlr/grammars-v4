@@ -38,10 +38,12 @@ package test_pkg is
   end component component_with_trailing_label;
 
   function signature_test(data : unsigned) return integer;
-
+  
   function signature_test(data : signed) return integer;
-
+  
   function signature_test(data : integer) return integer;
+
+  alias signature_test_alias is signature_test [unsigned return integer];
 
 end package;
 

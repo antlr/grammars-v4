@@ -1,0 +1,20 @@
+digraph ATN {
+rankdir=LR;
+s162[fontsize=11, label="162", shape=doublecircle, fixedsize=true, width=.6];
+s864[fontsize=11,label="864", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s161[fontsize=11,label="161", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s865[fontsize=11,label="865", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s866[fontsize=11,label="866", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s867[fontsize=11,label="867", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s868[fontsize=11,label="868", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s862[fontsize=11,label="862", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s863[fontsize=11,label="863", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s161 -> s862 [fontname="Times-Italic", label="&epsilon;"];
+s862 -> s863 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'e'", arrowhead = normal];
+s863 -> s864 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'x'", arrowhead = normal];
+s864 -> s865 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'t'", arrowhead = normal];
+s865 -> s866 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'e'", arrowhead = normal];
+s866 -> s867 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'r'", arrowhead = normal];
+s867 -> s868 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'n'", arrowhead = normal];
+s868 -> s162 [fontname="Times-Italic", label="&epsilon;"];
+}

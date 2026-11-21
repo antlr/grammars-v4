@@ -1,0 +1,10 @@
+digraph ATN {
+rankdir=LR;
+s19[fontsize=11, label="19", shape=doublecircle, fixedsize=true, width=.6];
+s18[fontsize=11,label="18", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s845[fontsize=11,label="845", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s846[fontsize=11,label="846", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s18 -> s845 [fontname="Times-Italic", label="&epsilon;"];
+s845 -> s846 [fontsize=11, fontname="Courier", arrowsize=.7, label = "{'add', 'alias', 'ascending', 'async', 'await', 'by', 'descending', 'dynamic', 'equals', 'from', 'get', 'global', 'group', 'into', 'join', 'let', 'nameof', 'notnull', 'on', 'orderby', 'partial', 'remove', 'select', 'set', 'unmanaged', 'value', 'var', 'when', 'where', 'yield'}", arrowhead = normal];
+s846 -> s19 [fontname="Times-Italic", label="&epsilon;"];
+}

@@ -1,0 +1,6 @@
+ixml{comment separation}version "1.0".
+
+start: dotted.name, trailing., characters.
+dotted.name: "a".
+trailing.: "b".
+characters: ['a'-'z']; [""""-"z"]; [''''-'z']; [#41-#5A].

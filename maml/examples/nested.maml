@@ -1,0 +1,14 @@
+{
+  items: [
+    { name: "Item1", value: 1 },
+    { name: "Item2", value: 2 },
+  ]
+  server: {
+    host: "localhost"
+    port: 8080
+    ratios: [0.5, 1.5e3, -2, -3.14, 0]
+  }
+  "quoted key": "value"
+  42: "digit-only key"
+  kebab-case_key: true
+}

@@ -1,0 +1,10 @@
+PROC main()
+  DEF x
+  x := 1
+  SELECT x
+    CASE 1
+      WriteF('one')
+    DEFAULT
+      WriteF('other')
+  ENDSELECT
+ENDPROC

@@ -1,0 +1,16 @@
+
+declare
+        lit                literally          'literally',
+        dcl                lit                'declare',
+        true               lit                '0ffh',
+        false              lit                '0',
+        boolean            lit                'byte',
+        forever            lit                'while true',
+        cr                 lit                '13',
+        lf                 lit                '10',
+        tab                lit                '9',
+        ctrlc              lit                '3',
+        ff                 lit                '12',
+        page$len$offset    lit                '1ch',
+        nopage$mode$offset lit                '2Ch',
+        sectorlen          lit                '128';

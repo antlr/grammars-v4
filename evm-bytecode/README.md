@@ -1,4 +1,4 @@
-# EVM Bytecode ANTLR 4 grammar
+# EVM Bytecode Grammar
 
 This grammar is based on official EVM bytecode reference (available [here](https://www.ethervm.io/)).
 The entry rule of the grammar is `program`.

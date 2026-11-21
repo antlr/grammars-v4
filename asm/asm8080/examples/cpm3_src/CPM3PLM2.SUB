@@ -1,0 +1,109 @@
+; CPM 3 PLM PROGRAM GENERATION SUBMIT #2
+;
+; ERASE GENERATION
+;
+stat con:=tty:
+vax $$as\sd mason.cpm30.sources\ar
+vax erase.plm $$stran
+stat con:=uc1:
+seteof erase.plm
+is14
+plm80 erase.plm pagewidth(100) debug optimize
+link mcd80a.obj,erase.obj,parse.obj,plm80.lib to erase.mod
+locate erase.mod code(0100H) stacksize(100)
+era erase.mod
+cpm
+zero
+objcpm erase
+stat con:=tty:
+vax $$as\sd mason.cpm30.listing\ar
+vax erase.lst $$stran
+vax erase.sym $$stran
+vax erase.lin $$stran
+stat con:=uc1:
+era erase.obj
+era *.lst
+era *.sym
+era *.lin
+;
+; TYPE GENERATION
+;
+stat con:=tty:
+vax $$as\sd mason.cpm30.sources\ar
+vax type.plm $$stran
+stat con:=uc1:
+seteof type.plm
+is14
+plm80 type.plm pagewidth(100) debug optimize
+link mcd80a.obj,type.obj,parse.obj,plm80.lib to type.mod
+locate type.mod code(0100H) stacksize(100)
+era type.mod
+cpm
+zero
+objcpm type
+era type.obj
+stat con:=tty:
+vax $$as\sd mason.cpm30.listing\ar
+vax type.lst $$stran
+vax type.sym $$stran
+vax type.lin $$stran
+stat con:=uc1:
+era *.sym
+era *.lst
+era *.lin
+;
+; RENAME GENERATION
+;
+stat con:=tty:
+vax $$as\sd mason.cpm30.sources\ar
+vax rename.plm $$stran
+stat con:=uc1:
+seteof rename.plm
+is14
+plm80 rename.plm pagewidth(100) debug optimize
+link mcd80a.obj,rename.obj,parse.obj,plm80.lib to rename.mod
+locate rename.mod code(0100H) stacksize(100)
+era rename.mod
+cpm
+zero
+objcpm rename
+stat con:=tty:
+vax $$as\sd mason.cpm30.listing\ar
+vax rename.lst $$stran
+vax rename.sym $$stran
+vax rename.lin $$stran
+stat con:=uc1:
+era rename.obj
+era *.lin
+era *.lst
+era *.sym
+;
+; SETDEF GENERATION
+;
+stat con:=tty:
+vax $$as\sd mason.cpm30.sources\ar
+vax setdef.plm $$stran
+stat con:=uc1:
+seteof setdef.plm
+is14
+plm80 setdef.plm pagewidth(132) debug optimize
+link mcd80a.obj,setdef.obj,plm80.lib to setdef.mod
+locate setdef.mod code(0100H) stacksize(100)
+era setdef.mod
+cpm
+zero
+objcpm setdef
+stat con:=tty:
+vax $$as\sd mason.cpm30.listing\ar
+vax setdef.lst $$stran
+vax setdef.sym $$stran
+vax setdef.lin $$stran
+stat con:=uc1:
+era setdef.obj
+era *.lst
+era *.lin
+era *.sym
+;
+; CALL CPM3PLM3
+SUB CPM3PLM3
+

@@ -1,0 +1,45 @@
+;
+; GET Generation
+;
+stat con:=tty:
+vax $$as\sd mason.cpm30.sources\ar
+vax get.plm $$stran
+;************ !!!!! NOTE !!!!! **************
+;GETRSX.ASM IS CONDITIONALLY ASSEMBLED
+;SET        submit equ false
+;********************************************
+stat con:=uc1:
+seteof get.plm
+is14
+asm80 getf.asm debug
+plm80 get.plm xref pagewidth(100) debug optimize
+link mcd80a.obj,get.obj,parse.obj,getf.obj,plm80.lib to get.mod
+locate get.mod code(0100H) stacksize(100)
+era get.mod
+cpm
+zero
+objcpm get
+rmac getrsx
+xref getrsx
+link getrsx[op]
+era get.rsx
+ren get.rsx=getrsx.prl
+stat con:=tty:
+vax $$as\sd mason.cpm30.listing\ar
+vax get.lst $$stran
+vax get.sym $$stran
+vax get.lin $$stran
+vax getrsx.prn $$stran
+vax getrsx.sym $$stran
+stat con:=uc1:
+era get
+era get.obj
+era *.lst
+era *.sym
+era *.lin
+era *.prn
+;
+; Call next generation
+;
+sub cpm3plm6
+

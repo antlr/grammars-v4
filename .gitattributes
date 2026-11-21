@@ -107,6 +107,7 @@ hypertalk/example-scriptlets/*.txt eol=lf
 javadoc/examples/**/*.java eol=lf
 kuka/examples/*.txt eol=lf
 mckeeman-form/examples/*.txt eol=lf
+mumps/examples/* eol=lf
 objc/examples/* eol=lf
 properties/examples/* eol=lf
 r/examples/*.txt eol=lf
@@ -116,9 +117,11 @@ vba/examples/*.bas eol=lf
 z/examples/*.utf8 eol=lf
 
 # Declare files that will always have CRLF line endings on checkout.
-# Currently the /vb6/**/*.cls and *.frm file need this, otherwise the grammar fails. 
+# Currently the /vb6/**/*.cls and *.frm file need this, otherwise the grammar fails.
 *.cls text eol=crlf
 *.frm text eol=crlf
+# gopher grammar's CRLF/LASTLINE tokens require literal \r\n.
+gopher/examples/*.txt eol=crlf
 
 # Denote all files that are truly binary and should not be modified.
 *.pdf binary
@@ -133,7 +136,7 @@ z/examples/*.utf8 eol=lf
 **/example/test_scripts/** linguist-vendored
 agc/notworking/** linguist-vendored
 asm/asmMASM/helloworld2.asm linguist-vendored
-basic/print.bas linguist-vendored
+basic/jvmBasic/print.bas linguist-vendored
 erlang/src/** linguist-vendored
 solidity/test.sol linguist-vendored
 sql/postgresql/examples.errors/** linguist-vendored

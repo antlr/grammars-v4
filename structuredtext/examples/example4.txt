@@ -1,0 +1,5 @@
+IF x > 0 THEN
+    y := 1;
+ELSE
+    y := -1;
+END_IF;

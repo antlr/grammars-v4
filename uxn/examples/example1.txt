@@ -1,0 +1,20 @@
+( Hello World, printed one letter at a time through the console device. )
+
+|0100
+
+;text
+
+@while
+	LDAk
+	DUP
+	?{
+		POP
+		POP2
+		BRK
+	}
+	#18 DEO
+	INC2
+	!while
+
+@text
+	"Hello "World! 00

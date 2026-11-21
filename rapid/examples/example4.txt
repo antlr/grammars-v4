@@ -1,0 +1,10 @@
+MODULE MainModule
+    PROC WaitLoop()
+        VAR num counter;
+        counter := 0;
+        WHILE counter < 5 DO
+            counter := counter + 1;
+            WaitTime 0.5;
+        ENDWHILE
+    ENDPROC
+ENDMODULE

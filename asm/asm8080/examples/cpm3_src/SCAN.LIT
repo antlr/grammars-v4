@@ -1,0 +1,23 @@
+
+declare
+    pcb$structure literally 'structure (
+            state address,
+            scan$adr address,
+            token$adr address,
+            tok$typ byte,
+            token$len byte,
+            p$level byte,
+            nxt$token byte)';
+
+declare
+    t$null lit '0',
+    t$param  lit '1',
+    t$op lit '2',
+    t$mod lit '4',
+    t$identifier lit '8',
+    t$string lit '16',
+    t$numeric lit '32',
+    t$filespec lit '64',
+    t$error lit '128';
+
+

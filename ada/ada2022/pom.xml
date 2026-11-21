@@ -43,6 +43,7 @@
 					<grammarName>Ada</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
+					<testFileExtension>.adb</testFileExtension>
 				</configuration>
 				<executions>
 					<execution>

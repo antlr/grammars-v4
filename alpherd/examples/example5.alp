@@ -1,0 +1,9 @@
+begin
+    proc sign(n:int) pre {n is defined}; post {}; is
+        case n of
+            0 :: skip
+            elof 1 :: skip
+            else skip
+        esac;
+    sign(5)
+end

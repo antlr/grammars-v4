@@ -1,0 +1,5 @@
+Cmnd_Alias	SERVICES = /sbin/service, /usr/bin/systemctl
+
+alice	ALL = NOPASSWD: SERVICES, /usr/bin/tail
+
+bob	ALL = PASSWD: /usr/bin/su, NOPASSWD: /sbin/reboot

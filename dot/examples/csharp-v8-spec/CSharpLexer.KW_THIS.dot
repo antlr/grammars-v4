@@ -1,0 +1,16 @@
+digraph ATN {
+rankdir=LR;
+s274[fontsize=11, label="274", shape=doublecircle, fixedsize=true, width=.6];
+s273[fontsize=11,label="273", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1236[fontsize=11,label="1236", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1237[fontsize=11,label="1237", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1238[fontsize=11,label="1238", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1239[fontsize=11,label="1239", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1240[fontsize=11,label="1240", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s273 -> s1236 [fontname="Times-Italic", label="&epsilon;"];
+s1236 -> s1237 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'t'", arrowhead = normal];
+s1237 -> s1238 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'h'", arrowhead = normal];
+s1238 -> s1239 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'i'", arrowhead = normal];
+s1239 -> s1240 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'s'", arrowhead = normal];
+s1240 -> s274 [fontname="Times-Italic", label="&epsilon;"];
+}

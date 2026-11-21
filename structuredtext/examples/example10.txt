@@ -1,0 +1,9 @@
+pi := 3.14;
+IF temperature > 100.0 AND NOT alarm THEN
+    alarm := TRUE;
+    log('overheat');
+ELSIF temperature < 0.0 THEN
+    alarm := TRUE;
+ELSE
+    alarm := FALSE;
+END_IF;

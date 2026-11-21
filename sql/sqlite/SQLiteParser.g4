@@ -430,6 +430,9 @@ pragma_value
     : signed_number
     | name
     | STRING_LITERAL
+    | ON_
+    | DELETE_
+    | DEFAULT_
 ;
 
 reindex_stmt

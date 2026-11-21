@@ -1,0 +1,7 @@
+FUNCTION Squares( nCount )
+   LOCAL aResult := {}
+   LOCAL nI
+   FOR nI := 1 TO nCount
+      aResult := AAdd( aResult, nI * nI )
+   NEXT
+   RETURN aResult

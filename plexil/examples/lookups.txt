@@ -1,0 +1,5 @@
+LookupDemo : {
+   startCondition : lookupOnChange : WheelStuck , threshold , 0.5 ; ;
+   postCondition : lookupWithfrequency : BatteryLevel , sensorId , 2.0 ; ;
+   assignment : temperature = lookupNow : TemperatureSensor ; ;
+}

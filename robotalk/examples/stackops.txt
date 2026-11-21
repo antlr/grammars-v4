@@ -1,0 +1,7 @@
+# Stack manipulation operators.
+1 2 3 4 5 2 ROLL
+87 42 99 -32 DROPALL
+1 2 SWAP
+5 DUPLICATE
+5 DUP
+5 DROP

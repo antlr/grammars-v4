@@ -1,0 +1,732 @@
+$title ('Utility Command Line Scanner')
+scanner:
+do;
+
+$include(comlit.lit)
+$include(mon.plm)
+
+dcl debug boolean initial (false);
+
+dcl eob lit '0';			/* end of buffer */
+
+$include(fcb.lit)
+
+
+/* -------- Some routines used for diagnostics if debug mode is on -------- */
+
+printchar: procedure(char) external;
+    declare char byte;
+end printchar;
+
+printb: procedure external;
+end printb;
+
+crlf: procedure external;
+end crlf;
+
+pdecimal: procedure(v,prec,zerosup) external;
+                         /* print value v, field size = (log10 prec) + 1  */
+                         /* with leading zero suppression if zerosup = true */
+    declare v address,                          /* value to print           */
+            prec address,                       /* precision                */
+            zerosup boolean,                    /* zero suppression flag    */
+            d byte;                             /* current decimal digit    */
+
+end pdecimal;
+
+/*
+show$buf: procedure;
+dcl i byte;
+i = 1;
+call crlf;
+call mon1(9,.('buff = $'));
+do while buff(i) <> 0;
+    i = i + 1;
+end;
+buff(i) = '$';
+call mon1(9,.buff(1));
+buff(i) = 0;
+end show$buf; */
+
+
+/* -------- -------- */
+
+white$space: procedure (str$adr) byte;
+    dcl str$adr address,
+        str based str$adr (1) byte,
+        i byte;
+    i = 0;
+    do while (str(i) = ' ') or (str(i) = tab);
+        i = i + 1;
+    end;
+    return(i);
+end white$space;
+
+delimiter: procedure(char) boolean;
+    dcl char byte;
+    if char = '[' or char = ']' or char = '(' or char = ')' or
+        char = '=' or char = ',' or char = 0 then
+        return (true);
+    return(false);
+end delimiter;
+
+dcl string$marker lit '05ch';
+
+deblank: procedure(buf$adr);
+    dcl (buf$adr,dest) address,
+        buf based buf$adr (128) byte,
+        (i,numspaces) byte,
+        string boolean;
+
+    string = false;
+    if (numspaces := white$space(.buf(1))) > 0 then
+        call move(buf(0) - numspaces + 1,.buf(numspaces+1),.buf(1));
+    i = 1;
+    do while buf(i) <> 0;
+        
+/*      call show$buf;*/
+
+        do while ((numspaces := white$space(.buf(i))) = 0 and (buf(i) <> 0))
+              and not string;
+       /*     call mon1(9,.(cr,lf,'2numspaces = $'));
+            call pdecimal(numspaces,100,false);*/
+/*          call show$buf;*/
+            if buf(i) = '"' then
+            do; 
+                string = true;
+                buf(i) = string$marker;
+            end;
+            i = i + 1;
+        end;
+
+        do while string and buf(i) <> 0; 
+            if buf(i) = '"' then
+                if buf(i+1) = '"' then
+                    call move(buf(0) - i + 1,.buf(i+1), .buf(i));
+                else
+                do;
+                    buf(i) = string$marker;
+                    string = false;
+                end;
+            i = i + 1;
+        end;
+
+        if (numspaces := white$space(.buf(i))) > 0 then
+        do;
+/*            call mon1(9,.(cr,lf,'1numspaces = $'));
+            call pdecimal(numspaces,100,false);*/
+            buf(i) = ' ';
+            dest = .buf(i+1);                    /* save space for ','    */
+            if i > 1 then
+                if delimiter(buf(i-1)) or delimiter(buf(i+numspaces)) then
+                                                 /* write over ' ' with   */
+                    dest = dest - 1;             /* a = [ ] ( )           */
+
+            call move(((buf(0)+1)-(i+numspaces-1)),
+                .buf(i+numspaces),dest);
+            if buf(i) = '"' then
+                string = true;
+            i = i + 1;
+        end;
+
+    end;
+    if buf(i - 1) = ' ' then      /* no trailing blanks */
+        buf(i - 1) = 0;
+    /* if debug then
+        call show$buf; */
+end deblank;
+
+upper$case: procedure (buf$adr);
+     dcl buf$adr address,
+         buf based buf$adr (1) byte,
+         i byte;
+
+     i = 0;
+     do while buf(i) <> eob;
+         if buf(i) >= 'a' and buf(i) <= 'z' then
+             buf(i) = buf(i) - ('a' - 'A');
+         i = i + 1;
+     end;
+end upper$case;
+
+dcl option$max lit '11';
+dcl done$scan lit '0ffffh';
+dcl ident$max lit '11';
+dcl token$max lit '11';
+
+dcl t$null lit '0',
+    t$param  lit '1',
+    t$option lit '2',
+    t$modifier lit '4',
+    t$identifier lit '8',
+    t$string lit '16',
+    t$numeric lit '32',
+    t$filespec lit '64',
+    t$error lit '128';
+
+dcl pcb$base address;
+dcl pcb based pcb$base structure (
+            state address,
+            scan$adr address,
+            token$adr address,
+            token$type byte,
+            token$len byte,
+            p$level byte,
+            nxt$token byte);
+
+dcl     scan$adr address,
+        inbuf based scan$adr (1) byte,
+        in$ptr byte,
+        token$adr address,
+        token based token$adr (1) byte,
+        t$ptr byte,
+        (char, nxtchar, tcount) byte;
+
+digit: procedure (char) boolean;
+    dcl char byte;
+    return (char >= '0' and char <= '9');
+end digit;
+
+letter: procedure (char) boolean;
+    dcl char byte;
+    return (char >= 'A' and char <= 'Z');
+end letter; 
+
+    eat$char: procedure;
+        char = inbuf(in$ptr := inptr + 1);
+        nxtchar = inbuf(in$ptr + 1);
+    end eat$char;
+ 
+    put$char: procedure(charx);
+        dcl charx byte;
+        if pcb.token$adr <> 0ffffh then
+            token(t$ptr := t$ptr + 1) = charx;
+    end put$char;
+
+    get$identifier: procedure (max) byte;
+        dcl max byte;
+
+        tcount = 0;
+     /* call mon1(9,.(cr,lf,'getindentifier$'));*/
+        if not letter(char) and char <> '$' then
+            return(tcount);
+        do while (letter(char) or digit(char) or char = '_' or
+            char = '$' ) and tcount <= max;
+            call put$char(char);
+            call eat$char;
+            tcount = tcount + 1;
+        end;
+        do while letter(char) or digit(char) or char = '_'
+            or char = '$' ;
+            call eat$char;
+            tcount = tcount + 1;
+        end;
+        pcb.token$type = t$identifier;
+/*      call mon1(9,.(cr,lf,'end of getident$'));  */
+        pcb.token$len = tcount;
+        return(tcount);
+    end get$identifier;
+
+    file$char: procedure (x) boolean;
+        dcl x byte;
+        return(letter(x) or digit(x) or x = '*' or x = '?'
+               or x = '_' or x = '$');
+    end file$char;
+
+    expand$wild$cards: procedure(field$size) boolean;
+        dcl (i,leftover,field$size) byte,
+            save$inptr address;
+
+        field$size = field$size + t$ptr;
+        do while filechar(char) and t$ptr < field$size;
+           if char = '*' then
+           do; leftover = t$ptr;
+               save$inptr = inptr;
+               call eatchar;
+               do while filechar(char);
+                   leftover = leftover + 1;
+                   call eatchar;
+               end;
+               if leftover >= field$size then	/* too many chars */
+               do; inptr = save$inptr;
+                   return(false);
+               end;  
+               do i = 1 to field$size - leftover;
+                   call putchar('?');
+               end;
+               inptr = save$inptr;
+           end;
+           else
+               call putchar(char);
+           call eatchar;
+        end;
+        return(true);
+    end expand$wild$cards;
+
+    get$file$spec: procedure boolean;
+        dcl i byte;
+        do i = 1 to f$name$len + f$type$len;
+            token(i) = ' ';
+        end;
+        if nxtchar = ':' then
+           if char >= 'A' and char <= 'P' then
+           do;
+               call putchar(char - 'A' + 1);
+               call eat$char;        /* skip ':'              */ 
+               call eat$char;        /* 1st char of file name */
+           end;
+           else
+               return(false);
+        else
+           call putchar(0);                  /* use default drive */
+        
+        if not (letter(char) or char = '$' or char = '_'
+            or char = '*' or char = '?' ) then  /* no leading numerics */
+            if token(0) = 0 then       /* ambiguous with numeric token */
+                return(false);
+
+        if not expand$wild$cards(f$namelen) then
+            return(false);                   /* blank name is illegal */
+        if char = '.' then
+            do; call eat$char;
+            if filechar(char) then
+                do; t$ptr = f$namelen;
+                if not expand$wild$cards(f$typelen) then
+                    return(false);
+                end;
+            end;
+       
+        pcb.token$len = f$name$len + f$type$len + 1;
+        pcb.token$type = t$file$spec; 
+        return(true);
+    end get$file$spec;       
+    
+    get$numeric: procedure(max) boolean;
+        dcl max byte;
+        if not digit(char) then
+             return(false);
+        do while digit(char) and pcb.token$len <= max and
+            char <> eob;
+            call putchar(char);
+            call eat$char;
+            pcb.token$len = pcb.token$len + 1;
+        end;
+        if char = 'H' or char = 'D' or char = 'B' then
+            if pcb.token$len < max then
+            do;
+                 call putchar(char);
+                 call eat$char;
+                 pcb.token$len = pcb.token$len + 1;
+            end;
+            else
+                 return(false);   
+        pcb.token$type = t$numeric;
+        return(true);
+    end get$numeric;   
+
+    get$string: procedure(max) boolean;
+        dcl max byte;
+        if char <> string$marker then
+            return(false);
+        call eatchar;
+        do while char <> string$marker and char <> eob
+            and pcb.token$len < token$max;
+            call putchar(char);
+            call eatchar;
+            pcb.token$len = pcb.token$len + 1;
+        end;
+        
+        do while char <> string$marker and char <> eob;
+            call eat$char;
+        end;
+        if char <> string$marker then
+            return(false);
+        pcb.token$type = t$string;
+        call eat$char;
+        return(true);
+    end get$string;
+
+    get$token$all: procedure boolean;
+        dcl save$inptr byte;
+
+/*      call mon1(9,.(cr,lf,'gettokenall$'));*/
+
+        save$inptr = in$ptr;
+	if get$file$spec then
+            return(true);
+
+/*        call mon1(9,.(cr,lf,'gettokenall - no file$')); */
+        in$ptr = save$inptr - 1; /* need to re-scan, reset buffer pointers */
+        call eat$char;
+        t$ptr = 255;
+        call putchar(0);              /* zero drive byte */
+        
+        if get$identifier(token$max) = 0 then
+            if not get$string(token$max) then
+                 if not get$numeric(token$max) then
+                      return(false);
+ /*       call mon1(9,.(cr,lf,'end gettokenall$'));*/
+        return(true);
+   end get$token$all;
+
+   get$modifier: procedure boolean;
+        if char = ',' or char = ')' or char = 0 then
+        do;
+            pcb.token$type = t$modifier or t$null;
+            return(true);
+        end;
+        if get$token$all then
+        do;
+            pcb.token$type = pcb.token$type or t$modifier;
+            return(true);
+        end;
+        return(false);
+    end get$modifier;
+
+    get$option: procedure boolean;
+        call putchar(0);
+        if get$identifier(token$max) > 0 then
+        do;
+            pcb.token$type = pcb.token$type or t$option;
+            if pcb.token$len > token$max then
+                pcb.token$len = token$max;
+            return(true);
+        end;
+        return(false);
+  end get$option;
+
+   get$param: procedure boolean;
+        if char = ',' or char = ')' or char = 0 then
+        do;
+            pcb.token$type = t$param or t$null;
+            return(true);
+        end;
+        if get$token$all then
+        do;
+            pcb.token$type = pcb.token$type or t$param;
+            return(true);
+        end;
+        return(false);
+    end get$param;
+
+    dcl gotatoken boolean;
+    dcl parens byte initial (0);
+
+    end$state: procedure boolean;
+        if gotatoken then
+        do;
+            pcb.state = .end$state;
+            return(true);
+        end;
+        pcb.token$type = t$null;
+        pcb.scan$adr = 0ffffh;
+        return(true);
+    end end$state;
+   
+    state8: procedure boolean reentrant;
+        if debug then do;
+        call mon1(9,.(cr,lf,'state8, char = $'));
+        call printchar(char); end;
+        if char = 0 then
+            return(end$state);
+        if char = ']' then
+        do;
+            call eatchar;
+            if char = ',' or nxtchar = '(' or nxtchar = ')' then
+                return(state2);
+            else if char = 0 then
+                return(end$state);
+            else
+                return(state1);
+        end;
+        else if char = ' ' or char = ',' then
+        do;
+            call eatchar;
+            return(state3);
+        end;
+        return(state3);
+    end state8;
+
+    state7:procedure boolean reentrant;
+        if debug then do;
+        call mon1(9,.(cr,lf,'state7, char = $'));
+        call printchar(char); end;
+        if char = 0 then
+            return(end$state);
+        if char = ' ' or char = ',' then
+        do;
+            call eat$char;
+            return(state6);
+        end;
+        else
+            if char = ')' then
+            do;
+               call eat$char;
+               return(state8);
+            end;
+        return(false);
+    end state7;
+
+    state6: procedure boolean reentrant;
+        if debug then do;
+        call mon1(9,.(cr,lf,'state6, char = $'));
+        call printchar(char); end;
+        if gotatoken then
+        do;
+            pcb.state = .state6;
+            pcb.nxt$token = t$modifier;
+            return(true);
+        end;
+        if (gotatoken := get$modifier) then
+            return(state7);
+        return(false);
+    end state6;
+
+    state5:procedure boolean reentrant;
+        if debug then do;
+        call mon1(9,.(cr,lf,'state5, nxtchar = $'));
+        call printchar(nxtchar); end;
+        if char = '(' then
+        do;
+            call eat$char;
+            return(state6);
+        end;
+        if gotatoken then
+        do;
+            pcb.state = .state5;
+            pcb.nxt$token = t$modifier;
+            return(true);
+        end;
+        if (gotatoken := get$modifier) then
+               return(state8);
+        return(false);
+    end state5;
+ 
+    state4: procedure boolean reentrant;
+        dcl temp byte;
+        if debug then do;
+        call mon1(9,.(cr,lf,'state4, char = $'));
+        call printchar(char); end;
+        if char = 0 then
+            return(end$state);
+        temp = char;
+        call eatchar;
+        if temp = ',' or temp = ' ' then
+            return(state3);
+        if temp = ']' then
+            if char = '(' or char = ','  or char = ')' then
+                return(state2);
+            else if char = 0 then
+                return(end$state);
+            else
+                return(state1);
+        if temp = '=' then
+            return(state5);
+        return(false);
+    end state4;
+
+    state3: procedure boolean reentrant;
+       if debug then do;
+       call mon1(9,.(cr,lf,'state3, char = $'));
+       call printchar(char); end;
+       if gotatoken then
+       do;
+           pcb.state = .state3;
+           pcb.nxt$token = t$option;
+           return(true);
+       end;
+       if (pcb.plevel := parens ) > 128 then
+            return(false);
+       if (gotatoken := get$option) then
+            return(state4);
+       return(false);
+    end state3;
+
+    state2: procedure boolean reentrant;
+        if debug then do;
+        call mon1(9,.(cr,lf,'state2, char = $'));
+        call printchar(char); end;
+        do while char = ')' or char = 0;
+            if char = 0 then
+                return(end$state);
+            call eat$char;
+            parens = parens - 1;
+        end;
+        if char = '[' then
+        do;
+            call eat$char;
+            return(state3);
+        end;
+        if char = ' ' or char = ','  or char = '(' then
+        do;
+            if char = '(' then
+                 parens = parens + 1;
+            call eat$char;
+            return(state1);
+        end;
+        return(state1);
+    end state$2; 
+    
+    state1: procedure boolean reentrant;
+        if debug then do; 
+        call mon1(9,.(cr,lf,'state1, char = $'));
+        call printchar(char); end;
+
+        if gotatoken then
+        do;
+            pcb.nxt$token = t$param;
+            pcb.state = .state1;
+            return(true);
+        end;
+        do while char = '(' ;
+            parens = parens + 1;
+            call eat$char;
+        end;
+        if (pcb.plevel := parens) > 128 then
+            return(false); 
+        if (gotatoken := get$param) then
+            return(state2);
+        return(false);
+     end state1;
+
+    start$state: procedure boolean;
+        if char = '@' then do;
+           debug = true;
+           call eat$char;
+           call mon1(9,.(cr,lf,'startstate, char = $'));
+           call printchar(char); end;
+
+        if char = 0 then
+            return(end$state);
+        if char = ')' then
+            return(false);
+        if char = '(' then
+        do;
+           parens = parens + 1;
+           call eat$char;
+           return(state1);
+        end;
+        if char = '[' then
+        do;
+            call eat$char;
+            return(state3);
+        end;
+        if (gotatoken := get$param) then
+            return(state2);
+        return(false);
+    end start$state;
+
+/* display$all: procedure;     /* called if debug set */
+
+    /* call mon1(9,.(cr,lf,'scanadr=$'));
+    call pdecimal(pcb.scanadr,10000,false);
+    call mon1(9,.(', tadr=$'));
+    call pdecimal(pcb.token$adr,10000, false);
+    call mon1(9,.(', tlen=$'));
+    call pdecimal(double(pcb.token$len),100, false);
+    call mon1(9,.(', ttype=$'));
+    call pdecimal(double(pcb.token$type),100,false);
+    call mon1(9,.(', plevel=$'));
+    call pdecimal(double(pcb.plevel),100,false);
+    call mon1(9,.(', ntok=$'));
+    call pdecimal(double(pcb.nxt$token),100,false);
+  
+    if (pcb.token$type and t$option) <> 0 then
+        call mon1(9,.(cr,lf,'option  =$'));
+    if (pcb.token$type and t$param) <> 0 then
+        call mon1(9,.(cr,lf,'parm    =$'));
+    if (pcb.token$type and t$modifier) <> 0 then
+        call mon1(9,.(cr,lf,'modifier=$'));
+
+    if (pcb.token$type and t$filespec) <> 0 then
+    do;
+        if fcb(0) = 0 then 
+            call print$char('0');
+        else call print$char(fcb(0) + 'A' - 1);
+        call print$char(':');
+        fcb(12) = '$';
+        call mon1(9,.fcb(1));
+        call mon1(9,.('			(filespec)$')); 
+    end;
+    if ((pcb.token$type and t$string) or (pcb.token$type and
+        t$identifier) or (pcb.token$type and t$numeric)) <> 0 then
+    do;
+        fcb(pcb.token$len + 1) = '$';  
+        call mon1(9,.fcb(1));
+    end;
+    if pcb.token$type = t$error then
+    do;
+        call mon1(9,.(cr,lf,'scanner error$'));
+        return;
+    end;
+
+    if (pcb.token$type and t$identifier) <> 0 then
+         call mon1(9,.(' (identifier)$'));
+    if (pcb.token$type and t$string) <> 0 then
+         call mon1(9,.(' (string)$'));
+    if (pcb.token$type and t$numeric) <> 0 then
+         call mon1(9,.(' (numeric)$'));
+
+    if (pcb.nxt$token and t$option) <> 0 then
+        call mon1(9,.(cr,lf,'nxt tok = option  $'));
+    if (pcb.nxt$token and t$param) <> 0 then
+        call mon1(9,.(cr,lf,'nxt tok = parm    $'));
+    if (pcb.nxt$token and t$modifier) <> 0 then
+        call mon1(9,.(cr,lf,'nxt tok = modifier$'));
+    call crlf;
+
+end display$all; */
+
+scan: procedure (pcb$adr) public;
+
+    dcl status boolean,
+        pcb$adr address;
+
+    pcb$base = pcb$adr;
+    scan$adr = pcb.scan$adr;
+    token$adr = pcb.token$adr;
+
+    in$ptr, t$ptr = 255;
+    call eatchar;
+
+    gotatoken = false;
+    pcb.nxt$token = t$null;
+    pcb.token$len = 0;
+
+    if pcb.token$type = t$error then         /* after one error, return */
+        return;                              /* on any following calls  */
+    else if pcb.state = .start$state then
+        status = start$state;
+    else if pcb.state = .state$1 then
+        status = state$1;
+    else if pcb.state = .state$3 then
+        status = state$3;
+    else if pcb.state = .state$5 then
+        status = state$5;
+    else if pcb.state = .state$6 then
+        status = state$6;
+    else if pcb.state = .end$state then      /* repeated calls go here   */
+        status = end$state;                  /* after first end$state    */
+    else
+        status = false;
+ 
+    if not status then
+        pcb.token$type = t$error;
+
+    if pcb.scan$adr <> 0ffffh then
+        pcb.scan$adr = pcb.scan$adr + inptr;
+    /* if debug then
+        call display$all; */
+end scan;
+
+scan$init: procedure(pcb$adr) public; 
+    dcl pcb$adr address;
+
+    pcb$base = pcb$adr;
+    call deblank(pcb.scan$adr);
+    call upper$case(pcb.scan$adr := pcb.scan$adr + 1);
+    pcb.state = .start$state;
+end scan$init;
+
+end scanner;
+

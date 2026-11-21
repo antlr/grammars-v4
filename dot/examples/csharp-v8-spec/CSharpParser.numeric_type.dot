@@ -1,0 +1,18 @@
+digraph ATN {
+rankdir=LR;
+s69[fontsize=11, label="69", shape=doublecircle, fixedsize=true, width=.6];
+s976[fontsize=11,label="976", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s977[fontsize=11,label="977", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s978[fontsize=11,label="978", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s979[fontsize=11,label="{&rarr;\n979\nd=24|{<p0>|<p1>|<p2>}}", shape=record, fixedsize=false, peripheries=1];
+s68[fontsize=11,label="68", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s980[fontsize=11,label="&larr;\n980", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s68 -> s979 [fontname="Times-Italic", label="&epsilon;"];
+s979:p0 -> s976 [fontname="Times-Italic", label="&epsilon;"];
+s979:p1 -> s977 [fontname="Times-Italic", label="&epsilon;"];
+s979:p2 -> s978 [fontname="Times-Italic", label="&epsilon;"];
+s976 -> s980 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<integral_type>", arrowhead = normal];
+s977 -> s980 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<floating_point_type>", arrowhead = normal];
+s978 -> s980 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'decimal'", arrowhead = normal];
+s980 -> s69 [fontname="Times-Italic", label="&epsilon;"];
+}

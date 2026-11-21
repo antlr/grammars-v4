@@ -1,0 +1,23 @@
+"   example2 -- data declarations
+    name    example2
+
+    even
+null_pk:
+    oct 007777000001        "null packed pointer
+
+channel_mask_set:
+    oct 17,17
+
+unlocked_apt:
+    dec -1
+
+pi_timeout_mess:
+    vfd 1/1,6/21,5/0,24/pi_timeout_mess_char
+
+pi_timeout_mess_char:
+    aci 'timeout'
+
+    equ pi_timeout_mess_words,*-pi_timeout_mess
+
+buffer:
+    bss 64

@@ -1,0 +1,14 @@
+# Lazy K example mixing all four supported notations:
+# combinator calculus (CL), Unlambda, Iota, and Jot.
+
+# CL notation: S, K, I juxtaposed, plus a parenthesized group
+SII(SKK)
+
+# Unlambda notation: backtick is a binary prefix application operator
+``sii
+
+# Iota notation: '*' is a binary prefix application operator over 'i'
+*i*ii
+
+# Jot notation: a nonempty string of 0s and 1s
+11000

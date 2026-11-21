@@ -1,0 +1,19 @@
+
+TEXT
+FEED COMPOSITION
+
+n20 = TAPE
+v213 = TAPE
+v240 = TAPE n20
+v140 = TAPE n2
+v3 = 0
+n0 = 4
+n1 = 0
+v0 = 4
+43) v215 = v0 + 1
+v215 = v213 / v215
+v218 = v213 - v215
+n1 = 0
+42) v(20+n1) = v(240+n1) x v213
+n1 = n1 + 1
+-> 42, n1 # 0

@@ -1,0 +1,14 @@
+# Interrupt-related operators and special effects.
+INTON
+INTOFF
+FLUSHINT
+panicsub RADAR' SETINT
+100 RANGE' SETPARAM
+RTI
+ICON3
+SND2
+BEEP
+5 PRINT
+DEBUGGER
+SYNC
+NOP

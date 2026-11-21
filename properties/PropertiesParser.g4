@@ -8,12 +8,13 @@ options {
 }
 
 propertiesFile
-    : row*
+    : row* EOF
     ;
 
 row
     : comment
     | line
+    | NEWLINE+
     ;
 
 line

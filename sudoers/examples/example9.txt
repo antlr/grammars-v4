@@ -1,0 +1,4 @@
+# host specifications using IP addresses and CIDR style networks
+jack	128.138.243.0 = ALL
+lisa	128.138.0.0/255.255.0.0 = ALL
+jen	ALL, !mail.host.com = ALL

@@ -1,0 +1,21 @@
+module example5;
+
+local function classify(n: int): string
+{
+	switch (n)
+	{
+		case 0:
+			return "zero";
+		case 1, 2, 3:
+			return "small";
+		default:
+			return "large";
+	}
+}
+
+for (i; 0 .. 5)
+{
+	classify(i);
+}
+
+local result = classify(2) == "small" ? "yes" : "no";

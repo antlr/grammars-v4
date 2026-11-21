@@ -1,0 +1,5 @@
+class Point(x, y); integer x, y;
+begin
+    integer sum;
+    sum := x + y
+end
