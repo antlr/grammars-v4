@@ -1,5 +1,5 @@
 # CSS3 Grammar
 
 ## Reference
-* [pldb](http://pldb.info/concepts/css)
+* [pldb](https://pldb.io/concepts/css)
 

@@ -1,5 +1,5 @@
 # WebIDL Grammar
 
 ## Reference
-* [pldb](http://pldb.info/concepts/web-idl)
+* [pldb](https://pldb.io/concepts/web-idl)
 

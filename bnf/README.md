@@ -21,5 +21,5 @@ https://dl.acm.org/doi/pdf/10.1145/355588.365140
 * Grammar is ambiguous.
 
 ## Reference
-* [pldb](http://pldb.info/concepts/bnf)
+* [pldb](https://pldb.io/concepts/bnf)
 

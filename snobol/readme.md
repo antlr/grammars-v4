@@ -1,5 +1,5 @@
 # SNOBOL Grammar
 
 ## Reference
-* [pldb](http://pldb.info/concepts/snobol)
+* [pldb](https://pldb.io/concepts/snobol)
 

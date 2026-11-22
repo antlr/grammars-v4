@@ -19,7 +19,7 @@ import re
 import glob as globmod
 
 ANTLR_BASE_URL = "https://github.com/antlr/grammars-v4/tree/master"
-PLDB_BASE_URL = "http://pldb.info/concepts"
+PLDB_BASE_URL = "https://pldb.io/concepts"
 
 # Regex to match any existing PLDB link in readmes
 # Covers: pldb.io, pldb.info, pldb.pub, pldb.com, and archive.org wrapping any of those

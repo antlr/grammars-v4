@@ -1,5 +1,5 @@
 # Haskell Grammar
 
 ## Reference
-* [pldb](http://pldb.info/concepts/haskell)
+* [pldb](https://pldb.io/concepts/haskell)
 

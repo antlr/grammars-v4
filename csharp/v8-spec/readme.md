@@ -127,7 +127,7 @@ the left-hand side of an element access — a constraint the grammar alone canno
 
 ## Reference
 * [csharpstandard, Working space for ECMA-TC49-TG2, the C# standard committee](https://github.com/dotnet/csharpstandard).
-* [pldb](http://pldb.info/concepts/csharp)
+* [pldb](https://pldb.io/concepts/csharp)
 * [ECMA 334](https://ecma-international.org/publications-and-standards/standards/ecma-334/)
 
 ## Performance

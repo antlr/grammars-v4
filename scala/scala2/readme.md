@@ -1,5 +1,5 @@
 # Scala 2 Grammar
 
 ## Reference
-* [pldb](http://pldb.info/concepts/scala)
+* [pldb](https://pldb.io/concepts/scala)
 

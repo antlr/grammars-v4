@@ -1,5 +1,5 @@
 # Vhdl
 
 ## Reference
-* [pldb](http://pldb.info/concepts/vhdl)
+* [pldb](https://pldb.io/concepts/vhdl)
 

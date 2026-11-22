@@ -61,6 +61,6 @@ Windows: Version 10.0.26200.7623 (this is a Windows 11 Insider Preview build);
 .NET SDK: 10.0.102. Sample size 20.
 
 ## Reference
-* [pldb](http://pldb.info/concepts/ada)
+* [pldb](https://pldb.io/concepts/ada)
 * http://www.ada-auth.org/acats.html
 * https://docs.adacore.com/live/wave/arm12/pdf/arm12/arm-12.pdf

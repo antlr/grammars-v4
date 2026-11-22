@@ -11,4 +11,4 @@ https://raw.githubusercontent.com/silicon-lang/bison/refs/heads/master/src/parse
 ## Reference
 
 [wikipedia](https://en.wikipedia.org/wiki/GNU_Bison)
-* [pldb](http://pldb.info/concepts/bison)
+* [pldb](https://pldb.io/concepts/bison)

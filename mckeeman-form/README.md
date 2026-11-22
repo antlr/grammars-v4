@@ -11,5 +11,5 @@ Document: https://www.crockford.com/mckeeman.html
 `McKeemanForm.g4` is ported from original McKeeman Form format (`examples/mckeeman.txt`) with some modification (use `?`, remove some recursion) to reduce parse tree depth.
 
 ## Reference
-* [pldb](http://pldb.info/concepts/mckeeman-form)
+* [pldb](https://pldb.io/concepts/mckeeman-form)
 

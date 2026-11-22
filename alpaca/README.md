@@ -5,5 +5,5 @@ An ANTLR4 grammar for [Alpaca](https://catseye.tc/article/Languages.md#alpaca) f
 See also: https://github.com/catseye/ALPACA
 
 ## Reference
-* [pldb](http://pldb.info/concepts/alpaca)
+* [pldb](https://pldb.io/concepts/alpaca)
 

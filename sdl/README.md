@@ -54,5 +54,5 @@ The software as well as the source code is available from VMS, Inc at:
 	https://vmssoftware.com/community/freeware/
 
 ## Reference
-* [pldb](http://pldb.info/concepts/sdl)
+* [pldb](https://pldb.io/concepts/sdl)
 

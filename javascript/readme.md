@@ -1,5 +1,5 @@
 # Javascript
 
 ## Reference
-* [pldb](http://pldb.info/concepts/javascript)
+* [pldb](https://pldb.io/concepts/javascript)
 

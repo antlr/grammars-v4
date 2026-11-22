@@ -1,5 +1,5 @@
 # Prolog Grammar
 
 ## Reference
-* [pldb](http://pldb.info/concepts/prolog)
+* [pldb](https://pldb.io/concepts/prolog)
 

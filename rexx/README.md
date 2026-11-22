@@ -13,7 +13,7 @@ ANSI standard.
   directory (_e.g._, Java or Python)
 
 ## Reference
-* [pldb](http://pldb.info/concepts/rexx)
+* [pldb](https://pldb.io/concepts/rexx)
 
 
 ## License

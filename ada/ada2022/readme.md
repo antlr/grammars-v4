@@ -68,5 +68,5 @@ The parser base class implements the following command-line options:
 
 * [Ada 2022 Reference Manual](http://www.ada-auth.org/standards/ada22.html)
 * [Ada 2022 Syntax Summary](http://www.ada-auth.org/standards/22rm/html/RM-P-1.html)
-* [pldb](http://pldb.info/concepts/ada)
+* [pldb](https://pldb.io/concepts/ada)
 * http://www.ada-auth.org/acats.html

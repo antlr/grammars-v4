@@ -12,5 +12,5 @@ but attempts to include as much of the syntax of other BASIC variants as possibl
 such as MS [GW-BASIC](http://en.wikipedia.org/wiki/GW_BASIC).
 
 ## Reference
-* [pldb](http://pldb.info/concepts/basic)
+* [pldb](https://pldb.io/concepts/basic)
 

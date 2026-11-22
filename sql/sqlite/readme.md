@@ -1,5 +1,5 @@
 # SQLite Grammar
 
 ## Reference
-* [pldb](http://pldb.info/concepts/sqlite)
+* [pldb](https://pldb.io/concepts/sqlite)
 

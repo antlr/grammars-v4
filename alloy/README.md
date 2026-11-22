@@ -7,5 +7,5 @@ Examples are from [https://alloytools.org/](https://alloytools.org/)
 Grammar from [here](https://alloytools.org/download/alloy-language-reference.pdf)
 
 ## Reference
-* [pldb](http://pldb.info/concepts/alloy)
+* [pldb](https://pldb.io/concepts/alloy)
 

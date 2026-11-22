@@ -1,5 +1,5 @@
 # LPC Grammar
 
 ## Reference
-* [pldb](http://pldb.info/concepts/lpc)
+* [pldb](https://pldb.io/concepts/lpc)
 
