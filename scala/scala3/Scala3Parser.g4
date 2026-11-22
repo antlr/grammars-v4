@@ -22,9 +22,12 @@ options { tokenVocab = Scala3Lexer; superClass = Scala3ParserBase; }
 // Top-level
 // =====================================================================
 
-colonTripleOpen: COLON? (INDENT | '{' INDENT?);
-tripleOpen: INDENT | '{' | '{' INDENT;
-tripleClose: DEDENT '}' | DEDENT | '}';
+colonBraceBlockOpen: COLON? braceBlockOpen;
+braceBlockOpen: LBRACE INDENT?;
+braceBlockClose: DEDENT? RBRACE;
+
+colonIndent: COLON? INDENT;
+
 indent: INDENT;
 outdent: DEDENT;
 // Statement separator: NEWLINE kept on default channel or real ';'.
@@ -49,7 +52,8 @@ topStat
     ;
 
 packaging
-    : PACKAGE qualId (COLON | ) colonTripleOpen topStats? tripleClose
+    : PACKAGE qualId colonBraceBlockOpen topStats? braceBlockClose
+    | PACKAGE qualId colonIndent topStats? DEDENT
     ;
 
 packageObject
@@ -185,7 +189,8 @@ typedFunParam
     ;
 
 matchType_
-    : infixType MATCH tripleOpen typeCaseClauses tripleClose
+    : infixType MATCH braceBlockOpen typeCaseClauses braceBlockClose
+    | infixType MATCH INDENT typeCaseClauses DEDENT
     ;
 
 infixType
@@ -248,7 +253,8 @@ typeArgs
     ;
 
 refinement
-    : colonTripleOpen (refineDcl (end_of_stat refineDcl)*)? tripleClose
+    : colonBraceBlockOpen (refineDcl (end_of_stat refineDcl)*)? braceBlockClose
+    | colonIndent (refineDcl (end_of_stat refineDcl)*)? DEDENT
     ;
 
 typeBounds
@@ -369,7 +375,8 @@ infixExpr
     ;
 
 matchClause
-    : MATCH tripleOpen caseClauses tripleClose
+    : MATCH braceBlockOpen caseClauses braceBlockClose
+    | MATCH INDENT caseClauses DEDENT
     ;
 
 prefixExpr
@@ -440,7 +447,8 @@ argumentExprs
     ;
 
 blockExpr
-    : tripleOpen (caseClauses | block) tripleClose 
+    : braceBlockOpen (caseClauses | block) braceBlockClose
+    | INDENT (caseClauses | block) DEDENT
     ;
 
 // Original @ 757667725:
@@ -480,7 +488,7 @@ enumerators0
     ;
 
 enumerators
-    : generator (end_of_stat enumerator)*
+    : generator (end_of_stat enumerator | guard_)*
     ;
 
 enumerator
@@ -852,7 +860,9 @@ extension_
     ;
 
 extMethods
-    : extMethod | colonTripleOpen (extMethod (end_of_stat extMethod)*)? tripleClose
+    : extMethod
+    | colonBraceBlockOpen (extMethod (end_of_stat extMethod)*)? braceBlockClose
+    | colonIndent (extMethod (end_of_stat extMethod)*)? DEDENT
     ;
 
 extMethod
@@ -886,7 +896,8 @@ constrApp
 
 constrExpr
     : selfInvocation
-    | tripleOpen selfInvocation (end_of_stat blockStat)* tripleClose
+    | braceBlockOpen selfInvocation (end_of_stat blockStat)* braceBlockClose
+    | INDENT selfInvocation (end_of_stat blockStat)* DEDENT
     ;
 
 selfInvocation
@@ -894,11 +905,13 @@ selfInvocation
     ;
 
 withTemplateBody
-    : tripleOpen end_of_stat? selfType? end_of_stat? (templateStat (end_of_stat templateStat)*)? tripleClose
+    : braceBlockOpen end_of_stat? selfType? end_of_stat? (templateStat (end_of_stat templateStat)*)? braceBlockClose
+    | INDENT end_of_stat? selfType? end_of_stat? (templateStat (end_of_stat templateStat)*)? DEDENT
     ;
 
 templateBody
-    : colonTripleOpen end_of_stat? selfType? end_of_stat? (templateStat (end_of_stat templateStat)*)? tripleClose
+    : colonBraceBlockOpen end_of_stat? selfType? end_of_stat? (templateStat (end_of_stat templateStat)*)? braceBlockClose
+    | colonIndent end_of_stat? selfType? end_of_stat? (templateStat (end_of_stat templateStat)*)? DEDENT
     ;
 
 templateStat
@@ -920,7 +933,8 @@ selfType
 // =====================================================================
 
 enumBody
-    : colonTripleOpen end_of_stat? selfType? end_of_stat? (enumStat (end_of_stat enumStat)*)? tripleClose
+    : colonBraceBlockOpen end_of_stat? selfType? end_of_stat? (enumStat (end_of_stat enumStat)*)? braceBlockClose
+    | colonIndent end_of_stat? selfType? end_of_stat? (enumStat (end_of_stat enumStat)*)? DEDENT
     ;
 
 enumStat

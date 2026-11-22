@@ -61,6 +61,7 @@ public abstract class Scala3LexerBase extends Lexer {
 
     private int previousPendingTokenType = 0;
     // Last token type sent on the default channel — used for canEndStat checks.
+    private int secondToLastNonHiddenType = 0;
     private int lastNonHiddenType = 0;
     // Two-token look-ahead.
     private Token curToken = null;
@@ -93,6 +94,7 @@ public abstract class Scala3LexerBase extends Lexer {
         indentLengthStack  = new ArrayDeque<>();
         pendingTokens      = new LinkedList<>();
         previousPendingTokenType = 0;
+        secondToLastNonHiddenType = 0;
         lastNonHiddenType  = 0;
         curToken           = null;
         ffgToken           = null;
@@ -231,7 +233,7 @@ public abstract class Scala3LexerBase extends Lexer {
                                  && ffgToken.getType() != Scala3Lexer.WITH;
         boolean willIndent = newIndent > curIndent
             && !isDot
-            && (canStartIndent(lastNonHiddenType) || rparenOpensIndent);
+            && (canStartIndent(lastNonHiddenType, secondToLastNonHiddenType) || rparenOpensIndent);
 
         // ---- Decide whether to surface the NEWLINE as a statement separator ----
         //
@@ -461,7 +463,7 @@ public abstract class Scala3LexerBase extends Lexer {
     }
 
     // canStartIndentTokens: previous tokens that allow INDENT emission.
-    private static boolean canStartIndent(int t) {
+    private static boolean canStartIndent(int t, int prev) {
         switch (t) {
             case Scala3Lexer.THEN:
             case Scala3Lexer.ELSE:
@@ -482,7 +484,7 @@ public abstract class Scala3LexerBase extends Lexer {
             case Scala3Lexer.IF:
             case Scala3Lexer.THROW:
             case Scala3Lexer.RETURN:
-                return true;
+                return prev != Scala3Lexer.END;
             default:
                 return false;
         }
@@ -509,8 +511,10 @@ public abstract class Scala3LexerBase extends Lexer {
 
     private void addPendingToken(Token token) {
         previousPendingTokenType = token.getType();
-        if (token.getChannel() == Token.DEFAULT_CHANNEL)
+        if (token.getChannel() == Token.DEFAULT_CHANNEL) {
+            secondToLastNonHiddenType = lastNonHiddenType;
             lastNonHiddenType = token.getType();
+        }
         pendingTokens.addLast(token);
     }
 

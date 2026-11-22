@@ -53,6 +53,7 @@ public abstract class Scala3LexerBase : Lexer
 
     private int _previousPendingTokenType = 0;
     // Last token type sent on the default channel — used for canEndStat checks.
+    private int _secondToLastNonHiddenType = 0;
     private int _lastNonHiddenType = 0;
     // Two-token look-ahead.
     private IToken? _curToken = null;
@@ -85,6 +86,7 @@ public abstract class Scala3LexerBase : Lexer
         _regionStack         = new();
         _indentLengthStack   = new();
         _pendingTokens       = new();
+        _secondToLastNonHiddenType = 0;
         _previousPendingTokenType = 0;
         _lastNonHiddenType   = 0;
         _curToken            = null;
@@ -258,7 +260,7 @@ public abstract class Scala3LexerBase : Lexer
                               && _ffgToken!.Type != Scala3Lexer.WITH;
         bool willIndent = newIndent > curIndent
                        && !isDot
-                       && (CanStartIndent(_lastNonHiddenType) || rparenOpensIndent);
+                       && (CanStartIndent(_lastNonHiddenType, _secondToLastNonHiddenType) || rparenOpensIndent);
 
         // ---- Decide whether to surface the NEWLINE as a statement separator ----
         //
@@ -487,7 +489,7 @@ public abstract class Scala3LexerBase : Lexer
     };
 
     // canStartIndentTokens: previous tokens that allow INDENT emission.
-    private static bool CanStartIndent(int t) => t switch
+    private static bool CanStartIndent(int t, int prev) => t switch
     {
         Scala3Lexer.THEN     => true,
         Scala3Lexer.ELSE     => true,
@@ -509,7 +511,7 @@ public abstract class Scala3LexerBase : Lexer
         Scala3Lexer.THROW    => true,
         Scala3Lexer.RETURN   => true,
         _                    => false
-    };
+    } && prev != Scala3Lexer.END;
 
     // -----------------------------------------------------------------------
     // Indentation length
@@ -537,8 +539,10 @@ public abstract class Scala3LexerBase : Lexer
     private void AddPendingToken(IToken token)
     {
         _previousPendingTokenType = token.Type;
-        if (token.Channel == TokenConstants.DefaultChannel)
+        if (token.Channel == TokenConstants.DefaultChannel) {
+            _secondToLastNonHiddenType = _lastNonHiddenType;
             _lastNonHiddenType = token.Type;
+        }
         _pendingTokens.AddLast(token);
     }
 
