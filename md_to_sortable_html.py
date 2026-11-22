@@ -98,7 +98,7 @@ def is_numeric_col(rows, i):
 
 def render_cell(tbl, column, value):
     if (tbl['heading'] == 'Results' and
-            column < len(tbl['headers']) and tbl['headers'][column] == 'Grammar'):
+            column < len(tbl['headers']) and tbl['headers'][column] in ('Grammar', 'Grammar Name')):
         url = 'https://github.com/antlr/grammars-v4/tree/master/' + quote(value, safe='/')
         return f'<a href="{html_mod.escape(url, quote=True)}">{md_inline(value)}</a>'
     if (column < len(tbl['headers']) and tbl['headers'][column] == 'Combined'):

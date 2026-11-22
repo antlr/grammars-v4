@@ -301,6 +301,7 @@ do
         # custom parser/lexer superclass. Build the tables once, outside the
         # timed runs, and keep them in a temporary directory for all N runs.
         ttt_stat='n.a.'
+        prt_stat='n.a.'
         action_free=true
         if (( action_count > 0 )) || grep -Eq 'superClass[[:space:]]*=' ../*.g4; then
             action_free=false
@@ -314,23 +315,27 @@ do
                 if printf '%s\n' "${files[@]}" |
                     trash parse --allstar -L "$interp_dir" --no-output -x > /dev/null 2>&1; then
                     run_ttt=()
+                    run_prt=()
                     allstar_ok=true
                     for ((run=1; run<=N; run++)); do
                         echo "=== $testname AllStar run $run/$N ==="
                         runfile="$tmpdir/$(echo "$testname" | tr '/' '_')_allstar_run${run}.txt"
                         printf '%s\n' "${files[@]}" |
-                            trash parse --allstar -L "$interp_dir" --no-output -x 2>&1 |
+                            trash parse --allstar -L "$interp_dir" --perf --no-output -x 2>&1 |
                             tee "$runfile"
                         parse_status=${PIPESTATUS[1]}
                         run_time=$(awk '/^TT:/{print $NF}' "$runfile" | tail -1)
-                        if (( parse_status != 0 )) || [[ -z "$run_time" ]]; then
+                        run_rate=$(awk '/^(PR|TPS):/{print $NF}' "$runfile" | tail -1)
+                        if (( parse_status != 0 )) || [[ -z "$run_time" || -z "$run_rate" ]]; then
                             allstar_ok=false
                             break
                         fi
                         run_ttt+=("$run_time")
+                        run_prt+=("$run_rate")
                     done
                     if [[ "$allstar_ok" == true ]]; then
                         ttt_stat=$(compute_stats "${run_ttt[@]}")
+                        prt_stat=$(compute_stats "${run_prt[@]}")
                     fi
                 else
                     echo "AllStar warm-up failed for $testname; TTT is n.a." >&2
@@ -361,7 +366,7 @@ do
         done
 
         row_number=$((${#table_rows[@]} + 1))
-        table_rows+=("| ${row_number} | ${testname} | ${tt_stat} | ${ttt_stat} | ${tps_stat} | ${ambiguity_count} | ${action_count} | ${combined} |")
+        table_rows+=("| ${row_number} | ${testname} | ${tt_stat} | ${ttt_stat} | ${tps_stat} | ${prt_stat} | ${ambiguity_count} | ${action_count} | ${combined} |")
         popd > /dev/null
     done
     popd > /dev/null
@@ -389,16 +394,17 @@ if [ ${#table_rows[@]} -gt 0 ]; then
 | Label | Description |
 |---|---|
 | `Number` | Current row position in the Results table |
-| `TTN` | **Total time, native C#** — overall wall-clock time for the generated C# parser run |
+| `TTS` | **Total time, native C#** — overall wall-clock time for the generated C# parser run |
 | `TTT` | **Total time, table-driven interpreter** — overall wall-clock time for `dotnet trash parse --allstar`; `n.a.` when the grammar requires target-language actions or a custom superclass |
-| `PR` | **Parse rate** — `total tokens / PT`; pure parse throughput across all files |
+| `PRN` | **Parse rate, native C#** — `total tokens / PT` for the generated C# parser |
+| `PRT` | **Parse rate, table-driven interpreter** — `total tokens / PT` for `dotnet trash parse --allstar`; `n.a.` when TTT is unavailable |
 | `Combined` | `yes` if the top-level grammar is combined and has no `tokenVocab` option; otherwise `no` |
 
 ### Results
 
 EOF
-        echo "| Number | Grammar | TTN (s) | TTT (s) | PR (t/s) | Ambiguities | Actions | Combined |"
-        echo "|--------|---------|---------|---------|----------|-------------|---------|----------|"
+        echo "| Number | Grammar Name | TTS (s) | TTT (s) | PRN (t/s) | PRT (t/s) | Ambiguities | Actions | Combined |"
+        echo "|--------|--------------|---------|---------|-----------|-----------|-------------|---------|----------|"
         for row in "${table_rows[@]}"; do
             echo "$row"
         done
