@@ -12,3 +12,7 @@ Note that `Symbol`, `Identifier`, `Numeral`, and `File-Name` are left as
 undefined "system terms" by that reference (their lexical form is resolved
 by the vocabulary files a real article imports, not by the grammar itself),
 so this grammar gives them pragmatic lexical definitions of its own.
+
+## Reference
+* [pldb](https://pldb.io/concepts/mizar)
+

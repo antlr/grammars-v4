@@ -26,3 +26,7 @@ in the conventional uppercase style:
   (`{|x| x * x}`)
 
 Reference: <https://harbour.github.io/>
+
+## Reference
+* [pldb](https://pldb.io/concepts/harbour)
+

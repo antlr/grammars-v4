@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 """
-Synchronize PLDB and grammars-v4 cross-references.
+Add PLDB links to the grammars-v4 readmes.
 
-For each grammar directory (identified by desc.xml):
-- Ensure a readme exists with a ## Reference section and PLDB link (if matched)
-- Ensure the PLDB .scroll file has an antlr entry pointing back
+For each grammar directory (identified by desc.xml), ensure a readme exists
+with a ## Reference section and a PLDB link (if matched).
+
+This script only writes to grammars-v4. It reads a local PLDB checkout to
+match grammars to PLDB concepts, but never changes it. Adding the antlr links
+that point back from PLDB to grammars-v4 belongs in the PLDB repository.
 
 Usage:
     python sync_pldb.py                          # Apply changes
@@ -30,7 +33,7 @@ PLDB_LINK_RE = re.compile(
 
 # Regex to extract concept name from various PLDB URL formats
 PLDB_CONCEPT_RE = re.compile(
-    r'pldb\.(?:io|info|pub|com)/(?:concepts|rows)/([^./\s)]+?)(?:\.html)?(?:\s|\)|$)',
+    r'pldb\.(?:io|info|pub|com)/(?:concepts|rows)/([^./\s)>]+?)(?:\.html)?(?:\s|\)|>|$)',
     re.IGNORECASE,
 )
 
@@ -38,7 +41,9 @@ PLDB_CONCEPT_RE = re.compile(
 # Manual mapping table: grammar_dir -> pldb_concept_id
 #
 # This table supplements the automatic matching methods. Edit it to add
-# entries that the heuristics cannot discover on their own.
+# entries that the heuristics cannot discover on their own. A value of None
+# means the grammar has no PLDB concept, and stops the heuristics from
+# matching a different language that happens to share the name.
 # The mapping need not be one-to-one: multiple grammar dirs may point to the
 # same PLDB concept.
 # ---------------------------------------------------------------------------
@@ -130,6 +135,27 @@ MANUAL_MAPPING = {
     "unicode/unicode16":            "unicode",
     "racket-bsl":                   "racket",
     "racket-isl":                   "racket",
+    # --- Grammars added after #4746 ---
+    "alpherd":                      "alphard-programming-language",
+    "amigae":                       "amiga-e",
+    "gerber":                       "gerber-image",
+    "hals":                         "hal-s",
+    "lazyk":                        "lazy-k",
+    "lil":                          "lil-lang",
+    "pl1":                          "pl-i",
+    "plm":                          "pl-m",
+    "sql/db2":                      "ibm-db2",
+    "standardml":                   "standard-ml",
+    "structuredtext":               "structured-text",
+    "tlaplus":                      "tla",
+    "vba/vba7_1":                   "vba",
+    "xquery/xquery4":               "xquery",
+    # --- No PLDB concept: the name matches a different language ---
+    "abc":                          None,   # ABC music notation, not the ABC language
+    "ccs":                          None,   # Cascading Code Sheets, not NetMRI CCS
+    "l":                            None,   # L (gatech), not l-lang.org
+    "spice":                        None,   # SPICE circuit netlists, not Spice (2021)
+    "squeak":                       None,   # Cardelli's 1985 Squeak, not the Smalltalk
 }
 
 # ---------------------------------------------------------------------------
@@ -346,6 +372,9 @@ def build_grammar_to_concept_mapping(grammar_dirs, grammars_dir, concepts_dir, p
         # Method 1: Manual mapping table (highest priority)
         if gdir in MANUAL_MAPPING:
             candidate = MANUAL_MAPPING[gdir]
+            if candidate is None:
+                unmatched.append(gdir)
+                continue
             if candidate.lower() in concept_lookup:
                 concept = concept_lookup[candidate.lower()]
 
@@ -552,80 +581,6 @@ def _ensure_reference_section(lines, concept):
 
 
 # ---------------------------------------------------------------------------
-# Phase 3: Update scroll files
-# ---------------------------------------------------------------------------
-
-def update_scroll_file(grammar_dir, concept, concepts_dir, dry_run=False):
-    scroll_path = os.path.join(concepts_dir, concept + ".scroll")
-    if not os.path.isfile(scroll_path):
-        return None
-
-    text, eol = read_file(scroll_path)
-    correct_url = f"{ANTLR_BASE_URL}/{grammar_dir}"
-    correct_line = f"antlr {correct_url}"
-    lines = text.split("\n")
-
-    antlr_idx = None
-    for i, line in enumerate(lines):
-        if line.startswith("antlr "):
-            antlr_idx = i
-            break
-
-    if antlr_idx is not None:
-        existing_url = lines[antlr_idx].strip().split(" ", 1)[1]
-        if existing_url == correct_url:
-            return None
-        if "antlr/grammars-v4" in existing_url:
-            lines[antlr_idx] = correct_line
-            write_file(scroll_path, "\n".join(lines), eol) if not dry_run else None
-            return f"FIX {concept}.scroll: antlr URL -> {correct_url}"
-        else:
-            return None
-    else:
-        insert_idx = _find_scroll_insert_position(lines)
-        lines.insert(insert_idx, correct_line)
-        write_file(scroll_path, "\n".join(lines), eol) if not dry_run else None
-        return f"ADD {concept}.scroll: antlr {correct_url}"
-
-
-def _find_scroll_insert_position(lines):
-    last_kv_idx = 0
-    for i, line in enumerate(lines):
-        if i == 0:
-            continue
-        stripped = line.strip()
-        if not stripped:
-            continue
-        if line.startswith(" ") or line.startswith("\t"):
-            continue
-        if stripped.startswith(("pygmentsHighlighter", "wikipedia ", "example",
-                                "keywords ", "lineComment", "multiLine",
-                                "has", "githubBigQuery", "semanticScholar",
-                                "githubLanguage")):
-            break
-        if " " in stripped or stripped.startswith("isOpenSource") or stripped.startswith("fileType"):
-            last_kv_idx = i
-    return last_kv_idx + 1
-
-
-def pick_primary_grammar_dir(grammar_dirs, concept, concepts_dir):
-    scroll_path = os.path.join(concepts_dir, concept + ".scroll")
-    if os.path.isfile(scroll_path):
-        text, _ = read_file(scroll_path)
-        for line in text.split("\n"):
-            if line.startswith("antlr ") and "antlr/grammars-v4" in line:
-                m = re.search(r"grammars-v4/(?:tree|blob)/master/(.+?)(?:\s|$)", line)
-                if m:
-                    existing = m.group(1).rstrip("/")
-                    if existing.endswith(".g4"):
-                        existing = os.path.dirname(existing).replace("\\", "/")
-                    if existing in grammar_dirs:
-                        return existing
-                break
-    return sorted(grammar_dirs, key=lambda d: (len(d), d))[0]
-
-
-# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 
@@ -641,7 +596,7 @@ def main():
 
     print(f"grammars-v4: {grammars_dir}")
     print(f"PLDB:        {pldb_dir}")
-    print(f"concepts:    {concepts_dir}\n")
+    print(f"concepts:    {concepts_dir} (read only)\n")
 
     # Phase 1
     print("Phase 1: Building grammar-to-PLDB mapping...")
@@ -657,14 +612,6 @@ def main():
         print("\n  Unmatched grammars:")
         for gdir in unmatched:
             print(f"    - {gdir}")
-
-    concept_to_dirs = {}
-    for gdir, concept in mapping.items():
-        concept_to_dirs.setdefault(concept, []).append(gdir)
-
-    primary_dirs = {}
-    for concept, dirs in concept_to_dirs.items():
-        primary_dirs[concept] = pick_primary_grammar_dir(dirs, concept, concepts_dir)
 
     # Phase 2
     print("\nPhase 2: Updating readmes in grammars-v4...")
@@ -692,24 +639,12 @@ def main():
 
     print(f"\n  Total readme changes: {len(readme_changes)}")
 
-    # Phase 3
-    print("\nPhase 3: Updating .scroll files in PLDB...")
-    scroll_changes = []
-    for concept, primary_gdir in sorted(primary_dirs.items()):
-        result = update_scroll_file(primary_gdir, concept, concepts_dir, dry_run)
-        if result:
-            scroll_changes.append(result)
-            print(f"  {result}")
-
-    print(f"\n  Total scroll changes: {len(scroll_changes)}")
-
     print(f"\n{'='*60}")
     print(f"Summary:")
     print(f"  Grammars processed: {len(grammar_dirs)}")
     print(f"  PLDB matches: {len(mapping)}")
     print(f"  Unmatched: {len(unmatched)}")
     print(f"  Readme files changed: {len(readme_changes)}")
-    print(f"  Scroll files changed: {len(scroll_changes)}")
     if dry_run:
         print("\n  (DRY RUN - no files were actually modified)")
 

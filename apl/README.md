@@ -42,3 +42,7 @@ function requires a symbol table, which is outside the scope of a
 context-free grammar; this grammar resolves the ambiguity by preferring
 the dyadic reading (`A FN B`) whenever a value already precedes the name,
 and otherwise falls back to the monadic reading (`FN B`).
+
+## Reference
+* [pldb](https://pldb.io/concepts/apl)
+

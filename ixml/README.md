@@ -104,3 +104,7 @@ is excluded because it contains non-iXML annotations.
 The Maven test plugin is configured to scan `examples/` with the `.ixml`
 extension filter. Its expected-error sidecar checks rejection of the annotated
 XPath sample instead of treating that experimental syntax as valid iXML.
+
+## Reference
+* [pldb](https://pldb.io/concepts/ixml)
+
