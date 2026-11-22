@@ -1,6 +1,6 @@
 // XQuery v4.0
 // Author: Ken Domino
-// Based on the XQuery 4.0 spec at https://qt4cg.org/pr/2796/xquery-40/xquery-40-autodiff.html
+// Based on the XQuery 4.0 spec at https://qt4cg.org/specifications/xquery-40/xquery-40.html.
 // Extends the XPath 4.0 lexer with XQuery-specific tokens and direct element constructor modes.
 //
 // Direct element constructor support requires lexer modes.
