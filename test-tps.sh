@@ -297,6 +297,49 @@ do
         action_count=$(printf '%s\n' "$action_counts" |
             awk -F: 'NF > 1 && $NF ~ /^[0-9]+$/ { sum += $NF } END { print sum+0 }')
 
+        # The interpreted parser cannot run target-language actions or a
+        # custom parser/lexer superclass. Build the tables once, outside the
+        # timed runs, and keep them in a temporary directory for all N runs.
+        ttt_stat='n.a.'
+        action_free=true
+        if (( action_count > 0 )) || grep -Eq 'superClass[[:space:]]*=' ../*.g4; then
+            action_free=false
+        fi
+        if [[ "$action_free" == true ]]; then
+            interp_dir="$tmpdir/$(echo "$testname" | tr '/' '_')_interp"
+            mkdir -p "$interp_dir"
+            interp_log="$tmpdir/$(echo "$testname" | tr '/' '_')_interp.txt"
+            if (set -o pipefail; cd .. && dotnet trash parse -t ANTLRv4 ./*.g4 |
+                dotnet trash interp -o "$interp_dir") > "$interp_log" 2>&1; then
+                if printf '%s\n' "${files[@]}" |
+                    trash parse --allstar -L "$interp_dir" --no-output -x > /dev/null 2>&1; then
+                    run_ttt=()
+                    allstar_ok=true
+                    for ((run=1; run<=N; run++)); do
+                        echo "=== $testname AllStar run $run/$N ==="
+                        runfile="$tmpdir/$(echo "$testname" | tr '/' '_')_allstar_run${run}.txt"
+                        printf '%s\n' "${files[@]}" |
+                            trash parse --allstar -L "$interp_dir" --no-output -x 2>&1 |
+                            tee "$runfile"
+                        parse_status=${PIPESTATUS[1]}
+                        run_time=$(awk '/^TT:/{print $NF}' "$runfile" | tail -1)
+                        if (( parse_status != 0 )) || [[ -z "$run_time" ]]; then
+                            allstar_ok=false
+                            break
+                        fi
+                        run_ttt+=("$run_time")
+                    done
+                    if [[ "$allstar_ok" == true ]]; then
+                        ttt_stat=$(compute_stats "${run_ttt[@]}")
+                    fi
+                else
+                    echo "AllStar warm-up failed for $testname; TTT is n.a." >&2
+                fi
+            else
+                echo "AllStar table generation failed for $testname; TTT is n.a. See $interp_log" >&2
+            fi
+        fi
+
         # Match the top-level parser selected by trgen to its source .g4.
         # A combined grammar named Foo produces the top-level FooParser.
         combined=no
@@ -318,7 +361,7 @@ do
         done
 
         row_number=$((${#table_rows[@]} + 1))
-        table_rows+=("| ${row_number} | ${testname} | ${pt_stat} | ${ot_stat} | ${tt_stat} | ${tps_stat} | ${warm_tps_stat} | ${speedup_stat} | ${ambiguity_count} | ${action_count} | ${combined} |")
+        table_rows+=("| ${row_number} | ${testname} | ${tt_stat} | ${ttt_stat} | ${tps_stat} | ${ambiguity_count} | ${action_count} | ${combined} |")
         popd > /dev/null
     done
     popd > /dev/null
@@ -346,19 +389,16 @@ if [ ${#table_rows[@]} -gt 0 ]; then
 | Label | Description |
 |---|---|
 | `Number` | Current row position in the Results table |
-| `PT` | **Parse time** — sum of the parse-only time across all input files |
-| `OT` | **Overhead time** — `TT − PT`; time spent on file I/O, lexer/parser construction, and post-parse work |
-| `TT` | **Total time** — overall wall-clock time for the entire run |
+| `TTN` | **Total time, native C#** — overall wall-clock time for the generated C# parser run |
+| `TTT` | **Total time, table-driven interpreter** — overall wall-clock time for `dotnet trash parse --allstar`; `n.a.` when the grammar requires target-language actions or a custom superclass |
 | `PR` | **Parse rate** — `total tokens / PT`; pure parse throughput across all files |
-| `Post-warmup PR` | PR computed from files 2…N only, excluding the first (warm-up) run; `n.a.` if only one file was parsed |
-| `Post-warmup Speed Up` | Ratio of Post-warmup PR to first-file PR, showing the JIT/runtime warm-up benefit; `n.a.` if only one file was parsed |
 | `Combined` | `yes` if the top-level grammar is combined and has no `tokenVocab` option; otherwise `no` |
 
 ### Results
 
 EOF
-        echo "| Number | Grammar | PT (s) | OT (s) | TT (s) | PR (t/s) | Post-warmup PR (t/s) | Post-warmup Speed Up | Ambiguities | Actions | Combined |"
-        echo "|--------|---------|--------|--------|--------|-----|-----------------|----------------------|-------------|---------|----------|"
+        echo "| Number | Grammar | TTN (s) | TTT (s) | PR (t/s) | Ambiguities | Actions | Combined |"
+        echo "|--------|---------|---------|---------|----------|-------------|---------|----------|"
         for row in "${table_rows[@]}"; do
             echo "$row"
         done

@@ -92,9 +92,9 @@ if not tables:
 sortable_idx = max(range(len(tables)), key=lambda i: len(tables[i]['rows']))
 
 def is_numeric_col(rows, i):
-    vals = [parse_num(r[i]) for r in rows if i < len(r)]
-    numeric = [v for v in vals if v is not None]
-    return len(numeric) > len(vals) / 2
+    values = [r[i].strip() for r in rows if i < len(r)]
+    present = [v for v in values if v and 'n.a.' not in v]
+    return bool(present) and all(parse_num(v) is not None for v in present)
 
 def render_cell(tbl, column, value):
     if (tbl['heading'] == 'Results' and
