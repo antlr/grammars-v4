@@ -480,7 +480,7 @@ enumerators0
     ;
 
 enumerators
-    : generator (end_of_stat enumerator)*
+    : generator (end_of_stat enumerator | guard_)*
     ;
 
 enumerator
