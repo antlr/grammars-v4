@@ -7,10 +7,10 @@
 -->
    <targets>Cpp;CSharp;Dart;Go;Java;OphiRust;Rust;TypeScript</targets>
    <test>
-      <inputs>examples/**/*.java;!examples/Foo4391.java</inputs>
+      <inputs>examples/**/*.java;!examples/Foo4391.java;!examples/negative/**/*.java</inputs>
    </test>
    <test>
       <name>Negative</name>
-      <inputs>examples/Foo4391.java</inputs>
+      <inputs>examples/Foo4391.java;examples/negative/**/*.java</inputs>
    </test>
 </desc>
