@@ -42,7 +42,7 @@ options {
 }
 
 compilationunit
-    : packageDeclaration? (importDeclaration | ';')* (typeDeclaration | ';')* EOF
+    : packageDeclaration? importDeclaration* (typeDeclaration | ';')* EOF
     | modularCompulationUnit EOF
     ;
 
