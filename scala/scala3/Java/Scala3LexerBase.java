@@ -147,10 +147,12 @@ public abstract class Scala3LexerBase extends Lexer {
             addPendingToken(curToken);
         } else if (type == Scala3Lexer.LBRACE) {
             regionStack.push(Region.InBraces);
+            indentLengthStack.push(indentLengthStack.peek()); //adds and indent for the brace region. It will be updated in handleNewlineToken if neccesary.
             addPendingToken(curToken);
         } else if (type == Scala3Lexer.RBRACE) {
             if (!regionStack.isEmpty() && regionStack.peek() == Region.InBraces)
                 regionStack.pop();
+            indentLengthStack.pop();
             addPendingToken(curToken);
         } else if (type == Token.EOF) {
             handleEofToken();
@@ -205,6 +207,13 @@ public abstract class Scala3LexerBase extends Lexer {
             newIndent = getIndentLength(curToken.getText());
         else
             newIndent = 0;
+
+        //Updates the indentation depth for the new brace region.
+        //This ensures that new indents inside the brace region are compared to the correct indent
+        if(lastNonHiddenType == Scala3Lexer.LBRACE) {
+            indentLengthStack.pop();
+            indentLengthStack.push(newIndent);
+        }
 
         // Lines starting with '.' are method-chain continuations — suppress
         // NEWLINE as separator and INDENT, but still emit DEDENT(s).
