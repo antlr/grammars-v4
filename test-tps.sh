@@ -394,7 +394,7 @@ if [ ${#table_rows[@]} -gt 0 ]; then
 | Label | Description |
 |---|---|
 | `Number` | Current row position in the Results table |
-| `TTS` | **Total time, native C#** — overall wall-clock time for the generated C# parser run |
+| `TTN` | **Total time, native C#** — overall wall-clock time for the generated C# parser run |
 | `TTT` | **Total time, table-driven interpreter** — overall wall-clock time for `dotnet trash parse --allstar`; `n.a.` when the grammar requires target-language actions or a custom superclass |
 | `PRN` | **Parse rate, native C#** — `total tokens / PT` for the generated C# parser |
 | `PRT` | **Parse rate, table-driven interpreter** — `total tokens / PT` for `dotnet trash parse --allstar`; `n.a.` when TTT is unavailable |
@@ -403,7 +403,7 @@ if [ ${#table_rows[@]} -gt 0 ]; then
 ### Results
 
 EOF
-        echo "| Number | Grammar Name | TTS (s) | TTT (s) | PRN (t/s) | PRT (t/s) | Ambiguities | Actions | Combined |"
+        echo "| Number | Grammar Name | TTN (s) | TTT (s) | PRN (t/s) | PRT (t/s) | Ambiguities | Actions | Combined |"
         echo "|--------|--------------|---------|---------|-----------|-----------|-------------|---------|----------|"
         for row in "${table_rows[@]}"; do
             echo "$row"

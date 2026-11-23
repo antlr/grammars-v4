@@ -31,7 +31,7 @@
 <thead><tr><th>Label</th><th>Description</th></tr></thead>
 <tbody>
 <tr><td style="text-align:left"><code>Number</code></td><td style="text-align:left">Current row position in the Results table</td></tr>
-<tr><td style="text-align:left"><code>TTS</code></td><td style="text-align:left"><strong>Total time, native C#</strong> — overall wall-clock time for the generated C# parser run</td></tr>
+<tr><td style="text-align:left"><code>TTN</code></td><td style="text-align:left"><strong>Total time, native C#</strong> — overall wall-clock time for the generated C# parser run</td></tr>
 <tr><td style="text-align:left"><code>TTT</code></td><td style="text-align:left"><strong>Total time, table-driven interpreter</strong> — overall wall-clock time for <code>dotnet trash parse --allstar</code>; <code>n.a.</code> when the grammar requires target-language actions or a custom superclass</td></tr>
 <tr><td style="text-align:left"><code>PRN</code></td><td style="text-align:left"><strong>Parse rate, native C#</strong> — <code>total tokens / PT</code> for the generated C# parser</td></tr>
 <tr><td style="text-align:left"><code>PRT</code></td><td style="text-align:left"><strong>Parse rate, table-driven interpreter</strong> — <code>total tokens / PT</code> for <code>dotnet trash parse --allstar</code>; <code>n.a.</code> when TTT is unavailable</td></tr>
@@ -43,7 +43,7 @@
 <thead><tr>
   <th class="row-number">Number</th>
   <th onclick="sortTable('perf-table',1)">Grammar Name</th>
-  <th onclick="sortTable('perf-table',2)">TTS (s)</th>
+  <th onclick="sortTable('perf-table',2)">TTN (s)</th>
   <th onclick="sortTable('perf-table',3)">TTT (s)</th>
   <th onclick="sortTable('perf-table',4)">PRN (t/s)</th>
   <th onclick="sortTable('perf-table',5)">PRT (t/s)</th>
