@@ -149,6 +149,11 @@ public abstract class Scala3LexerBase extends Lexer {
             regionStack.push(Region.InBraces);
             addPendingToken(curToken);
         } else if (type == Scala3Lexer.RBRACE) {
+            while (!regionStack.isEmpty() && regionStack.peek() == Region.Indented) {
+                indentLengthStack.pop();
+                regionStack.pop();
+                createAndAddPendingToken(Scala3Lexer.DEDENT, Token.DEFAULT_CHANNEL, "<DEDENT>", curToken);
+            }
             if (!regionStack.isEmpty() && regionStack.peek() == Region.InBraces)
                 regionStack.pop();
             addPendingToken(curToken);

@@ -161,6 +161,12 @@ public abstract class Scala3LexerBase : Lexer
                 break;
 
             case Scala3Lexer.RBRACE:
+                while (_regionStack.Count > 0 && _regionStack.Peek() == Region.Indented)
+                {
+                    _indentLengthStack.Pop();
+                    _regionStack.Pop();
+                    CreateAndAddPendingToken(Scala3Lexer.DEDENT, TokenConstants.DefaultChannel, "<DEDENT>", _curToken);
+                }
                 if (_regionStack.Count > 0 && _regionStack.Peek() == Region.InBraces)
                     _regionStack.Pop();
                 AddPendingToken(_curToken);
