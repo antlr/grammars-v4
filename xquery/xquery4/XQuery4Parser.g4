@@ -1,6 +1,6 @@
 // XQuery v4.0
 // Author: Ken Domino
-// Based on the XQuery 4.0 spec at https://qt4cg.org/pr/2796/xquery-40/xquery-40-autodiff.html
+// Based on the XQuery 4.0 spec at https://qt4cg.org/specifications/xquery-40/xquery-40.html.
 //
 // XQuery 4.0 is a superset of XPath 4.0. This grammar incorporates all XPath 4.0
 // expression rules and adds XQuery-specific module structure, prolog, FLWOR enhancements,
