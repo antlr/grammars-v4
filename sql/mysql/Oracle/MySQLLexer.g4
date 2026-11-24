@@ -320,9 +320,10 @@ fragment HEXDIGIT
     ;
 
 // The 0x and 0b prefixes are lower case only; the quoted forms X'..' and B'..' take either case.
+// A quoted hex literal has an even number of digits.
 HEX_NUMBER
     : ('0x' HEXDIGIT+)
-    | ([xX] '\'' HEXDIGIT* '\'')
+    | ([xX] '\'' (HEXDIGIT HEXDIGIT)* '\'')
     ;
 
 BIN_NUMBER
