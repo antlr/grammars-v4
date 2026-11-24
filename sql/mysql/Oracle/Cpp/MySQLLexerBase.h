@@ -97,6 +97,8 @@ class MySQLLexerBase : public antlr4::Lexer
         void doDateSub();
         void doExtract();
         void doGroupConcat();
+        void doJsonArrayagg();
+        void doJsonObjectagg();
         void doMax();
         void doMid();
         void doMin();

@@ -221,6 +221,8 @@ public abstract class MySQLLexerBase extends Lexer {
     public void doDateSub() { this._type = determineFunction(MySQLLexer.DATE_SUB_SYMBOL); }
     public void doExtract() { this._type = determineFunction(MySQLLexer.EXTRACT_SYMBOL); }
     public void doGroupConcat() { this._type = determineFunction(MySQLLexer.GROUP_CONCAT_SYMBOL); }
+    public void doJsonArrayagg() { this._type = determineFunction(MySQLLexer.JSON_ARRAYAGG_SYMBOL); }
+    public void doJsonObjectagg() { this._type = determineFunction(MySQLLexer.JSON_OBJECTAGG_SYMBOL); }
     public void doMax() { this._type = determineFunction(MySQLLexer.MAX_SYMBOL); }
     public void doMid() { this._type = determineFunction(MySQLLexer.SUBSTRING_SYMBOL); }
     public void doMin() { this._type = determineFunction(MySQLLexer.MIN_SYMBOL); }

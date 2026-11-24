@@ -1819,10 +1819,6 @@ NVARCHAR_SYMBOL
     : N V A R C H A R
     ;
 
-OFFLINE_SYMBOL
-    : O F F L I N E
-    ;
-
 OFFSET_SYMBOL
     : O F F S E T
     ;
@@ -1833,10 +1829,6 @@ ON_SYMBOL
 
 ONE_SYMBOL
     : O N E
-    ;
-
-ONLINE_SYMBOL
-    : O N L I N E
     ;
 
 ONLY_SYMBOL
@@ -2943,11 +2935,11 @@ RECURSIVE_SYMBOL
     ;                                                                                     // SQL-1999-R
 
 JSON_OBJECTAGG_SYMBOL
-    : J S O N '_' O B J E C T A G G
+    : J S O N '_' O B J E C T A G G                                                       { this.doJsonObjectagg(); }
     ;                                                                                     // SQL-2015-R
 
 JSON_ARRAYAGG_SYMBOL
-    : J S O N '_' A R R A Y A G G
+    : J S O N '_' A R R A Y A G G                                                         { this.doJsonArrayagg(); }
     ;                                                                                     // SQL-2015-R
 
 OF_SYMBOL

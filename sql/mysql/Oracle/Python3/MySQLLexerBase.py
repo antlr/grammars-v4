@@ -245,6 +245,12 @@ class MySQLLexerBase(Lexer):
     def doGroupConcat(self):
         self._type = self.determineFunction(self.GROUP_CONCAT_SYMBOL)
 
+    def doJsonArrayagg(self):
+        self._type = self.determineFunction(self.JSON_ARRAYAGG_SYMBOL)
+
+    def doJsonObjectagg(self):
+        self._type = self.determineFunction(self.JSON_OBJECTAGG_SYMBOL)
+
     def doMax(self):
         self._type = self.determineFunction(self.MAX_SYMBOL)
 

@@ -254,6 +254,8 @@ class MySQLLexerBase extends Lexer {
     doDateSub() { this._type = this.determineFunction(MySQLLexer.DATE_SUB_SYMBOL); }
     doExtract() { this._type = this.determineFunction(MySQLLexer.EXTRACT_SYMBOL); }
     doGroupConcat() { this._type = this.determineFunction(MySQLLexer.GROUP_CONCAT_SYMBOL); }
+    doJsonArrayagg() { this._type = this.determineFunction(MySQLLexer.JSON_ARRAYAGG_SYMBOL); }
+    doJsonObjectagg() { this._type = this.determineFunction(MySQLLexer.JSON_OBJECTAGG_SYMBOL); }
     doMax() { this._type = this.determineFunction(MySQLLexer.MAX_SYMBOL); }
     doMid() { this._type = this.determineFunction(MySQLLexer.SUBSTRING_SYMBOL); }
     doMin() { this._type = this.determineFunction(MySQLLexer.MIN_SYMBOL); }

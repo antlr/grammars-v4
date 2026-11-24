@@ -258,6 +258,8 @@ func (m *MySQLLexerBase) doDateAdd() { m.SetType(m.determineFunction(MySQLLexerD
 func (m *MySQLLexerBase) doDateSub() { m.SetType(m.determineFunction(MySQLLexerDATE_SUB_SYMBOL)) }
 func (m *MySQLLexerBase) doExtract() { m.SetType(m.determineFunction(MySQLLexerEXTRACT_SYMBOL)) }
 func (m *MySQLLexerBase) doGroupConcat() { m.SetType(m.determineFunction(MySQLLexerGROUP_CONCAT_SYMBOL)) }
+func (m *MySQLLexerBase) doJsonArrayagg() { m.SetType(m.determineFunction(MySQLLexerJSON_ARRAYAGG_SYMBOL)) }
+func (m *MySQLLexerBase) doJsonObjectagg() { m.SetType(m.determineFunction(MySQLLexerJSON_OBJECTAGG_SYMBOL)) }
 func (m *MySQLLexerBase) doMax() { m.SetType(m.determineFunction(MySQLLexerMAX_SYMBOL)) }
 func (m *MySQLLexerBase) doMid() { m.SetType(m.determineFunction(MySQLLexerSUBSTRING_SYMBOL)) }
 func (m *MySQLLexerBase) doMin() { m.SetType(m.determineFunction(MySQLLexerMIN_SYMBOL)) }

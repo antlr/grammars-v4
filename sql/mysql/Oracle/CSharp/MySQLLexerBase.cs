@@ -323,6 +323,8 @@ public class MySQLLexerBase : Lexer {
     public void doDateSub() => Type = determineFunction(MySQLLexer.DATE_SUB_SYMBOL);
     public void doExtract() => Type = determineFunction(MySQLLexer.EXTRACT_SYMBOL);
     public void doGroupConcat() => Type = determineFunction(MySQLLexer.GROUP_CONCAT_SYMBOL);
+    public void doJsonArrayagg() => Type = determineFunction(MySQLLexer.JSON_ARRAYAGG_SYMBOL);
+    public void doJsonObjectagg() => Type = determineFunction(MySQLLexer.JSON_OBJECTAGG_SYMBOL);
     public void doMax() => Type = determineFunction(MySQLLexer.MAX_SYMBOL);
     public void doMid() => Type = determineFunction(MySQLLexer.SUBSTRING_SYMBOL);
     public void doMin() => Type = determineFunction(MySQLLexer.MIN_SYMBOL);
