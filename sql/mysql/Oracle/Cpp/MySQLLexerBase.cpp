@@ -218,7 +218,7 @@ void MySQLLexerBase::doVarPop() { this->type = this->determineFunction(MySQLLexe
 void MySQLLexerBase::doVarSamp() { this->type = this->determineFunction(MySQLLexer::VAR_SAMP_SYMBOL); }
 void MySQLLexerBase::doUnderscoreCharset() { this->type = this->checkCharset(this->getText()); }
 bool MySQLLexerBase::doDollarQuotedStringText() { return this->serverVersion >= 80034 && this->supportMle; }
-bool MySQLLexerBase::isVersionComment() { return inVersionComment; }
+bool MySQLLexerBase::isVersionComment() { return this->checkMySQLVersion(this->getText()); }
 bool MySQLLexerBase::isBackTickQuotedId() { return !this->isSqlModeActive(SqlMode::NoBackslashEscapes); }
 bool MySQLLexerBase::isDoubleQuotedText() { return !this->isSqlModeActive(SqlMode::NoBackslashEscapes); }
 bool MySQLLexerBase::isSingleQuotedText() { return !this->isSqlModeActive(SqlMode::NoBackslashEscapes); }
