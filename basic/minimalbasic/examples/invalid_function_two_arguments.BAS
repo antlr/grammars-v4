@@ -1,0 +1,2 @@
+10 PRINT SIN(1,2)
+20 END

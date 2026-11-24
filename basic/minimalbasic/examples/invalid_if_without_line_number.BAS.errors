@@ -1,0 +1,2 @@
+line 1:14 extraneous input '\n' expecting INTEGER
+line 2:3 extraneous input 'END' expecting {<EOF>, NEWLINE}

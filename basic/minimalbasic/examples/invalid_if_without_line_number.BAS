@@ -1,0 +1,2 @@
+10 IF X=1 THEN
+20 END
