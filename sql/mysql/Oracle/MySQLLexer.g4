@@ -3590,6 +3590,7 @@ INVALID_INPUT
     | [\u000E-\u001F] // More control codes.
     | '['
     | ']'
+    | [xX] '\'' HEXDIGIT (HEXDIGIT HEXDIGIT)* '\'' // A quoted hex literal with an odd number of digits.
     ;
 
 // String and text types.
