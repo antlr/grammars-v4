@@ -1,0 +1,3 @@
+line 3:41 mismatched input '2147483648' expecting INT_NUMBER
+line 4:41 mismatched input '9999999999' expecting INT_NUMBER
+line 5:41 mismatched input '00000000002147483648' expecting INT_NUMBER
