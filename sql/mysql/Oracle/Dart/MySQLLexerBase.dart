@@ -107,7 +107,7 @@ abstract class MySQLLexerBase extends Lexer
     int determineFunction(int proposed) {
         var input = this.inputStream.LA(1) ?? 0;
         if (isSqlModeActive(SqlMode.ignoreSpace)) {
-            while ([' ', '\t', '\r', '\n'].contains(String.fromCharCode(input))) {
+            while (' \t\r\n'.codeUnits.contains(input)) {
                 // Consume logic based on InputStream equivalent.
                 this.interpreter?.consume(this.inputStream);
                 this.channel = Lexer.HIDDEN;

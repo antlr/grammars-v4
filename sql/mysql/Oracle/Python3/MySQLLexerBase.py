@@ -62,15 +62,15 @@ class MySQLLexerBase(Lexer):
         return False
 
     def determineFunction(self, proposed):
-        input_char = chr(self._input.LA(1))
+        input_char = self._input.LA(1)
         if self.isSqlModeActive(SqlMode.IgnoreSpace):
-            while input_char in " \t\r\n":
+            while input_char in (ord(' '), ord('\t'), ord('\r'), ord('\n')):
                 self._input.consume()
                 self._channel = Lexer.HIDDEN
                 self._type = self.WHITESPACE
-                input_char = chr(self._input.LA(1))
+                input_char = self._input.LA(1)
 
-        return proposed if input_char == '(' else self.IDENTIFIER
+        return proposed if input_char == ord('(') else self.IDENTIFIER
 
     def determineNumericType(self, text):
         if text is None:
