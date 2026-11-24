@@ -4478,10 +4478,11 @@ real_ulonglong_number
     | LONG_NUMBER
     ;
 
+// A sign only before a number, as in signed_literal of sql_yacc.yy.
 signedLiteral
     : literal
-    | PLUS_OPERATOR ulong_number
-    | MINUS_OPERATOR ulong_number
+    | PLUS_OPERATOR numLiteral
+    | MINUS_OPERATOR numLiteral
     ;
 
 signedLiteralOrNull
