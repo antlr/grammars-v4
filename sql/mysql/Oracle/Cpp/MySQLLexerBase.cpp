@@ -60,11 +60,13 @@ bool MySQLLexerBase::checkMySQLVersion(std::string text) {
 }
 
 int MySQLLexerBase::determineFunction(int proposed) {
-    char input = static_cast<char>(_input->LA(1));
+    // With IGNORE_SPACE, look past whitespace (the characters of the WHITESPACE rule) for the open parenthesis.
+    // The whitespace stays in the input, to be lexed as WHITESPACE after this token.
+    ssize_t i = 1;
+    size_t input = _input->LA(i);
     if (isSqlModeActive(SqlMode::IgnoreSpace)) {
-        while (isspace(input)) {
-            this->getInterpreter<antlr4::atn::LexerATNSimulator>()->consume(_input);
-            input = static_cast<char>(_input->LA(1));
+        while (input == ' ' || input == '\t' || input == '\f' || input == '\r' || input == '\n') {
+            input = _input->LA(++i);
         }
     }
 

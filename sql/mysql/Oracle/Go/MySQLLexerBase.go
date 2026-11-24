@@ -224,16 +224,14 @@ func (m *MySQLLexerBase) checkMySQLVersion(text string) bool {
 }
 
 func (m *MySQLLexerBase) determineFunction(proposed int) int {
-    // Skip any whitespace character if the sql mode says they should be ignored,
-    // before actually trying to match the open parenthesis.
-    input := m.GetInputStream().LA(1)
+    // With IGNORE_SPACE, look past whitespace (the characters of the WHITESPACE rule) for the open parenthesis.
+    // The whitespace stays in the input, to be lexed as WHITESPACE after this token.
+    i := 1
+    input := m.GetInputStream().LA(i)
     if m.isSqlModeActive(IgnoreSpace) {
-        for input == ' ' || input == '\t' || input == '\r' || input == '\n' {
-            m.Interpreter.Consume(m.GetInputStream())
-            // Update channel and token type
-            m.SetChannel(antlr.LexerHidden)
-            m.SetType(MySQLLexerWHITESPACE)
-            input = m.GetInputStream().LA(1)
+        for input == ' ' || input == '\t' || input == '\f' || input == '\r' || input == '\n' {
+            i++
+            input = m.GetInputStream().LA(i)
         }
     }
 

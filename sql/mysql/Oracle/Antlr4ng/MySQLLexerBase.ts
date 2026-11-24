@@ -114,19 +114,17 @@ export abstract class MySQLLexerBase extends Lexer {
      * @returns If a function call is found then return the proposed token type, otherwise just IDENTIFIER.
      */
     protected determineFunction(proposed: number): number {
-        // Skip any whitespace character if the sql mode says they should be ignored,
-        // before actually trying to match the open parenthesis.
-        let input = String.fromCharCode(this.inputStream.LA(1));
+        // With IGNORE_SPACE, look past whitespace (the characters of the WHITESPACE rule) for the open parenthesis.
+        // The whitespace stays in the input, to be lexed as WHITESPACE after this token.
+        let i = 1;
+        let input = this.inputStream.LA(i);
         if (this.isSqlModeActive(SqlMode.IgnoreSpace)) {
-            while (input === " " || input === "\t" || input === "\r" || input === "\n") {
-                this.interpreter.consume(this.inputStream);
-                this.channel = Lexer.HIDDEN;
-                this.type = MySQLLexer.WHITESPACE;
-                input = String.fromCharCode(this.inputStream.LA(1));
+            while (input === 0x20 || input === 0x09 || input === 0x0C || input === 0x0D || input === 0x0A) {
+                input = this.inputStream.LA(++i);
             }
         }
 
-        return input === "(" ? proposed : MySQLLexer.IDENTIFIER;
+        return input === 0x28 ? proposed : MySQLLexer.IDENTIFIER;
 
     }
 

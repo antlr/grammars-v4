@@ -105,15 +105,13 @@ abstract class MySQLLexerBase extends Lexer
      * @returns If a function call is found then return the proposed token type, otherwise just IDENTIFIER.
      */
     int determineFunction(int proposed) {
-        var input = this.inputStream.LA(1) ?? 0;
+        // With IGNORE_SPACE, look past whitespace (the characters of the WHITESPACE rule) for the open parenthesis.
+        // The whitespace stays in the input, to be lexed as WHITESPACE after this token.
+        var i = 1;
+        var input = this.inputStream.LA(i) ?? 0;
         if (isSqlModeActive(SqlMode.ignoreSpace)) {
-            while (' \t\r\n'.codeUnits.contains(input)) {
-                // Consume logic based on InputStream equivalent.
-                this.interpreter?.consume(this.inputStream);
-                this.channel = Lexer.HIDDEN;
-                this.type = MySQLLexer.TOKEN_WHITESPACE;
-                var c = this.inputStream.LA(1);
-                input = c ?? 0;
+            while (' \t\f\r\n'.codeUnits.contains(input)) {
+                input = this.inputStream.LA(++i) ?? 0;
             }
         }
         var r = input == '('.codeUnitAt(0) ? proposed : MySQLLexer.TOKEN_IDENTIFIER;

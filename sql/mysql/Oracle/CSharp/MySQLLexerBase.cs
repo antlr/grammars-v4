@@ -138,15 +138,13 @@ public class MySQLLexerBase : Lexer {
      */
     protected int determineFunction(int proposed)
     {
-        // Skip any whitespace character if the sql mode says they should be ignored,
-        // before actually trying to match the open parenthesis.
-        var input = (char)this.InputStream.LA(1);
+        // With IGNORE_SPACE, look past whitespace (the characters of the WHITESPACE rule) for the open parenthesis.
+        // The whitespace stays in the input, to be lexed as WHITESPACE after this token.
+        var i = 1;
+        var input = this.InputStream.LA(i);
         if (this.isSqlModeActive(SqlMode.IgnoreSpace)) {
-            while (input == ' ' || input == '\t' || input == '\r' || input == '\n') {
-                this.Interpreter.Consume((ICharStream)this.InputStream);
-                this.Channel = Hidden;
-                this.Type = MySQLLexer.WHITESPACE;
-                input = (char)this.InputStream.LA(1);
+            while (input == ' ' || input == '\t' || input == '\f' || input == '\r' || input == '\n') {
+                input = this.InputStream.LA(++i);
             }
         }
 
