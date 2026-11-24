@@ -127,7 +127,7 @@ func (m *MySQLLexerBase) isSqlModeActive(mode SqlMode) bool { return StaticMySQL
 func (m *MySQLLexerBase) doIntNumber() { m.SetType(m.determineNumericType(m.GetText())); }
 
 func (m *MySQLLexerBase) determineNumericType(text string) int {
-    length := len(text) - 1
+    length := len(text)
     if length < StaticMySQLLexerBase.longLength {
         return MySQLLexerINT_NUMBER
     }
@@ -142,7 +142,7 @@ func (m *MySQLLexerBase) determineNumericType(text string) int {
         length--
         negative = true
     }
-    for text[index] == '0' && length > 0 {
+    for length > 0 && text[index] == '0' {
         index++
         length--
     }
@@ -179,7 +179,7 @@ func (m *MySQLLexerBase) determineNumericType(text string) int {
             if length > StaticMySQLLexerBase.unsignedLongLongLength {
                 return MySQLLexerDECIMAL_NUMBER;
             }
-            cmp = StaticMySQLLexerBase.unsignedLongLongString[1:]
+            cmp = StaticMySQLLexerBase.unsignedLongLongString
             smaller = MySQLLexerULONGLONG_NUMBER
             bigger = MySQLLexerDECIMAL_NUMBER
         } else {

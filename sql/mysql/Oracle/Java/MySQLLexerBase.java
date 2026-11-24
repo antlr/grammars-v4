@@ -95,7 +95,7 @@ public abstract class MySQLLexerBase extends Lexer {
     }
 
     protected int determineNumericType(String text) {
-        int length = text.length() - 1;
+        int length = text.length();
         if (length < MySQLLexerBase.longLength) {
             return MySQLLexer.INT_NUMBER;
         }
@@ -111,7 +111,7 @@ public abstract class MySQLLexerBase extends Lexer {
             negative = true;
         }
 
-        while (text.charAt(index) == '0' && length > 0) {
+        while (length > 0 && text.charAt(index) == '0') {
             ++index;
             --length;
         }
