@@ -6,9 +6,14 @@ import (
 )
 
 
+// defaultServerVersion is the server version the lexer and the parser assume,
+// as the base class constructors of the other targets set it.
+const defaultServerVersion = 80200
+
 type MySQLLexerBase struct {
     *antlr.BaseLexer
     serverVersion int
+    initialized        bool
     sqlModes           map[SqlMode]bool
     supportMle         bool
     charSets           map[string]bool
@@ -30,7 +35,6 @@ var StaticMySQLLexerBase MySQLLexerBase
 
 func init() {
     StaticMySQLLexerBase = MySQLLexerBase {
-        serverVersion:  80200,
         supportMle:     true,
         charSets:       make(map[string]bool),
         inVersionComment: false,
@@ -49,7 +53,8 @@ func init() {
 
 func NewMySQLLexerBase(input antlr.CharStream) *MySQLLexerBase {
     r := &MySQLLexerBase{
-        serverVersion:  80200,
+        serverVersion:  defaultServerVersion,
+        initialized:    true,
         supportMle:     true,
         charSets:       make(map[string]bool),
         inVersionComment: false,
@@ -97,23 +102,23 @@ func (m *MySQLLexerBase) emitDot() {
     m.TokenStartCharIndex = m.TokenStartCharIndex + 1
 }
 
-func (m *MySQLLexerBase) isMasterCompressionAlgorithm() bool { return StaticMySQLLexerBase.serverVersion >= 80018 && m.isServerVersionLt80024() }
-func (m *MySQLLexerBase) isServerVersionGe80011() bool { return StaticMySQLLexerBase.serverVersion >= 80011 }
-func (m *MySQLLexerBase) isServerVersionGe80013() bool { return StaticMySQLLexerBase.serverVersion >= 80013 }
-func (m *MySQLLexerBase) isServerVersionLt80014() bool { return StaticMySQLLexerBase.serverVersion < 80014 }
-func (m *MySQLLexerBase) isServerVersionGe80014() bool { return StaticMySQLLexerBase.serverVersion >= 80014 }
-func (m *MySQLLexerBase) isServerVersionGe80016() bool { return StaticMySQLLexerBase.serverVersion >= 80016 }
-func (m *MySQLLexerBase) isServerVersionGe80017() bool { return StaticMySQLLexerBase.serverVersion >= 80017 }
-func (m *MySQLLexerBase) isServerVersionGe80018() bool { return StaticMySQLLexerBase.serverVersion >= 80018 }
-func (m *MySQLLexerBase) isServerVersionLt80021() bool { return StaticMySQLLexerBase.serverVersion < 80021 }
-func (m *MySQLLexerBase) isServerVersionGe80021() bool { return StaticMySQLLexerBase.serverVersion >= 80021 }
-func (m *MySQLLexerBase) isServerVersionLt80022() bool { return StaticMySQLLexerBase.serverVersion < 80022 }
-func (m *MySQLLexerBase) isServerVersionGe80022() bool { return StaticMySQLLexerBase.serverVersion >= 80022 }
-func (m *MySQLLexerBase) isServerVersionLt80023() bool { return StaticMySQLLexerBase.serverVersion < 80023 }
-func (m *MySQLLexerBase) isServerVersionGe80023() bool { return StaticMySQLLexerBase.serverVersion >= 80023 }
-func (m *MySQLLexerBase) isServerVersionLt80024() bool { return StaticMySQLLexerBase.serverVersion < 80024 }
-func (m *MySQLLexerBase) isServerVersionGe80024() bool { return StaticMySQLLexerBase.serverVersion >= 80024 }
-func (m *MySQLLexerBase) isServerVersionLt80031() bool { return StaticMySQLLexerBase.serverVersion < 80031 }
+func (m *MySQLLexerBase) isMasterCompressionAlgorithm() bool { return m.serverVersion >= 80018 && m.isServerVersionLt80024() }
+func (m *MySQLLexerBase) isServerVersionGe80011() bool { return m.serverVersion >= 80011 }
+func (m *MySQLLexerBase) isServerVersionGe80013() bool { return m.serverVersion >= 80013 }
+func (m *MySQLLexerBase) isServerVersionLt80014() bool { return m.serverVersion < 80014 }
+func (m *MySQLLexerBase) isServerVersionGe80014() bool { return m.serverVersion >= 80014 }
+func (m *MySQLLexerBase) isServerVersionGe80016() bool { return m.serverVersion >= 80016 }
+func (m *MySQLLexerBase) isServerVersionGe80017() bool { return m.serverVersion >= 80017 }
+func (m *MySQLLexerBase) isServerVersionGe80018() bool { return m.serverVersion >= 80018 }
+func (m *MySQLLexerBase) isServerVersionLt80021() bool { return m.serverVersion < 80021 }
+func (m *MySQLLexerBase) isServerVersionGe80021() bool { return m.serverVersion >= 80021 }
+func (m *MySQLLexerBase) isServerVersionLt80022() bool { return m.serverVersion < 80022 }
+func (m *MySQLLexerBase) isServerVersionGe80022() bool { return m.serverVersion >= 80022 }
+func (m *MySQLLexerBase) isServerVersionLt80023() bool { return m.serverVersion < 80023 }
+func (m *MySQLLexerBase) isServerVersionGe80023() bool { return m.serverVersion >= 80023 }
+func (m *MySQLLexerBase) isServerVersionLt80024() bool { return m.serverVersion < 80024 }
+func (m *MySQLLexerBase) isServerVersionGe80024() bool { return m.serverVersion >= 80024 }
+func (m *MySQLLexerBase) isServerVersionLt80031() bool { return m.serverVersion < 80031 }
 
 func (m *MySQLLexerBase) doLogicalOr() {
     if m.isSqlModeActive(PipesAsConcat) {
@@ -215,7 +220,7 @@ func (m *MySQLLexerBase) checkMySQLVersion(text string) bool {
         return false
     }
 
-    if version <= StaticMySQLLexerBase.serverVersion {
+    if version <= m.serverVersion {
         StaticMySQLLexerBase.inVersionComment = true
         return true
     }
@@ -288,7 +293,7 @@ func (m *MySQLLexerBase) doVariance() { m.SetType(m.determineFunction(MySQLLexer
 func (m *MySQLLexerBase) doVarPop() { m.SetType(m.determineFunction(MySQLLexerVARIANCE_SYMBOL)) }
 func (m *MySQLLexerBase) doVarSamp() { m.SetType(m.determineFunction(MySQLLexerVAR_SAMP_SYMBOL)) }
 func (m *MySQLLexerBase) doUnderscoreCharset() { m.SetType(m.checkCharset(m.GetText())) }
-func (m *MySQLLexerBase) doDollarQuotedStringText() bool { return StaticMySQLLexerBase.serverVersion >= 80034 && StaticMySQLLexerBase.supportMle; }
+func (m *MySQLLexerBase) doDollarQuotedStringText() bool { return m.serverVersion >= 80034 && StaticMySQLLexerBase.supportMle; }
 func (m *MySQLLexerBase) isVersionComment() bool { return m.checkMySQLVersion(m.GetText()) }
 func (m *MySQLLexerBase) isBackTickQuotedId() bool { return ! m.isSqlModeActive(NoBackslashEscapes) }
 func (m *MySQLLexerBase) isDoubleQuotedText() bool { return !m.isSqlModeActive(NoBackslashEscapes) }
@@ -319,6 +324,14 @@ func (m *MySQLLexerBase) checkCharset(text string) int {
  * @returns The next token in the token stream.
  */
 func (m *MySQLLexerBase) NextToken() antlr.Token {
+    // The generated NewMySQLLexer does not call NewMySQLLexerBase, so the
+    // instance state the other targets set in their constructor is set here,
+    // before any lexer predicate reads it.
+    if !m.initialized {
+        m.initialized = true
+        m.serverVersion = defaultServerVersion
+    }
+
     if len(m.pendingTokens) != 0 {
         pending := m.pendingTokens[0]
         m.pendingTokens = m.pendingTokens[1:]
