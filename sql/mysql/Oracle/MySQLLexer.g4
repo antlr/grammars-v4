@@ -2192,7 +2192,7 @@ RETURNS_SYMBOL
     ;                                                                                     // SQL-2003-R
 
 RETURN_SYMBOL
-    : R E T U R N?
+    : R E T U R N
     ;                                                                                     // SQL-2003-R
 
 REVERSE_SYMBOL
