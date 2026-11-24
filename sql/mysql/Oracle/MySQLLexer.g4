@@ -328,7 +328,7 @@ HEX_NUMBER
 
 BIN_NUMBER
     : ('0b' [01]+)
-    | ([bB] '\'' [01]+ '\'')
+    | ([bB] '\'' [01]* '\'')
     ;
 
 INT_NUMBER
@@ -3591,6 +3591,8 @@ INVALID_INPUT
     | '['
     | ']'
     | [xX] '\'' HEXDIGIT (HEXDIGIT HEXDIGIT)* '\'' // A quoted hex literal with an odd number of digits.
+    | [xX] '\'' HEXDIGIT* ~['0-9a-fA-F] // A quoted hex literal with a character other than a hex digit.
+    | [bB] '\'' [01]* ~['01] // A quoted bit literal with a character other than 0 or 1.
     ;
 
 // String and text types.
