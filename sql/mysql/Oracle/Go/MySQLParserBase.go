@@ -16,7 +16,7 @@ var StaticMySQLParserBase MySQLParserBase
 func init() {
     StaticMySQLParserBase = MySQLParserBase {
         supportMle:     true,
-        serverVersion: 80200,
+        serverVersion: defaultServerVersion,
     }
     StaticMySQLParserBase.sqlModes = sqlModeFromString("ANSI_QUOTES");
 }
@@ -24,7 +24,7 @@ func init() {
 func NewMySQLParserBase(input antlr.InputStream) *MySQLParserBase {
     r := &MySQLParserBase{
         supportMle:     true,
-        serverVersion: 80200,
+        serverVersion: defaultServerVersion,
     }
     r.sqlModes = make(map[SqlMode]bool)
     return r

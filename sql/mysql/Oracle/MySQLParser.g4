@@ -4845,6 +4845,7 @@ identifierKeywordsUnambiguous
         | ENFORCED_SYMBOL
         | ENGINES_SYMBOL
         | ENGINE_SYMBOL
+        | ENGINE_ATTRIBUTE_SYMBOL
         | ENUM_SYMBOL
         | ERRORS_SYMBOL
         | ERROR_SYMBOL
@@ -5203,6 +5204,7 @@ identifierKeywordsUnambiguous
         | PARSE_TREE_SYMBOL
         | S3_SYMBOL
         | BERNOULLI_SYMBOL
+        | AUTO_SYMBOL
     )
     /* INSERT OTHER KEYWORDS HERE */
     ;
