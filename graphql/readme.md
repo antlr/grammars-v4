@@ -1,5 +1,5 @@
 # GraphQL Grammar
 
 ## Reference
-* [pldb](http://pldb.info/concepts/graphql)
+* [pldb](https://pldb.io/concepts/graphql)
 

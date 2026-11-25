@@ -12,7 +12,7 @@ Javacc is a parser generator. This grammar was adapted from the
 ## Reference
 
 * https://github.com/javacc/javacc
-* [pldb](http://pldb.info/concepts/javacc)
+* [pldb](https://pldb.io/concepts/javacc)
 * https://en.wikipedia.org/wiki/JavaCC
 
 ## License

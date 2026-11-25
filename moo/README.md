@@ -5,5 +5,5 @@ An ANTLR4 grammar for [MOO](https://en.wikipedia.org/wiki/MOO_(programming_langu
 Examples are from [here](https://github.com/robmyers/moocode)
 
 ## Reference
-* [pldb](http://pldb.info/concepts/moo)
+* [pldb](https://pldb.io/concepts/moo)
 

@@ -1,5 +1,5 @@
 # StarRocks Grammar
 
 ## Reference
-* [pldb](http://pldb.info/concepts/sql)
+* [pldb](https://pldb.io/concepts/sql)
 

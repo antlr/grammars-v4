@@ -30,7 +30,7 @@ Universal, clear and fast Python grammar.
     * Refactoring
 
 ## Reference
-* [pldb](http://pldb.info/concepts/python)
+* [pldb](https://pldb.io/concepts/python)
 
 
 ## License

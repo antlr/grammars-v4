@@ -74,3 +74,7 @@ cd Generated-CSharp
 bash build.sh
 bash test.sh
 ```
+
+## Reference
+* [pldb](https://pldb.io/concepts/xquery)
+

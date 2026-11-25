@@ -1,5 +1,5 @@
 # Kotlin
 
 ## Reference
-* [pldb](http://pldb.info/concepts/kotlin)
+* [pldb](https://pldb.io/concepts/kotlin)
 

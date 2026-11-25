@@ -1,5 +1,5 @@
 # Logo
 
 ## Reference
-* [pldb](http://pldb.info/concepts/logo)
+* [pldb](https://pldb.io/concepts/logo)
 

@@ -1,5 +1,5 @@
 # Lambda
 
 ## Reference
-* [pldb](http://pldb.info/concepts/lambda)
+* [pldb](https://pldb.io/concepts/lambda)
 

@@ -43,5 +43,5 @@ Need a working parser for modern Java? Use java/java first.
 Need exact JLS correspondence? Use java8. 9, or 20, but expect much slower performance. 
 
 ## Reference
-* [pldb](http://pldb.info/concepts/java)
+* [pldb](https://pldb.io/concepts/java)
 

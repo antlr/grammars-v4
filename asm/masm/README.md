@@ -12,5 +12,5 @@ We all attend Monterrey Tech in Cuernavaca.
 We will appreciate so much your feedback at A00378918@itesm.mx
 
 ## Reference
-* [pldb](http://pldb.info/concepts/masm)
+* [pldb](https://pldb.io/concepts/masm)
 

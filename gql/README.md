@@ -66,5 +66,6 @@ or verify query execution results.
 ## References
 
 - [ISO/IEC 39075:2024 — Graph Query Language](https://www.iso.org/standard/76120.html)
+- [Graph Query Language](https://pldb.io/concepts/graph-query-language)
 - [OpenGQL grammar project](https://github.com/opengql/grammar)
-- [ANTLR](https://www.antlr.org/)
+- [ANTLR](https://www.antlr.org/) 

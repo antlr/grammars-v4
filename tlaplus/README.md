@@ -22,3 +22,7 @@ Run every example from this directory with `mvn clean test`, or from the reposit
 root with `mvn -pl tlaplus clean test`. The parser entry point is `modules`, which
 requires the entire input to be consumed. `desc.xml` configures the same entry
 point for Trash Toolkit drivers.
+
+## Reference
+* [pldb](https://pldb.io/concepts/tla)
+

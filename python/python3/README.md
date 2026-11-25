@@ -16,5 +16,5 @@ section is well documented, so people trying to port this grammar to
 another target should not have much difficulty.
 
 ## Reference
-* [pldb](http://pldb.info/concepts/python)
+* [pldb](https://pldb.io/concepts/python)
 

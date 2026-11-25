@@ -8,5 +8,5 @@ Format data from [here](https://www.iucr.org/__data/iucr/cif/standard/cifstd5.ht
 Examples from [here](https://www.balisage.net/Proceedings/vol26/html/Gryk01/BalisageVol26-Gryk01.html)
 
 ## Reference
-* [pldb](http://pldb.info/concepts/star)
+* [pldb](https://pldb.io/concepts/star)
 

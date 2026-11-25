@@ -1,5 +1,5 @@
 # Smalltalk Grammar
 
 ## Reference
-* [pldb](http://pldb.info/concepts/smalltalk)
+* [pldb](https://pldb.io/concepts/smalltalk)
 
