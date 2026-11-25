@@ -72,7 +72,7 @@ int MySQLLexerBase::determineFunction(int proposed) {
 }
 
 int MySQLLexerBase::determineNumericType(std::string text) {
-    int length = text.length() - 1;
+    int length = text.length();
     if (length < longLength) return MySQLLexer::INT_NUMBER;
 
     bool negative = false;
@@ -85,7 +85,7 @@ int MySQLLexerBase::determineNumericType(std::string text) {
         negative = true;
     }
 
-    while (text[index] == '0' && length > 0) {
+    while (length > 0 && text[index] == '0') {
         ++index; --length;
     }
 
@@ -128,8 +128,7 @@ int MySQLLexerBase::determineNumericType(std::string text) {
     }
 
     int cmpIndex = 0;
-    while (index < text.length() && text[index] == cmp[cmpIndex]) {
-        ++index; ++cmpIndex;
+    while (index < text.length() && cmp[cmpIndex++] == text[index++]) {
     }
 
     return (text[index - 1] <= cmp[cmpIndex - 1]) ? smaller : bigger;

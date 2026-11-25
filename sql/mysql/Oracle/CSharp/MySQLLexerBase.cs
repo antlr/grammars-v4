@@ -166,7 +166,7 @@ public class MySQLLexerBase : Lexer {
         // The original code checks for leading +/- but actually that can never happen, neither in the
         // server parser (as a digit is used to trigger processing in the lexer) nor in our parser
         // as our rules are defined without signs. But we do it anyway for maximum compatibility.
-        var length = text.Length - 1;
+        var length = text.Length;
         if (length < MySQLLexerBase.longLength) { // quick normal case
             return MySQLLexer.INT_NUMBER;
         }
@@ -182,7 +182,7 @@ public class MySQLLexerBase : Lexer {
             negative = true;
         }
 
-        while (text[index] == '0' && length > 0) {
+        while (length > 0 && text[index] == '0') {
             ++index;
             --length;
         }

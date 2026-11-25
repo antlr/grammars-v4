@@ -1,0 +1,5 @@
+-- IGNORE n LINES takes INT_NUMBER only, as the server's grammar takes NUM only, so each of these LONG_NUMBER
+-- literals is a syntax error, as on the server.
+LOAD DATA INFILE 'f' INTO TABLE t IGNORE 2147483648 LINES;
+LOAD DATA INFILE 'f' INTO TABLE t IGNORE 9999999999 LINES;
+LOAD DATA INFILE 'f' INTO TABLE t IGNORE 00000000002147483648 LINES;

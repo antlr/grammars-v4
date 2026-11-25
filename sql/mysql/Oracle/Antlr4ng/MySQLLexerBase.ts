@@ -141,7 +141,7 @@ export abstract class MySQLLexerBase extends Lexer {
         // The original code checks for leading +/- but actually that can never happen, neither in the
         // server parser (as a digit is used to trigger processing in the lexer) nor in our parser
         // as our rules are defined without signs. But we do it anyway for maximum compatibility.
-        let length = text.length - 1;
+        let length = text.length;
         if (length < MySQLLexerBase.#longLength) { // quick normal case
             return MySQLLexer.INT_NUMBER;
         }
@@ -157,7 +157,7 @@ export abstract class MySQLLexerBase extends Lexer {
             negative = true;
         }
 
-        while (text.charAt(index) === "0" && length > 0) {
+        while (length > 0 && text.charAt(index) === "0") {
             ++index;
             --length;
         }

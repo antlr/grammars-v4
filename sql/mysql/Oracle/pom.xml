@@ -43,6 +43,7 @@
 					<grammarName>MySQL</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples</exampleFiles>
+					<testFileExtension>.sql</testFileExtension>
 				</configuration>
 				<executions>
 					<execution>
