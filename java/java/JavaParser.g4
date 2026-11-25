@@ -511,7 +511,7 @@ typeIdentifier // Identifiers that are not restricted for type declarations
     | PROVIDES
     | WITH
     | TRANSITIVE
-    | SEALED
+    | WHEN
     ;
 
 localTypeDeclaration
