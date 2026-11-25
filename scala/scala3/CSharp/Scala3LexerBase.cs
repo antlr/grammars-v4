@@ -165,6 +165,7 @@ public abstract class Scala3LexerBase : Lexer
 
             case Scala3Lexer.LBRACE:
                 _regionStack.Push(Region.InBraces);
+                _indentLengthStack.Push(_indentLengthStack.Peek()); //adds and indent for the brace region. It will be updated in handleNewlineToken if neccesary.
                 AddPendingToken(_curToken);
                 break;
 
@@ -172,6 +173,7 @@ public abstract class Scala3LexerBase : Lexer
                 if (_regionStack.Count > 0 && _regionStack.Peek() == Region.InBraces)
                     _regionStack.Pop();
                 AddPendingToken(_curToken);
+                _indentLengthStack.Pop();
                 break;
 
             case TokenConstants.EOF:
@@ -240,6 +242,13 @@ public abstract class Scala3LexerBase : Lexer
             newIndent = GetIndentLength(_curToken!.Text);
         else
             newIndent = 0;
+
+        //Updates the indentation depth for the new brace region.
+        //This ensures that new indents inside the brace region are compared to the correct indent
+        if (_lastNonHiddenType == Scala3Lexer.LBRACE) {
+            _indentLengthStack.Pop();
+            _indentLengthStack.Push(newIndent);
+        }
 
         // Lines starting with '.' are method-chain continuations — suppress
         // NEWLINE as separator and INDENT, but still emit DEDENT(s).
