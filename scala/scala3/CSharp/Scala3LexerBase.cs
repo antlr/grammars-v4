@@ -59,6 +59,8 @@ public abstract class Scala3LexerBase : Lexer
     private IToken? _curToken = null;
     private IToken? _ffgToken = null;
 
+    private List<int> _remoteBlockOpeningBracketsCounts = new();
+
     protected Scala3LexerBase(ICharStream input) : base(input) { }
     protected Scala3LexerBase(ICharStream input, TextWriter output, TextWriter errorOutput)
         : base(input, output, errorOutput) { }
@@ -91,6 +93,7 @@ public abstract class Scala3LexerBase : Lexer
         _lastNonHiddenType   = 0;
         _curToken            = null;
         _ffgToken            = null;
+        _remoteBlockOpeningBracketsCounts = new();
     }
 
     // -----------------------------------------------------------------------
@@ -122,6 +125,10 @@ public abstract class Scala3LexerBase : Lexer
 
             case Scala3Lexer.LPAREN:
             case Scala3Lexer.LBRACKET:
+                IncrementBracketCounters();
+                if(CanStartIndentAfterParam(_lastNonHiddenType)) {
+                    _remoteBlockOpeningBracketsCounts.Add(1);
+                }
                 _regionStack.Push(Region.InParens);
                 AddPendingToken(_curToken);
                 break;
@@ -141,6 +148,7 @@ public abstract class Scala3LexerBase : Lexer
 
             case Scala3Lexer.RPAREN:
             case Scala3Lexer.RBRACKET:
+                DecrementBracketCounters();
                 // Drain any Indented regions opened inside InParens (e.g. a
                 // colonArgument body whose closing ')' is on the same source
                 // line as the body text, so no NEWLINE-triggered DEDENT ran).
@@ -260,7 +268,7 @@ public abstract class Scala3LexerBase : Lexer
                               && _ffgToken!.Type != Scala3Lexer.WITH;
         bool willIndent = newIndent > curIndent
                        && !isDot
-                       && (CanStartIndent(_lastNonHiddenType, _secondToLastNonHiddenType) || rparenOpensIndent);
+                       && (CanStartIndent(_lastNonHiddenType, _secondToLastNonHiddenType) || rparenOpensIndent || CanStartIndentBlockAfterParam());
 
         // ---- Decide whether to surface the NEWLINE as a statement separator ----
         //
@@ -513,6 +521,19 @@ public abstract class Scala3LexerBase : Lexer
         _                    => false
     } && prev != Scala3Lexer.END;
 
+    private static bool CanStartIndentAfterParam(int type) => type switch
+    {
+        Scala3Lexer.IF    => true,
+        Scala3Lexer.WHILE => true,
+        Scala3Lexer.FOR   => true,
+        _                 => false
+    };
+
+    private bool CanStartIndentBlockAfterParam()
+    {
+        return _lastNonHiddenType == Scala3Lexer.RPAREN && _remoteBlockOpeningBracketsCounts.Any(value => value == 0);
+    }
+
     // -----------------------------------------------------------------------
     // Indentation length
     // -----------------------------------------------------------------------
@@ -563,5 +584,21 @@ public abstract class Scala3LexerBase : Lexer
             StopIndex  = anchor.StartIndex - 1  // zero-length synthetic token
         };
         AddPendingToken(t);
+    }
+
+    private void IncrementBracketCounters()
+    {
+        _remoteBlockOpeningBracketsCounts.RemoveAll(count => count == 0);
+
+        for (int i = 0; i < _remoteBlockOpeningBracketsCounts.Count; i++)
+            _remoteBlockOpeningBracketsCounts[i]++;
+    }
+
+    private void DecrementBracketCounters()
+    {
+        _remoteBlockOpeningBracketsCounts.RemoveAll(count => count == 0);
+
+        for (int i = 0; i < _remoteBlockOpeningBracketsCounts.Count; i++)
+            _remoteBlockOpeningBracketsCounts[i]--;
     }
 }

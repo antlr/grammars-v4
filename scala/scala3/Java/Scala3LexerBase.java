@@ -32,6 +32,8 @@ import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Token;
 
+import java.util.List;
+import java.util.ArrayList;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.LinkedList;
@@ -67,6 +69,9 @@ public abstract class Scala3LexerBase extends Lexer {
     private Token curToken = null;
     private Token ffgToken = null;
 
+    //Bracket counter for keywords that can open a code-block after the end of a bracketed expression
+    private List<Integer> remoteBlockOpeningBracketsCounts = new ArrayList<>();
+
     protected Scala3LexerBase(CharStream input) {
         super(input);
     }
@@ -98,6 +103,7 @@ public abstract class Scala3LexerBase extends Lexer {
         lastNonHiddenType  = 0;
         curToken           = null;
         ffgToken           = null;
+        remoteBlockOpeningBracketsCounts = new ArrayList<>();
     }
 
     // -----------------------------------------------------------------------
@@ -121,6 +127,10 @@ public abstract class Scala3LexerBase extends Lexer {
         if (type == Scala3Lexer.NEWLINE) {
             handleNewlineToken();
         } else if (type == Scala3Lexer.LPAREN || type == Scala3Lexer.LBRACKET) {
+            incrementBracketCounters();
+            if(canStartIndentAfterParen(lastNonHiddenType)) {
+                remoteBlockOpeningBracketsCounts.add(1);
+            }
             regionStack.push(Region.InParens);
             addPendingToken(curToken);
         } else if (type == Scala3Lexer.COMMA) {
@@ -134,6 +144,7 @@ public abstract class Scala3LexerBase extends Lexer {
             }
             addPendingToken(curToken);
         } else if (type == Scala3Lexer.RPAREN || type == Scala3Lexer.RBRACKET) {
+            decrementBracketCounters();
             // Drain any Indented regions opened inside InParens (e.g. a
             // colonArgument body whose closing ')' is on the same source
             // line as the body text, so no NEWLINE-triggered DEDENT ran).
@@ -233,7 +244,7 @@ public abstract class Scala3LexerBase extends Lexer {
                                  && ffgToken.getType() != Scala3Lexer.WITH;
         boolean willIndent = newIndent > curIndent
             && !isDot
-            && (canStartIndent(lastNonHiddenType, secondToLastNonHiddenType) || rparenOpensIndent);
+            && (canStartIndent(lastNonHiddenType, secondToLastNonHiddenType) || rparenOpensIndent || canStartIndentBlockAfterParen());
 
         // ---- Decide whether to surface the NEWLINE as a statement separator ----
         //
@@ -490,6 +501,23 @@ public abstract class Scala3LexerBase extends Lexer {
         }
     }
 
+
+    private static boolean canStartIndentAfterParen(int type) {
+        switch (type) {
+            case Scala3Lexer.IF:
+            case Scala3Lexer.WHILE:
+            case Scala3Lexer.FOR:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private boolean canStartIndentBlockAfterParen() {
+        return lastNonHiddenType == Scala3Lexer.RPAREN
+                &&  remoteBlockOpeningBracketsCounts.stream().anyMatch(it -> it == 0);
+    }
+
     // -----------------------------------------------------------------------
     // Indentation length
     // -----------------------------------------------------------------------
@@ -532,5 +560,15 @@ public abstract class Scala3LexerBase extends Lexer {
         t.setStartIndex(anchor.getStartIndex());
         t.setStopIndex(anchor.getStartIndex() - 1); // zero-length synthetic token
         addPendingToken(t);
+    }
+
+    private void incrementBracketCounters() {
+        remoteBlockOpeningBracketsCounts.removeIf(it -> it == 0);
+        remoteBlockOpeningBracketsCounts.replaceAll(it -> it + 1);
+    }
+
+    private void decrementBracketCounters() {
+        remoteBlockOpeningBracketsCounts.removeIf(it -> it == 0);
+        remoteBlockOpeningBracketsCounts.replaceAll(it -> it - 1);
     }
 }
