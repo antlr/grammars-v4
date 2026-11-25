@@ -4,7 +4,6 @@ ANTLR4 grammar for Kotlin written only in ANTLR's special syntax.
 
 ## Reference
 
-* [pldb](http://pldb.info/concepts/kotlin)
 * [EBNF Kotlin grammar](http://kotlinlang.org/docs/reference/grammar.html)
 * [Kotlin specification](https://kotlinlang.org/spec)
 
