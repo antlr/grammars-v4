@@ -1,0 +1,1 @@
+line 2:0 extraneous input 'import' expecting {<EOF>, 'abstract', 'class', 'enum', 'final', 'interface', 'non-sealed', 'private', 'protected', 'public', 'record', 'sealed', 'static', 'strictfp', ';', '@'}
