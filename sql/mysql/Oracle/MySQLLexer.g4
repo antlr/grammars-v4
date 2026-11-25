@@ -319,15 +319,16 @@ fragment HEXDIGIT
     : [0-9a-fA-F]
     ;
 
-// Only lower case 'x' and 'b' count for hex + bin numbers. Otherwise it's an identifier.
+// The 0x and 0b prefixes are lower case only; the quoted forms X'..' and B'..' take either case.
+// A quoted hex literal has an even number of digits.
 HEX_NUMBER
     : ('0x' HEXDIGIT+)
-    | ('x\'' HEXDIGIT* '\'')
+    | ([xX] '\'' (HEXDIGIT HEXDIGIT)* '\'')
     ;
 
 BIN_NUMBER
     : ('0b' [01]+)
-    | ('b\'' [01]+ '\'')
+    | ([bB] '\'' [01]* '\'')
     ;
 
 INT_NUMBER
@@ -3589,6 +3590,9 @@ INVALID_INPUT
     | [\u000E-\u001F] // More control codes.
     | '['
     | ']'
+    | [xX] '\'' HEXDIGIT (HEXDIGIT HEXDIGIT)* '\'' // A quoted hex literal with an odd number of digits.
+    | [xX] '\'' HEXDIGIT* ~['0-9a-fA-F] // A quoted hex literal with a character other than a hex digit.
+    | [bB] '\'' [01]* ~['01] // A quoted bit literal with a character other than 0 or 1.
     ;
 
 // String and text types.
