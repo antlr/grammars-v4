@@ -211,7 +211,8 @@ do
     if [ $quiet != "true" ]; then echo "Generating driver for $testname."; fi
     trgen_opts=(-t "$target")
     [[ -n "$antlr_version" ]] && trgen_opts+=(--antlr-version "$antlr_version")
-    bad=$(dotnet trash gen "${trgen_opts[@]}" 2>/dev/null)
+    trgen_log="$tmpdir/$(echo "$testname" | tr '/' '_')_trgen.txt"
+    bad=$(dotnet trash gen "${trgen_opts[@]}" 2>"$trgen_log")
     for i in $bad; do failed+=( "$testname/$target" ); done
 
     for d in `echo Generated-$target`
@@ -296,8 +297,76 @@ do
         action_count=$(printf '%s\n' "$action_counts" |
             awk -F: 'NF > 1 && $NF ~ /^[0-9]+$/ { sum += $NF } END { print sum+0 }')
 
+        # The interpreted parser cannot run target-language actions or a
+        # custom parser/lexer superclass. Build the tables once, outside the
+        # timed runs, and keep them in a temporary directory for all N runs.
+        ttt_stat='n.a.'
+        prt_stat='n.a.'
+        action_free=true
+        if (( action_count > 0 )) || grep -Eq 'superClass[[:space:]]*=' ../*.g4; then
+            action_free=false
+        fi
+        if [[ "$action_free" == true ]]; then
+            interp_dir="$tmpdir/$(echo "$testname" | tr '/' '_')_interp"
+            mkdir -p "$interp_dir"
+            interp_log="$tmpdir/$(echo "$testname" | tr '/' '_')_interp.txt"
+            if (set -o pipefail; cd .. && dotnet trash parse -t ANTLRv4 ./*.g4 |
+                dotnet trash interp -o "$interp_dir") > "$interp_log" 2>&1; then
+                if printf '%s\n' "${files[@]}" |
+                    trash parse --allstar -L "$interp_dir" --no-output -x > /dev/null 2>&1; then
+                    run_ttt=()
+                    run_prt=()
+                    allstar_ok=true
+                    for ((run=1; run<=N; run++)); do
+                        echo "=== $testname AllStar run $run/$N ==="
+                        runfile="$tmpdir/$(echo "$testname" | tr '/' '_')_allstar_run${run}.txt"
+                        printf '%s\n' "${files[@]}" |
+                            trash parse --allstar -L "$interp_dir" --perf --no-output -x 2>&1 |
+                            tee "$runfile"
+                        parse_status=${PIPESTATUS[1]}
+                        run_time=$(awk '/^TT:/{print $NF}' "$runfile" | tail -1)
+                        run_rate=$(awk '/^(PR|TPS):/{print $NF}' "$runfile" | tail -1)
+                        if (( parse_status != 0 )) || [[ -z "$run_time" || -z "$run_rate" ]]; then
+                            allstar_ok=false
+                            break
+                        fi
+                        run_ttt+=("$run_time")
+                        run_prt+=("$run_rate")
+                    done
+                    if [[ "$allstar_ok" == true ]]; then
+                        ttt_stat=$(compute_stats "${run_ttt[@]}")
+                        prt_stat=$(compute_stats "${run_prt[@]}")
+                    fi
+                else
+                    echo "AllStar warm-up failed for $testname; TTT is n.a." >&2
+                fi
+            else
+                echo "AllStar table generation failed for $testname; TTT is n.a. See $interp_log" >&2
+            fi
+        fi
+
+        # Match the top-level parser selected by trgen to its source .g4.
+        # A combined grammar named Foo produces the top-level FooParser.
+        combined=no
+        top_level_names=$(sed -n 's/^Top-level grammars //p' "$trgen_log" |
+            tr -d '\r' | tr '\n' ' ')
+        combined_xpath='//grammarSpec[not(grammarDecl/grammarType/LEXER or grammarDecl/grammarType/PARSER) and not(prequelConstruct/optionsSpec/option[identifier/text() = "tokenVocab"])]'
+        for grammar_file in ../*.g4; do
+            [[ -f "$grammar_file" ]] || continue
+            grammar_name=${grammar_file##*/}
+            grammar_name=${grammar_name%.g4}
+            [[ " $top_level_names " == *" ${grammar_name}Parser "* ]] || continue
+            combined_count=$(dotnet trash parse -t ANTLRv4 "$grammar_file" 2>/dev/null |
+                MSYS2_ARG_CONV_EXCL='//' dotnet trash xpath "$combined_xpath" |
+                dotnet trash text --text -c 2>/dev/null)
+            if [[ "$combined_count" == 1 ]]; then
+                combined=yes
+                break
+            fi
+        done
+
         row_number=$((${#table_rows[@]} + 1))
-        table_rows+=("| ${row_number} | ${testname} | ${pt_stat} | ${ot_stat} | ${tt_stat} | ${tps_stat} | ${warm_tps_stat} | ${speedup_stat} | ${ambiguity_count} | ${action_count} |")
+        table_rows+=("| ${row_number} | ${testname} | ${tt_stat} | ${ttt_stat} | ${tps_stat} | ${prt_stat} | ${ambiguity_count} | ${action_count} | ${combined} |")
         popd > /dev/null
     done
     popd > /dev/null
@@ -315,24 +384,27 @@ if [ ${#table_rows[@]} -gt 0 ]; then
     {
         printf '## Performance Summary (N=%s runs, mean ± SEM)\n\n' "$N"
         printf 'Git commit: `%s`\n\nGit tag: `%s`\n\n' "$git_commit" "$git_tags"
+	printf '\n'
+	dotnet trash machine
+	printf '\n'
         cat <<'EOF'
+
 ### Column key
 
 | Label | Description |
 |---|---|
 | `Number` | Current row position in the Results table |
-| `PT` | **Parse time** — sum of the parse-only time across all input files |
-| `OT` | **Overhead time** — `TT − PT`; time spent on file I/O, lexer/parser construction, and post-parse work |
-| `TT` | **Total time** — overall wall-clock time for the entire run |
-| `PR` | **Parse rate** — `total tokens / PT`; pure parse throughput across all files |
-| `Post-warmup PR` | PR computed from files 2…N only, excluding the first (warm-up) run; `n.a.` if only one file was parsed |
-| `Post-warmup Speed Up` | Ratio of Post-warmup PR to first-file PR, showing the JIT/runtime warm-up benefit; `n.a.` if only one file was parsed |
+| `TTN` | **Total time, native C#** — overall wall-clock time for the generated C# parser run |
+| `TTT` | **Total time, table-driven interpreter** — overall wall-clock time for `dotnet trash parse --allstar`; `n.a.` when the grammar requires target-language actions or a custom superclass |
+| `PRN` | **Parse rate, native C#** — `total tokens / PT` for the generated C# parser |
+| `PRT` | **Parse rate, table-driven interpreter** — `total tokens / PT` for `dotnet trash parse --allstar`; `n.a.` when TTT is unavailable |
+| `Combined` | `yes` if the top-level grammar is combined and has no `tokenVocab` option; otherwise `no` |
 
 ### Results
 
 EOF
-        echo "| Number | Grammar | PT (s) | OT (s) | TT (s) | PR (t/s) | Post-warmup PR (t/s) | Post-warmup Speed Up | Ambiguities | Actions |"
-        echo "|--------|---------|--------|--------|--------|-----|-----------------|----------------------|-------------|---------|"
+        echo "| Number | Grammar Name | TTN (s) | TTT (s) | PRN (t/s) | PRT (t/s) | Ambiguities | Actions | Combined |"
+        echo "|--------|--------------|---------|---------|-----------|-----------|-------------|---------|----------|"
         for row in "${table_rows[@]}"; do
             echo "$row"
         done
