@@ -269,7 +269,11 @@ public abstract class CSharpParserBase extends Parser
 
     public void BeginVariableDeclaration()
     {
+        // After left-factoring (typed_member_declaration), type_ lives in the
+        // parent context; fall back to parent when current context has no children.
         ParserRuleContext ctx = (ParserRuleContext) _ctx;
+        if (ctx.getChildCount() == 0 && ctx.getParent() instanceof ParserRuleContext)
+            ctx = (ParserRuleContext) ctx.getParent();
         _pendingVarType = ctx.getChild(ctx.getChildCount() - 1).getText();
     }
 
@@ -372,6 +376,24 @@ public abstract class CSharpParserBase extends Parser
 
     public boolean IsClassBaseInterfaceList() { return classBaseTypeCheck(true); }
     public boolean IsClassBaseClassType()     { return classBaseTypeCheck(false); }
+
+    public boolean IsPrimaryConstraintAhead()
+    {
+        Token tok = ((CommonTokenStream)_input).LT(1);
+        if (tok == null) return false;
+        int type = tok.getType();
+        if (type == CSharpLexer.KW_CLASS || type == CSharpLexer.KW_STRUCT ||
+            type == CSharpLexer.KW_NOTNULL || type == CSharpLexer.KW_UNMANAGED ||
+            type == CSharpLexer.KW_OBJECT || type == CSharpLexer.KW_STRING)
+            return true;
+        CSharpScope.CSharpSymbol sym = symTable.currentScope().lookupChain(tok.getText());
+        if (sym == null) return true;
+        if (sym.kind == CSharpSymbolKind.TypeParameter) return false;
+        if (sym.kind != CSharpSymbolKind.Type) return true;
+        return sym.typeKind != CSharpTypeKind.Interface;
+    }
+
+    public boolean IsSecondaryConstraintAhead() { return !IsPrimaryConstraintAhead(); }
 
     public boolean IsDeclarationPatternAhead()
     {

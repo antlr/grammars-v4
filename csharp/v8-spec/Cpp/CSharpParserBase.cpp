@@ -255,6 +255,24 @@ bool CSharpParserBase::classBaseTypeCheck(bool wantInterface)
 bool CSharpParserBase::IsClassBaseInterfaceList() { return classBaseTypeCheck(true); }
 bool CSharpParserBase::IsClassBaseClassType()     { return classBaseTypeCheck(false); }
 
+bool CSharpParserBase::IsPrimaryConstraintAhead()
+{
+    antlr4::Token *t = _input->LT(1);
+    if (!t) return false;
+    int tt = static_cast<int>(t->getType());
+    if (tt == CSharpLexer::KW_CLASS || tt == CSharpLexer::KW_STRUCT ||
+        tt == CSharpLexer::KW_NOTNULL || tt == CSharpLexer::KW_UNMANAGED ||
+        tt == CSharpLexer::KW_OBJECT || tt == CSharpLexer::KW_STRING)
+        return true;
+    CSharpSymbol *sym = symTable()->currentScope()->lookupChain(t->getText());
+    if (!sym) return true;
+    if (sym->kind == CSharpSymbolKind::TypeParameter) return false;
+    if (sym->kind != CSharpSymbolKind::Type) return true;
+    return sym->typeKind != CSharpTypeKind::Interface;
+}
+
+bool CSharpParserBase::IsSecondaryConstraintAhead() { return !IsPrimaryConstraintAhead(); }
+
 bool CSharpParserBase::IsExplicitlyTypedLocalVariable()
 {
     antlr4::Token *t = _input->LT(1);
@@ -323,7 +341,13 @@ void CSharpParserBase::OnUsingNamespaceDirective()
 
 void CSharpParserBase::BeginVariableDeclaration()
 {
+    // After left-factoring (typed_member_declaration), type_ lives in the
+    // parent context; fall back to parent when current context has no children.
     antlr4::ParserRuleContext *ctx = getContext();
+    if (!ctx) return;
+    if (ctx->children.empty()) {
+        ctx = dynamic_cast<antlr4::ParserRuleContext*>(ctx->parent);
+    }
     if (!ctx || ctx->children.empty()) return;
     pendingVarType_ = ctx->children.back()->getText();
 }
