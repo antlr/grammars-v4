@@ -1400,10 +1400,17 @@ onError
     : jsonOnResponse ON_SYMBOL ERROR_SYMBOL
     ;
 
+// signed_literal in sql_yacc.yy: any literal but NULL, and a sign only before a number.
 jsonOnResponse
     : ERROR_SYMBOL
     | NULL_SYMBOL
-    | DEFAULT_SYMBOL textStringLiteral
+    | DEFAULT_SYMBOL (
+        textLiteral
+        | (PLUS_OPERATOR | MINUS_OPERATOR)? numLiteral
+        | temporalLiteral
+        | boolLiteral
+        | UNDERSCORE_CHARSET? (HEX_NUMBER | BIN_NUMBER)
+    )
     ;
 
 unionOption
@@ -4471,10 +4478,11 @@ real_ulonglong_number
     | LONG_NUMBER
     ;
 
+// A sign only before a number, as in signed_literal of sql_yacc.yy.
 signedLiteral
     : literal
-    | PLUS_OPERATOR ulong_number
-    | MINUS_OPERATOR ulong_number
+    | PLUS_OPERATOR numLiteral
+    | MINUS_OPERATOR numLiteral
     ;
 
 signedLiteralOrNull
