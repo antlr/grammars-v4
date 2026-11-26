@@ -1,0 +1,14 @@
+// struct declaration, the auto-generated constructor, field access,
+// and reassignment via "set".
+
+struct Spaceship {
+    name str;
+    numWings int;
+}
+
+exported func main() {
+    ship = Spaceship("Serenity", 2);
+    println("Ship name: {ship.name}");
+    set ship.name = "Raza";
+    println("New name: {ship.name}");
+}

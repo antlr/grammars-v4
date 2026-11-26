@@ -1,0 +1,14 @@
+// Lambdas passed as values, both with an explicit block body and with
+// a bare expression body.
+
+func applyTwice(f, x int) int {
+    return f(f(x));
+}
+
+exported func main() {
+    double = (x int) => { x + 2 };
+    println("{applyTwice(double, 5)}");
+
+    inc = (x) => x + 1;
+    println("{inc(10)}");
+}

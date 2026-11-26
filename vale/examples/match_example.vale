@@ -1,0 +1,23 @@
+// match with literal patterns and a wildcard ("_") pattern.
+
+func describe(n int) str {
+    result = "";
+    match n {
+        0 {
+            set result = "zero";
+        }
+        1 {
+            set result = "one";
+        }
+        _ {
+            set result = "many";
+        }
+    }
+    return result;
+}
+
+exported func main() {
+    println(describe(0));
+    println(describe(1));
+    println(describe(5));
+}

@@ -1,0 +1,21 @@
+// An interface with a virtual method, a struct, and the "impl" statement
+// that declares the struct conforms to the interface.
+
+interface Bipedal {
+    func hop(virtual self &Bipedal) void;
+}
+
+struct Human {
+    name str;
+}
+
+impl Bipedal for Human;
+
+func hop(self &Human) void {
+    println("{self.name} hops!");
+}
+
+exported func main() {
+    h = Human("Steve");
+    hop(&h);
+}

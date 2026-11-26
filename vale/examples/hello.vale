@@ -1,0 +1,8 @@
+// A minimal Vale program: a local binding and string interpolation.
+
+import stdlib.*;
+
+exported func main() {
+    name = "World";
+    println("Hello, {name}!");
+}

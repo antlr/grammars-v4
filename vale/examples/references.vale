@@ -1,0 +1,22 @@
+// Ownership and reference operators: & (borrow), ^ (owning heap
+// allocation), && (weak reference), and "weakable" structs.
+
+struct Spaceship {
+    name str;
+}
+
+weakable struct Base {
+    label str;
+}
+
+func greet(s &Spaceship) {
+    println("Hello, {s.name}!");
+}
+
+exported func main() {
+    ship = ^Spaceship("Enterprise");
+    greet(&ship);
+
+    base = ^Base("Alpha");
+    weakBase = &&base;
+}

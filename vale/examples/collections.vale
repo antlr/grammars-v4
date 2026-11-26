@@ -1,0 +1,18 @@
+// List construction and chaining, foreach over a collection, and both
+// static ("[#5]...") and runtime ("[]...") array literals with fill
+// functions.
+
+import stdlib.collections.list.*;
+
+exported func main() {
+    numbers = List<int>().add(1).add(3).add(7);
+    total = 0;
+    foreach x in numbers {
+        set total = total + x;
+    }
+    println("total={total}");
+
+    fixed = [#5][0, 2, 4, 6, 8];
+    doubled = [#5](i => i * 2);
+    dyn = [](3, x => x * 5);
+}

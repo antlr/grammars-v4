@@ -1,0 +1,18 @@
+// A generic struct and a generic function, with explicit type arguments
+// at the call site.
+
+struct Flock<T> {
+    ships List<T>;
+}
+
+func longest<T>(a &T, b &T) &T {
+    if a.length() > b.length() {
+        return a;
+    }
+    return b;
+}
+
+exported func main() {
+    flock = Flock<int>(List<int>());
+    println("{flock}");
+}
