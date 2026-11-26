@@ -1,0 +1,22 @@
+// if/else, while, foreach/in, and break.
+
+exported func main() {
+    i = 0;
+    while i < 5 {
+        println("{i}");
+        set i = i + 1;
+    }
+
+    if i == 5 {
+        println("done counting");
+    } else {
+        println("huh?");
+    }
+
+    foreach x in range(0, 3) {
+        if x == 1 {
+            break;
+        }
+        println("x={x}");
+    }
+}

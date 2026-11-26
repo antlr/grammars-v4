@@ -1,0 +1,17 @@
+// Function declarations: an expression-bodied function, a generic
+// function with borrowed parameters, and an explicit return statement.
+
+func add2(x int) int {
+    x + 2
+}
+
+func longerShip<T>(a &T, b &T) &T {
+    if a.length() > b.length() {
+        return a;
+    }
+    return b;
+}
+
+exported func main() {
+    println("{add2(40)}");
+}
