@@ -302,6 +302,7 @@
 				<module>lisa</module>
                 <module>lisp</module>
 				<module>llvm-ir</module>
+				<module>lobster</module>
 				<module>logo</module>
 				<module>lpc</module>
 				<module>lrc</module>
