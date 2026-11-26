@@ -1,0 +1,13 @@
+%!PS-Adobe-3.0
+% "if" and "ifelse" take procedure objects as their true/false branches.
+
+/abs2 {
+    dup 0 lt
+    { neg }
+    { }
+    ifelse
+} def
+
+-5 abs2
+3 0 lt { (negative) } { (non-negative) } ifelse
+pop pop
