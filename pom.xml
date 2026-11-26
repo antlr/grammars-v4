@@ -286,6 +286,7 @@
 				<module>json5</module>
 				<module>karel</module>
 				<module>kirikiri-tjs</module>
+				<module>koka</module>
 				<module>kotlin</module>
 				<module>kql</module>
 				<module>kuka</module>
