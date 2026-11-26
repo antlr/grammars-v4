@@ -1,0 +1,11 @@
+%!PS-Adobe-3.0
+% "for" runs a procedure once per step from the initial value to the
+% limit, pushing the current control value each time.
+
+/sum 0 def
+1 1 10 {
+    /i exch def
+    /sum sum i add def
+} for
+sum
+pop

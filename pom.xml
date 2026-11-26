@@ -372,6 +372,7 @@
 				<module>ply</module>
 				<module>pmmn</module>
 				<module>postalcode</module>
+				<module>postscript</module>
 				<module>powerbuilder</module>
 				<module>powerbuilderdw</module>
 				<module>powerquery</module>

@@ -1,0 +1,12 @@
+%!PS-Adobe-3.0
+% Recursive factorial: a procedure that calls itself by name.
+
+/factorial {
+    dup 1 le
+    { pop 1 }
+    { dup 1 sub factorial mul }
+    ifelse
+} def
+
+5 factorial
+pop
