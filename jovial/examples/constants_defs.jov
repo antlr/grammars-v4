@@ -1,0 +1,13 @@
+"DEF for compile-time text substitution, and CONSTANT for a typed,"
+"compile-time-valued item."
+
+DEF MAXSIZE == 100;
+DEF PI == 3.14159;
+
+CONSTANT LIMIT S 32 = 1000;
+
+PROC USECONST();
+   BEGIN
+   ITEM X S 32;
+   X = LIMIT + MAXSIZE;
+   END

@@ -1,0 +1,11 @@
+"IF / ELSE, using string literals ('...')."
+
+PROC CHECK(X);
+   BEGIN
+   ITEM X S 32;
+   ITEM RESULT A 10;
+   IF X > 0;
+      RESULT = 'POSITIVE';
+   ELSE
+      RESULT = 'NONPOSITIVE';
+   END

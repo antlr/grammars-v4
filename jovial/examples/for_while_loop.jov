@@ -1,0 +1,13 @@
+"The FOR loop's distinctive ': initial BY step WHILE condition' form,"
+"and an ordinary WHILE loop."
+
+PROC LOOPS();
+   BEGIN
+   ITEM I S 32;
+   ITEM SUM S 32;
+   SUM = 0;
+   FOR I:0 BY 1 WHILE I<10;
+      SUM = SUM + I;
+   WHILE SUM < 100;
+      SUM = SUM + 1;
+   END

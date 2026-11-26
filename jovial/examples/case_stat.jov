@@ -1,0 +1,13 @@
+"CASE statement with integer-labeled alternatives."
+
+PROC CLASSIFY(N);
+   BEGIN
+   ITEM N S 32;
+   ITEM LABEL A 10;
+   CASE N;
+      BEGIN
+      1: LABEL = 'ONE';
+      2: LABEL = 'TWO';
+      3: LABEL = 'THREE';
+      END
+   END

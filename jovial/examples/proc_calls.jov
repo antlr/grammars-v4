@@ -1,0 +1,17 @@
+"Calling one PROC from another, RETURN with a value, and a GOTO/label."
+
+PROC ADD(A:B);
+   BEGIN
+   ITEM A S 32;
+   ITEM B S 32;
+   RETURN A + B;
+   END
+
+PROC MAIN();
+   BEGIN
+   ITEM RESULT S 32;
+   RESULT = ADD(2, 3);
+   GOTO DONE;
+   DONE:
+      RETURN;
+   END

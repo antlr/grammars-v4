@@ -1,0 +1,16 @@
+"Wikipedia's canonical JOVIAL example (from the J73 manual): searches a"
+"1000-element table for CODE and returns the matching VALUE, or -99999"
+"if nothing matches."
+
+PROC RETRIEVE(CODE:VALUE);
+   BEGIN
+   ITEM CODE U;
+   ITEM VALUE F;
+   VALUE = -99999.;
+   FOR I:0 BY 1 WHILE I<1000;
+      IF CODE = TABCODE(I);
+         BEGIN
+         VALUE = TABVALUE(I);
+         EXIT;
+         END
+   END
