@@ -1,6 +1,6 @@
 # Lobster Grammar
 
-[Lobster](https://aardappel.github.io/lobster/) is a statically typed, lexically
+[Lobster](https://aardappel.github.io/lobster/language_reference.html) is a statically typed, lexically
 scoped, garbage collected (reference counted), embeddable scripting/systems
 language with a focus on game development, written in C++ by Wouter van Oortmerssen.
 
@@ -34,7 +34,3 @@ and inline `fn` lambdas to a single-line body (named `def` functions and the
 control-flow statements still support full, multi-line indented bodies).
 
 Entry rule: `program`
-
-## Reference
-
-* [pldb](http://pldb.info/concepts/lobster)
