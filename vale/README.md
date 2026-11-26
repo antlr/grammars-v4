@@ -38,7 +38,3 @@ constructs that are shown concretely in the guide's examples: `struct`,
 (`[](n, fill)`) array literals; and lambdas (`(x) => { ... }`).
 
 Entry rule: `program`
-
-## Reference
-
-* [pldb](http://pldb.info/concepts/vale)
