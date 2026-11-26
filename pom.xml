@@ -281,6 +281,7 @@
 				<module>javadoc</module>
 				<module>javascript</module>
 				<module>joss</module>
+				<module>jovial</module>
 				<module>jpa</module>
 				<module>json</module>
 				<module>json5</module>

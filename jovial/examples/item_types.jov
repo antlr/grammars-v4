@@ -1,0 +1,14 @@
+"ITEM declarations covering the common JOVIAL type letters: S (signed"
+"integer), U (unsigned), F (floating point), B (boolean/bit), and"
+"A (character string), each with a bit/character size."
+
+PROC SHOWTYPES();
+   BEGIN
+   ITEM COUNT S 32;
+   ITEM FLAGS U 16;
+   ITEM RATIO F 48;
+   ITEM ACTIVE B 1;
+   ITEM NAME A 10;
+   COUNT = 1;
+   RATIO = 0.5;
+   END

@@ -1,0 +1,18 @@
+"A minimal JOVIAL program: a PROGRAM header, two PROC declarations,"
+"a CALL statement, and TERM."
+
+PROGRAM HELLO;
+
+PROC PRINTMSG(MSG);
+   BEGIN
+   ITEM MSG A 20;
+   RETURN;
+   END
+
+PROC MAIN();
+   BEGIN
+   ITEM GREETING A 20;
+   CALL PRINTMSG(GREETING);
+   END
+
+TERM

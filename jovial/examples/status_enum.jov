@@ -1,0 +1,9 @@
+"STATUS declares a discrete, named-value (enumeration-like) type: once"
+"as a standalone TYPE, and once inline on an ITEM."
+
+TYPE COLORTYPE STATUS(RED, GREEN, BLUE);
+
+PROC SHOWCOLOR();
+   BEGIN
+   ITEM CURCOLOR STATUS(RED, GREEN, BLUE);
+   END

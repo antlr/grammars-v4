@@ -1,0 +1,13 @@
+"TABLE declares an array; here each element is itself a one-field block,"
+"and FOR fills every element via index-call notation."
+
+PROC FILLTABLE();
+   BEGIN
+   TABLE SCORES(0:9);
+      BEGIN
+      ITEM VAL S 32;
+      END
+   ITEM I S 32;
+   FOR I:0 BY 1 WHILE I<10;
+      SCORES(I) = I * 2;
+   END
