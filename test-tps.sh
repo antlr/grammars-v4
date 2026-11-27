@@ -345,13 +345,14 @@ do
             fi
         fi
 
-        # Build and time the generated OphiRust parser separately. The input
+        # Build and time OphiRust only for grammars eligible for AllStar. The input
         # paths from test.sh are relative to the grammar directory, while the
         # Rust executable runs from Generated-OphiRust.
         ttr_stat='n.a.'
         prr_stat='n.a.'
+        if [[ "$action_free" == true ]]; then
         rust_log="$tmpdir/$(echo "$testname" | tr '/' '_')_ophirust_build.txt"
-        if (cd .. && dotnet trash gen -t OphiRust) > "$rust_log" 2>&1 &&
+        if (cd .. && dotnet trash gen -t OphiRust --force) > "$rust_log" 2>&1 &&
             (cd ../Generated-OphiRust && bash build.sh) >> "$rust_log" 2>&1; then
             rust_exe=./target/release/test
             [[ "$machine" == MinGw ]] && rust_exe+=.exe
@@ -385,6 +386,7 @@ do
             fi
         else
             echo "OphiRust build failed for $testname; TTR and PRR are n.a. See $rust_log" >&2
+        fi
         fi
 
         # Match the top-level parser selected by trgen to its source .g4.
@@ -438,7 +440,7 @@ if [ ${#table_rows[@]} -gt 0 ]; then
 | `Number` | Current row position in the Results table |
 | `TTN` | **Total time, native C#** — overall wall-clock time for the generated C# parser run |
 | `TTT` | **Total time, table-driven interpreter** — overall wall-clock time for `dotnet trash parse --allstar`; `n.a.` when the grammar requires target-language actions or a custom superclass |
-| `TTR` | **Total time, OphiRust** — overall wall-clock time for the generated OphiRust parser; `n.a.` when generation, build, or parse fails |
+| `TTR` | **Total time, OphiRust** — overall wall-clock time for the generated OphiRust parser; `n.a.` when the grammar requires target-language actions or a custom superclass, or when generation, build, or parse fails |
 | `PRN` | **Parse rate, native C#** — `total tokens / PT` for the generated C# parser |
 | `PRT` | **Parse rate, table-driven interpreter** — `total tokens / PT` for `dotnet trash parse --allstar`; `n.a.` when TTT is unavailable |
 | `PRR` | **Parse rate, OphiRust** — `total tokens / PT` for the generated OphiRust parser; `n.a.` when TTR is unavailable |
