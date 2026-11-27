@@ -4079,7 +4079,9 @@ non_reserved_words
     | AES
     | ALLOW_OVERLAPPING_EXECUTION
     | ARRAY_AGG
+    | BRANCHES
     | CA
+    | CHANNELS
     | CHECKSUM
     | COLLECTION
     | COMMENT
@@ -4141,6 +4143,7 @@ non_reserved_words
     | MEDIUM
     | METRIC
     | METRICS
+    | MIDDLE_NAME
     | MODE
     | NAME
     | NETWORK
@@ -4186,6 +4189,7 @@ non_reserved_words
     | RECURSIVE
     | REFERENCES
     | REFRESH_MODE
+    | REGIONS
     | RELATIONSHIPS
     | RESOURCE
     | RESOURCES
@@ -4223,6 +4227,7 @@ non_reserved_words
     | VERSIONS
     | VISIBILITY
     | VOLUME
+    | WAREHOUSE_SIZE
     | WAREHOUSE_TYPE
     | YEAR
     ;
