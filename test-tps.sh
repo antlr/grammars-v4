@@ -338,10 +338,10 @@ do
                         prt_stat=$(compute_stats "${run_prt[@]}")
                     fi
                 else
-                    echo "AllStar warm-up failed for $testname; TTT is n.a." >&2
+                    echo "AllStar warm-up failed for $testname; TT* is n.a." >&2
                 fi
             else
-                echo "AllStar table generation failed for $testname; TTT is n.a. See $interp_log" >&2
+                echo "AllStar table generation failed for $testname; TT* is n.a. See $interp_log" >&2
             fi
         fi
 
@@ -488,14 +488,14 @@ if [ ${#table_rows[@]} -gt 0 ]; then
 | Label | Description |
 |---|---|
 | `Number` | Current row position in the Results table |
-| `TTN` | **Total time, native C#** — overall wall-clock time for the generated C# parser run |
-| `TTT` | **Total time, table-driven interpreter** — overall wall-clock time for `dotnet trash parse --allstar`; `n.a.` when the grammar requires target-language actions or a custom superclass |
+| `TTC` | **Total time, native C#** — overall wall-clock time for the generated C# parser run |
+| `TT*` | **Total time, table-driven interpreter** — overall wall-clock time for `dotnet trash parse --allstar`; `n.a.` when the grammar requires target-language actions or a custom superclass |
 | `TTR` | **Total time, OphiRust** — overall wall-clock time for the generated OphiRust parser; `n.a.` when the grammar requires target-language actions or a custom superclass, or when generation, build, or parse fails |
 | `TTJ` | **Total time, Java** — overall wall-clock time for the generated Java parser; `n.a.` when generation, build, or parse fails |
 | `TTD` | **Total time, Dart** — overall wall-clock time for the generated Dart parser; `n.a.` when generation, build, or parse fails |
 | `TTG` | **Total time, Go** — overall wall-clock time for the generated Go parser; `n.a.` when generation, build, or parse fails |
-| `PRN` | **Parse rate, native C#** — `total tokens / PT` for the generated C# parser |
-| `PRT` | **Parse rate, table-driven interpreter** — `total tokens / PT` for `dotnet trash parse --allstar`; `n.a.` when TTT is unavailable |
+| `PRC` | **Parse rate, native C#** — `total tokens / PT` for the generated C# parser |
+| `PR*` | **Parse rate, table-driven interpreter** — `total tokens / PT` for `dotnet trash parse --allstar`; `n.a.` when `TT*` is unavailable |
 | `PRR` | **Parse rate, OphiRust** — `total tokens / PT` for the generated OphiRust parser; `n.a.` when TTR is unavailable |
 | `PRJ` | **Parse rate, Java** — `total tokens / PT` for the generated Java parser; `n.a.` when TTJ is unavailable |
 | `PRD` | **Parse rate, Dart** — `total tokens / PT` for the generated Dart parser; `n.a.` when TTD is unavailable |
@@ -505,7 +505,7 @@ if [ ${#table_rows[@]} -gt 0 ]; then
 ### Results
 
 EOF
-        echo "| Number | Grammar Name | TTN (s) | TTT (s) | TTR (s) | TTJ (s) | TTD (s) | TTG (s) | PRN (t/s) | PRT (t/s) | PRR (t/s) | PRJ (t/s) | PRD (t/s) | PRG (t/s) | Ambiguities | Actions | Combined |"
+        echo "| Number | Grammar Name | TTC (s) | TT* (s) | TTR (s) | TTJ (s) | TTD (s) | TTG (s) | PRC (t/s) | PR* (t/s) | PRR (t/s) | PRJ (t/s) | PRD (t/s) | PRG (t/s) | Ambiguities | Actions | Combined |"
         echo "|--------|--------------|---------|---------|---------|---------|---------|---------|-----------|-----------|-----------|-----------|-----------|-----------|-------------|---------|----------|"
         for row in "${table_rows[@]}"; do
             echo "$row"
