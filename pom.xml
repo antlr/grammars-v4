@@ -223,6 +223,7 @@
 				<module>elixir</module>
 				<module>erlang</module>
 				<module>esolang</module>
+				<module>euclid</module>
 				<module>euler</module>
 				<module>evm-bytecode</module>
 				<module>falcon</module>

@@ -1,0 +1,13 @@
+% assert and assume: Euclid's verification-oriented statements.
+
+module Assertions =
+begin
+    var n : integer;
+    var square : integer;
+
+    n := 7;
+    assert n > 0;
+    assume n < 1000;
+    square := n * n;
+    assert square > 0;
+end Assertions

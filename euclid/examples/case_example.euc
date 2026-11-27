@@ -1,0 +1,14 @@
+% case statement with comma-separated labels and an "otherwise" default.
+
+module CaseExample =
+begin
+    var n : integer;
+    var label : integer;
+
+    n := 2;
+    case n of
+        1 : label := 100;
+        2, 3 : label := 200;
+        otherwise : label := 0;
+    end case
+end CaseExample
