@@ -188,7 +188,7 @@ alterServer
     ;
 
 alterTable
-    : onlineOption? TABLE_SYMBOL tableRef alterTableActions?
+    : TABLE_SYMBOL tableRef alterTableActions?
     ;
 
 alterTableActions
@@ -542,7 +542,7 @@ routineOption
     ;
 
 createIndex
-    : onlineOption? (
+    : (
         UNIQUE_SYMBOL? type = INDEX_SYMBOL indexName indexTypeClause? createIndexTarget indexOption*
         | type = FULLTEXT_SYMBOL INDEX_SYMBOL indexName createIndexTarget fulltextIndexOption*
         | type = SPATIAL_SYMBOL INDEX_SYMBOL indexName createIndexTarget spatialIndexOption*
@@ -776,7 +776,7 @@ dropProcedure
     ;
 
 dropIndex
-    : onlineOption? type = INDEX_SYMBOL indexRef ON_SYMBOL tableRef indexLockAndAlgorithm?
+    : type = INDEX_SYMBOL indexRef ON_SYMBOL tableRef indexLockAndAlgorithm?
     ;
 
 dropLogfileGroup
@@ -4187,11 +4187,6 @@ likeOrWhere
     : // opt_wild_or_where in sql_yacc.yy
     likeClause
     | whereClause
-    ;
-
-onlineOption
-    : ONLINE_SYMBOL
-    | OFFLINE_SYMBOL
     ;
 
 noWriteToBinLog
