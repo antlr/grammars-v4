@@ -95,18 +95,16 @@ class MySQLLexerBase extends Lexer {
      * @returns If a function call is found then return the proposed token type, otherwise just IDENTIFIER.
      */
     determineFunction(proposed) {
-        // Skip any whitespace character if the sql mode says they should be ignored,
-        // before actually trying to match the open parenthesis.
-        let input = String.fromCharCode(this._input.LA(1));
+        // With IGNORE_SPACE, look past whitespace (the characters of the WHITESPACE rule) for the open parenthesis.
+        // The whitespace stays in the input, to be lexed as WHITESPACE after this token.
+        let i = 1;
+        let input = this._input.LA(i);
         if (this.isSqlModeActive(SqlMode.IgnoreSpace)) {
-            while (input === " " || input === "\t" || input === "\r" || input === "\n") {
-                this._interp.consume(this._input);
-                //                this.channel = Lexer.HIDDEN;
-                this._type = MySQLLexer.WHITESPACE;
-                input = String.fromCharCode(this._input.LA(1));
+            while (input === 0x20 || input === 0x09 || input === 0x0C || input === 0x0D || input === 0x0A) {
+                input = this._input.LA(++i);
             }
         }
-        return input === "(" ? proposed : MySQLLexer.IDENTIFIER;
+        return input === 0x28 ? proposed : MySQLLexer.IDENTIFIER;
     }
     /**
      * Checks the given text and determines the smallest number type from it. Code has been taken from sql_lex.cc.

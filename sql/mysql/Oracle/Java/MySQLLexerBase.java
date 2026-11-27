@@ -82,13 +82,13 @@ public abstract class MySQLLexerBase extends Lexer {
     }
 
     protected int determineFunction(int proposed) {
-        char input = (char) this._input.LA(1);
+        // With IGNORE_SPACE, look past whitespace (the characters of the WHITESPACE rule) for the open parenthesis.
+        // The whitespace stays in the input, to be lexed as WHITESPACE after this token.
+        int i = 1;
+        int input = this._input.LA(i);
         if (this.isSqlModeActive(SqlMode.IgnoreSpace)) {
-            while (input == ' ' || input == '\t' || input == '\r' || input == '\n') {
-                this.getInterpreter().consume(this._input);
-                this._channel = HIDDEN;
-                this._type = MySQLLexer.WHITESPACE;
-                input = (char) this._input.LA(1);
+            while (input == ' ' || input == '\t' || input == '\f' || input == '\r' || input == '\n') {
+                input = this._input.LA(++i);
             }
         }
         return input == '(' ? proposed : MySQLLexer.IDENTIFIER;
