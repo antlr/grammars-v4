@@ -345,6 +345,48 @@ do
             fi
         fi
 
+        # Build and time the generated OphiRust parser separately. The input
+        # paths from test.sh are relative to the grammar directory, while the
+        # Rust executable runs from Generated-OphiRust.
+        ttr_stat='n.a.'
+        prr_stat='n.a.'
+        rust_log="$tmpdir/$(echo "$testname" | tr '/' '_')_ophirust_build.txt"
+        if (cd .. && dotnet trash gen -t OphiRust) > "$rust_log" 2>&1 &&
+            (cd ../Generated-OphiRust && bash build.sh) >> "$rust_log" 2>&1; then
+            rust_exe=./target/release/test
+            [[ "$machine" == MinGw ]] && rust_exe+=.exe
+            if printf '../%s\n' "${files[@]}" |
+                (cd ../Generated-OphiRust && "$rust_exe" -x) > /dev/null 2>&1; then
+                run_ttr=()
+                run_prr=()
+                rust_ok=true
+                for ((run=1; run<=N; run++)); do
+                    echo "=== $testname OphiRust run $run/$N ==="
+                    runfile="$tmpdir/$(echo "$testname" | tr '/' '_')_ophirust_run${run}.txt"
+                    printf '../%s\n' "${files[@]}" |
+                        (cd ../Generated-OphiRust && "$rust_exe" -x --perf) 2>&1 |
+                        tee "$runfile"
+                    parse_status=${PIPESTATUS[1]}
+                    run_time=$(awk '/^TT:/{print $NF}' "$runfile" | tail -1)
+                    run_rate=$(awk '/^PR:/{print $NF}' "$runfile" | tail -1)
+                    if (( parse_status != 0 )) || [[ -z "$run_time" || -z "$run_rate" ]]; then
+                        rust_ok=false
+                        break
+                    fi
+                    run_ttr+=("$run_time")
+                    run_prr+=("$run_rate")
+                done
+                if [[ "$rust_ok" == true ]]; then
+                    ttr_stat=$(compute_stats "${run_ttr[@]}")
+                    prr_stat=$(compute_stats "${run_prr[@]}")
+                fi
+            else
+                echo "OphiRust warm-up failed for $testname; TTR and PRR are n.a." >&2
+            fi
+        else
+            echo "OphiRust build failed for $testname; TTR and PRR are n.a. See $rust_log" >&2
+        fi
+
         # Match the top-level parser selected by trgen to its source .g4.
         # A combined grammar named Foo produces the top-level FooParser.
         combined=no
@@ -366,7 +408,7 @@ do
         done
 
         row_number=$((${#table_rows[@]} + 1))
-        table_rows+=("| ${row_number} | ${testname} | ${tt_stat} | ${ttt_stat} | ${tps_stat} | ${prt_stat} | ${ambiguity_count} | ${action_count} | ${combined} |")
+        table_rows+=("| ${row_number} | ${testname} | ${tt_stat} | ${ttt_stat} | ${ttr_stat} | ${tps_stat} | ${prt_stat} | ${prr_stat} | ${ambiguity_count} | ${action_count} | ${combined} |")
         popd > /dev/null
     done
     popd > /dev/null
@@ -396,15 +438,17 @@ if [ ${#table_rows[@]} -gt 0 ]; then
 | `Number` | Current row position in the Results table |
 | `TTN` | **Total time, native C#** — overall wall-clock time for the generated C# parser run |
 | `TTT` | **Total time, table-driven interpreter** — overall wall-clock time for `dotnet trash parse --allstar`; `n.a.` when the grammar requires target-language actions or a custom superclass |
+| `TTR` | **Total time, OphiRust** — overall wall-clock time for the generated OphiRust parser; `n.a.` when generation, build, or parse fails |
 | `PRN` | **Parse rate, native C#** — `total tokens / PT` for the generated C# parser |
 | `PRT` | **Parse rate, table-driven interpreter** — `total tokens / PT` for `dotnet trash parse --allstar`; `n.a.` when TTT is unavailable |
+| `PRR` | **Parse rate, OphiRust** — `total tokens / PT` for the generated OphiRust parser; `n.a.` when TTR is unavailable |
 | `Combined` | `yes` if the top-level grammar is combined and has no `tokenVocab` option; otherwise `no` |
 
 ### Results
 
 EOF
-        echo "| Number | Grammar Name | TTN (s) | TTT (s) | PRN (t/s) | PRT (t/s) | Ambiguities | Actions | Combined |"
-        echo "|--------|--------------|---------|---------|-----------|-----------|-------------|---------|----------|"
+        echo "| Number | Grammar Name | TTN (s) | TTT (s) | TTR (s) | PRN (t/s) | PRT (t/s) | PRR (t/s) | Ambiguities | Actions | Combined |"
+        echo "|--------|--------------|---------|---------|---------|-----------|-----------|-----------|-------------|---------|----------|"
         for row in "${table_rows[@]}"; do
             echo "$row"
         done
