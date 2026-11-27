@@ -1,0 +1,16 @@
+/* PERFORM calls an internal subroutine defined with DEFINE SUBROUTINE
+/* ... END-SUBROUTINE; subroutines share the module's data area rather
+/* than taking parameters.
+DEFINE DATA LOCAL
+1 #X (I4)
+1 #Y (I4)
+END-DEFINE
+
+MOVE 5 TO #X
+PERFORM SQUAREIT
+WRITE #Y
+
+DEFINE SUBROUTINE SQUAREIT
+  COMPUTE #Y = #X * #X
+END-SUBROUTINE
+END
