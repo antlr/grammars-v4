@@ -1,0 +1,14 @@
+% A minimal Euclid program: a module that imports a routine, defines a
+% procedure that explicitly imports what it needs, and calls it.
+
+module Hello =
+imports (Put)
+begin
+    procedure Greet()
+    imports (var Put)
+    begin
+        Put("Hello, Euclid!");
+    end Greet
+
+    Greet();
+end Hello

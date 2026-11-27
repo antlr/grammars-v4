@@ -1,0 +1,13 @@
+% if / then / else.
+
+module Conditionals =
+begin
+    var x : integer;
+
+    x := 5;
+    if x > 0 then
+        x := x + 1;
+    else
+        x := x - 1;
+    end if
+end Conditionals

@@ -1,0 +1,12 @@
+% var declarations and ordinary arithmetic assignment.
+
+module Arithmetic =
+begin
+    var a : integer;
+    var b : integer;
+    var total : integer;
+
+    a := 10;
+    b := 3;
+    total := a + b * 2;
+end Arithmetic

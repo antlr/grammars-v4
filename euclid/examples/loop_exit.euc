@@ -1,0 +1,13 @@
+% Euclid's single looping construct ("loop ... end loop"), left with
+% "exit" or "exit when" rather than an arbitrary goto.
+
+module LoopExit =
+begin
+    var i : integer;
+
+    i := 0;
+    loop
+        exit when i >= 10;
+        i := i + 1;
+    end loop
+end LoopExit

@@ -1,0 +1,14 @@
+% A record type and field access/assignment.
+
+module Records =
+begin
+    type Point = record
+        x : integer;
+        y : integer;
+    end record;
+
+    var p : Point;
+
+    p.x := 3;
+    p.y := 4;
+end Records

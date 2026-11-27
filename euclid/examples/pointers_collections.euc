@@ -1,0 +1,18 @@
+% Euclid restricts pointers to elements of a declared "collection" (for
+% verifiability); new/free allocate and release them.
+
+module PointersDemo =
+begin
+    type Node = record
+        value : integer;
+        next : pointer to Node;
+    end record;
+
+    type NodePtr = collection of pointer to Node;
+
+    var list : NodePtr;
+    var p : pointer to Node;
+
+    new(p);
+    free(p);
+end PointersDemo

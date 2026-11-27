@@ -1,0 +1,18 @@
+% A function - a closed scope that must explicitly import what it
+% uses, and returns a value via "result" rather than an assignment to
+% its own name.
+
+module MathOps =
+begin
+    function Square(n : integer) : integer
+    imports (n)
+    begin
+        result n * n;
+    end Square
+
+    var x : integer;
+    var y : integer;
+
+    x := 5;
+    y := Square(x);
+end MathOps
