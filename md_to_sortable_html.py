@@ -123,8 +123,8 @@ def comparison_classes(headers, row):
     """Highlight the best and worst available mean within each metric group."""
     classes = {}
     for names, lower_is_better in (
-        ({'TTN', 'TTT', 'TTR'}, True),
-        ({'PRN', 'PRT', 'PRR'}, False),
+        ({'TTN', 'TTT', 'TTR', 'TTJ', 'TTD', 'TTG'}, True),
+        ({'PRN', 'PRT', 'PRR', 'PRJ', 'PRD', 'PRG'}, False),
     ):
         values = {
             i: parse_num(row[i])
