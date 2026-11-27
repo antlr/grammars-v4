@@ -1,0 +1,16 @@
+-- A FUNCTION (a local declaration, then VALOF/RESULT to produce its
+-- value) called from a PROC.
+
+INT FUNCTION square (VAL INT n)
+  INT result:
+  VALOF
+    SEQ
+      result := n * n
+    RESULT result
+:
+
+PROC showsquare (VAL INT n, CHAN OF INT out)
+  out ! square(n)
+:
+
+showsquare(5, out)

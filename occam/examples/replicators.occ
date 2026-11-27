@@ -1,0 +1,7 @@
+-- A replicated SEQ ("SEQ i = 0 FOR 10") is occam's counted-loop form.
+
+INT total:
+SEQ
+  total := 0
+  SEQ i = 0 FOR 10
+    total := total + i

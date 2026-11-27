@@ -1,0 +1,13 @@
+-- CASE selects an alternative by matching the selector's value against
+-- one or more comma-separated labels; ELSE is the default.
+
+INT n:
+SEQ
+  n := 2
+  CASE n
+    0
+      SKIP
+    1, 2
+      SKIP
+    ELSE
+      STOP

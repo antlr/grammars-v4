@@ -1,0 +1,11 @@
+-- IF is a list of guard/process pairs, tried in order; TRUE is the
+-- conventional final "else" guard.
+
+INT a:
+SEQ
+  a := 5
+  IF
+    a > 0
+      SKIP
+    TRUE
+      STOP

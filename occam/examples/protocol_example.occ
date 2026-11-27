@@ -1,0 +1,9 @@
+-- A sequential PROTOCOL (a channel carrying two INTs per message), a
+-- DATA TYPE alias, and receiving both fields of one message.
+
+PROTOCOL PAIR IS INT; INT:
+DATA TYPE MYINT IS INT:
+CHAN OF PAIR p:
+INT a, b:
+SEQ
+  p ? a; b

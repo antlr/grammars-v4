@@ -1,0 +1,10 @@
+-- ALT waits on whichever of several channel inputs becomes ready first.
+
+CHAN OF INT c1, c2:
+INT x:
+SEQ
+  ALT
+    c1 ? x
+      SKIP
+    c2 ? x
+      SKIP

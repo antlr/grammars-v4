@@ -1,0 +1,7 @@
+-- INT declarations and ordinary arithmetic assignment.
+
+INT a, b, result:
+SEQ
+  a := 10
+  b := 3
+  result := a + b * 2
