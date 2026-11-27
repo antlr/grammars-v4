@@ -1,0 +1,12 @@
+/* MOVE assigns a literal value; COMPUTE evaluates an expression.
+DEFINE DATA LOCAL
+1 #A (I4)
+1 #B (I4)
+1 #TOTAL (I4)
+END-DEFINE
+
+MOVE 10 TO #A
+MOVE 3 TO #B
+COMPUTE #TOTAL = #A + #B * 2
+WRITE #TOTAL
+END

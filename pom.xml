@@ -335,6 +335,7 @@
 				<module>mumath</module>
 				<module>mumps</module>
 				<module>muparser</module>
+				<module>natural</module>
 				<module>newick</module>
 				<module>nock</module>
 				<module>oberon</module>
