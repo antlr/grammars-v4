@@ -337,6 +337,7 @@
 				<module>newick</module>
 				<module>nock</module>
 				<module>oberon</module>
+				<module>occam</module>
 				<module>ocl</module>
                 <module>odin</module>
                 <module>orc</module>

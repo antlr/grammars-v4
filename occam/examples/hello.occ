@@ -1,0 +1,13 @@
+-- A minimal occam program: a PROC taking an output channel, sent each
+-- character of "Hello" one at a time, then instantiated.
+
+PROC hello (CHAN OF BYTE out)
+  SEQ
+    out ! 'H'
+    out ! 'e'
+    out ! 'l'
+    out ! 'l'
+    out ! 'o'
+:
+
+hello(out)

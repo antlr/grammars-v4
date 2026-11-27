@@ -1,0 +1,8 @@
+-- A channel declaration, and PAR running an output and the matching
+-- input concurrently.
+
+CHAN OF INT c:
+INT x:
+PAR
+  c ! 42
+  c ? x

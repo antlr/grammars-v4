@@ -1,0 +1,7 @@
+-- WHILE loop.
+
+INT n:
+SEQ
+  n := 0
+  WHILE n < 10
+    n := n + 1
