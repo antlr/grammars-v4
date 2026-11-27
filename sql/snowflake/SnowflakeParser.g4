@@ -130,7 +130,7 @@ delete_statement
     ;
 
 values_builder
-    : VALUES '(' expr_list ')' (COMMA '(' expr_list ')')?
+    : VALUES '(' expr_list ')' (COMMA '(' expr_list ')')*
     ;
 
 other_command
