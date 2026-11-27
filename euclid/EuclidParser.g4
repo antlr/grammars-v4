@@ -134,7 +134,7 @@ stmt
     | assumeStmt SEMI
     | returnStmt SEMI
     | resultStmt SEMI
-    | newStmt SEMI
+    | allocStmt SEMI
     | freeStmt SEMI
     | ifStmt
     | loopStmt
@@ -175,7 +175,7 @@ resultStmt
     : RESULT expr
     ;
 
-newStmt
+allocStmt
     : NEW LPAREN variable RPAREN
     ;
 
