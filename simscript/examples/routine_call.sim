@@ -1,0 +1,12 @@
+!! a routine with parameters and a RETURN value, invoked with CALL
+MAIN
+    CALL SQUARE GIVEN 7
+    WORK 2 UNITS
+    STOP
+END
+
+ROUTINE TO SQUARE GIVEN N
+    LET RESULT = N * N
+    PRINT RESULT
+    RETURN RESULT
+END

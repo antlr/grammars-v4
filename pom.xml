@@ -335,6 +335,7 @@
 				<module>mumath</module>
 				<module>mumps</module>
 				<module>muparser</module>
+				<module>natural</module>
 				<module>newick</module>
 				<module>nock</module>
 				<module>oberon</module>
@@ -392,6 +393,7 @@
 				<module>racket-bsl</module>
 				<module>racket-isl</module>
                 <module>rapid</module>
+				<module>ratfor</module>
 				<module>rcs</module>
                 <module>reaper</module>
 				<module>recfile</module>
@@ -420,11 +422,13 @@
 				<module>scss</module>
 				<module>sdl</module>
 				<module>semver</module>
+				<module>setl</module>
 				<module>sexpression</module>
 				<module>sgf</module>
 				<module>sharc</module>
 				<module>sici</module>
 				<module>sieve</module>
+                <module>simscript</module>
                 <module>simula</module>
                 <module>small</module>
 				<module>smalltalk</module>

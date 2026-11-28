@@ -1,0 +1,9 @@
+!! IF / ELSE / ALWAYS conditional block
+MAIN
+    LET N = -4
+    IF N > 0
+        PRINT "positive"
+    ELSE
+        PRINT "non-positive"
+    ALWAYS
+END

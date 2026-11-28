@@ -1,0 +1,15 @@
+$ a recursive procedure (factorial) called from the main program
+program procedure_example;
+    var n, result;
+
+    procedure fact(n);
+        if n <= 1 then
+            return 1;
+        end if;
+        return n * fact(n - 1);
+    end fact;
+
+    n := 5;
+    result := fact(n);
+    print(result);
+end procedure_example;

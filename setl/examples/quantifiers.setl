@@ -1,0 +1,9 @@
+$ existential and universal quantifiers
+program quantifiers;
+    var s, hasEven, allPositive;
+    s := {1, 2, 3, 4, 5};
+    hasEven := exists x in s | x mod 2 = 0;
+    allPositive := forall x in s | x > 0;
+    print(hasEven);
+    print(allPositive);
+end quantifiers;

@@ -1,0 +1,8 @@
+/* INPUT prompts for a value; DISPLAY shows labeled output.
+DEFINE DATA LOCAL
+1 #NAME (A20)
+END-DEFINE
+
+INPUT 'Enter name:' #NAME
+DISPLAY 'Name' #NAME
+END
