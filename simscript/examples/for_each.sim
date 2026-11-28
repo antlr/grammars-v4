@@ -1,0 +1,8 @@
+!! FOR EACH ... IN ... WITH ... DO ... LOOP
+MAIN
+    LET TOTAL = 0
+    FOR EACH C IN CUSTOMERS WITH C > 0 DO
+        ADD C TO TOTAL
+    LOOP
+    PRINT TOTAL
+END

@@ -428,6 +428,7 @@
 				<module>sharc</module>
 				<module>sici</module>
 				<module>sieve</module>
+                <module>simscript</module>
                 <module>simula</module>
                 <module>small</module>
 				<module>smalltalk</module>

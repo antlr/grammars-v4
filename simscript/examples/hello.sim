@@ -1,0 +1,4 @@
+!! print a greeting
+MAIN
+    PRINT "Hello, SIMSCRIPT!"
+END
