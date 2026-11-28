@@ -393,6 +393,7 @@
 				<module>racket-bsl</module>
 				<module>racket-isl</module>
                 <module>rapid</module>
+				<module>ratfor</module>
 				<module>rcs</module>
                 <module>reaper</module>
 				<module>recfile</module>
