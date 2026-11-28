@@ -1,0 +1,11 @@
+$ while loop summing 1..10
+program while_loop;
+    var i, total;
+    i := 1;
+    total := 0;
+    while i <= 10 loop
+        total := total + i;
+        i := i + 1;
+    end loop;
+    print(total);
+end while_loop;

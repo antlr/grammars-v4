@@ -1,0 +1,4 @@
+$ print a greeting
+program hello;
+    print("Hello, SETL!");
+end hello;

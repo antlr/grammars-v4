@@ -1,0 +1,13 @@
+$ if / elseif / else
+program if_else;
+    var n, result;
+    n := -3;
+    if n > 0 then
+        result := "positive";
+    elseif n < 0 then
+        result := "negative";
+    else
+        result := "zero";
+    end if;
+    print(result);
+end if_else;

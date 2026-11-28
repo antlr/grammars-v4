@@ -1,0 +1,12 @@
+$ basic set operations
+program set_literal;
+    var s, t, u;
+    s := {1, 2, 3};
+    t := {3, 4, 5};
+    u := s union t;
+    print(u);
+    print(s inter t);
+    print(s less 1);
+    print(s with 9);
+    print(#s);
+end set_literal;
