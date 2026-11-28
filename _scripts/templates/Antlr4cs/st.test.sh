@@ -57,7 +57,7 @@ fi
 mkdir -p "$output_dir"
 
 # Parse all input files.
-runner=("$generated_dir/bin/Debug/net10.0/<if(os_win)>Test.exe<else>Test<endif>")
+runner=("$generated_dir/bin/Debug/net11.0/<if(os_win)>Test.exe<else>Test<endif>")
 <if(individual_parsing)>
 # Individual parsing.
 rm -f parse.txt

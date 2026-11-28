@@ -26,7 +26,7 @@ if ($files.Count -eq 0) {
 }
 
 # Parse inputs; all generated artifacts stay under this generated app.
-$runner = @("$generatedDir/bin/Debug/net10.0/<if(os_win)>Test.exe<else>Test<endif>")
+$runner = @("$generatedDir/bin/Debug/net11.0/<if(os_win)>Test.exe<else>Test<endif>")
 Push-Location -LiteralPath $sourceRoot
 try {
 <if(individual_parsing)>
