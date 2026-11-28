@@ -1,0 +1,7 @@
+!! LET assignment with arithmetic expressions
+MAIN
+    LET X = 3
+    LET Y = 4
+    LET Z = X * X + Y * Y
+    PRINT Z
+END

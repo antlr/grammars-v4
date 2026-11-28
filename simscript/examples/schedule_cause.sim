@@ -1,0 +1,14 @@
+!! scheduling and immediately causing event notices
+PREAMBLE
+    EVENT NOTICES INCLUDE ARRIVAL, DEPARTURE.
+END
+
+MAIN
+    SCHEDULE AN ARRIVAL IN 5 UNITS
+    SCHEDULE A DEPARTURE GIVEN 1 IN 10 UNITS
+    CAUSE AN ARRIVAL
+END
+
+EVENT TO ARRIVAL
+    PRINT "customer arrived"
+END

@@ -1,0 +1,10 @@
+!! WHILE ... DO ... LOOP
+MAIN
+    LET I = 1
+    LET TOTAL = 0
+    WHILE I <= 10 DO
+        ADD I TO TOTAL
+        LET I = I + 1
+    LOOP
+    PRINT TOTAL
+END
