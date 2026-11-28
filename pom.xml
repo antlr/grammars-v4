@@ -421,6 +421,7 @@
 				<module>scss</module>
 				<module>sdl</module>
 				<module>semver</module>
+				<module>setl</module>
 				<module>sexpression</module>
 				<module>sgf</module>
 				<module>sharc</module>

@@ -1,0 +1,11 @@
+$ case statement
+program case_stmt;
+    var day, name;
+    day := 3;
+    case day of
+        1, 7 => name := "weekend";
+        2, 3, 4, 5, 6 => name := "weekday";
+        otherwise => name := "unknown";
+    end case;
+    print(name);
+end case_stmt;

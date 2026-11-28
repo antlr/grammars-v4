@@ -1,0 +1,8 @@
+$ tuples and indexing
+program tuple_literal;
+    var t;
+    t := [10, 20, 30, 40];
+    print(t(1));
+    print(t(1..2));
+    print(#t);
+end tuple_literal;
