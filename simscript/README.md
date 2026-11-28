@@ -17,7 +17,7 @@ https://en.wikipedia.org/wiki/SIMSCRIPT
 
 No freely-available, authoritative SIMSCRIPT II.5 language reference manual
 could be located online -- CACI's current corporate site no longer hosts one
-(`https://www.caci.com/simscript` returns HTTP 404), and the canonical
+(`www.caci.com/simscript` returns HTTP 404), and the canonical
 language references are print-only books: Philip J. Kiviat's *Simscript
 II.5: Programming Language* (CACI, 1973) and C. Russell's *Building
 Simulation Models with SIMSCRIPT II.5* (CACI, 1983), neither of which has a
