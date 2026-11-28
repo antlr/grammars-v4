@@ -1,0 +1,2 @@
+line 1:9 mismatched input '(' expecting '='
+line 1:11 mismatched input ')' expecting {REMARK, 'DATA', GOTO, GOSUB, 'DEF', 'DIM', 'END', 'FOR', 'IF', 'INPUT', 'LET', 'NEXT', 'ON', 'OPTION', 'PRINT', 'RANDOMIZE', 'READ', 'RESTORE', 'RETURN', 'STOP'}

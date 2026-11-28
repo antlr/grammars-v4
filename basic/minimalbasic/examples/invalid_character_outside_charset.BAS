@@ -1,0 +1,2 @@
+10 PRINT "A|B"
+20 END

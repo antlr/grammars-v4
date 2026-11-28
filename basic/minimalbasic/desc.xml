@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/kaby76/Trash/raw/refs/heads/main/desc.xsd">
+   <antlr-version>^4.13.0</antlr-version>
+   <targets>Cpp;CSharp;Dart;Go;Java;JavaScript;PHP;Python3;TypeScript;Antlr4ng</targets>
+   <entry-point>program</entry-point>
+   <test>
+      <inputs>examples;!examples/invalid_array_name_with_digit.BAS;!examples/invalid_character_outside_charset.BAS;!examples/invalid_data_trailing_comma.BAS;!examples/invalid_def_two_parameters.BAS;!examples/invalid_dim_non_integer_bound.BAS;!examples/invalid_function_two_arguments.BAS;!examples/invalid_if_without_line_number.BAS;!examples/invalid_next_with_subscript.BAS;!examples/invalid_sign_after_operator.BAS;!examples/invalid_string_concatenation.BAS;!examples/invalid_string_less_than.BAS;!examples/invalid_string_subscript.BAS;!examples/invalid_tab_outside_print.BAS</inputs>
+   </test>
+   <test>
+      <name>Negative</name>
+      <inputs>examples/invalid_array_name_with_digit.BAS;examples/invalid_character_outside_charset.BAS;examples/invalid_data_trailing_comma.BAS;examples/invalid_def_two_parameters.BAS;examples/invalid_dim_non_integer_bound.BAS;examples/invalid_function_two_arguments.BAS;examples/invalid_if_without_line_number.BAS;examples/invalid_next_with_subscript.BAS;examples/invalid_sign_after_operator.BAS;examples/invalid_string_concatenation.BAS;examples/invalid_string_less_than.BAS;examples/invalid_string_subscript.BAS;examples/invalid_tab_outside_print.BAS</inputs>
+   </test>
+</desc>

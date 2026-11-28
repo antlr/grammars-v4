@@ -1,0 +1,2 @@
+10 IF A$<B$ THEN 20
+20 END

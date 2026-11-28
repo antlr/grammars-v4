@@ -1,0 +1,2 @@
+10 LET A=TAB(3)
+20 END

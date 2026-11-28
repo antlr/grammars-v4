@@ -13,6 +13,7 @@
 
   <modules>
     <module>fullbasic</module>
+    <module>minimalbasic</module>
     <module>jvmBasic</module>
   </modules>
 </project>

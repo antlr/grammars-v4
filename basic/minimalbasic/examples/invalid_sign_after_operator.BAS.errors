@@ -1,0 +1,1 @@
+line 1:11 extraneous input '-' expecting {'ABS', 'ATN', 'COS', 'EXP', 'INT', 'LOG', 'RND', 'SGN', 'SIN', 'SQR', 'TAN', FN_NAME, LETTER_DIGIT_NAME, LETTER_NAME, INTEGER, REAL, '('}

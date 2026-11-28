@@ -1,0 +1,2 @@
+10 DEF FNA(X,Y)=X+Y
+20 END
