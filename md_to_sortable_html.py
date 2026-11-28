@@ -119,6 +119,30 @@ def render_static_table(tbl):
     out += '</tbody>\n</table>\n'
     return out
 
+def comparison_classes(headers, row):
+    """Highlight the best and worst available mean within each metric group."""
+    classes = {}
+    for names, lower_is_better in (
+        ({'TTC', 'TT*', 'TTR', 'TTJ', 'TTD', 'TTG'}, True),
+        ({'PRC', 'PR*', 'PRR', 'PRJ', 'PRD', 'PRG'}, False),
+    ):
+        values = {
+            i: parse_num(row[i])
+            for i, header in enumerate(headers)
+            if header.split()[0] in names and i < len(row)
+        }
+        values = {i: value for i, value in values.items() if value is not None}
+        if len(values) < 2 or min(values.values()) == max(values.values()):
+            continue
+        best = min(values.values()) if lower_is_better else max(values.values())
+        worst = max(values.values()) if lower_is_better else min(values.values())
+        for i, value in values.items():
+            if value == best:
+                classes[i] = 'metric-best'
+            elif value == worst:
+                classes[i] = 'metric-worst'
+    return classes
+
 def render_sortable_table(tbl, table_id):
     headers = tbl['headers']
     rows = tbl['rows']
@@ -137,8 +161,11 @@ def render_sortable_table(tbl, table_id):
             out += f'  <th onclick="sortTable(\'{table_id}\',{i})">{h(hdr)}</th>\n'
     out += '</tr></thead>\n<tbody>\n'
     for row in rows:
-        out += '<tr>' + ''.join(f'<td>{render_cell(tbl, i, c)}</td>'
-                                  for i, c in enumerate(row)) + '</tr>\n'
+        classes = comparison_classes(headers, row)
+        out += '<tr>' + ''.join(
+            f'<td class="{classes[i]}">{render_cell(tbl, i, c)}</td>'
+            if i in classes else f'<td>{render_cell(tbl, i, c)}</td>'
+            for i, c in enumerate(row)) + '</tr>\n'
     out += '</tbody>\n</table>\n'
 
     out += f"""<script>
@@ -210,6 +237,8 @@ out = f"""<!DOCTYPE html>
   .key-table td {{ text-align: left; }}
   .combined-yes {{ color: #176b38; font-weight: 600; }}
   .combined-no {{ color: #8d2932; font-weight: 600; }}
+  #perf-table td.metric-best {{ background: #d9f2df; color: #176b38; font-weight: 600; }}
+  #perf-table td.metric-worst {{ background: #f9dddd; color: #8d2932; font-weight: 600; }}
 </style>
 </head>
 <body>

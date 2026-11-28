@@ -338,12 +338,106 @@ do
                         prt_stat=$(compute_stats "${run_prt[@]}")
                     fi
                 else
-                    echo "AllStar warm-up failed for $testname; TTT is n.a." >&2
+                    echo "AllStar warm-up failed for $testname; TT* is n.a." >&2
                 fi
             else
-                echo "AllStar table generation failed for $testname; TTT is n.a. See $interp_log" >&2
+                echo "AllStar table generation failed for $testname; TT* is n.a. See $interp_log" >&2
             fi
         fi
+
+        # Build and time OphiRust only for grammars eligible for AllStar. The input
+        # paths from test.sh are relative to the grammar directory, while the
+        # Rust executable runs from Generated-OphiRust.
+        ttr_stat='n.a.'
+        prr_stat='n.a.'
+        if [[ "$action_free" == true ]]; then
+        rust_log="$tmpdir/$(echo "$testname" | tr '/' '_')_ophirust_build.txt"
+        if (cd .. && dotnet trash gen -t OphiRust --force) > "$rust_log" 2>&1 &&
+            (cd ../Generated-OphiRust && bash build.sh) >> "$rust_log" 2>&1; then
+            rust_exe=./target/release/test
+            [[ "$machine" == MinGw ]] && rust_exe+=.exe
+            if printf '../%s\n' "${files[@]}" |
+                (cd ../Generated-OphiRust && "$rust_exe" -x) > /dev/null 2>&1; then
+                run_ttr=()
+                run_prr=()
+                rust_ok=true
+                for ((run=1; run<=N; run++)); do
+                    echo "=== $testname OphiRust run $run/$N ==="
+                    runfile="$tmpdir/$(echo "$testname" | tr '/' '_')_ophirust_run${run}.txt"
+                    printf '../%s\n' "${files[@]}" |
+                        (cd ../Generated-OphiRust && "$rust_exe" -x --perf) 2>&1 |
+                        tee "$runfile"
+                    parse_status=${PIPESTATUS[1]}
+                    run_time=$(awk '/^TT:/{print $NF}' "$runfile" | tail -1)
+                    run_rate=$(awk '/^PR:/{print $NF}' "$runfile" | tail -1)
+                    if (( parse_status != 0 )) || [[ -z "$run_time" || -z "$run_rate" ]]; then
+                        rust_ok=false
+                        break
+                    fi
+                    run_ttr+=("$run_time")
+                    run_prr+=("$run_rate")
+                done
+                if [[ "$rust_ok" == true ]]; then
+                    ttr_stat=$(compute_stats "${run_ttr[@]}")
+                    prr_stat=$(compute_stats "${run_prr[@]}")
+                fi
+            else
+                echo "OphiRust warm-up failed for $testname; TTR and PRR are n.a." >&2
+            fi
+        else
+            echo "OphiRust build failed for $testname; TTR and PRR are n.a. See $rust_log" >&2
+        fi
+        fi
+
+        # Measure the other generated targets on the same inputs. Each target
+        # gets its own build and one discarded warm-up before the timed runs.
+        ttj_stat='n.a.'; prj_stat='n.a.'
+        ttd_stat='n.a.'; prd_stat='n.a.'
+        ttg_stat='n.a.'; prg_stat='n.a.'
+        for extra_target in Java Dart Go; do
+            extra_log="$tmpdir/$(echo "$testname" | tr '/' '_')_${extra_target}_build.txt"
+            if ! (cd .. && dotnet trash gen -t "$extra_target" --force) > "$extra_log" 2>&1 ||
+               ! (cd "../Generated-$extra_target" && bash build.sh) >> "$extra_log" 2>&1; then
+                echo "$extra_target build failed for $testname; TT and PR are n.a. See $extra_log" >&2
+                continue
+            fi
+            if ! printf '../%s\n' "${files[@]}" |
+                (cd "../Generated-$extra_target" && bash run.sh -x) > /dev/null 2>&1; then
+                echo "$extra_target warm-up failed for $testname; TT and PR are n.a." >&2
+                continue
+            fi
+
+            run_extra_tt=()
+            run_extra_pr=()
+            extra_ok=true
+            for ((run=1; run<=N; run++)); do
+                echo "=== $testname $extra_target run $run/$N ==="
+                runfile="$tmpdir/$(echo "$testname" | tr '/' '_')_${extra_target}_run${run}.txt"
+                printf '../%s\n' "${files[@]}" |
+                    (cd "../Generated-$extra_target" && bash run.sh -x --perf) 2>&1 |
+                    tee "$runfile"
+                parse_status=${PIPESTATUS[1]}
+                run_time=$(awk '/^TT:/{print $NF}' "$runfile" | tail -1)
+                run_rate=$(awk '/^PR:/{print $NF}' "$runfile" | tail -1)
+                if (( parse_status != 0 )) || [[ -z "$run_time" || -z "$run_rate" ]]; then
+                    extra_ok=false
+                    break
+                fi
+                run_extra_tt+=("$run_time")
+                run_extra_pr+=("$run_rate")
+            done
+            if [[ "$extra_ok" == true ]]; then
+                extra_tt_stat=$(compute_stats "${run_extra_tt[@]}")
+                extra_pr_stat=$(compute_stats "${run_extra_pr[@]}")
+                case "$extra_target" in
+                    Java) ttj_stat=$extra_tt_stat; prj_stat=$extra_pr_stat ;;
+                    Dart) ttd_stat=$extra_tt_stat; prd_stat=$extra_pr_stat ;;
+                    Go)   ttg_stat=$extra_tt_stat; prg_stat=$extra_pr_stat ;;
+                esac
+            else
+                echo "$extra_target parse failed for $testname; TT and PR are n.a." >&2
+            fi
+        done
 
         # Match the top-level parser selected by trgen to its source .g4.
         # A combined grammar named Foo produces the top-level FooParser.
@@ -366,7 +460,7 @@ do
         done
 
         row_number=$((${#table_rows[@]} + 1))
-        table_rows+=("| ${row_number} | ${testname} | ${tt_stat} | ${ttt_stat} | ${tps_stat} | ${prt_stat} | ${ambiguity_count} | ${action_count} | ${combined} |")
+        table_rows+=("| ${row_number} | ${testname} | ${tt_stat} | ${ttt_stat} | ${ttr_stat} | ${ttj_stat} | ${ttd_stat} | ${ttg_stat} | ${tps_stat} | ${prt_stat} | ${prr_stat} | ${prj_stat} | ${prd_stat} | ${prg_stat} | ${ambiguity_count} | ${action_count} | ${combined} |")
         popd > /dev/null
     done
     popd > /dev/null
@@ -394,17 +488,25 @@ if [ ${#table_rows[@]} -gt 0 ]; then
 | Label | Description |
 |---|---|
 | `Number` | Current row position in the Results table |
-| `TTN` | **Total time, native C#** — overall wall-clock time for the generated C# parser run |
-| `TTT` | **Total time, table-driven interpreter** — overall wall-clock time for `dotnet trash parse --allstar`; `n.a.` when the grammar requires target-language actions or a custom superclass |
-| `PRN` | **Parse rate, native C#** — `total tokens / PT` for the generated C# parser |
-| `PRT` | **Parse rate, table-driven interpreter** — `total tokens / PT` for `dotnet trash parse --allstar`; `n.a.` when TTT is unavailable |
+| `TTC` | **Total time, native C#** — overall wall-clock time for the generated C# parser run |
+| `TT*` | **Total time, table-driven interpreter** — overall wall-clock time for `dotnet trash parse --allstar`; `n.a.` when the grammar requires target-language actions or a custom superclass |
+| `TTR` | **Total time, OphiRust** — overall wall-clock time for the generated OphiRust parser; `n.a.` when the grammar requires target-language actions or a custom superclass, or when generation, build, or parse fails |
+| `TTJ` | **Total time, Java** — overall wall-clock time for the generated Java parser; `n.a.` when generation, build, or parse fails |
+| `TTD` | **Total time, Dart** — overall wall-clock time for the generated Dart parser; `n.a.` when generation, build, or parse fails |
+| `TTG` | **Total time, Go** — overall wall-clock time for the generated Go parser; `n.a.` when generation, build, or parse fails |
+| `PRC` | **Parse rate, native C#** — `total tokens / PT` for the generated C# parser |
+| `PR*` | **Parse rate, table-driven interpreter** — `total tokens / PT` for `dotnet trash parse --allstar`; `n.a.` when `TT*` is unavailable |
+| `PRR` | **Parse rate, OphiRust** — `total tokens / PT` for the generated OphiRust parser; `n.a.` when TTR is unavailable |
+| `PRJ` | **Parse rate, Java** — `total tokens / PT` for the generated Java parser; `n.a.` when TTJ is unavailable |
+| `PRD` | **Parse rate, Dart** — `total tokens / PT` for the generated Dart parser; `n.a.` when TTD is unavailable |
+| `PRG` | **Parse rate, Go** — `total tokens / PT` for the generated Go parser; `n.a.` when TTG is unavailable |
 | `Combined` | `yes` if the top-level grammar is combined and has no `tokenVocab` option; otherwise `no` |
 
 ### Results
 
 EOF
-        echo "| Number | Grammar Name | TTN (s) | TTT (s) | PRN (t/s) | PRT (t/s) | Ambiguities | Actions | Combined |"
-        echo "|--------|--------------|---------|---------|-----------|-----------|-------------|---------|----------|"
+        echo "| Number | Grammar Name | TTC (s) | TT* (s) | TTR (s) | TTJ (s) | TTD (s) | TTG (s) | PRC (t/s) | PR* (t/s) | PRR (t/s) | PRJ (t/s) | PRD (t/s) | PRG (t/s) | Ambiguities | Actions | Combined |"
+        echo "|--------|--------------|---------|---------|---------|---------|---------|---------|-----------|-----------|-----------|-----------|-----------|-----------|-------------|---------|----------|"
         for row in "${table_rows[@]}"; do
             echo "$row"
         done
