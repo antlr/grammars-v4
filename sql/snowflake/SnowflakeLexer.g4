@@ -1220,7 +1220,8 @@ LINE_COMMENT   : '--' ~[\r\n]*                 -> channel(HIDDEN);
 LINE_COMMENT_2 : '//' ~[\r\n]*                 -> channel(HIDDEN);
 
 // TODO: ID can be not only Latin.
-DOUBLE_QUOTE_ID    : '"' ~'"'+ '"';
+// A doubled quote inside a quoted identifier is an escaped quote ("a""b").
+DOUBLE_QUOTE_ID    : '"' (~'"' | '""')+ '"';
 DOUBLE_QUOTE_BLANK : '""';
 SINGLE_QUOTE       : '\'';
 
